@@ -94,6 +94,7 @@ describe('AuthManager', () => {
   let mockStoreUser: jest.Mock;
   let mockOverlayAppend: jest.Mock;
   let mockOverlayRemove: jest.Mock;
+  let mockRevokeTokens: jest.Mock;
 
   beforeEach(() => {
     mockSigninPopup = jest.fn();
@@ -106,6 +107,7 @@ describe('AuthManager', () => {
     mockStoreUser = jest.fn();
     mockOverlayAppend = jest.fn();
     mockOverlayRemove = jest.fn();
+    mockRevokeTokens = jest.fn();
     (UserManager as jest.Mock).mockReturnValue({
       signinPopup: mockSigninPopup,
       signinCallback: mockSigninCallback,
@@ -115,6 +117,7 @@ describe('AuthManager', () => {
       getUser: mockGetUser,
       signinSilent: mockSigninSilent,
       storeUser: mockStoreUser,
+      revokeTokens: mockRevokeTokens,
     });
     (Overlay as jest.Mock).mockReturnValue({
       append: mockOverlayAppend,
@@ -140,11 +143,13 @@ describe('AuthManager', () => {
           userinfo_endpoint: `${config.authenticationDomain}/userinfo`,
           end_session_endpoint: `${config.authenticationDomain}${logoutEndpoint}`
             + `?client_id=${config.oidcConfiguration.clientId}`,
+          revocation_endpoint: `${config.authenticationDomain}/oauth/revoke`,
         },
         popup_redirect_uri: config.oidcConfiguration.popupRedirectUri,
         redirect_uri: config.oidcConfiguration.redirectUri,
         scope: config.oidcConfiguration.scope,
         userStore: expect.any(WebStorageStateStore),
+        revokeTokenTypes: ['refresh_token'],
       });
     });
 
@@ -159,6 +164,7 @@ describe('AuthManager', () => {
           extraQueryParams: {
             audience: configWithAudience.oidcConfiguration.audience,
           },
+          revokeTokenTypes: ['refresh_token'],
         }));
       });
     });
@@ -391,6 +397,7 @@ describe('AuthManager', () => {
 
       await manager.logout();
 
+      expect(mockRevokeTokens).toHaveBeenCalledWith(['refresh_token']);
       expect(mockSignoutRedirect).toBeCalled();
     });
 
@@ -402,6 +409,7 @@ describe('AuthManager', () => {
 
       await manager.logout();
 
+      expect(mockRevokeTokens).toHaveBeenCalledWith(['refresh_token']);
       expect(mockSignoutRedirect).toBeCalled();
     });
 
@@ -413,10 +421,46 @@ describe('AuthManager', () => {
 
       await manager.logout();
 
+      expect(mockRevokeTokens).toHaveBeenCalledWith(['refresh_token']);
       expect(mockSignoutSilent).toBeCalled();
     });
 
-    it('should throw an error if user is failed to logout', async () => {
+    describe('when revoking of refresh tokens fails', () => {
+      it('should throw an error for redirect logout', async () => {
+        const configuration = getConfig({
+          logoutMode: 'redirect',
+        });
+        const manager = new AuthManager(configuration);
+        mockRevokeTokens.mockRejectedValue(new Error(mockErrorMsg));
+
+        await expect(() => manager.logout()).rejects.toThrow(
+          new PassportError(
+            mockErrorMsg,
+            PassportErrorType.LOGOUT_ERROR,
+          ),
+        );
+        expect(mockSignoutRedirect).not.toHaveBeenCalled();
+      });
+
+      it('should throw an error for silent logout', async () => {
+        const configuration = getConfig({
+          logoutMode: 'silent',
+        });
+        const manager = new AuthManager(configuration);
+        mockRevokeTokens.mockRejectedValue(new Error(mockErrorMsg));
+
+        await expect(() => manager.logout()).rejects.toThrow(
+          new PassportError(
+            mockErrorMsg,
+            PassportErrorType.LOGOUT_ERROR,
+          ),
+        );
+        // In silent mode, signoutSilent is called in parallel with revokeTokens
+        expect(mockSignoutSilent).toHaveBeenCalled();
+      });
+    });
+
+    it('should throw an error if user is failed to logout with redirect', async () => {
       const configuration = getConfig({
         logoutMode: 'redirect',
       });
@@ -430,6 +474,24 @@ describe('AuthManager', () => {
           PassportErrorType.LOGOUT_ERROR,
         ),
       );
+      expect(mockRevokeTokens).toHaveBeenCalledWith(['refresh_token']);
+    });
+
+    it('should throw an error if user is failed to logout silently', async () => {
+      const configuration = getConfig({
+        logoutMode: 'silent',
+      });
+      const manager = new AuthManager(configuration);
+
+      mockSignoutSilent.mockRejectedValue(new Error(mockErrorMsg));
+
+      await expect(() => manager.logout()).rejects.toThrow(
+        new PassportError(
+          mockErrorMsg,
+          PassportErrorType.LOGOUT_ERROR,
+        ),
+      );
+      expect(mockRevokeTokens).toHaveBeenCalledWith(['refresh_token']);
     });
   });
 
