@@ -6,6 +6,7 @@ import { Amount, Coin, CoinAmount, ERC20, Native, Token } from '../types';
 import { DEFAULT_DEADLINE_SECONDS } from '../constants/router';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
+  // function quoteExactInput(bytes memory path, uint256 amountIn) external returns (uint256 amountOut, uint160[] memory sqrtPriceX96AfterList, uint32[] memory initializedTicksCrossedList, uint256 gasEstimate);
   // eslint-disable-next-line @typescript-eslint/naming-convention
   '0xcdca1753': ['uint256', 'uint160[]', 'uint32[]', 'uint256'],
   // eslint-disable-next-line @typescript-eslint/naming-convention

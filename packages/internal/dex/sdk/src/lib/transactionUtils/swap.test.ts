@@ -1,4 +1,4 @@
-import { TradeType } from '@uniswap/sdk-core';
+import { Percent, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { parseEther } from 'ethers';
 import {
@@ -76,6 +76,7 @@ const buildExactInputQuote = (tokenIn = IMX_TEST_TOKEN, tokenOut = FUN_TEST_TOKE
   amountIn: newAmountFromString('99', tokenIn),
   amountOut: newAmountFromString('990', tokenOut),
   tradeType: TradeType.EXACT_INPUT,
+  priceImpact: new Percent(0, 100),
 });
 
 const buildExactOutputQuote = (tokenIn = IMX_TEST_TOKEN, tokenOut = FUN_TEST_TOKEN): QuoteResult => ({
@@ -84,6 +85,7 @@ const buildExactOutputQuote = (tokenIn = IMX_TEST_TOKEN, tokenOut = FUN_TEST_TOK
   amountIn: newAmountFromString('100', tokenIn),
   amountOut: newAmountFromString('1000', tokenOut),
   tradeType: TradeType.EXACT_OUTPUT,
+  priceImpact: new Percent(0, 100),
 });
 
 const buildMultiExactInputQuote = (
@@ -96,6 +98,7 @@ const buildMultiExactInputQuote = (
   amountIn: newAmountFromString('99', tokenIn),
   amountOut: newAmountFromString('990', tokenOut),
   tradeType: TradeType.EXACT_INPUT,
+  priceImpact: new Percent(0, 100),
 });
 
 const buildMultiExactOutputQuote = (
@@ -108,6 +111,7 @@ const buildMultiExactOutputQuote = (
   amountIn: newAmountFromString('100', tokenIn),
   amountOut: newAmountFromString('1000', tokenOut),
   tradeType: TradeType.EXACT_OUTPUT,
+  priceImpact: new Percent(0, 100),
 });
 
 const tenPercentFees = (tokenIn: Coin): Fees =>
@@ -533,6 +537,7 @@ describe('adjustQuoteWithFees', () => {
           amountIn: newAmountFromString('9', nativeTokenService.wrappedToken), // has been wrapped
           amountOut: newAmountFromString('1', FUN_TEST_TOKEN),
           tradeType: TradeType.EXACT_INPUT,
+          priceImpact: new Percent(0, 100),
         };
         const userSpecifiedAmountIn = newAmountFromString('10', nativeTokenService.nativeToken);
 
@@ -607,6 +612,7 @@ describe('adjustQuoteWithFees', () => {
           amountIn: newAmountFromString('10', nativeTokenService.wrappedToken), // has been wrapped
           amountOut: newAmountFromString('1', FUN_TEST_TOKEN),
           tradeType: TradeType.EXACT_OUTPUT,
+          priceImpact: new Percent(0, 100),
         };
         const userSpecifiedAmountOut = quote.amountOut;
 
