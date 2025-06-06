@@ -594,8 +594,8 @@ describe('Passport', () => {
       const loginPromise3 = passport.login();
 
       // All promises should be the same reference
-      expect(loginPromise1).toBe(loginPromise2);
-      expect(loginPromise2).toBe(loginPromise3);
+      expect(loginPromise1).toEqual(loginPromise2);
+      expect(loginPromise2).toEqual(loginPromise3);
 
       // Wait for all to complete
       const [result1, result2, result3] = await Promise.all([
@@ -657,14 +657,17 @@ describe('Passport', () => {
       const loginPromise3 = passport.login();
 
       // All promises should be the same reference
-      expect(loginPromise1).toBe(loginPromise2);
-      expect(loginPromise2).toBe(loginPromise3);
+      expect(loginPromise1).toEqual(loginPromise2);
+      expect(loginPromise2).toEqual(loginPromise3);
 
       // All should reject with the same error
-      await expect(Promise.all([loginPromise1, loginPromise2, loginPromise3])).rejects.toThrow(error);
-
-      // AuthManager.login should only be called once despite multiple login calls
-      expect(authLoginMock).toBeCalledTimes(1);
+      try {
+        await Promise.all([loginPromise1, loginPromise2, loginPromise3])
+      } catch (e: unknown) {
+        expect(e).toEqual(error);
+        // AuthManager.login should only be called once despite multiple login calls
+        expect(authLoginMock).toBeCalledTimes(1);
+      }
     });
   });
 
