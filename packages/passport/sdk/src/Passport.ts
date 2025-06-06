@@ -183,6 +183,8 @@ export class Passport {
     }, 'connectEvm', false);
   }
 
+  #loginPromise: Promise<UserProfile | null> | null = null;
+
   /**
    * Initiates the login process.
    * @param {Object} options - Login options
@@ -200,7 +202,13 @@ export class Passport {
     useSilentLogin?: boolean;
     useRedirectFlow?: boolean;
   }): Promise<UserProfile | null> {
-    return withMetricsAsync(async () => {
+    // If there's already a login in progress, return that promise
+    if (this.#loginPromise) {
+      return this.#loginPromise;
+    }
+
+    // Create and store the login promise
+    this.#loginPromise = withMetricsAsync(async () => {
       const { useCachedSession = false, useSilentLogin } = options || {};
       let user: User | null = null;
 
@@ -235,6 +243,14 @@ export class Passport {
 
       return user ? user.profile : null;
     }, 'login');
+
+    try {
+      const result = await this.#loginPromise;
+      return result;
+    } finally {
+      // Reset the login promise when the login process completes
+      this.#loginPromise = null;
+    }
   }
 
   /**
