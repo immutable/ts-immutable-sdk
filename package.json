@@ -45,6 +45,11 @@
     "*.{js,jsx,ts,tsx}": "eslint"
   },
   "packageManager": "pnpm@9.12.0",
+  "pnpm": {
+    "overrides": {
+      "oidc-client-ts": "v3.3.0-rc.0"
+    }
+  },
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
