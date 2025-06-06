@@ -652,9 +652,11 @@ describe('Passport', () => {
       authLoginMock.mockRejectedValue(error);
 
       // Make multiple concurrent login calls that will fail
-      const loginPromise1 = passport.login();
-      const loginPromise2 = passport.login();
-      const loginPromise3 = passport.login();
+      const [loginPromise1, loginPromise2, loginPromise3] = [
+        passport.login(),
+        passport.login(),
+        passport.login(),
+      ];
 
       // All promises should be the same reference
       expect(loginPromise1).toEqual(loginPromise2);
@@ -662,7 +664,7 @@ describe('Passport', () => {
 
       // All should reject with the same error
       try {
-        await Promise.all([loginPromise1, loginPromise2, loginPromise3])
+        await Promise.all([loginPromise1, loginPromise2, loginPromise3]);
       } catch (e: unknown) {
         expect(e).toEqual(error);
         // AuthManager.login should only be called once despite multiple login calls
