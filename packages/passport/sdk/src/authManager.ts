@@ -71,11 +71,13 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
       token_endpoint: `${authenticationDomain}/oauth/token`,
       userinfo_endpoint: `${authenticationDomain}/userinfo`,
       end_session_endpoint: endSessionEndpoint.toString(),
+      revocation_endpoint: `${authenticationDomain}/oauth/revoke`,
     },
     mergeClaims: true,
     automaticSilentRenew: false, // Disabled until https://github.com/authts/oidc-client-ts/issues/430 has been resolved
     scope: oidcConfiguration.scope,
     userStore,
+    revokeTokenTypes: ['refresh_token'],
     extraQueryParams: {
       ...config.extraQueryParams,
       ...(oidcConfiguration.audience ? { audience: oidcConfiguration.audience } : {}),
@@ -436,15 +438,17 @@ export default class AuthManager {
   }
 
   public async logout(): Promise<void> {
-    return withPassportError<void>(
-      async () => {
-        if (this.logoutMode === 'silent') {
-          return this.userManager.signoutSilent();
-        }
-        return this.userManager.signoutRedirect();
-      },
-      PassportErrorType.LOGOUT_ERROR,
-    );
+    return withPassportError<void>(async () => {
+      if (this.logoutMode === 'silent') {
+        await Promise.all([
+          this.userManager.revokeTokens(['refresh_token']),
+          this.userManager.signoutSilent(),
+        ]);
+      } else {
+        await this.userManager.revokeTokens(['refresh_token']);
+        await this.userManager.signoutRedirect();
+      }
+    }, PassportErrorType.LOGOUT_ERROR);
   }
 
   public async logoutSilentCallback(url: string): Promise<void> {
