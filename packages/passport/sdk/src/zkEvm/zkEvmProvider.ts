@@ -280,12 +280,9 @@ export class ZkEvmProvider implements Provider {
             try {
               userZkEvmEthAddress = await this.#userRegistrationPromise;
               flow.addEvent('endUserRegistration');
-              // Clear the cache after successful registration so future calls get fresh user data
+            } finally {
+              // Clear the cache on success or error
               this.#clearUserRegistrationCache();
-            } catch (error) {
-              // Clear the cached promise on error so it can be retried
-              this.#clearUserRegistrationCache();
-              throw error;
             }
           } else {
             userZkEvmEthAddress = user.zkEvm.ethAddress;
