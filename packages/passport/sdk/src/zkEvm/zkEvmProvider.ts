@@ -77,6 +77,12 @@ export class ZkEvmProvider implements Provider {
 
   #signerInitialisationError: unknown | undefined;
 
+  /**
+   * Cache for the user registration promise to prevent race conditions
+   * when multiple eth_requestAccounts calls happen concurrently
+   */
+  #userRegistrationPromise?: Promise<string> | undefined;
+
   public readonly isPassport: boolean = true;
 
   constructor({
@@ -133,7 +139,15 @@ export class ZkEvmProvider implements Provider {
 
   #handleLogout = () => {
     this.#ethSigner = undefined;
+    this.#userRegistrationPromise = undefined;
     this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
+  };
+
+  /**
+   * Clear the cached user registration promise
+   */
+  #clearUserRegistrationCache = () => {
+    this.#userRegistrationPromise = undefined;
   };
 
   /**
@@ -247,18 +261,29 @@ export class ZkEvmProvider implements Provider {
           if (!isZkEvmUser(user)) {
             flow.addEvent('startUserRegistration');
 
-            const ethSigner = await this.#getSigner();
-            flow.addEvent('ethSignerResolved');
+            // Check if registration is already in progress to prevent race conditions
+            if (!this.#userRegistrationPromise) {
+              const ethSigner = await this.#getSigner();
+              flow.addEvent('ethSignerResolved');
 
-            userZkEvmEthAddress = await registerZkEvmUser({
-              ethSigner,
-              authManager: this.#authManager,
-              multiRollupApiClients: this.#multiRollupApiClients,
-              accessToken: user.accessToken,
-              rpcProvider: this.#rpcProvider,
-              flow,
-            });
-            flow.addEvent('endUserRegistration');
+              // Cache the registration promise to prevent concurrent registrations
+              this.#userRegistrationPromise = registerZkEvmUser({
+                ethSigner,
+                authManager: this.#authManager,
+                multiRollupApiClients: this.#multiRollupApiClients,
+                accessToken: user.accessToken,
+                rpcProvider: this.#rpcProvider,
+                flow,
+              });
+            }
+
+            try {
+              userZkEvmEthAddress = await this.#userRegistrationPromise;
+              flow.addEvent('endUserRegistration');
+            } finally {
+              // Clear the cache on success or error
+              this.#clearUserRegistrationCache();
+            }
           } else {
             userZkEvmEthAddress = user.zkEvm.ethAddress;
           }
