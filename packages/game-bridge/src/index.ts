@@ -31,17 +31,13 @@ const sdkVersionSha = '__SDK_VERSION_SHA__';
 
 const PASSPORT_FUNCTIONS = {
   init: 'init',
-  initDeviceFlow: 'initDeviceFlow',
   relogin: 'relogin',
   reconnect: 'reconnect',
   getPKCEAuthUrl: 'getPKCEAuthUrl',
   loginPKCE: 'loginPKCE',
   connectPKCE: 'connectPKCE',
-  loginConfirmCode: 'loginConfirmCode',
-  connectConfirmCode: 'connectConfirmCode',
   getAccessToken: 'getAccessToken',
   getIdToken: 'getIdToken',
-  logout: 'logout',
   getEmail: 'getEmail',
   getPassportId: 'getPassportId',
   getLinkedAddresses: 'getLinkedAddresses',
@@ -98,19 +94,11 @@ type CommonCallbackData = {
   result?: any;
 };
 
-// Type for callback data specific to initDeviceFlow
-type InitDeviceFlowCallbackData = CommonCallbackData & {
-  code: string;
-  deviceCode: string;
-  url: string;
-  interval: number;
-};
-
 type RequestAccountsCallbackData = CommonCallbackData & {
   accounts: string[];
 };
 
-type CallbackData = CommonCallbackData | InitDeviceFlowCallbackData | RequestAccountsCallbackData;
+type CallbackData = CommonCallbackData | RequestAccountsCallbackData;
 
 type VersionInfo = {
   gameBridgeTag: string;
@@ -313,21 +301,6 @@ window.callFunction = async (jsonData: string) => {
         });
         break;
       }
-      case PASSPORT_FUNCTIONS.initDeviceFlow: {
-        const response = await getPassportClient().loginWithDeviceFlow();
-        trackDuration(moduleName, 'performedInitDeviceFlow', mt(markStart));
-        callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success: true,
-          error: null,
-          code: response.code,
-          deviceCode: response.deviceCode,
-          url: response.url,
-          interval: response.interval,
-        });
-        break;
-      }
       case PASSPORT_FUNCTIONS.relogin: {
         const userInfo = await getPassportClient().login({
           useCachedSession: true,
@@ -426,66 +399,6 @@ window.callFunction = async (jsonData: string) => {
           requestId,
           success: providerSet,
           error: null,
-        });
-        break;
-      }
-      case PASSPORT_FUNCTIONS.loginConfirmCode: {
-        const request = JSON.parse(data);
-        const profile = await getPassportClient().loginWithDeviceFlowCallback(
-          request.deviceCode,
-          request.interval,
-          request.timeoutMs ?? null,
-        );
-
-        identify({ passportId: profile.sub });
-        trackDuration(moduleName, 'performedLoginConfirmCode', mt(markStart));
-
-        callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success: true,
-          error: null,
-        });
-        break;
-      }
-      case PASSPORT_FUNCTIONS.connectConfirmCode: {
-        const request = JSON.parse(data);
-        const profile = await getPassportClient().loginWithDeviceFlowCallback(
-          request.deviceCode,
-          request.interval,
-          request.timeoutMs ?? null,
-        );
-
-        const passportProvider = await getPassportClient().connectImx();
-        const providerSet = setProvider(passportProvider);
-
-        if (!providerSet) {
-          throw new Error('Failed to connect via confirm code');
-        }
-
-        identify({ passportId: profile.sub });
-        trackDuration(moduleName, 'performedConnectConfirmCode', mt(markStart), {
-          succeeded: providerSet,
-        });
-        callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success: providerSet,
-          error: null,
-        });
-        break;
-      }
-      case PASSPORT_FUNCTIONS.logout: {
-        const deviceFlowEndSessionEndpoint = await getPassportClient().logoutDeviceFlow();
-        providerInstance = null;
-        zkEvmProviderInstance = null;
-        trackDuration(moduleName, 'performedGetLogoutUrl', mt(markStart));
-        callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success: true,
-          error: null,
-          result: deviceFlowEndSessionEndpoint,
         });
         break;
       }
