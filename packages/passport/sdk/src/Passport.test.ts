@@ -44,7 +44,6 @@ describe('Passport', () => {
   let loginCallbackMock: jest.Mock;
   let logoutMock: jest.Mock;
   let removeUserMock: jest.Mock;
-  let getDeviceFlowEndSessionEndpointMock: jest.Mock;
   let magicLoginMock: jest.Mock;
   let magicLogoutMock: jest.Mock;
   let getUserMock: jest.Mock;
@@ -62,7 +61,6 @@ describe('Passport', () => {
     magicLogoutMock = jest.fn();
     logoutMock = jest.fn();
     removeUserMock = jest.fn();
-    getDeviceFlowEndSessionEndpointMock = jest.fn();
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
     getProviderMock = jest.fn();
@@ -76,7 +74,6 @@ describe('Passport', () => {
       loginCallback: loginCallbackMock,
       logout: logoutMock,
       removeUser: removeUserMock,
-      getDeviceFlowEndSessionEndpoint: getDeviceFlowEndSessionEndpointMock,
       getUser: getUserMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
       forceUserRefresh: forceUserRefreshMock,
@@ -319,36 +316,6 @@ describe('Passport', () => {
         expect(trackError).toHaveBeenCalledWith(
           'passport',
           'logout',
-          e,
-          { flowId: '123' },
-        );
-      }
-    });
-  });
-
-  describe('logoutDeviceFlow', () => {
-    it('should execute logoutDeviceFlow without error and return the device flow end session endpoint', async () => {
-      const endSessionEndpoint = 'https://test.com/logout';
-      getDeviceFlowEndSessionEndpointMock.mockReturnValue(endSessionEndpoint);
-
-      const result = await passport.logoutDeviceFlow();
-
-      expect(result).toEqual('https://test.com/logout');
-      expect(removeUserMock).toHaveBeenCalledTimes(1);
-      expect(magicLogoutMock).toHaveBeenCalledTimes(1);
-      expect(getDeviceFlowEndSessionEndpointMock).toHaveBeenCalledTimes(1);
-    });
-
-    it('should call track error function if an error occurs', async () => {
-      const error = new Error('error');
-      removeUserMock.mockRejectedValue(error);
-
-      try {
-        await passport.logoutDeviceFlow();
-      } catch (e) {
-        expect(trackError).toHaveBeenCalledWith(
-          'passport',
-          'logoutDeviceFlow',
           e,
           { flowId: '123' },
         );

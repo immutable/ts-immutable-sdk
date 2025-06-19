@@ -659,37 +659,4 @@ describe('AuthManager', () => {
       );
     });
   });
-
-  describe('getDeviceFlowEndSessionEndpoint', () => {
-    describe('with a logged in user', () => {
-      describe('when a logoutRedirectUri is specified', () => {
-        it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', async () => {
-          mockGetUser.mockReturnValue(mockOidcUser);
-
-          const am = new AuthManager(getConfig({ logoutRedirectUri }));
-          const result = await am.getDeviceFlowEndSessionEndpoint();
-          const uri = new URL(result);
-
-          expect(uri.hostname).toEqual(authenticationDomain);
-          expect(uri.pathname).toEqual(logoutEndpoint);
-          expect(uri.searchParams.get('client_id')).toEqual(clientId);
-          expect(uri.searchParams.get('returnTo')).toEqual(logoutRedirectUri);
-        });
-      });
-
-      describe('when no post_logout_redirect_uri is specified', () => {
-        it('should return the endSessionEndpoint without a `returnTo` or `client_id` query string params', async () => {
-          mockGetUser.mockReturnValue(mockOidcUser);
-
-          const am = new AuthManager(getConfig());
-          const result = await am.getDeviceFlowEndSessionEndpoint();
-          const uri = new URL(result);
-
-          expect(uri.hostname).toEqual(authenticationDomain);
-          expect(uri.pathname).toEqual(logoutEndpoint);
-          expect(uri.searchParams.get('client_id')).toEqual(clientId);
-        });
-      });
-    });
-  });
 });

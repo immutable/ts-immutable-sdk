@@ -18,10 +18,7 @@ import { PassportError, PassportErrorType, withPassportError } from './errors/pa
 import {
   PassportMetadata,
   User,
-  DeviceCodeResponse,
-  DeviceConnectResponse,
   DeviceTokenResponse,
-  DeviceErrorResponse,
   IdTokenPayload,
   OidcConfiguration,
   UserZkEvm,
@@ -86,12 +83,6 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
 
   return baseConfiguration;
 };
-
-function wait(ms: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
 
 function base64URLEncode(str: ArrayBuffer) {
   return btoa(String.fromCharCode(...new Uint8Array(str)))
@@ -288,92 +279,6 @@ export default class AuthManager {
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
-  /**
-   * loginWithDeviceFlow
-   * @param anonymousId Caller can pass an anonymousId if they want to associate their user's identity with immutable's internal instrumentation.
-   */
-  public async loginWithDeviceFlow(anonymousId?: string): Promise<DeviceConnectResponse> {
-    return withPassportError<DeviceConnectResponse>(async () => {
-      const response = await axios.post<DeviceCodeResponse>(
-        `${this.config.authenticationDomain}/oauth/device/code`,
-        {
-          client_id: this.config.oidcConfiguration.clientId,
-          scope: this.config.oidcConfiguration.scope,
-          audience: this.config.oidcConfiguration.audience,
-        },
-        formUrlEncodedHeader,
-      );
-
-      const rid = getDetail(Detail.RUNTIME_ID);
-
-      return {
-        code: response.data.user_code,
-        deviceCode: response.data.device_code,
-        url: `${response.data.verification_uri_complete}${rid ? `&rid=${rid}` : ''}${anonymousId ? `&third_party_a_id=${anonymousId}` : ''}`,
-        interval: response.data.interval,
-      };
-    }, PassportErrorType.AUTHENTICATION_ERROR);
-  }
-
-  /* eslint-disable no-await-in-loop */
-  public async loginWithDeviceFlowCallback(deviceCode: string, interval: number, timeoutMs?: number): Promise<User> {
-    return withPassportError<User>(async () => {
-      const startTime = Date.now();
-      const loopCondition = true;
-      while (loopCondition) {
-        if (timeoutMs != null && Date.now() - startTime > timeoutMs) {
-          throw new Error('Timed out');
-        }
-
-        await wait(interval * 1000);
-
-        try {
-          const tokenResponse = await this.getDeviceFlowToken(deviceCode);
-          const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
-          const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
-          await this.userManager.storeUser(oidcUser);
-
-          return user;
-        } catch (error) {
-          if (axios.isAxiosError(error)) {
-            const responseError: DeviceErrorResponse = error.response?.data;
-            switch (responseError.error) {
-              case 'authorization_pending':
-                break;
-              case 'slow_down':
-                break;
-              case 'expired_token':
-                throw new Error('Token expired, please log in again');
-              case 'access_denied':
-                throw new Error('User denied access');
-              default:
-                throw new Error('Error getting token');
-            }
-          } else {
-            throw error;
-          }
-        }
-      }
-
-      throw new Error('Failed to get credentials');
-    }, PassportErrorType.AUTHENTICATION_ERROR);
-  }
-  /* eslint-enable no-await-in-loop */
-
-  private async getDeviceFlowToken(deviceCode: string): Promise<DeviceTokenResponse> {
-    const response = await axios.post<DeviceTokenResponse>(
-      `${this.config.authenticationDomain}/oauth/token`,
-      {
-        client_id: this.config.oidcConfiguration.clientId,
-        grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
-        device_code: deviceCode,
-      },
-      formUrlEncodedHeader,
-    );
-
-    return response.data;
-  }
-
   public async getPKCEAuthorizationUrl(): Promise<string> {
     const verifier = base64URLEncode(window.crypto.getRandomValues(new Uint8Array(32)));
     const challenge = base64URLEncode(await sha256(verifier));
@@ -457,17 +362,6 @@ export default class AuthManager {
 
   public async removeUser(): Promise<void> {
     return this.userManager.removeUser();
-  }
-
-  public async getDeviceFlowEndSessionEndpoint(): Promise<string> {
-    const { authenticationDomain, oidcConfiguration } = this.config;
-
-    const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain);
-    endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
-
-    if (oidcConfiguration.logoutRedirectUri) endSessionEndpoint.searchParams.set('returnTo', oidcConfiguration.logoutRedirectUri);
-
-    return endSessionEndpoint.toString();
   }
 
   public forceUserRefreshInBackground() {
