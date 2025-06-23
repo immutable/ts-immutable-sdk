@@ -42,7 +42,7 @@ for PRODUCT in "${PRODUCTS[@]}"; do
   JSON_FILE="$EXAMPLES_ROOT/_parsed/${PRODUCT}-examples.json"
   if [ -f "$JSON_FILE" ]; then
     # Create directory for JSON file if it doesn't exist
-    JSON_DIR="$DOCS_REPO_DIR/docs/main/example/zkEVM/$PRODUCT-examples"
+    JSON_DIR="$DOCS_REPO_DIR/docs/main/build/typescript/usage-guides/$PRODUCT"
     mkdir -p "$JSON_DIR"
     
     # Copy JSON file
