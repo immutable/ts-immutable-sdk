@@ -72,13 +72,13 @@ jobs:
           git checkout -b $BRANCH_NAME
           
           git add .
-          git commit -m "Update example app tutorials from SDK repo"
+          git commit -m "chore: example app usage guide updated"
           git push -u origin $BRANCH_NAME
           echo "Successfully pushed changes to docs repo on branch $BRANCH_NAME"
 
           PR_URL=$(gh pr create \
-            --title "Update example app tutorials from SDK repo" \
-            --body "Automated PR from ts-immutable-sdk to update tutorials. Review and merge if all looks good." \
+            --title "auto(ts-immutable-sdk): example app usage guide updated" \
+            --body "Automated PR from ts-immutable-sdk to update tutorials. This is safe for anyone to approve and merge."
             --base DVR-295-docs-restructure \
             --repo immutable/docs)
           
@@ -92,5 +92,5 @@ jobs:
         if: steps.create_pr.outputs.pr_url != ''
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: 'New automated tutorials PR is ready for review: ${{ steps.create_pr.outputs.pr_url }}'
+          message: 'New automated TS SDK sample app tutorials PR is ready for review: ${{ steps.create_pr.outputs.pr_url }}'
           webhook-url: ${{ secrets.SDK_DOCS_TUTORIALS_SLACK_WEBHOOK }}
