@@ -1,5 +1,5 @@
 const core = require('@actions/core');
-const webhook = process.env.SDK_PUBLISH_SLACK_WEBHOOK;
+const webhook = core.getInput('webhook-url');
 
 const run = async () => {
   if (webhook) {

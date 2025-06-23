@@ -156,12 +156,14 @@ jobs:
         uses: ./.github/actions/notify-slack-publish-status
         with:
           message: "✅ ${{ github.triggering_actor }} successfully published SDK packages @ version ${{steps.release.outputs.RELEASE_NAME}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.release.outputs.RELEASE_NAME}}"
+          webhook-url: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
 
       - name: Notify SDK Slack Publish Failure
         if: ${{ failure() && (steps.npm_release.conclusion == 'failure') && env.DRY_RUN == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
           message: "❌ Failed to publish SDK version ${{steps.release.outputs.RELEASE_NAME}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
+          webhook-url: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
           
       - name: Wait for NPM @latest Update
         id: wait_for_npm_update

@@ -89,11 +89,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
         shell: bash
 
-      # - name: Notify Slack of New Docs PR
-      #   if: steps.create_pr.outputs.pr_url != ''
-      #   uses: slackapi/slack-github-action@v1.26.0
-      #   with:
-      #     channel-id: ${{ secrets.DOCS_PR_SLACK_CHANNEL_ID }}
-      #     slack-message: "New automated tutorials PR is ready for review: <${{ steps.create_pr.outputs.pr_url }}|View Pull Request>"
-      #   env:
-      #     SLACK_BOT_TOKEN: ${{ secrets.DOCS_PR_SLACK_BOT_TOKEN }}
+      - name: Notify Slack
+        if: steps.create_pr.outputs.pr_url != ''
+        uses: ./.github/actions/notify-slack-publish-status
+        with:
+          message: 'New automated tutorials PR is ready for review: ${{ steps.create_pr.outputs.pr_url }}'
+          webhook-url: ${{ secrets.SDK_DOCS_TUTORIALS_SLACK_WEBHOOK }}

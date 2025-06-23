@@ -6,6 +6,9 @@ inputs:
     description: 'Message to send to Slack'
     required: true
     default: ''
+  webhook-url:
+    description: 'Slack incoming webhook URL'
+    required: true
 runs:
   using: 'node20'
   main: 'index.js'
