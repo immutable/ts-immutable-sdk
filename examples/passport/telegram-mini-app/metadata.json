@@ -4,5 +4,6 @@
   "keywords": ["Immutable", "SDK", "Passport", "Telegram", "Mini App", "Device Flow Authentication", "NFT Transfers"],
   "tech_stack": ["Next.js", "TypeScript", "Telegram SDK", "Ethers.js"],
   "product": "Passport",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "deprecated": true
 } 

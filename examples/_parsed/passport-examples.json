@@ -2,24 +2,29 @@
   "logged-in-user-with-nextjs": {
     "tutorial": "logged-in-user-with-nextjs.md",
     "metadata": {
-      "title": "User Information after Logging In with NextJS",
-      "description": "Example of retrieving and displaying user data after authentication with Immutable Passport in a NextJS application",
+      "title": "Logged-in User with NextJS",
+      "description": "Example app demonstrating how to access user information and manage linked addresses after a user has logged in with Immutable Passport in a NextJS application",
       "keywords": [
         "Immutable",
         "SDK",
         "Passport",
         "NextJS",
+        "Authentication",
         "User Info",
         "Linked Addresses",
-        "Tokens"
+        "Token Verification",
+        "Wallet Linking"
       ],
       "tech_stack": [
         "NextJS",
+        "React",
         "TypeScript",
-        "React"
+        "Ethereum",
+        "MetaMask"
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
+      "deprecated": false,
       "sidebar_order": 3
     }
   },
@@ -46,6 +51,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
+      "deprecated": false,
       "sidebar_order": 2
     }
   },
@@ -73,6 +79,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
+      "deprecated": false,
       "sidebar_order": 1
     }
   },
@@ -98,6 +105,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
+      "deprecated": true,
       "sidebar_order": 7
     }
   },
@@ -126,6 +134,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
+      "deprecated": false,
       "sidebar_order": 4
     }
   },
@@ -150,6 +159,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
+      "deprecated": false,
       "sidebar_order": 6
     }
   },
@@ -173,6 +183,7 @@
       ],
       "product": "Passport",
       "programming_language": "TypeScript",
+      "deprecated": false,
       "sidebar_order": 5
     }
   }

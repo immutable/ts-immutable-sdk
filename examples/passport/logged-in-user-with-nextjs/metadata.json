@@ -4,5 +4,6 @@
   "keywords": ["Immutable", "SDK", "Passport", "NextJS", "Authentication", "User Info", "Linked Addresses", "Token Verification", "Wallet Linking"],
   "tech_stack": ["NextJS", "React", "TypeScript", "Ethereum", "MetaMask"],
   "product": "Passport",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "deprecated": false
 } 

@@ -4,5 +4,6 @@
   "keywords": ["Immutable", "SDK", "Passport", "Wallet Connection", "Transaction Execution", "zkEVM"],
   "tech_stack": ["Next.js", "TypeScript", "ethers.js"],
   "product": "Passport",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "deprecated": false
 } 

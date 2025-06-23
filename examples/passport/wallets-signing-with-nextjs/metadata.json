@@ -4,5 +4,6 @@
   "keywords": ["Immutable", "SDK", "Passport", "Sign Message", "EIP-712", "ERC-191", "Next.js"],
   "tech_stack": ["Next.js", "TypeScript", "Ethers.js"],
   "product": "Passport",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "deprecated": false
 } 

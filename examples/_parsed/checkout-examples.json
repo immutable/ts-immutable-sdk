@@ -19,6 +19,7 @@
       ],
       "product": "Checkout",
       "programming_language": "TypeScript",
+      "deprecated": false,
       "sidebar_order": 1
     }
   },
@@ -44,6 +45,7 @@
       ],
       "product": "Checkout",
       "programming_language": "TypeScript",
+      "deprecated": false,
       "sidebar_order": 4
     }
   },
@@ -68,6 +70,7 @@
       ],
       "product": "Checkout",
       "programming_language": "TypeScript",
+      "deprecated": false,
       "sidebar_order": 3
     }
   },
@@ -92,6 +95,7 @@
       ],
       "product": "Checkout",
       "programming_language": "TypeScript",
+      "deprecated": false,
       "sidebar_order": 2
     }
   }

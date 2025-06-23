@@ -20,6 +20,7 @@
       ],
       "product": "Contracts",
       "programming_language": "TypeScript",
+      "deprecated": false,
       "sidebar_order": 1
     }
   }

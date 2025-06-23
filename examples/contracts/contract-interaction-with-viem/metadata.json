@@ -16,5 +16,6 @@
     "Immutable Contracts"
   ],
   "product": "Contracts",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "deprecated": false
 } 

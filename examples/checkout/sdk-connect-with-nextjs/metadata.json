@@ -4,5 +4,6 @@
   "keywords": ["Immutable", "SDK", "Checkout", "MetaMask", "Web3", "Connect Wallet"],
   "tech_stack": ["Next.js", "TypeScript", "Ethers.js"],
   "product": "Checkout",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "deprecated": false
 } 

@@ -4,5 +4,6 @@
   "keywords": ["Immutable", "SDK", "Wallet", "Balance", "MetaMask", "Token", "NextJS"],
   "tech_stack": ["NextJS", "TypeScript", "ethers.js"],
   "product": "Checkout",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "deprecated": false
 } 

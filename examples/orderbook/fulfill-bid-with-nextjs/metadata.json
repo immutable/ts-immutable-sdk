@@ -4,5 +4,6 @@
   "keywords": ["Immutable", "SDK", "Orderbook", "Fulfill Bid", "ERC721", "ERC1155", "Next.js"],
   "tech_stack": ["Next.js", "TypeScript", "Immutable SDK", "Ethers.js"],
   "product": "Orderbook",
-  "programming_language": "TypeScript"
+  "programming_language": "TypeScript",
+  "deprecated": false
 } 
