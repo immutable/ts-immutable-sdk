@@ -126,24 +126,6 @@ export type UserZkEvm = WithRequired<User, 'zkEvm'>;
 export const isUserZkEvm = (user: User): user is UserZkEvm => !!user.zkEvm;
 export const isUserImx = (user: User): user is UserImx => !!user.imx;
 
-// Device code auth
-
-export type DeviceConnectResponse = {
-  code: string;
-  deviceCode: string;
-  url: string;
-  interval: number;
-};
-
-export type DeviceCodeResponse = {
-  device_code: string;
-  user_code: string;
-  verification_uri: string;
-  expires_in: number;
-  interval: number;
-  verification_uri_complete: string;
-};
-
 export type DeviceTokenResponse = {
   access_token: string;
   refresh_token?: string;
@@ -165,11 +147,6 @@ export type IdTokenPayload = {
   exp: number;
   iss: string;
   iat: number;
-};
-
-export type DeviceErrorResponse = {
-  error: string;
-  error_description: string;
 };
 
 export type PKCEData = {
