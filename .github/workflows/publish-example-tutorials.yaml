@@ -68,7 +68,7 @@ jobs:
             exit 0
           fi
 
-          BRANCH_NAME="chore/sdk-docs-update-${{ github.run_id }}"
+          BRANCH_NAME="chore/ts-sdk-docs-update-${{ github.run_id }}"
           git checkout -b $BRANCH_NAME
           
           git add .
