@@ -33,7 +33,7 @@ jobs:
           repository: immutable/docs
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
           path: imx-docs
-          ref: main
+          ref: DVR-295-docs-restructure
 
       - name: Setup environment variables
         run: |
@@ -59,21 +59,41 @@ jobs:
           ./.github/scripts/process-tutorials.sh
         shell: bash
 
-      - name: Commit and Push Changes to Docs Repo
+      - name: Create Pull Request in Docs Repo
+        id: create_pr
         run: |
           cd "$CLONE_DIR"
-          # Check if there are changes to commit
-          if git status --porcelain | grep -q .; then
-            # Add all changes
-            git add .
-            
-            # Commit the changes
-            git commit -m "Update example app tutorials from SDK repo"
-            
-            # Push to the target branch
-            git push -u origin main
-            echo "Successfully pushed example app tutorial changes to docs repo"
-          else
+          if ! git status --porcelain | grep -q .; then
             echo "No changes to commit"
+            echo "pr_url=" >> $GITHUB_OUTPUT
+            exit 0
           fi
-        shell: bash 
+
+          BRANCH_NAME="chore/sdk-docs-update-${{ github.run_id }}"
+          git checkout -b $BRANCH_NAME
+          
+          git add .
+          git commit -m "Update example app tutorials from SDK repo"
+          git push -u origin $BRANCH_NAME
+          echo "Successfully pushed changes to docs repo on branch $BRANCH_NAME"
+
+          PR_URL=$(gh pr create \
+            --title "Update example app tutorials from SDK repo" \
+            --body "Automated PR from ts-immutable-sdk to update tutorials. Review and merge if all looks good." \
+            --base DVR-295-docs-restructure \
+            --repo immutable/docs)
+          
+          echo "Successfully created PR in docs repo: $PR_URL"
+          echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+        shell: bash
+
+      # - name: Notify Slack of New Docs PR
+      #   if: steps.create_pr.outputs.pr_url != ''
+      #   uses: slackapi/slack-github-action@v1.26.0
+      #   with:
+      #     channel-id: ${{ secrets.DOCS_PR_SLACK_CHANNEL_ID }}
+      #     slack-message: "New automated tutorials PR is ready for review: <${{ steps.create_pr.outputs.pr_url }}|View Pull Request>"
+      #   env:
+      #     SLACK_BOT_TOKEN: ${{ secrets.DOCS_PR_SLACK_BOT_TOKEN }}
