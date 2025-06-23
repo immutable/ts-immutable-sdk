@@ -17,7 +17,7 @@ for PRODUCT in "${PRODUCTS[@]}"; do
   echo "Processing tutorials for $PRODUCT..."
   
   # Create _tutorials directory in docs repo if it doesn't exist
-  TUTORIALS_DIR="$DOCS_REPO_DIR/docs/main/build/typescript/usage-guides/$PRODUCT"
+  TUTORIALS_DIR="$DOCS_REPO_DIR/docs/main/build/typescript/usage-guides/$PRODUCT/_tutorials"
   mkdir -p "$TUTORIALS_DIR"
   
   # Get all example apps for this product
