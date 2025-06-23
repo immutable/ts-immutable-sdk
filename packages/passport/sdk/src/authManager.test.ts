@@ -135,7 +135,7 @@ describe('AuthManager', () => {
         authority: config.authenticationDomain,
         client_id: config.oidcConfiguration.clientId,
         extraQueryParams: {},
-        mergeClaims: true,
+        mergeClaimsStrategy: { array: 'merge' },
         automaticSilentRenew: false,
         metadata: {
           authorization_endpoint: `${config.authenticationDomain}/authorize`,
