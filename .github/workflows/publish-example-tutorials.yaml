@@ -78,7 +78,7 @@ jobs:
 
           PR_URL=$(gh pr create \
             --title "auto(ts-immutable-sdk): example app usage guide updated" \
-            --body "Automated PR from ts-immutable-sdk to update tutorials. This is safe for anyone to approve and merge."
+            --body "Automated PR from ts-immutable-sdk to update tutorials. This is safe for anyone to approve and merge." \
             --base DVR-295-docs-restructure \
             --repo immutable/docs)
           
