@@ -45,11 +45,6 @@
     "*.{js,jsx,ts,tsx}": "eslint"
   },
   "packageManager": "pnpm@9.12.0",
-  "pnpm": {
-    "overrides": {
-      "oidc-client-ts": "v3.3.0-rc.0"
-    }
-  },
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
@@ -81,6 +76,6 @@
     "test": "nx affected -t test",
     "test:examples": "pnpm --recursive --sequential --filter '@examples/**' test",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
-    "typecheck": "nx affected -t typecheck"    
+    "typecheck": "nx affected -t typecheck"
   }
 }
