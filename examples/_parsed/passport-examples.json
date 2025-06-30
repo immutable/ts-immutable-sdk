@@ -76,31 +76,6 @@
       "sidebar_order": 1
     }
   },
-  "telegram-mini-app": {
-    "tutorial": "telegram-mini-app.md",
-    "metadata": {
-      "title": "Telegram Mini App with Immutable Passport",
-      "description": "Demonstrates device flow authentication and NFT transfers in a Telegram Mini App using Immutable Passport",
-      "keywords": [
-        "Immutable",
-        "SDK",
-        "Passport",
-        "Telegram",
-        "Mini App",
-        "Device Flow Authentication",
-        "NFT Transfers"
-      ],
-      "tech_stack": [
-        "Next.js",
-        "TypeScript",
-        "Telegram SDK",
-        "Ethers.js"
-      ],
-      "product": "Passport",
-      "programming_language": "TypeScript",
-      "sidebar_order": 7
-    }
-  },
   "wallets-connect-with-nextjs": {
     "tutorial": "wallets-connect-with-nextjs.md",
     "metadata": {

@@ -15,7 +15,6 @@ import MagicAdapter from './magic/magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
-  DeviceConnectResponse,
   isUserImx,
   isUserZkEvm,
   LinkedWallet,
@@ -159,9 +158,7 @@ export class Passport {
    */
   public connectEvm(options: {
     announceProvider: boolean
-  } = {
-    announceProvider: true,
-  }): Promise<Provider> {
+  } = { announceProvider: true }): Promise<Provider> {
     return withMetricsAsync(async () => {
       const provider = new ZkEvmProvider({
         passportEventEmitter: this.passportEventEmitter,
@@ -270,41 +267,6 @@ export class Passport {
   }
 
   /**
-   * Initiates a device flow login.
-   * @param {Object} options - Login options
-   * @param {string} [options.anonymousId] - ID used to enrich Passport internal metrics
-   * @returns {Promise<DeviceConnectResponse>} A promise that resolves to the device connection response
-   */
-  public async loginWithDeviceFlow(options?: {
-    anonymousId?: string;
-  }): Promise<DeviceConnectResponse> {
-    return withMetricsAsync(() => this.authManager.loginWithDeviceFlow(options?.anonymousId), 'loginWithDeviceFlow');
-  }
-
-  /**
-   * Handles the device flow login callback.
-   * @param {string} deviceCode - The device code received from the initial request
-   * @param {number} interval - Polling interval in seconds
-   * @param {number} [timeoutMs] - Optional timeout in milliseconds
-   * @returns {Promise<UserProfile>} A promise that resolves to the user profile
-   */
-  public async loginWithDeviceFlowCallback(
-    deviceCode: string,
-    interval: number,
-    timeoutMs?: number,
-  ): Promise<UserProfile> {
-    return withMetricsAsync(async () => {
-      const user = await this.authManager.loginWithDeviceFlowCallback(
-        deviceCode,
-        interval,
-        timeoutMs,
-      );
-      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
-      return user.profile;
-    }, 'loginWithDeviceFlowCallback');
-  }
-
-  /**
    * Initiates a PKCE flow login.
    * @returns {string} The authorization URL for the PKCE flow
    */
@@ -350,21 +312,6 @@ export class Passport {
       }
       this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
     }, 'logout');
-  }
-
-  /**
-     * Logs the user out of Passport when using device flow authentication.
-     *
-     * @returns {Promise<string>} The device flow end session endpoint. Consumers are responsible for
-     * opening this URL in the same browser that was used to log the user in.
-     */
-  public async logoutDeviceFlow(): Promise<string> {
-    return withMetricsAsync(async () => {
-      await this.authManager.removeUser();
-      await this.magicAdapter.logout();
-      this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
-      return await this.authManager.getDeviceFlowEndSessionEndpoint();
-    }, 'logoutDeviceFlow');
   }
 
   /**
