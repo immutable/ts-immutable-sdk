@@ -244,6 +244,11 @@ export class Passport {
     try {
       const result = await this.#loginPromise;
       return result;
+    // eslint-disable-next-line no-useless-catch
+    } catch (error) {
+      // The following is required to prevent a scenario where
+      // the error is not thrown in a browser context.
+      throw error;
     } finally {
       // Reset the login promise when the login process completes
       this.#loginPromise = null;
