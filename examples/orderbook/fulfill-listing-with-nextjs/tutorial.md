@@ -2,15 +2,24 @@
 
 # Fulfill Listing with Next.js
 
+</div>
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import ListAdmonition from '@site/src/components/ListAdmonition';
+import ListingOrderComparison from '@site/docs/main/build/typescript/usage/orderbook/_partials/listing-vs-order.mdx'
+import FeeQTYUnits from '@site/docs/main/_partials/fees/fees-quantity-units.mdx';
+
 This tutorial demonstrates how to implement NFT listing fulfillment using the Immutable Orderbook SDK with Next.js. The application showcases how to fulfill both ERC721 and ERC1155 listings, providing a complete workflow from listing discovery to transaction execution.
 
-</div>
 
 <div class="button-component">
 
 [View app on Github](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-listing-with-nextjs) <span class="button-component-arrow">→</span>
 
 </div>
+
+
 
 ## Features Overview
 
@@ -19,63 +28,95 @@ This tutorial demonstrates how to implement NFT listing fulfillment using the Im
 - Filter active listings by contract address and currency type
 - Apply taker ecosystem fees during fulfillment
 
-## SDK Integration Details
+## Get, sign and send transactions for fulfillment
 
-### Fulfill ERC721 Listing
+This call returns actions that are required to fulfill an order. For fulfillment all actions are [transaction actions](/products/zkEVM/orderbook/actions) and include a type and builder method that can be used to generate the raw transaction for submission. The purpose of these transactions are as follows:
+ - `APPROVAL` - An approval transaction is required to be submitted before the fulfillment transaction if spending an ERC20 token and the seaport contract does not yet have the required allowance.
+ - `FULFILL_ORDER` - The fulfillment transaction to be submitted to fulfill the order.
 
-Fulfills an active listing for an ERC721 token on the Orderbook.
+The `taker` below is any `ethers` compatible `Signer` or `Wallet` instance for the user creating the listing.
 
-```typescript title="Fulfill ERC721 Listing" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-listing-with-nextjs/src/app/fulfill-listing-with-erc721/page.tsx"
-const fulfillERC721Listing = async (listingID: string) => {
-  const { actions } = await orderbookSDK.fulfillOrder(
-    listingID,
-    accountsState[0],
-    takerEcosystemFeeRecipient != "" ? [{
-      recipientAddress: takerEcosystemFeeRecipient, // Replace address with your own marketplace address
-      amount: takerEcosystemFeeAmount, // Insert taker ecosystem/marketplace fee here
-    }] : [],
-  );
+When a marketplace submits a fulfill order request, they could include a `takerFees` field as demonstrated in the code block below. This fee should be represented as the net amount that the marketplace wishes to receive for the services provided, and it should be quoted in the same ERC20 (or native) token in which the order is listed.
 
-  for (const action of actions) {
-    if (action.type === orderbook.ActionType.TRANSACTION) {
-      const builtTx = await action.buildTransaction();
-      await signer?.sendTransaction(builtTx);
-    }
-  }
-};
+The `fulfillOrder` call also returns the expiry for the transactions (if an user submits a transaction after the expiration it will fail on chain) and the `order` entity with confirmed fee information.
+
+<ListAdmonition label="Note" type="tip" title="Fees">
+    Read more about fees <a href="/products/zkEVM/orderbook/fees">here</a>
+</ListAdmonition>
+
+<ListAdmonition label="Note" type="tip" title="Approval">
+  If the taker has purchased NFTs in the currency before, or if the listing is in the native token, no approval will be required and there will be only one fulfillment transaction in the list of actions.
+</ListAdmonition>
+
+<FeeQTYUnits />
+
+Select the tabs below to learn about filling ERC721 and ERC1155 listings:
+<Tabs>
+<TabItem value="erc721_fulfillment" label="ERC721 fulfillment">
+
+```tsx reference=examples/orderbook/fulfill-listing-with-nextjs/src/app/fulfill-listing-with-erc721/page.tsx#fulfill-erc721-listing title="Fill ERC721 Listing"
 ```
 
-The code first calls the `fulfillOrder` method from the Orderbook SDK, passing the listing ID, the buyer's wallet address, and optional taker ecosystem fees. The method returns a set of actions that need to be executed to complete the fulfillment. The code then iterates through these actions, builds transactions for actions of type `TRANSACTION`, and sends them using the connected wallet's signer. This process handles all the necessary on-chain interactions to complete the purchase of the NFT.
+The fulfillment transaction is now processed. You can poll [Get orders](/products/zkEVM/orderbook/get) for the off-chain representation of the order.
 
-### Fulfill ERC1155 Listing
+The order will asynchronously transition to `FILLED` once on-chain events have been registered by Immutable services.
 
-Fulfills an active listing for a specific quantity of an ERC1155 token on the Orderbook.
+As shown below, the `fill_status` field in the response of the [Get orders](/products/zkEVM/orderbook/get) endpoint will have the `numerator` and `denominator` values equal to `1` to indicate that the order has been fully filled.
 
-```typescript title="Fulfill ERC1155 Listing" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/fulfill-listing-with-nextjs/src/app/fulfill-listing-with-erc1155/page.tsx"
-const fulfillERC1155Listing = async (
-  listingID: string,
-  unitsToFill?: string, // Number of units to fill
-) => {
-  const { actions } = await orderbookSDK.fulfillOrder(
-    listingID,
-    accountsState[0],
-    takerEcosystemFeeRecipient != "" ? [{
-      recipientAddress: takerEcosystemFeeRecipient, // Replace address with your own marketplace address
-      amount: takerEcosystemFeeAmount, // Insert taker ecosystem/marketplace fee here
-    }] : [],
-    unitsToFill,
-  );
-
-  for (const action of actions) {
-    if (action.type === orderbook.ActionType.TRANSACTION && signer) {
-      const builtTx = await action.buildTransaction();
-      await (await signer.sendTransaction(builtTx)).wait(1);
-    }
-  }
-};
+```json
+{
+  "fill_status":{
+    "numerator": "1",
+    "denominator": "1"
+}
 ```
 
-Similar to the ERC721 fulfillment, this function calls the `fulfillOrder` method but includes an additional parameter for the number of units to fulfill. This is particularly important for ERC1155 tokens where a single listing might offer multiple units of the same NFT. The function processes the returned actions in the same way, building and sending transactions to complete the purchase. The implementation also waits for one confirmation of the transaction to ensure it's properly included in the blockchain.
+:::note
+For further details on order fill status, see the [following product guide](/products/zkEVM/orderbook/fill-status)
+:::
+
+</TabItem>
+
+<TabItem value="erc1155_fulfillment" label="ERC1155 fulfillment">
+
+It is possible to partially fill ERC1155 orders and if only a portion of the order is to be filled (partial fill scenario), an optional `amountToFill` parameter is used to specific the quantity of tokens to be filled.
+If the `amountToFill` parameter is not specified for ERC1155 orders, the entire order will be filled.
+
+If an order is attempted to be filled beyond the available quantity a `best effort` fulfillment is attempted where the order is filled up to the available quantity.
+
+If fulfilling an ERC1155 order, the taker fee `amount` should be a multiple of the sell token amount. For example, if the original listing is selling `5` tokens, the taker fee amount should be a multiple of `5` so 5, 10, 15, etc.
+
+:::note
+The taker fee amount should reflect the complete view of the order and should not be scaled down in the case of a partial fill.
+
+For example, if the original listing is selling `5` tokens at `100` IMX each and the taker fee is `1%` (i.e., `1` IMX per token), the taker fee amount on all fills (partial or full) should be `5` IMX. The orderbook will pro-rate the fee for the marketplace based on the quantity executed.
+:::
+
+```tsx reference=examples/orderbook/fulfill-listing-with-nextjs/src/app/fulfill-listing-with-erc1155/page.tsx#fulfill-erc1155-listing title="Fill ERC1155 Listing"
+```
+
+The fulfillment transaction is now processed. You can poll [Get orders](/products/zkEVM/orderbook/get) for the off-chain representation of the order.
+
+The order will asynchronously transition to `FILLED` if the order was fully filled and once on-chain events have been registered by Immutable services. If however, the order was only partially filled the order will stay in the `ACTIVE` state.
+
+The `fill_status` field in the response of the [Get orders](/products/zkEVM/orderbook/get) endpoint will indicate the ratio of the order that is currently filled. If the order has been fully filled, the `numerator` and `denominator` values will be equal.
+
+For instance, the below snipped would indicate that 50% of the order has been filled.
+
+```json
+{
+  "fill_status":{
+    "numerator": "1",
+    "denominator": "2"
+}
+```
+
+:::note
+For further details on order fill status, see the [following product guide](/products/zkEVM/orderbook/fill-status)
+:::
+
+</TabItem>
+</Tabs>
 
 ## Running the App
 

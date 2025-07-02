@@ -4,6 +4,9 @@
 
 </div>
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 This example app demonstrates how to create NFT listings using the Immutable Orderbook SDK with Next.js. It shows how to create listings for both ERC721 and ERC1155 tokens, enabling users to list their NFTs for sale in exchange for either native currency or ERC20 tokens.
 
 <div class="button-component">
@@ -17,185 +20,113 @@ This example app demonstrates how to create NFT listings using the Immutable Ord
 - Create NFT listings for ERC721 tokens
 - Create NFT listings for ERC1155 tokens
 
-## SDK Integration Details
+## Prepare the listing
 
-### Create Listing for ERC721 Tokens
+The call to `prepareListing` returns [actions](/products/zkEVM/orderbook/actions), order components and the order hash. The order components, order hash and a signature of from the signable action are required for creating the order in later steps. Actions for preparing a listing include both transaction and signable action types. The details of these actions are as follows:
+ - `APPROVAL` transaction - An approval transaction is required when the user has not yet approved the seaport contract for the collection they are creating the listing for.
+ - `CREATE_LISTING` signable message - This signable message is used to create the order on the Immutable order book.
 
-Creates a listing on the Orderbook for a specific ERC721 token.
+Listing creation enforces royalties requirements based on the ERC2981 interface - prepare listing in the SDK will query the royalty information automatically.
 
-1. Prepare the ERC721 listing:
+The `maker` below is any `ethers` compatible `Signer` or `Wallet` instance for the user creating the listing.
 
-```typescript title="Prepare ERC721 Listing" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc721/page.tsx"
-const prepareERC721Listing = async (): Promise<orderbook.PrepareListingResponse> => {
-  // build the sell item
-  const sell: ERC721Item = {
-    contractAddress: sellItemContractAddress,
-    tokenId: sellItemTokenID,
-    type: "ERC721",
-  };
+<FeeQTYUnits />
 
-  // build the buy item
-  const buy =
-    buyItemType === "Native"
-      ? ({
-          amount: buyItemAmount,
-          type: "NATIVE",
-        } as NativeItem)
-      : ({
-          amount: buyItemAmount,
-          type: "ERC20",
-          contractAddress: buyItemContractAddress,
-        } as ERC20Item);
+Select the tabs below to learn about the differences between preparing listings for ERC721 and ERC1155 tokens:
+<Tabs>
+<TabItem value="erc721_listing" label="ERC721 listing creation">
 
-  // build the prepare listing parameters
-  const prepareListingParams: PrepareListingParams = {
-    makerAddress: accountsState[0],
-    buy,
-    sell,
-  };
+If preparing a listing containing ERC721 tokens, the `amount` of tokens offered for sale is always `1` and therefore the `amount` field in the `sell` token section is not required.
 
-  // invoke the orderbook SDK to prepare the listing
-  return await orderbookSDK.prepareListing(prepareListingParams);
-};
+Orders containing ERC721 tokens should be setup with the order_type as `FULL_RESTRICTED` because ERC721 orders can only be fully filled. If you are using the SDK, the order type will be automatically set based on the token type.
+If using the API directly, please ensure you are setting the order type correctly in the protocol data section.
+
+:::note
+All new listings created starting May 2024 should use Signed Zone version 2 contract address as specified in the [list of deployed contracts](https://github.com/immutable/contracts/blob/main/contract_address.json).
+
+The legacy zone contract is deprecated as of May 2024 and will be sunset in May 2025. All existing listings that were created using the legacy zone contract will continue to be supported until May 2025.
+
+If you are using the SDK, the contract address is automatically updated for you. If you are using the API directly, please ensure you are using the correct zone contract address in the protocol data section.
+:::
+
+```tsx reference=examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc721/page.tsx#prepare-erc721-listing title="Prepare ERC721 Listing"
 ```
 
-2. Sign and submit approval for the listing:
+</TabItem>
 
-```typescript title="Sign and Submit Approval" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc721/page.tsx"
-export const signAndSubmitApproval = async (
-  provider: BrowserProvider,
-  listing: orderbook.PrepareListingResponse,
-): Promise<void> => {
-  // get your user's Web3 wallet, e.g. MetaMask, Passport, etc
-  const signer = await provider.getSigner();
+<TabItem value="erc1155_listing" label="ERC1155 listing creation">
 
-  // If the user hasn't yet approved the Immutable Seaport contract to transfer assets from this
-  // collection on their behalf they'll need to do so before they create an order
-  const approvalActions = listing.actions.filter(
-    (action): action is orderbook.TransactionAction =>
-      action.type === orderbook.ActionType.TRANSACTION,
-  );
+If preparing a listing containing ERC1155 tokens, the `amount` of tokens offered for sale should be specified in the `amount` field in the `sell` token section. The amount of tokens in the `buy` section should be a multiple of the sell token amount.
 
-  for (const approvalAction of approvalActions) {
-    const unsignedTx = await approvalAction.buildTransaction();
-    const receipt = await signer.sendTransaction(unsignedTx);
-    await receipt.wait();
-  }
+For example, if the user is listing 5 tokens for sale i.e `amount` in sell token section is `5` then the `amount` in the buy token section should be a multiple of `5` so 5, 10, 15, etc.
 
-  return;
-};
+Orders containing ERC1155 tokens should be setup the order_type as `PARTIAL_RESTRICTED` to allow for partial fulfillment. If you are using the SDK, the order type will be automatically set based on the token type.
+If using the API directly, please ensure you are setting the order type correctly in the protocol data section.
+
+:::note
+All new listings created starting May 2024 should use Signed Zone version 2 contract address as specified in the [list of deployed contracts](https://github.com/immutable/contracts/blob/main/contract_address.json).
+
+The legacy zone contract is deprecated as of May 2024 and will be sunset in May 2025. All existing listings that were created using the legacy zone contract will continue to be supported until May 2025.
+
+If you are using the SDK, the contract address is automatically updated for you. If you are using the API directly, please ensure you are using the correct zone contract address in the protocol data section.
+:::
+
+```tsx reference=examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc1155/page.tsx#prepare-erc1155-listing title="Prepare ERC1155 Listing"
 ```
 
-3. Sign the listing:
+</TabItem>
+</Tabs>
 
-```typescript title="Sign Listing" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc721/page.tsx"
-export const signListing = async (
-  provider: BrowserProvider,
-  listing: orderbook.PrepareListingResponse,
-): Promise<string> => {
-  // get your user's Web3 wallet, e.g. MetaMask, Passport, etc
-  const signer = await provider.getSigner();
+## Sign and submit the approval transaction
 
-  // For an order to be created (and subsequently filled), Immutable needs a valid signature for the order data.
-  // This signature is stored off-chain and is later provided to any user wishing to fulfil the open order.
-  // The signature only allows the order to be fulfilled if it meets the conditions specified by the user that created the listing.
-  const signableAction = listing.actions.find(
-    (action): action is orderbook.SignableAction =>
-      action.type === orderbook.ActionType.SIGNABLE,
-  )!;
+If there is an approval transaction required for the listing, it needs to be signed and submitted to the zkEVM.
 
-  const signature = await signer.signTypedData(
-    signableAction.message.domain,
-    signableAction.message.types,
-    signableAction.message.value,
-  );
-
-  return signature;
-};
+```tsx reference=examples/orderbook/create-listing-with-nextjs/src/app/utils/listing.ts#sign-and-submit-approval title="Sign and submit approval"
 ```
 
-4. Create the listing:
+## Sign the typed order data
 
-```typescript title="Create Listing" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc721/page.tsx"
-export const createListing = async (
-  client: orderbook.Orderbook,
-  preparedListing: orderbook.PrepareListingResponse,
-  orderSignature: string,
-  makerEcosystemFee?: {
-    recipientAddress: string;
-    amount: string;
-  },
-): Promise<string> => {
-  const order = await client.createListing({
-    orderComponents: preparedListing.orderComponents,
-    orderHash: preparedListing.orderHash,
-    orderSignature,
-    // Optional maker marketplace fee
-    makerFees: makerEcosystemFee ? [
-      {
-        recipientAddress: makerEcosystemFee.recipientAddress,
-        amount: makerEcosystemFee.amount,
-      },
-    ] : [],
-  });
-  return order.result.id;
-};
+For an order to be created (and subsequently filled), Immutable needs a valid signature for the order data. This signature is stored off-chain and is later provided to any user wishing to fulfil the open order. The signature only allows the order to be fulfilled if it meets the conditions specified by the user that created the listing.
+
+```tsx reference=examples/orderbook/create-listing-with-nextjs/src/app/utils/listing.ts#sign-listing title="Sign listing"
 ```
 
-The ERC721 listing workflow consists of four main steps:
+## Create the listing
 
-1. **Prepare the listing**: This involves specifying what you're selling (an ERC721 token) and what you want in return (either Native currency or an ERC20 token).
+This last step is sending the locally signed order to the Immutable orderbook where validation will be performed for the order.
+If the order contains malformed data, an incorrect signature or incorrect buy / sell amounts (in case of ERC1155 listings) the server will return an invalid response,
+otherwise it will be server side signed and ready to be fulfilled.
 
-2. **Sign and submit approval**: Before creating a listing, the user must approve the Immutable Seaport contract to transfer the NFT on their behalf. This step processes any approval transactions required to enable the transfer when the listing is fulfilled.
+When a marketplace submits a locally signed order to the Immutable orderbook, they should include a makerFees field as demonstrated in the code block below. This fee should be represented as the net amount that the marketplace wishes to receive for the services provided, and it should be quoted in the same ERC20 token in which the order is listed.
 
-3. **Sign the listing**: The user signs the order data using their wallet. This signature is stored off-chain and allows the order to be fulfilled only under the conditions specified by the seller.
+:::note
+If creating a listing for ERC1155 tokens, the fee `amount` should be a multiple of the sell token amount.
+For example, if the user is selling 5 tokens, the maker fee amount should be 5, 10, 15, etc.
+:::
 
-4. **Create the listing**: Finally, the application submits the listing to Immutable's Orderbook service. This includes the order components, hash, signature, and optional marketplace fees.
+For example, if the NFT is selling for 50 IMX, and a maker fee of 1% is applied, it should be represented like this:
 
-### Create Listing for ERC1155 Tokens
+<FeeQTYUnits />
 
-Creates a listing on the Orderbook for a specific quantity of an ERC1155 token.
-
-The implementation for ERC1155 tokens is similar to ERC721, with the main difference being the inclusion of a quantity (amount) parameter for the tokens being sold:
-
-```typescript title="Prepare ERC1155 Listing" manualLink="https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook/create-listing-with-nextjs/src/app/create-listing-with-erc1155/page.tsx"
-const prepareERC1155Listing = async (): Promise<orderbook.PrepareListingResponse> => {
-  // build the sell item
-  const sell: ERC1155Item = {
-    contractAddress: sellItemContractAddress,
-    tokenId: sellItemTokenID,
-    amount: sellItemQty,
-    type: "ERC1155",
-  };
-
-  // build the buy item
-  const buy =
-    buyItemType === "Native"
-      ? ({
-          amount: buyItemAmount,
-          type: "NATIVE",
-        } as NativeItem)
-      : ({
-          amount: buyItemAmount,
-          type: "ERC20",
-          contractAddress: buyItemContractAddress,
-        } as ERC20Item);
-
-  // build the prepare listing parameters
-  const prepareListingParams: PrepareListingParams = {
-    makerAddress: accountsState[0],
-    buy,
-    sell,
-  };
-
-  // invoke the orderbook SDK to prepare the listing
-  return await orderbookSDK.prepareListing(prepareListingParams);
-};
+```ts
+makerFees: [{
+  amount: '500000000000000000', // 0.5 IMX
+}]
 ```
 
-The key difference when creating an ERC1155 listing is that you must specify the quantity (amount) of tokens to sell. ERC1155 tokens are semi-fungible, meaning multiple tokens can share the same ID. This allows sellers to list a specific quantity of tokens from their collection.
+For additional details on fees that ecosystems like marketplaces can incorporate into orders for the services they offer, please refer to our [fee guide](/products/zkEVM/orderbook/fees).
 
-The rest of the process (approval, signing, and creating the listing) follows the same pattern as the ERC721 implementation, with the appropriate token type set to "ERC1155".
+Orders created will initially be in `PENDING` status. Upon further validating blockchain approval events (if necessary) and balance checks (i.e. listing owner indeed owns NFT),
+it will become `ACTIVE`. You can read more about order statuses [here](/products/zkEVM/orderbook/statuses).
+
+<ListAdmonition label="Note" type="tip" title="Status polling">
+  You can poll the Get Listing endpoint to check on status updates - in the near
+  future we also plan on introducing push based (webhook) integration for order
+  events.
+</ListAdmonition>
+
+```tsx reference=examples/orderbook/create-listing-with-nextjs/src/app/utils/listing.ts#create-listing title="Create Listing"
+```
 
 ## Running the App
 
@@ -228,7 +159,7 @@ cp .env.example .env
 
 4. Edit the `.env` file to add your Immutable Hub publishable API key and client ID:
 
-```
+```bash
 NEXT_PUBLIC_PUBLISHABLE_KEY=your_publishable_key
 NEXT_PUBLIC_CLIENT_ID=your_client_id
 ```

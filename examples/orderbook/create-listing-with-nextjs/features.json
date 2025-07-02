@@ -3,5 +3,6 @@
         "create-listing-for-erc721",
         "create-listing-for-erc1155"
     ],
-    "order": 30
+    "order": 30,
+    "manually-edited": true
 }
