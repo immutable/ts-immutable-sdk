@@ -22,6 +22,5 @@ export type {
   UserProfile,
   PassportOverrides,
   PassportModuleConfiguration,
-  DeviceConnectResponse,
   DeviceTokenResponse,
 } from './types';

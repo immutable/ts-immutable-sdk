@@ -20,7 +20,7 @@
       "product": "Checkout",
       "programming_language": "TypeScript",
       "deprecated": false,
-      "sidebar_order": 1
+      "sidebar_order": 20
     }
   },
   "sdk-gas-estimation-with-nextjs": {
@@ -46,7 +46,7 @@
       "product": "Checkout",
       "programming_language": "TypeScript",
       "deprecated": false,
-      "sidebar_order": 4
+      "sidebar_order": 50
     }
   },
   "sdk-switch-network-with-nextjs": {
@@ -71,7 +71,7 @@
       "product": "Checkout",
       "programming_language": "TypeScript",
       "deprecated": false,
-      "sidebar_order": 3
+      "sidebar_order": 40
     }
   },
   "sdk-wallet-balance-with-nextjs": {
@@ -96,7 +96,7 @@
       "product": "Checkout",
       "programming_language": "TypeScript",
       "deprecated": false,
-      "sidebar_order": 2
+      "sidebar_order": 30
     }
   }
 }

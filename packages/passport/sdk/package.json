@@ -22,7 +22,7 @@
     "jwt-decode": "^3.1.2",
     "localforage": "^1.10.0",
     "magic-sdk": "^29.0.5",
-    "oidc-client-ts": "2.4.0",
+    "oidc-client-ts": "3.3.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
