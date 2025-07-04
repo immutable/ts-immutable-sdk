@@ -6,6 +6,11 @@
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FeeQTYUnits from '@site/docs/main/_partials/fees/fees-quantity-units.mdx';
+import ListingOrderComparison from '@site/docs/main/build/typescript/usage/orderbook/_partials/listing-vs-order.mdx';
+
+
+<ListingOrderComparison />
 
 This example app demonstrates how to create NFT listings using the Immutable Orderbook SDK with Next.js. It shows how to create listings for both ERC721 and ERC1155 tokens, enabling users to list their NFTs for sale in exchange for either native currency or ERC20 tokens.
 

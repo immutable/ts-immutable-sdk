@@ -1,14 +1,22 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import ListAdmonition from '@site/src/components/ListAdmonition';
+import ListingOrderComparison from '@site/docs/main/build/typescript/usage/orderbook/_partials/listing-vs-order.mdx'
+import FeeQTYUnits from '@site/docs/main/_partials/fees/fees-quantity-units.mdx';
+
+
+<ListAdmonition label="Prerequisites">
+    <li><a href="/build/typescript/usage/orderbook/setup#create-signers-for-user-authorisation">Create signers</a></li>
+</ListAdmonition>
+<ListingOrderComparison />
+
+
 <div class="display-none">
 
 # Fulfill Listing with Next.js
 
 </div>
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-import ListAdmonition from '@site/src/components/ListAdmonition';
-import ListingOrderComparison from '@site/docs/main/build/typescript/usage/orderbook/_partials/listing-vs-order.mdx'
-import FeeQTYUnits from '@site/docs/main/_partials/fees/fees-quantity-units.mdx';
 
 This tutorial demonstrates how to implement NFT listing fulfillment using the Immutable Orderbook SDK with Next.js. The application showcases how to fulfill both ERC721 and ERC1155 listings, providing a complete workflow from listing discovery to transaction execution.
 
