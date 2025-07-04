@@ -2,7 +2,7 @@ import encode from 'jwt-encode';
 import {
   User as OidcUser,
 } from 'oidc-client-ts';
-import { isIdTokenExpired, isTokenExpired } from './token';
+import { isIdTokenExpired, isAccessTokenExpiredOrExpiring } from './token';
 
 const now = Math.floor(Date.now() / 1000);
 const oneHourLater = now + 3600;
@@ -31,13 +31,13 @@ describe('isIdTokenExpired', () => {
   });
 });
 
-describe('isTokenExpired', () => {
+describe('isAccessTokenExpiredOrExpiring', () => {
   it('should return true if expired is true', () => {
     const user = {
       id_token: mockValidIdToken,
       expired: true,
     } as unknown as OidcUser;
-    expect(isTokenExpired(user)).toBe(true);
+    expect(isAccessTokenExpiredOrExpiring(user)).toBe(true);
   });
 
   it('should return false if idToken is valid', () => {
@@ -45,7 +45,7 @@ describe('isTokenExpired', () => {
       id_token: mockValidIdToken,
       expired: false,
     } as unknown as OidcUser;
-    expect(isTokenExpired(user)).toBe(false);
+    expect(isAccessTokenExpiredOrExpiring(user)).toBe(false);
   });
 
   it('should return true idToken is expired', () => {
@@ -53,6 +53,6 @@ describe('isTokenExpired', () => {
       id_token: mockExpiredIdToken,
       expired: false,
     } as unknown as OidcUser;
-    expect(isTokenExpired(user)).toBe(true);
+    expect(isAccessTokenExpiredOrExpiring(user)).toBe(true);
   });
 });
