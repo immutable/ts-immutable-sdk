@@ -44,6 +44,8 @@ describe('relayerClient', () => {
       const data = '0x123';
 
       (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(JSON.stringify({ result: transactionHash })),
         json: () => ({
           result: transactionHash,
         }),
@@ -69,6 +71,36 @@ describe('relayerClient', () => {
         }],
       });
     });
+
+    it('throws HTTP error for non-ok response', async () => {
+      const to = '0xd64b0d2d72bb1b3f18046b8a7fc6c9ee6bccd287';
+      const data = '0x123';
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 401,
+        statusText: 'Unauthorized',
+        text: () => Promise.resolve('{"error":"invalid_token"}'),
+      });
+
+      await expect(relayerClient.ethSendTransaction(to, data)).rejects.toThrow(
+        'Relayer HTTP error: 401. Content: "{"error":"invalid_token"}"',
+      );
+    });
+
+    it('throws JSON parse error for invalid response', async () => {
+      const to = '0xd64b0d2d72bb1b3f18046b8a7fc6c9ee6bccd287';
+      const data = '0x123';
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve('invalid json'),
+      });
+
+      await expect(relayerClient.ethSendTransaction(to, data)).rejects.toThrow(
+        'Relayer JSON parse error: Unexpected token \'i\', "invalid json" is not valid JSON. Content: "invalid json"',
+      );
+    });
   });
 
   describe('imGetTransactionByHash', () => {
@@ -82,6 +114,8 @@ describe('relayerClient', () => {
       };
 
       (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(JSON.stringify({ result: relayerTransaction })),
         json: () => ({
           result: relayerTransaction,
         }),
@@ -118,6 +152,8 @@ describe('relayerClient', () => {
       }];
 
       (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(JSON.stringify({ result: feeOptions })),
         json: () => ({
           result: feeOptions,
         }),
@@ -152,6 +188,8 @@ describe('relayerClient', () => {
       const relayerSignature = '0x123';
 
       (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(JSON.stringify({ result: relayerSignature })),
         json: () => ({
           result: relayerSignature,
         }),
@@ -186,6 +224,8 @@ describe('relayerClient', () => {
       const relayerSignature = '0x123';
 
       (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(JSON.stringify({ result: relayerSignature })),
         json: () => ({
           result: relayerSignature,
         }),
