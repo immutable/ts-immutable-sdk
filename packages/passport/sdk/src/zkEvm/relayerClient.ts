@@ -102,6 +102,12 @@ export class RelayerClient {
     this.authManager = authManager;
   }
 
+  private static getResponsePreview(text: string): string {
+    return text.length > 100
+      ? `${text.substring(0, 50)}...${text.substring(text.length - 50)}`
+      : text;
+  }
+
   private async postToRelayer<T>(request: RelayerTransactionRequest): Promise<T> {
     const body: RelayerTransactionRequest & JsonRpc = {
       id: 1,
@@ -120,9 +126,19 @@ export class RelayerClient {
       body: JSON.stringify(body),
     });
 
-    const jsonResponse = await response.json();
-    if (jsonResponse.error) {
-      throw jsonResponse.error;
+    if (!response.ok) {
+      const responseText = await response.text();
+      const preview = RelayerClient.getResponsePreview(responseText);
+      throw new Error(`Relayer HTTP error: ${response.status}. Content: "${preview}"`);
+    }
+
+    const responseText = await response.text();
+    let jsonResponse;
+    try {
+      jsonResponse = JSON.parse(responseText);
+    } catch (parseError) {
+      const preview = RelayerClient.getResponsePreview(responseText);
+      throw new Error(`Relayer JSON parse error: ${parseError instanceof Error ? parseError.message : 'Unknown error'}. Content: "${preview}"`);
     }
 
     return jsonResponse;
