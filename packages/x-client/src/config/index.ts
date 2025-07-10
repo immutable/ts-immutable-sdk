@@ -10,7 +10,7 @@ import {
 export { Environment, ImmutableConfiguration } from '@imtbl/config';
 export class ApiConfiguration extends imx.Configuration { }
 
-const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
+const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-2.3.2' };
 
 interface ImmutableXConfigurationParams {
   basePath: string;
@@ -64,7 +64,7 @@ export const createConfig = ({
   }
 
   if (sdkVersion) {
-    defaultHeaders['x-sdk-version'] = sdkVersion;
+    defaultHeaders['x-sdk-version'] = 'ts-immutable-sdk-2.3.2';
   }
 
   // eslint-disable-next-line no-param-reassign

@@ -29,21 +29,25 @@ export type UserProfile = {
   sub: string;
 };
 
+export type ImxAddresses = {
+  ethAddress: string;
+  starkAddress: string;
+  userAdminAddress: string;
+}
+
+export type ZkEvmAddresses = {
+  ethAddress: string;
+  userAdminAddress: string;
+}
+
 export type User = {
   idToken?: string;
   accessToken: string;
   refreshToken?: string;
   profile: UserProfile;
   expired?: boolean;
-  imx?: {
-    ethAddress: string;
-    starkAddress: string;
-    userAdminAddress: string;
-  };
-  zkEvm?: {
-    ethAddress: string;
-    userAdminAddress: string;
-  };
+  imx?: ImxAddresses;
+  zkEvm?: ZkEvmAddresses;
 };
 
 export type PassportMetadata = {

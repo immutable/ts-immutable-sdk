@@ -19,12 +19,13 @@ import {
 } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
+import MagicTeeAdapter from '../magic/magicTeeAdapter';
 
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
 
 export type TransactionParams = {
-  ethSigner: Signer;
+  magicTeeAdapter: MagicTeeAdapter;
   rpcProvider: JsonRpcProvider;
   guardianClient: GuardianClient;
   relayerClient: RelayerClient;
@@ -34,7 +35,7 @@ export type TransactionParams = {
   isBackgroundTransaction?: boolean;
 };
 
-export type EjectionTransactionParams = Pick<TransactionParams, 'ethSigner' | 'zkEvmAddress' | 'flow'>;
+export type EjectionTransactionParams = Pick<TransactionParams, 'magicTeeAdapter' | 'zkEvmAddress' | 'flow'>;
 export type EjectionTransactionResponse = {
   to: string;
   data: string;
@@ -164,7 +165,7 @@ export const pollRelayerTransaction = async (
 
 export const prepareAndSignTransaction = async ({
   transactionRequest,
-  ethSigner,
+  magicTeeAdapter,
   rpcProvider,
   guardianClient,
   relayerClient,
@@ -211,7 +212,7 @@ export const prepareAndSignTransaction = async ({
       nonce,
       chainIdBigNumber,
       zkEvmAddress,
-      ethSigner,
+      magicTeeAdapter,
     );
     flow.addEvent('endGetSignedMetaTransactions');
     return signed;
@@ -265,7 +266,7 @@ const buildMetaTransactionForEjection = async (
 
 export const prepareAndSignEjectionTransaction = async ({
   transactionRequest,
-  ethSigner,
+  magicTeeAdapter,
   zkEvmAddress,
   flow,
 }: EjectionTransactionParams & { transactionRequest: TransactionRequest }): Promise<EjectionTransactionResponse> => {
@@ -279,7 +280,7 @@ export const prepareAndSignEjectionTransaction = async ({
     transactionRequest.nonce as BigNumberish,
     BigInt(transactionRequest.chainId ?? 0),
     zkEvmAddress,
-    ethSigner,
+    magicTeeAdapter,
   );
   flow.addEvent('endGetSignedMetaTransactions');
 

@@ -2,6 +2,8 @@ import { Signer } from 'ethers';
 import {
   createStarkSigner,
   generateLegacyStarkPrivateKey,
+  generateLegacyStarkPrivateKeyFromSignature,
+  DEFAULT_SIGNATURE_MESSAGE,
   StarkSigner,
 } from '@imtbl/x-client';
 import { withPassportError, PassportErrorType } from '../errors/passportError';

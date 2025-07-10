@@ -287,6 +287,19 @@ export async function generateLegacyStarkPrivateKey(
 ): Promise<string> {
   const address = (await signer.getAddress()).toLowerCase();
   const signature = await signer.signMessage(toUtf8Bytes(legacy.DEFAULT_SIGNATURE_MESSAGE));
+  return generateLegacyStarkPrivateKeyFromSignature(signature, address);
+}
+
+/**
+ * Generates a deterministic Stark private key from the provided signature and address.
+ * @param signature - The signature to use to generate the private key.
+ * @param address - The address to use to generate the private key.
+ * @returns the private key as a hex string
+ */
+export async function generateLegacyStarkPrivateKeyFromSignature(
+  signature: string,
+  address: string,
+): Promise<string> {
   const seed = Signature.from(signature).s;
   const path = legacy.getAccountPath(
     legacy.DEFAULT_ACCOUNT_LAYER,

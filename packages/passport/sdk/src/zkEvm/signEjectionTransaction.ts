@@ -12,7 +12,7 @@ type EthSendTransactionEjectionParams = EjectionTransactionParams & {
 
 export const signEjectionTransaction = async ({
   params,
-  ethSigner,
+  magicTeeAdapter,
   zkEvmAddress,
   flow,
 }: EthSendTransactionEjectionParams): Promise<EjectionTransactionResponse> => {
@@ -26,7 +26,7 @@ export const signEjectionTransaction = async ({
   const transactionRequest = params[0] as TransactionRequest;
   return await prepareAndSignEjectionTransaction({
     transactionRequest,
-    ethSigner,
+    magicTeeAdapter,
     zkEvmAddress,
     flow,
   });

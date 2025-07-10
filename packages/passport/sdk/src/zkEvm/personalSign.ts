@@ -1,16 +1,18 @@
 import { Flow } from '@imtbl/metrics';
-import { Signer, JsonRpcProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { hexToString } from '../utils/string';
 import GuardianClient from '../guardian';
 import { RelayerClient } from './relayerClient';
 import { packSignatures, signERC191Message } from './walletHelpers';
+import MagicTeeAdapter from '../magic/magicTeeAdapter';
+import { ZkEvmAddresses } from '../types';
 
 interface PersonalSignParams {
-  ethSigner: Signer;
+  magicTeeAdapter: MagicTeeAdapter;
   rpcProvider: JsonRpcProvider;
   params: any[];
-  zkEvmAddress: string;
+  zkEvmAddresses: ZkEvmAddresses;
   guardianClient: GuardianClient;
   relayerClient: RelayerClient;
   flow: Flow;
@@ -18,8 +20,8 @@ interface PersonalSignParams {
 
 export const personalSign = async ({
   params,
-  ethSigner,
-  zkEvmAddress,
+  magicTeeAdapter,
+  zkEvmAddresses,
   rpcProvider,
   guardianClient,
   relayerClient,
@@ -32,7 +34,7 @@ export const personalSign = async ({
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'personal_sign requires an address and a message');
   }
 
-  if (fromAddress.toLowerCase() !== zkEvmAddress.toLowerCase()) {
+  if (fromAddress.toLowerCase() !== zkEvmAddresses.ethAddress.toLowerCase()) {
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'personal_sign requires the signer to be the from address');
   }
 
@@ -42,21 +44,25 @@ export const personalSign = async ({
   flow.addEvent('endDetectNetwork');
   const chainIdBigNumber = BigInt(chainId);
 
-  // Sign the message with the EOA without blocking
-  const eoaSignaturePromise = signERC191Message(chainIdBigNumber, payload, ethSigner, fromAddress);
-  eoaSignaturePromise.then(() => flow.addEvent('endEOASignature'));
+  // Parallelize the evaluation and signing of the message
+  const evaluateMessage = async () => {
+    await guardianClient.evaluateERC191Message({ chainID: chainId, payload });
+    flow.addEvent('endEvaluateERC191Message');
+  };
 
-  await guardianClient.evaluateERC191Message({ chainID: chainId, payload });
-  flow.addEvent('endEvaluateERC191Message');
+  const generateEoaSignature = async () => {
+    const eoaSignature = await signERC191Message(chainIdBigNumber, payload, magicTeeAdapter, fromAddress);
+    flow.addEvent('endEOASignature');
+    return eoaSignature;
+  };
 
-  const [eoaSignature, relayerSignature] = await Promise.all([
-    eoaSignaturePromise,
-    relayerClient.imSign(fromAddress, payload),
+  const [, eoaSignature] = await Promise.all([
+    evaluateMessage(),
+    generateEoaSignature(),
   ]);
-  flow.addEvent('endRelayerSign');
 
-  const eoaAddress = await ethSigner.getAddress();
-  flow.addEvent('endGetEOAAddress');
+  const relayerSignature = await relayerClient.imSign(fromAddress, payload);
+    flow.addEvent('endRelayerSign');
 
-  return packSignatures(eoaSignature, eoaAddress, relayerSignature);
+  return packSignatures(eoaSignature, zkEvmAddresses.userAdminAddress, relayerSignature);
 };

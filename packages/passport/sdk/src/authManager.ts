@@ -196,8 +196,7 @@ export default class AuthManager {
         this.userManager.signinPopup({
           extraQueryParams: {
             ...(this.userManager.settings?.extraQueryParams ?? {}),
-            rid: getDetail(Detail.RUNTIME_ID) || '',
-            third_party_a_id: anonymousId || '',
+            hello: 'world'
           },
           popupWindowFeatures: {
             width: 410,

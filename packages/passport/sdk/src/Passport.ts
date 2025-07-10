@@ -1,6 +1,6 @@
 import { IMXProvider } from '@imtbl/x-provider';
 import {
-  createConfig, ImxApiClients, imxApiConfig, MultiRollupApiClients,
+  createConfig, ImxApiClients, imxApiConfig, MagicTeeApiClients, MultiRollupApiClients,
 } from '@imtbl/generated-clients';
 import { IMXClient } from '@imtbl/x-client';
 import { Environment } from '@imtbl/config';
@@ -12,6 +12,7 @@ import {
 import { isAxiosError } from 'axios';
 import AuthManager from './authManager';
 import MagicAdapter from './magic/magicAdapter';
+import MagicTeeAdapter from './magic/magicTeeAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
@@ -59,6 +60,13 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
   const magicProviderProxyFactory = new MagicProviderProxyFactory(authManager, config);
   const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
   const confirmationScreen = new ConfirmationScreen(config);
+  const magicTeeApiClients = new MagicTeeApiClients({
+    basePath: config.magicTeeBasePath,
+    timeout: config.magicTeeTimeout,
+    magicPublishableApiKey: config.magicPublishableApiKey,
+    magicProviderId: config.magicProviderId,
+  });
+  const magicTeeAdapter = new MagicTeeAdapter(config, authManager, magicTeeApiClients);
   const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
   const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
 
@@ -88,6 +96,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     config,
     authManager,
     magicAdapter,
+    magicTeeAdapter,
     confirmationScreen,
     immutableXClient,
     multiRollupApiClients,
@@ -108,6 +117,8 @@ export class Passport {
 
   private readonly magicAdapter: MagicAdapter;
 
+  private readonly magicTeeAdapter: MagicTeeAdapter;
+
   private readonly multiRollupApiClients: MultiRollupApiClients;
 
   private readonly passportImxProviderFactory: PassportImxProviderFactory;
@@ -122,6 +133,7 @@ export class Passport {
     this.config = privateVars.config;
     this.authManager = privateVars.authManager;
     this.magicAdapter = privateVars.magicAdapter;
+    this.magicTeeAdapter = privateVars.magicTeeAdapter;
     this.confirmationScreen = privateVars.confirmationScreen;
     this.immutableXClient = privateVars.immutableXClient;
     this.multiRollupApiClients = privateVars.multiRollupApiClients;
@@ -156,17 +168,25 @@ export class Passport {
    * @param {boolean} options.announceProvider - Whether to announce the provider via EIP-6963 for wallet discovery (defaults to true)
    * @returns {Provider} The EVM provider instance
    */
-  public connectEvm(options: {
+  public async connectEvm(options: {
     announceProvider: boolean
   } = { announceProvider: true }): Promise<Provider> {
     return withMetricsAsync(async () => {
+      let user: User | null = null;
+      try {
+        user = await this.authManager.getUser();
+      } catch (error) {
+        logger.warn('Failed to retrieve a cached user session', error);
+      }
+
       const provider = new ZkEvmProvider({
         passportEventEmitter: this.passportEventEmitter,
         authManager: this.authManager,
-        magicAdapter: this.magicAdapter,
+        magicTeeAdapter: this.magicTeeAdapter,
         config: this.config,
         multiRollupApiClients: this.multiRollupApiClients,
         guardianClient: this.guardianClient,
+        user,
       });
 
       if (options?.announceProvider) {

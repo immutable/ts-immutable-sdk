@@ -1,17 +1,20 @@
 import { Flow } from '@imtbl/metrics';
-import { Signer, JsonRpcProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import GuardianClient from '../guardian';
 import { signAndPackTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { RelayerClient } from './relayerClient';
+import MagicTeeAdapter from '../magic/magicTeeAdapter';
+import { ZkEvmAddresses } from '../types';
 
 export type SignTypedDataV4Params = {
-  ethSigner: Signer;
+  magicTeeAdapter: MagicTeeAdapter;
   rpcProvider: JsonRpcProvider;
   relayerClient: RelayerClient;
   method: string;
   params: Array<any>;
+  zkEvmAddresses: ZkEvmAddresses;
   guardianClient: GuardianClient;
   flow: Flow;
 };
@@ -66,7 +69,8 @@ const transformTypedData = (typedData: string | object, chainId: bigint): TypedD
 export const signTypedDataV4 = async ({
   params,
   method,
-  ethSigner,
+  zkEvmAddresses,
+  magicTeeAdapter,
   rpcProvider,
   relayerClient,
   guardianClient,
@@ -92,9 +96,10 @@ export const signTypedDataV4 = async ({
   const signature = await signAndPackTypedData(
     typedData,
     relayerSignature,
+    zkEvmAddresses.userAdminAddress,
     BigInt(chainId),
     fromAddress,
-    ethSigner,
+    magicTeeAdapter,
   );
   flow.addEvent('getSignedTypedData');
 

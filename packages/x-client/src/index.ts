@@ -9,6 +9,8 @@ export * from './types';
 export type { ImxModuleConfiguration as ImxClientModuleConfiguration } from './config';
 export {
   generateLegacyStarkPrivateKey as imxClientGenerateLegacyStarkPrivateKey,
+  generateLegacyStarkPrivateKeyFromSignature as imxClientGenerateLegacyStarkPrivateKeyFromSignature,
   createStarkSigner as imxClientCreateStarkSigner,
+  DEFAULT_SIGNATURE_MESSAGE,
 } from './exportUtils';
 export type { WalletConnection as ImxClientWalletConnection } from './types';
