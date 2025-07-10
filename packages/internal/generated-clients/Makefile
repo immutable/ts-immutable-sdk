@@ -80,3 +80,28 @@ generate-blockchain-data-types:
     -o /app/src/blockchain-data \
     -c /app/config/blockchain-data.config.json \
     --additional-properties=stringEnums=true
+
+# -------------------------------------------------
+# Magic TEE
+# -------------------------------------------------
+
+.PHONY: generate-magic-tee-openapi
+generate-magic-tee-openapi: get-magic-tee-openapi generate-magic-tee-client
+
+.PHONY: get-magic-tee-openapi
+get-magic-tee-openapi:
+	rm -f src/magic-tee-openapi.json && touch src/magic-tee-openapi.json && \
+	curl -H "Accept: application/json+v3" \
+    https://tee.express.magiclabs.com/openapi.json \
+    -o src/magic-tee-openapi.json
+
+.PHONY: generate-magic-tee-client
+generate-magic-tee-client:
+	pnpm rimraf src/magic-tee && \
+    mkdir src/magic-tee && \
+	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v7.0.1 generate \
+    --inline-schema-options REFACTOR_ALLOF_INLINE_SCHEMAS=true \
+    -i ./app/src/magic-tee-openapi.json \
+    -g typescript-axios \
+    -o /app/src/magic-tee \
+    -c /app/config/magic-tee.config.json
