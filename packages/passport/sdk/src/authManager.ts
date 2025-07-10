@@ -364,6 +364,17 @@ export default class AuthManager {
     return this.userManager.removeUser();
   }
 
+  public async getLogoutUrl(): Promise<string> {
+    const { authenticationDomain, oidcConfiguration } = this.config;
+
+    const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain);
+    endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
+
+    if (oidcConfiguration.logoutRedirectUri) endSessionEndpoint.searchParams.set('returnTo', oidcConfiguration.logoutRedirectUri);
+
+    return endSessionEndpoint.toString();
+  }
+
   public forceUserRefreshInBackground() {
     this.refreshTokenAndUpdatePromise().catch((error) => {
       logger.warn('Failed to refresh user token', error);
