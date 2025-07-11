@@ -5,7 +5,7 @@ import {
   packSignatures,
   signERC191Message,
 } from './walletHelpers';
-import { chainId } from '../test/mocks';
+import { chainId, mockUserZkEvm } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import GuardianClient from '../guardian';
 import { ZkEvmAddresses } from '../types';
@@ -14,8 +14,6 @@ import MagicTeeAdapter from '../magic/magicTeeAdapter';
 jest.mock('./walletHelpers');
 
 describe('personalSign', () => {
-  const eoaAddress = '0xd64b0d2d72bb1b3f18046b8a7fc6c9ee6bccd287';
-  const userAdminAddress = '0x1234567890123456789012345678901234567890';
   const message = 'hello';
 
   const eoaSignature = '02011b1d383526a2815d26550eb314b5d7e05513273300439b63b94e127c13e1bae9f3f24ab42717c7ae2e25fb82e7fd24afc320690413ca6581c798f91cce8296bd21f4f35a4b33b882a5401499f829481d8ed8d3de23741b0103';
@@ -27,8 +25,8 @@ describe('personalSign', () => {
     personalSign: jest.fn(),
   };
   const zkEvmAddresses: ZkEvmAddresses = {
-    ethAddress: eoaAddress,
-    userAdminAddress: userAdminAddress,
+    ethAddress: mockUserZkEvm.zkEvm.ethAddress,
+    userAdminAddress: mockUserZkEvm.zkEvm.userAdminAddress,
   };
   const rpcProvider = {
     getNetwork: jest.fn(),
@@ -58,7 +56,7 @@ describe('personalSign', () => {
   describe('when a valid address and message are provided', () => {
     it('returns a signature', async () => {
       const result = await personalSign({
-        params: [message, eoaAddress],
+        params: [message, zkEvmAddresses.ethAddress],
         magicTeeAdapter: magicTeeAdapter as unknown as MagicTeeAdapter,
         rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
@@ -72,12 +70,12 @@ describe('personalSign', () => {
         payload: message,
         chainID: chainId,
       });
-      expect(relayerClient.imSign).toHaveBeenCalledWith(eoaAddress, message);
+      expect(relayerClient.imSign).toHaveBeenCalledWith(zkEvmAddresses.ethAddress, message);
       expect(signERC191Message).toHaveBeenCalledWith(
         BigInt(chainId),
         message,
         magicTeeAdapter,
-        eoaAddress,
+        zkEvmAddresses.ethAddress,
       );
     });
   });
@@ -87,7 +85,7 @@ describe('personalSign', () => {
       const hexMessage = '0x68656c6c6f'; // 'hello' in hex
 
       const result = await personalSign({
-        params: [hexMessage, eoaAddress],
+        params: [hexMessage, zkEvmAddresses.ethAddress],
         magicTeeAdapter: magicTeeAdapter as unknown as MagicTeeAdapter,
         rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
@@ -101,12 +99,12 @@ describe('personalSign', () => {
         payload: message,
         chainID: chainId,
       });
-      expect(relayerClient.imSign).toHaveBeenCalledWith(eoaAddress, message);
+      expect(relayerClient.imSign).toHaveBeenCalledWith(zkEvmAddresses.ethAddress, message);
       expect(signERC191Message).toHaveBeenCalledWith(
         BigInt(chainId),
         message,
         magicTeeAdapter,
-        eoaAddress,
+        zkEvmAddresses.ethAddress,
       );
     });
   });
@@ -114,7 +112,7 @@ describe('personalSign', () => {
   describe('when an argument is missing', () => {
     it('throws an error', async () => {
       await expect(personalSign({
-        params: [eoaAddress],
+        params: [zkEvmAddresses.ethAddress],
         magicTeeAdapter: magicTeeAdapter as unknown as MagicTeeAdapter,
         rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,

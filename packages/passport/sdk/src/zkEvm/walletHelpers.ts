@@ -3,10 +3,9 @@ import { v1 as sequenceCoreV1 } from '@0xsequence/core';
 import { trackDuration } from '@imtbl/metrics';
 import {
   BigNumberish, Contract, getBytes, hashMessage,
-  Interface, keccak256, Signer, solidityPacked, ZeroAddress,
+  Interface, keccak256, solidityPacked, ZeroAddress,
   TypedDataEncoder, JsonRpcProvider, AbiCoder,
   isError,
-  ethers,
 } from 'ethers';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
 import MagicTeeAdapter from '../magic/magicTeeAdapter';

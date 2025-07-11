@@ -139,13 +139,13 @@ describe('sendDeployTransactionAndPersonalSign', () => {
   it('calls guardianClient.withConfirmationScreen with the correct arguments', async () => {
     await sendDeployTransactionAndPersonalSign({
       params,
-      magicTeeAdapter: mockMagicTeeAdapter,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       zkEvmAddresses,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
-    } as any);
+    } );
 
     expect(guardianClient.withConfirmationScreen).toHaveBeenCalled();
   });
