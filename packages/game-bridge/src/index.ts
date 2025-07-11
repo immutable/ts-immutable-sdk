@@ -38,6 +38,7 @@ const PASSPORT_FUNCTIONS = {
   connectPKCE: 'connectPKCE',
   getAccessToken: 'getAccessToken',
   getIdToken: 'getIdToken',
+  logout: 'logout',
   getEmail: 'getEmail',
   getPassportId: 'getPassportId',
   getLinkedAddresses: 'getLinkedAddresses',
@@ -399,6 +400,20 @@ window.callFunction = async (jsonData: string) => {
           requestId,
           success: providerSet,
           error: null,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.logout: {
+        const logoutUrl = await getPassportClient().getLogoutUrl();
+        providerInstance = null;
+        zkEvmProviderInstance = null;
+        trackDuration(moduleName, 'performedGetLogoutUrl', mt(markStart));
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          error: null,
+          result: logoutUrl,
         });
         break;
       }
