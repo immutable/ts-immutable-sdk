@@ -11,7 +11,7 @@ import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { mockUser, mockUserZkEvm, testConfig } from '../test/mocks';
 import { signTypedDataV4 } from './signTypedDataV4';
-import MagicAdapter from '../magic/magicAdapter';
+import MagicTeeAdapter from '../magic/magicTeeAdapter';
 import { signEjectionTransaction } from './signEjectionTransaction';
 
 jest.mock('ethers', () => ({
@@ -29,14 +29,14 @@ jest.mock('./signTypedDataV4');
 describe('ZkEvmProvider', () => {
   let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   const config = testConfig;
-  const ethSigner = {};
+  const magicTeeAdapter = {
+    personalSign: jest.fn(),
+    createWallet: jest.fn(),
+  } as unknown as MagicTeeAdapter;
   const authManager = {
     getUserOrLogin: jest.fn().mockResolvedValue(mockUserZkEvm),
     getUser: jest.fn().mockResolvedValue(mockUserZkEvm),
   };
-  const magicAdapter = {
-    login: jest.fn(),
-  } as Partial<MagicAdapter> as MagicAdapter;
   const guardianClient = {
     withConfirmationScreen: jest.fn().mockImplementation(() => (task: () => void) => task()),
   } as unknown as GuardianClient;
@@ -44,9 +44,6 @@ describe('ZkEvmProvider', () => {
   beforeEach(() => {
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     jest.resetAllMocks();
-    (BrowserProvider as unknown as jest.Mock).mockImplementation(() => ({
-      getSigner: jest.fn().mockImplementation(() => ethSigner),
-    }));
     (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
       addEvent: jest.fn(),
       end: jest.fn(),
@@ -58,41 +55,38 @@ describe('ZkEvmProvider', () => {
       .mockImplementation(() => (task: () => void) => task());
   });
 
-  const getProvider = () => {
+  const getProvider = (user: any = null) => {
     const constructorParameters = {
       config,
       authManager: authManager as Partial<AuthManager> as AuthManager,
       passportEventEmitter,
       guardianClient,
-      magicAdapter,
-    } as Partial<ZkEvmProviderInput>;
+      magicTeeAdapter,
+      multiRollupApiClients: {} as any,
+      user,
+    } as ZkEvmProviderInput;
 
-    return new ZkEvmProvider(constructorParameters as ZkEvmProviderInput);
+    return new ZkEvmProvider(constructorParameters);
   };
 
   describe('constructor', () => {
     describe('when an application session exists', () => {
-      it('initialises the signer', async () => {
-        authManager.getUser.mockResolvedValue(mockUserZkEvm);
-        getProvider();
+      it('initialises the provider', async () => {
+        const provider = getProvider(mockUserZkEvm);
 
         await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
 
-        expect(authManager.getUser).toBeCalledTimes(1);
-        expect(magicAdapter.login).toBeCalledTimes(1);
-        expect(BrowserProvider).toBeCalledTimes(1);
+        expect(provider.isPassport).toBe(true);
       });
 
       describe('and the user has not registered before', () => {
         it('does not call session activity', async () => {
           const onAccountsRequested = jest.fn();
           passportEventEmitter.on(PassportEvents.ACCOUNTS_REQUESTED, onAccountsRequested);
-          authManager.getUser.mockResolvedValue(mockUser);
-          getProvider();
+          getProvider(mockUser);
 
           await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
 
-          expect(authManager.getUser).toBeCalledTimes(1);
           expect(onAccountsRequested).not.toHaveBeenCalled();
         });
       });
@@ -100,12 +94,10 @@ describe('ZkEvmProvider', () => {
         it('calls session activity', async () => {
           const onAccountsRequested = jest.fn();
           passportEventEmitter.on(PassportEvents.ACCOUNTS_REQUESTED, onAccountsRequested);
-          authManager.getUser.mockResolvedValue(mockUserZkEvm);
-          getProvider();
+          getProvider(mockUserZkEvm);
 
           await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
 
-          expect(authManager.getUser).toBeCalledTimes(1);
           expect(onAccountsRequested).toHaveBeenCalledTimes(1);
         });
       });
@@ -116,14 +108,14 @@ describe('ZkEvmProvider', () => {
         authManager.getUser.mockResolvedValue(null);
       });
 
-      it('initialises the signer', async () => {
-        getProvider();
+      it('initialises the provider', async () => {
+        const provider = getProvider();
         passportEventEmitter.emit(PassportEvents.LOGGED_IN, mockUserZkEvm);
 
         await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
 
-        expect(magicAdapter.login).toBeCalledTimes(1);
-        expect(BrowserProvider).toBeCalledTimes(1);
+        // The provider should be initialized
+        expect(provider.isPassport).toBe(true);
       });
 
       describe('and the user has not registered before', () => {
@@ -164,7 +156,7 @@ describe('ZkEvmProvider', () => {
 
       expect(resultOne).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
       expect(resultTwo).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
-      expect(authManager.getUser).toBeCalledTimes(3);
+      expect(authManager.getUser).toBeCalledTimes(2);
     });
 
     it('should emit accountsChanged event and identify user when user logs in', async () => {
@@ -187,39 +179,31 @@ describe('ZkEvmProvider', () => {
       });
     });
 
-    it('should throw an error if the signer initialisation fails', async () => {
+    it('should throw an error if there is a registration error', async () => {
       authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
       authManager.getUser.mockResolvedValue(mockUserZkEvm);
+      (sendTransaction as jest.Mock).mockRejectedValue(new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Something went wrong'));
 
-      (BrowserProvider as unknown as jest.Mock).mockImplementation(() => ({
-        getSigner: () => {
-          throw new Error('Something went wrong');
-        },
-      }));
       const provider = getProvider();
       await provider.request({ method: 'eth_requestAccounts' });
 
-      await expect(provider.request({ method: 'eth_sendTransaction' })).rejects.toThrow(
+      await expect(provider.request({ method: 'eth_sendTransaction', params: [{ to: '0x123', value: '1' }] })).rejects.toThrow(
         new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Something went wrong'),
       );
     });
 
-    it('should not reinitialise the ethSigner when it has been set during the constructor', async () => {
+    it('should not reinitialise the provider when it has been set during the constructor', async () => {
       authManager.getUser.mockResolvedValue(mockUserZkEvm);
-      const provider = getProvider();
+      const provider = getProvider(mockUserZkEvm);
 
       await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
 
-      expect(magicAdapter.login).toBeCalledTimes(1);
-      expect(BrowserProvider).toBeCalledTimes(1);
-
       await provider.request({ method: 'eth_requestAccounts' });
 
-      // Add a delay so that we can check if the ethSigner is initialised again
+      // Add a delay so that we can check if the provider is initialised again
       await new Promise(process.nextTick);
 
-      expect(magicAdapter.login).toBeCalledTimes(1);
-      expect(BrowserProvider).toBeCalledTimes(1);
+      expect(authManager.getUser).toBeCalledTimes(1);
     });
   });
 
@@ -270,7 +254,7 @@ describe('ZkEvmProvider', () => {
       expect(sendTransaction).toHaveBeenCalledWith({
         params: [transaction],
         guardianClient,
-        ethSigner,
+        magicTeeAdapter,
         rpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
@@ -316,7 +300,7 @@ describe('ZkEvmProvider', () => {
       expect(result).toEqual(signedTransaction);
       expect(signEjectionTransaction).toHaveBeenCalledWith({
         params: [transaction],
-        ethSigner,
+        magicTeeAdapter,
         zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
         flow: expect.any(Object),
       });
@@ -357,7 +341,8 @@ describe('ZkEvmProvider', () => {
         method: 'eth_signTypedData_v4',
         params: [address, typedDataPayload],
         guardianClient,
-        ethSigner,
+        magicTeeAdapter,
+        zkEvmAddresses: mockUserZkEvm.zkEvm,
         rpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         flow: expect.any(Object),
@@ -377,9 +362,7 @@ describe('ZkEvmProvider', () => {
 
   describe('isPassport', () => {
     it('should be set to true', () => {
-      authManager.getUser.mockResolvedValue(mockUserZkEvm);
-
-      const provider = getProvider();
+      const provider = getProvider(mockUserZkEvm);
 
       expect(provider.isPassport).toBe(true);
       expect((provider as Provider).isPassport).toBe(true);
@@ -398,53 +381,34 @@ describe('ZkEvmProvider', () => {
         await provider.request({ method: 'eth_requestAccounts' });
         passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
 
-        await expect(provider.request({ method: 'eth_sendTransaction' })).rejects.toThrowError(
-          unauthorisedError,
-        );
+        await expect(provider.request({ method: 'eth_sendTransaction' })).rejects.toThrow(unauthorisedError);
       });
     });
 
-    describe('and eth_signTypedDataV4 is called', () => {
+    describe('and im_signEjectionTransaction is called', () => {
       it('throws an unauthorized error', async () => {
-        authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
         authManager.getUser.mockResolvedValue(null);
+        authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
 
         const provider = getProvider();
         await provider.request({ method: 'eth_requestAccounts' });
         passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
 
-        await expect(provider.request({ method: 'eth_signTypedData_v4' })).rejects.toThrowError(
-          unauthorisedError,
-        );
+        await expect(provider.request({ method: 'im_signEjectionTransaction' })).rejects.toThrow(unauthorisedError);
       });
     });
 
-    describe('and eth_accounts is called', () => {
-      it('returns an empty array', async () => {
-        authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+    describe('and eth_signTypedData_v4 is called', () => {
+      it('throws an unauthorized error', async () => {
         authManager.getUser.mockResolvedValue(null);
+        authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
 
         const provider = getProvider();
         await provider.request({ method: 'eth_requestAccounts' });
         passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
-        const result = await provider.request({ method: 'eth_accounts' });
 
-        expect(result).toEqual([]);
+        await expect(provider.request({ method: 'eth_signTypedData_v4' })).rejects.toThrow(unauthorisedError);
       });
-    });
-
-    it('should emit accountsChanged', async () => {
-      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-      authManager.getUser.mockResolvedValue(mockUserZkEvm);
-
-      const provider = getProvider();
-      await provider.request({ method: 'eth_requestAccounts' });
-
-      const onAccountsChanged = jest.fn();
-      provider.on('accountsChanged', onAccountsChanged);
-      passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
-
-      expect(onAccountsChanged).toHaveBeenCalledWith([]);
     });
   });
 

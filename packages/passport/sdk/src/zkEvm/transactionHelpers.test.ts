@@ -1,5 +1,5 @@
 import { Flow } from '@imtbl/metrics';
-import { JsonRpcProvider, Signer } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { RelayerClient } from './relayerClient';
 import GuardianClient from '../guardian';
 import { FeeOption, MetaTransaction, RelayerTransactionStatus } from './types';
@@ -7,6 +7,7 @@ import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { pollRelayerTransaction, prepareAndSignEjectionTransaction, prepareAndSignTransaction } from './transactionHelpers';
 import * as walletHelpers from './walletHelpers';
 import { retryWithDelay } from '../network/retry';
+import MagicTeeAdapter from '../magic/magicTeeAdapter';
 
 jest.mock('./walletHelpers', () => ({
   __esModule: true,
@@ -16,6 +17,11 @@ jest.mock('../network/retry');
 
 describe('transactionHelpers', () => {
   const flow = { addEvent: jest.fn() } as unknown as Flow;
+
+  const magicTeeAdapter = {
+    personalSign: jest.fn(),
+    createWallet: jest.fn(),
+  } as unknown as MagicTeeAdapter;
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -107,15 +113,22 @@ describe('transactionHelpers', () => {
       validateEVMTransaction: jest.fn().mockResolvedValue(undefined),
     } as unknown as GuardianClient;
 
-    const ethSigner = {} as Signer;
-
     beforeEach(() => {
       jest.resetAllMocks();
       jest.spyOn(walletHelpers, 'signMetaTransactions').mockResolvedValue(signedTransactions);
       jest.spyOn(walletHelpers, 'getNonce').mockResolvedValue(nonce);
-      jest.spyOn(walletHelpers, 'getNormalisedTransactions').mockReturnValue(metaTransactions as any);
+      jest.spyOn(walletHelpers, 'getNormalisedTransactions').mockReturnValue([
+        {
+          delegateCall: false,
+          revertOnError: true,
+          gasLimit: BigInt(0),
+          target: metaTransactions[0].to || '0x0000000000000000000000000000000000000000',
+          value: BigInt(metaTransactions[0].value || 0),
+          data: metaTransactions[0].data || '0x',
+        },
+      ]);
       jest.spyOn(walletHelpers, 'encodedTransactions').mockReturnValue('encodedTransactions123');
-      jest.spyOn(rpcProvider, 'getNetwork').mockResolvedValue({ chainId } as any);
+      (rpcProvider.getNetwork as jest.Mock).mockResolvedValue({ chainId });
       jest.spyOn(relayerClient, 'imGetFeeOptions').mockResolvedValue([imxFeeOption]);
       jest.spyOn(relayerClient, 'ethSendTransaction').mockResolvedValue(relayerId);
       jest.spyOn(guardianClient, 'validateEVMTransaction').mockResolvedValue(undefined);
@@ -124,7 +137,7 @@ describe('transactionHelpers', () => {
     it('prepares and signs transaction correctly', async () => {
       const result = await prepareAndSignTransaction({
         transactionRequest,
-        ethSigner,
+        magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
@@ -155,7 +168,7 @@ describe('transactionHelpers', () => {
 
       await prepareAndSignTransaction({
         transactionRequest,
-        ethSigner,
+        magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
@@ -190,7 +203,7 @@ describe('transactionHelpers', () => {
 
       await prepareAndSignTransaction({
         transactionRequest,
-        ethSigner,
+        magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
@@ -237,7 +250,7 @@ describe('transactionHelpers', () => {
         expect.any(BigInt),
         expect.any(BigInt),
         zkEvmAddress,
-        ethSigner,
+        magicTeeAdapter,
       );
     });
 
@@ -246,7 +259,7 @@ describe('transactionHelpers', () => {
 
       const result = await prepareAndSignTransaction({
         transactionRequest,
-        ethSigner,
+        magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
@@ -266,7 +279,7 @@ describe('transactionHelpers', () => {
 
       await expect(prepareAndSignTransaction({
         transactionRequest,
-        ethSigner,
+        magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
@@ -284,7 +297,7 @@ describe('transactionHelpers', () => {
 
       await expect(prepareAndSignTransaction({
         transactionRequest,
-        ethSigner,
+        magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
@@ -298,7 +311,7 @@ describe('transactionHelpers', () => {
 
       await expect(prepareAndSignTransaction({
         transactionRequest,
-        ethSigner,
+        magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
@@ -319,7 +332,6 @@ describe('transactionHelpers', () => {
     };
 
     const zkEvmAddress = '0x1234567890123456789012345678901234567890';
-    const ethSigner = {} as Signer;
     const signedTransactions = 'signedTransactions123';
 
     beforeEach(() => {
@@ -334,7 +346,7 @@ describe('transactionHelpers', () => {
             ...transactionRequest,
             nonce: 0,
           },
-          ethSigner,
+          magicTeeAdapter,
           zkEvmAddress,
           flow,
         });

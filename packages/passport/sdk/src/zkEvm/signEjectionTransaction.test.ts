@@ -1,9 +1,10 @@
 import { Flow } from '@imtbl/metrics';
-import { Signer, TransactionRequest } from 'ethers';
+import { TransactionRequest } from 'ethers';
 import { mockUserZkEvm } from '../test/mocks';
 import * as transactionHelpers from './transactionHelpers';
 import { signEjectionTransaction } from './signEjectionTransaction';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
+import MagicTeeAdapter from '../magic/magicTeeAdapter';
 
 jest.mock('./transactionHelpers');
 jest.mock('../network/retry');
@@ -21,9 +22,12 @@ describe('im_signEjectionTransaction', () => {
     chainId: 1,
     value: BigInt('5'),
   };
-  const ethSigner = {
-    getAddress: jest.fn(),
-  } as Partial<Signer> as Signer;
+  
+  const mockMagicTeeAdapter = {
+    personalSign: jest.fn(),
+    createWallet: jest.fn(),
+  };
+  
   const flow = {
     addEvent: jest.fn(),
   };
@@ -38,14 +42,14 @@ describe('im_signEjectionTransaction', () => {
   it('calls prepareAndSignEjectionTransaction with the correct arguments', async () => {
     await signEjectionTransaction({
       params: [transactionRequest],
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
       flow: flow as unknown as Flow,
     });
 
     expect(transactionHelpers.prepareAndSignEjectionTransaction).toHaveBeenCalledWith({
       transactionRequest,
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
       flow: flow as unknown as Flow,
     });
@@ -54,7 +58,7 @@ describe('im_signEjectionTransaction', () => {
   it('calls signEjectionTransaction with invalid params', async () => {
     await expect(signEjectionTransaction({
       params: [transactionRequest, { test: 'test' }],
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
       flow: flow as unknown as Flow,
     })).rejects.toThrow(
@@ -65,7 +69,7 @@ describe('im_signEjectionTransaction', () => {
   it('returns the transaction hash', async () => {
     const result = await signEjectionTransaction({
       params: [transactionRequest],
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
       flow: flow as unknown as Flow,
     });

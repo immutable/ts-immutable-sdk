@@ -1,5 +1,5 @@
 import { Flow } from '@imtbl/metrics';
-import { Signer, JsonRpcProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import GuardianClient from '../guardian';
 import { signAndPackTypedData } from './walletHelpers';
 import {
@@ -10,11 +10,13 @@ import { RelayerClient } from './relayerClient';
 import { signTypedDataV4 } from './signTypedDataV4';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { TypedDataPayload } from './types';
+import MagicTeeAdapter from '../magic/magicTeeAdapter';
 
 jest.mock('./walletHelpers');
 
 describe('signTypedDataV4', () => {
   const address = '0xd64b0d2d72bb1b3f18046b8a7fc6c9ee6bccd287';
+  const userAdminAddress = '0x1234567890123456789012345678901234567890';
   const eip712Payload: TypedDataPayload = {
     types: { EIP712Domain: [] },
     domain: {},
@@ -23,7 +25,14 @@ describe('signTypedDataV4', () => {
   };
   const relayerSignature = '02011b1d383526a2815d26550eb314b5d7e0551327330043c4d07715346a7d5517ecbc32304fc1ccdcd52fea386c94c3b58b90410f20cd1d5c6db8fa1f03c34e82dce78c3445ce38583e0b0689c69b8fbedbc33d3a2e45431b0103';
   const combinedSignature = '0x000202011b1d383526a2815d26550eb314b5d7e0551327330043c4d07715346a7d5517ecbc32304fc1ccdcd52fea386c94c3b58b90410f20cd1d5c6db8fa1f03c34e82dce78c3445ce38583e0b0689c69b8fbedbc33d3a2e45431b01030001d25acf5eef26fb627f91e02ebd111580030ab8fb0a55567ac8cc66c34de7ae98185125a76adc6ee2fea042c7fce9c85a41e790ce3529f93dfec281bf56620ef21b02';
-  const ethSigner = {} as Signer;
+  const magicTeeAdapter = {
+    personalSign: jest.fn(),
+    createWallet: jest.fn(),
+  };
+  const zkEvmAddresses = {
+    ethAddress: address,
+    userAdminAddress: userAdminAddress,
+  };
   const rpcProvider = {
     getNetwork: jest.fn(),
   };
@@ -51,7 +60,8 @@ describe('signTypedDataV4', () => {
       const result = await signTypedDataV4({
         method: 'eth_signTypedData_v4',
         params: [address, JSON.stringify(eip712Payload)],
-        ethSigner,
+        magicTeeAdapter: magicTeeAdapter as unknown as MagicTeeAdapter,
+        zkEvmAddresses: zkEvmAddresses as any,
         rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as unknown as GuardianClient,
@@ -66,9 +76,10 @@ describe('signTypedDataV4', () => {
       expect(signAndPackTypedData).toHaveBeenCalledWith(
         eip712Payload,
         relayerSignature,
+        userAdminAddress,
         BigInt(chainId),
         address,
-        ethSigner,
+        magicTeeAdapter,
       );
     });
   });
@@ -78,7 +89,8 @@ describe('signTypedDataV4', () => {
       const result = await signTypedDataV4({
         method: 'eth_signTypedData_v4',
         params: [address, eip712Payload],
-        ethSigner,
+        magicTeeAdapter: magicTeeAdapter as unknown as MagicTeeAdapter,
+        zkEvmAddresses: zkEvmAddresses as any,
         rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as any,
@@ -93,9 +105,10 @@ describe('signTypedDataV4', () => {
       expect(signAndPackTypedData).toHaveBeenCalledWith(
         eip712Payload,
         relayerSignature,
+        userAdminAddress,
         BigInt(chainId),
         address,
-        ethSigner,
+        magicTeeAdapter,
       );
     });
   });
@@ -106,7 +119,8 @@ describe('signTypedDataV4', () => {
         signTypedDataV4({
           method: 'eth_signTypedData_v4',
           params: [address],
-          ethSigner,
+          magicTeeAdapter: magicTeeAdapter as unknown as MagicTeeAdapter,
+          zkEvmAddresses: zkEvmAddresses as any,
           rpcProvider: rpcProvider as unknown as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
@@ -124,7 +138,8 @@ describe('signTypedDataV4', () => {
         signTypedDataV4({
           method: 'eth_signTypedData_v4',
           params: [address, '*~<|8)-/-<'],
-          ethSigner,
+          magicTeeAdapter: magicTeeAdapter as unknown as MagicTeeAdapter,
+          zkEvmAddresses: zkEvmAddresses as any,
           rpcProvider: rpcProvider as unknown as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
@@ -150,7 +165,8 @@ describe('signTypedDataV4', () => {
         signTypedDataV4({
           method: 'eth_signTypedData_v4',
           params: [address, payload],
-          ethSigner,
+          magicTeeAdapter: magicTeeAdapter as unknown as MagicTeeAdapter,
+          zkEvmAddresses: zkEvmAddresses as any,
           rpcProvider: rpcProvider as unknown as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
@@ -176,7 +192,8 @@ describe('signTypedDataV4', () => {
               },
             },
           ],
-          ethSigner,
+          magicTeeAdapter: magicTeeAdapter as unknown as MagicTeeAdapter,
+          zkEvmAddresses: zkEvmAddresses as any,
           rpcProvider: rpcProvider as unknown as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
@@ -201,7 +218,8 @@ describe('signTypedDataV4', () => {
         address,
         payload,
       ],
-      ethSigner,
+      magicTeeAdapter: magicTeeAdapter as unknown as MagicTeeAdapter,
+      zkEvmAddresses: zkEvmAddresses as any,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       guardianClient: guardianClient as any,
@@ -216,9 +234,10 @@ describe('signTypedDataV4', () => {
     expect(signAndPackTypedData).toHaveBeenCalledWith(
       payload,
       relayerSignature,
+      userAdminAddress,
       BigInt(chainId),
       address,
-      ethSigner,
+      magicTeeAdapter,
     );
   });
 });

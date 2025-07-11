@@ -1,10 +1,11 @@
 import { Flow } from '@imtbl/metrics';
-import { Signer, TransactionRequest, JsonRpcProvider } from 'ethers';
+import { TransactionRequest, JsonRpcProvider } from 'ethers';
 import { sendTransaction } from './sendTransaction';
 import { mockUserZkEvm } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import GuardianClient from '../guardian';
 import * as transactionHelpers from './transactionHelpers';
+import MagicTeeAdapter from '../magic/magicTeeAdapter';
 
 jest.mock('./transactionHelpers');
 jest.mock('../network/retry');
@@ -32,9 +33,11 @@ describe('sendTransaction', () => {
   const guardianClient = {
     validateEVMTransaction: jest.fn(),
   };
-  const ethSigner = {
-    getAddress: jest.fn(),
-  } as Partial<Signer> as Signer;
+  const mockMagicTeeAdapter = {
+    personalSign: jest.fn(),
+    createWallet: jest.fn(),
+  };
+  
   const flow = {
     addEvent: jest.fn(),
   };
@@ -54,7 +57,7 @@ describe('sendTransaction', () => {
   it('calls prepareAndSignTransaction with the correct arguments', async () => {
     await sendTransaction({
       params: [transactionRequest],
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
@@ -64,7 +67,7 @@ describe('sendTransaction', () => {
 
     expect(transactionHelpers.prepareAndSignTransaction).toHaveBeenCalledWith({
       transactionRequest,
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       guardianClient: guardianClient as unknown as GuardianClient,
@@ -77,7 +80,7 @@ describe('sendTransaction', () => {
   it('calls pollRelayerTransaction with the correct arguments', async () => {
     await sendTransaction({
       params: [transactionRequest],
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
@@ -95,7 +98,7 @@ describe('sendTransaction', () => {
   it('returns the transaction hash', async () => {
     const result = await sendTransaction({
       params: [transactionRequest],
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
@@ -113,7 +116,7 @@ describe('sendTransaction', () => {
     await expect(
       sendTransaction({
         params: [transactionRequest],
-        ethSigner,
+        magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
         rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,

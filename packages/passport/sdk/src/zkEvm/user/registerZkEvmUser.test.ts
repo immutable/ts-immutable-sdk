@@ -1,23 +1,28 @@
-import { signRaw } from '@imtbl/toolkit';
+import { deserializeSignature, serializeEthSignature } from '@imtbl/toolkit';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
-import { JsonRpcProvider, JsonRpcSigner, Signer } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { ChainId, ChainName } from '../../network/chains';
 import { registerZkEvmUser } from './registerZkEvmUser';
 import AuthManager from '../../authManager';
 import { mockListChains, mockUserZkEvm } from '../../test/mocks';
+import MagicTeeAdapter from '../../magic/magicTeeAdapter';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
-  JsonRpcSigner: jest.fn(),
   JsonRpcProvider: jest.fn(),
 }));
-jest.mock('@imtbl/toolkit');
+jest.mock('@imtbl/toolkit', () => ({
+  deserializeSignature: jest.fn(),
+  serializeEthSignature: jest.fn(),
+}));
 
 describe('registerZkEvmUser', () => {
-  const ethSignerMock = {
-    getAddress: jest.fn(),
+  const mockMagicTeeAdapter = {
+    createWallet: jest.fn(),
+    personalSign: jest.fn(),
   };
+  
   const authManager = {
     getUser: jest.fn(),
     forceUserRefreshInBackground: jest.fn(),
@@ -42,9 +47,13 @@ describe('registerZkEvmUser', () => {
 
   beforeEach(() => {
     jest.restoreAllMocks();
-    (JsonRpcSigner as unknown as jest.Mock).mockImplementation(() => ethSignerMock);
-    ethSignerMock.getAddress.mockResolvedValue(ethereumAddress);
-    (signRaw as jest.Mock).mockResolvedValue(ethereumSignature);
+    mockMagicTeeAdapter.createWallet.mockResolvedValue(ethereumAddress);
+    mockMagicTeeAdapter.personalSign.mockResolvedValue('mockSignature');
+    
+    // Mock the signature processing chain
+    (deserializeSignature as jest.Mock).mockReturnValue('deserializedSignature');
+    (serializeEthSignature as jest.Mock).mockReturnValue(ethereumSignature);
+    
     multiRollupApiClients.chainsApi.listChains.mockResolvedValue(mockListChains);
     jsonRPCProvider.getNetwork.mockResolvedValue({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
   });
@@ -56,7 +65,7 @@ describe('registerZkEvmUser', () => {
       );
       await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
-        ethSigner: ethSignerMock as unknown as Signer,
+        magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
         accessToken,
         rpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
@@ -75,7 +84,7 @@ describe('registerZkEvmUser', () => {
 
     const result = await registerZkEvmUser({
       authManager: authManager as unknown as AuthManager,
-      ethSigner: ethSignerMock as unknown as Signer,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
       accessToken,
       rpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,

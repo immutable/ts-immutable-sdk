@@ -1,9 +1,11 @@
 import { Flow } from '@imtbl/metrics';
-import { Signer, JsonRpcProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 import { sendDeployTransactionAndPersonalSign } from './sendDeployTransactionAndPersonalSign';
 import { mockUserZkEvm } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import GuardianClient from '../guardian';
+import MagicTeeAdapter from '../magic/magicTeeAdapter';
+import { ZkEvmAddresses } from '../types';
 import * as transactionHelpers from './transactionHelpers';
 import * as personalSign from './personalSign';
 
@@ -31,9 +33,14 @@ describe('sendDeployTransactionAndPersonalSign', () => {
     validateEVMTransaction: jest.fn(),
     withConfirmationScreen: jest.fn(),
   };
-  const ethSigner = {
-    getAddress: jest.fn(),
-  } as Partial<Signer> as Signer;
+  const mockMagicTeeAdapter = {
+    personalSign: jest.fn(),
+    createWallet: jest.fn(),
+  };
+  const zkEvmAddresses: ZkEvmAddresses = {
+    ethAddress: mockUserZkEvm.zkEvm.ethAddress,
+    userAdminAddress: '0x1234567890123456789012345678901234567890',
+  };
   const flow = {
     addEvent: jest.fn(),
   };
@@ -56,21 +63,21 @@ describe('sendDeployTransactionAndPersonalSign', () => {
   it('calls prepareAndSignTransaction with the correct arguments', async () => {
     await sendDeployTransactionAndPersonalSign({
       params,
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
-    });
+    } as any);
 
     expect(transactionHelpers.prepareAndSignTransaction).toHaveBeenCalledWith({
       transactionRequest: { to: mockUserZkEvm.zkEvm.ethAddress, value: 0 },
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       guardianClient: guardianClient as unknown as GuardianClient,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses,
       flow: flow as unknown as Flow,
     });
   });
@@ -78,18 +85,18 @@ describe('sendDeployTransactionAndPersonalSign', () => {
   it('calls personalSign with the correct arguments', async () => {
     await sendDeployTransactionAndPersonalSign({
       params,
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
-    });
+    } as any);
 
     expect(personalSign.personalSign).toHaveBeenCalledWith({
       params,
-      ethSigner,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       guardianClient: guardianClient as unknown as GuardianClient,
       relayerClient: relayerClient as unknown as RelayerClient,
@@ -100,13 +107,13 @@ describe('sendDeployTransactionAndPersonalSign', () => {
   it('calls pollRelayerTransaction with the correct arguments', async () => {
     await sendDeployTransactionAndPersonalSign({
       params,
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
-    });
+    } as any);
 
     expect(transactionHelpers.pollRelayerTransaction).toHaveBeenCalledWith(
       relayerClient as unknown as RelayerClient,
@@ -118,13 +125,13 @@ describe('sendDeployTransactionAndPersonalSign', () => {
   it('returns the signed message', async () => {
     const result = await sendDeployTransactionAndPersonalSign({
       params,
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
-    });
+    } as any);
 
     expect(result).toEqual(signedMessage);
   });
@@ -132,13 +139,13 @@ describe('sendDeployTransactionAndPersonalSign', () => {
   it('calls guardianClient.withConfirmationScreen with the correct arguments', async () => {
     await sendDeployTransactionAndPersonalSign({
       params,
-      ethSigner,
+      magicTeeAdapter: mockMagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
-    });
+    } as any);
 
     expect(guardianClient.withConfirmationScreen).toHaveBeenCalled();
   });
@@ -150,13 +157,13 @@ describe('sendDeployTransactionAndPersonalSign', () => {
     await expect(
       sendDeployTransactionAndPersonalSign({
         params,
-        ethSigner,
+        magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
         rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
-        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+        zkEvmAddresses,
         guardianClient: guardianClient as unknown as GuardianClient,
         flow: flow as unknown as Flow,
-      }),
+      } as any),
     ).rejects.toThrow(error);
   });
 });

@@ -50,7 +50,7 @@ describe('MagicTeeAdapter', () => {
 
     mockCreateWallet = jest.fn();
     mockPersonalSign = jest.fn();
-    mockIsAxiosError = isAxiosError as jest.Mock;
+    mockIsAxiosError = isAxiosError as unknown as jest.Mock;
 
     magicTeeApiClient = {
       walletApi: {
@@ -323,7 +323,7 @@ describe('MagicTeeAdapter', () => {
       };
 
       authManager.getUser.mockResolvedValue(mockUser as any);
-      magicTeeApiClient.walletApi.createWalletV1WalletPost.mockResolvedValue(mockResponse as any);
+      mockCreateWallet.mockResolvedValue(mockResponse as any);
 
       await adapter.createWallet();
 
@@ -343,7 +343,7 @@ describe('MagicTeeAdapter', () => {
       };
 
       authManager.getUser.mockResolvedValue(mockUser as any);
-      magicTeeApiClient.transactionApi.signMessageV1WalletPersonalSignPost.mockResolvedValue(mockResponse as any);
+      mockPersonalSign.mockResolvedValue(mockResponse as any);
 
       await adapter.personalSign(message);
 
@@ -362,7 +362,7 @@ describe('MagicTeeAdapter', () => {
       };
 
       authManager.getUser.mockResolvedValue(mockUser as any);
-      magicTeeApiClient.walletApi.createWalletV1WalletPost.mockResolvedValue(mockResponse as any);
+      mockCreateWallet.mockResolvedValue(mockResponse as any);
 
       await adapter.createWallet();
 
@@ -383,7 +383,7 @@ describe('MagicTeeAdapter', () => {
       };
 
       authManager.getUser.mockResolvedValue(mockUser as any);
-      magicTeeApiClient.transactionApi.signMessageV1WalletPersonalSignPost.mockResolvedValue(mockResponse as any);
+      mockPersonalSign.mockResolvedValue(mockResponse as any);
 
       await adapter.personalSign(message);
 
