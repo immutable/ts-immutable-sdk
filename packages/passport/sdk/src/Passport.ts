@@ -176,7 +176,7 @@ export class Passport {
       try {
         user = await this.authManager.getUser();
       } catch (error) {
-        logger.warn('Failed to retrieve a cached user session', error);
+        // Initialise the zkEvmProvider without a user
       }
 
       const provider = new ZkEvmProvider({

@@ -33,7 +33,7 @@ describe('Config', () => {
     passportMrBasePath: 'passportMrBasePath123',
   };
 
-  const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-2.3.2' };
+  const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
   describe('when the baseConfig environment is SANDBOX', () => {
     it('returns a Config', () => {

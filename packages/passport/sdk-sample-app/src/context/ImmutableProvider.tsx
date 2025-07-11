@@ -126,7 +126,7 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
         baseConfig,
         clientId: 'pCtSnHovRnPiQuBcFkXAnbCNqNVcDM3m',
         overrides: {
-          authenticationDomain: 'http://localhost:1234',
+          authenticationDomain: 'https://auth.dev.immutable.com',
           magicPublishableApiKey: 'pk_live_4058236363130CA9',
           magicProviderId: 'C9odf7hU4EQ5EufcfgYfcBaT5V6LhocXyiPRhIjw2EY=',
           passportDomain: 'https://passport.dev.immutable.com',
