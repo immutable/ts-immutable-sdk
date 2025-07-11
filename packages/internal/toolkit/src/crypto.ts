@@ -9,7 +9,7 @@ type SignatureOptions = {
 };
 
 // used to sign message with L1 keys. Used for registration
-function serializeEthSignature(sig: SignatureOptions): string {
+export function serializeEthSignature(sig: SignatureOptions): string {
   // This is because golang appends a recovery param
   // https://github.com/ethers-io/ethers.js/issues/823
   return encUtils.addHexPrefix(
@@ -29,7 +29,7 @@ function importRecoveryParam(v: string): number | undefined {
 }
 
 // used chained with serializeEthSignature. serializeEthSignature(deserializeSignature(...))
-function deserializeSignature(sig: string, size = 64): SignatureOptions {
+export function deserializeSignature(sig: string, size = 64): SignatureOptions {
   const removedHexPrefixSig = encUtils.removeHexPrefix(sig);
   return {
     r: new BN(removedHexPrefixSig.substring(0, size), 'hex'),

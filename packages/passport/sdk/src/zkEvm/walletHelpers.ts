@@ -3,11 +3,12 @@ import { v1 as sequenceCoreV1 } from '@0xsequence/core';
 import { trackDuration } from '@imtbl/metrics';
 import {
   BigNumberish, Contract, getBytes, hashMessage,
-  Interface, keccak256, Signer, solidityPacked, ZeroAddress,
+  Interface, keccak256, solidityPacked, ZeroAddress,
   TypedDataEncoder, JsonRpcProvider, AbiCoder,
   isError,
 } from 'ethers';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
+import MagicTeeAdapter from '../magic/magicTeeAdapter';
 
 const SIGNATURE_WEIGHT = 1; // Weight of a single signature in the multi-sig
 const TRANSACTION_SIGNATURE_THRESHOLD = 1; // Total required weight in the multi-sig for a transaction
@@ -117,7 +118,7 @@ export const signMetaTransactions = async (
   nonce: BigNumberish,
   chainId: bigint,
   walletAddress: string,
-  signer: Signer,
+  magicTeeAdapter: MagicTeeAdapter,
 ): Promise<string> => {
   const normalisedMetaTransactions = getNormalisedTransactions(metaTransactions);
 
@@ -131,7 +132,7 @@ export const signMetaTransactions = async (
   const hashArray = getBytes(hash);
 
   const startTime = performance.now();
-  const ethsigNoType = await signer.signMessage(hashArray);
+  const ethsigNoType = await magicTeeAdapter.personalSign(hashArray);
   trackDuration(
     'passport',
     'magicSignMessageGetSignedMetaTransactions',
@@ -209,9 +210,10 @@ export const packSignatures = (
 export const signAndPackTypedData = async (
   typedData: TypedDataPayload,
   relayerSignature: string,
+  eoaWalletAddress: string,
   chainId: bigint,
   walletAddress: string,
-  signer: Signer,
+  magicTeeAdapter: MagicTeeAdapter,
 ): Promise<string> => {
   // Ethers auto-generates the EIP712Domain type in the TypedDataEncoder, and so it needs to be removed
   const types = { ...typedData.types };
@@ -228,21 +230,20 @@ export const signAndPackTypedData = async (
   const hashArray = getBytes(hash);
 
   const startTime = performance.now();
-  const eoaSignature = await signer.signMessage(hashArray);
+  const eoaSignature = await magicTeeAdapter.personalSign(hashArray);
   trackDuration(
     'passport',
     'magicSignMessageTypedData',
     Math.round(performance.now() - startTime),
   );
-  const eoaAddress = await signer.getAddress();
 
-  return packSignatures(eoaSignature, eoaAddress, relayerSignature);
+  return packSignatures(eoaSignature, eoaWalletAddress, relayerSignature);
 };
 
 export const signERC191Message = async (
   chainId: bigint,
   payload: string,
-  signer: Signer,
+  magicTeeAdapter: MagicTeeAdapter,
   walletAddress: string,
 ): Promise<string> => {
   // Generate digest
@@ -253,7 +254,7 @@ export const signERC191Message = async (
   const subDigestHash = keccak256(subDigest);
   const subDigestHashArray = getBytes(subDigestHash);
 
-  return signer.signMessage(subDigestHashArray);
+  return magicTeeAdapter.personalSign(subDigestHashArray);
 };
 
 export const getEip155ChainId = (chainId: number) => `eip155:${chainId}`;
