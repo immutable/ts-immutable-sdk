@@ -4,7 +4,6 @@ import {
 } from '@imtbl/metrics';
 import {
   JsonRpcProvider, Signer, toBeHex,
-  BrowserProvider,
 } from 'ethers';
 import {
   Provider,
@@ -13,7 +12,6 @@ import {
   RequestArguments,
 } from './types';
 import AuthManager from '../authManager';
-import MagicAdapter from '../magic/magicAdapter';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import {
@@ -33,11 +31,12 @@ import { signEjectionTransaction } from './signEjectionTransaction';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
-  magicAdapter: MagicAdapter;
   config: PassportConfiguration;
   multiRollupApiClients: MultiRollupApiClients;
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   guardianClient: GuardianClient;
+  ethSigner: Signer;
+  user: User | null;
 };
 
 const isZkEvmUser = (user: User): user is UserZkEvm => 'zkEvm' in user;
@@ -61,37 +60,28 @@ export class ZkEvmProvider implements Provider {
 
   readonly #rpcProvider: JsonRpcProvider; // Used for read
 
-  readonly #magicAdapter: MagicAdapter;
-
   readonly #multiRollupApiClients: MultiRollupApiClients;
 
   readonly #relayerClient: RelayerClient;
 
-  /**
-   * This property is set during `#initialiseEthSigner` and stores the signer in a promise.
-   * This property is not meant to be accessed directly, but through the
-   * `#getSigner` method.
-   * @see getSigner
-   */
-  #ethSigner?: Promise<Signer | undefined> | undefined;
-
-  #signerInitialisationError: unknown | undefined;
+  readonly #ethSigner: Signer;
 
   public readonly isPassport: boolean = true;
 
   constructor({
     authManager,
-    magicAdapter,
     config,
     multiRollupApiClients,
     passportEventEmitter,
     guardianClient,
+    ethSigner,
+    user,
   }: ZkEvmProviderInput) {
     this.#authManager = authManager;
-    this.#magicAdapter = magicAdapter;
     this.#config = config;
     this.#guardianClient = guardianClient;
     this.#passportEventEmitter = passportEventEmitter;
+    this.#ethSigner = ethSigner;
 
     this.#rpcProvider = new JsonRpcProvider(this.#config.zkEvmRpcUrl, undefined, {
       staticNetwork: true,
@@ -106,22 +96,13 @@ export class ZkEvmProvider implements Provider {
     this.#multiRollupApiClients = multiRollupApiClients;
     this.#providerEventEmitter = new TypedEventEmitter<ProviderEventMap>();
 
-    // Automatically connect an existing user session to Passport
-    this.#authManager.getUser().then((user) => {
-      if (user) {
-        this.#initialiseEthSigner(user);
-        if (isZkEvmUser(user)) {
-          this.#callSessionActivity(user.zkEvm.ethAddress);
-        }
-      }
-    }).catch(() => {
-      // User does not exist, don't initialise an eth signer
-    });
+    if (user && isZkEvmUser(user)) {
+      this.#callSessionActivity(user.zkEvm.ethAddress);
+    }
 
-    passportEventEmitter.on(PassportEvents.LOGGED_IN, (user: User) => {
-      this.#initialiseEthSigner(user);
-      if (isZkEvmUser(user)) {
-        this.#callSessionActivity(user.zkEvm.ethAddress);
+    passportEventEmitter.on(PassportEvents.LOGGED_IN, (loggedInUser: User) => {
+      if (isZkEvmUser(loggedInUser)) {
+        this.#callSessionActivity(loggedInUser.zkEvm.ethAddress);
       }
     });
     passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.#handleLogout);
@@ -132,56 +113,8 @@ export class ZkEvmProvider implements Provider {
   }
 
   #handleLogout = () => {
-    this.#ethSigner = undefined;
     this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
   };
-
-  /**
-   * This method is called by `eth_requestAccounts` and asynchronously initialises the signer.
-   * The signer is stored in a promise so that it can be retrieved by the provider
-   * when needed.
-   *
-   * If an error is thrown during initialisation, it is stored in the `signerInitialisationError`,
-   * so that it doesn't result in an unhandled promise rejection.
-   *
-   * This error is thrown when the signer is requested through:
-   * @see #getSigner
-   *
-   */
-  #initialiseEthSigner(user: User) {
-    const generateSigner = async (): Promise<Signer> => {
-      const magicRpcProvider = await this.#magicAdapter.login(user.idToken!);
-      const browserProvider = new BrowserProvider(magicRpcProvider);
-
-      return browserProvider.getSigner();
-    };
-
-    this.#signerInitialisationError = undefined;
-    // eslint-disable-next-line no-async-promise-executor
-    this.#ethSigner = new Promise(async (resolve) => {
-      try {
-        resolve(await generateSigner());
-      } catch (err) {
-        // Capture and store the initialization error
-        this.#signerInitialisationError = err;
-        resolve(undefined);
-      }
-    });
-  }
-
-  async #getSigner(): Promise<Signer> {
-    const ethSigner = await this.#ethSigner;
-    // Throw the stored error if the signers failed to initialise
-    if (typeof ethSigner === 'undefined') {
-      if (typeof this.#signerInitialisationError !== 'undefined') {
-        // eslint-disable-next-line @typescript-eslint/no-throw-literal
-        throw this.#signerInitialisationError;
-      }
-      throw new Error('Signer failed to initialise');
-    }
-
-    return ethSigner;
-  }
 
   async #callSessionActivity(zkEvmAddress: string, clientId?: string) {
     // SessionActivity requests are processed in nonce space 1, where as all
@@ -190,10 +123,9 @@ export class ZkEvmProvider implements Provider {
     // INVALID_NONCE error.
     const nonceSpace: bigint = BigInt(1);
     const sendTransactionClosure = async (params: Array<any>, flow: Flow) => {
-      const ethSigner = await this.#getSigner();
       return await sendTransaction({
         params,
-        ethSigner,
+        ethSigner: this.#ethSigner,
         guardianClient: this.#guardianClient,
         rpcProvider: this.#rpcProvider,
         relayerClient: this.#relayerClient,
@@ -238,20 +170,13 @@ export class ZkEvmProvider implements Provider {
           const user = await this.#authManager.getUserOrLogin();
           flow.addEvent('endGetUserOrLogin');
 
-          if (!this.#ethSigner) {
-            this.#initialiseEthSigner(user);
-          }
-
-          let userZkEvmEthAddress;
+          let userZkEvmEthAddress: string | undefined;
 
           if (!isZkEvmUser(user)) {
             flow.addEvent('startUserRegistration');
 
-            const ethSigner = await this.#getSigner();
-            flow.addEvent('ethSignerResolved');
-
             userZkEvmEthAddress = await registerZkEvmUser({
-              ethSigner,
+              ethSigner: this.#ethSigner,
               authManager: this.#authManager,
               multiRollupApiClients: this.#multiRollupApiClients,
               accessToken: user.accessToken,
@@ -298,12 +223,9 @@ export class ZkEvmProvider implements Provider {
             width: 480,
             height: 720,
           })(async () => {
-            const ethSigner = await this.#getSigner();
-            flow.addEvent('endGetSigner');
-
             return await sendTransaction({
               params: request.params || [],
-              ethSigner,
+              ethSigner: this.#ethSigner,
               guardianClient: this.#guardianClient,
               rpcProvider: this.#rpcProvider,
               relayerClient: this.#relayerClient,
@@ -342,9 +264,6 @@ export class ZkEvmProvider implements Provider {
             width: 480,
             height: 720,
           })(async () => {
-            const ethSigner = await this.#getSigner();
-            flow.addEvent('endGetSigner');
-
             if (this.#config.forceScwDeployBeforeMessageSignature) {
               // Check if the smart contract wallet has been deployed
               const nonce = await getNonce(this.#rpcProvider, zkEvmAddress);
@@ -353,8 +272,8 @@ export class ZkEvmProvider implements Provider {
                 // submit a transaction before signing the message
                 return await sendDeployTransactionAndPersonalSign({
                   params: request.params || [],
-                  ethSigner,
                   zkEvmAddress,
+                  ethSigner: this.#ethSigner,
                   rpcProvider: this.#rpcProvider,
                   guardianClient: this.#guardianClient,
                   relayerClient: this.#relayerClient,
@@ -365,8 +284,8 @@ export class ZkEvmProvider implements Provider {
 
             return await personalSign({
               params: request.params || [],
-              ethSigner,
               zkEvmAddress,
+              ethSigner: this.#ethSigner,
               rpcProvider: this.#rpcProvider,
               guardianClient: this.#guardianClient,
               relayerClient: this.#relayerClient,
@@ -401,13 +320,10 @@ export class ZkEvmProvider implements Provider {
             width: 480,
             height: 720,
           })(async () => {
-            const ethSigner = await this.#getSigner();
-            flow.addEvent('endGetSigner');
-
             return await signTypedDataV4({
               method: request.method,
               params: request.params || [],
-              ethSigner,
+              ethSigner: this.#ethSigner,
               rpcProvider: this.#rpcProvider,
               relayerClient: this.#relayerClient,
               guardianClient: this.#guardianClient,
@@ -481,12 +397,9 @@ export class ZkEvmProvider implements Provider {
         const flow = trackFlow('passport', 'imSignEjectionTransaction');
 
         try {
-          const ethSigner = await this.#getSigner();
-          flow.addEvent('endGetSigner');
-
           return await signEjectionTransaction({
             params: request.params || [],
-            ethSigner,
+            ethSigner: this.#ethSigner,
             zkEvmAddress,
             flow,
           });
