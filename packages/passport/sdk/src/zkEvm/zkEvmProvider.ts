@@ -102,9 +102,9 @@ export class ZkEvmProvider implements Provider {
       this.#callSessionActivity(user.zkEvm);
     }
 
-    passportEventEmitter.on(PassportEvents.LOGGED_IN, (user: User) => {
-      if (isZkEvmUser(user)) {
-        this.#callSessionActivity(user.zkEvm);
+    passportEventEmitter.on(PassportEvents.LOGGED_IN, (loggedInUser: User) => {
+      if (isZkEvmUser(loggedInUser)) {
+        this.#callSessionActivity(loggedInUser.zkEvm);
       }
     });
     passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.#handleLogout);
@@ -124,19 +124,17 @@ export class ZkEvmProvider implements Provider {
     // we can submit a session activity request per SCW in parallel without a SCW
     // INVALID_NONCE error.
     const nonceSpace: bigint = BigInt(1);
-    const sendTransactionClosure = async (params: Array<any>, flow: Flow) => {
-      return await sendTransaction({
-        params,
-        magicTeeAdapter: this.#magicTeeAdapter,
-        guardianClient: this.#guardianClient,
-        rpcProvider: this.#rpcProvider,
-        relayerClient: this.#relayerClient,
-        zkEvmAddresses,
-        flow,
-        nonceSpace,
-        isBackgroundTransaction: true,
-      });
-    };
+    const sendTransactionClosure = async (params: Array<any>, flow: Flow) => await sendTransaction({
+      params,
+      magicTeeAdapter: this.#magicTeeAdapter,
+      guardianClient: this.#guardianClient,
+      rpcProvider: this.#rpcProvider,
+      relayerClient: this.#relayerClient,
+      zkEvmAddresses,
+      flow,
+      nonceSpace,
+      isBackgroundTransaction: true,
+    });
     this.#passportEventEmitter.emit(PassportEvents.ACCOUNTS_REQUESTED, {
       environment: this.#config.baseConfig.environment,
       sendTransaction: sendTransactionClosure,
@@ -222,17 +220,15 @@ export class ZkEvmProvider implements Provider {
           return await this.#guardianClient.withConfirmationScreen({
             width: 480,
             height: 720,
-          })(async () => {
-            return await sendTransaction({
-              params: request.params || [],
-              magicTeeAdapter: this.#magicTeeAdapter,
-              guardianClient: this.#guardianClient,
-              rpcProvider: this.#rpcProvider,
-              relayerClient: this.#relayerClient,
-              zkEvmAddresses,
-              flow,
-            });
-          });
+          })(async () => await sendTransaction({
+            params: request.params || [],
+            magicTeeAdapter: this.#magicTeeAdapter,
+            guardianClient: this.#guardianClient,
+            rpcProvider: this.#rpcProvider,
+            relayerClient: this.#relayerClient,
+            zkEvmAddresses,
+            flow,
+          }));
         } catch (error) {
           if (error instanceof Error) {
             trackError('passport', 'eth_sendTransaction', error, { flowId: flow.details.flowId });
@@ -319,18 +315,16 @@ export class ZkEvmProvider implements Provider {
           return await this.#guardianClient.withConfirmationScreen({
             width: 480,
             height: 720,
-          })(async () => {
-            return await signTypedDataV4({
-              zkEvmAddresses,
-              method: request.method,
-              params: request.params || [],
-              magicTeeAdapter: this.#magicTeeAdapter,
-              rpcProvider: this.#rpcProvider,
-              relayerClient: this.#relayerClient,
-              guardianClient: this.#guardianClient,
-              flow,
-            });
-          });
+          })(async () => await signTypedDataV4({
+            zkEvmAddresses,
+            method: request.method,
+            params: request.params || [],
+            magicTeeAdapter: this.#magicTeeAdapter,
+            rpcProvider: this.#rpcProvider,
+            relayerClient: this.#relayerClient,
+            guardianClient: this.#guardianClient,
+            flow,
+          }));
         } catch (error) {
           if (error instanceof Error) {
             trackError('passport', 'eth_signTypedData', error, { flowId: flow.details.flowId });

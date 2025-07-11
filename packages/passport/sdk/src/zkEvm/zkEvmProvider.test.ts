@@ -1,5 +1,5 @@
 import { identify, trackFlow } from '@imtbl/metrics';
-import { BrowserProvider, JsonRpcProvider, toBeHex } from 'ethers';
+import { JsonRpcProvider, toBeHex } from 'ethers';
 import AuthManager from '../authManager';
 import { ZkEvmProvider, ZkEvmProviderInput } from './zkEvmProvider';
 import { sendTransaction } from './sendTransaction';

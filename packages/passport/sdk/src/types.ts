@@ -33,12 +33,12 @@ export type ImxAddresses = {
   ethAddress: string;
   starkAddress: string;
   userAdminAddress: string;
-}
+};
 
 export type ZkEvmAddresses = {
   ethAddress: string;
   userAdminAddress: string;
-}
+};
 
 export type User = {
   idToken?: string;

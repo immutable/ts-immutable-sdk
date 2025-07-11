@@ -22,7 +22,7 @@ describe('registerZkEvmUser', () => {
     createWallet: jest.fn(),
     personalSign: jest.fn(),
   };
-  
+
   const authManager = {
     getUser: jest.fn(),
     forceUserRefreshInBackground: jest.fn(),
@@ -48,11 +48,11 @@ describe('registerZkEvmUser', () => {
     jest.restoreAllMocks();
     mockMagicTeeAdapter.createWallet.mockResolvedValue(mockUserZkEvm.zkEvm.userAdminAddress);
     mockMagicTeeAdapter.personalSign.mockResolvedValue('mockSignature');
-    
+
     // Mock the signature processing chain
     (deserializeSignature as jest.Mock).mockReturnValue('deserializedSignature');
     (serializeEthSignature as jest.Mock).mockReturnValue(ethereumSignature);
-    
+
     multiRollupApiClients.chainsApi.listChains.mockResolvedValue(mockListChains);
     jsonRPCProvider.getNetwork.mockResolvedValue({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
   });

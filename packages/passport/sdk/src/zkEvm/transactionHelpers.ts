@@ -1,6 +1,6 @@
 import { Flow } from '@imtbl/metrics';
 import {
-  Signer, TransactionRequest, JsonRpcProvider,
+  TransactionRequest, JsonRpcProvider,
   BigNumberish,
 } from 'ethers';
 import {

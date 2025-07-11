@@ -31,7 +31,7 @@ describe('signTypedDataV4', () => {
   };
   const zkEvmAddresses = {
     ethAddress: address,
-    userAdminAddress: userAdminAddress,
+    userAdminAddress,
   };
   const rpcProvider = {
     getNetwork: jest.fn(),

@@ -37,7 +37,7 @@ describe('sendTransaction', () => {
     personalSign: jest.fn(),
     createWallet: jest.fn(),
   };
-  
+
   const flow = {
     addEvent: jest.fn(),
   };

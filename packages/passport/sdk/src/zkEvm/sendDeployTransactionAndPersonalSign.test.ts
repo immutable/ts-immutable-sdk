@@ -145,7 +145,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
       zkEvmAddresses,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
-    } );
+    });
 
     expect(guardianClient.withConfirmationScreen).toHaveBeenCalled();
   });

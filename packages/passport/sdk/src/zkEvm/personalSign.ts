@@ -62,7 +62,7 @@ export const personalSign = async ({
   ]);
 
   const relayerSignature = await relayerClient.imSign(fromAddress, payload);
-    flow.addEvent('endRelayerSign');
+  flow.addEvent('endRelayerSign');
 
   return packSignatures(eoaSignature, zkEvmAddresses.userAdminAddress, relayerSignature);
 };

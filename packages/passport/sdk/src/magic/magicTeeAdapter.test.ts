@@ -1,10 +1,9 @@
-import { PassportConfiguration } from '../config';
-import AuthManager from '../authManager';
 import { MagicTeeApiClients } from '@imtbl/generated-clients';
-import { PassportError, PassportErrorType } from '../errors/passportError';
 import { trackDuration } from '@imtbl/metrics';
-import { withMetricsAsync } from '../utils/metrics';
 import { isAxiosError } from 'axios';
+import AuthManager from '../authManager';
+import { PassportError, PassportErrorType } from '../errors/passportError';
+import { withMetricsAsync } from '../utils/metrics';
 import MagicTeeAdapter from './magicTeeAdapter';
 
 // Mock dependencies
@@ -15,7 +14,6 @@ jest.mock('axios', () => ({
 }));
 
 describe('MagicTeeAdapter', () => {
-  let config: PassportConfiguration;
   let authManager: jest.Mocked<AuthManager>;
   let magicTeeApiClient: jest.Mocked<MagicTeeApiClients>;
   let adapter: MagicTeeAdapter;
@@ -38,11 +36,6 @@ describe('MagicTeeAdapter', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
-    config = {
-      magicPublishableApiKey: 'test-magic-key',
-      magicProviderId: 'test-provider-id',
-    } as PassportConfiguration;
 
     authManager = {
       getUser: jest.fn(),
@@ -61,7 +54,7 @@ describe('MagicTeeAdapter', () => {
       },
     } as any;
 
-    adapter = new MagicTeeAdapter(config, authManager, magicTeeApiClient);
+    adapter = new MagicTeeAdapter(authManager, magicTeeApiClient);
 
     // Mock withMetricsAsync to call the function directly
     (withMetricsAsync as jest.Mock).mockImplementation(async (fn, flowName) => {
@@ -76,9 +69,8 @@ describe('MagicTeeAdapter', () => {
   describe('constructor', () => {
     it('should initialize with provided dependencies', () => {
       expect(adapter).toBeInstanceOf(MagicTeeAdapter);
-      expect(adapter['config']).toBe(config);
-      expect(adapter['authManager']).toBe(authManager);
-      expect(adapter['magicTeeApiClient']).toBe(magicTeeApiClient);
+      expect(adapter.authManager).toBe(authManager);
+      expect(adapter.magicTeeApiClient).toBe(magicTeeApiClient);
     });
   });
 
@@ -104,12 +96,12 @@ describe('MagicTeeAdapter', () => {
             chain: 'ETH',
           },
         },
-        { headers: mockHeaders }
+        { headers: mockHeaders },
       );
       expect(trackDuration).toHaveBeenCalledWith(
         'passport',
         'magicCreateWallet',
-        expect.any(Number)
+        expect.any(Number),
       );
     });
 
@@ -127,7 +119,7 @@ describe('MagicTeeAdapter', () => {
       mockIsAxiosError.mockReturnValue(true);
 
       await expect(adapter.createWallet()).rejects.toThrow(
-        'Failed to create wallet with status 500: {"error":"Internal server error"}'
+        'Failed to create wallet with status 500: {"error":"Internal server error"}',
       );
     });
 
@@ -141,7 +133,7 @@ describe('MagicTeeAdapter', () => {
       mockIsAxiosError.mockReturnValue(true);
 
       await expect(adapter.createWallet()).rejects.toThrow(
-        'Failed to create wallet: Network error'
+        'Failed to create wallet: Network error',
       );
     });
 
@@ -153,7 +145,7 @@ describe('MagicTeeAdapter', () => {
       mockIsAxiosError.mockReturnValue(false);
 
       await expect(adapter.createWallet()).rejects.toThrow(
-        'Failed to create wallet: Generic error'
+        'Failed to create wallet: Generic error',
       );
     });
 
@@ -163,8 +155,8 @@ describe('MagicTeeAdapter', () => {
       await expect(adapter.createWallet()).rejects.toThrow(
         new PassportError(
           'User has been logged out',
-          PassportErrorType.NOT_LOGGED_IN_ERROR
-        )
+          PassportErrorType.NOT_LOGGED_IN_ERROR,
+        ),
       );
     });
   });
@@ -193,12 +185,12 @@ describe('MagicTeeAdapter', () => {
             chain: 'ETH',
           },
         },
-        { headers: mockHeaders }
+        { headers: mockHeaders },
       );
       expect(trackDuration).toHaveBeenCalledWith(
         'passport',
         'magicPersonalSign',
-        expect.any(Number)
+        expect.any(Number),
       );
     });
 
@@ -225,7 +217,7 @@ describe('MagicTeeAdapter', () => {
             chain: 'ETH',
           },
         },
-        { headers: mockHeaders }
+        { headers: mockHeaders },
       );
     });
 
@@ -244,7 +236,7 @@ describe('MagicTeeAdapter', () => {
       mockIsAxiosError.mockReturnValue(true);
 
       await expect(adapter.personalSign(message)).rejects.toThrow(
-        'Failed to create signature using EOA with status 400: {"error":"Bad request"}'
+        'Failed to create signature using EOA with status 400: {"error":"Bad request"}',
       );
     });
 
@@ -259,7 +251,7 @@ describe('MagicTeeAdapter', () => {
       mockIsAxiosError.mockReturnValue(true);
 
       await expect(adapter.personalSign(message)).rejects.toThrow(
-        'Failed to create signature using EOA: Network timeout'
+        'Failed to create signature using EOA: Network timeout',
       );
     });
 
@@ -272,7 +264,7 @@ describe('MagicTeeAdapter', () => {
       mockIsAxiosError.mockReturnValue(false);
 
       await expect(adapter.personalSign(message)).rejects.toThrow(
-        'Failed to create signature using EOA: Signing failed'
+        'Failed to create signature using EOA: Signing failed',
       );
     });
 
@@ -283,8 +275,8 @@ describe('MagicTeeAdapter', () => {
       await expect(adapter.personalSign(message)).rejects.toThrow(
         new PassportError(
           'User has been logged out',
-          PassportErrorType.NOT_LOGGED_IN_ERROR
-        )
+          PassportErrorType.NOT_LOGGED_IN_ERROR,
+        ),
       );
     });
   });
@@ -293,7 +285,7 @@ describe('MagicTeeAdapter', () => {
     it('should return headers with authorization token when user is logged in', async () => {
       authManager.getUser.mockResolvedValue(mockUser as any);
 
-      const result = await adapter['getHeaders']();
+      const result = await adapter.getHeaders();
 
       expect(result).toEqual({
         Authorization: 'Bearer test-id-token',
@@ -304,11 +296,11 @@ describe('MagicTeeAdapter', () => {
     it('should throw PassportError when user is not logged in', async () => {
       authManager.getUser.mockResolvedValue(null);
 
-      await expect(adapter['getHeaders']()).rejects.toThrow(
+      await expect(adapter.getHeaders()).rejects.toThrow(
         new PassportError(
           'User has been logged out',
-          PassportErrorType.NOT_LOGGED_IN_ERROR
-        )
+          PassportErrorType.NOT_LOGGED_IN_ERROR,
+        ),
       );
     });
   });
@@ -329,7 +321,7 @@ describe('MagicTeeAdapter', () => {
 
       expect(withMetricsAsync).toHaveBeenCalledWith(
         expect.any(Function),
-        'magicCreateWallet'
+        'magicCreateWallet',
       );
     });
 
@@ -349,7 +341,7 @@ describe('MagicTeeAdapter', () => {
 
       expect(withMetricsAsync).toHaveBeenCalledWith(
         expect.any(Function),
-        'magicPersonalSign'
+        'magicPersonalSign',
       );
     });
 
@@ -369,7 +361,7 @@ describe('MagicTeeAdapter', () => {
       expect(trackDuration).toHaveBeenCalledWith(
         'passport',
         'magicCreateWallet',
-        expect.any(Number)
+        expect.any(Number),
       );
     });
 
@@ -390,8 +382,8 @@ describe('MagicTeeAdapter', () => {
       expect(trackDuration).toHaveBeenCalledWith(
         'passport',
         'magicPersonalSign',
-        expect.any(Number)
+        expect.any(Number),
       );
     });
   });
-}); 
+});

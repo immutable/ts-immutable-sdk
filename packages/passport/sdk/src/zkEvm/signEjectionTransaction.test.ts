@@ -22,12 +22,12 @@ describe('im_signEjectionTransaction', () => {
     chainId: 1,
     value: BigInt('5'),
   };
-  
+
   const mockMagicTeeAdapter = {
     personalSign: jest.fn(),
     createWallet: jest.fn(),
   };
-  
+
   const flow = {
     addEvent: jest.fn(),
   };

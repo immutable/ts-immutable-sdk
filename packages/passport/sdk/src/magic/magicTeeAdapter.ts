@@ -1,22 +1,18 @@
-import { PassportConfiguration } from '../config';
-import AuthManager from '../authManager';
 import { MagicTeeApiClients } from '@imtbl/generated-clients';
-import { PassportError, PassportErrorType } from '../errors/passportError';
 import { isAxiosError } from 'axios';
 import { Flow, trackDuration } from '@imtbl/metrics';
+import { PassportError, PassportErrorType } from '../errors/passportError';
+import AuthManager from '../authManager';
 import { withMetricsAsync } from '../utils/metrics';
 
 const CHAIN_IDENTIFIER = 'ETH';
 
 export default class MagicTeeAdapter {
-  private readonly config: PassportConfiguration;
-
   private readonly authManager: AuthManager;
 
   private readonly magicTeeApiClient: MagicTeeApiClients;
 
-  constructor(config: PassportConfiguration, authManager: AuthManager, magicTeeApiClient: MagicTeeApiClients) {
-    this.config = config;
+  constructor(authManager: AuthManager, magicTeeApiClient: MagicTeeApiClients) {
     this.authManager = authManager;
     this.magicTeeApiClient = magicTeeApiClient;
   }
@@ -33,7 +29,7 @@ export default class MagicTeeAdapter {
               chain: CHAIN_IDENTIFIER,
             },
           },
-          { headers }
+          { headers },
         );
 
         trackDuration(
@@ -45,7 +41,7 @@ export default class MagicTeeAdapter {
         return response.data.public_address;
       } catch (error) {
         let errorMessage: string = 'Failed to create wallet';
-  
+
         if (isAxiosError(error)) {
           if (error.response) {
             errorMessage += ` with status ${error.response.status}: ${JSON.stringify(error.response.data)}`;
@@ -55,7 +51,7 @@ export default class MagicTeeAdapter {
         } else {
           errorMessage += `: ${(error as Error).message}`;
         }
-  
+
         throw new Error(errorMessage);
       }
     }, 'magicCreateWallet');
@@ -84,7 +80,7 @@ export default class MagicTeeAdapter {
         return response.data.signature;
       } catch (error) {
         let errorMessage: string = 'Failed to create signature using EOA';
-  
+
         if (isAxiosError(error)) {
           if (error.response) {
             errorMessage += ` with status ${error.response.status}: ${JSON.stringify(error.response.data)}`;
@@ -94,7 +90,7 @@ export default class MagicTeeAdapter {
         } else {
           errorMessage += `: ${(error as Error).message}`;
         }
-  
+
         throw new Error(errorMessage);
       }
     }, 'magicPersonalSign');

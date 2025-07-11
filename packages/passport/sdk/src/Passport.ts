@@ -66,7 +66,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     magicPublishableApiKey: config.magicPublishableApiKey,
     magicProviderId: config.magicProviderId,
   });
-  const magicTeeAdapter = new MagicTeeAdapter(config, authManager, magicTeeApiClients);
+  const magicTeeAdapter = new MagicTeeAdapter(authManager, magicTeeApiClients);
   const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
   const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
 
