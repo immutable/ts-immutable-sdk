@@ -154,11 +154,6 @@ export type PKCEData = {
   verifier: string;
 };
 
-export type IMXSigners = {
-  starkSigner: StarkSigner;
-  ethSigner: EthSigner;
-};
-
 export type LinkWalletParams = {
   type: string;
   walletAddress: string;

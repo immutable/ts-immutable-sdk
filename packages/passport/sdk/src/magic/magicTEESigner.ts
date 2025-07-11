@@ -1,3 +1,4 @@
+import { AbstractSigner, Provider, Signer, TransactionRequest, TypedDataDomain, TypedDataField } from 'ethers';
 import { MagicTeeApiClients } from '@imtbl/generated-clients';
 import { isAxiosError } from 'axios';
 import { Flow, trackDuration } from '@imtbl/metrics';
@@ -7,17 +8,39 @@ import { withMetricsAsync } from '../utils/metrics';
 
 const CHAIN_IDENTIFIER = 'ETH';
 
-export default class MagicTeeAdapter {
+export default class MagicTEESigner extends AbstractSigner {
   private readonly authManager: AuthManager;
 
   private readonly magicTeeApiClient: MagicTeeApiClients;
 
+  private walletAddress: string | null = null;
+
+  private walletAddressPromise: Promise<string> | null = null;
+
   constructor(authManager: AuthManager, magicTeeApiClient: MagicTeeApiClients) {
+    super();
     this.authManager = authManager;
     this.magicTeeApiClient = magicTeeApiClient;
+    this.createWallet()
+      .then((address) => {
+        this.walletAddress = address;
+      })
+      .catch(() => {
+        this.walletAddress = null;
+      });
   }
 
-  public async createWallet(): Promise<string> {
+  public async getAddress(): Promise<string> {
+    if (this.walletAddress) {
+      return this.walletAddress;
+    } else if (this.walletAddressPromise) {
+      return this.walletAddressPromise;
+    }
+
+    return this.createWallet();
+  }
+
+  private async createWallet(): Promise<string> {
     const headers = await this.getHeaders();
 
     return withMetricsAsync(async (flow: Flow) => {
@@ -38,7 +61,8 @@ export default class MagicTeeAdapter {
           Math.round(performance.now() - startTime),
         );
 
-        return response.data.public_address;
+        this.walletAddress = response.data.public_address;
+        return this.walletAddress;
       } catch (error) {
         let errorMessage: string = 'Failed to create wallet';
 
@@ -53,11 +77,18 @@ export default class MagicTeeAdapter {
         }
 
         throw new Error(errorMessage);
+      } finally {
+        this.walletAddressPromise = null;
       }
     }, 'magicCreateWallet');
   }
 
-  public async personalSign(message: string | Uint8Array): Promise<string> {
+  public async signMessage(message: string | Uint8Array): Promise<string> {
+    // Call getAddress to ensure that the wallet has been created
+    if (!this.walletAddress) {
+      await this.getAddress();
+    }
+
     const messageToSign = message instanceof Uint8Array ? `0x${Buffer.from(message).toString('hex')}` : message;
     const headers = await this.getHeaders();
 
@@ -104,9 +135,18 @@ export default class MagicTeeAdapter {
         PassportErrorType.NOT_LOGGED_IN_ERROR,
       );
     }
-
     return {
       Authorization: `Bearer ${user.idToken}`,
     };
+  }
+
+  connect(provider: null | Provider): Signer {
+    throw new Error('Method not implemented.');
+  }
+  signTransaction(tx: TransactionRequest): Promise<string> {
+    throw new Error('Method not implemented.');
+  }
+  signTypedData(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>): Promise<string> {
+    throw new Error('Method not implemented.');
   }
 }

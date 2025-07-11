@@ -4,7 +4,7 @@ import { isAxiosError } from 'axios';
 import AuthManager from '../authManager';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { withMetricsAsync } from '../utils/metrics';
-import MagicTeeAdapter from './magicTeeAdapter';
+import MagicTeeAdapter from './magicTEESigner';
 
 // Mock dependencies
 jest.mock('../utils/metrics');

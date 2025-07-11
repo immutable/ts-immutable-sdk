@@ -3,16 +3,16 @@ import { IMXProvider } from '@imtbl/x-provider';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import AuthManager from '../authManager';
-import MagicAdapter from '../magic/magicAdapter';
 import { PassportEventMap, User } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportImxProvider } from './passportImxProvider';
 import GuardianClient from '../guardian';
+import MagicTEESigner from '../magic/magicTEESigner';
 
 export type PassportImxProviderFactoryInput = {
   authManager: AuthManager;
   immutableXClient: IMXClient;
-  magicAdapter: MagicAdapter;
+  magicTEESigner: MagicTEESigner;
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   imxApiClients: ImxApiClients;
   guardianClient: GuardianClient;
@@ -23,7 +23,7 @@ export class PassportImxProviderFactory {
 
   private readonly immutableXClient: IMXClient;
 
-  private readonly magicAdapter: MagicAdapter;
+  private readonly magicTEESigner: MagicTEESigner;
 
   private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
@@ -34,14 +34,14 @@ export class PassportImxProviderFactory {
   constructor({
     authManager,
     immutableXClient,
-    magicAdapter,
+    magicTEESigner,
     passportEventEmitter,
     imxApiClients,
     guardianClient,
   }: PassportImxProviderFactoryInput) {
     this.authManager = authManager;
     this.immutableXClient = immutableXClient;
-    this.magicAdapter = magicAdapter;
+    this.magicTEESigner = magicTEESigner;
     this.passportEventEmitter = passportEventEmitter;
     this.imxApiClients = imxApiClients;
     this.guardianClient = guardianClient;
@@ -73,7 +73,7 @@ export class PassportImxProviderFactory {
       authManager: this.authManager,
       immutableXClient: this.immutableXClient,
       passportEventEmitter: this.passportEventEmitter,
-      magicAdapter: this.magicAdapter,
+      magicTEESigner: this.magicTEESigner,
       imxApiClients: this.imxApiClients,
       guardianClient: this.guardianClient,
     });
