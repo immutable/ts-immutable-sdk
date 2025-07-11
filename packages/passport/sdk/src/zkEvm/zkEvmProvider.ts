@@ -17,6 +17,7 @@ import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import {
   PassportEventMap, PassportEvents, User, UserZkEvm,
+  ZkEvmAddresses,
 } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
@@ -98,12 +99,12 @@ export class ZkEvmProvider implements Provider {
     this.#providerEventEmitter = new TypedEventEmitter<ProviderEventMap>();
 
     if (user && isZkEvmUser(user)) {
-      this.#callSessionActivity(user.zkEvm.ethAddress);
+      this.#callSessionActivity(user.zkEvm);
     }
 
     passportEventEmitter.on(PassportEvents.LOGGED_IN, (user: User) => {
       if (isZkEvmUser(user)) {
-        this.#callSessionActivity(user.zkEvm.ethAddress);
+        this.#callSessionActivity(user.zkEvm);
       }
     });
     passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.#handleLogout);
@@ -117,7 +118,7 @@ export class ZkEvmProvider implements Provider {
     this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
   };
 
-  async #callSessionActivity(zkEvmAddress: string, clientId?: string) {
+  async #callSessionActivity(zkEvmAddresses: ZkEvmAddresses, clientId?: string) {
     // SessionActivity requests are processed in nonce space 1, where as all
     // other sendTransaction requests are processed in nonce space 0. This means
     // we can submit a session activity request per SCW in parallel without a SCW
@@ -130,7 +131,7 @@ export class ZkEvmProvider implements Provider {
         guardianClient: this.#guardianClient,
         rpcProvider: this.#rpcProvider,
         relayerClient: this.#relayerClient,
-        zkEvmAddress,
+        zkEvmAddresses,
         flow,
         nonceSpace,
         isBackgroundTransaction: true,
@@ -139,7 +140,7 @@ export class ZkEvmProvider implements Provider {
     this.#passportEventEmitter.emit(PassportEvents.ACCOUNTS_REQUESTED, {
       environment: this.#config.baseConfig.environment,
       sendTransaction: sendTransactionClosure,
-      walletAddress: zkEvmAddress,
+      walletAddress: zkEvmAddresses.ethAddress,
       passportClient: clientId || this.#config.oidcConfiguration.clientId,
     });
   }
@@ -162,7 +163,7 @@ export class ZkEvmProvider implements Provider {
 
     switch (request.method) {
       case 'eth_requestAccounts': {
-        const zkEvmAddresses = await this.#getZkEvmAddresses();
+        let zkEvmAddresses = await this.#getZkEvmAddresses();
         if (zkEvmAddresses) return [zkEvmAddresses.ethAddress];
 
         const flow = trackFlow('passport', 'ethRequestAccounts');
@@ -171,12 +172,10 @@ export class ZkEvmProvider implements Provider {
           const user = await this.#authManager.getUserOrLogin();
           flow.addEvent('endGetUserOrLogin');
 
-          let userZkEvmEthAddress;
-
           if (!isZkEvmUser(user)) {
             flow.addEvent('startUserRegistration');
 
-            userZkEvmEthAddress = await registerZkEvmUser({
+            zkEvmAddresses = await registerZkEvmUser({
               magicTeeAdapter: this.#magicTeeAdapter,
               authManager: this.#authManager,
               multiRollupApiClients: this.#multiRollupApiClients,
@@ -186,17 +185,17 @@ export class ZkEvmProvider implements Provider {
             });
             flow.addEvent('endUserRegistration');
           } else {
-            userZkEvmEthAddress = user.zkEvm.ethAddress;
+            zkEvmAddresses = user.zkEvm;
           }
 
           this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [
-            userZkEvmEthAddress,
+            zkEvmAddresses.ethAddress,
           ]);
           identify({
             passportId: user.profile.sub,
           });
-          this.#callSessionActivity(userZkEvmEthAddress);
-          return [userZkEvmEthAddress];
+          this.#callSessionActivity(zkEvmAddresses);
+          return [zkEvmAddresses.ethAddress];
         } catch (error) {
           if (error instanceof Error) {
             trackError('passport', 'ethRequestAccounts', error, { flowId: flow.details.flowId });
@@ -230,7 +229,7 @@ export class ZkEvmProvider implements Provider {
               guardianClient: this.#guardianClient,
               rpcProvider: this.#rpcProvider,
               relayerClient: this.#relayerClient,
-              zkEvmAddress: zkEvmAddresses.ethAddress,
+              zkEvmAddresses,
               flow,
             });
           });
@@ -274,7 +273,7 @@ export class ZkEvmProvider implements Provider {
                 return await sendDeployTransactionAndPersonalSign({
                   params: request.params || [],
                   magicTeeAdapter: this.#magicTeeAdapter,
-                  zkEvmAddress: zkEvmAddresses.ethAddress,
+                  zkEvmAddresses,
                   rpcProvider: this.#rpcProvider,
                   guardianClient: this.#guardianClient,
                   relayerClient: this.#relayerClient,
@@ -402,7 +401,7 @@ export class ZkEvmProvider implements Provider {
           return await signEjectionTransaction({
             params: request.params || [],
             magicTeeAdapter: this.#magicTeeAdapter,
-            zkEvmAddress: zkEvmAddresses.ethAddress,
+            zkEvmAddresses,
             flow,
           });
         } catch (error) {
@@ -420,7 +419,7 @@ export class ZkEvmProvider implements Provider {
         const [clientId] = request.params || [];
         const zkEvmAddresses = await this.#getZkEvmAddresses();
         if (zkEvmAddresses) {
-          this.#callSessionActivity(zkEvmAddresses.ethAddress, clientId);
+          this.#callSessionActivity(zkEvmAddresses, clientId);
         }
         return null;
       }

@@ -20,6 +20,7 @@ import {
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
 import MagicTeeAdapter from '../magic/magicTeeAdapter';
+import { ZkEvmAddresses } from '../types';
 
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
@@ -29,13 +30,13 @@ export type TransactionParams = {
   rpcProvider: JsonRpcProvider;
   guardianClient: GuardianClient;
   relayerClient: RelayerClient;
-  zkEvmAddress: string;
+  zkEvmAddresses: ZkEvmAddresses;
   flow: Flow;
   nonceSpace?: bigint;
   isBackgroundTransaction?: boolean;
 };
 
-export type EjectionTransactionParams = Pick<TransactionParams, 'magicTeeAdapter' | 'zkEvmAddress' | 'flow'>;
+export type EjectionTransactionParams = Pick<TransactionParams, 'magicTeeAdapter' | 'zkEvmAddresses' | 'flow'>;
 export type EjectionTransactionResponse = {
   to: string;
   data: string;
@@ -74,7 +75,7 @@ const buildMetaTransactions = async (
   transactionRequest: TransactionRequest,
   rpcProvider: JsonRpcProvider,
   relayerClient: RelayerClient,
-  zkevmAddress: string,
+  zkEvmAddresses: ZkEvmAddresses,
   nonceSpace?: bigint,
 ): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
   if (!transactionRequest.to) {
@@ -94,8 +95,8 @@ const buildMetaTransactions = async (
 
   // Estimate the fee and get the nonce from the smart wallet
   const [nonce, feeOption] = await Promise.all([
-    getNonce(rpcProvider, zkevmAddress, nonceSpace),
-    getFeeOption(metaTransaction, zkevmAddress, relayerClient),
+    getNonce(rpcProvider, zkEvmAddresses.ethAddress, nonceSpace),
+    getFeeOption(metaTransaction, zkEvmAddresses.ethAddress, relayerClient),
   ]);
 
   // Build the meta transactions array with a valid nonce and fee transaction
@@ -169,7 +170,7 @@ export const prepareAndSignTransaction = async ({
   rpcProvider,
   guardianClient,
   relayerClient,
-  zkEvmAddress,
+  zkEvmAddresses,
   flow,
   nonceSpace,
   isBackgroundTransaction,
@@ -182,7 +183,7 @@ export const prepareAndSignTransaction = async ({
     transactionRequest,
     rpcProvider,
     relayerClient,
-    zkEvmAddress,
+    zkEvmAddresses,
     nonceSpace,
   );
   flow.addEvent('endBuildMetaTransactions');
@@ -211,7 +212,7 @@ export const prepareAndSignTransaction = async ({
       metaTransactions,
       nonce,
       chainIdBigNumber,
-      zkEvmAddress,
+      zkEvmAddresses.ethAddress,
       magicTeeAdapter,
     );
     flow.addEvent('endGetSignedMetaTransactions');
@@ -223,7 +224,7 @@ export const prepareAndSignTransaction = async ({
     signTransaction(),
   ]);
 
-  const relayerId = await relayerClient.ethSendTransaction(zkEvmAddress, signedTransactions);
+  const relayerId = await relayerClient.ethSendTransaction(zkEvmAddresses.ethAddress, signedTransactions);
   flow.addEvent('endRelayerSendTransaction');
 
   return { signedTransactions, relayerId, nonce };
@@ -267,7 +268,7 @@ const buildMetaTransactionForEjection = async (
 export const prepareAndSignEjectionTransaction = async ({
   transactionRequest,
   magicTeeAdapter,
-  zkEvmAddress,
+  zkEvmAddresses,
   flow,
 }: EjectionTransactionParams & { transactionRequest: TransactionRequest }): Promise<EjectionTransactionResponse> => {
   const metaTransaction = await buildMetaTransactionForEjection(
@@ -279,13 +280,13 @@ export const prepareAndSignEjectionTransaction = async ({
     metaTransaction,
     transactionRequest.nonce as BigNumberish,
     BigInt(transactionRequest.chainId ?? 0),
-    zkEvmAddress,
+    zkEvmAddresses.ethAddress,
     magicTeeAdapter,
   );
   flow.addEvent('endGetSignedMetaTransactions');
 
   return {
-    to: zkEvmAddress,
+    to: zkEvmAddresses.ethAddress,
     data: signedTransaction,
     chainId: getEip155ChainId(Number(transactionRequest.chainId ?? 0)),
   };

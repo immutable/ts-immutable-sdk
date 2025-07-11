@@ -257,7 +257,7 @@ describe('ZkEvmProvider', () => {
         magicTeeAdapter,
         rpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
-        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+        zkEvmAddresses: mockUserZkEvm.zkEvm,
         flow: expect.any(Object),
       });
     });
@@ -301,7 +301,7 @@ describe('ZkEvmProvider', () => {
       expect(signEjectionTransaction).toHaveBeenCalledWith({
         params: [transaction],
         magicTeeAdapter,
-        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+        zkEvmAddresses: mockUserZkEvm.zkEvm,
         flow: expect.any(Object),
       });
     });

@@ -6,6 +6,7 @@ import { getEip155ChainId } from '../walletHelpers';
 import AuthManager from '../../authManager';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 import MagicTeeAdapter from '../../magic/magicTeeAdapter';
+import { ZkEvmAddresses } from '../../types';
 
 export type RegisterZkEvmUserInput = {
   authManager: AuthManager;
@@ -25,9 +26,9 @@ export async function registerZkEvmUser({
   accessToken,
   rpcProvider,
   flow,
-}: RegisterZkEvmUserInput): Promise<string> {
+}: RegisterZkEvmUserInput): Promise<ZkEvmAddresses> {
   // Parallelize the operations that can happen concurrently
-  const ethereumAddress = await magicTeeAdapter.createWallet();
+  const userAdminAddress = await magicTeeAdapter.createWallet();
   flow.addEvent('endGetAddress');
 
   const signaturePromise = magicTeeAdapter.personalSign(MESSAGE_TO_SIGN)
@@ -60,7 +61,7 @@ export async function registerZkEvmUser({
     const registrationResponse = await multiRollupApiClients.passportApi.createCounterfactualAddressV2({
       chainName,
       createCounterfactualAddressRequest: {
-        ethereum_address: ethereumAddress,
+        ethereum_address: userAdminAddress,
         ethereum_signature: ethereumSignature,
       },
     }, {
@@ -70,7 +71,10 @@ export async function registerZkEvmUser({
 
     authManager.forceUserRefreshInBackground();
 
-    return registrationResponse.data.counterfactual_address;
+    return {
+      userAdminAddress,
+      ethAddress: registrationResponse.data.counterfactual_address,
+    };
   } catch (error) {
     throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Failed to create counterfactual address: ${error}`);
   }

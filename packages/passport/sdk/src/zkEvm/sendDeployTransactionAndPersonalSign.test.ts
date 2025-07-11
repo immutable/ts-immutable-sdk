@@ -69,7 +69,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
       zkEvmAddresses,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
-    } as any);
+    });
 
     expect(transactionHelpers.prepareAndSignTransaction).toHaveBeenCalledWith({
       transactionRequest: { to: mockUserZkEvm.zkEvm.ethAddress, value: 0 },
@@ -91,7 +91,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
       zkEvmAddresses,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
-    } as any);
+    });
 
     expect(personalSign.personalSign).toHaveBeenCalledWith({
       params,
@@ -113,7 +113,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
       zkEvmAddresses,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
-    } as any);
+    });
 
     expect(transactionHelpers.pollRelayerTransaction).toHaveBeenCalledWith(
       relayerClient as unknown as RelayerClient,
@@ -131,7 +131,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
       zkEvmAddresses,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
-    } as any);
+    });
 
     expect(result).toEqual(signedMessage);
   });
@@ -163,7 +163,7 @@ describe('sendDeployTransactionAndPersonalSign', () => {
         zkEvmAddresses,
         guardianClient: guardianClient as unknown as GuardianClient,
         flow: flow as unknown as Flow,
-      } as any),
+      }),
     ).rejects.toThrow(error);
   });
 });

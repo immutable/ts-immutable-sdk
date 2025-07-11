@@ -60,7 +60,7 @@ describe('sendTransaction', () => {
       magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses: mockUserZkEvm.zkEvm,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
     });
@@ -71,7 +71,7 @@ describe('sendTransaction', () => {
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       guardianClient: guardianClient as unknown as GuardianClient,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses: mockUserZkEvm.zkEvm,
       flow: flow as unknown as Flow,
       isBackgroundTransaction: false,
     });
@@ -83,7 +83,7 @@ describe('sendTransaction', () => {
       magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses: mockUserZkEvm.zkEvm,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
     });
@@ -101,7 +101,7 @@ describe('sendTransaction', () => {
       magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
       rpcProvider: rpcProvider as unknown as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses: mockUserZkEvm.zkEvm,
       guardianClient: guardianClient as unknown as GuardianClient,
       flow: flow as unknown as Flow,
     });
@@ -119,7 +119,7 @@ describe('sendTransaction', () => {
         magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
         rpcProvider: rpcProvider as unknown as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
-        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+        zkEvmAddresses: mockUserZkEvm.zkEvm,
         guardianClient: guardianClient as unknown as GuardianClient,
         flow: flow as unknown as Flow,
       }),

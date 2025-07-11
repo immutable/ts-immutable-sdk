@@ -166,7 +166,7 @@ export class Passport {
    * Connects to EVM and optionally announces the provider.
    * @param {Object} options - Configuration options
    * @param {boolean} options.announceProvider - Whether to announce the provider via EIP-6963 for wallet discovery (defaults to true)
-   * @returns {Provider} The EVM provider instance
+   * @returns {Promise<Provider>} The EVM provider instance
    */
   public async connectEvm(options: {
     announceProvider: boolean

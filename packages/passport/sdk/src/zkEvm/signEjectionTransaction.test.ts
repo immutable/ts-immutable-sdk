@@ -43,14 +43,14 @@ describe('im_signEjectionTransaction', () => {
     await signEjectionTransaction({
       params: [transactionRequest],
       magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses: mockUserZkEvm.zkEvm,
       flow: flow as unknown as Flow,
     });
 
     expect(transactionHelpers.prepareAndSignEjectionTransaction).toHaveBeenCalledWith({
       transactionRequest,
       magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses: mockUserZkEvm.zkEvm,
       flow: flow as unknown as Flow,
     });
   });
@@ -59,7 +59,7 @@ describe('im_signEjectionTransaction', () => {
     await expect(signEjectionTransaction({
       params: [transactionRequest, { test: 'test' }],
       magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses: mockUserZkEvm.zkEvm,
       flow: flow as unknown as Flow,
     })).rejects.toThrow(
       new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'im_signEjectionTransaction requires a singular param (hash)'),
@@ -70,7 +70,7 @@ describe('im_signEjectionTransaction', () => {
     const result = await signEjectionTransaction({
       params: [transactionRequest],
       magicTeeAdapter: mockMagicTeeAdapter as unknown as MagicTeeAdapter,
-      zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      zkEvmAddresses: mockUserZkEvm.zkEvm,
       flow: flow as unknown as Flow,
     });
 

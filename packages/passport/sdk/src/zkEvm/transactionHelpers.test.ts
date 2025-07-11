@@ -72,7 +72,10 @@ describe('transactionHelpers', () => {
   describe('prepareAndSignTransaction', () => {
     const chainId = 123n;
     const nonce = BigInt(5);
-    const zkEvmAddress = '0x1234567890123456789012345678901234567890';
+    const zkEvmAddresses = {
+      ethAddress: '0x1234567890123456789012345678901234567890',
+      userAdminAddress: '0x4567890123456789012345678901234567890123',
+    };
     const transactionRequest = {
       to: '0x1234567890123456789012345678901234567890',
       data: '0x456',
@@ -141,7 +144,7 @@ describe('transactionHelpers', () => {
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddress,
+        zkEvmAddresses,
         flow,
       });
 
@@ -154,7 +157,7 @@ describe('transactionHelpers', () => {
       expect(rpcProvider.getNetwork).toHaveBeenCalled();
       expect(guardianClient.validateEVMTransaction).toHaveBeenCalled();
       expect(walletHelpers.signMetaTransactions).toHaveBeenCalled();
-      expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(zkEvmAddress, signedTransactions);
+      expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(zkEvmAddresses.ethAddress, signedTransactions);
       expect(flow.addEvent).toHaveBeenCalledWith('endDetectNetwork');
       expect(flow.addEvent).toHaveBeenCalledWith('endBuildMetaTransactions');
       expect(flow.addEvent).toHaveBeenCalledWith('endValidateEVMTransaction');
@@ -172,7 +175,7 @@ describe('transactionHelpers', () => {
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddress,
+        zkEvmAddresses,
         flow,
       });
 
@@ -207,7 +210,7 @@ describe('transactionHelpers', () => {
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddress,
+        zkEvmAddresses,
         flow,
       });
 
@@ -249,7 +252,7 @@ describe('transactionHelpers', () => {
         ]),
         expect.any(BigInt),
         expect.any(BigInt),
-        zkEvmAddress,
+        zkEvmAddresses.ethAddress,
         magicTeeAdapter,
       );
     });
@@ -263,7 +266,7 @@ describe('transactionHelpers', () => {
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddress,
+        zkEvmAddresses,
         flow,
       });
 
@@ -283,7 +286,7 @@ describe('transactionHelpers', () => {
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddress,
+        zkEvmAddresses,
         flow,
       })).rejects.toThrow('Validation failed');
 
@@ -301,7 +304,7 @@ describe('transactionHelpers', () => {
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddress,
+        zkEvmAddresses,
         flow,
       })).rejects.toThrow('Signing failed');
     });
@@ -315,7 +318,7 @@ describe('transactionHelpers', () => {
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddress,
+        zkEvmAddresses,
         flow,
       })).rejects.toThrow('Transaction send failed');
     });
@@ -331,7 +334,10 @@ describe('transactionHelpers', () => {
       chainId,
     };
 
-    const zkEvmAddress = '0x1234567890123456789012345678901234567890';
+    const zkEvmAddresses = {
+      ethAddress: '0x1234567890123456789012345678901234567890',
+      userAdminAddress: '0x4567890123456789012345678901234567890123',
+    };
     const signedTransactions = 'signedTransactions123';
 
     beforeEach(() => {
@@ -347,14 +353,14 @@ describe('transactionHelpers', () => {
             nonce: 0,
           },
           magicTeeAdapter,
-          zkEvmAddress,
+          zkEvmAddresses,
           flow,
         });
 
         expect(result).toEqual({
           chainId: 'eip155:123',
           data: signedTransactions,
-          to: zkEvmAddress,
+          to: zkEvmAddresses.ethAddress,
         });
       });
     });
