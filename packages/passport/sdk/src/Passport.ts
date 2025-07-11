@@ -335,6 +335,19 @@ export class Passport {
   }
 
   /**
+   * Returns the logout URL for the current user.
+   * @returns {Promise<string>} The logout URL
+   */
+  public async getLogoutUrl(): Promise<string> {
+    return withMetricsAsync(async () => {
+      await this.authManager.removeUser();
+      await this.magicAdapter.logout();
+      this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
+      return await this.authManager.getLogoutUrl();
+    }, 'getLogoutUrl');
+  }
+
+  /**
    * Handles the silent logout callback.
    * @param {string} url - The callback URL to process
    * @returns {Promise<void>} A promise that resolves when the silent logout is complete
