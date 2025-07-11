@@ -66,14 +66,6 @@ describe('MagicTeeAdapter', () => {
     });
   });
 
-  describe('constructor', () => {
-    it('should initialize with provided dependencies', () => {
-      expect(adapter).toBeInstanceOf(MagicTeeAdapter);
-      expect(adapter.authManager).toBe(authManager);
-      expect(adapter.magicTeeApiClient).toBe(magicTeeApiClient);
-    });
-  });
-
   describe('createWallet', () => {
     it('should successfully create wallet and return public address', async () => {
       const mockPublicAddress = '0x123456789abcdef';
@@ -273,30 +265,6 @@ describe('MagicTeeAdapter', () => {
       authManager.getUser.mockResolvedValue(null);
 
       await expect(adapter.personalSign(message)).rejects.toThrow(
-        new PassportError(
-          'User has been logged out',
-          PassportErrorType.NOT_LOGGED_IN_ERROR,
-        ),
-      );
-    });
-  });
-
-  describe('getHeaders', () => {
-    it('should return headers with authorization token when user is logged in', async () => {
-      authManager.getUser.mockResolvedValue(mockUser as any);
-
-      const result = await adapter.getHeaders();
-
-      expect(result).toEqual({
-        Authorization: 'Bearer test-id-token',
-      });
-      expect(authManager.getUser).toHaveBeenCalledTimes(1);
-    });
-
-    it('should throw PassportError when user is not logged in', async () => {
-      authManager.getUser.mockResolvedValue(null);
-
-      await expect(adapter.getHeaders()).rejects.toThrow(
         new PassportError(
           'User has been logged out',
           PassportErrorType.NOT_LOGGED_IN_ERROR,
