@@ -16,6 +16,7 @@ import logger from './utils/logger';
 import { isTokenExpired } from './utils/token';
 import { PassportError, PassportErrorType, withPassportError } from './errors/passportError';
 import {
+  DirectLoginMethod,
   PassportMetadata,
   User,
   DeviceTokenResponse,
@@ -171,15 +172,19 @@ export default class AuthManager {
     });
   };
 
-  public async loginWithRedirect(anonymousId?: string, directLoginMethod?: string): Promise<void> {
+  private buildExtraQueryParams(anonymousId?: string, directLoginMethod?: DirectLoginMethod): Record<string, string> {
+    return {
+      ...(this.userManager.settings?.extraQueryParams ?? {}),
+      rid: getDetail(Detail.RUNTIME_ID) || '',
+      third_party_a_id: anonymousId || '',
+      ...(directLoginMethod && { direct: directLoginMethod }),
+    };
+  }
+
+  public async loginWithRedirect(anonymousId?: string, directLoginMethod?: DirectLoginMethod): Promise<void> {
     await this.userManager.clearStaleState();
     return withPassportError<void>(async () => {
-      const extraQueryParams: Record<string, string> = {
-        ...(this.userManager.settings?.extraQueryParams ?? {}),
-        rid: getDetail(Detail.RUNTIME_ID) || '',
-        third_party_a_id: anonymousId || '',
-        ...(directLoginMethod && { direct: directLoginMethod }),
-      };
+      const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginMethod);
 
       await this.userManager.signinRedirect({
         extraQueryParams,
@@ -191,16 +196,11 @@ export default class AuthManager {
    * login
    * @param anonymousId Caller can pass an anonymousId if they want to associate their user's identity with immutable's internal instrumentation.
    */
-  public async login(anonymousId?: string, directLoginMethod?: string): Promise<User> {
+  public async login(anonymousId?: string, directLoginMethod?: DirectLoginMethod): Promise<User> {
     return withPassportError<User>(async () => {
       const popupWindowTarget = 'passportLoginPrompt';
       const signinPopup = async () => {
-        const extraQueryParams: Record<string, string> = {
-          ...(this.userManager.settings?.extraQueryParams ?? {}),
-          rid: getDetail(Detail.RUNTIME_ID) || '',
-          third_party_a_id: anonymousId || '',
-          ...(directLoginMethod && { direct: directLoginMethod }),
-        };
+        const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginMethod);
 
         return this.userManager.signinPopup({
           extraQueryParams,
@@ -284,7 +284,7 @@ export default class AuthManager {
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
-  public async getPKCEAuthorizationUrl(): Promise<string> {
+  public async getPKCEAuthorizationUrl(directLoginMethod?: DirectLoginMethod): Promise<string> {
     const verifier = base64URLEncode(window.crypto.getRandomValues(new Uint8Array(32)));
     const challenge = base64URLEncode(await sha256(verifier));
 
@@ -307,6 +307,7 @@ export default class AuthManager {
 
     if (scope) pKCEAuthorizationUrl.searchParams.set('scope', scope);
     if (audience) pKCEAuthorizationUrl.searchParams.set('audience', audience);
+    if (directLoginMethod) pKCEAuthorizationUrl.searchParams.set('direct', directLoginMethod);
 
     return pKCEAuthorizationUrl.toString();
   }

@@ -272,10 +272,11 @@ export class Passport {
 
   /**
    * Initiates a PKCE flow login.
+   * @param {DirectLoginMethod} [directLoginMethod] - If provided, directly redirects to the specified login method
    * @returns {string} The authorization URL for the PKCE flow
    */
-  public loginWithPKCEFlow(): Promise<string> {
-    return withMetricsAsync(async () => await this.authManager.getPKCEAuthorizationUrl(), 'loginWithPKCEFlow');
+  public loginWithPKCEFlow(directLoginMethod?: DirectLoginMethod): Promise<string> {
+    return withMetricsAsync(async () => await this.authManager.getPKCEAuthorizationUrl(directLoginMethod), 'loginWithPKCEFlow');
   }
 
   /**
