@@ -3,7 +3,7 @@ import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients, imxApiConfig, MultiRollupApiClients } from '@imtbl/generated-clients';
 import { trackError, trackFlow } from '@imtbl/metrics';
 import AuthManager from './authManager';
-import MagicAdapter from './magic/magicAdapter';
+import MagicTEESigner from './magic/magicTEESigner';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { OidcConfiguration, UserProfile } from './types';
@@ -21,7 +21,7 @@ import { ZkEvmProvider } from './zkEvm';
 import { PassportError, PassportErrorType } from './errors/passportError';
 
 jest.mock('./authManager');
-jest.mock('./magic/magicAdapter');
+jest.mock('./magic/magicTEESigner');
 jest.mock('./starkEx');
 jest.mock('./confirmation');
 jest.mock('./zkEvm');
@@ -78,9 +78,9 @@ describe('Passport', () => {
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
       forceUserRefresh: forceUserRefreshMock,
     });
-    (MagicAdapter as jest.Mock).mockReturnValue({
-      login: magicLoginMock,
-      logout: magicLogoutMock,
+    (MagicTEESigner as jest.Mock).mockReturnValue({
+      getAddress: jest.fn().mockResolvedValue('0x123'),
+      signMessage: jest.fn().mockResolvedValue('signature'),
     });
     (PassportImxProviderFactory as jest.Mock).mockReturnValue({
       getProvider: getProviderMock,

@@ -11,6 +11,7 @@ export const transactionHash = '0x867';
 
 const mandatoryHandlers = [
   rest.get('https://api.sandbox.immutable.com/v1/sdk/session-activity/check', async (req, res, ctx) => res(ctx.status(404))),
+  rest.post('https://api.immutable.com/v1/sdk/metrics', async (req, res, ctx) => res(ctx.status(200))),
   rest.post('https://rpc.testnet.immutable.com', async (req, res, ctx) => {
     const body = await req.json<JsonRpcRequestPayload>();
     switch (body.method) {
@@ -32,6 +33,26 @@ const mandatoryHandlers = [
 
 const chainName = `${encodeURIComponent(ChainName.IMTBL_ZKEVM_TESTNET)}`;
 export const mswHandlers = {
+  magicTEE: {
+    createWallet: {
+      success: rest.post('https://tee.express.magiclabs.com/v1/wallet', (req, res, ctx) => res(
+        ctx.status(201),
+        ctx.json({
+          public_address: '0x123456789abcdef',
+        }),
+      )),
+      internalServerError: rest.post('https://tee.express.magiclabs.com/v1/wallet', (req, res, ctx) => res(ctx.status(500))),
+    },
+    personalSign: {
+      success: rest.post('https://tee.express.magiclabs.com/v1/wallet/personal-sign', (req, res, ctx) => res(
+        ctx.status(200),
+        ctx.json({
+          signature: '0xsignature123',
+        }),
+      )),
+      internalServerError: rest.post('https://tee.express.magiclabs.com/v1/wallet/personal-sign', (req, res, ctx) => res(ctx.status(500))),
+    },
+  },
   counterfactualAddress: {
     success: rest.post(
       `https://api.sandbox.immutable.com/v2/chains/${chainName}/passport/counterfactual-address`,

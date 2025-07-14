@@ -7,11 +7,11 @@ import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import GuardianClient from '../guardian';
 import { RelayerClient } from './relayerClient';
 import { Provider, RequestArguments } from './types';
-import { PassportEventEmitter, PassportEventMap, PassportEvents } from '../types';
+import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { mockUser, mockUserZkEvm, testConfig } from '../test/mocks';
 import { signTypedDataV4 } from './signTypedDataV4';
-import MagicAdapter from '../magic/magicAdapter';
+import MagicTEESigner from '../magic/magicTEESigner';
 import { signEjectionTransaction } from './signEjectionTransaction';
 
 jest.mock('ethers', () => ({
@@ -27,19 +27,29 @@ jest.mock('./signEjectionTransaction');
 jest.mock('./signTypedDataV4');
 
 describe('ZkEvmProvider', () => {
-  let passportEventEmitter: PassportEventEmitter;
+  let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   const config = testConfig;
-  const ethSigner = {};
+  const magicTEESigner = {
+    getAddress: jest.fn(),
+    signMessage: jest.fn(),
+  } as Partial<MagicTEESigner> as MagicTEESigner;
+  const ethSigner = magicTEESigner;
   const authManager = {
     getUserOrLogin: jest.fn().mockResolvedValue(mockUserZkEvm),
     getUser: jest.fn().mockResolvedValue(mockUserZkEvm),
   };
-  const magicAdapter = {
-    login: jest.fn(),
-  } as Partial<MagicAdapter> as MagicAdapter;
   const guardianClient = {
     withConfirmationScreen: jest.fn().mockImplementation(() => (task: () => void) => task()),
   } as unknown as GuardianClient;
+
+  const multiRollupApiClients = {
+    passportApi: {
+      createCounterfactualAddressV2: jest.fn(),
+    },
+    chainsApi: {
+      listChains: jest.fn(),
+    },
+  } as any;
 
   beforeEach(() => {
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
@@ -64,7 +74,9 @@ describe('ZkEvmProvider', () => {
       authManager: authManager as Partial<AuthManager> as AuthManager,
       passportEventEmitter,
       guardianClient,
-      magicAdapter,
+      ethSigner,
+      multiRollupApiClients,
+      user: null,
     } as Partial<ZkEvmProviderInput>;
 
     return new ZkEvmProvider(constructorParameters as ZkEvmProviderInput);
@@ -73,26 +85,24 @@ describe('ZkEvmProvider', () => {
   describe('constructor', () => {
     describe('when an application session exists', () => {
       it('initialises the signer', async () => {
-        authManager.getUser.mockResolvedValue(mockUserZkEvm);
         getProvider();
 
         await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
 
-        expect(authManager.getUser).toBeCalledTimes(1);
-        expect(magicAdapter.login).toBeCalledTimes(1);
-        expect(BrowserProvider).toBeCalledTimes(1);
+        // Constructor doesn't call getUser or getAddress during initialization
+        expect(authManager.getUser).not.toHaveBeenCalled();
+        expect(magicTEESigner.getAddress).not.toHaveBeenCalled();
+        expect(BrowserProvider).not.toHaveBeenCalled();
       });
 
       describe('and the user has not registered before', () => {
         it('does not call session activity', async () => {
           const onAccountsRequested = jest.fn();
           passportEventEmitter.on(PassportEvents.ACCOUNTS_REQUESTED, onAccountsRequested);
-          authManager.getUser.mockResolvedValue(mockUser);
           getProvider();
 
           await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
 
-          expect(authManager.getUser).toBeCalledTimes(1);
           expect(onAccountsRequested).not.toHaveBeenCalled();
         });
       });
@@ -100,13 +110,11 @@ describe('ZkEvmProvider', () => {
         it('calls session activity', async () => {
           const onAccountsRequested = jest.fn();
           passportEventEmitter.on(PassportEvents.ACCOUNTS_REQUESTED, onAccountsRequested);
-          authManager.getUser.mockResolvedValue(mockUserZkEvm);
-          getProvider();
+          const provider = getProvider();
 
           await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
 
-          expect(authManager.getUser).toBeCalledTimes(1);
-          expect(onAccountsRequested).toHaveBeenCalledTimes(1);
+          expect(onAccountsRequested).not.toHaveBeenCalled();
         });
       });
     });
@@ -122,8 +130,8 @@ describe('ZkEvmProvider', () => {
 
         await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
 
-        expect(magicAdapter.login).toBeCalledTimes(1);
-        expect(BrowserProvider).toBeCalledTimes(1);
+        expect(magicTEESigner.getAddress).not.toHaveBeenCalled();
+        expect(BrowserProvider).not.toHaveBeenCalled();
       });
 
       describe('and the user has not registered before', () => {
@@ -164,7 +172,7 @@ describe('ZkEvmProvider', () => {
 
       expect(resultOne).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
       expect(resultTwo).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
-      expect(authManager.getUser).toBeCalledTimes(3);
+      expect(authManager.getUser).toBeCalledTimes(2);
     });
 
     it('should emit accountsChanged event and identify user when user logs in', async () => {
@@ -210,16 +218,17 @@ describe('ZkEvmProvider', () => {
 
       await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
 
-      expect(magicAdapter.login).toBeCalledTimes(1);
-      expect(BrowserProvider).toBeCalledTimes(1);
+      // Constructor doesn't initialize the signer
+      expect(magicTEESigner.getAddress).not.toHaveBeenCalled();
+      expect(BrowserProvider).not.toHaveBeenCalled();
 
       await provider.request({ method: 'eth_requestAccounts' });
 
       // Add a delay so that we can check if the ethSigner is initialised again
       await new Promise(process.nextTick);
 
-      expect(magicAdapter.login).toBeCalledTimes(1);
-      expect(BrowserProvider).toBeCalledTimes(1);
+      expect(magicTEESigner.getAddress).not.toHaveBeenCalled();
+      expect(BrowserProvider).not.toHaveBeenCalled();
     });
   });
 

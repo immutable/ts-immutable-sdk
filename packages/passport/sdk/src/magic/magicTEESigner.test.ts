@@ -1,388 +1,381 @@
+import { AbstractSigner, Provider } from 'ethers';
 import { MagicTeeApiClients } from '@imtbl/generated-clients';
 import { trackDuration } from '@imtbl/metrics';
 import { isAxiosError } from 'axios';
+import MagicTEESigner from './magicTEESigner';
 import AuthManager from '../authManager';
 import { PassportError, PassportErrorType } from '../errors/passportError';
+import { mockUser } from '../test/mocks';
 import { withMetricsAsync } from '../utils/metrics';
-import MagicTeeAdapter from './magicTEESigner';
 
-// Mock dependencies
-jest.mock('../utils/metrics');
+// Mock all dependencies
 jest.mock('@imtbl/metrics');
-jest.mock('axios', () => ({
-  isAxiosError: jest.fn(),
-}));
+jest.mock('axios');
+jest.mock('../utils/metrics');
 
-describe('MagicTeeAdapter', () => {
-  let authManager: jest.Mocked<AuthManager>;
-  let magicTeeApiClient: jest.Mocked<MagicTeeApiClients>;
-  let adapter: MagicTeeAdapter;
-  let mockCreateWallet: jest.Mock;
-  let mockPersonalSign: jest.Mock;
-  let mockIsAxiosError: jest.Mock;
+describe('MagicTEESigner', () => {
+  let magicTEESigner: MagicTEESigner;
+  let mockAuthManager: jest.Mocked<AuthManager>;
+  let mockMagicTeeApiClient: jest.Mocked<MagicTeeApiClients>;
+  let mockFlow: any;
+  let mockCreateWalletV1WalletPost: jest.Mock;
+  let mockSignMessageV1WalletPersonalSignPost: jest.Mock;
 
-  const mockUser = {
-    idToken: 'test-id-token',
-    accessToken: 'test-access-token',
-    profile: {
-      sub: 'test-user-id',
-      email: 'test@example.com',
+  const mockWalletResponse = {
+    data: {
+      public_address: '0x123456789abcdef',
     },
   };
 
-  const mockHeaders = {
-    Authorization: 'Bearer test-id-token',
+  const mockSignatureResponse = {
+    data: {
+      signature: '0xsignature123',
+    },
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    authManager = {
+    // Mock AuthManager
+    mockAuthManager = {
       getUser: jest.fn(),
     } as any;
 
-    mockCreateWallet = jest.fn();
-    mockPersonalSign = jest.fn();
-    mockIsAxiosError = isAxiosError as unknown as jest.Mock;
+    // Mock API methods
+    mockCreateWalletV1WalletPost = jest.fn();
+    mockSignMessageV1WalletPersonalSignPost = jest.fn();
 
-    magicTeeApiClient = {
+    // Mock MagicTeeApiClients
+    mockMagicTeeApiClient = {
       walletApi: {
-        createWalletV1WalletPost: mockCreateWallet,
+        createWalletV1WalletPost: mockCreateWalletV1WalletPost,
       },
       transactionApi: {
-        signMessageV1WalletPersonalSignPost: mockPersonalSign,
+        signMessageV1WalletPersonalSignPost: mockSignMessageV1WalletPersonalSignPost,
       },
     } as any;
 
-    adapter = new MagicTeeAdapter(authManager, magicTeeApiClient);
+    // Mock Flow
+    mockFlow = {
+      details: {
+        flowName: 'testFlow',
+        flowId: '123',
+      },
+      addEvent: jest.fn(),
+    };
 
-    // Mock withMetricsAsync to call the function directly
+    // Mock withMetricsAsync
     (withMetricsAsync as jest.Mock).mockImplementation(async (fn, flowName) => {
-      const mockFlow = {
-        details: { flowName },
-        addEvent: jest.fn(),
-      };
       return fn(mockFlow);
     });
-  });
 
-  describe('constructor', () => {
-    it('should initialize with provided dependencies', () => {
-      expect(adapter).toBeInstanceOf(MagicTeeAdapter);
-      expect(adapter.authManager).toBe(authManager);
-      expect(adapter.magicTeeApiClient).toBe(magicTeeApiClient);
+    // Mock trackDuration
+    (trackDuration as jest.Mock).mockImplementation(() => {});
+
+    // Mock isAxiosError
+    (isAxiosError as unknown as jest.Mock).mockImplementation((error) => {
+      return error && error.isAxiosError === true;
     });
+
+    magicTEESigner = new MagicTEESigner(mockAuthManager, mockMagicTeeApiClient);
   });
 
-  describe('createWallet', () => {
-    it('should successfully create wallet and return public address', async () => {
-      const mockPublicAddress = '0x123456789abcdef';
-      const mockResponse = {
-        data: {
-          public_address: mockPublicAddress,
-        },
-      };
+  describe('getAddress', () => {
+    it('should return wallet address when user is logged in', async () => {
+      mockAuthManager.getUser.mockResolvedValue(mockUser);
+      mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
 
-      authManager.getUser.mockResolvedValue(mockUser as any);
-      mockCreateWallet.mockResolvedValue(mockResponse as any);
+      const address = await magicTEESigner.getAddress();
 
-      const result = await adapter.createWallet();
-
-      expect(result).toBe(mockPublicAddress);
-      expect(authManager.getUser).toHaveBeenCalledTimes(1);
-      expect(mockCreateWallet).toHaveBeenCalledWith(
+      expect(address).toBe('0x123456789abcdef');
+      expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
         {
           createWalletRequestModel: {
             chain: 'ETH',
           },
         },
-        { headers: mockHeaders },
-      );
-      expect(trackDuration).toHaveBeenCalledWith(
-        'passport',
-        'magicCreateWallet',
-        expect.any(Number),
+        { headers: { Authorization: `Bearer ${mockUser.idToken}` } }
       );
     });
 
-    it('should throw detailed error when API call fails with axios error and response', async () => {
-      const axiosError = {
-        response: {
-          status: 500,
-          data: { error: 'Internal server error' },
-        },
-        message: 'Request failed',
-      };
+    it('should throw error when user is not logged in', async () => {
+      mockAuthManager.getUser.mockResolvedValue(null);
 
-      authManager.getUser.mockResolvedValue(mockUser as any);
-      mockCreateWallet.mockRejectedValue(axiosError);
-      mockIsAxiosError.mockReturnValue(true);
-
-      await expect(adapter.createWallet()).rejects.toThrow(
-        'Failed to create wallet with status 500: {"error":"Internal server error"}',
-      );
-    });
-
-    it('should throw detailed error when API call fails with axios error without response', async () => {
-      const axiosError = {
-        message: 'Network error',
-      };
-
-      authManager.getUser.mockResolvedValue(mockUser as any);
-      mockCreateWallet.mockRejectedValue(axiosError);
-      mockIsAxiosError.mockReturnValue(true);
-
-      await expect(adapter.createWallet()).rejects.toThrow(
-        'Failed to create wallet: Network error',
-      );
-    });
-
-    it('should throw detailed error when API call fails with non-axios error', async () => {
-      const genericError = new Error('Generic error');
-
-      authManager.getUser.mockResolvedValue(mockUser as any);
-      mockCreateWallet.mockRejectedValue(genericError);
-      mockIsAxiosError.mockReturnValue(false);
-
-      await expect(adapter.createWallet()).rejects.toThrow(
-        'Failed to create wallet: Generic error',
-      );
-    });
-
-    it('should throw PassportError when user is not logged in', async () => {
-      authManager.getUser.mockResolvedValue(null);
-
-      await expect(adapter.createWallet()).rejects.toThrow(
+      await expect(magicTEESigner.getAddress()).rejects.toThrow(
         new PassportError(
           'User has been logged out',
           PassportErrorType.NOT_LOGGED_IN_ERROR,
-        ),
+        )
+      );
+    });
+
+    it('should reuse existing wallet for same user', async () => {
+      mockAuthManager.getUser.mockResolvedValue(mockUser);
+      mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
+
+      // Call getAddress twice
+      const address1 = await magicTEESigner.getAddress();
+      const address2 = await magicTEESigner.getAddress();
+
+      expect(address1).toBe('0x123456789abcdef');
+      expect(address2).toBe('0x123456789abcdef');
+      // Should only call createWallet once
+      expect(mockCreateWalletV1WalletPost).toHaveBeenCalledTimes(1);
+    });
+
+    it('should create new wallet when user changes', async () => {
+      const user1 = { ...mockUser, profile: { ...mockUser.profile, sub: 'user1' } };
+      const user2 = { ...mockUser, profile: { ...mockUser.profile, sub: 'user2' } };
+
+      mockAuthManager.getUser
+        .mockResolvedValueOnce(user1)
+        .mockResolvedValueOnce(user1)
+        .mockResolvedValueOnce(user2)
+        .mockResolvedValueOnce(user2);
+
+      mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
+
+      // First call with user1
+      await magicTEESigner.getAddress();
+      
+      // Second call with user2 (different user)
+      await magicTEESigner.getAddress();
+
+      expect(mockCreateWalletV1WalletPost).toHaveBeenCalledTimes(2);
+    });
+
+    it('should handle API errors gracefully', async () => {
+      mockAuthManager.getUser.mockResolvedValue(mockUser);
+      const apiError = {
+        isAxiosError: true,
+        response: {
+          status: 500,
+          data: { message: 'Internal server error' },
+        },
+      };
+      (isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+      mockCreateWalletV1WalletPost.mockRejectedValue(apiError);
+
+      await expect(magicTEESigner.getAddress()).rejects.toThrow(
+        'Failed to create wallet with status 500: {"message":"Internal server error"}'
+      );
+    });
+
+    it('should handle network errors gracefully', async () => {
+      mockAuthManager.getUser.mockResolvedValue(mockUser);
+      const networkError = {
+        isAxiosError: true,
+        message: 'Network Error',
+      };
+      (isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+      mockCreateWalletV1WalletPost.mockRejectedValue(networkError);
+
+      await expect(magicTEESigner.getAddress()).rejects.toThrow(
+        'Failed to create wallet: Network Error'
+      );
+    });
+
+    it('should handle non-axios errors gracefully', async () => {
+      mockAuthManager.getUser.mockResolvedValue(mockUser);
+      const genericError = new Error('Generic error');
+      (isAxiosError as unknown as jest.Mock).mockReturnValue(false);
+      mockCreateWalletV1WalletPost.mockRejectedValue(genericError);
+
+      await expect(magicTEESigner.getAddress()).rejects.toThrow(
+        'Failed to create wallet: Generic error'
+      );
+    });
+
+    it('should handle concurrent wallet creation requests', async () => {
+      mockAuthManager.getUser.mockResolvedValue(mockUser);
+      mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
+
+      // Make two concurrent calls
+      const [address1, address2] = await Promise.all([
+        magicTEESigner.getAddress(),
+        magicTEESigner.getAddress(),
+      ]);
+
+      expect(address1).toBe('0x123456789abcdef');
+      expect(address2).toBe('0x123456789abcdef');
+      // Should only call createWallet once even with concurrent requests
+      expect(mockCreateWalletV1WalletPost).toHaveBeenCalledTimes(1);
+    });
+
+    it('should track metrics for wallet creation', async () => {
+      mockAuthManager.getUser.mockResolvedValue(mockUser);
+      mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
+
+      await magicTEESigner.getAddress();
+
+      expect(withMetricsAsync).toHaveBeenCalledWith(
+        expect.any(Function),
+        'magicCreateWallet'
+      );
+      expect(trackDuration).toHaveBeenCalledWith(
+        'passport',
+        'testFlow',
+        expect.any(Number)
       );
     });
   });
 
-  describe('personalSign', () => {
-    it('should successfully sign string message and return signature', async () => {
+  describe('signMessage', () => {
+    beforeEach(() => {
+      mockAuthManager.getUser.mockResolvedValue(mockUser);
+      mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
+      mockSignMessageV1WalletPersonalSignPost.mockResolvedValue(mockSignatureResponse);
+    });
+
+    it('should sign string message successfully', async () => {
       const message = 'Hello, world!';
-      const mockSignature = '0xabcdef123456';
-      const mockResponse = {
-        data: {
-          signature: mockSignature,
-        },
-      };
+      const signature = await magicTEESigner.signMessage(message);
 
-      authManager.getUser.mockResolvedValue(mockUser as any);
-      mockPersonalSign.mockResolvedValue(mockResponse as any);
-
-      const result = await adapter.personalSign(message);
-
-      expect(result).toBe(mockSignature);
-      expect(authManager.getUser).toHaveBeenCalledTimes(1);
-      expect(mockPersonalSign).toHaveBeenCalledWith(
+      expect(signature).toBe('0xsignature123');
+      expect(mockSignMessageV1WalletPersonalSignPost).toHaveBeenCalledWith(
         {
           personalSignRequest: {
             message_base64: Buffer.from(message, 'utf-8').toString('base64'),
             chain: 'ETH',
           },
         },
-        { headers: mockHeaders },
-      );
-      expect(trackDuration).toHaveBeenCalledWith(
-        'passport',
-        'magicPersonalSign',
-        expect.any(Number),
+        { headers: { Authorization: `Bearer ${mockUser.idToken}` } }
       );
     });
 
-    it('should successfully sign Uint8Array message and return signature', async () => {
-      const message = new Uint8Array([72, 101, 108, 108, 111]); // "Hello" in bytes
-      const expectedHexMessage = '0x48656c6c6f';
-      const mockSignature = '0xabcdef123456';
-      const mockResponse = {
-        data: {
-          signature: mockSignature,
-        },
-      };
+    it('should sign Uint8Array message successfully', async () => {
+      const message = new Uint8Array([72, 101, 108, 108, 111]); // "Hello"
+      const signature = await magicTEESigner.signMessage(message);
 
-      authManager.getUser.mockResolvedValue(mockUser as any);
-      mockPersonalSign.mockResolvedValue(mockResponse as any);
-
-      const result = await adapter.personalSign(message);
-
-      expect(result).toBe(mockSignature);
-      expect(mockPersonalSign).toHaveBeenCalledWith(
+      expect(signature).toBe('0xsignature123');
+      expect(mockSignMessageV1WalletPersonalSignPost).toHaveBeenCalledWith(
         {
           personalSignRequest: {
-            message_base64: Buffer.from(expectedHexMessage, 'utf-8').toString('base64'),
+            message_base64: Buffer.from(`0x${Buffer.from(message).toString('hex')}`, 'utf-8').toString('base64'),
             chain: 'ETH',
           },
         },
-        { headers: mockHeaders },
+        { headers: { Authorization: `Bearer ${mockUser.idToken}` } }
       );
     });
 
-    it('should throw detailed error when API call fails with axios error and response', async () => {
-      const message = 'Hello, world!';
-      const axiosError = {
+    it('should throw error when user is not logged in', async () => {
+      mockAuthManager.getUser.mockResolvedValue(null);
+
+      await expect(magicTEESigner.signMessage('test')).rejects.toThrow(
+        new PassportError(
+          'User has been logged out',
+          PassportErrorType.NOT_LOGGED_IN_ERROR,
+        )
+      );
+    });
+
+    it('should handle API errors gracefully', async () => {
+      const apiError = {
+        isAxiosError: true,
         response: {
           status: 400,
-          data: { error: 'Bad request' },
-        },
-        message: 'Request failed',
-      };
-
-      authManager.getUser.mockResolvedValue(mockUser as any);
-      mockPersonalSign.mockRejectedValue(axiosError);
-      mockIsAxiosError.mockReturnValue(true);
-
-      await expect(adapter.personalSign(message)).rejects.toThrow(
-        'Failed to create signature using EOA with status 400: {"error":"Bad request"}',
-      );
-    });
-
-    it('should throw detailed error when API call fails with axios error without response', async () => {
-      const message = 'Hello, world!';
-      const axiosError = {
-        message: 'Network timeout',
-      };
-
-      authManager.getUser.mockResolvedValue(mockUser as any);
-      mockPersonalSign.mockRejectedValue(axiosError);
-      mockIsAxiosError.mockReturnValue(true);
-
-      await expect(adapter.personalSign(message)).rejects.toThrow(
-        'Failed to create signature using EOA: Network timeout',
-      );
-    });
-
-    it('should throw detailed error when API call fails with non-axios error', async () => {
-      const message = 'Hello, world!';
-      const genericError = new Error('Signing failed');
-
-      authManager.getUser.mockResolvedValue(mockUser as any);
-      mockPersonalSign.mockRejectedValue(genericError);
-      mockIsAxiosError.mockReturnValue(false);
-
-      await expect(adapter.personalSign(message)).rejects.toThrow(
-        'Failed to create signature using EOA: Signing failed',
-      );
-    });
-
-    it('should throw PassportError when user is not logged in', async () => {
-      const message = 'Hello, world!';
-      authManager.getUser.mockResolvedValue(null);
-
-      await expect(adapter.personalSign(message)).rejects.toThrow(
-        new PassportError(
-          'User has been logged out',
-          PassportErrorType.NOT_LOGGED_IN_ERROR,
-        ),
-      );
-    });
-  });
-
-  describe('getHeaders', () => {
-    it('should return headers with authorization token when user is logged in', async () => {
-      authManager.getUser.mockResolvedValue(mockUser as any);
-
-      const result = await adapter.getHeaders();
-
-      expect(result).toEqual({
-        Authorization: 'Bearer test-id-token',
-      });
-      expect(authManager.getUser).toHaveBeenCalledTimes(1);
-    });
-
-    it('should throw PassportError when user is not logged in', async () => {
-      authManager.getUser.mockResolvedValue(null);
-
-      await expect(adapter.getHeaders()).rejects.toThrow(
-        new PassportError(
-          'User has been logged out',
-          PassportErrorType.NOT_LOGGED_IN_ERROR,
-        ),
-      );
-    });
-  });
-
-  describe('metrics integration', () => {
-    it('should call withMetricsAsync with correct flow name for createWallet', async () => {
-      const mockPublicAddress = '0x123456789abcdef';
-      const mockResponse = {
-        data: {
-          public_address: mockPublicAddress,
+          data: { message: 'Invalid signature request' },
         },
       };
+      (isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+      mockSignMessageV1WalletPersonalSignPost.mockRejectedValue(apiError);
 
-      authManager.getUser.mockResolvedValue(mockUser as any);
-      mockCreateWallet.mockResolvedValue(mockResponse as any);
+      await expect(magicTEESigner.signMessage('test')).rejects.toThrow(
+        'Failed to create signature using EOA with status 400: {"message":"Invalid signature request"}'
+      );
+    });
 
-      await adapter.createWallet();
+    it('should handle network errors gracefully', async () => {
+      const networkError = {
+        isAxiosError: true,
+        message: 'Network Error',
+      };
+      (isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+      mockSignMessageV1WalletPersonalSignPost.mockRejectedValue(networkError);
+
+      await expect(magicTEESigner.signMessage('test')).rejects.toThrow(
+        'Failed to create signature using EOA: Network Error'
+      );
+    });
+
+    it('should handle non-axios errors gracefully', async () => {
+      const genericError = new Error('Generic error');
+      (isAxiosError as unknown as jest.Mock).mockReturnValue(false);
+      mockSignMessageV1WalletPersonalSignPost.mockRejectedValue(genericError);
+
+      await expect(magicTEESigner.signMessage('test')).rejects.toThrow(
+        'Failed to create signature using EOA: Generic error'
+      );
+    });
+
+    it('should track metrics for message signing', async () => {
+      await magicTEESigner.signMessage('test');
 
       expect(withMetricsAsync).toHaveBeenCalledWith(
         expect.any(Function),
-        'magicCreateWallet',
+        'magicPersonalSign'
       );
-    });
-
-    it('should call withMetricsAsync with correct flow name for personalSign', async () => {
-      const message = 'Hello, world!';
-      const mockSignature = '0xabcdef123456';
-      const mockResponse = {
-        data: {
-          signature: mockSignature,
-        },
-      };
-
-      authManager.getUser.mockResolvedValue(mockUser as any);
-      mockPersonalSign.mockResolvedValue(mockResponse as any);
-
-      await adapter.personalSign(message);
-
-      expect(withMetricsAsync).toHaveBeenCalledWith(
-        expect.any(Function),
-        'magicPersonalSign',
-      );
-    });
-
-    it('should track duration for successful createWallet calls', async () => {
-      const mockPublicAddress = '0x123456789abcdef';
-      const mockResponse = {
-        data: {
-          public_address: mockPublicAddress,
-        },
-      };
-
-      authManager.getUser.mockResolvedValue(mockUser as any);
-      mockCreateWallet.mockResolvedValue(mockResponse as any);
-
-      await adapter.createWallet();
-
       expect(trackDuration).toHaveBeenCalledWith(
         'passport',
-        'magicCreateWallet',
-        expect.any(Number),
+        'testFlow',
+        expect.any(Number)
       );
     });
 
-    it('should track duration for successful personalSign calls', async () => {
-      const message = 'Hello, world!';
-      const mockSignature = '0xabcdef123456';
-      const mockResponse = {
-        data: {
-          signature: mockSignature,
-        },
-      };
+    it('should ensure wallet is created before signing', async () => {
+      await magicTEESigner.signMessage('test');
 
-      authManager.getUser.mockResolvedValue(mockUser as any);
-      mockPersonalSign.mockResolvedValue(mockResponse as any);
+      // Should call both createWallet and signMessage
+      expect(mockCreateWalletV1WalletPost).toHaveBeenCalled();
+      expect(mockSignMessageV1WalletPersonalSignPost).toHaveBeenCalled();
+    });
+  });
 
-      await adapter.personalSign(message);
+  describe('error handling in createWallet', () => {
+    it('should reset createWalletPromise on error', async () => {
+      mockAuthManager.getUser.mockResolvedValue(mockUser);
+      
+      const error = new Error('API Error');
+      mockCreateWalletV1WalletPost
+        .mockRejectedValueOnce(error)
+        .mockResolvedValueOnce(mockWalletResponse);
 
-      expect(trackDuration).toHaveBeenCalledWith(
-        'passport',
-        'magicPersonalSign',
-        expect.any(Number),
+      // First call should fail
+      await expect(magicTEESigner.getAddress()).rejects.toThrow('API Error');
+      
+      // Second call should succeed (promise should be reset)
+      const address = await magicTEESigner.getAddress();
+      expect(address).toBe('0x123456789abcdef');
+      expect(mockCreateWalletV1WalletPost).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('headers generation', () => {
+    it('should generate correct headers for authenticated user', async () => {
+      mockAuthManager.getUser.mockResolvedValue(mockUser);
+      mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
+
+      await magicTEESigner.getAddress();
+
+      expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
+        expect.any(Object),
+        {
+          headers: {
+            Authorization: `Bearer ${mockUser.idToken}`,
+          },
+        }
+      );
+    });
+
+    it('should throw error when trying to generate headers for null user', async () => {
+      mockAuthManager.getUser.mockResolvedValue(null);
+
+      await expect(magicTEESigner.getAddress()).rejects.toThrow(
+        new PassportError(
+          'User has been logged out',
+          PassportErrorType.NOT_LOGGED_IN_ERROR,
+        )
       );
     });
   });

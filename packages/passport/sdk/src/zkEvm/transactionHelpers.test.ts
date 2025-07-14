@@ -130,11 +130,11 @@ describe('transactionHelpers', () => {
     it('prepares and signs transaction correctly', async () => {
       const result = await prepareAndSignTransaction({
         transactionRequest,
-        magicTeeAdapter,
+        ethSigner: magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddresses,
+        zkEvmAddress: zkEvmAddresses.ethAddress,
         flow,
       });
 
@@ -161,11 +161,11 @@ describe('transactionHelpers', () => {
 
       await prepareAndSignTransaction({
         transactionRequest,
-        magicTeeAdapter,
+        ethSigner: magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddresses,
+        zkEvmAddress: zkEvmAddresses.ethAddress,
         flow,
       });
 
@@ -196,11 +196,11 @@ describe('transactionHelpers', () => {
 
       await prepareAndSignTransaction({
         transactionRequest,
-        magicTeeAdapter,
+        ethSigner: magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddresses,
+        zkEvmAddress: zkEvmAddresses.ethAddress,
         flow,
       });
 
@@ -247,16 +247,30 @@ describe('transactionHelpers', () => {
       );
     });
 
+    it('processes empty fee options correctly', async () => {
+      (relayerClient.imGetFeeOptions as jest.Mock).mockResolvedValue([]);
+
+      await expect(prepareAndSignTransaction({
+        transactionRequest,
+        ethSigner: magicTeeAdapter,
+        rpcProvider,
+        guardianClient,
+        relayerClient,
+        zkEvmAddress: zkEvmAddresses.ethAddress,
+        flow,
+      })).rejects.toThrow('Failed to retrieve fees for IMX token');
+    });
+
     it('signs the transaction when the nonce is zero', async () => {
       jest.spyOn(walletHelpers, 'getNonce').mockResolvedValue(0n);
 
       const result = await prepareAndSignTransaction({
         transactionRequest,
-        magicTeeAdapter,
+        ethSigner: magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddresses,
+        zkEvmAddress: zkEvmAddresses.ethAddress,
         flow,
       });
 
@@ -272,11 +286,11 @@ describe('transactionHelpers', () => {
 
       await expect(prepareAndSignTransaction({
         transactionRequest,
-        magicTeeAdapter,
+        ethSigner: magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddresses,
+        zkEvmAddress: zkEvmAddresses.ethAddress,
         flow,
       })).rejects.toThrow('Validation failed');
 
@@ -290,11 +304,11 @@ describe('transactionHelpers', () => {
 
       await expect(prepareAndSignTransaction({
         transactionRequest,
-        magicTeeAdapter,
+        ethSigner: magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddresses,
+        zkEvmAddress: zkEvmAddresses.ethAddress,
         flow,
       })).rejects.toThrow('Signing failed');
     });
@@ -304,11 +318,11 @@ describe('transactionHelpers', () => {
 
       await expect(prepareAndSignTransaction({
         transactionRequest,
-        magicTeeAdapter,
+        ethSigner: magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddresses,
+        zkEvmAddress: zkEvmAddresses.ethAddress,
         flow,
       })).rejects.toThrow('Transaction send failed');
     });
@@ -342,8 +356,8 @@ describe('transactionHelpers', () => {
             ...transactionRequest,
             nonce: 0,
           },
-          magicTeeAdapter,
-          zkEvmAddresses,
+          ethSigner: magicTeeAdapter,
+          zkEvmAddress: zkEvmAddresses.ethAddress,
           flow,
         });
 

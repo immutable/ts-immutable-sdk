@@ -24,8 +24,6 @@ export interface PassportEventMap extends Record<string, any> {
   [PassportEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
 }
 
-export type PassportEventEmitter = TypedEventEmitter<PassportEventMap>;
-
 export type UserProfile = {
   email?: string;
   nickname?: string;

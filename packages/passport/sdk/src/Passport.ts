@@ -19,7 +19,6 @@ import {
   isUserZkEvm,
   LinkedWallet,
   LinkWalletParams,
-  PassportEventEmitter,
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
@@ -64,7 +63,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     magicPublishableApiKey: config.magicPublishableApiKey,
     magicProviderId: config.magicProviderId,
   });
-  const magicTEESigner = new MagicTEESigner(authManager, magicTeeApiClients, passportEventEmitter);
+  const magicTEESigner = new MagicTEESigner(authManager, magicTeeApiClients);
   const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
 
   const immutableXClient = passportModuleConfiguration.overrides
@@ -117,7 +116,7 @@ export class Passport {
 
   private readonly passportImxProviderFactory: PassportImxProviderFactory;
 
-  private readonly passportEventEmitter: PassportEventEmitter;
+  private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
   private readonly guardianClient: GuardianClient;
 

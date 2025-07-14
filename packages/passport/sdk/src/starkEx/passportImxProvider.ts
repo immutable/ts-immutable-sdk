@@ -1,6 +1,5 @@
 import {
   AnyToken,
-  EthSigner,
   IMXClient,
   NftTransferDetails,
   StarkSigner,
@@ -18,8 +17,7 @@ import { TransactionResponse } from 'ethers';
 import AuthManager from '../authManager';
 import GuardianClient from '../guardian';
 import {
-  PassportEvents, UserImx, User, isUserImx,
-  PassportEventEmitter,
+  PassportEventMap, PassportEvents, UserImx, User, isUserImx,
 } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
@@ -29,11 +27,12 @@ import registerOffchain from './workflows/registerOffchain';
 import { getStarkSigner } from './getStarkSigner';
 import { withMetricsAsync } from '../utils/metrics';
 import MagicTEESigner from '../magic/magicTEESigner';
+import TypedEventEmitter from '../utils/typedEventEmitter';
 
 export interface PassportImxProviderOptions {
   authManager: AuthManager;
   immutableXClient: IMXClient;
-  passportEventEmitter: PassportEventEmitter;
+  passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   magicTEESigner: MagicTEESigner;
   imxApiClients: ImxApiClients;
   guardianClient: GuardianClient;

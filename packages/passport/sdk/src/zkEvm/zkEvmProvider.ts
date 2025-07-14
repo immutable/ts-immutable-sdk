@@ -15,7 +15,7 @@ import AuthManager from '../authManager';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import {
-  PassportEventEmitter, PassportEvents, User, UserZkEvm,
+  PassportEventMap, PassportEvents, User, UserZkEvm,
 } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
@@ -33,7 +33,7 @@ export type ZkEvmProviderInput = {
   authManager: AuthManager;
   config: PassportConfiguration;
   multiRollupApiClients: MultiRollupApiClients;
-  passportEventEmitter: PassportEventEmitter;
+  passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   guardianClient: GuardianClient;
   ethSigner: Signer;
   user: User | null;

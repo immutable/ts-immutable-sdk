@@ -20,10 +20,10 @@ import { PassportImxProvider } from './passportImxProvider';
 import {
   batchNftTransfer, cancelOrder, createOrder, createTrade, exchangeTransfer, transfer,
 } from './workflows';
-import { PassportEventEmitter, PassportEventMap, PassportEvents } from '../types';
+import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
-import MagicAdapter from '../magic/magicAdapter';
+import MagicTEESigner from '../magic/magicTEESigner';
 import { getStarkSigner } from './getStarkSigner';
 import GuardianClient from '../guardian';
 
@@ -66,8 +66,9 @@ describe('PassportImxProvider', () => {
     getAddress: jest.fn(),
   };
 
-  const magicAdapterMock = {
-    login: jest.fn(),
+  const magicTEESignerMock = {
+    getAddress: jest.fn(),
+    signMessage: jest.fn(),
   };
 
   const mockGuardianClient = {
@@ -77,7 +78,7 @@ describe('PassportImxProvider', () => {
 
   const getSignerMock = jest.fn();
 
-  let passportEventEmitter: PassportEventEmitter;
+  let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
   const imxApiClients = new ImxApiClients({} as any);
 
@@ -97,13 +98,14 @@ describe('PassportImxProvider', () => {
     }));
 
     // Signers
-    magicAdapterMock.login.mockResolvedValue({ getSigner: getSignerMock });
+    magicTEESignerMock.getAddress.mockResolvedValue('0x123');
+    magicTEESignerMock.signMessage.mockResolvedValue('signature');
     (BrowserProvider as unknown as jest.Mock).mockReturnValue({ getSigner: getSignerMock });
     (getStarkSigner as jest.Mock).mockResolvedValue(mockStarkSigner);
 
     passportImxProvider = new PassportImxProvider({
       authManager: mockAuthManager as unknown as AuthManager,
-      magicAdapter: magicAdapterMock as unknown as MagicAdapter,
+      magicTEESigner: magicTEESignerMock as unknown as MagicTEESigner,
       guardianClient: mockGuardianClient as unknown as GuardianClient,
       immutableXClient,
       passportEventEmitter,
@@ -116,8 +118,8 @@ describe('PassportImxProvider', () => {
       // The promise is created in the constructor but not awaited until a method is called
       await passportImxProvider.getAddress();
 
-      expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUserImx.idToken);
-      expect(getStarkSigner).toHaveBeenCalledWith(mockEthSigner);
+      expect(magicTEESignerMock.getAddress).toHaveBeenCalled();
+      expect(getStarkSigner).toHaveBeenCalledWith(magicTEESignerMock);
     });
 
     it('initialises the eth and stark signers only once', async () => {
@@ -125,14 +127,14 @@ describe('PassportImxProvider', () => {
       await passportImxProvider.getAddress();
       await passportImxProvider.getAddress();
 
-      expect(magicAdapterMock.login).toHaveBeenCalledTimes(1);
+      expect(magicTEESignerMock.getAddress).toHaveBeenCalledTimes(1);
       expect(getStarkSigner).toHaveBeenCalledTimes(1);
     });
 
     it('re-throws the initialisation error when a method is called', async () => {
       mockAuthManager.getUser.mockResolvedValue(mockUserImx);
       // Signers
-      magicAdapterMock.login.mockResolvedValue({});
+      magicTEESignerMock.getAddress.mockResolvedValue('0x123');
       (getStarkSigner as jest.Mock).mockRejectedValue(new Error('error'));
 
       // Metrics
@@ -145,7 +147,7 @@ describe('PassportImxProvider', () => {
 
       const pp = new PassportImxProvider({
         authManager: mockAuthManager as unknown as AuthManager,
-        magicAdapter: magicAdapterMock as unknown as MagicAdapter,
+        magicTEESigner: magicTEESignerMock as unknown as MagicTEESigner,
         guardianClient: mockGuardianClient as unknown as GuardianClient,
         immutableXClient,
         passportEventEmitter: new TypedEventEmitter<PassportEventMap>(),
@@ -363,7 +365,7 @@ describe('PassportImxProvider', () => {
       const magicProviderMock = {};
 
       mockAuthManager.login.mockResolvedValue(mockUser);
-      magicAdapterMock.login.mockResolvedValue(magicProviderMock);
+      magicTEESignerMock.getAddress.mockResolvedValue('0x123');
       mockAuthManager.forceUserRefresh.mockResolvedValue({ ...mockUser, imx: { ethAddress: '', starkAddress: '', userAdminAddress: '' } });
       await passportImxProvider.registerOffchain();
 
