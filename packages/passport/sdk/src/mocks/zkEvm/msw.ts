@@ -29,6 +29,18 @@ const mandatoryHandlers = [
       }
     }
   }),
+  rest.post('https://tee.express.magiclabs.com/v1/wallet', (req, res, ctx) => res(
+    ctx.status(201),
+    ctx.json({
+      public_address: '0x123456789abcdef',
+    }),
+  )),
+  rest.post('https://tee.express.magiclabs.com/v1/wallet/personal-sign', (req, res, ctx) => res(
+    ctx.status(200),
+    ctx.json({
+      signature: '0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b',
+    }),
+  )),
 ];
 
 const chainName = `${encodeURIComponent(ChainName.IMTBL_ZKEVM_TESTNET)}`;
@@ -47,7 +59,7 @@ export const mswHandlers = {
       success: rest.post('https://tee.express.magiclabs.com/v1/wallet/personal-sign', (req, res, ctx) => res(
         ctx.status(200),
         ctx.json({
-          signature: '0xsignature123',
+          signature: '0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b',
         }),
       )),
       internalServerError: rest.post('https://tee.express.magiclabs.com/v1/wallet/personal-sign', (req, res, ctx) => res(ctx.status(500))),

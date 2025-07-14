@@ -12,7 +12,6 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
 import { trackError, trackFlow } from '@imtbl/metrics';
-import { BrowserProvider } from 'ethers';
 import registerPassportStarkEx from './workflows/registration';
 import { mockUser, mockUserImx } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';

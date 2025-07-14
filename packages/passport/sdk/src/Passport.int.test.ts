@@ -206,12 +206,16 @@ describe('Passport', () => {
         });
 
         it('registers the user and returns the ether key', async () => {
+          mockGetUser.mockResolvedValueOnce(null);
           mockSigninPopup.mockResolvedValue(mockOidcUser);
+          mockGetUser.mockResolvedValueOnce(mockOidcUser);
           mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
+          mockGetUser.mockResolvedValue(mockOidcUserZkevm);
           useMswHandlers([
             mswHandlers.rpcProvider.success,
             mswHandlers.counterfactualAddress.success,
             mswHandlers.api.chains.success,
+            mswHandlers.magicTEE.createWallet.success,
           ]);
 
           const zkEvmProvider = await getZkEvmProvider();
@@ -226,13 +230,15 @@ describe('Passport', () => {
 
         describe('when the registration request fails', () => {
           it('throws an error', async () => {
-            mockSigninPopup.mockResolvedValue(mockOidcUser);
             mockGetUser.mockResolvedValueOnce(null);
+            mockSigninPopup.mockResolvedValue(mockOidcUser);
             mockGetUser.mockResolvedValueOnce(mockOidcUser);
             mockSigninSilent.mockResolvedValue(mockOidcUser);
+            mockGetUser.mockResolvedValue(mockOidcUser);
             useMswHandlers([
               mswHandlers.counterfactualAddress.internalServerError,
               mswHandlers.api.chains.success,
+              mswHandlers.magicTEE.createWallet.success,
             ]);
 
             const zkEvmProvider = await getZkEvmProvider();
@@ -250,10 +256,11 @@ describe('Passport', () => {
         const transferToAddress = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
 
         useMswHandlers([
-          mswHandlers.counterfactualAddress.success,
           mswHandlers.rpcProvider.success,
           mswHandlers.relayer.success,
           mswHandlers.guardian.evaluateTransaction.success,
+          mswHandlers.magicTEE.createWallet.success,
+          mswHandlers.magicTEE.personalSign.success,
         ]);
         mockMagicRequest.mockImplementation(({ method }: RequestArguments) => {
           switch (method) {
@@ -289,7 +296,7 @@ describe('Passport', () => {
         });
 
         expect(result).toEqual(transactionHash);
-        expect(mockGetUser).toHaveBeenCalledTimes(6);
+        expect(mockGetUser).toHaveBeenCalledTimes(9);
       });
 
       it('ethSigner is initialised if user logs in after connectEvm', async () => {
@@ -300,6 +307,8 @@ describe('Passport', () => {
           mswHandlers.rpcProvider.success,
           mswHandlers.relayer.success,
           mswHandlers.guardian.evaluateTransaction.success,
+          mswHandlers.magicTEE.createWallet.success,
+          mswHandlers.magicTEE.personalSign.success,
         ]);
         mockMagicRequest.mockImplementation(({ method }: RequestArguments) => {
           switch (method) {
@@ -317,7 +326,7 @@ describe('Passport', () => {
             }
           }
         });
-        mockGetUser.mockResolvedValueOnce(Promise.resolve(null));
+        mockGetUser.mockResolvedValueOnce(null);
         mockSigninPopup.mockResolvedValue(mockOidcUserZkevm);
         mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
 
@@ -344,7 +353,7 @@ describe('Passport', () => {
         // user logs in, ethSigner is initialised
         await passport.login();
 
-        mockGetUser.mockResolvedValue(Promise.resolve(mockOidcUserZkevm));
+        mockGetUser.mockResolvedValue(mockOidcUserZkevm);
 
         expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
 

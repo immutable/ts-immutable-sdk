@@ -1,6 +1,4 @@
-import {
-  AbstractSigner, Provider, Signer, TransactionRequest, TypedDataDomain, TypedDataField,
-} from 'ethers';
+import { AbstractSigner, Signer } from 'ethers';
 import { MagicTeeApiClients } from '@imtbl/generated-clients';
 import { isAxiosError } from 'axios';
 import { Flow, trackDuration } from '@imtbl/metrics';
@@ -61,7 +59,7 @@ export default class MagicTEESigner extends AbstractSigner {
         this.userWallet = null;
 
         const user = await this.getUserOrThrow();
-        const headers = await this.getHeaders(user);
+        const headers = MagicTEESigner.getHeaders(user);
 
         await withMetricsAsync(async (flow: Flow) => {
           try {
@@ -105,9 +103,8 @@ export default class MagicTEESigner extends AbstractSigner {
           }
         }, 'magicCreateWallet');
       } catch (error) {
-        return reject(error);
-      }
-      finally {
+        reject(error);
+      } finally {
         this.createWalletPromise = null;
       }
     });
@@ -126,7 +123,7 @@ export default class MagicTEESigner extends AbstractSigner {
     return user;
   }
 
-  private async getHeaders(user: User): Promise<Record<string, string>> {
+  private static getHeaders(user: User): Record<string, string> {
     if (!user) {
       throw new PassportError(
         'User has been logged out',
@@ -150,7 +147,7 @@ export default class MagicTEESigner extends AbstractSigner {
 
     const messageToSign = message instanceof Uint8Array ? `0x${Buffer.from(message).toString('hex')}` : message;
     const user = await this.getUserOrThrow();
-    const headers = await this.getHeaders(user);
+    const headers = await MagicTEESigner.getHeaders(user);
 
     return withMetricsAsync(async (flow: Flow) => {
       try {
@@ -187,15 +184,18 @@ export default class MagicTEESigner extends AbstractSigner {
     }, 'magicPersonalSign');
   }
 
-  connect(provider: null | Provider): Signer {
+  // eslint-disable-next-line class-methods-use-this
+  connect(): Signer {
     throw new Error('Method not implemented.');
   }
 
-  signTransaction(tx: TransactionRequest): Promise<string> {
+  // eslint-disable-next-line class-methods-use-this
+  signTransaction(): Promise<string> {
     throw new Error('Method not implemented.');
   }
 
-  signTypedData(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>): Promise<string> {
+  // eslint-disable-next-line class-methods-use-this
+  signTypedData(): Promise<string> {
     throw new Error('Method not implemented.');
   }
 }

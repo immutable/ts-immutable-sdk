@@ -3,7 +3,7 @@ import { JsonRpcProvider, toBeHex } from 'ethers';
 import AuthManager from '../authManager';
 import { ZkEvmProvider, ZkEvmProviderInput } from './zkEvmProvider';
 import { sendTransaction } from './sendTransaction';
-import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
+import { JsonRpcError, ProviderErrorCode } from './JsonRpcError';
 import GuardianClient from '../guardian';
 import { RelayerClient } from './relayerClient';
 import { Provider, RequestArguments } from './types';

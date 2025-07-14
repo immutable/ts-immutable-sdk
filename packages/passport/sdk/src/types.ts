@@ -2,7 +2,6 @@ import { Environment, ModuleConfiguration } from '@imtbl/config';
 import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
-import TypedEventEmitter from './utils/typedEventEmitter';
 
 export enum PassportEvents {
   LOGGED_OUT = 'loggedOut',

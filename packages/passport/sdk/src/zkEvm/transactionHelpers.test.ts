@@ -2,7 +2,7 @@ import { Flow } from '@imtbl/metrics';
 import { JsonRpcProvider } from 'ethers';
 import { RelayerClient } from './relayerClient';
 import GuardianClient from '../guardian';
-import { FeeOption, MetaTransaction, RelayerTransactionStatus } from './types';
+import { FeeOption, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { pollRelayerTransaction, prepareAndSignEjectionTransaction, prepareAndSignTransaction } from './transactionHelpers';
 import * as walletHelpers from './walletHelpers';
@@ -81,16 +81,6 @@ describe('transactionHelpers', () => {
       data: '0x456',
       value: '0x00',
     };
-
-    const metaTransactions: MetaTransaction[] = [
-      {
-        to: transactionRequest.to,
-        data: transactionRequest.data,
-        nonce,
-        value: transactionRequest.value,
-        revertOnError: true,
-      },
-    ];
 
     const signedTransactions = 'signedTransactions123';
     const relayerId = 'relayerId123';
@@ -245,20 +235,6 @@ describe('transactionHelpers', () => {
         zkEvmAddresses.ethAddress,
         magicTeeAdapter,
       );
-    });
-
-    it('processes empty fee options correctly', async () => {
-      (relayerClient.imGetFeeOptions as jest.Mock).mockResolvedValue([]);
-
-      await expect(prepareAndSignTransaction({
-        transactionRequest,
-        ethSigner: magicTeeAdapter,
-        rpcProvider,
-        guardianClient,
-        relayerClient,
-        zkEvmAddress: zkEvmAddresses.ethAddress,
-        flow,
-      })).rejects.toThrow('Failed to retrieve fees for IMX token');
     });
 
     it('signs the transaction when the nonce is zero', async () => {

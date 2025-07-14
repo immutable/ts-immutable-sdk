@@ -1,4 +1,3 @@
-import { AbstractSigner, Provider } from 'ethers';
 import { MagicTeeApiClients } from '@imtbl/generated-clients';
 import { trackDuration } from '@imtbl/metrics';
 import { isAxiosError } from 'axios';
@@ -65,17 +64,13 @@ describe('MagicTEESigner', () => {
     };
 
     // Mock withMetricsAsync
-    (withMetricsAsync as jest.Mock).mockImplementation(async (fn, flowName) => {
-      return fn(mockFlow);
-    });
+    (withMetricsAsync as jest.Mock).mockImplementation(async (fn) => fn(mockFlow));
 
     // Mock trackDuration
     (trackDuration as jest.Mock).mockImplementation(() => {});
 
     // Mock isAxiosError
-    (isAxiosError as unknown as jest.Mock).mockImplementation((error) => {
-      return error && error.isAxiosError === true;
-    });
+    (isAxiosError as unknown as jest.Mock).mockImplementation((error) => error && error.isAxiosError === true);
 
     magicTEESigner = new MagicTEESigner(mockAuthManager, mockMagicTeeApiClient);
   });
@@ -94,7 +89,7 @@ describe('MagicTEESigner', () => {
             chain: 'ETH',
           },
         },
-        { headers: { Authorization: `Bearer ${mockUser.idToken}` } }
+        { headers: { Authorization: `Bearer ${mockUser.idToken}` } },
       );
     });
 
@@ -105,7 +100,7 @@ describe('MagicTEESigner', () => {
         new PassportError(
           'User has been logged out',
           PassportErrorType.NOT_LOGGED_IN_ERROR,
-        )
+        ),
       );
     });
 
@@ -137,7 +132,7 @@ describe('MagicTEESigner', () => {
 
       // First call with user1
       await magicTEESigner.getAddress();
-      
+
       // Second call with user2 (different user)
       await magicTEESigner.getAddress();
 
@@ -157,7 +152,7 @@ describe('MagicTEESigner', () => {
       mockCreateWalletV1WalletPost.mockRejectedValue(apiError);
 
       await expect(magicTEESigner.getAddress()).rejects.toThrow(
-        'Failed to create wallet with status 500: {"message":"Internal server error"}'
+        'Failed to create wallet with status 500: {"message":"Internal server error"}',
       );
     });
 
@@ -171,7 +166,7 @@ describe('MagicTEESigner', () => {
       mockCreateWalletV1WalletPost.mockRejectedValue(networkError);
 
       await expect(magicTEESigner.getAddress()).rejects.toThrow(
-        'Failed to create wallet: Network Error'
+        'Failed to create wallet: Network Error',
       );
     });
 
@@ -182,7 +177,7 @@ describe('MagicTEESigner', () => {
       mockCreateWalletV1WalletPost.mockRejectedValue(genericError);
 
       await expect(magicTEESigner.getAddress()).rejects.toThrow(
-        'Failed to create wallet: Generic error'
+        'Failed to create wallet: Generic error',
       );
     });
 
@@ -210,12 +205,12 @@ describe('MagicTEESigner', () => {
 
       expect(withMetricsAsync).toHaveBeenCalledWith(
         expect.any(Function),
-        'magicCreateWallet'
+        'magicCreateWallet',
       );
       expect(trackDuration).toHaveBeenCalledWith(
         'passport',
         'testFlow',
-        expect.any(Number)
+        expect.any(Number),
       );
     });
   });
@@ -239,7 +234,7 @@ describe('MagicTEESigner', () => {
             chain: 'ETH',
           },
         },
-        { headers: { Authorization: `Bearer ${mockUser.idToken}` } }
+        { headers: { Authorization: `Bearer ${mockUser.idToken}` } },
       );
     });
 
@@ -255,7 +250,7 @@ describe('MagicTEESigner', () => {
             chain: 'ETH',
           },
         },
-        { headers: { Authorization: `Bearer ${mockUser.idToken}` } }
+        { headers: { Authorization: `Bearer ${mockUser.idToken}` } },
       );
     });
 
@@ -266,7 +261,7 @@ describe('MagicTEESigner', () => {
         new PassportError(
           'User has been logged out',
           PassportErrorType.NOT_LOGGED_IN_ERROR,
-        )
+        ),
       );
     });
 
@@ -282,7 +277,7 @@ describe('MagicTEESigner', () => {
       mockSignMessageV1WalletPersonalSignPost.mockRejectedValue(apiError);
 
       await expect(magicTEESigner.signMessage('test')).rejects.toThrow(
-        'Failed to create signature using EOA with status 400: {"message":"Invalid signature request"}'
+        'Failed to create signature using EOA with status 400: {"message":"Invalid signature request"}',
       );
     });
 
@@ -295,7 +290,7 @@ describe('MagicTEESigner', () => {
       mockSignMessageV1WalletPersonalSignPost.mockRejectedValue(networkError);
 
       await expect(magicTEESigner.signMessage('test')).rejects.toThrow(
-        'Failed to create signature using EOA: Network Error'
+        'Failed to create signature using EOA: Network Error',
       );
     });
 
@@ -305,7 +300,7 @@ describe('MagicTEESigner', () => {
       mockSignMessageV1WalletPersonalSignPost.mockRejectedValue(genericError);
 
       await expect(magicTEESigner.signMessage('test')).rejects.toThrow(
-        'Failed to create signature using EOA: Generic error'
+        'Failed to create signature using EOA: Generic error',
       );
     });
 
@@ -314,12 +309,12 @@ describe('MagicTEESigner', () => {
 
       expect(withMetricsAsync).toHaveBeenCalledWith(
         expect.any(Function),
-        'magicPersonalSign'
+        'magicPersonalSign',
       );
       expect(trackDuration).toHaveBeenCalledWith(
         'passport',
         'testFlow',
-        expect.any(Number)
+        expect.any(Number),
       );
     });
 
@@ -335,7 +330,7 @@ describe('MagicTEESigner', () => {
   describe('error handling in createWallet', () => {
     it('should reset createWalletPromise on error', async () => {
       mockAuthManager.getUser.mockResolvedValue(mockUser);
-      
+
       const error = new Error('API Error');
       mockCreateWalletV1WalletPost
         .mockRejectedValueOnce(error)
@@ -343,7 +338,7 @@ describe('MagicTEESigner', () => {
 
       // First call should fail
       await expect(magicTEESigner.getAddress()).rejects.toThrow('API Error');
-      
+
       // Second call should succeed (promise should be reset)
       const address = await magicTEESigner.getAddress();
       expect(address).toBe('0x123456789abcdef');
@@ -364,7 +359,7 @@ describe('MagicTEESigner', () => {
           headers: {
             Authorization: `Bearer ${mockUser.idToken}`,
           },
-        }
+        },
       );
     });
 
@@ -375,7 +370,7 @@ describe('MagicTEESigner', () => {
         new PassportError(
           'User has been logged out',
           PassportErrorType.NOT_LOGGED_IN_ERROR,
-        )
+        ),
       );
     });
   });
