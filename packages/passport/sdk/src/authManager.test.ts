@@ -517,20 +517,22 @@ describe('AuthManager', () => {
       expect(result).toEqual(mockUser);
     });
 
-    it('should return null when user has no idToken and isAccessTokenExpiredOrExpiring returns true', async () => {
-      const userWithoutIdToken = { ...mockOidcUser, id_token: undefined };
+    it('should return null when user has no idToken', async () => {
+      const userWithoutIdToken = { ...mockOidcUser, id_token: undefined, refresh_token: undefined };
       mockGetUser.mockReturnValue(userWithoutIdToken);
-      (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(true);
+      // Restore real function behavior for this test
+      (isAccessTokenExpiredOrExpiring as jest.Mock).mockImplementation(
+        jest.requireActual('./utils/token').isAccessTokenExpiredOrExpiring,
+      );
 
       const result = await authManager.getUser();
 
       expect(result).toBeNull();
-      expect(isAccessTokenExpiredOrExpiring).toHaveBeenCalledWith(userWithoutIdToken);
     });
 
-    it('should refresh token when expires_in is 30 seconds or less', async () => {
-      const expiringUser = { ...mockOidcUser, expires_in: 25 };
-      mockGetUser.mockReturnValue(expiringUser);
+    it('should refresh token when access token is expired or expiring', async () => {
+      const userWithExpiringAccessToken = { ...mockOidcUser };
+      mockGetUser.mockReturnValue(userWithExpiringAccessToken);
       (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(true);
       mockSigninSilent.mockResolvedValue(mockOidcUser);
 
@@ -540,19 +542,23 @@ describe('AuthManager', () => {
       expect(result).toEqual(mockUser);
     });
 
-    it('should handle user with null expires_in', async () => {
-      const userWithNullExpiresIn = { ...mockOidcUser, expires_in: null };
-      mockGetUser.mockReturnValue(userWithNullExpiresIn);
-      (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(false);
+    it('should handle user with missing access token', async () => {
+      const userWithoutAccessToken = { ...mockOidcUser, access_token: undefined };
+      mockGetUser.mockReturnValue(userWithoutAccessToken);
+      // Restore real function behavior for this test
+      (isAccessTokenExpiredOrExpiring as jest.Mock).mockImplementation(
+        jest.requireActual('./utils/token').isAccessTokenExpiredOrExpiring,
+      );
+      mockSigninSilent.mockResolvedValue(mockOidcUser);
 
       const result = await authManager.getUser();
 
-      expect(mockSigninSilent).not.toHaveBeenCalled();
+      expect(mockSigninSilent).toBeCalledTimes(1);
       expect(result).toEqual(mockUser);
     });
 
-    it('should return user directly when token is not expired or expiring', async () => {
-      const freshUser = { ...mockOidcUser, expires_in: 3600 }; // 1 hour
+    it('should return user directly when access token is not expired or expiring', async () => {
+      const freshUser = { ...mockOidcUser };
       mockGetUser.mockReturnValue(freshUser);
       (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(false);
 
