@@ -2,7 +2,7 @@ import jwt_decode from 'jwt-decode';
 import {
   User as OidcUser,
 } from 'oidc-client-ts';
-import { IdTokenPayload } from '../types';
+import { IdTokenPayload, TokenPayload } from '../types';
 
 export function isIdTokenExpired(idToken: string | undefined): boolean {
   if (!idToken) {
@@ -15,18 +15,29 @@ export function isIdTokenExpired(idToken: string | undefined): boolean {
 }
 
 export function isAccessTokenExpiredOrExpiring(oidcUser: OidcUser): boolean {
-  const { id_token: idToken, expired, expires_in } = oidcUser;
-  if (expired) {
+  const { id_token: idToken, access_token: accessToken } = oidcUser;
+
+  // Handle missing tokens - assume they need to login again
+  if (!accessToken || !idToken) {
     return true;
   }
 
-  // if token will expire in 30 seconds or less, return true
-  if (expires_in && expires_in <= 30) {
-    return true;
-  }
+  // Decode the access token to check its expiration
+  try {
+    const decodedAccessToken = jwt_decode<TokenPayload>(accessToken);
+    const now = Math.floor(Date.now() / 1000);
 
-  // Handle missing idToken - assume they need to login again
-  if (!idToken) {
+    // Access tokens without expiration claims are invalid (security vulnerability)
+    if (!decodedAccessToken.exp) {
+      return true;
+    }
+
+    // Check if access token is expired or expiring in 30 seconds or less
+    if (decodedAccessToken.exp <= now + 30) {
+      return true;
+    }
+  } catch (error) {
+    // If we can't decode the access token, assume it's invalid
     return true;
   }
 
