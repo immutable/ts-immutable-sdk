@@ -118,11 +118,6 @@ export interface PassportModuleConfiguration
    * to approve a deploy transaction before signing.
    */
   forceScwDeployBeforeMessageSignature?: boolean;
-
-  /**
-   * Extra query params to be sent to the OIDC provider.
-   */
-  extraQueryParams?: Record<string, string>;
 }
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };

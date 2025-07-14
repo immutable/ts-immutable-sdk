@@ -76,7 +76,6 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
     userStore,
     revokeTokenTypes: ['refresh_token'],
     extraQueryParams: {
-      ...config.extraQueryParams,
       ...(oidcConfiguration.audience ? { audience: oidcConfiguration.audience } : {}),
     },
   };
