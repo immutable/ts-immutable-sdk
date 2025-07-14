@@ -39,6 +39,7 @@ const PASSPORT_FUNCTIONS = {
   connectPKCE: 'connectPKCE',
   loginConfirmCode: 'loginConfirmCode',
   connectConfirmCode: 'connectConfirmCode',
+  tokenExchange: 'tokenExchange',
   getAccessToken: 'getAccessToken',
   getIdToken: 'getIdToken',
   logout: 'logout',
@@ -486,6 +487,19 @@ window.callFunction = async (jsonData: string) => {
           success: true,
           error: null,
           result: deviceFlowEndSessionEndpoint,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.tokenExchange: {
+        const request = JSON.parse(data);
+        const profile = await getPassportClient().tokenExchange(request.email, request.jwt);
+        identify({ passportId: profile.sub });
+        trackDuration(moduleName, 'performedTokenExchange', mt(markStart));
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          error: null,
         });
         break;
       }

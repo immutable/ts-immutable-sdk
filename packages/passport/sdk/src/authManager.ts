@@ -437,6 +437,36 @@ export default class AuthManager {
     return response.data;
   }
 
+  public async tokenExchange(email: string, jwt: string): Promise<User> {
+    return withPassportError<User>(async () => {
+      const tokenResponse = await this.getTokenExchange(email, jwt);
+      console.log(`tokenResponse ${JSON.stringify(tokenResponse)}`);
+      const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
+      console.log(`oidcUser ${JSON.stringify(oidcUser)}`);
+      const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
+      console.log(`user ${JSON.stringify(user)}`);
+      await this.userManager.storeUser(oidcUser);
+      return user;
+    }, PassportErrorType.AUTHENTICATION_ERROR);
+  }
+
+  private async getTokenExchange(email: string, jwt: string): Promise<DeviceTokenResponse> {
+    const response = await axios.post<DeviceTokenResponse>(
+      'http://localhost:8070/v1/token-exchange',
+      {
+        email,
+        client_id: this.config.oidcConfiguration.clientId,
+        jwt,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    return response.data;
+  }
+
   public async logout(): Promise<void> {
     return withPassportError<void>(async () => {
       if (this.logoutMode === 'silent') {

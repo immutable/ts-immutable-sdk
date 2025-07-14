@@ -198,8 +198,20 @@ export default class GuardianClient {
         { headers },
       );
 
+      console.log('response', response);
+
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
+      console.log(`evaluateEVMTransaction Error message: ${error.message}`);
+      console.log(`evaluateEVMTransaction Error code: ${error.code}`);
+      if (error.response) {
+        console.log(`evaluateEVMTransaction Response status: ${error.response.status}`);
+        console.log(`evaluateEVMTransaction Response statusText: ${error.response.statusText}`);
+        console.log(`evaluateEVMTransaction Response data: ${JSON.stringify(error.response.data)}`);
+        console.log(`evaluateEVMTransaction Response headers: ${JSON.stringify(error.response.headers)}`);
+      } else if (error.request) {
+        console.log(`evaluateEVMTransaction Request data: ${error.request}`);
+      }
       if (axios.isAxiosError(error) && error.response?.status === 403) {
         throw new PassportError('Service unavailable', PassportErrorType.SERVICE_UNAVAILABLE_ERROR);
       }

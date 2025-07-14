@@ -159,9 +159,7 @@ export class Passport {
    */
   public connectEvm(options: {
     announceProvider: boolean
-  } = {
-    announceProvider: true,
-  }): Promise<Provider> {
+  } = { announceProvider: true }): Promise<Provider> {
     return withMetricsAsync(async () => {
       const provider = new ZkEvmProvider({
         passportEventEmitter: this.passportEventEmitter,
@@ -330,6 +328,20 @@ export class Passport {
       this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
       return user.profile;
     }, 'loginWithPKCEFlowCallback');
+  }
+
+  /**
+   * Exchanges a JWT for tokens and returns the user profile.
+   * @param {string} email - The email of the user
+   * @param {string} jwt - The JWT to exchange
+   * @returns {Promise<UserProfile>} A promise that resolves to the user profile
+   */
+  public async tokenExchange(email: string, jwt: string): Promise<UserProfile> {
+    return withMetricsAsync(async () => {
+      const user = await this.authManager.tokenExchange(email, jwt);
+      // this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+      return user.profile;
+    }, 'tokenExchange');
   }
 
   /**

@@ -15,6 +15,7 @@ const passportInstance = new passport.Passport({
   redirectUri: 'https://localhost:3000/redirect',
   logoutRedirectUri: 'https://localhost:3000/logout',
   audience: 'platform_api',
+
   scope: 'openid offline_access email transact',
 });
 
