@@ -21,6 +21,12 @@ const PassportContext = createContext<{
   getUserInfo: () => Promise<UserProfile | undefined>;
   getLinkedAddresses: () => Promise<string[] | undefined>;
   linkWallet: (params: LinkWalletParams) => Promise<LinkedWallet | undefined>;
+  popupRedirectGoogle: () => void;
+  popupRedirectApple: () => void;
+  popupRedirectFacebook: () => void;
+  loginGoogle: () => void;
+  loginApple: () => void;
+  loginFacebook: () => void;
 }>({
       imxProvider: undefined,
       zkEvmProvider: undefined,
@@ -34,6 +40,12 @@ const PassportContext = createContext<{
       getUserInfo: () => Promise.resolve(undefined),
       getLinkedAddresses: () => Promise.resolve(undefined),
       linkWallet: () => Promise.resolve(undefined),
+      popupRedirectGoogle: () => undefined,
+      popupRedirectApple: () => undefined,
+      popupRedirectFacebook: () => undefined,
+      loginGoogle: () => undefined,
+      loginApple: () => undefined,
+      loginFacebook: () => undefined,
     });
 
 export function PassportProvider({
@@ -163,14 +175,109 @@ export function PassportProvider({
     }
   }, [addMessage, passportClient, setIsLoading]);
 
+  // Popup redirect methods (provider-specific)
+  const popupRedirectGoogle = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const userProfile = await passportClient.login({ directLoginMethod: 'google' });
+      addMessage('Popup Login (Google)', userProfile);
+    } catch (err) {
+      addMessage('Popup Login (Google)', err);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [addMessage, passportClient, setIsLoading]);
+
+  const popupRedirectApple = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const userProfile = await passportClient.login({ directLoginMethod: 'apple' });
+      addMessage('Popup Login (Apple)', userProfile);
+    } catch (err) {
+      addMessage('Popup Login (Apple)', err);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [addMessage, passportClient, setIsLoading]);
+
+  const popupRedirectFacebook = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const userProfile = await passportClient.login({ directLoginMethod: 'facebook' });
+      addMessage('Popup Login (Facebook)', userProfile);
+    } catch (err) {
+      addMessage('Popup Login (Facebook)', err);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [addMessage, passportClient, setIsLoading]);
+
+  // Login (redirect) methods
+  const loginGoogle = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const userProfile = await passportClient.login({
+        directLoginMethod: 'google',
+        useRedirectFlow: true,
+      });
+      addMessage('Login (Google)', userProfile);
+    } catch (err) {
+      addMessage('Login (Google)', err);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [addMessage, passportClient, setIsLoading]);
+
+  const loginApple = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const userProfile = await passportClient.login({
+        directLoginMethod: 'apple',
+        useRedirectFlow: true,
+      });
+      addMessage('Login (Apple)', userProfile);
+    } catch (err) {
+      addMessage('Login (Apple)', err);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [addMessage, passportClient, setIsLoading]);
+
+  const loginFacebook = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const userProfile = await passportClient.login({
+        directLoginMethod: 'facebook',
+        useRedirectFlow: true,
+      });
+      addMessage('Login (Facebook)', userProfile);
+    } catch (err) {
+      addMessage('Login (Facebook)', err);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [addMessage, passportClient, setIsLoading]);
+
   const providerValues = useMemo(() => ({
     imxProvider,
     zkEvmProvider,
     connectImx,
     connectZkEvm,
     logout,
-    login,
     popupRedirect,
+    popupRedirectGoogle,
+    popupRedirectApple,
+    popupRedirectFacebook,
+    login,
+    loginGoogle,
+    loginApple,
+    loginFacebook,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -182,8 +289,14 @@ export function PassportProvider({
     connectImx,
     connectZkEvm,
     logout,
-    login,
     popupRedirect,
+    popupRedirectGoogle,
+    popupRedirectApple,
+    popupRedirectFacebook,
+    login,
+    loginGoogle,
+    loginApple,
+    loginFacebook,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -204,9 +317,15 @@ export function usePassportProvider() {
     zkEvmProvider,
     connectImx,
     connectZkEvm,
-    login,
-    popupRedirect,
     logout,
+    popupRedirect,
+    popupRedirectGoogle,
+    popupRedirectApple,
+    popupRedirectFacebook,
+    login,
+    loginGoogle,
+    loginApple,
+    loginFacebook,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -218,9 +337,15 @@ export function usePassportProvider() {
     zkEvmProvider,
     connectImx,
     connectZkEvm,
-    login,
-    popupRedirect,
     logout,
+    popupRedirect,
+    popupRedirectGoogle,
+    popupRedirectApple,
+    popupRedirectFacebook,
+    login,
+    loginGoogle,
+    loginApple,
+    loginFacebook,
     getIdToken,
     getAccessToken,
     getUserInfo,

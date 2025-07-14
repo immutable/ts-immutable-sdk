@@ -3,6 +3,13 @@ import { EthSigner, IMXClient, StarkSigner } from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
 
+/**
+ * Direct login method identifier
+ * Known providers: 'google', 'apple', 'facebook'
+ * Additional providers may be supported server-side
+ */
+export type DirectLoginMethod = string;
+
 export enum PassportEvents {
   LOGGED_OUT = 'loggedOut',
   LOGGED_IN = 'loggedIn',

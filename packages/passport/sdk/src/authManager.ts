@@ -172,15 +172,18 @@ export default class AuthManager {
     });
   };
 
-  public async loginWithRedirect(anonymousId?: string): Promise<void> {
+  public async loginWithRedirect(anonymousId?: string, directLoginMethod?: string): Promise<void> {
     await this.userManager.clearStaleState();
     return withPassportError<void>(async () => {
+      const extraQueryParams: Record<string, string> = {
+        ...(this.userManager.settings?.extraQueryParams ?? {}),
+        rid: getDetail(Detail.RUNTIME_ID) || '',
+        third_party_a_id: anonymousId || '',
+        ...(directLoginMethod && { direct: directLoginMethod }),
+      };
+
       await this.userManager.signinRedirect({
-        extraQueryParams: {
-          ...(this.userManager.settings?.extraQueryParams ?? {}),
-          rid: getDetail(Detail.RUNTIME_ID) || '',
-          third_party_a_id: anonymousId || '',
-        },
+        extraQueryParams,
       });
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
@@ -189,23 +192,26 @@ export default class AuthManager {
    * login
    * @param anonymousId Caller can pass an anonymousId if they want to associate their user's identity with immutable's internal instrumentation.
    */
-  public async login(anonymousId?: string): Promise<User> {
+  public async login(anonymousId?: string, directLoginMethod?: string): Promise<User> {
     return withPassportError<User>(async () => {
       const popupWindowTarget = 'passportLoginPrompt';
-      const signinPopup = async () => (
-        this.userManager.signinPopup({
-          extraQueryParams: {
-            ...(this.userManager.settings?.extraQueryParams ?? {}),
-            rid: getDetail(Detail.RUNTIME_ID) || '',
-            third_party_a_id: anonymousId || '',
-          },
+      const signinPopup = async () => {
+        const extraQueryParams: Record<string, string> = {
+          ...(this.userManager.settings?.extraQueryParams ?? {}),
+          rid: getDetail(Detail.RUNTIME_ID) || '',
+          third_party_a_id: anonymousId || '',
+          ...(directLoginMethod && { direct: directLoginMethod }),
+        };
+
+        return this.userManager.signinPopup({
+          extraQueryParams,
           popupWindowFeatures: {
             width: 410,
             height: 450,
           },
           popupWindowTarget,
-        })
-      );
+        });
+      };
 
       // This promise attempts to open the signin popup, and displays the blocked popup overlay if necessary.
       return new Promise((resolve, reject) => {
