@@ -44,8 +44,6 @@ describe('Passport', () => {
   let loginCallbackMock: jest.Mock;
   let logoutMock: jest.Mock;
   let removeUserMock: jest.Mock;
-  let magicLoginMock: jest.Mock;
-  let magicLogoutMock: jest.Mock;
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
   let getProviderMock: jest.Mock;
@@ -57,8 +55,6 @@ describe('Passport', () => {
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue(mockUser);
     loginCallbackMock = jest.fn();
-    magicLoginMock = jest.fn();
-    magicLogoutMock = jest.fn();
     logoutMock = jest.fn();
     removeUserMock = jest.fn();
     getUserMock = jest.fn();
@@ -289,26 +285,12 @@ describe('Passport', () => {
         await passport.logout();
 
         expect(logoutMock).toBeCalledTimes(1);
-        expect(magicLogoutMock).toBeCalledTimes(1);
-      });
-    });
-
-    describe('when the logout mode is redirect', () => {
-      it('should execute logout without error in the correct order', async () => {
-        await passport.logout();
-
-        const logoutMockOrder = logoutMock.mock.invocationCallOrder[0];
-        const magicLogoutMockOrder = magicLogoutMock.mock.invocationCallOrder[0];
-
-        expect(logoutMock).toBeCalledTimes(1);
-        expect(magicLogoutMock).toBeCalledTimes(1);
-        expect(magicLogoutMockOrder).toBeLessThan(logoutMockOrder);
       });
     });
 
     it('should call track error function if an error occurs', async () => {
       const error = new Error('error');
-      magicLogoutMock.mockRejectedValue(error);
+      logoutMock.mockRejectedValue(error);
 
       try {
         await passport.logout();

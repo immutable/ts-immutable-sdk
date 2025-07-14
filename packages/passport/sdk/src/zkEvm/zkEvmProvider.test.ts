@@ -1,5 +1,5 @@
 import { identify, trackFlow } from '@imtbl/metrics';
-import { BrowserProvider, JsonRpcProvider, toBeHex } from 'ethers';
+import { JsonRpcProvider, toBeHex } from 'ethers';
 import AuthManager from '../authManager';
 import { ZkEvmProvider, ZkEvmProviderInput } from './zkEvmProvider';
 import { sendTransaction } from './sendTransaction';
@@ -17,7 +17,6 @@ import { signEjectionTransaction } from './signEjectionTransaction';
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
   JsonRpcProvider: jest.fn(),
-  BrowserProvider: jest.fn(),
 }));
 jest.mock('@imtbl/metrics');
 jest.mock('./relayerClient');
@@ -54,9 +53,6 @@ describe('ZkEvmProvider', () => {
   beforeEach(() => {
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     jest.resetAllMocks();
-    (BrowserProvider as unknown as jest.Mock).mockImplementation(() => ({
-      getSigner: jest.fn().mockImplementation(() => ethSigner),
-    }));
     (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
       addEvent: jest.fn(),
       end: jest.fn(),
@@ -92,7 +88,6 @@ describe('ZkEvmProvider', () => {
         // Constructor doesn't call getUser or getAddress during initialization
         expect(authManager.getUser).not.toHaveBeenCalled();
         expect(magicTEESigner.getAddress).not.toHaveBeenCalled();
-        expect(BrowserProvider).not.toHaveBeenCalled();
       });
 
       describe('and the user has not registered before', () => {
@@ -110,7 +105,7 @@ describe('ZkEvmProvider', () => {
         it('calls session activity', async () => {
           const onAccountsRequested = jest.fn();
           passportEventEmitter.on(PassportEvents.ACCOUNTS_REQUESTED, onAccountsRequested);
-          const provider = getProvider();
+          getProvider();
 
           await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
 
@@ -122,16 +117,6 @@ describe('ZkEvmProvider', () => {
     describe('when a login occurs outside of the zkEvm provider', () => {
       beforeEach(() => {
         authManager.getUser.mockResolvedValue(null);
-      });
-
-      it('initialises the signer', async () => {
-        getProvider();
-        passportEventEmitter.emit(PassportEvents.LOGGED_IN, mockUserZkEvm);
-
-        await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
-
-        expect(magicTEESigner.getAddress).not.toHaveBeenCalled();
-        expect(BrowserProvider).not.toHaveBeenCalled();
       });
 
       describe('and the user has not registered before', () => {
@@ -193,42 +178,6 @@ describe('ZkEvmProvider', () => {
       expect(identify).toHaveBeenCalledWith({
         passportId: mockUserZkEvm.profile.sub,
       });
-    });
-
-    it('should throw an error if the signer initialisation fails', async () => {
-      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-      authManager.getUser.mockResolvedValue(mockUserZkEvm);
-
-      (BrowserProvider as unknown as jest.Mock).mockImplementation(() => ({
-        getSigner: () => {
-          throw new Error('Something went wrong');
-        },
-      }));
-      const provider = getProvider();
-      await provider.request({ method: 'eth_requestAccounts' });
-
-      await expect(provider.request({ method: 'eth_sendTransaction' })).rejects.toThrow(
-        new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Something went wrong'),
-      );
-    });
-
-    it('should not reinitialise the ethSigner when it has been set during the constructor', async () => {
-      authManager.getUser.mockResolvedValue(mockUserZkEvm);
-      const provider = getProvider();
-
-      await new Promise(process.nextTick); // https://immutable.atlassian.net/browse/ID-2516
-
-      // Constructor doesn't initialize the signer
-      expect(magicTEESigner.getAddress).not.toHaveBeenCalled();
-      expect(BrowserProvider).not.toHaveBeenCalled();
-
-      await provider.request({ method: 'eth_requestAccounts' });
-
-      // Add a delay so that we can check if the ethSigner is initialised again
-      await new Promise(process.nextTick);
-
-      expect(magicTEESigner.getAddress).not.toHaveBeenCalled();
-      expect(BrowserProvider).not.toHaveBeenCalled();
     });
   });
 
