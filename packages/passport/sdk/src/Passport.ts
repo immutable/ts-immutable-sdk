@@ -19,6 +19,7 @@ import {
   isUserZkEvm,
   LinkedWallet,
   LinkWalletParams,
+  PassportEventEmitter,
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
@@ -54,6 +55,7 @@ const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfigura
 
 export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
   const config = new PassportConfiguration(passportModuleConfiguration);
+  const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
   const authManager = new AuthManager(config);
   const confirmationScreen = new ConfirmationScreen(config);
   const magicTeeApiClients = new MagicTeeApiClients({
@@ -62,9 +64,8 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     magicPublishableApiKey: config.magicPublishableApiKey,
     magicProviderId: config.magicProviderId,
   });
-  const magicTEESigner = new MagicTEESigner(authManager, magicTeeApiClients);
+  const magicTEESigner = new MagicTEESigner(authManager, magicTeeApiClients, passportEventEmitter);
   const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
-  const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
 
   const immutableXClient = passportModuleConfiguration.overrides
     ? passportModuleConfiguration.overrides.immutableXClient
@@ -116,7 +117,7 @@ export class Passport {
 
   private readonly passportImxProviderFactory: PassportImxProviderFactory;
 
-  private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  private readonly passportEventEmitter: PassportEventEmitter;
 
   private readonly guardianClient: GuardianClient;
 

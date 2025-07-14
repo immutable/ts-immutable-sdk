@@ -15,11 +15,11 @@ import {
   ImxApiClients,
 } from '@imtbl/generated-clients';
 import { TransactionResponse } from 'ethers';
-import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
 import GuardianClient from '../guardian';
 import {
-  PassportEventMap, PassportEvents, UserImx, User, isUserImx,
+  PassportEvents, UserImx, User, isUserImx,
+  PassportEventEmitter,
 } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
@@ -33,7 +33,7 @@ import MagicTEESigner from '../magic/magicTEESigner';
 export interface PassportImxProviderOptions {
   authManager: AuthManager;
   immutableXClient: IMXClient;
-  passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  passportEventEmitter: PassportEventEmitter;
   magicTEESigner: MagicTEESigner;
   imxApiClients: ImxApiClients;
   guardianClient: GuardianClient;
@@ -100,9 +100,7 @@ export class PassportImxProvider implements IMXProvider {
    *
    */
   #initialiseSigner() {
-    const generateSigners = async (): Promise<StarkSigner> => {
-      return getStarkSigner(this.magicTEESigner);
-    };
+    const generateSigners = async (): Promise<StarkSigner> => getStarkSigner(this.magicTEESigner);
 
     // eslint-disable-next-line no-async-promise-executor
     this.starkSigner = new Promise(async (resolve) => {

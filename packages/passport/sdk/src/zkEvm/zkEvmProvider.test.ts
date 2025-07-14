@@ -7,7 +7,7 @@ import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import GuardianClient from '../guardian';
 import { RelayerClient } from './relayerClient';
 import { Provider, RequestArguments } from './types';
-import { PassportEventMap, PassportEvents } from '../types';
+import { PassportEventEmitter, PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { mockUser, mockUserZkEvm, testConfig } from '../test/mocks';
 import { signTypedDataV4 } from './signTypedDataV4';
@@ -27,7 +27,7 @@ jest.mock('./signEjectionTransaction');
 jest.mock('./signTypedDataV4');
 
 describe('ZkEvmProvider', () => {
-  let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  let passportEventEmitter: PassportEventEmitter;
   const config = testConfig;
   const ethSigner = {};
   const authManager = {

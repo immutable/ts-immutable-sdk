@@ -1,7 +1,8 @@
 import { Environment, ModuleConfiguration } from '@imtbl/config';
-import { EthSigner, IMXClient, StarkSigner } from '@imtbl/x-client';
+import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
+import TypedEventEmitter from './utils/typedEventEmitter';
 
 export enum PassportEvents {
   LOGGED_OUT = 'loggedOut',
@@ -23,11 +24,18 @@ export interface PassportEventMap extends Record<string, any> {
   [PassportEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
 }
 
+export type PassportEventEmitter = TypedEventEmitter<PassportEventMap>;
+
 export type UserProfile = {
   email?: string;
   nickname?: string;
   sub: string;
 };
+
+export enum RollupType {
+  IMX = 'imx',
+  ZKEVM = 'zkEvm',
+}
 
 export type User = {
   idToken?: string;
@@ -35,12 +43,12 @@ export type User = {
   refreshToken?: string;
   profile: UserProfile;
   expired?: boolean;
-  imx?: {
+  [RollupType.IMX]?: {
     ethAddress: string;
     starkAddress: string;
     userAdminAddress: string;
   };
-  zkEvm?: {
+  [RollupType.ZKEVM]?: {
     ethAddress: string;
     userAdminAddress: string;
   };
@@ -120,11 +128,11 @@ export interface PassportModuleConfiguration
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
-export type UserImx = WithRequired<User, 'imx'>;
-export type UserZkEvm = WithRequired<User, 'zkEvm'>;
+export type UserImx = WithRequired<User, RollupType.IMX>;
+export type UserZkEvm = WithRequired<User, RollupType.ZKEVM>;
 
-export const isUserZkEvm = (user: User): user is UserZkEvm => !!user.zkEvm;
-export const isUserImx = (user: User): user is UserImx => !!user.imx;
+export const isUserZkEvm = (user: User): user is UserZkEvm => !!user[RollupType.ZKEVM];
+export const isUserImx = (user: User): user is UserImx => !!user[RollupType.IMX];
 
 export type DeviceTokenResponse = {
   access_token: string;

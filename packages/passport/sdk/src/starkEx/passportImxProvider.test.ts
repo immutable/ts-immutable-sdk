@@ -20,7 +20,7 @@ import { PassportImxProvider } from './passportImxProvider';
 import {
   batchNftTransfer, cancelOrder, createOrder, createTrade, exchangeTransfer, transfer,
 } from './workflows';
-import { PassportEventMap, PassportEvents } from '../types';
+import { PassportEventEmitter, PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
 import MagicAdapter from '../magic/magicAdapter';
@@ -77,7 +77,7 @@ describe('PassportImxProvider', () => {
 
   const getSignerMock = jest.fn();
 
-  let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  let passportEventEmitter: PassportEventEmitter;
 
   const imxApiClients = new ImxApiClients({} as any);
 

@@ -15,7 +15,7 @@ import AuthManager from '../authManager';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import {
-  PassportEventMap, PassportEvents, User, UserZkEvm,
+  PassportEventEmitter, PassportEvents, User, UserZkEvm,
 } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
@@ -33,7 +33,7 @@ export type ZkEvmProviderInput = {
   authManager: AuthManager;
   config: PassportConfiguration;
   multiRollupApiClients: MultiRollupApiClients;
-  passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  passportEventEmitter: PassportEventEmitter;
   guardianClient: GuardianClient;
   ethSigner: Signer;
   user: User | null;
@@ -122,19 +122,17 @@ export class ZkEvmProvider implements Provider {
     // we can submit a session activity request per SCW in parallel without a SCW
     // INVALID_NONCE error.
     const nonceSpace: bigint = BigInt(1);
-    const sendTransactionClosure = async (params: Array<any>, flow: Flow) => {
-      return await sendTransaction({
-        params,
-        ethSigner: this.#ethSigner,
-        guardianClient: this.#guardianClient,
-        rpcProvider: this.#rpcProvider,
-        relayerClient: this.#relayerClient,
-        zkEvmAddress,
-        flow,
-        nonceSpace,
-        isBackgroundTransaction: true,
-      });
-    };
+    const sendTransactionClosure = async (params: Array<any>, flow: Flow) => await sendTransaction({
+      params,
+      ethSigner: this.#ethSigner,
+      guardianClient: this.#guardianClient,
+      rpcProvider: this.#rpcProvider,
+      relayerClient: this.#relayerClient,
+      zkEvmAddress,
+      flow,
+      nonceSpace,
+      isBackgroundTransaction: true,
+    });
     this.#passportEventEmitter.emit(PassportEvents.ACCOUNTS_REQUESTED, {
       environment: this.#config.baseConfig.environment,
       sendTransaction: sendTransactionClosure,
@@ -222,17 +220,15 @@ export class ZkEvmProvider implements Provider {
           return await this.#guardianClient.withConfirmationScreen({
             width: 480,
             height: 720,
-          })(async () => {
-            return await sendTransaction({
-              params: request.params || [],
-              ethSigner: this.#ethSigner,
-              guardianClient: this.#guardianClient,
-              rpcProvider: this.#rpcProvider,
-              relayerClient: this.#relayerClient,
-              zkEvmAddress,
-              flow,
-            });
-          });
+          })(async () => await sendTransaction({
+            params: request.params || [],
+            ethSigner: this.#ethSigner,
+            guardianClient: this.#guardianClient,
+            rpcProvider: this.#rpcProvider,
+            relayerClient: this.#relayerClient,
+            zkEvmAddress,
+            flow,
+          }));
         } catch (error) {
           if (error instanceof Error) {
             trackError('passport', 'eth_sendTransaction', error, { flowId: flow.details.flowId });
@@ -319,17 +315,15 @@ export class ZkEvmProvider implements Provider {
           return await this.#guardianClient.withConfirmationScreen({
             width: 480,
             height: 720,
-          })(async () => {
-            return await signTypedDataV4({
-              method: request.method,
-              params: request.params || [],
-              ethSigner: this.#ethSigner,
-              rpcProvider: this.#rpcProvider,
-              relayerClient: this.#relayerClient,
-              guardianClient: this.#guardianClient,
-              flow,
-            });
-          });
+          })(async () => await signTypedDataV4({
+            method: request.method,
+            params: request.params || [],
+            ethSigner: this.#ethSigner,
+            rpcProvider: this.#rpcProvider,
+            relayerClient: this.#relayerClient,
+            guardianClient: this.#guardianClient,
+            flow,
+          }));
         } catch (error) {
           if (error instanceof Error) {
             trackError('passport', 'eth_signTypedData', error, { flowId: flow.details.flowId });
