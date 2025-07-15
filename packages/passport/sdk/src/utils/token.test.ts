@@ -2,7 +2,7 @@ import encode from 'jwt-encode';
 import {
   User as OidcUser,
 } from 'oidc-client-ts';
-import { isIdTokenExpired, isAccessTokenExpiredOrExpiring } from './token';
+import { isAccessTokenExpiredOrExpiring } from './token';
 
 const now = Math.floor(Date.now() / 1000);
 const oneHourLater = now + 3600;
@@ -23,20 +23,6 @@ export const mockValidIdToken = encode({
 const mockFreshAccessToken = encode({
   exp: fortyFiveSecondsLater, // Expires in 45 seconds (outside 30-second buffer)
 }, 'secret');
-
-describe('isIdTokenExpired', () => {
-  it('should return false if idToken is undefined', () => {
-    expect(isIdTokenExpired(undefined)).toBe(false);
-  });
-
-  it('should return true if idToken is expired', () => {
-    expect(isIdTokenExpired(mockExpiredIdToken)).toBe(true);
-  });
-
-  it('should return false if idToken is not expired', () => {
-    expect(isIdTokenExpired(mockValidIdToken)).toBe(false);
-  });
-});
 
 describe('isAccessTokenExpiredOrExpiring', () => {
   it('should return true if access token is missing', () => {
@@ -86,6 +72,19 @@ describe('isAccessTokenExpiredOrExpiring', () => {
   it('should return true if access token is valid but id token is expired', () => {
     const user = {
       id_token: mockExpiredIdToken,
+      access_token: mockFreshAccessToken,
+    } as unknown as OidcUser;
+    expect(isAccessTokenExpiredOrExpiring(user)).toBe(true);
+  });
+
+  it('should return true if access token is valid but id token is expiring within 30 seconds', () => {
+    const expiringIdToken = encode({
+      iat: now,
+      exp: now + 15, // Expires in 15 seconds
+    }, 'secret');
+
+    const user = {
+      id_token: expiringIdToken,
       access_token: mockFreshAccessToken,
     } as unknown as OidcUser;
     expect(isAccessTokenExpiredOrExpiring(user)).toBe(true);

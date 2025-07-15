@@ -4,14 +4,23 @@ import {
 } from 'oidc-client-ts';
 import { IdTokenPayload, TokenPayload } from '../types';
 
-export function isIdTokenExpired(idToken: string | undefined): boolean {
-  if (!idToken) {
-    return false;
-  }
+function isTokenExpiredOrExpiring(token: string): boolean {
+  try {
+    // try to decode the token as access token payload or id token payload
+    const decodedToken = jwt_decode<TokenPayload | IdTokenPayload>(token);
+    const now = Math.floor(Date.now() / 1000);
 
-  const decodedToken = jwt_decode<IdTokenPayload>(idToken);
-  const now = Math.floor(Date.now() / 1000);
-  return decodedToken.exp < now;
+    // Tokens without expiration claims are invalid (security vulnerability)
+    if (!decodedToken.exp) {
+      return true;
+    }
+
+    // Check if token is expired or expiring in 30 seconds or less
+    return decodedToken.exp <= now + 30;
+  } catch (error) {
+    // If we can't decode the token, assume it's invalid
+    return true;
+  }
 }
 
 export function isAccessTokenExpiredOrExpiring(oidcUser: OidcUser): boolean {
@@ -22,24 +31,11 @@ export function isAccessTokenExpiredOrExpiring(oidcUser: OidcUser): boolean {
     return true;
   }
 
-  // Decode the access token to check its expiration
-  try {
-    const decodedAccessToken = jwt_decode<TokenPayload>(accessToken);
-    const now = Math.floor(Date.now() / 1000);
-
-    // Access tokens without expiration claims are invalid (security vulnerability)
-    if (!decodedAccessToken.exp) {
-      return true;
-    }
-
-    // Check if access token is expired or expiring in 30 seconds or less
-    if (decodedAccessToken.exp <= now + 30) {
-      return true;
-    }
-  } catch (error) {
-    // If we can't decode the access token, assume it's invalid
+  // Check if access token is expired or expiring
+  if (isTokenExpiredOrExpiring(accessToken)) {
     return true;
   }
 
-  return isIdTokenExpired(idToken);
+  // Check if ID token is expired or expiring
+  return isTokenExpiredOrExpiring(idToken);
 }
