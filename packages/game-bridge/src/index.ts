@@ -42,6 +42,7 @@ const PASSPORT_FUNCTIONS = {
   getEmail: 'getEmail',
   getPassportId: 'getPassportId',
   getLinkedAddresses: 'getLinkedAddresses',
+  storeTokens: 'storeTokens',
   imx: {
     getAddress: 'getAddress',
     isRegisteredOffchain: 'isRegisteredOffchain',
@@ -450,6 +451,19 @@ window.callFunction = async (jsonData: string) => {
           success,
           error: null,
           result: idToken,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.storeTokens: {
+        const tokenResponse = JSON.parse(data);
+        const profile = await getPassportClient().storeTokens(tokenResponse);
+        identify({ passportId: profile.sub });
+        trackDuration(moduleName, 'performedStoreTokens', mt(markStart));
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          error: null,
         });
         break;
       }
