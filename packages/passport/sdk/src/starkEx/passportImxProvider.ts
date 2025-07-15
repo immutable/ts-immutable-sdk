@@ -99,12 +99,10 @@ export class PassportImxProvider implements IMXProvider {
    *
    */
   #initialiseSigner() {
-    const generateSigners = async (): Promise<StarkSigner> => getStarkSigner(this.magicTEESigner);
-
     // eslint-disable-next-line no-async-promise-executor
     this.starkSigner = new Promise(async (resolve) => {
       try {
-        resolve(await generateSigners());
+        resolve(await getStarkSigner(this.magicTEESigner));
       } catch (err) {
         // Capture and store the initialization error
         this.signerInitialisationError = err;

@@ -35,9 +35,8 @@ export default class MagicTEESigner extends AbstractSigner {
       userWallet = await this.createWallet();
     }
 
-    const user = await this.getUserOrThrow();
-
     // Check if the user has changed since the last createWallet request was made. If so, initialise the new user's wallet.
+    const user = await this.getUserOrThrow();
     if (user.profile.sub !== userWallet.userIdentifier) {
       userWallet = await this.createWallet();
     }
@@ -148,6 +147,8 @@ export default class MagicTEESigner extends AbstractSigner {
     const messageToSign = message instanceof Uint8Array ? `0x${Buffer.from(message).toString('hex')}` : message;
     const user = await this.getUserOrThrow();
     const headers = await MagicTEESigner.getHeaders(user);
+
+    console.log('messageToSign', messageToSign);
 
     return withMetricsAsync(async (flow: Flow) => {
       try {
