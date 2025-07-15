@@ -692,4 +692,183 @@ describe('AuthManager', () => {
       });
     });
   });
+
+  describe('getPKCEAuthorizationUrl', () => {
+    beforeEach(() => {
+      // Mock crypto.getRandomValues for PKCE verifier and state generation
+      const mockArrayBuffer = new ArrayBuffer(32);
+      const mockUint8Array = new Uint8Array([
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+        17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+      ]);
+      Object.defineProperty(window, 'crypto', {
+        value: {
+          getRandomValues: jest.fn().mockReturnValue(mockUint8Array),
+          subtle: {
+            digest: jest.fn().mockResolvedValue(mockArrayBuffer),
+          },
+        },
+        writable: true,
+      });
+
+      // Mock TextEncoder
+      global.TextEncoder = jest.fn().mockImplementation(() => ({
+        encode: jest.fn().mockReturnValue(mockUint8Array),
+      }));
+
+      // Mock btoa function used in base64URLEncode
+      global.btoa = jest.fn().mockReturnValue('bW9ja2VkLWJhc2U2NC1zdHJpbmc=');
+    });
+
+    it('should generate a PKCE authorization URL with required parameters', async () => {
+      const result = await authManager.getPKCEAuthorizationUrl();
+      const url = new URL(result);
+
+      expect(url.hostname).toEqual(authenticationDomain);
+      expect(url.pathname).toEqual('/authorize');
+      expect(url.searchParams.get('response_type')).toEqual('code');
+      expect(url.searchParams.get('code_challenge_method')).toEqual('S256');
+      expect(url.searchParams.get('client_id')).toEqual(clientId);
+      expect(url.searchParams.get('redirect_uri')).toEqual(redirectUri);
+      expect(url.searchParams.get('scope')).toEqual('email profile');
+      expect(url.searchParams.get('code_challenge')).toEqual('bW9ja2VkLWJhc2U2NC1zdHJpbmc');
+      expect(url.searchParams.get('state')).toEqual('bW9ja2VkLWJhc2U2NC1zdHJpbmc');
+    });
+
+    it('should not include direct parameter when directLoginMethod is not provided', async () => {
+      const result = await authManager.getPKCEAuthorizationUrl();
+      const url = new URL(result);
+
+      expect(url.searchParams.get('direct')).toBeNull();
+    });
+
+    it('should include direct parameter when directLoginMethod is provided', async () => {
+      const directLoginMethod = 'apple';
+      const result = await authManager.getPKCEAuthorizationUrl(directLoginMethod);
+      const url = new URL(result);
+
+      expect(url.searchParams.get('direct')).toEqual('apple');
+    });
+
+    it('should include direct parameter for google login method', async () => {
+      const directLoginMethod = 'google';
+      const result = await authManager.getPKCEAuthorizationUrl(directLoginMethod);
+      const url = new URL(result);
+
+      expect(url.searchParams.get('direct')).toEqual('google');
+    });
+
+    it('should include direct parameter for facebook login method', async () => {
+      const directLoginMethod = 'facebook';
+      const result = await authManager.getPKCEAuthorizationUrl(directLoginMethod);
+      const url = new URL(result);
+
+      expect(url.searchParams.get('direct')).toEqual('facebook');
+    });
+
+    it('should include audience parameter when specified in config', async () => {
+      const configWithAudience = getConfig({ audience: 'test-audience' });
+      const am = new AuthManager(configWithAudience);
+
+      const result = await am.getPKCEAuthorizationUrl();
+      const url = new URL(result);
+
+      expect(url.searchParams.get('audience')).toEqual('test-audience');
+    });
+
+    it('should include both direct and audience parameters', async () => {
+      const configWithAudience = getConfig({ audience: 'test-audience' });
+      const am = new AuthManager(configWithAudience);
+
+      const result = await am.getPKCEAuthorizationUrl('apple');
+      const url = new URL(result);
+
+      expect(url.searchParams.get('direct')).toEqual('apple');
+      expect(url.searchParams.get('audience')).toEqual('test-audience');
+    });
+  });
+
+  describe('login with directLoginMethod', () => {
+    it('should pass directLoginMethod to login popup', async () => {
+      mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+      await authManager.login('anonymous-id', 'apple');
+
+      expect(mockSigninPopup).toHaveBeenCalledWith({
+        extraQueryParams: {
+          rid: '',
+          third_party_a_id: 'anonymous-id',
+          direct: 'apple',
+        },
+        popupWindowFeatures: {
+          width: 410,
+          height: 450,
+        },
+        popupWindowTarget: 'passportLoginPrompt',
+      });
+    });
+
+    it('should not include direct parameter when directLoginMethod is not provided', async () => {
+      mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+      await authManager.login('anonymous-id');
+
+      expect(mockSigninPopup).toHaveBeenCalledWith({
+        extraQueryParams: {
+          rid: '',
+          third_party_a_id: 'anonymous-id',
+        },
+        popupWindowFeatures: {
+          width: 410,
+          height: 450,
+        },
+        popupWindowTarget: 'passportLoginPrompt',
+      });
+    });
+  });
+
+  describe('loginWithRedirect with directLoginMethod', () => {
+    let mockSigninRedirect: jest.Mock;
+
+    beforeEach(() => {
+      mockSigninRedirect = jest.fn();
+      (UserManager as jest.Mock).mockReturnValue({
+        signinPopup: mockSigninPopup,
+        signinCallback: mockSigninCallback,
+        signinRedirectCallback: mockSigninRedirectCallback,
+        signoutRedirect: mockSignoutRedirect,
+        signoutSilent: mockSignoutSilent,
+        getUser: mockGetUser,
+        signinSilent: mockSigninSilent,
+        storeUser: mockStoreUser,
+        revokeTokens: mockRevokeTokens,
+        signinRedirect: mockSigninRedirect,
+        clearStaleState: jest.fn(),
+      });
+      authManager = new AuthManager(getConfig());
+    });
+
+    it('should pass directLoginMethod to redirect login', async () => {
+      await authManager.loginWithRedirect('anonymous-id', 'google');
+
+      expect(mockSigninRedirect).toHaveBeenCalledWith({
+        extraQueryParams: {
+          rid: '',
+          third_party_a_id: 'anonymous-id',
+          direct: 'google',
+        },
+      });
+    });
+
+    it('should not include direct parameter when directLoginMethod is not provided', async () => {
+      await authManager.loginWithRedirect('anonymous-id');
+
+      expect(mockSigninRedirect).toHaveBeenCalledWith({
+        extraQueryParams: {
+          rid: '',
+          third_party_a_id: 'anonymous-id',
+        },
+      });
+    });
+  });
 });
