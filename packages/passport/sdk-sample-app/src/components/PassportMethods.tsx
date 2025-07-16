@@ -11,8 +11,14 @@ function PassportMethods() {
   const { isLoading } = useStatusProvider();
   const {
     logout,
-    login,
     popupRedirect,
+    popupRedirectGoogle,
+    popupRedirectApple,
+    popupRedirectFacebook,
+    login,
+    loginGoogle,
+    loginApple,
+    loginFacebook,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -52,9 +58,45 @@ function PassportMethods() {
         </WorkflowButton>
         <WorkflowButton
           disabled={isLoading}
+          onClick={popupRedirectGoogle}
+        >
+          Popup Login (Google)
+        </WorkflowButton>
+        <WorkflowButton
+          disabled={isLoading}
+          onClick={popupRedirectApple}
+        >
+          Popup Login (Apple)
+        </WorkflowButton>
+        <WorkflowButton
+          disabled={isLoading}
+          onClick={popupRedirectFacebook}
+        >
+          Popup Login (Facebook)
+        </WorkflowButton>
+        <WorkflowButton
+          disabled={isLoading}
           onClick={login}
         >
           Login
+        </WorkflowButton>
+        <WorkflowButton
+          disabled={isLoading}
+          onClick={loginGoogle}
+        >
+          Login (Google)
+        </WorkflowButton>
+        <WorkflowButton
+          disabled={isLoading}
+          onClick={loginApple}
+        >
+          Login (Apple)
+        </WorkflowButton>
+        <WorkflowButton
+          disabled={isLoading}
+          onClick={loginFacebook}
+        >
+          Login (Facebook)
         </WorkflowButton>
         <WorkflowButton
           disabled={isLoading}

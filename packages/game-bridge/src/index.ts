@@ -233,7 +233,6 @@ window.callFunction = async (jsonData: string) => {
               scope,
               crossSdkBridgeEnabled: true,
               logoutMode,
-              extraQueryParams: request.extraQueryParams,
               overrides: {
                 authenticationDomain: 'https://auth.dev.immutable.com',
                 magicPublishableApiKey: 'pk_live_4058236363130CA9', // Public key
@@ -269,7 +268,6 @@ window.callFunction = async (jsonData: string) => {
               crossSdkBridgeEnabled: true,
               jsonRpcReferrer: 'http://imtblgamesdk.local',
               logoutMode,
-              extraQueryParams: request.extraQueryParams,
             };
           }
 
@@ -351,7 +349,9 @@ window.callFunction = async (jsonData: string) => {
         break;
       }
       case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
-        const url = await getPassportClient().loginWithPKCEFlow();
+        const request = data ? JSON.parse(data) : {};
+        const directLoginMethod = request?.directLoginMethod;
+        const url = await getPassportClient().loginWithPKCEFlow(directLoginMethod);
         trackDuration(moduleName, 'performedGetPkceAuthUrl', mt(markStart));
         callbackToGame({
           responseFor: fxName,

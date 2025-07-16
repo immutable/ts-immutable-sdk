@@ -15,6 +15,7 @@ import MagicAdapter from './magic/magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
+  DirectLoginMethod,
   isUserImx,
   isUserZkEvm,
   LinkedWallet,
@@ -189,6 +190,8 @@ export class Passport {
    * @param {string} [options.anonymousId] - ID used to enrich Passport internal metrics
    * @param {boolean} [options.useSilentLogin] - If true, attempts silent authentication without user interaction.
    *                                            Note: This takes precedence over useCachedSession if both are true
+   * @param {boolean} [options.useRedirectFlow] - If true, uses redirect flow instead of popup flow
+   * @param {DirectLoginMethod} [options.directLoginMethod] - If provided, directly redirects to the specified login method
    * @returns {Promise<UserProfile | null>} A promise that resolves to the user profile if logged in, null otherwise
    * @throws {Error} If retrieving the cached user session fails (except for "Unknown or invalid refresh token" errors)
    *                and useCachedSession is true
@@ -198,6 +201,7 @@ export class Passport {
     anonymousId?: string;
     useSilentLogin?: boolean;
     useRedirectFlow?: boolean;
+    directLoginMethod?: DirectLoginMethod;
   }): Promise<UserProfile | null> {
     // If there's already a login in progress, return that promise
     if (this.#loginPromise) {
@@ -225,9 +229,9 @@ export class Passport {
         user = await this.authManager.forceUserRefresh();
       } else if (!user && !useCachedSession) {
         if (options?.useRedirectFlow) {
-          await this.authManager.loginWithRedirect(options?.anonymousId);
+          await this.authManager.loginWithRedirect(options?.anonymousId, options?.directLoginMethod);
         } else {
-          user = await this.authManager.login(options?.anonymousId);
+          user = await this.authManager.login(options?.anonymousId, options?.directLoginMethod);
         }
       }
 
@@ -268,10 +272,11 @@ export class Passport {
 
   /**
    * Initiates a PKCE flow login.
+   * @param {DirectLoginMethod} [directLoginMethod] - If provided, directly redirects to the specified login method
    * @returns {string} The authorization URL for the PKCE flow
    */
-  public loginWithPKCEFlow(): Promise<string> {
-    return withMetricsAsync(async () => await this.authManager.getPKCEAuthorizationUrl(), 'loginWithPKCEFlow');
+  public loginWithPKCEFlow(directLoginMethod?: DirectLoginMethod): Promise<string> {
+    return withMetricsAsync(async () => await this.authManager.getPKCEAuthorizationUrl(directLoginMethod), 'loginWithPKCEFlow');
   }
 
   /**
