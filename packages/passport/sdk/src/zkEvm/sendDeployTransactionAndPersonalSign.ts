@@ -7,30 +7,30 @@ type EthSendDeployTransactionParams = TransactionParams & {
 
 export const sendDeployTransactionAndPersonalSign = async ({
   params,
-  ethSigner,
+  magicTeeAdapter,
   rpcProvider,
   relayerClient,
   guardianClient,
-  zkEvmAddress,
+  zkEvmAddresses,
   flow,
 }: EthSendDeployTransactionParams): Promise<string> => {
-  const deployTransaction = { to: zkEvmAddress, value: 0 };
+  const deployTransaction = { to: zkEvmAddresses.ethAddress, value: 0 };
 
   const { relayerId } = await prepareAndSignTransaction({
     transactionRequest: deployTransaction,
-    ethSigner,
+    magicTeeAdapter,
     rpcProvider,
     guardianClient,
     relayerClient,
-    zkEvmAddress,
+    zkEvmAddresses,
     flow,
   });
 
   return guardianClient.withConfirmationScreen()(async () => {
     const signedMessage = await personalSign({
       params,
-      ethSigner,
-      zkEvmAddress,
+      magicTeeAdapter,
+      zkEvmAddresses,
       rpcProvider,
       guardianClient,
       relayerClient,

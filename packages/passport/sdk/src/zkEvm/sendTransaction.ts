@@ -6,11 +6,11 @@ type EthSendTransactionParams = TransactionParams & {
 
 export const sendTransaction = async ({
   params,
-  ethSigner,
+  magicTeeAdapter,
   rpcProvider,
   relayerClient,
   guardianClient,
-  zkEvmAddress,
+  zkEvmAddresses,
   flow,
   nonceSpace,
   isBackgroundTransaction = false,
@@ -19,11 +19,11 @@ export const sendTransaction = async ({
 
   const { relayerId } = await prepareAndSignTransaction({
     transactionRequest,
-    ethSigner,
+    magicTeeAdapter,
     rpcProvider,
     guardianClient,
     relayerClient,
-    zkEvmAddress,
+    zkEvmAddresses,
     flow,
     nonceSpace,
     isBackgroundTransaction,

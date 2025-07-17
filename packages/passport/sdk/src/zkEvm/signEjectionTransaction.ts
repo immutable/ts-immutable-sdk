@@ -12,8 +12,8 @@ type EthSendTransactionEjectionParams = EjectionTransactionParams & {
 
 export const signEjectionTransaction = async ({
   params,
-  ethSigner,
-  zkEvmAddress,
+  magicTeeAdapter,
+  zkEvmAddresses,
   flow,
 }: EthSendTransactionEjectionParams): Promise<EjectionTransactionResponse> => {
   if (!params || params.length !== 1) {
@@ -26,8 +26,8 @@ export const signEjectionTransaction = async ({
   const transactionRequest = params[0] as TransactionRequest;
   return await prepareAndSignEjectionTransaction({
     transactionRequest,
-    ethSigner,
-    zkEvmAddress,
+    magicTeeAdapter,
+    zkEvmAddresses,
     flow,
   });
 };
