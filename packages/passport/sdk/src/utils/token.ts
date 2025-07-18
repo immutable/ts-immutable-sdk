@@ -26,16 +26,10 @@ function isTokenExpiredOrExpiring(token: string): boolean {
 export function isAccessTokenExpiredOrExpiring(oidcUser: OidcUser): boolean {
   const { id_token: idToken, access_token: accessToken } = oidcUser;
 
-  // Handle missing tokens - assume they need to login again
   if (!accessToken || !idToken) {
     return true;
   }
 
-  // Check if access token is expired or expiring
-  if (isTokenExpiredOrExpiring(accessToken)) {
-    return true;
-  }
-
-  // Check if ID token is expired or expiring
-  return isTokenExpiredOrExpiring(idToken);
+  // Check if either token is expired or expiring
+  return isTokenExpiredOrExpiring(accessToken) || isTokenExpiredOrExpiring(idToken);
 }
