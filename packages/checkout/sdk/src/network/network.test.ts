@@ -52,6 +52,13 @@ const unrecognisedChainError = {
   },
 };
 
+const anotherUnrecognisedChainError = {
+  error: {
+    message: 'Provider error',
+    code: 4902,
+  },
+};
+
 jest.mock('../api/http', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   HttpClient: jest.fn().mockImplementation(() => ({
@@ -300,6 +307,54 @@ describe('network functions', () => {
           send: jest
             .fn()
             .mockRejectedValueOnce(unrecognisedChainError)
+            .mockResolvedValueOnce({}),
+          ethereumProvider: {
+            isMetaMask: true,
+          },
+          getNetwork: jest.fn().mockResolvedValue(zkevmNetworkInfo),
+        })
+        .mockReturnValueOnce({
+          send: jest.fn().mockResolvedValueOnce({}),
+          ethereumProvider: {
+            isMetaMask: true,
+          },
+          getNetwork: jest.fn().mockResolvedValue(zkevmNetworkInfo),
+        });
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
+
+      await switchWalletNetwork(
+        testCheckoutConfiguration,
+        provider,
+        ChainId.IMTBL_ZKEVM_TESTNET,
+      );
+
+      expect(provider.send).toHaveBeenCalledWith(WalletAction.ADD_NETWORK, [
+        {
+          chainId: testCheckoutConfiguration.networkMap.get(
+            ChainId.IMTBL_ZKEVM_TESTNET,
+          )?.chainIdHex,
+          chainName: testCheckoutConfiguration.networkMap.get(
+            ChainId.IMTBL_ZKEVM_TESTNET,
+          )?.chainName,
+          rpcUrls: testCheckoutConfiguration.networkMap.get(
+            ChainId.IMTBL_ZKEVM_TESTNET,
+          )?.rpcUrls,
+          nativeCurrency: testCheckoutConfiguration.networkMap.get(
+            ChainId.IMTBL_ZKEVM_TESTNET,
+          )?.nativeCurrency,
+          blockExplorerUrls: testCheckoutConfiguration.networkMap.get(
+            ChainId.IMTBL_ZKEVM_TESTNET,
+          )?.blockExplorerUrls,
+        },
+      ]);
+    });
+
+    it('should request the user to add a new network when anotherUnrecognisedChainError is received', async () => {
+      (WrappedBrowserProvider as unknown as jest.Mock)
+        .mockReturnValueOnce({
+          send: jest
+            .fn()
+            .mockRejectedValueOnce(anotherUnrecognisedChainError)
             .mockResolvedValueOnce({}),
           ethereumProvider: {
             isMetaMask: true,
