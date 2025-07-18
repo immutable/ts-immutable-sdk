@@ -20,16 +20,7 @@ export default function ConnectWidget() {
   }, [environment]);
   const [provider, setProvider] = useState<WrappedBrowserProvider>();
 
-  function toggleEnvironment() {
-    if (environment === Environment.PRODUCTION) {
-      setEnvironment(Environment.SANDBOX);
-    } else {
-      setEnvironment(Environment.PRODUCTION);
-    }
-  }
-
-  console.log('qwerqewrqwer')
-  console.log(checkout.getInjectedProviders())
+  console.log('injected providers:', checkout.getInjectedProviders())
 
   return (
     <div>

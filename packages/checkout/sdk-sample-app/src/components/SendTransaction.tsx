@@ -43,11 +43,11 @@ export default function SendTransaction(props: SendTransactionProps) {
 
   async function sendTxClick() {
     if (!checkout) {
-      console.error('missing checkout, please connect frist');
+      console.error('missing checkout, please connect first');
       return;
     }
     if (!provider) {
-      console.error('missing provider, please connect frist');
+      console.error('missing provider, please connect first');
       return;
     }
 
