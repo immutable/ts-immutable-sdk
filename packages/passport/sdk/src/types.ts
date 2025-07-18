@@ -114,7 +114,7 @@ export interface PassportModuleConfiguration
   /**
    * This flag controls whether a deploy transaction is sent before signing an ERC191 message.
    *
-   * @default false - By default, this behavior is disabled and the user will not be asked
+   * @default true - By default, this behavior is enabled and the user will be asked
    * to approve a deploy transaction before signing.
    */
   forceScwDeployBeforeMessageSignature?: boolean;

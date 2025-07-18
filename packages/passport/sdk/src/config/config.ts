@@ -70,7 +70,7 @@ export class PassportConfiguration {
     this.oidcConfiguration = oidcConfiguration;
     this.baseConfig = baseConfig;
     this.crossSdkBridgeEnabled = crossSdkBridgeEnabled || false;
-    this.forceScwDeployBeforeMessageSignature = forceScwDeployBeforeMessageSignature || false;
+    this.forceScwDeployBeforeMessageSignature = forceScwDeployBeforeMessageSignature ?? true;
     this.popupOverlayOptions = popupOverlayOptions || {
       disableGenericPopupOverlay: false,
       disableBlockedPopupOverlay: false,
