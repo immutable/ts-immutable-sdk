@@ -13,7 +13,7 @@ import { getDetail, Detail } from '@imtbl/metrics';
 import localForage from 'localforage';
 import DeviceCredentialsManager from './storage/device_credentials_manager';
 import logger from './utils/logger';
-import { isTokenExpired } from './utils/token';
+import { isAccessTokenExpiredOrExpiring } from './utils/token';
 import { PassportError, PassportErrorType, withPassportError } from './errors/passportError';
 import {
   DirectLoginMethod,
@@ -475,13 +475,15 @@ export default class AuthManager {
     const oidcUser = await this.userManager.getUser();
     if (!oidcUser) return null;
 
-    if (!isTokenExpired(oidcUser)) {
+    // if the token is not expired or expiring in 30 seconds or less, return the user
+    if (!isAccessTokenExpiredOrExpiring(oidcUser)) {
       const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
       if (user && typeAssertion(user)) {
         return user;
       }
     }
 
+    // if the token is expired or expiring in 30 seconds or less, refresh the token
     if (oidcUser.refresh_token) {
       const user = await this.refreshTokenAndUpdatePromise();
       if (user && typeAssertion(user)) {
