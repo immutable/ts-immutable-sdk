@@ -28,7 +28,7 @@ For all IMX workflows, you are required to log in with Passport before you can i
 #### ZkEvm workflows
 
 All ZkEvm workflows except `eth_requestAccounts` and `eth_sendTransaction` do not require you to be logged in and can be executed without having a connected Passport wallet. Specifically for `eth_sendTransaction` however, you must call `eth_requestAccounts` first.
-Some function calls, such as `eth_gasPrice` and `eth_getBalance` will return a value prefixed by `0x` - these are in hexidecimal format and must be converted to base 10 if you are looking for the actual number.
+Some function calls, such as `eth_gasPrice` and `eth_getBalance` will return a value prefixed by `0x` - these are in hexadecimal format and must be converted to base 10 if you are looking for the actual number.
 
 #### Logging out
 
