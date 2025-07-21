@@ -15,6 +15,7 @@ import MagicAdapter from './magic/magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
+  DeviceTokenResponse,
   DirectLoginMethod,
   isUserImx,
   isUserZkEvm,
@@ -297,6 +298,14 @@ export class Passport {
       this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
       return user.profile;
     }, 'loginWithPKCEFlowCallback');
+  }
+
+  public async storeTokens(tokenResponse: DeviceTokenResponse): Promise<UserProfile> {
+    return withMetricsAsync(async () => {
+      const user = await this.authManager.storeTokens(tokenResponse);
+      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+      return user.profile;
+    }, 'storeTokens');
   }
 
   /**
