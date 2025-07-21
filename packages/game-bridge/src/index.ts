@@ -9,7 +9,18 @@ import {
   trackDuration,
   identify,
 } from '@imtbl/metrics';
-import { BrowserProvider } from 'ethers';
+// eslint-disable-next-line import/no-duplicates
+import * as ethers from 'ethers';
+// eslint-disable-next-line import/no-duplicates
+import { BrowserProvider, getAddress } from 'ethers';
+
+// This patches a bundler issue where @0xsequence/core expects
+// `ethers.getAddress` to exist on the `ethers` namespace, but Parcel
+// fails to attach it in a global build. This ensures the function is
+// available before any Passport code executes.
+if (typeof ethers === 'object' && !ethers.getAddress) {
+  (ethers as any).getAddress = getAddress;
+}
 
 /* eslint-disable no-undef */
 const scope = 'openid offline_access profile email transact';
