@@ -74,7 +74,7 @@ describe('Passport', () => {
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
       forceUserRefresh: forceUserRefreshMock,
     });
-    (MagicTEESigner as jest.Mock).mockReturnValue({
+    (MagicTEESigner as unknown as jest.Mock).mockReturnValue({
       getAddress: jest.fn().mockResolvedValue('0x123'),
       signMessage: jest.fn().mockResolvedValue('signature'),
     });
