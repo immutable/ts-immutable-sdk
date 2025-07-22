@@ -148,8 +148,6 @@ export default class MagicTEESigner extends AbstractSigner {
     const user = await this.getUserOrThrow();
     const headers = await MagicTEESigner.getHeaders(user);
 
-    console.log('messageToSign', messageToSign);
-
     return withMetricsAsync(async (flow: Flow) => {
       try {
         const startTime = performance.now();
