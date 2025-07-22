@@ -257,6 +257,8 @@ export function SaleContextProvider(props: {
         return;
       }
 
+      // For sale context, we don't have specific token/amount data at this point
+      // as it's determined during the sale flow, so we pass undefined for tokenData
       const assessment = await fetchRiskAssessment([address], checkout.config);
       setRiskAssessment(assessment);
     })();

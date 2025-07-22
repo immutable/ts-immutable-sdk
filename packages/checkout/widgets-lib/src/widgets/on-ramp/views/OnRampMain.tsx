@@ -231,7 +231,14 @@ export function OnRampMain({
     (async () => {
       const walletAddress = await (await provider.getSigner()).getAddress();
 
-      const assessment = await fetchRiskAssessment([walletAddress], checkout.config);
+      // Prepare token data for v2 API if available
+      const tokenData = tokenAddress && tokenAmount ? [{
+        address: walletAddress,
+        tokenAddr: tokenAddress,
+        amount: tokenAmount,
+      }] : undefined;
+
+      const assessment = await fetchRiskAssessment([walletAddress], checkout.config, tokenData);
 
       if (isAddressSanctioned(assessment)) {
         viewDispatch({

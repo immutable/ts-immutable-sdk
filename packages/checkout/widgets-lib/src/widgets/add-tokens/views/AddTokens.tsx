@@ -425,7 +425,15 @@ export function AddTokens({
   const sendRequestOnRampEvent = async () => {
     if (
       toAddress
-      && (await checkSanctionedAddresses([toAddress], checkout.config))
+      && (await checkSanctionedAddresses(
+        [toAddress], 
+        checkout.config,
+        selectedToken?.address && selectedAmount ? [{
+          address: toAddress,
+          tokenAddr: selectedToken.address,
+          amount: selectedAmount,
+        }] : undefined,
+      ))
     ) {
       viewDispatch({
         payload: {
@@ -502,6 +510,18 @@ export function AddTokens({
       && (await checkSanctionedAddresses(
         [fromAddress, toAddress],
         checkout.config,
+        selectedToken?.address && selectedAmount ? [
+          {
+            address: fromAddress,
+            tokenAddr: selectedToken.address,
+            amount: selectedAmount,
+          },
+          {
+            address: toAddress,
+            tokenAddr: selectedToken.address,
+            amount: selectedAmount,
+          },
+        ] : undefined,
       ))
     ) {
       viewDispatch({

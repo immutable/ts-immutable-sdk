@@ -205,7 +205,14 @@ export default function SwapWidget({
         return;
       }
 
-      const assessment = await fetchRiskAssessment([address], checkout.config);
+      // Prepare token data for v2 API if available
+      const tokenData = fromTokenAddress && amount ? [{
+        address,
+        tokenAddr: fromTokenAddress,
+        amount,
+      }] : undefined;
+
+      const assessment = await fetchRiskAssessment([address], checkout.config, tokenData);
       swapDispatch({
         payload: {
           type: SwapActions.SET_RISK_ASSESSMENT,
