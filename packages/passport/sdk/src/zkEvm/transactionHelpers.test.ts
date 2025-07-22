@@ -308,11 +308,11 @@ describe('transactionHelpers', () => {
 
       await expect(prepareAndSignTransaction({
         transactionRequest,
-        ethSigner,
+        ethSigner: magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddress,
+        zkEvmAddress: zkEvmAddresses.ethAddress,
         flow,
       })).rejects.toThrow('Invalid fee options received from relayer');
     });
@@ -322,11 +322,11 @@ describe('transactionHelpers', () => {
 
       await expect(prepareAndSignTransaction({
         transactionRequest,
-        ethSigner,
+        ethSigner: magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddress,
+        zkEvmAddress: zkEvmAddresses.ethAddress,
         flow,
       })).rejects.toThrow('Invalid fee options received from relayer');
     });
@@ -336,11 +336,11 @@ describe('transactionHelpers', () => {
 
       await expect(prepareAndSignTransaction({
         transactionRequest,
-        ethSigner,
+        ethSigner: magicTeeAdapter,
         rpcProvider,
         guardianClient,
         relayerClient,
-        zkEvmAddress,
+        zkEvmAddress: zkEvmAddresses.ethAddress,
         flow,
       })).rejects.toThrow('Invalid fee options received from relayer');
     });
