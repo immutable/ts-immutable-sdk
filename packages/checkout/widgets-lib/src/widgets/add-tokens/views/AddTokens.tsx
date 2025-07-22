@@ -426,7 +426,7 @@ export function AddTokens({
     if (
       toAddress
       && (await checkSanctionedAddresses(
-        [toAddress], 
+        [toAddress],
         checkout.config,
         selectedToken?.address && selectedAmount ? [{
           address: toAddress,

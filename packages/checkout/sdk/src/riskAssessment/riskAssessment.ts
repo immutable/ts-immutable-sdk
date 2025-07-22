@@ -52,16 +52,16 @@ export const fetchRiskAssessment = async (
     // Prepare v2 request payload
     const requestPayload: SanctionsCheckV2RequestItem[] = addresses.map((address) => {
       const item: SanctionsCheckV2RequestItem = { address };
-      
+
       // Add token and amount data if available
       if (tokenData) {
-        const tokenInfo = tokenData.find(t => t.address.toLowerCase() === address.toLowerCase());
+        const tokenInfo = tokenData.find((t) => t.address.toLowerCase() === address.toLowerCase());
         if (tokenInfo) {
           if (tokenInfo.tokenAddr) item.token_addr = tokenInfo.tokenAddr;
           if (tokenInfo.amount) item.amount = tokenInfo.amount;
         }
       }
-      
+
       return item;
     });
 
