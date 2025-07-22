@@ -455,8 +455,7 @@ describe('AuthManager', () => {
             PassportErrorType.LOGOUT_ERROR,
           ),
         );
-        // In silent mode, signoutSilent is called in parallel with revokeTokens
-        expect(mockSignoutSilent).toHaveBeenCalled();
+        expect(mockSignoutSilent).not.toHaveBeenCalled();
       });
     });
 
