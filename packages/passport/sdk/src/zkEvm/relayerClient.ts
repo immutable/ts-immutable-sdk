@@ -51,7 +51,7 @@ type ImGetFeeOptionsRequest = {
 };
 
 type ImGetFeeOptionsResponse = JsonRpc & {
-  result: FeeOption[]
+  result: FeeOption[] | undefined
 };
 
 // ImSign types
@@ -126,19 +126,23 @@ export class RelayerClient {
       body: JSON.stringify(body),
     });
 
+    const responseText = await response.text();
+
     if (!response.ok) {
-      const responseText = await response.text();
       const preview = RelayerClient.getResponsePreview(responseText);
       throw new Error(`Relayer HTTP error: ${response.status}. Content: "${preview}"`);
     }
 
-    const responseText = await response.text();
     let jsonResponse;
     try {
       jsonResponse = JSON.parse(responseText);
     } catch (parseError) {
       const preview = RelayerClient.getResponsePreview(responseText);
       throw new Error(`Relayer JSON parse error: ${parseError instanceof Error ? parseError.message : 'Unknown error'}. Content: "${preview}"`);
+    }
+
+    if (jsonResponse.error) {
+      throw new Error(jsonResponse.error);
     }
 
     return jsonResponse;
@@ -167,7 +171,7 @@ export class RelayerClient {
     return result;
   }
 
-  public async imGetFeeOptions(userAddress: string, data: BytesLike): Promise<FeeOption[]> {
+  public async imGetFeeOptions(userAddress: string, data: BytesLike): Promise<FeeOption[] | undefined> {
     const { chainId } = await this.rpcProvider.getNetwork();
     const payload: ImGetFeeOptionsRequest = {
       method: 'im_getFeeOptions',

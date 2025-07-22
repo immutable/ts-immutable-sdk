@@ -49,11 +49,11 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
 
   const switchNetwork = useCallback(async(chainId: ChainId) => {
     if (!checkout) {
-      console.error('missing checkout, please connect frist');
+      console.error('missing checkout, please connect first');
       return;
     }
     if (!provider) {
-      console.error('missing provider, please connect frist');
+      console.error('missing provider, please connect first');
       return;
     }
 
@@ -81,11 +81,11 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
 
   async function getNetworkInfo() {
     if (!checkout) {
-      console.error('missing checkout, please connect frist');
+      console.error('missing checkout, please connect first');
       return;
     }
     if (!provider) {
-      console.error('missing provider, please connect frist');
+      console.error('missing provider, please connect first');
       return;
     }
 

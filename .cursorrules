@@ -1,0 +1,56 @@
+# Cursor Rules for Immutable SDK
+
+## Conventional Commits
+
+Always use conventional commit format for all commits and PR titles:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+### Types
+- **feat**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation only changes
+- **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **perf**: A code change that improves performance
+- **test**: Adding missing tests or correcting existing tests
+- **build**: Changes that affect the build system or external dependencies
+- **ci**: Changes to CI configuration files and scripts
+- **chore**: Other changes that don't modify src or test files
+- **revert**: Reverts a previous commit
+
+### Scope Guidelines
+- **IMPORTANT**: Scopes should match the names of packages in the repo (without the `@imtbl/` prefix)
+- Examples of valid scopes: `checkout-widgets`, `passport`, `config`, `blockchain-data`, etc.
+- Find the correct scope by checking the package.json `name` field in the relevant package directory
+- Use the full package name after `@imtbl/` (e.g., if package is `@imtbl/checkout-widgets`, use `checkout-widgets`)
+
+### Examples
+- `feat(checkout-widgets): update price impact warning message`
+- `fix(passport): resolve token validation error`
+- `docs(config): add installation instructions`
+- `refactor(blockchain-data): simplify token formatting logic`
+
+### PR Title Guidelines
+- Use the same conventional commit format for PR titles
+- Keep titles under 50 characters when possible
+- Use lowercase for the description
+- Be descriptive but concise
+- **ALWAYS** include the scope matching the package name (without `@imtbl/` prefix)
+
+### Commit Message Guidelines
+- Use imperative mood in the subject line ("add" not "added" or "adding")
+- Capitalize the first letter of the description
+- Do not end the subject line with a period
+- Limit the subject line to 50 characters
+- Separate subject from body with a blank line
+- Use the body to explain what and why vs. how
+- Wrap the body at 72 characters
+
+When creating PRs, always follow this conventional commit style for both the commit messages and PR titles.

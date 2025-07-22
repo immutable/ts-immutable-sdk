@@ -3,6 +3,13 @@ import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
 
+/**
+ * Direct login method identifier
+ * Known providers: 'google', 'apple', 'facebook'
+ * Additional providers may be supported server-side
+ */
+export type DirectLoginMethod = string;
+
 export enum PassportEvents {
   LOGGED_OUT = 'loggedOut',
   LOGGED_IN = 'loggedIn',
@@ -116,11 +123,6 @@ export interface PassportModuleConfiguration
    * to approve a deploy transaction before signing.
    */
   forceScwDeployBeforeMessageSignature?: boolean;
-
-  /**
-   * Extra query params to be sent to the OIDC provider.
-   */
-  extraQueryParams?: Record<string, string>;
 }
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };

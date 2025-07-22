@@ -9,7 +9,18 @@ import {
   trackDuration,
   identify,
 } from '@imtbl/metrics';
-import { BrowserProvider } from 'ethers';
+// eslint-disable-next-line import/no-duplicates
+import * as ethers from 'ethers';
+// eslint-disable-next-line import/no-duplicates
+import { BrowserProvider, getAddress } from 'ethers';
+
+// This patches a bundler issue where @0xsequence/core expects
+// `ethers.getAddress` to exist on the `ethers` namespace, but Parcel
+// fails to attach it in a global build. This ensures the function is
+// available before any Passport code executes.
+if (typeof ethers === 'object' && !ethers.getAddress) {
+  (ethers as any).getAddress = getAddress;
+}
 
 /* eslint-disable no-undef */
 const scope = 'openid offline_access profile email transact';
@@ -233,7 +244,6 @@ window.callFunction = async (jsonData: string) => {
               scope,
               crossSdkBridgeEnabled: true,
               logoutMode,
-              extraQueryParams: request.extraQueryParams,
               overrides: {
                 authenticationDomain: 'https://auth.dev.immutable.com',
                 magicPublishableApiKey: 'pk_live_4058236363130CA9', // Public key
@@ -269,7 +279,6 @@ window.callFunction = async (jsonData: string) => {
               crossSdkBridgeEnabled: true,
               jsonRpcReferrer: 'http://imtblgamesdk.local',
               logoutMode,
-              extraQueryParams: request.extraQueryParams,
             };
           }
 
@@ -351,7 +360,9 @@ window.callFunction = async (jsonData: string) => {
         break;
       }
       case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
-        const url = await getPassportClient().loginWithPKCEFlow();
+        const request = data ? JSON.parse(data) : {};
+        const directLoginMethod = request?.directLoginMethod;
+        const url = await getPassportClient().loginWithPKCEFlow(directLoginMethod);
         trackDuration(moduleName, 'performedGetPkceAuthUrl', mt(markStart));
         callbackToGame({
           responseFor: fxName,
