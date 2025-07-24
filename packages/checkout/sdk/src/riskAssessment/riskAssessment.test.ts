@@ -45,6 +45,10 @@ describe('riskAssessment', () => {
       const sanctions = await fetchRiskAssessment(
         [address1, address2],
         mockedConfig,
+        [
+          { address: address1, tokenAddr: '0xtest1', amount: '100' },
+          { address: address2, tokenAddr: '0xtest2', amount: '200' },
+        ],
       );
 
       expect(sanctions[address1.toLowerCase()]).toEqual({ sanctioned: false });
@@ -62,13 +66,14 @@ describe('riskAssessment', () => {
       const sanctions = await fetchRiskAssessment(
         [address1],
         mockedConfig,
+        [{ address: address1, tokenAddr: '0xtest', amount: '100' }],
       );
 
       expect(sanctions[address1.toLowerCase()]).toEqual({ sanctioned: false });
       expect(mockedAxios.post).not.toHaveBeenCalled();
     });
 
-    it('should return default risk assessment not found for address', async () => {
+    it('should return default risk assessment on empty response', async () => {
       mockRemoteConfig.mockResolvedValue({
         enabled: true,
         levels: ['severe'],
@@ -85,6 +90,7 @@ describe('riskAssessment', () => {
       const sanctions = await fetchRiskAssessment(
         [address1],
         mockedConfig,
+        [{ address: address1, tokenAddr: '0xtest', amount: '100' }],
       );
 
       expect(sanctions[address1.toLowerCase()]).toEqual({ sanctioned: false });
