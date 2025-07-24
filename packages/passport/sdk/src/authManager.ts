@@ -350,13 +350,11 @@ export default class AuthManager {
 
   public async logout(): Promise<void> {
     return withPassportError<void>(async () => {
+      await this.userManager.revokeTokens(['refresh_token']);
+
       if (this.logoutMode === 'silent') {
-        await Promise.all([
-          this.userManager.revokeTokens(['refresh_token']),
-          this.userManager.signoutSilent(),
-        ]);
+        await this.userManager.signoutSilent();
       } else {
-        await this.userManager.revokeTokens(['refresh_token']);
         await this.userManager.signoutRedirect();
       }
     }, PassportErrorType.LOGOUT_ERROR);
