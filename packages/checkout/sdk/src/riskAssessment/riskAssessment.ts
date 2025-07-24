@@ -51,10 +51,10 @@ export const fetchRiskAssessment = async (
 
     // Prepare v2 request payload
     const requestPayload: SanctionsCheckV2RequestItem[] = addresses.map((address) => {
-      const item: SanctionsCheckV2RequestItem = { 
+      const item: SanctionsCheckV2RequestItem = {
         address,
         token_addr: '',
-        amount: '0'
+        amount: '0',
       };
 
       // Add token and amount data
