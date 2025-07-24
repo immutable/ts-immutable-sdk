@@ -257,12 +257,18 @@ export function SaleContextProvider(props: {
         return;
       }
 
-      // For sale context, we don't have specific token/amount data at this point
-      // as it's determined during the sale flow, so we pass undefined for tokenData
-      const assessment = await fetchRiskAssessment([address], checkout.config);
+      // Prepare token data for v2 API if available
+      // Use selectedCurrency and orderQuote to get token address and amount when they exist
+      const tokenData = selectedCurrency?.address && orderQuote.totalAmount[selectedCurrency.name] ? [{
+        address,
+        tokenAddr: selectedCurrency.address,
+        amount: orderQuote.totalAmount[selectedCurrency.name].amount.toString(),
+      }] : undefined;
+
+      const assessment = await fetchRiskAssessment([address], checkout.config, tokenData);
       setRiskAssessment(assessment);
     })();
-  }, [checkout, provider]);
+  }, [checkout, provider, selectedCurrency, orderQuote]);
 
   const {
     sign: signOrder,
