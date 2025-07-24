@@ -257,13 +257,15 @@ export function SaleContextProvider(props: {
         return;
       }
 
-      // Prepare token data for v2 API if available
+      // Prepare token data for v2 API - now required
       // Use selectedCurrency and orderQuote to get token address and amount when they exist
-      const tokenData = selectedCurrency?.address && orderQuote.totalAmount[selectedCurrency.name] ? [{
+      const tokenData = [{
         address,
-        tokenAddr: selectedCurrency.address,
-        amount: orderQuote.totalAmount[selectedCurrency.name].amount.toString(),
-      }] : undefined;
+        tokenAddr: selectedCurrency?.address || '',
+        amount: (selectedCurrency?.address && orderQuote.totalAmount[selectedCurrency.name]) 
+          ? orderQuote.totalAmount[selectedCurrency.name].amount.toString() 
+          : '0',
+      }];
 
       const assessment = await fetchRiskAssessment([address], checkout.config, tokenData);
       setRiskAssessment(assessment);

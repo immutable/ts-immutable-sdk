@@ -24,15 +24,15 @@ export type AssessmentResult = {
 
 // New type for v2 request items
 type SanctionsCheckV2RequestItem = {
-  address?: string;
-  amount?: string;
-  token_addr?: string;
+  address: string;
+  amount: string;
+  token_addr: string;
 };
 
 export const fetchRiskAssessment = async (
   addresses: string[],
   config: CheckoutConfiguration,
-  tokenData?: Array<{ address: string; tokenAddr?: string; amount?: string }>,
+  tokenData: Array<{ address: string; tokenAddr: string; amount: string }>,
 ): Promise<AssessmentResult> => {
   const result = Object.fromEntries(
     addresses.map((address) => [address.toLowerCase(), { sanctioned: false }]),
@@ -51,15 +51,17 @@ export const fetchRiskAssessment = async (
 
     // Prepare v2 request payload
     const requestPayload: SanctionsCheckV2RequestItem[] = addresses.map((address) => {
-      const item: SanctionsCheckV2RequestItem = { address };
+      const item: SanctionsCheckV2RequestItem = { 
+        address,
+        token_addr: '',
+        amount: '0'
+      };
 
-      // Add token and amount data if available
-      if (tokenData) {
-        const tokenInfo = tokenData.find((t) => t.address.toLowerCase() === address.toLowerCase());
-        if (tokenInfo) {
-          if (tokenInfo.tokenAddr) item.token_addr = tokenInfo.tokenAddr;
-          if (tokenInfo.amount) item.amount = tokenInfo.amount;
-        }
+      // Add token and amount data
+      const tokenInfo = tokenData.find((t) => t.address.toLowerCase() === address.toLowerCase());
+      if (tokenInfo) {
+        item.token_addr = tokenInfo.tokenAddr;
+        item.amount = tokenInfo.amount;
       }
 
       return item;

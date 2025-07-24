@@ -205,12 +205,12 @@ export default function SwapWidget({
         return;
       }
 
-      // Prepare token data for v2 API if available
-      const tokenData = fromTokenAddress && amount ? [{
+      // Prepare token data for v2 API - now required
+      const tokenData = [{
         address,
-        tokenAddr: fromTokenAddress,
-        amount,
-      }] : undefined;
+        tokenAddr: fromTokenAddress || '',
+        amount: amount || '0',
+      }];
 
       const assessment = await fetchRiskAssessment([address], checkout.config, tokenData);
       swapDispatch({

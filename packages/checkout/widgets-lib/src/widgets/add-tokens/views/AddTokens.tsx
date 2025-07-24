@@ -428,11 +428,11 @@ export function AddTokens({
       && (await checkSanctionedAddresses(
         [toAddress],
         checkout.config,
-        selectedToken?.address && selectedAmount ? [{
+        [{
           address: toAddress,
-          tokenAddr: selectedToken.address,
-          amount: selectedAmount,
-        }] : undefined,
+          tokenAddr: selectedToken?.address || '',
+          amount: selectedAmount || '0',
+        }],
       ))
     ) {
       viewDispatch({
@@ -510,18 +510,18 @@ export function AddTokens({
       && (await checkSanctionedAddresses(
         [fromAddress, toAddress],
         checkout.config,
-        selectedToken?.address && selectedAmount ? [
+        [
           {
             address: fromAddress,
-            tokenAddr: selectedToken.address,
-            amount: selectedAmount,
+            tokenAddr: selectedToken?.address || '',
+            amount: selectedAmount || '0',
           },
           {
             address: toAddress,
-            tokenAddr: selectedToken.address,
-            amount: selectedAmount,
+            tokenAddr: selectedToken?.address || '',
+            amount: selectedAmount || '0',
           },
-        ] : undefined,
+        ],
       ))
     ) {
       viewDispatch({

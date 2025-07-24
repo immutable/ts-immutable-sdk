@@ -188,19 +188,19 @@ export function BridgeForm(props: BridgeFormProps) {
         addresses.push(to.walletAddress);
       }
 
-      // Prepare token data for v2 API if available
-      const tokenData = formToken && formAmount ? [
+      // Prepare token data for v2 API - now required
+      const tokenData = [
         {
           address: from.walletAddress,
-          tokenAddr: formToken.token.address,
-          amount: formAmount,
+          tokenAddr: formToken?.token.address || '',
+          amount: formAmount || '0',
         },
         ...(to.walletAddress.toLowerCase() !== from.walletAddress.toLowerCase() ? [{
           address: to.walletAddress,
-          tokenAddr: formToken.token.address,
-          amount: formAmount,
+          tokenAddr: formToken?.token.address || '',
+          amount: formAmount || '0',
         }] : []),
-      ] : undefined;
+      ];
 
       const assessment = await fetchRiskAssessment(addresses, checkout.config, tokenData);
       bridgeDispatch({

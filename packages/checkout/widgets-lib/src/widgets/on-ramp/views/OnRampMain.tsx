@@ -231,12 +231,12 @@ export function OnRampMain({
     (async () => {
       const walletAddress = await (await provider.getSigner()).getAddress();
 
-      // Prepare token data for v2 API if available
-      const tokenData = tokenAddress && tokenAmount ? [{
+      // Prepare token data for v2 API - now required
+      const tokenData = [{
         address: walletAddress,
-        tokenAddr: tokenAddress,
-        amount: tokenAmount,
-      }] : undefined;
+        tokenAddr: tokenAddress || '',
+        amount: tokenAmount || '0',
+      }];
 
       const assessment = await fetchRiskAssessment([walletAddress], checkout.config, tokenData);
 
