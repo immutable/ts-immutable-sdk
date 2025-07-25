@@ -262,8 +262,8 @@ export function SaleContextProvider(props: {
       const tokenData = [{
         address,
         tokenAddr: selectedCurrency?.address || '',
-        amount: (selectedCurrency?.address && orderQuote.totalAmount[selectedCurrency.name]) 
-          ? orderQuote.totalAmount[selectedCurrency.name].amount.toString() 
+        amount: (selectedCurrency?.address && orderQuote.totalAmount[selectedCurrency.name])
+          ? orderQuote.totalAmount[selectedCurrency.name].amount.toString()
           : '0',
       }];
 
