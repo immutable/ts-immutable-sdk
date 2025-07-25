@@ -224,14 +224,22 @@ export function OnRampMain({
   };
 
   useEffect(() => {
-    if (!checkout || !provider) return;
+    // Only run risk assessment when we have meaningful token and amount data
+    if (!checkout || !provider || !tokenAddress || !tokenAmount) return;
 
     let userWalletAddress = '';
 
     (async () => {
       const walletAddress = await (await provider.getSigner()).getAddress();
 
-      const assessment = await fetchRiskAssessment([walletAddress], checkout.config);
+      // We have meaningful token data - call enhanced risk assessment
+      const assessmentData = [{
+        address: walletAddress,
+        tokenAddr: tokenAddress,
+        amount: tokenAmount,
+      }];
+
+      const assessment = await fetchRiskAssessment(checkout.config, assessmentData);
 
       if (isAddressSanctioned(assessment)) {
         viewDispatch({
