@@ -227,7 +227,8 @@ export class Checkout {
 
   /**
    * Fetches risk assessment for the given assessment data.
-   * @param {Array<{address: string; tokenAddr?: string; amount?: string}>} assessmentData - Assessment data with addresses and optional token context.
+   * @param {Array<{address: string; tokenAddr?: string; amount?: string}>} assessmentData 
+   *   Assessment data with addresses and optional token context.
    * @returns {Promise<AssessmentResult>} - A promise that resolves to the risk assessment result.
    */
   public async getRiskAssessment(
