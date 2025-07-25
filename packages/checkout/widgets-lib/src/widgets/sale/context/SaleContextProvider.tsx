@@ -246,7 +246,8 @@ export function SaleContextProvider(props: {
   }, [provider]);
 
   useEffect(() => {
-    if (!checkout || riskAssessment) {
+    // Only run risk assessment when we have meaningful token selection
+    if (!checkout || riskAssessment || !selectedCurrency?.address || !orderQuote.totalAmount[selectedCurrency.name]?.amount) {
       return;
     }
 
@@ -257,17 +258,14 @@ export function SaleContextProvider(props: {
         return;
       }
 
-      // Prepare token data for v2 API - now required
-      // Use selectedCurrency and orderQuote to get token address and amount when they exist
-      const tokenData = [{
+      // We have meaningful token data - call enhanced risk assessment
+      const assessmentData = [{
         address,
-        tokenAddr: selectedCurrency?.address || '',
-        amount: (selectedCurrency?.address && orderQuote.totalAmount[selectedCurrency.name])
-          ? orderQuote.totalAmount[selectedCurrency.name].amount.toString()
-          : '0',
+        tokenAddr: selectedCurrency.address,
+        amount: orderQuote.totalAmount[selectedCurrency.name].amount.toString(),
       }];
 
-      const assessment = await fetchRiskAssessment([address], checkout.config, tokenData);
+      const assessment = await fetchRiskAssessment(checkout.config, assessmentData);
       setRiskAssessment(assessment);
     })();
   }, [checkout, provider, selectedCurrency, orderQuote]);

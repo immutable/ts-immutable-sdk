@@ -43,7 +43,6 @@ describe('riskAssessment', () => {
       mockedAxios.post.mockResolvedValueOnce(mockRiskResponse);
 
       const sanctions = await fetchRiskAssessment(
-        [address1, address2],
         mockedConfig,
         [
           { address: address1, tokenAddr: '0xtest1', amount: '100' },
@@ -64,9 +63,8 @@ describe('riskAssessment', () => {
       const address1 = '0x1234567890';
 
       const sanctions = await fetchRiskAssessment(
-        [address1],
         mockedConfig,
-        [{ address: address1, tokenAddr: '0xtest', amount: '100' }],
+        [{ address: address1 }], // Test without token data when disabled
       );
 
       expect(sanctions[address1.toLowerCase()]).toEqual({ sanctioned: false });
@@ -88,7 +86,6 @@ describe('riskAssessment', () => {
       mockedAxios.post.mockResolvedValueOnce(mockRiskResponse);
 
       const sanctions = await fetchRiskAssessment(
-        [address1],
         mockedConfig,
         [{ address: address1, tokenAddr: '0xtest', amount: '100' }],
       );

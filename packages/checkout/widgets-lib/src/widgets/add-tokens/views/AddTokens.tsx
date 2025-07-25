@@ -426,13 +426,12 @@ export function AddTokens({
     if (
       toAddress
       && (await checkSanctionedAddresses(
-        [toAddress],
         checkout.config,
-        [{
+        selectedToken?.address && selectedAmount ? [{
           address: toAddress,
-          tokenAddr: selectedToken?.address || '',
-          amount: selectedAmount || '0',
-        }],
+          tokenAddr: selectedToken.address,
+          amount: selectedAmount,
+        }] : [{ address: toAddress }],
       ))
     ) {
       viewDispatch({
@@ -508,19 +507,21 @@ export function AddTokens({
       fromAddress
       && toAddress
       && (await checkSanctionedAddresses(
-        [fromAddress, toAddress],
         checkout.config,
-        [
+        selectedToken?.address && selectedAmount ? [
           {
             address: fromAddress,
-            tokenAddr: selectedToken?.address || '',
-            amount: selectedAmount || '0',
+            tokenAddr: selectedToken.address,
+            amount: selectedAmount,
           },
           {
             address: toAddress,
-            tokenAddr: selectedToken?.address || '',
-            amount: selectedAmount || '0',
+            tokenAddr: selectedToken.address,
+            amount: selectedAmount,
           },
+        ] : [
+          { address: fromAddress },
+          { address: toAddress },
         ],
       ))
     ) {

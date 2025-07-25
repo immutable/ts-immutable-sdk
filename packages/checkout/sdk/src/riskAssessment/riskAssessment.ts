@@ -25,17 +25,23 @@ export type AssessmentResult = {
 // New type for v2 request items
 type SanctionsCheckV2RequestItem = {
   address: string;
-  amount: string;
-  token_addr: string;
+  amount?: string;
+  token_addr?: string;
+};
+
+// Simplified assessment data - no redundant address info
+type AssessmentData = {
+  address: string;
+  tokenAddr?: string;
+  amount?: string;
 };
 
 export const fetchRiskAssessment = async (
-  addresses: string[],
   config: CheckoutConfiguration,
-  tokenData: Array<{ address: string; tokenAddr: string; amount: string }>,
+  assessmentData: AssessmentData[],
 ): Promise<AssessmentResult> => {
   const result = Object.fromEntries(
-    addresses.map((address) => [address.toLowerCase(), { sanctioned: false }]),
+    assessmentData.map((data) => [data.address.toLowerCase(), { sanctioned: false }]),
   );
 
   const riskConfig = (await config.remote.getConfig('riskAssessment')) as
@@ -49,19 +55,14 @@ export const fetchRiskAssessment = async (
   try {
     const riskLevels = riskConfig?.levels.map((l) => l.toLowerCase()) ?? [];
 
-    // Prepare v2 request payload
-    const requestPayload: SanctionsCheckV2RequestItem[] = addresses.map((address) => {
-      const item: SanctionsCheckV2RequestItem = {
-        address,
-        token_addr: '',
-        amount: '0',
-      };
+    // Prepare v2 request payload - only include token data when meaningful
+    const requestPayload: SanctionsCheckV2RequestItem[] = assessmentData.map((data) => {
+      const item: SanctionsCheckV2RequestItem = { address: data.address };
 
-      // Add token and amount data
-      const tokenInfo = tokenData.find((t) => t.address.toLowerCase() === address.toLowerCase());
-      if (tokenInfo) {
-        item.token_addr = tokenInfo.tokenAddr;
-        item.amount = tokenInfo.amount;
+      // Only add token data if we have meaningful values (not empty strings or zero amounts)
+      if (data.tokenAddr && data.amount && data.amount !== '0') {
+        item.token_addr = data.tokenAddr;
+        item.amount = data.amount;
       }
 
       return item;

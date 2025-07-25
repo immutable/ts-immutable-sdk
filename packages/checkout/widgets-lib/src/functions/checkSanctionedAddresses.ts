@@ -5,10 +5,9 @@ import {
 } from '@imtbl/checkout-sdk';
 
 export const checkSanctionedAddresses = async (
-  addresses: string[],
   config: CheckoutConfiguration,
-  tokenData: Array<{ address: string; tokenAddr: string; amount: string }>,
+  assessmentData: Array<{ address: string; tokenAddr?: string; amount?: string }>,
 ): Promise<boolean> => {
-  const result = await fetchRiskAssessment(addresses, config, tokenData);
+  const result = await fetchRiskAssessment(config, assessmentData);
   return isAddressSanctioned(result, undefined);
 };
