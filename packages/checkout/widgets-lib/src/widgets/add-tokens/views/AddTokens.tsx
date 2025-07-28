@@ -505,7 +505,7 @@ export function AddTokens({
     if (!selectedRouteData || !selectedToken?.address) return;
 
     // Only check sanctions if we have meaningful amount data
-    const shouldCheckSanctions = selectedAmount && fromAddress && toAddress && selectedToken.address;
+    const shouldCheckSanctions = selectedAmount && fromAddress && toAddress;
     const isSanctioned = shouldCheckSanctions && await checkSanctionedAddresses(
       checkout.config,
       [
