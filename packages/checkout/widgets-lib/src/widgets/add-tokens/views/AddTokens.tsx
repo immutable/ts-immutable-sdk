@@ -508,20 +508,17 @@ export function AddTokens({
       && toAddress
       && (await checkSanctionedAddresses(
         checkout.config,
-        selectedToken?.address && selectedAmount ? [
+        [
           {
             address: fromAddress,
-            tokenAddr: selectedToken.address,
-            amount: selectedAmount,
+            tokenAddr: selectedToken?.address || 'native',
+            amount: selectedAmount || '0',
           },
           {
             address: toAddress,
-            tokenAddr: selectedToken.address,
-            amount: selectedAmount,
+            tokenAddr: selectedToken?.address || 'native',
+            amount: selectedAmount || '0',
           },
-        ] : [
-          { address: fromAddress },
-          { address: toAddress },
         ],
       ))
     ) {
