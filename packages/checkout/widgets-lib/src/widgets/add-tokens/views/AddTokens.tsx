@@ -427,11 +427,11 @@ export function AddTokens({
       toAddress
       && (await checkSanctionedAddresses(
         checkout.config,
-        selectedToken?.address && selectedAmount ? [{
+        [{
           address: toAddress,
-          tokenAddr: selectedToken.address,
-          amount: selectedAmount,
-        }] : [{ address: toAddress }],
+          tokenAddr: selectedToken?.address || 'native',
+          amount: selectedAmount || '0',
+        }],
       ))
     ) {
       viewDispatch({
