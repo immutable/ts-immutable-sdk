@@ -25,15 +25,15 @@ export type AssessmentResult = {
 // New type for v2 request items
 type SanctionsCheckV2RequestItem = {
   address: string;
-  amount?: string;
-  token_addr?: string;
+  amount: string;
+  token_addr: string;
 };
 
 // Simplified assessment data - no redundant address info
 type AssessmentData = {
   address: string;
-  tokenAddr?: string;
-  amount?: string;
+  tokenAddr: string;
+  amount: string;
 };
 
 export const fetchRiskAssessment = async (
@@ -55,17 +55,13 @@ export const fetchRiskAssessment = async (
   try {
     const riskLevels = riskConfig?.levels.map((l) => l.toLowerCase()) ?? [];
 
-    // Prepare v2 request payload - only include token data when meaningful
+    // Prepare v2 request payload - always include token data
     const requestPayload: SanctionsCheckV2RequestItem[] = assessmentData.map((data) => {
-      const item: SanctionsCheckV2RequestItem = { address: data.address };
-
-      // Only add token data if we have meaningful values (not empty strings or zero amounts)
-      if (data.tokenAddr && data.amount && data.amount !== '0') {
-        item.token_addr = data.tokenAddr;
-        item.amount = data.amount;
-      }
-
-      return item;
+      return {
+        address: data.address,
+        token_addr: data.tokenAddr,
+        amount: data.amount,
+      };
     });
 
     const response = await axios.post<RiskAssessment[]>(
