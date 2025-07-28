@@ -193,8 +193,8 @@ export function BridgeForm(props: BridgeFormProps) {
         },
         ...(to.walletAddress.toLowerCase() !== from.walletAddress.toLowerCase() ? [{
           address: to.walletAddress,
-          tokenAddr: formToken!.token.address!,
-          amount: formAmount!,
+          tokenAddr: formToken.token.address,
+          amount: formAmount,
         }] : []),
       ];
 
