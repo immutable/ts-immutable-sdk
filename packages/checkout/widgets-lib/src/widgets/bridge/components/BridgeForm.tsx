@@ -188,13 +188,13 @@ export function BridgeForm(props: BridgeFormProps) {
       const assessmentData = [
         {
           address: from.walletAddress,
-          tokenAddr: formToken.token.address,
-          amount: formAmount,
+          tokenAddr: formToken!.token.address!,
+          amount: formAmount!,
         },
         ...(to.walletAddress.toLowerCase() !== from.walletAddress.toLowerCase() ? [{
           address: to.walletAddress,
-          tokenAddr: formToken.token.address,
-          amount: formAmount,
+          tokenAddr: formToken!.token.address!,
+          amount: formAmount!,
         }] : []),
       ];
 
