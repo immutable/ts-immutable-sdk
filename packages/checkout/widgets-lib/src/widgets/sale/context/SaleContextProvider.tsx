@@ -247,8 +247,7 @@ export function SaleContextProvider(props: {
 
   useEffect(() => {
     // Only run risk assessment when we have meaningful token selection
-    if (!checkout || riskAssessment || !selectedCurrency?.address
-        || !orderQuote.totalAmount[selectedCurrency.name]?.amount) {
+    if (!checkout || riskAssessment || !selectedCurrency) {
       return;
     }
 
