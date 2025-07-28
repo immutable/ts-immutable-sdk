@@ -510,14 +510,14 @@ export function AddTokens({
       checkout.config,
       [
         {
-          address: fromAddress!,
-          tokenAddr: selectedToken!.address!,
-          amount: selectedAmount!,
+          address: fromAddress,
+          tokenAddr: selectedToken.address,
+          amount: selectedAmount,
         },
         {
-          address: toAddress!,
-          tokenAddr: selectedToken!.address!,
-          amount: selectedAmount!,
+          address: toAddress,
+          tokenAddr: selectedToken.address,
+          amount: selectedAmount,
         },
       ],
     );
