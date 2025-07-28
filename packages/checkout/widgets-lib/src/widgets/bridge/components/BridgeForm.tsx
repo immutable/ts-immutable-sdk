@@ -178,17 +178,27 @@ export function BridgeForm(props: BridgeFormProps) {
   );
 
   useEffect(() => {
-    if (!checkout || !from || !to) {
+    // Only run risk assessment when we have meaningful token and amount selection
+    if (!checkout || !from || !to || !formToken?.token.address || !formAmount) {
       return;
     }
 
     (async () => {
-      const addresses = [from.walletAddress];
-      if (to.walletAddress.toLowerCase() !== from.walletAddress.toLowerCase()) {
-        addresses.push(to.walletAddress);
-      }
+      // We have meaningful token data - call enhanced risk assessment
+      const assessmentData = [
+        {
+          address: from.walletAddress,
+          tokenAddr: formToken.token.address as string,
+          amount: formAmount as string,
+        },
+        ...(to.walletAddress.toLowerCase() !== from.walletAddress.toLowerCase() ? [{
+          address: to.walletAddress,
+          tokenAddr: formToken.token.address as string,
+          amount: formAmount as string,
+        }] : []),
+      ];
 
-      const assessment = await fetchRiskAssessment(addresses, checkout.config);
+      const assessment = await fetchRiskAssessment(checkout.config, assessmentData);
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_RISK_ASSESSMENT,
@@ -196,7 +206,7 @@ export function BridgeForm(props: BridgeFormProps) {
         },
       });
     })();
-  }, [checkout, from, to]);
+  }, [checkout, from, to, formToken, formAmount]);
 
   const canFetchEstimates = (silently: boolean): boolean => {
     if (Number.isNaN(parseFloat(formAmount))) return false;
