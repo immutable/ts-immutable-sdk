@@ -64,7 +64,7 @@ describe('riskAssessment', () => {
 
       const sanctions = await fetchRiskAssessment(
         mockedConfig,
-        [{ address: address1 }], // Test without token data when disabled
+        [{ address: address1, tokenAddr: 'native', amount: '100' }], // Include required fields even when disabled
       );
 
       expect(sanctions[address1.toLowerCase()]).toEqual({ sanctioned: false });
