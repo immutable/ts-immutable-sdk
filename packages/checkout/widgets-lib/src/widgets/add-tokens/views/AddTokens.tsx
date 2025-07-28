@@ -433,7 +433,7 @@ export function AddTokens({
         amount: selectedAmount,
       }],
     );
-    
+
     if (isSanctioned) {
       viewDispatch({
         payload: {
