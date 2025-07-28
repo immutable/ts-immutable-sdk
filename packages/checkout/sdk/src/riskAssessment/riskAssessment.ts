@@ -56,13 +56,11 @@ export const fetchRiskAssessment = async (
     const riskLevels = riskConfig?.levels.map((l) => l.toLowerCase()) ?? [];
 
     // Prepare v2 request payload - always include token data
-    const requestPayload: SanctionsCheckV2RequestItem[] = assessmentData.map((data) => {
-      return {
-        address: data.address,
-        token_addr: data.tokenAddr,
-        amount: data.amount,
-      };
-    });
+    const requestPayload: SanctionsCheckV2RequestItem[] = assessmentData.map((data) => ({
+      address: data.address,
+      token_addr: data.tokenAddr,
+      amount: data.amount,
+    }));
 
     const response = await axios.post<RiskAssessment[]>(
       `${IMMUTABLE_API_BASE_URL[config.environment]}/v2/sanctions/check`,
