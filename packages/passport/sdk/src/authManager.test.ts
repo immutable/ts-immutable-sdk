@@ -24,6 +24,7 @@ const clientId = '11111';
 const redirectUri = 'https://test.com';
 const popupRedirectUri = `${redirectUri}-popup`;
 const logoutEndpoint = '/v2/logout';
+const crossSdkBridgeLogoutEndpoint = '/im-logged-out';
 const logoutRedirectUri = `${redirectUri}logout/callback`;
 
 const getConfig = (values?: Partial<PassportModuleConfiguration>) => new PassportConfiguration({
@@ -108,7 +109,7 @@ describe('AuthManager', () => {
     mockOverlayAppend = jest.fn();
     mockOverlayRemove = jest.fn();
     mockRevokeTokens = jest.fn();
-    (UserManager as jest.Mock).mockReturnValue({
+    (UserManager as jest.Mock).mockImplementation((config) => ({
       signinPopup: mockSigninPopup,
       signinCallback: mockSigninCallback,
       signinRedirectCallback: mockSigninRedirectCallback,
@@ -118,7 +119,12 @@ describe('AuthManager', () => {
       signinSilent: mockSigninSilent,
       storeUser: mockStoreUser,
       revokeTokens: mockRevokeTokens,
-    });
+      settings: {
+        metadata: {
+          end_session_endpoint: config.metadata?.end_session_endpoint,
+        },
+      },
+    }));
     (Overlay as jest.Mock).mockReturnValue({
       append: mockOverlayAppend,
       remove: mockOverlayRemove,
@@ -718,7 +724,9 @@ describe('AuthManager', () => {
 
           const am = new AuthManager(getConfig({ logoutRedirectUri }));
           const result = await am.getLogoutUrl();
-          const uri = new URL(result);
+
+          expect(result).not.toBeNull();
+          const uri = new URL(result!);
 
           expect(uri.hostname).toEqual(authenticationDomain);
           expect(uri.pathname).toEqual(logoutEndpoint);
@@ -733,12 +741,42 @@ describe('AuthManager', () => {
 
           const am = new AuthManager(getConfig());
           const result = await am.getLogoutUrl();
-          const uri = new URL(result);
+
+          expect(result).not.toBeNull();
+          const uri = new URL(result!);
 
           expect(uri.hostname).toEqual(authenticationDomain);
           expect(uri.pathname).toEqual(logoutEndpoint);
           expect(uri.searchParams.get('client_id')).toEqual(clientId);
         });
+      });
+
+      describe('when crossSdkBridgeEnabled is true', () => {
+        it('should use the bridge logout endpoint path', async () => {
+          mockGetUser.mockReturnValue(mockOidcUser);
+
+          const am = new AuthManager(getConfig({ crossSdkBridgeEnabled: true, logoutRedirectUri }));
+          const result = await am.getLogoutUrl();
+
+          expect(result).not.toBeNull();
+          const uri = new URL(result!);
+
+          expect(uri.hostname).toEqual(authenticationDomain);
+          expect(uri.pathname).toEqual(crossSdkBridgeLogoutEndpoint);
+          expect(uri.searchParams.get('client_id')).toEqual(clientId);
+          expect(uri.searchParams.get('returnTo')).toEqual(logoutRedirectUri);
+        });
+      });
+    });
+
+    describe('when end_session_endpoint is not available', () => {
+      it('should return null', async () => {
+        const am = new AuthManager(getConfig());
+        // eslint-disable-next-line @typescript-eslint/dot-notation
+        am['userManager'].settings.metadata!.end_session_endpoint = undefined;
+
+        const result = await am.getLogoutUrl();
+        expect(result).toBeNull();
       });
     });
   });
