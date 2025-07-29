@@ -348,6 +348,16 @@ export default class AuthManager {
     return response.data;
   }
 
+  public async storeTokens(tokenResponse: DeviceTokenResponse): Promise<User> {
+    return withPassportError<User>(async () => {
+      const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
+      const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
+      await this.userManager.storeUser(oidcUser);
+
+      return user;
+    }, PassportErrorType.AUTHENTICATION_ERROR);
+  }
+
   public async logout(): Promise<void> {
     return withPassportError<void>(async () => {
       await this.userManager.revokeTokens(['refresh_token']);
