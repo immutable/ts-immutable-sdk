@@ -1,6 +1,6 @@
 import { IMXProvider } from '@imtbl/x-provider';
 import {
-  createConfig, ImxApiClients, imxApiConfig, MultiRollupApiClients,
+  createConfig, ImxApiClients, imxApiConfig, MagicTeeApiClients, MultiRollupApiClients,
 } from '@imtbl/generated-clients';
 import { IMXClient } from '@imtbl/x-client';
 import { Environment } from '@imtbl/config';
@@ -11,10 +11,11 @@ import {
 } from '@imtbl/metrics';
 import { isAxiosError } from 'axios';
 import AuthManager from './authManager';
-import MagicAdapter from './magic/magicAdapter';
+import MagicTEESigner from './magic/magicTEESigner';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
+  DeviceTokenResponse,
   DirectLoginMethod,
   isUserImx,
   isUserZkEvm,
@@ -35,7 +36,6 @@ import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { isAPIError, PassportError, PassportErrorType } from './errors/passportError';
 import { withMetricsAsync } from './utils/metrics';
-import { MagicProviderProxyFactory } from './magic/magicProviderProxyFactory';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -57,9 +57,14 @@ const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfigura
 export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
   const config = new PassportConfiguration(passportModuleConfiguration);
   const authManager = new AuthManager(config);
-  const magicProviderProxyFactory = new MagicProviderProxyFactory(authManager, config);
-  const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
   const confirmationScreen = new ConfirmationScreen(config);
+  const magicTeeApiClients = new MagicTeeApiClients({
+    basePath: config.magicTeeBasePath,
+    timeout: config.magicTeeTimeout,
+    magicPublishableApiKey: config.magicPublishableApiKey,
+    magicProviderId: config.magicProviderId,
+  });
+  const magicTEESigner = new MagicTEESigner(authManager, magicTeeApiClients);
   const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
   const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
 
@@ -79,7 +84,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
   const passportImxProviderFactory = new PassportImxProviderFactory({
     authManager,
     immutableXClient,
-    magicAdapter,
+    magicTEESigner,
     passportEventEmitter,
     imxApiClients,
     guardianClient,
@@ -88,7 +93,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
   return {
     config,
     authManager,
-    magicAdapter,
+    magicTEESigner,
     confirmationScreen,
     immutableXClient,
     multiRollupApiClients,
@@ -107,7 +112,7 @@ export class Passport {
 
   private readonly immutableXClient: IMXClient;
 
-  private readonly magicAdapter: MagicAdapter;
+  private readonly magicTEESigner: MagicTEESigner;
 
   private readonly multiRollupApiClients: MultiRollupApiClients;
 
@@ -122,7 +127,7 @@ export class Passport {
 
     this.config = privateVars.config;
     this.authManager = privateVars.authManager;
-    this.magicAdapter = privateVars.magicAdapter;
+    this.magicTEESigner = privateVars.magicTEESigner;
     this.confirmationScreen = privateVars.confirmationScreen;
     this.immutableXClient = privateVars.immutableXClient;
     this.multiRollupApiClients = privateVars.multiRollupApiClients;
@@ -155,19 +160,27 @@ export class Passport {
    * Connects to EVM and optionally announces the provider.
    * @param {Object} options - Configuration options
    * @param {boolean} options.announceProvider - Whether to announce the provider via EIP-6963 for wallet discovery (defaults to true)
-   * @returns {Provider} The EVM provider instance
+   * @returns {Promise<Provider>} The EVM provider instance
    */
-  public connectEvm(options: {
+  public async connectEvm(options: {
     announceProvider: boolean
   } = { announceProvider: true }): Promise<Provider> {
     return withMetricsAsync(async () => {
+      let user: User | null = null;
+      try {
+        user = await this.authManager.getUser();
+      } catch (error) {
+        // Initialise the zkEvmProvider without a user
+      }
+
       const provider = new ZkEvmProvider({
         passportEventEmitter: this.passportEventEmitter,
         authManager: this.authManager,
-        magicAdapter: this.magicAdapter,
         config: this.config,
         multiRollupApiClients: this.multiRollupApiClients,
         guardianClient: this.guardianClient,
+        ethSigner: this.magicTEESigner,
+        user,
       });
 
       if (options?.announceProvider) {
@@ -299,22 +312,21 @@ export class Passport {
     }, 'loginWithPKCEFlowCallback');
   }
 
+  public async storeTokens(tokenResponse: DeviceTokenResponse): Promise<UserProfile> {
+    return withMetricsAsync(async () => {
+      const user = await this.authManager.storeTokens(tokenResponse);
+      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+      return user.profile;
+    }, 'storeTokens');
+  }
+
   /**
    * Logs out the current user.
    * @returns {Promise<void>} A promise that resolves when the logout is complete
    */
   public async logout(): Promise<void> {
     return withMetricsAsync(async () => {
-      if (this.config.oidcConfiguration.logoutMode === 'silent') {
-        await Promise.allSettled([
-          this.authManager.logout(),
-          this.magicAdapter.logout(),
-        ]);
-      } else {
-        // We need to ensure that the Magic wallet is logged out BEFORE redirecting
-        await this.magicAdapter.logout();
-        await this.authManager.logout();
-      }
+      await this.authManager.logout();
       this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
     }, 'logout');
   }
@@ -326,7 +338,6 @@ export class Passport {
   public async getLogoutUrl(): Promise<string | null> {
     return withMetricsAsync(async () => {
       await this.authManager.removeUser();
-      await this.magicAdapter.logout();
       this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
       return await this.authManager.getLogoutUrl();
     }, 'getLogoutUrl');

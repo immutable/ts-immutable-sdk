@@ -12,7 +12,6 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
 import { trackError, trackFlow } from '@imtbl/metrics';
-import { BrowserProvider } from 'ethers';
 import registerPassportStarkEx from './workflows/registration';
 import { mockUser, mockUserImx } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
@@ -23,7 +22,7 @@ import {
 import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
-import MagicAdapter from '../magic/magicAdapter';
+import MagicTEESigner from '../magic/magicTEESigner';
 import { getStarkSigner } from './getStarkSigner';
 import GuardianClient from '../guardian';
 
@@ -61,13 +60,9 @@ describe('PassportImxProvider', () => {
     getYCoordinate: jest.fn(),
   } as StarkSigner;
 
-  const mockEthSigner = {
-    signMessage: jest.fn(),
+  const mockMagicTEESigner = {
     getAddress: jest.fn(),
-  };
-
-  const magicAdapterMock = {
-    login: jest.fn(),
+    signMessage: jest.fn(),
   };
 
   const mockGuardianClient = {
@@ -75,15 +70,12 @@ describe('PassportImxProvider', () => {
     withConfirmationScreenTask: () => (task: () => any) => task,
   };
 
-  const getSignerMock = jest.fn();
-
   let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
   const imxApiClients = new ImxApiClients({} as any);
 
   beforeEach(() => {
     jest.restoreAllMocks();
-    getSignerMock.mockReturnValue(mockEthSigner);
     (registerPassportStarkEx as jest.Mock).mockResolvedValue(null);
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     mockAuthManager.getUser.mockResolvedValue(mockUserImx);
@@ -97,13 +89,11 @@ describe('PassportImxProvider', () => {
     }));
 
     // Signers
-    magicAdapterMock.login.mockResolvedValue({ getSigner: getSignerMock });
-    (BrowserProvider as unknown as jest.Mock).mockReturnValue({ getSigner: getSignerMock });
     (getStarkSigner as jest.Mock).mockResolvedValue(mockStarkSigner);
 
     passportImxProvider = new PassportImxProvider({
       authManager: mockAuthManager as unknown as AuthManager,
-      magicAdapter: magicAdapterMock as unknown as MagicAdapter,
+      magicTEESigner: mockMagicTEESigner as unknown as MagicTEESigner,
       guardianClient: mockGuardianClient as unknown as GuardianClient,
       immutableXClient,
       passportEventEmitter,
@@ -116,8 +106,7 @@ describe('PassportImxProvider', () => {
       // The promise is created in the constructor but not awaited until a method is called
       await passportImxProvider.getAddress();
 
-      expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUserImx.idToken);
-      expect(getStarkSigner).toHaveBeenCalledWith(mockEthSigner);
+      expect(getStarkSigner).toHaveBeenCalledWith(mockMagicTEESigner);
     });
 
     it('initialises the eth and stark signers only once', async () => {
@@ -125,14 +114,12 @@ describe('PassportImxProvider', () => {
       await passportImxProvider.getAddress();
       await passportImxProvider.getAddress();
 
-      expect(magicAdapterMock.login).toHaveBeenCalledTimes(1);
       expect(getStarkSigner).toHaveBeenCalledTimes(1);
     });
 
     it('re-throws the initialisation error when a method is called', async () => {
       mockAuthManager.getUser.mockResolvedValue(mockUserImx);
       // Signers
-      magicAdapterMock.login.mockResolvedValue({});
       (getStarkSigner as jest.Mock).mockRejectedValue(new Error('error'));
 
       // Metrics
@@ -145,7 +132,7 @@ describe('PassportImxProvider', () => {
 
       const pp = new PassportImxProvider({
         authManager: mockAuthManager as unknown as AuthManager,
-        magicAdapter: magicAdapterMock as unknown as MagicAdapter,
+        magicTEESigner: mockMagicTEESigner as unknown as MagicTEESigner,
         guardianClient: mockGuardianClient as unknown as GuardianClient,
         immutableXClient,
         passportEventEmitter: new TypedEventEmitter<PassportEventMap>(),
@@ -360,15 +347,12 @@ describe('PassportImxProvider', () => {
 
   describe('registerOffChain', () => {
     it('should register the user and update the provider instance user', async () => {
-      const magicProviderMock = {};
-
       mockAuthManager.login.mockResolvedValue(mockUser);
-      magicAdapterMock.login.mockResolvedValue(magicProviderMock);
       mockAuthManager.forceUserRefresh.mockResolvedValue({ ...mockUser, imx: { ethAddress: '', starkAddress: '', userAdminAddress: '' } });
       await passportImxProvider.registerOffchain();
 
       expect(registerPassportStarkEx).toHaveBeenCalledWith({
-        ethSigner: mockEthSigner,
+        ethSigner: mockMagicTEESigner,
         starkSigner: mockStarkSigner,
         imxApiClients: new ImxApiClients({} as any),
       }, mockUserImx.accessToken);
