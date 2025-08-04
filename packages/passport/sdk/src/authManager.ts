@@ -38,7 +38,12 @@ const formUrlEncodedHeader = {
 };
 
 const logoutEndpoint = '/v2/logout';
+const crossSdkBridgeLogoutEndpoint = '/im-logged-out';
 const authorizeEndpoint = '/authorize';
+
+const getLogoutEndpointPath = (crossSdkBridgeEnabled: boolean): string => (
+  crossSdkBridgeEnabled ? crossSdkBridgeLogoutEndpoint : logoutEndpoint
+);
 
 const getAuthConfiguration = (config: PassportConfiguration): UserManagerSettings => {
   const { authenticationDomain, oidcConfiguration } = config;
@@ -53,7 +58,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
   }
   const userStore = new WebStorageStateStore({ store });
 
-  const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain.replace(/^(?:https?:\/\/)?(.*)/, 'https://$1'));
+  const endSessionEndpoint = new URL(getLogoutEndpointPath(config.crossSdkBridgeEnabled), authenticationDomain.replace(/^(?:https?:\/\/)?(.*)/, 'https://$1'));
   endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
   if (oidcConfiguration.logoutRedirectUri) {
     endSessionEndpoint.searchParams.set('returnTo', oidcConfiguration.logoutRedirectUri);
@@ -368,15 +373,15 @@ export default class AuthManager {
     return this.userManager.removeUser();
   }
 
-  public async getLogoutUrl(): Promise<string> {
-    const { authenticationDomain, oidcConfiguration } = this.config;
+  public async getLogoutUrl(): Promise<string | null> {
+    const endSessionEndpoint = this.userManager.settings?.metadata?.end_session_endpoint;
 
-    const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain);
-    endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
+    if (!endSessionEndpoint) {
+      logger.warn('Failed to get logout URL');
+      return null;
+    }
 
-    if (oidcConfiguration.logoutRedirectUri) endSessionEndpoint.searchParams.set('returnTo', oidcConfiguration.logoutRedirectUri);
-
-    return endSessionEndpoint.toString();
+    return endSessionEndpoint;
   }
 
   public forceUserRefreshInBackground() {

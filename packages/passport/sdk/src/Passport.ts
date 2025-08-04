@@ -326,7 +326,7 @@ export class Passport {
    * Returns the logout URL for the current user.
    * @returns {Promise<string>} The logout URL
    */
-  public async getLogoutUrl(): Promise<string> {
+  public async getLogoutUrl(): Promise<string | null> {
     return withMetricsAsync(async () => {
       await this.authManager.removeUser();
       this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
