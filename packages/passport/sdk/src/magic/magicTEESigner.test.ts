@@ -4,7 +4,7 @@ import { isAxiosError } from 'axios';
 import MagicTEESigner from './magicTEESigner';
 import AuthManager from '../authManager';
 import { PassportError, PassportErrorType } from '../errors/passportError';
-import { mockUser } from '../test/mocks';
+import { mockUser, mockUserImx, mockUserZkEvm } from '../test/mocks';
 import { withMetricsAsync } from '../utils/metrics';
 
 // Mock all dependencies
@@ -372,6 +372,171 @@ describe('MagicTEESigner', () => {
           PassportErrorType.NOT_LOGGED_IN_ERROR,
         ),
       );
+    });
+  });
+
+  describe('wallet address validation', () => {
+    describe('IMX user wallet address validation', () => {
+      it('should throw error when IMX user wallet address does not match TEE wallet address', async () => {
+        const imxUserWithMismatchedAddress = {
+          ...mockUserImx,
+          imx: {
+            ...mockUserImx.imx,
+            userAdminAddress: '0xdifferentaddress123',
+          },
+        };
+
+        mockAuthManager.getUser.mockResolvedValue(imxUserWithMismatchedAddress);
+        mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
+
+        await expect(magicTEESigner.getAddress()).rejects.toThrow(
+          new PassportError(
+            'Wallet address mismatch.'
+              + `Rollup: IMX, TEE address: ${mockWalletResponse.data.public_address}, `
+              + `profile address: ${imxUserWithMismatchedAddress.imx.userAdminAddress}`,
+            PassportErrorType.WALLET_CONNECTION_ERROR,
+          ),
+        );
+      });
+
+      it('should succeed when IMX user wallet address matches TEE wallet address', async () => {
+        const imxUserWithMatchingAddress = {
+          ...mockUserImx,
+          imx: {
+            ...mockUserImx.imx,
+            userAdminAddress: mockWalletResponse.data.public_address,
+          },
+        };
+
+        mockAuthManager.getUser.mockResolvedValue(imxUserWithMatchingAddress);
+        mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
+
+        const address = await magicTEESigner.getAddress();
+
+        expect(address).toBe(mockWalletResponse.data.public_address);
+        expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
+          {
+            createWalletRequestModel: {
+              chain: 'ETH',
+            },
+          },
+          { headers: { Authorization: `Bearer ${imxUserWithMatchingAddress.idToken}` } },
+        );
+      });
+    });
+
+    describe('zkEVM user wallet address validation', () => {
+      it('should throw error when zkEVM user wallet address does not match TEE wallet address', async () => {
+        const zkEvmUserWithMismatchedAddress = {
+          ...mockUserZkEvm,
+          zkEvm: {
+            ...mockUserZkEvm.zkEvm,
+            userAdminAddress: '0xdifferentaddress456',
+          },
+        };
+
+        mockAuthManager.getUser.mockResolvedValue(zkEvmUserWithMismatchedAddress);
+        mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
+
+        await expect(magicTEESigner.getAddress()).rejects.toThrow(
+          new PassportError(
+            'Wallet address mismatch.'
+              + `Rollup: zkEVM, TEE address: ${mockWalletResponse.data.public_address}, `
+              + `profile address: ${zkEvmUserWithMismatchedAddress.zkEvm.userAdminAddress}`,
+            PassportErrorType.WALLET_CONNECTION_ERROR,
+          ),
+        );
+      });
+
+      it('should succeed when zkEVM user wallet address matches TEE wallet address', async () => {
+        const zkEvmUserWithMatchingAddress = {
+          ...mockUserZkEvm,
+          zkEvm: {
+            ...mockUserZkEvm.zkEvm,
+            userAdminAddress: mockWalletResponse.data.public_address,
+          },
+        };
+
+        mockAuthManager.getUser.mockResolvedValue(zkEvmUserWithMatchingAddress);
+        mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
+
+        const address = await magicTEESigner.getAddress();
+
+        expect(address).toBe(mockWalletResponse.data.public_address);
+        expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
+          {
+            createWalletRequestModel: {
+              chain: 'ETH',
+            },
+          },
+          { headers: { Authorization: `Bearer ${zkEvmUserWithMatchingAddress.idToken}` } },
+        );
+      });
+    });
+
+    describe('regular user (no wallet validation)', () => {
+      it('should succeed for regular user without IMX or zkEVM properties', async () => {
+        mockAuthManager.getUser.mockResolvedValue(mockUser);
+        mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
+
+        const address = await magicTEESigner.getAddress();
+
+        expect(address).toBe(mockWalletResponse.data.public_address);
+        expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
+          {
+            createWalletRequestModel: {
+              chain: 'ETH',
+            },
+          },
+          { headers: { Authorization: `Bearer ${mockUser.idToken}` } },
+        );
+      });
+    });
+
+    describe('wallet address validation in signMessage', () => {
+      it('should validate wallet address before signing message for IMX user', async () => {
+        const imxUserWithMismatchedAddress = {
+          ...mockUserImx,
+          imx: {
+            ...mockUserImx.imx,
+            userAdminAddress: '0xdifferentaddress123',
+          },
+        };
+
+        mockAuthManager.getUser.mockResolvedValue(imxUserWithMismatchedAddress);
+        mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
+
+        await expect(magicTEESigner.signMessage('test message')).rejects.toThrow(
+          new PassportError(
+            'Wallet address mismatch.'
+              + `Rollup: IMX, TEE address: ${mockWalletResponse.data.public_address}, `
+              + `profile address: ${imxUserWithMismatchedAddress.imx.userAdminAddress}`,
+            PassportErrorType.WALLET_CONNECTION_ERROR,
+          ),
+        );
+      });
+
+      it('should validate wallet address before signing message for zkEVM user', async () => {
+        const zkEvmUserWithMismatchedAddress = {
+          ...mockUserZkEvm,
+          zkEvm: {
+            ...mockUserZkEvm.zkEvm,
+            userAdminAddress: '0xdifferentaddress456',
+          },
+        };
+
+        mockAuthManager.getUser.mockResolvedValue(zkEvmUserWithMismatchedAddress);
+        mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
+
+        await expect(magicTEESigner.signMessage('test message')).rejects.toThrow(
+          new PassportError(
+            'Wallet address mismatch.'
+              + `Rollup: zkEVM, TEE address: ${mockWalletResponse.data.public_address}, `
+              + `profile address: ${zkEvmUserWithMismatchedAddress.zkEvm.userAdminAddress}`,
+            PassportErrorType.WALLET_CONNECTION_ERROR,
+          ),
+        );
+      });
     });
   });
 });
