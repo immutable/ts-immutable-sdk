@@ -22,7 +22,7 @@ describe('MagicTEESigner', () => {
 
   const mockWalletResponse = {
     data: {
-      public_address: '0x123456789abcdef',
+      public_address: mockUserZkEvm.zkEvm.userAdminAddress,
     },
   };
 
@@ -82,7 +82,7 @@ describe('MagicTEESigner', () => {
 
       const address = await magicTEESigner.getAddress();
 
-      expect(address).toBe('0x123456789abcdef');
+      expect(address).toBe(mockUserZkEvm.zkEvm.userAdminAddress);
       expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
         {
           createWalletRequestModel: {
@@ -112,8 +112,8 @@ describe('MagicTEESigner', () => {
       const address1 = await magicTEESigner.getAddress();
       const address2 = await magicTEESigner.getAddress();
 
-      expect(address1).toBe('0x123456789abcdef');
-      expect(address2).toBe('0x123456789abcdef');
+      expect(address1).toBe(mockUserZkEvm.zkEvm.userAdminAddress);
+      expect(address2).toBe(mockUserZkEvm.zkEvm.userAdminAddress);
       // Should only call createWallet once
       expect(mockCreateWalletV1WalletPost).toHaveBeenCalledTimes(1);
     });
@@ -191,8 +191,8 @@ describe('MagicTEESigner', () => {
         magicTEESigner.getAddress(),
       ]);
 
-      expect(address1).toBe('0x123456789abcdef');
-      expect(address2).toBe('0x123456789abcdef');
+      expect(address1).toBe(mockUserZkEvm.zkEvm.userAdminAddress);
+      expect(address2).toBe(mockUserZkEvm.zkEvm.userAdminAddress);
       // Should only call createWallet once even with concurrent requests
       expect(mockCreateWalletV1WalletPost).toHaveBeenCalledTimes(1);
     });
@@ -341,7 +341,7 @@ describe('MagicTEESigner', () => {
 
       // Second call should succeed (promise should be reset)
       const address = await magicTEESigner.getAddress();
-      expect(address).toBe('0x123456789abcdef');
+      expect(address).toBe(mockUserZkEvm.zkEvm.userAdminAddress);
       expect(mockCreateWalletV1WalletPost).toHaveBeenCalledTimes(2);
     });
   });

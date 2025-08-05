@@ -32,7 +32,7 @@ const mandatoryHandlers = [
   rest.post('https://tee.express.magiclabs.com/v1/wallet', (req, res, ctx) => res(
     ctx.status(201),
     ctx.json({
-      public_address: '0x123456789abcdef',
+      public_address: mockUserZkEvm.zkEvm.userAdminAddress,
     }),
   )),
   rest.post('https://tee.express.magiclabs.com/v1/wallet/personal-sign', (req, res, ctx) => res(
@@ -50,7 +50,7 @@ export const mswHandlers = {
       success: rest.post('https://tee.express.magiclabs.com/v1/wallet', (req, res, ctx) => res(
         ctx.status(201),
         ctx.json({
-          public_address: '0x123456789abcdef',
+          public_address: mockUserZkEvm.zkEvm.userAdminAddress,
         }),
       )),
       internalServerError: rest.post('https://tee.express.magiclabs.com/v1/wallet', (req, res, ctx) => res(ctx.status(500))),
