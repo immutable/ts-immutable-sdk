@@ -830,28 +830,37 @@ describe('AuthManager', () => {
       expect(url.searchParams.get('direct')).toBeNull();
     });
 
-    it('should include direct parameter when directLoginMethod is provided', async () => {
-      const directLoginMethod = 'apple';
-      const result = await authManager.getPKCEAuthorizationUrl(directLoginMethod);
+    it('should include direct parameter when directLoginOptions is provided', async () => {
+      const directLoginOptions = { method: 'apple' as const };
+      const result = await authManager.getPKCEAuthorizationUrl(directLoginOptions);
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('apple');
     });
 
     it('should include direct parameter for google login method', async () => {
-      const directLoginMethod = 'google';
-      const result = await authManager.getPKCEAuthorizationUrl(directLoginMethod);
+      const directLoginOptions = { method: 'google' as const };
+      const result = await authManager.getPKCEAuthorizationUrl(directLoginOptions);
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('google');
     });
 
     it('should include direct parameter for facebook login method', async () => {
-      const directLoginMethod = 'facebook';
-      const result = await authManager.getPKCEAuthorizationUrl(directLoginMethod);
+      const directLoginOptions = { method: 'facebook' as const };
+      const result = await authManager.getPKCEAuthorizationUrl(directLoginOptions);
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('facebook');
+    });
+
+    it('should handle email login with email parameter', async () => {
+      const directLoginOptions = { method: 'email' as const, email: 'test@example.com' };
+      const result = await authManager.getPKCEAuthorizationUrl(directLoginOptions);
+      const url = new URL(result);
+
+      expect(url.searchParams.get('direct')).toEqual('email');
+      expect(url.searchParams.get('email')).toEqual('test@example.com');
     });
 
     it('should include audience parameter when specified in config', async () => {
@@ -868,25 +877,101 @@ describe('AuthManager', () => {
       const configWithAudience = getConfig({ audience: 'test-audience' });
       const am = new AuthManager(configWithAudience);
 
-      const result = await am.getPKCEAuthorizationUrl('apple');
+      const result = await am.getPKCEAuthorizationUrl({ method: 'apple' as const });
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('apple');
       expect(url.searchParams.get('audience')).toEqual('test-audience');
     });
+
+    describe('email validation logic', () => {
+      it('should not include direct/email parameters when email method has empty email', async () => {
+        const directLoginOptions = { method: 'email' as const, email: '' };
+        const result = await authManager.getPKCEAuthorizationUrl(directLoginOptions);
+        const url = new URL(result);
+
+        expect(url.searchParams.get('direct')).toBeNull();
+        expect(url.searchParams.get('email')).toBeNull();
+      });
+
+      it('should not include direct/email parameters when email method has undefined email', async () => {
+        const directLoginOptions = { method: 'email' as const, email: undefined as any };
+        const result = await authManager.getPKCEAuthorizationUrl(directLoginOptions);
+        const url = new URL(result);
+
+        expect(url.searchParams.get('direct')).toBeNull();
+        expect(url.searchParams.get('email')).toBeNull();
+      });
+
+      it('should not include direct/email parameters when email method has "undefined" string email', async () => {
+        const directLoginOptions = { method: 'email' as const, email: 'undefined' };
+        const result = await authManager.getPKCEAuthorizationUrl(directLoginOptions);
+        const url = new URL(result);
+
+        expect(url.searchParams.get('direct')).toBeNull();
+        expect(url.searchParams.get('email')).toBeNull();
+      });
+
+      it('should not include direct/email parameters when email method has "null" string email', async () => {
+        const directLoginOptions = { method: 'email' as const, email: 'null' };
+        const result = await authManager.getPKCEAuthorizationUrl(directLoginOptions);
+        const url = new URL(result);
+
+        expect(url.searchParams.get('direct')).toBeNull();
+        expect(url.searchParams.get('email')).toBeNull();
+      });
+
+      it('should include both direct and email parameters when email method has valid email', async () => {
+        const directLoginOptions = { method: 'email' as const, email: 'user@example.com' };
+        const result = await authManager.getPKCEAuthorizationUrl(directLoginOptions);
+        const url = new URL(result);
+
+        expect(url.searchParams.get('direct')).toEqual('email');
+        expect(url.searchParams.get('email')).toEqual('user@example.com');
+      });
+
+      it('should include direct parameter for social login methods regardless of email field', async () => {
+        const directLoginOptions = { method: 'google' as const };
+        const result = await authManager.getPKCEAuthorizationUrl(directLoginOptions);
+        const url = new URL(result);
+
+        expect(url.searchParams.get('direct')).toEqual('google');
+        expect(url.searchParams.get('email')).toBeNull();
+      });
+    });
   });
 
-  describe('login with directLoginMethod', () => {
+  describe('login with directLoginOptions', () => {
     it('should pass directLoginMethod to login popup', async () => {
       mockSigninPopup.mockResolvedValue(mockOidcUser);
 
-      await authManager.login('anonymous-id', 'apple');
+      await authManager.login('anonymous-id', { method: 'apple' as const });
 
       expect(mockSigninPopup).toHaveBeenCalledWith({
         extraQueryParams: {
           rid: '',
           third_party_a_id: 'anonymous-id',
           direct: 'apple',
+        },
+        popupWindowFeatures: {
+          width: 410,
+          height: 450,
+        },
+        popupWindowTarget: 'passportLoginPrompt',
+      });
+    });
+
+    it('should handle email login with email parameter', async () => {
+      mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+      await authManager.login('anonymous-id', { method: 'email', email: 'test@example.com' });
+
+      expect(mockSigninPopup).toHaveBeenCalledWith({
+        extraQueryParams: {
+          rid: '',
+          third_party_a_id: 'anonymous-id',
+          direct: 'email',
+          email: 'test@example.com',
         },
         popupWindowFeatures: {
           width: 410,
@@ -913,9 +998,122 @@ describe('AuthManager', () => {
         popupWindowTarget: 'passportLoginPrompt',
       });
     });
+
+    describe('email validation logic for login popup', () => {
+      it('should not include direct/email parameters when email method has empty email', async () => {
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+        await authManager.login('anonymous-id', { method: 'email', email: '' });
+
+        expect(mockSigninPopup).toHaveBeenCalledWith({
+          extraQueryParams: {
+            rid: '',
+            third_party_a_id: 'anonymous-id',
+          },
+          popupWindowFeatures: {
+            width: 410,
+            height: 450,
+          },
+          popupWindowTarget: 'passportLoginPrompt',
+        });
+      });
+
+      it('should not include direct/email parameters when email method has undefined email', async () => {
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+        await authManager.login('anonymous-id', { method: 'email', email: undefined as any });
+
+        expect(mockSigninPopup).toHaveBeenCalledWith({
+          extraQueryParams: {
+            rid: '',
+            third_party_a_id: 'anonymous-id',
+          },
+          popupWindowFeatures: {
+            width: 410,
+            height: 450,
+          },
+          popupWindowTarget: 'passportLoginPrompt',
+        });
+      });
+
+      it('should not include direct/email parameters when email method has "undefined" string email', async () => {
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+        await authManager.login('anonymous-id', { method: 'email', email: 'undefined' });
+
+        expect(mockSigninPopup).toHaveBeenCalledWith({
+          extraQueryParams: {
+            rid: '',
+            third_party_a_id: 'anonymous-id',
+          },
+          popupWindowFeatures: {
+            width: 410,
+            height: 450,
+          },
+          popupWindowTarget: 'passportLoginPrompt',
+        });
+      });
+
+      it('should not include direct/email parameters when email method has "null" string email', async () => {
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+        await authManager.login('anonymous-id', { method: 'email', email: 'null' });
+
+        expect(mockSigninPopup).toHaveBeenCalledWith({
+          extraQueryParams: {
+            rid: '',
+            third_party_a_id: 'anonymous-id',
+          },
+          popupWindowFeatures: {
+            width: 410,
+            height: 450,
+          },
+          popupWindowTarget: 'passportLoginPrompt',
+        });
+      });
+
+      it('should include both direct and email parameters when email method has valid email', async () => {
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+        await authManager.login('anonymous-id', { method: 'email', email: 'user@example.com' });
+
+        expect(mockSigninPopup).toHaveBeenCalledWith({
+          extraQueryParams: {
+            rid: '',
+            third_party_a_id: 'anonymous-id',
+            direct: 'email',
+            email: 'user@example.com',
+          },
+          popupWindowFeatures: {
+            width: 410,
+            height: 450,
+          },
+          popupWindowTarget: 'passportLoginPrompt',
+        });
+      });
+
+      it('should include direct parameter for social login methods', async () => {
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+        await authManager.login('anonymous-id', { method: 'google' });
+
+        expect(mockSigninPopup).toHaveBeenCalledWith({
+          extraQueryParams: {
+            rid: '',
+            third_party_a_id: 'anonymous-id',
+            direct: 'google',
+          },
+          popupWindowFeatures: {
+            width: 410,
+            height: 450,
+          },
+          popupWindowTarget: 'passportLoginPrompt',
+        });
+      });
+    });
   });
 
-  describe('loginWithRedirect with directLoginMethod', () => {
+  describe('loginWithRedirect with directLoginOptions', () => {
     let mockSigninRedirect: jest.Mock;
 
     beforeEach(() => {
@@ -937,13 +1135,26 @@ describe('AuthManager', () => {
     });
 
     it('should pass directLoginMethod to redirect login', async () => {
-      await authManager.loginWithRedirect('anonymous-id', 'google');
+      await authManager.loginWithRedirect('anonymous-id', { method: 'google' as const });
 
       expect(mockSigninRedirect).toHaveBeenCalledWith({
         extraQueryParams: {
           rid: '',
           third_party_a_id: 'anonymous-id',
           direct: 'google',
+        },
+      });
+    });
+
+    it('should handle email login with email parameter for redirect', async () => {
+      await authManager.loginWithRedirect('anonymous-id', { method: 'email', email: 'test@example.com' });
+
+      expect(mockSigninRedirect).toHaveBeenCalledWith({
+        extraQueryParams: {
+          rid: '',
+          third_party_a_id: 'anonymous-id',
+          direct: 'email',
+          email: 'test@example.com',
         },
       });
     });
@@ -956,6 +1167,77 @@ describe('AuthManager', () => {
           rid: '',
           third_party_a_id: 'anonymous-id',
         },
+      });
+    });
+
+    describe('email validation logic for redirect login', () => {
+      it('should not include direct/email parameters when email method has empty email', async () => {
+        await authManager.loginWithRedirect('anonymous-id', { method: 'email', email: '' });
+
+        expect(mockSigninRedirect).toHaveBeenCalledWith({
+          extraQueryParams: {
+            rid: '',
+            third_party_a_id: 'anonymous-id',
+          },
+        });
+      });
+
+      it('should not include direct/email parameters when email method has undefined email', async () => {
+        await authManager.loginWithRedirect('anonymous-id', { method: 'email', email: undefined as any });
+
+        expect(mockSigninRedirect).toHaveBeenCalledWith({
+          extraQueryParams: {
+            rid: '',
+            third_party_a_id: 'anonymous-id',
+          },
+        });
+      });
+
+      it('should not include direct/email parameters when email method has "undefined" string email', async () => {
+        await authManager.loginWithRedirect('anonymous-id', { method: 'email', email: 'undefined' });
+
+        expect(mockSigninRedirect).toHaveBeenCalledWith({
+          extraQueryParams: {
+            rid: '',
+            third_party_a_id: 'anonymous-id',
+          },
+        });
+      });
+
+      it('should not include direct/email parameters when email method has "null" string email', async () => {
+        await authManager.loginWithRedirect('anonymous-id', { method: 'email', email: 'null' });
+
+        expect(mockSigninRedirect).toHaveBeenCalledWith({
+          extraQueryParams: {
+            rid: '',
+            third_party_a_id: 'anonymous-id',
+          },
+        });
+      });
+
+      it('should include both direct and email parameters when email method has valid email', async () => {
+        await authManager.loginWithRedirect('anonymous-id', { method: 'email', email: 'user@example.com' });
+
+        expect(mockSigninRedirect).toHaveBeenCalledWith({
+          extraQueryParams: {
+            rid: '',
+            third_party_a_id: 'anonymous-id',
+            direct: 'email',
+            email: 'user@example.com',
+          },
+        });
+      });
+
+      it('should include direct parameter for social login methods', async () => {
+        await authManager.loginWithRedirect('anonymous-id', { method: 'apple' });
+
+        expect(mockSigninRedirect).toHaveBeenCalledWith({
+          extraQueryParams: {
+            rid: '',
+            third_party_a_id: 'anonymous-id',
+            direct: 'apple',
+          },
+        });
       });
     });
   });

@@ -23,4 +23,5 @@ export type {
   PassportOverrides,
   PassportModuleConfiguration,
   DeviceTokenResponse,
+  DirectLoginOptions,
 } from './types';
