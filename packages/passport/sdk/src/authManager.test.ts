@@ -880,7 +880,7 @@ describe('AuthManager', () => {
     it('should pass directLoginMethod to login popup', async () => {
       mockSigninPopup.mockResolvedValue(mockOidcUser);
 
-      await authManager.login('anonymous-id', 'apple');
+      await authManager.login('anonymous-id', { directLoginMethod: 'apple' });
 
       expect(mockSigninPopup).toHaveBeenCalledWith({
         extraQueryParams: {
@@ -937,7 +937,7 @@ describe('AuthManager', () => {
     });
 
     it('should pass directLoginMethod to redirect login', async () => {
-      await authManager.loginWithRedirect('anonymous-id', 'google');
+      await authManager.loginWithRedirect('anonymous-id', { directLoginMethod: 'google' });
 
       expect(mockSigninRedirect).toHaveBeenCalledWith({
         extraQueryParams: {

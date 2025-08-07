@@ -24,3 +24,6 @@ export type {
   PassportModuleConfiguration,
   DeviceTokenResponse,
 } from './types';
+export {
+  MarketingConsentStatus,
+} from './types';

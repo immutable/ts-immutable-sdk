@@ -16,10 +16,12 @@ import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
   DirectLoginMethod,
+  DirectLoginOptions,
   isUserImx,
   isUserZkEvm,
   LinkedWallet,
   LinkWalletParams,
+  MarketingConsentStatus,
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
@@ -191,7 +193,10 @@ export class Passport {
    * @param {boolean} [options.useSilentLogin] - If true, attempts silent authentication without user interaction.
    *                                            Note: This takes precedence over useCachedSession if both are true
    * @param {boolean} [options.useRedirectFlow] - If true, uses redirect flow instead of popup flow
-   * @param {DirectLoginMethod} [options.directLoginMethod] - If provided, directly redirects to the specified login method
+   * @param {DirectLoginOptions} [options.directLoginOptions] - If provided, contains login method and marketing consent options
+   * @param {DirectLoginMethod} [options.directLoginOptions.directLoginMethod] - The login method to use (e.g., 'google', 'apple', 'email')
+   * @param {MarketingConsentStatus} [options.directLoginOptions.marketingConsentStatus] - Marketing consent status ('opted_in' or 'unsubscribed')
+   * @param {string} [options.directLoginOptions.email] - Required when directLoginMethod is 'email'
    * @returns {Promise<UserProfile | null>} A promise that resolves to the user profile if logged in, null otherwise
    * @throws {Error} If retrieving the cached user session fails (except for "Unknown or invalid refresh token" errors)
    *                and useCachedSession is true
@@ -201,7 +206,7 @@ export class Passport {
     anonymousId?: string;
     useSilentLogin?: boolean;
     useRedirectFlow?: boolean;
-    directLoginMethod?: DirectLoginMethod;
+    directLoginOptions?: DirectLoginOptions;
   }): Promise<UserProfile | null> {
     // If there's already a login in progress, return that promise
     if (this.#loginPromise) {
@@ -229,9 +234,9 @@ export class Passport {
         user = await this.authManager.forceUserRefresh();
       } else if (!user && !useCachedSession) {
         if (options?.useRedirectFlow) {
-          await this.authManager.loginWithRedirect(options?.anonymousId, options?.directLoginMethod);
+          await this.authManager.loginWithRedirect(options?.anonymousId, options?.directLoginOptions);
         } else {
-          user = await this.authManager.login(options?.anonymousId, options?.directLoginMethod);
+          user = await this.authManager.login(options?.anonymousId, options?.directLoginOptions);
         }
       }
 
@@ -272,11 +277,17 @@ export class Passport {
 
   /**
    * Initiates a PKCE flow login.
-   * @param {DirectLoginMethod} [directLoginMethod] - If provided, directly redirects to the specified login method
+   * @param {DirectLoginOptions} [directLoginOptions] - If provided, directly redirects to the specified login method
    * @returns {string} The authorization URL for the PKCE flow
    */
-  public loginWithPKCEFlow(directLoginMethod?: DirectLoginMethod): Promise<string> {
-    return withMetricsAsync(async () => await this.authManager.getPKCEAuthorizationUrl(directLoginMethod), 'loginWithPKCEFlow');
+  public loginWithPKCEFlow(
+    directLoginMethod?: DirectLoginMethod,
+    marketingConsentStatus?: MarketingConsentStatus,
+  ): Promise<string> {
+    return withMetricsAsync(
+      async () => await this.authManager.getPKCEAuthorizationUrl(directLoginMethod, marketingConsentStatus),
+      'loginWithPKCEFlow',
+    );
   }
 
   /**
