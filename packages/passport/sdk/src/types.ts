@@ -10,6 +10,8 @@ import { Flow } from '@imtbl/metrics';
  */
 export type DirectLoginMethod = string;
 
+export type DirectLoginOptions = { method: string } | { method: 'email'; email: string };
+
 export enum PassportEvents {
   LOGGED_OUT = 'loggedOut',
   LOGGED_IN = 'loggedIn',

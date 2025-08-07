@@ -179,7 +179,7 @@ export function PassportProvider({
   const popupRedirectGoogle = useCallback(async () => {
     try {
       setIsLoading(true);
-      const userProfile = await passportClient.login({ directLoginMethod: 'google' });
+      const userProfile = await passportClient.login({ directLoginOptions: { method: 'google' } });
       addMessage('Popup Login (Google)', userProfile);
     } catch (err) {
       addMessage('Popup Login (Google)', err);
@@ -192,7 +192,7 @@ export function PassportProvider({
   const popupRedirectApple = useCallback(async () => {
     try {
       setIsLoading(true);
-      const userProfile = await passportClient.login({ directLoginMethod: 'apple' });
+      const userProfile = await passportClient.login({ directLoginOptions: { method: 'apple' } });
       addMessage('Popup Login (Apple)', userProfile);
     } catch (err) {
       addMessage('Popup Login (Apple)', err);
@@ -205,7 +205,7 @@ export function PassportProvider({
   const popupRedirectFacebook = useCallback(async () => {
     try {
       setIsLoading(true);
-      const userProfile = await passportClient.login({ directLoginMethod: 'facebook' });
+      const userProfile = await passportClient.login({ directLoginOptions: { method: 'facebook' } });
       addMessage('Popup Login (Facebook)', userProfile);
     } catch (err) {
       addMessage('Popup Login (Facebook)', err);
@@ -220,7 +220,7 @@ export function PassportProvider({
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({
-        directLoginMethod: 'google',
+        directLoginOptions: { method: 'google' },
         useRedirectFlow: true,
       });
       addMessage('Login (Google)', userProfile);
@@ -236,7 +236,7 @@ export function PassportProvider({
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({
-        directLoginMethod: 'apple',
+        directLoginOptions: { method: 'apple' },
         useRedirectFlow: true,
       });
       addMessage('Login (Apple)', userProfile);
@@ -252,7 +252,7 @@ export function PassportProvider({
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({
-        directLoginMethod: 'facebook',
+        directLoginOptions: { method: 'facebook' },
         useRedirectFlow: true,
       });
       addMessage('Login (Facebook)', userProfile);
