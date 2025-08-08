@@ -180,7 +180,6 @@ export function PassportProvider({
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({
-        useRedirectFlow: true,
         directLoginOptions: {
           directLoginMethod: 'google',
           marketingConsentStatus: MarketingConsentStatus.Unsubscribed,
