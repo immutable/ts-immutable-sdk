@@ -16,9 +16,7 @@ import logger from './utils/logger';
 import { isAccessTokenExpiredOrExpiring } from './utils/token';
 import { PassportError, PassportErrorType, withPassportError } from './errors/passportError';
 import {
-  DirectLoginMethod,
   DirectLoginOptions,
-  MarketingConsentStatus,
   PassportMetadata,
   User,
   DeviceTokenResponse,
@@ -180,15 +178,31 @@ export default class AuthManager {
   };
 
   private buildExtraQueryParams(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Record<string, string> {
-    return {
+    const params: Record<string, string> = {
       ...(this.userManager.settings?.extraQueryParams ?? {}),
       rid: getDetail(Detail.RUNTIME_ID) || '',
       third_party_a_id: anonymousId || '',
-      ...(directLoginOptions?.directLoginMethod && { direct: directLoginOptions.directLoginMethod }),
-      ...(directLoginOptions?.marketingConsentStatus && {
-        marketingConsent: directLoginOptions.marketingConsentStatus,
-      }),
     };
+
+    if (directLoginOptions) {
+      // If method is email, only include direct login params if email is valid
+      if (directLoginOptions.directLoginMethod === 'email') {
+        const emailValue = directLoginOptions.email;
+        if (emailValue) {
+          params.direct = directLoginOptions.directLoginMethod;
+          params.email = emailValue;
+        }
+        // If email method but no valid email, disregard both direct and email params
+      } else {
+        // For non-email methods (social login), always include direct param
+        params.direct = directLoginOptions.directLoginMethod;
+      }
+      if (directLoginOptions.marketingConsentStatus) {
+        params.marketingConsent = directLoginOptions.marketingConsentStatus;
+      }
+    }
+
+    return params;
   }
 
   public async loginWithRedirect(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<void> {
@@ -205,6 +219,10 @@ export default class AuthManager {
   /**
    * login
    * @param anonymousId Caller can pass an anonymousId if they want to associate their user's identity with immutable's internal instrumentation.
+   * @param directLoginOptions If provided, contains login method and marketing consent options
+   * @param directLoginOptions.directLoginMethod The login method to use (e.g., 'google', 'apple', 'email')
+   * @param directLoginOptions.marketingConsentStatus Marketing consent status ('opted_in' or 'unsubscribed')
+   * @param directLoginOptions.email Required when directLoginMethod is 'email'
    */
   public async login(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<User> {
     return withPassportError<User>(async () => {
@@ -294,10 +312,7 @@ export default class AuthManager {
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
-  public async getPKCEAuthorizationUrl(
-    directLoginMethod?: DirectLoginMethod,
-    marketingConsentStatus?: MarketingConsentStatus,
-  ): Promise<string> {
+  public async getPKCEAuthorizationUrl(directLoginOptions?: DirectLoginOptions): Promise<string> {
     const verifier = base64URLEncode(window.crypto.getRandomValues(new Uint8Array(32)));
     const challenge = base64URLEncode(await sha256(verifier));
 
@@ -320,8 +335,23 @@ export default class AuthManager {
 
     if (scope) pKCEAuthorizationUrl.searchParams.set('scope', scope);
     if (audience) pKCEAuthorizationUrl.searchParams.set('audience', audience);
-    if (directLoginMethod) pKCEAuthorizationUrl.searchParams.set('direct', directLoginMethod);
-    if (marketingConsentStatus) pKCEAuthorizationUrl.searchParams.set('marketingConsent', marketingConsentStatus);
+
+    if (directLoginOptions) {
+      // If method is email, only include direct login params if email is valid
+      if (directLoginOptions.directLoginMethod === 'email') {
+        const emailValue = directLoginOptions.email;
+        if (emailValue) {
+          pKCEAuthorizationUrl.searchParams.set('direct', directLoginOptions.directLoginMethod);
+          pKCEAuthorizationUrl.searchParams.set('email', emailValue);
+        }
+      } else {
+        // For non-email methods (social login), always include direct param
+        pKCEAuthorizationUrl.searchParams.set('direct', directLoginOptions.directLoginMethod);
+      }
+      if (directLoginOptions.marketingConsentStatus) {
+        pKCEAuthorizationUrl.searchParams.set('marketingConsent', directLoginOptions.marketingConsentStatus);
+      }
+    }
 
     return pKCEAuthorizationUrl.toString();
   }

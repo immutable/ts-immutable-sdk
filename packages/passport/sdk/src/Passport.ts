@@ -15,13 +15,11 @@ import MagicAdapter from './magic/magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
-  DirectLoginMethod,
   DirectLoginOptions,
   isUserImx,
   isUserZkEvm,
   LinkedWallet,
   LinkWalletParams,
-  MarketingConsentStatus,
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
@@ -280,12 +278,9 @@ export class Passport {
    * @param {DirectLoginOptions} [directLoginOptions] - If provided, directly redirects to the specified login method
    * @returns {string} The authorization URL for the PKCE flow
    */
-  public loginWithPKCEFlow(
-    directLoginMethod?: DirectLoginMethod,
-    marketingConsentStatus?: MarketingConsentStatus,
-  ): Promise<string> {
+  public loginWithPKCEFlow(directLoginOptions?: DirectLoginOptions): Promise<string> {
     return withMetricsAsync(
-      async () => await this.authManager.getPKCEAuthorizationUrl(directLoginMethod, marketingConsentStatus),
+      async () => await this.authManager.getPKCEAuthorizationUrl(directLoginOptions),
       'loginWithPKCEFlow',
     );
   }
