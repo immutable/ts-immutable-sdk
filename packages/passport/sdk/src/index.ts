@@ -23,4 +23,9 @@ export type {
   PassportOverrides,
   PassportModuleConfiguration,
   DeviceTokenResponse,
+  DirectLoginOptions,
+  DirectLoginMethod,
+} from './types';
+export {
+  MarketingConsentStatus,
 } from './types';

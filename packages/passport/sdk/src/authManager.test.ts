@@ -7,7 +7,7 @@ import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
 import { isAccessTokenExpiredOrExpiring } from './utils/token';
-import { isUserZkEvm, PassportModuleConfiguration } from './types';
+import { isUserZkEvm, MarketingConsentStatus, PassportModuleConfiguration } from './types';
 
 jest.mock('jwt-decode');
 jest.mock('oidc-client-ts', () => ({
@@ -832,7 +832,7 @@ describe('AuthManager', () => {
 
     it('should include direct parameter when directLoginMethod is provided', async () => {
       const directLoginMethod = 'apple';
-      const result = await authManager.getPKCEAuthorizationUrl(directLoginMethod);
+      const result = await authManager.getPKCEAuthorizationUrl({ directLoginMethod });
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('apple');
@@ -840,7 +840,7 @@ describe('AuthManager', () => {
 
     it('should include direct parameter for google login method', async () => {
       const directLoginMethod = 'google';
-      const result = await authManager.getPKCEAuthorizationUrl(directLoginMethod);
+      const result = await authManager.getPKCEAuthorizationUrl({ directLoginMethod });
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('google');
@@ -848,7 +848,7 @@ describe('AuthManager', () => {
 
     it('should include direct parameter for facebook login method', async () => {
       const directLoginMethod = 'facebook';
-      const result = await authManager.getPKCEAuthorizationUrl(directLoginMethod);
+      const result = await authManager.getPKCEAuthorizationUrl({ directLoginMethod });
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('facebook');
@@ -868,10 +868,11 @@ describe('AuthManager', () => {
       const configWithAudience = getConfig({ audience: 'test-audience' });
       const am = new AuthManager(configWithAudience);
 
-      const result = await am.getPKCEAuthorizationUrl('apple');
+      const result = await am.getPKCEAuthorizationUrl({ directLoginMethod: 'apple', marketingConsentStatus: MarketingConsentStatus.OptedIn });
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('apple');
+      expect(url.searchParams.get('marketingConsent')).toEqual(MarketingConsentStatus.OptedIn);
       expect(url.searchParams.get('audience')).toEqual('test-audience');
     });
   });
@@ -880,7 +881,7 @@ describe('AuthManager', () => {
     it('should pass directLoginMethod to login popup', async () => {
       mockSigninPopup.mockResolvedValue(mockOidcUser);
 
-      await authManager.login('anonymous-id', 'apple');
+      await authManager.login('anonymous-id', { directLoginMethod: 'apple' });
 
       expect(mockSigninPopup).toHaveBeenCalledWith({
         extraQueryParams: {
@@ -937,7 +938,7 @@ describe('AuthManager', () => {
     });
 
     it('should pass directLoginMethod to redirect login', async () => {
-      await authManager.loginWithRedirect('anonymous-id', 'google');
+      await authManager.loginWithRedirect('anonymous-id', { directLoginMethod: 'google' });
 
       expect(mockSigninRedirect).toHaveBeenCalledWith({
         extraQueryParams: {
