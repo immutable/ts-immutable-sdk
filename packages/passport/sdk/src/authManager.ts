@@ -49,7 +49,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
   const { authenticationDomain, oidcConfiguration } = config;
 
   let store;
-  if (config.crossSdkBridgeEnabled) {
+  if (config.crossSdkBridgeEnabled && typeof window !== 'undefined') {
     store = new LocalForageAsyncStorage('ImmutableSDKPassport', localForage.INDEXEDDB);
   } else if (typeof window !== 'undefined') {
     store = window.localStorage;
