@@ -16,6 +16,7 @@ import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
   DirectLoginOptions,
+  DeviceTokenResponse,
   isUserImx,
   isUserZkEvm,
   LinkedWallet,
@@ -192,7 +193,7 @@ export class Passport {
    *                                            Note: This takes precedence over useCachedSession if both are true
    * @param {boolean} [options.useRedirectFlow] - If true, uses redirect flow instead of popup flow
    * @param {DirectLoginOptions} [options.directLoginOptions] - If provided, contains login method and marketing consent options
-   * @param {DirectLoginMethod} [options.directLoginOptions.directLoginMethod] - The login method to use (e.g., 'google', 'apple', 'email')
+   * @param {string} [options.directLoginOptions.directLoginMethod] - The login method to use (e.g., 'google', 'apple', 'email')
    * @param {MarketingConsentStatus} [options.directLoginOptions.marketingConsentStatus] - Marketing consent status ('opted_in' or 'unsubscribed')
    * @param {string} [options.directLoginOptions.email] - Required when directLoginMethod is 'email'
    * @returns {Promise<UserProfile | null>} A promise that resolves to the user profile if logged in, null otherwise
@@ -303,6 +304,14 @@ export class Passport {
       this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
       return user.profile;
     }, 'loginWithPKCEFlowCallback');
+  }
+
+  public async storeTokens(tokenResponse: DeviceTokenResponse): Promise<UserProfile> {
+    return withMetricsAsync(async () => {
+      const user = await this.authManager.storeTokens(tokenResponse);
+      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+      return user.profile;
+    }, 'storeTokens');
   }
 
   /**
