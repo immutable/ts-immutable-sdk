@@ -176,3 +176,16 @@ export type LinkedWallet = {
   name?: string;
   clientName: string;
 };
+
+export enum MarketingConsentStatus {
+  OptedIn = 'opted_in',
+  Unsubscribed = 'unsubscribed',
+}
+
+export type DirectLoginOptions = {
+  directLoginMethod: DirectLoginMethod;
+  marketingConsentStatus?: MarketingConsentStatus;
+} & (
+  | { directLoginMethod: 'email'; email: string }
+  | { directLoginMethod: Exclude<DirectLoginMethod, 'email'>; email?: never }
+);

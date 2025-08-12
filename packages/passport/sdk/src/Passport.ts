@@ -15,7 +15,8 @@ import MagicAdapter from './magic/magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
-  DirectLoginMethod,
+  DirectLoginOptions,
+  DeviceTokenResponse,
   isUserImx,
   isUserZkEvm,
   LinkedWallet,
@@ -191,7 +192,10 @@ export class Passport {
    * @param {boolean} [options.useSilentLogin] - If true, attempts silent authentication without user interaction.
    *                                            Note: This takes precedence over useCachedSession if both are true
    * @param {boolean} [options.useRedirectFlow] - If true, uses redirect flow instead of popup flow
-   * @param {DirectLoginMethod} [options.directLoginMethod] - If provided, directly redirects to the specified login method
+   * @param {DirectLoginOptions} [options.directLoginOptions] - If provided, contains login method and marketing consent options
+   * @param {string} [options.directLoginOptions.directLoginMethod] - The login method to use (e.g., 'google', 'apple', 'email')
+   * @param {MarketingConsentStatus} [options.directLoginOptions.marketingConsentStatus] - Marketing consent status ('opted_in' or 'unsubscribed')
+   * @param {string} [options.directLoginOptions.email] - Required when directLoginMethod is 'email'
    * @returns {Promise<UserProfile | null>} A promise that resolves to the user profile if logged in, null otherwise
    * @throws {Error} If retrieving the cached user session fails (except for "Unknown or invalid refresh token" errors)
    *                and useCachedSession is true
@@ -201,7 +205,7 @@ export class Passport {
     anonymousId?: string;
     useSilentLogin?: boolean;
     useRedirectFlow?: boolean;
-    directLoginMethod?: DirectLoginMethod;
+    directLoginOptions?: DirectLoginOptions;
   }): Promise<UserProfile | null> {
     // If there's already a login in progress, return that promise
     if (this.#loginPromise) {
@@ -229,9 +233,9 @@ export class Passport {
         user = await this.authManager.forceUserRefresh();
       } else if (!user && !useCachedSession) {
         if (options?.useRedirectFlow) {
-          await this.authManager.loginWithRedirect(options?.anonymousId, options?.directLoginMethod);
+          await this.authManager.loginWithRedirect(options?.anonymousId, options?.directLoginOptions);
         } else {
-          user = await this.authManager.login(options?.anonymousId, options?.directLoginMethod);
+          user = await this.authManager.login(options?.anonymousId, options?.directLoginOptions);
         }
       }
 
@@ -272,11 +276,14 @@ export class Passport {
 
   /**
    * Initiates a PKCE flow login.
-   * @param {DirectLoginMethod} [directLoginMethod] - If provided, directly redirects to the specified login method
+   * @param {DirectLoginOptions} [directLoginOptions] - If provided, directly redirects to the specified login method
    * @returns {string} The authorization URL for the PKCE flow
    */
-  public loginWithPKCEFlow(directLoginMethod?: DirectLoginMethod): Promise<string> {
-    return withMetricsAsync(async () => await this.authManager.getPKCEAuthorizationUrl(directLoginMethod), 'loginWithPKCEFlow');
+  public loginWithPKCEFlow(directLoginOptions?: DirectLoginOptions): Promise<string> {
+    return withMetricsAsync(
+      async () => await this.authManager.getPKCEAuthorizationUrl(directLoginOptions),
+      'loginWithPKCEFlow',
+    );
   }
 
   /**
@@ -297,6 +304,14 @@ export class Passport {
       this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
       return user.profile;
     }, 'loginWithPKCEFlowCallback');
+  }
+
+  public async storeTokens(tokenResponse: DeviceTokenResponse): Promise<UserProfile> {
+    return withMetricsAsync(async () => {
+      const user = await this.authManager.storeTokens(tokenResponse);
+      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+      return user.profile;
+    }, 'storeTokens');
   }
 
   /**
@@ -323,7 +338,7 @@ export class Passport {
    * Returns the logout URL for the current user.
    * @returns {Promise<string>} The logout URL
    */
-  public async getLogoutUrl(): Promise<string> {
+  public async getLogoutUrl(): Promise<string | null> {
     return withMetricsAsync(async () => {
       await this.authManager.removeUser();
       await this.magicAdapter.logout();

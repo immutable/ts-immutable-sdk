@@ -7,7 +7,7 @@ import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
 import { isAccessTokenExpiredOrExpiring } from './utils/token';
-import { isUserZkEvm, PassportModuleConfiguration } from './types';
+import { isUserZkEvm, MarketingConsentStatus, PassportModuleConfiguration } from './types';
 
 jest.mock('jwt-decode');
 jest.mock('oidc-client-ts', () => ({
@@ -24,6 +24,7 @@ const clientId = '11111';
 const redirectUri = 'https://test.com';
 const popupRedirectUri = `${redirectUri}-popup`;
 const logoutEndpoint = '/v2/logout';
+const crossSdkBridgeLogoutEndpoint = '/im-logged-out';
 const logoutRedirectUri = `${redirectUri}logout/callback`;
 
 const getConfig = (values?: Partial<PassportModuleConfiguration>) => new PassportConfiguration({
@@ -108,7 +109,7 @@ describe('AuthManager', () => {
     mockOverlayAppend = jest.fn();
     mockOverlayRemove = jest.fn();
     mockRevokeTokens = jest.fn();
-    (UserManager as jest.Mock).mockReturnValue({
+    (UserManager as jest.Mock).mockImplementation((config) => ({
       signinPopup: mockSigninPopup,
       signinCallback: mockSigninCallback,
       signinRedirectCallback: mockSigninRedirectCallback,
@@ -118,7 +119,12 @@ describe('AuthManager', () => {
       signinSilent: mockSigninSilent,
       storeUser: mockStoreUser,
       revokeTokens: mockRevokeTokens,
-    });
+      settings: {
+        metadata: {
+          end_session_endpoint: config.metadata?.end_session_endpoint,
+        },
+      },
+    }));
     (Overlay as jest.Mock).mockReturnValue({
       append: mockOverlayAppend,
       remove: mockOverlayRemove,
@@ -455,8 +461,7 @@ describe('AuthManager', () => {
             PassportErrorType.LOGOUT_ERROR,
           ),
         );
-        // In silent mode, signoutSilent is called in parallel with revokeTokens
-        expect(mockSignoutSilent).toHaveBeenCalled();
+        expect(mockSignoutSilent).not.toHaveBeenCalled();
       });
     });
 
@@ -719,7 +724,9 @@ describe('AuthManager', () => {
 
           const am = new AuthManager(getConfig({ logoutRedirectUri }));
           const result = await am.getLogoutUrl();
-          const uri = new URL(result);
+
+          expect(result).not.toBeNull();
+          const uri = new URL(result!);
 
           expect(uri.hostname).toEqual(authenticationDomain);
           expect(uri.pathname).toEqual(logoutEndpoint);
@@ -734,12 +741,42 @@ describe('AuthManager', () => {
 
           const am = new AuthManager(getConfig());
           const result = await am.getLogoutUrl();
-          const uri = new URL(result);
+
+          expect(result).not.toBeNull();
+          const uri = new URL(result!);
 
           expect(uri.hostname).toEqual(authenticationDomain);
           expect(uri.pathname).toEqual(logoutEndpoint);
           expect(uri.searchParams.get('client_id')).toEqual(clientId);
         });
+      });
+
+      describe('when crossSdkBridgeEnabled is true', () => {
+        it('should use the bridge logout endpoint path', async () => {
+          mockGetUser.mockReturnValue(mockOidcUser);
+
+          const am = new AuthManager(getConfig({ crossSdkBridgeEnabled: true, logoutRedirectUri }));
+          const result = await am.getLogoutUrl();
+
+          expect(result).not.toBeNull();
+          const uri = new URL(result!);
+
+          expect(uri.hostname).toEqual(authenticationDomain);
+          expect(uri.pathname).toEqual(crossSdkBridgeLogoutEndpoint);
+          expect(uri.searchParams.get('client_id')).toEqual(clientId);
+          expect(uri.searchParams.get('returnTo')).toEqual(logoutRedirectUri);
+        });
+      });
+    });
+
+    describe('when end_session_endpoint is not available', () => {
+      it('should return null', async () => {
+        const am = new AuthManager(getConfig());
+        // eslint-disable-next-line @typescript-eslint/dot-notation
+        am['userManager'].settings.metadata!.end_session_endpoint = undefined;
+
+        const result = await am.getLogoutUrl();
+        expect(result).toBeNull();
       });
     });
   });
@@ -795,7 +832,7 @@ describe('AuthManager', () => {
 
     it('should include direct parameter when directLoginMethod is provided', async () => {
       const directLoginMethod = 'apple';
-      const result = await authManager.getPKCEAuthorizationUrl(directLoginMethod);
+      const result = await authManager.getPKCEAuthorizationUrl({ directLoginMethod });
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('apple');
@@ -803,7 +840,7 @@ describe('AuthManager', () => {
 
     it('should include direct parameter for google login method', async () => {
       const directLoginMethod = 'google';
-      const result = await authManager.getPKCEAuthorizationUrl(directLoginMethod);
+      const result = await authManager.getPKCEAuthorizationUrl({ directLoginMethod });
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('google');
@@ -811,7 +848,7 @@ describe('AuthManager', () => {
 
     it('should include direct parameter for facebook login method', async () => {
       const directLoginMethod = 'facebook';
-      const result = await authManager.getPKCEAuthorizationUrl(directLoginMethod);
+      const result = await authManager.getPKCEAuthorizationUrl({ directLoginMethod });
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('facebook');
@@ -831,10 +868,11 @@ describe('AuthManager', () => {
       const configWithAudience = getConfig({ audience: 'test-audience' });
       const am = new AuthManager(configWithAudience);
 
-      const result = await am.getPKCEAuthorizationUrl('apple');
+      const result = await am.getPKCEAuthorizationUrl({ directLoginMethod: 'apple', marketingConsentStatus: MarketingConsentStatus.OptedIn });
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('apple');
+      expect(url.searchParams.get('marketingConsent')).toEqual(MarketingConsentStatus.OptedIn);
       expect(url.searchParams.get('audience')).toEqual('test-audience');
     });
   });
@@ -843,7 +881,7 @@ describe('AuthManager', () => {
     it('should pass directLoginMethod to login popup', async () => {
       mockSigninPopup.mockResolvedValue(mockOidcUser);
 
-      await authManager.login('anonymous-id', 'apple');
+      await authManager.login('anonymous-id', { directLoginMethod: 'apple' });
 
       expect(mockSigninPopup).toHaveBeenCalledWith({
         extraQueryParams: {
@@ -900,7 +938,7 @@ describe('AuthManager', () => {
     });
 
     it('should pass directLoginMethod to redirect login', async () => {
-      await authManager.loginWithRedirect('anonymous-id', 'google');
+      await authManager.loginWithRedirect('anonymous-id', { directLoginMethod: 'google' });
 
       expect(mockSigninRedirect).toHaveBeenCalledWith({
         extraQueryParams: {
