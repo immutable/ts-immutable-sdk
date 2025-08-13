@@ -111,8 +111,8 @@ export class Blockscout {
       // Map address_hash to address if address is not present
       const normalizedItems = response.data?.items?.map((item: BlockscoutToken) => {
         const normalizedToken = { ...item.token };
-        if (!normalizedToken.address && normalizedToken.address_hash) {
-          normalizedToken.address = normalizedToken.address_hash;
+        if (!normalizedToken.address && (normalizedToken as any).address_hash) {
+          normalizedToken.address = (normalizedToken as any).address_hash;
         }
         return { ...item, token: normalizedToken };
       }) || [];
