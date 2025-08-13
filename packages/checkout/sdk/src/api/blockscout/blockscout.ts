@@ -107,12 +107,22 @@ export class Blockscout {
 
       const response = await this.httpClient.get(url); // success if 2XX response otherwise throw error
 
+      // Normalize the data by ensuring address field is always present
+      // Map address_hash to address if address is not present
+      const normalizedItems = response.data?.items?.map((item: BlockscoutToken) => {
+        const normalizedToken = { ...item.token };
+        if (!normalizedToken.address && normalizedToken.address_hash) {
+          normalizedToken.address = normalizedToken.address_hash;
+        }
+        return { ...item, token: normalizedToken };
+      }) || [];
+
       // To get around an issue with native tokens being an ERC-20, there is the need
       // to remove IMX from `resp` and add it back in using getNativeTokenByWalletAddress.
       // This has affected some of the early wallets, and it might not be an issue in mainnet
       // however, let's enforce it.
       const data = {
-        items: response.data?.items?.filter(
+        items: normalizedItems.filter(
           (token: BlockscoutToken) => token.token.address && token.token.address !== this.nativeToken.address,
         ),
         // eslint-disable-next-line @typescript-eslint/naming-convention

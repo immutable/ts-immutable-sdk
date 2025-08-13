@@ -20,6 +20,7 @@ export interface BlockscoutToken {
 
 export interface BlockscoutTokenData {
   address: string
+  address_hash?: string
   decimals: string
   name: string
   symbol: string
@@ -34,6 +35,7 @@ export interface BlockscoutError {
 
 export interface BlockscoutNativeTokenData {
   address: string
+  address_hash?: string
   decimals: string
   name: string
   symbol: string
