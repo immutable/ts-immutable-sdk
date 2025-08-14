@@ -423,10 +423,18 @@ export function AddTokens({
   }, [checkout, id]);
 
   const sendRequestOnRampEvent = async () => {
-    if (
-      toAddress
-      && (await checkSanctionedAddresses([toAddress], checkout.config))
-    ) {
+    // Only check sanctions if we have meaningful data
+    const shouldCheckSanctions = toAddress && selectedToken?.address && selectedAmount;
+    const isSanctioned = shouldCheckSanctions && await checkSanctionedAddresses(
+      checkout.config,
+      [{
+        address: toAddress,
+        tokenAddr: selectedToken.address!,
+        amount: selectedAmount,
+      }],
+    );
+
+    if (isSanctioned) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -496,14 +504,25 @@ export function AddTokens({
   const handleReviewClick = async () => {
     if (!selectedRouteData || !selectedToken?.address) return;
 
-    if (
-      fromAddress
-      && toAddress
-      && (await checkSanctionedAddresses(
-        [fromAddress, toAddress],
-        checkout.config,
-      ))
-    ) {
+    // Only check sanctions if we have meaningful amount data
+    const shouldCheckSanctions = selectedAmount && fromAddress && toAddress;
+    const isSanctioned = shouldCheckSanctions && await checkSanctionedAddresses(
+      checkout.config,
+      [
+        {
+          address: fromAddress,
+          tokenAddr: selectedToken.address,
+          amount: selectedAmount,
+        },
+        {
+          address: toAddress,
+          tokenAddr: selectedToken.address,
+          amount: selectedAmount,
+        },
+      ],
+    );
+
+    if (isSanctioned) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
