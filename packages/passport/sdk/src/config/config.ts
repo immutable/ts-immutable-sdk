@@ -38,6 +38,10 @@ export class PassportConfiguration {
 
   readonly magicProviderId: string;
 
+  readonly magicTeeBasePath: string = 'https://tee.express.magiclabs.com';
+
+  readonly magicTeeTimeout: number = 6000;
+
   readonly oidcConfiguration: OidcConfiguration;
 
   readonly baseConfig: ImmutableConfiguration;
