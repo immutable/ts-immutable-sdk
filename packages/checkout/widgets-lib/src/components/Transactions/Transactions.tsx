@@ -362,7 +362,7 @@ export function Transactions({
         details: {
           from_address: '0xunknown',
           from_chain: ChainSlug.IMTBL_ZKEVM_MAINNET, // TODO
-          from_token_address: withdrawal.token, // this is wrong
+          from_token_address: '0x94Eb1f2da28A9D30f9699D8Dc1D59A47F9D354a2', // withdrawal.token, // this is wrong
           to_address: withdrawal.recipient,
           to_chain: ChainSlug.ETHEREUM, // TODO
           to_token_address: withdrawal.token,
