@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -8,8 +9,8 @@ import {
   TokenFilterTypes,
   TokenInfo,
   WalletProviderRdns,
+  ChainSlug,
 } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
 import { JsonRpcProvider } from 'ethers';
 import { HeaderNavigation } from '../Header/HeaderNavigation';
@@ -23,7 +24,7 @@ import {
 import {
   DEFAULT_TRANSACTIONS_RETRY_POLICY,
 } from '../../lib';
-import { CheckoutApi, Transaction, TransactionType } from '../../lib/clients';
+import { Transaction, TransactionType } from '../../lib/clients';
 import { retry } from '../../lib/retry';
 import { getChainSlugById } from '../../lib/chains';
 import {
@@ -70,7 +71,7 @@ export function Transactions({
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const {
     bridgeDispatch,
-    bridgeState: { checkout, from },
+    bridgeState: { checkout, from, tokenBridge },
   } = useContext(BridgeContext);
   const { page } = useAnalytics();
   const { t } = useTranslation();
@@ -227,17 +228,6 @@ export function Transactions({
     return { [rootChainName]: rootData, [childChainName]: childData };
   };
 
-  const getTransactionsDetails = useCallback(
-    async (env: Environment, address: string) => {
-      const client = new CheckoutApi({ env });
-      return client.getTransactions({
-        txType: TransactionType.BRIDGE,
-        fromAddress: address,
-      });
-    },
-    [],
-  );
-
   const handleWalletChange = useCallback(
     async (event: WalletChangeEvent) => {
       track({
@@ -313,22 +303,55 @@ export function Transactions({
 
   const fetchData = useCallback(async () => {
     if (!from?.walletAddress) return undefined;
+    if (!tokenBridge) return undefined;
 
-    const localTxs = await getTransactionsDetails(
-      checkout.config.environment,
-      from?.walletAddress,
-    );
-
-    const tokensWithChainSlug: { [k: string]: string } = {};
-    localTxs.result.forEach((txn) => {
-      tokensWithChainSlug[txn.details.from_token_address] = txn.details.from_chain;
+    const pendingWithdrawals = await tokenBridge.getPendingWithdrawals({
+      recipient: '0x20e9503A6BC31765d3648b4AB67d035AA67c65A6', // has to be the receiver
     });
+
+    console.log({ pendingWithdrawals });
+
+    const transactions = (await Promise.all(pendingWithdrawals.pending.map(async (withdrawal, index) => {
+      const tokenMapping = await tokenBridge.getTokenMapping({
+        rootToken: withdrawal.token,
+        rootChainId: checkout.config.l1ChainId.toString(),
+        childChainId: checkout.config.l2ChainId.toString(),
+      });
+      if (!tokenMapping.childToken) return null;
+
+      return {
+        tx_type: TransactionType.BRIDGE,
+        details: {
+          from_address: withdrawal.withdrawer,
+          from_chain: getChainSlugById(checkout.config.l2ChainId),
+          from_token_address: tokenMapping.childToken,
+          to_address: withdrawal.recipient,
+          to_chain: getChainSlugById(checkout.config.l1ChainId),
+          to_token_address: withdrawal.token,
+          amount: withdrawal.amount.toString(),
+          current_status: {
+            status: 'withdrawal_pending',
+            index,
+            withdrawal_ready_at: new Date(withdrawal.timeoutEnd).toISOString(),
+          },
+        },
+        blockchain_metadata: {
+          transaction_hash: '', // TODO
+        },
+        created_at: new Date(withdrawal.timeoutEnd).toISOString(),
+      };
+    }))).filter((tx) => tx !== null);
+
+    console.log({ transactions });
+
+    const tokensWithChainSlug = transactions.reduce<Record<string, ChainSlug>>((acc, tx) =>
+      ({ ...acc, [tx.details.from_token_address]: tx.details.from_chain }), {});
 
     return {
       tokens: await getTokensDetails(tokensWithChainSlug),
-      transactions: localTxs.result,
+      transactions,
     };
-  }, [from, getTransactionsDetails]);
+  }, [from, tokenBridge]);
 
   const { providers } = useInjectedProviders({ checkout });
   const walletOptions = useMemo(() => providers, [providers]);
@@ -343,6 +366,7 @@ export function Transactions({
         return;
       }
 
+      // these will become a list of pending transactions only
       const knownTxs = data.transactions.filter((txn) => {
         const tokens = data.tokens[txn.details.from_chain];
         if (!tokens) return false;
