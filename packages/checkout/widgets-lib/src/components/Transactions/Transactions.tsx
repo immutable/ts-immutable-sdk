@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -8,10 +9,14 @@ import {
   TokenFilterTypes,
   TokenInfo,
   WalletProviderRdns,
+  ChainSlug,
 } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
 import { JsonRpcProvider } from 'ethers';
+import {
+  BridgeConfiguration, ETH_MAINNET_TO_ZKEVM_MAINNET, TokenBridge,
+} from '@imtbl/bridge-sdk';
 import { HeaderNavigation } from '../Header/HeaderNavigation';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../Footer/FooterLogo';
@@ -314,19 +319,74 @@ export function Transactions({
   const fetchData = useCallback(async () => {
     if (!from?.walletAddress) return undefined;
 
-    const localTxs = await getTransactionsDetails(
-      checkout.config.environment,
-      from?.walletAddress,
+    console.log({ from });
+
+    // Root provider is always L1
+    const rootProvider = new JsonRpcProvider(
+      checkout.config.networkMap.get(checkout.config.l1ChainId)?.rpcUrls[0],
     );
 
+    // Child provider is always L2
+    const childProvider = new JsonRpcProvider(
+      checkout.config.networkMap.get(checkout.config.l2ChainId)?.rpcUrls[0],
+    );
+
+    const providers = new Map<ChainId, JsonRpcProvider>();
+    providers.set(checkout.config.l1ChainId, rootProvider);
+    providers.set(checkout.config.l2ChainId, childProvider);
+
+    const tokenBridge = new TokenBridge(new BridgeConfiguration({
+      baseConfig: new ImmutableConfiguration({ environment: checkout.config.environment }),
+      bridgeInstance: ETH_MAINNET_TO_ZKEVM_MAINNET, // TODO
+      rootProvider,
+      childProvider,
+    }));
+
+    // here we call getPendingWithdrawals
+    const pendingWithdrawals = await tokenBridge.getPendingWithdrawals({
+      recipient: '0xbD8Dc294478ec4dAd9f1b4596bf275f4d0309817',
+    });
+
+    console.log({ pendingWithdrawals });
+
+    // const localTxs = await getTransactionsDetails(
+    //   checkout.config.environment,
+    //   from?.walletAddress,
+    // );
+
+    // eslint-disable-next-line arrow-body-style
+    const transactions: Transaction[] = pendingWithdrawals.pending.map((withdrawal, index) => {
+      return {
+        tx_type: TransactionType.BRIDGE,
+        details: {
+          from_address: '0xunknown',
+          from_chain: ChainSlug.IMTBL_ZKEVM_TESTNET, // TODO
+          from_token_address: withdrawal.token, // this is wrong
+          to_address: withdrawal.recipient,
+          to_chain: ChainSlug.SEPOLIA, // TODO
+          to_token_address: withdrawal.token,
+          amount: withdrawal.amount.toString(),
+          current_status: {
+            status: 'pending',
+            index,
+            withdrawal_ready_at: withdrawal.timeoutEnd.toString(),
+          },
+        },
+        blockchain_metadata: {
+          transaction_hash: '0xunknown',
+        },
+        created_at: 'TODO',
+      };
+    });
+
     const tokensWithChainSlug: { [k: string]: string } = {};
-    localTxs.result.forEach((txn) => {
-      tokensWithChainSlug[txn.details.from_token_address] = txn.details.from_chain;
+    pendingWithdrawals.pending.forEach((withdrawal) => {
+      tokensWithChainSlug[withdrawal.token] = ChainSlug.SEPOLIA; // TODO
     });
 
     return {
       tokens: await getTokensDetails(tokensWithChainSlug),
-      transactions: localTxs.result,
+      transactions,
     };
   }, [from, getTransactionsDetails]);
 
@@ -343,11 +403,14 @@ export function Transactions({
         return;
       }
 
+      // these will become a list of pending transactions only
       const knownTxs = data.transactions.filter((txn) => {
         const tokens = data.tokens[txn.details.from_chain];
+        console.log({ tokens });
         if (!tokens) return false;
 
         const token = tokens[txn.details.from_token_address.toLowerCase()];
+        console.log({ token });
         if (!token) return false;
 
         return true;
