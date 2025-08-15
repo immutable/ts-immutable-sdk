@@ -311,9 +311,6 @@ export function Transactions({
 
     console.log({ pendingWithdrawals });
 
-    // get the from_addr on l2
-    // get the txn hash
-
     const transactions = (await Promise.all(pendingWithdrawals.pending.map(async (withdrawal, index) => {
       const tokenMapping = await tokenBridge.getTokenMapping({
         rootToken: withdrawal.token,
@@ -325,7 +322,7 @@ export function Transactions({
       return {
         tx_type: TransactionType.BRIDGE,
         details: {
-          from_address: '', // TODO: Do we need this?
+          from_address: withdrawal.withdrawer,
           from_chain: getChainSlugById(checkout.config.l2ChainId),
           from_token_address: tokenMapping.childToken,
           to_address: withdrawal.recipient,
@@ -333,17 +330,19 @@ export function Transactions({
           to_token_address: withdrawal.token,
           amount: withdrawal.amount.toString(),
           current_status: {
-            status: 'pending',
+            status: 'withdrawal_pending',
             index,
-            withdrawal_ready_at: withdrawal.timeoutEnd.toString(),
+            withdrawal_ready_at: new Date(withdrawal.timeoutEnd).toISOString(),
           },
         },
         blockchain_metadata: {
           transaction_hash: '', // TODO
         },
-        created_at: 'TODO',
+        created_at: new Date(withdrawal.timeoutEnd).toISOString(),
       };
     }))).filter((tx) => tx !== null);
+
+    console.log({ transactions });
 
     const tokensWithChainSlug = transactions.reduce<Record<string, ChainSlug>>((acc, tx) =>
       ({ ...acc, [tx.details.from_token_address]: tx.details.from_chain }), {});
