@@ -344,7 +344,7 @@ export function Transactions({
 
     // here we call getPendingWithdrawals
     const pendingWithdrawals = await tokenBridge.getPendingWithdrawals({
-      recipient: '0xbD8Dc294478ec4dAd9f1b4596bf275f4d0309817',
+      recipient: '0x20e9503A6BC31765d3648b4AB67d035AA67c65A6',
     });
 
     console.log({ pendingWithdrawals });
@@ -360,10 +360,10 @@ export function Transactions({
         tx_type: TransactionType.BRIDGE,
         details: {
           from_address: '0xunknown',
-          from_chain: ChainSlug.IMTBL_ZKEVM_TESTNET, // TODO
+          from_chain: ChainSlug.IMTBL_ZKEVM_MAINNET, // TODO
           from_token_address: withdrawal.token, // this is wrong
           to_address: withdrawal.recipient,
-          to_chain: ChainSlug.SEPOLIA, // TODO
+          to_chain: ChainSlug.ETHEREUM, // TODO
           to_token_address: withdrawal.token,
           amount: withdrawal.amount.toString(),
           current_status: {
@@ -381,7 +381,7 @@ export function Transactions({
 
     const tokensWithChainSlug: { [k: string]: string } = {};
     pendingWithdrawals.pending.forEach((withdrawal) => {
-      tokensWithChainSlug[withdrawal.token] = ChainSlug.SEPOLIA; // TODO
+      tokensWithChainSlug[withdrawal.token] = ChainSlug.ETHEREUM; // TODO
     });
 
     return {
