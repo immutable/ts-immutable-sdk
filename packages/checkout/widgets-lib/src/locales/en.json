@@ -636,7 +636,7 @@
       },
       "fiatPricePrefix": "≈ USD $",
       "support": {
-        "body1": "Need help?",
+        "body1": "Need additional help?",
         "body2": " Contact ",
         "body3": "support",
         "supportLink": "https://support.immutable.com/hc/en-us",
