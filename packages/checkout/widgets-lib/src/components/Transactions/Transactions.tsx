@@ -151,6 +151,7 @@ export function Transactions({
   }) => {
     const rootChainName = getChainSlugById(checkout.config.l1ChainId);
     const childChainName = getChainSlugById(checkout.config.l2ChainId);
+    console.log({ rootChainName, childChainName });
 
     const [rootData, childData] = await Promise.all([
       rootChainTokensHashmap(),
@@ -381,8 +382,10 @@ export function Transactions({
 
     const tokensWithChainSlug: { [k: string]: string } = {};
     pendingWithdrawals.pending.forEach((withdrawal) => {
-      tokensWithChainSlug[withdrawal.token] = ChainSlug.ETHEREUM; // TODO
+      tokensWithChainSlug[withdrawal.token] = ChainSlug.IMTBL_ZKEVM_MAINNET; // TODO
     });
+
+    console.log({ tokensWithChainSlug });
 
     return {
       tokens: await getTokensDetails(tokensWithChainSlug),
@@ -405,6 +408,7 @@ export function Transactions({
 
       // these will become a list of pending transactions only
       const knownTxs = data.transactions.filter((txn) => {
+        console.log({ dataTokens: data.tokens });
         const tokens = data.tokens[txn.details.from_chain];
         console.log({ tokens });
         if (!tokens) return false;
