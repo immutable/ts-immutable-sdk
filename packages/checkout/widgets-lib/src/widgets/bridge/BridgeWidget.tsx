@@ -257,7 +257,7 @@ export default function BridgeWidget({
             />
           )}
           {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (
-            <Transactions onBackButtonClick={goBackToWalletNetworkSelector} defaultTokenImage={defaultTokenImage} />
+            <Transactions onBackButtonClick={goBackToWalletNetworkSelector} />
           )}
           {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL && (
             <ClaimWithdrawal transaction={viewState.view.transaction} />
