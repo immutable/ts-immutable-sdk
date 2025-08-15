@@ -345,7 +345,7 @@ export function Transactions({
 
     // here we call getPendingWithdrawals
     const pendingWithdrawals = await tokenBridge.getPendingWithdrawals({
-      recipient: '0x20e9503A6BC31765d3648b4AB67d035AA67c65A6',
+      recipient: '0x20e9503A6BC31765d3648b4AB67d035AA67c65A6', // has to be the receiver
     });
 
     console.log({ pendingWithdrawals });
@@ -354,6 +354,10 @@ export function Transactions({
     //   checkout.config.environment,
     //   from?.walletAddress,
     // );
+
+    // get the token addr on l2
+    // get the from_addr on l2
+    // get the txn hash
 
     // eslint-disable-next-line arrow-body-style
     const transactions: Transaction[] = pendingWithdrawals.pending.map((withdrawal, index) => {
@@ -374,15 +378,15 @@ export function Transactions({
           },
         },
         blockchain_metadata: {
-          transaction_hash: '0xunknown',
+          transaction_hash: '0xunknown', // TODO
         },
         created_at: 'TODO',
       };
     });
 
     const tokensWithChainSlug: { [k: string]: string } = {};
-    pendingWithdrawals.pending.forEach((withdrawal) => {
-      tokensWithChainSlug[withdrawal.token] = ChainSlug.IMTBL_ZKEVM_MAINNET; // TODO
+    pendingWithdrawals.pending.forEach(() => {
+      tokensWithChainSlug['0x94Eb1f2da28A9D30f9699D8Dc1D59A47F9D354a2'] = ChainSlug.IMTBL_ZKEVM_MAINNET; // TODO
     });
 
     console.log({ tokensWithChainSlug });
