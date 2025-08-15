@@ -73,7 +73,7 @@ function LookingForPastTransactions() {
         >
           Axelarscan
         </Link>
-        . Search there using a non-Passport wallet address.
+        . Search there with the non-Passport wallet address used in the transaction.
       </Body>
     </Box>
   );
