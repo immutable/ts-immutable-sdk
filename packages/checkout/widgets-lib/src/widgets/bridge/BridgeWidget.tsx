@@ -61,7 +61,6 @@ import {
   BridgeClaimWithdrawalFailure,
   BridgeWidgetViews,
 } from '../../context/view-context/BridgeViewContextTypes';
-import { ClaimWithdrawal } from './views/ClaimWithdrawal';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
@@ -257,10 +256,7 @@ export default function BridgeWidget({
             />
           )}
           {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (
-            <Transactions onBackButtonClick={goBackToWalletNetworkSelector} defaultTokenImage={defaultTokenImage} />
-          )}
-          {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL && (
-            <ClaimWithdrawal transaction={viewState.view.transaction} />
+            <Transactions onBackButtonClick={goBackToWalletNetworkSelector} />
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView

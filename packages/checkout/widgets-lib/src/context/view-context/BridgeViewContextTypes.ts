@@ -1,6 +1,5 @@
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { TransactionResponse } from 'ethers';
-import { Transaction } from '../../lib/clients';
 import { ViewType } from './ViewType';
 
 export enum BridgeWidgetViews {
@@ -26,7 +25,6 @@ export type BridgeWidgetView =
   | BridgeFailure
   | BridgeApproveTransaction
   | BridgeTransactions
-  | BridgeClaimWithdrawal
   | BridgeClaimWithdrawalInProgress
   | BridgeClaimWithdrawalSuccess
   | BridgeClaimWithdrawalFailure
@@ -63,11 +61,6 @@ interface BridgeApproveTransaction extends ViewType {
 
 interface BridgeTransactions extends ViewType {
   type: BridgeWidgetViews.TRANSACTIONS,
-}
-
-interface BridgeClaimWithdrawal extends ViewType {
-  type: BridgeWidgetViews.CLAIM_WITHDRAWAL,
-  transaction: Transaction
 }
 
 interface BridgeClaimWithdrawalInProgress extends ViewType {
