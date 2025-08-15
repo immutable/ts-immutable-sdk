@@ -11,12 +11,8 @@ import {
   WalletProviderRdns,
   ChainSlug,
 } from '@imtbl/checkout-sdk';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
 import { JsonRpcProvider } from 'ethers';
-import {
-  BridgeConfiguration, ETH_MAINNET_TO_ZKEVM_MAINNET, TokenBridge,
-} from '@imtbl/bridge-sdk';
 import { HeaderNavigation } from '../Header/HeaderNavigation';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../Footer/FooterLogo';
@@ -28,7 +24,7 @@ import {
 import {
   DEFAULT_TRANSACTIONS_RETRY_POLICY,
 } from '../../lib';
-import { CheckoutApi, Transaction, TransactionType } from '../../lib/clients';
+import { Transaction, TransactionType } from '../../lib/clients';
 import { retry } from '../../lib/retry';
 import { getChainSlugById } from '../../lib/chains';
 import {
@@ -75,7 +71,7 @@ export function Transactions({
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const {
     bridgeDispatch,
-    bridgeState: { checkout, from },
+    bridgeState: { checkout, from, tokenBridge },
   } = useContext(BridgeContext);
   const { page } = useAnalytics();
   const { t } = useTranslation();
@@ -151,7 +147,6 @@ export function Transactions({
   }) => {
     const rootChainName = getChainSlugById(checkout.config.l1ChainId);
     const childChainName = getChainSlugById(checkout.config.l2ChainId);
-    console.log({ rootChainName, childChainName });
 
     const [rootData, childData] = await Promise.all([
       rootChainTokensHashmap(),
@@ -233,17 +228,6 @@ export function Transactions({
     return { [rootChainName]: rootData, [childChainName]: childData };
   };
 
-  const getTransactionsDetails = useCallback(
-    async (env: Environment, address: string) => {
-      const client = new CheckoutApi({ env });
-      return client.getTransactions({
-        txType: TransactionType.BRIDGE,
-        fromAddress: address,
-      });
-    },
-    [],
-  );
-
   const handleWalletChange = useCallback(
     async (event: WalletChangeEvent) => {
       track({
@@ -319,56 +303,33 @@ export function Transactions({
 
   const fetchData = useCallback(async () => {
     if (!from?.walletAddress) return undefined;
+    if (!tokenBridge) return undefined;
 
-    console.log({ from });
-
-    // Root provider is always L1
-    const rootProvider = new JsonRpcProvider(
-      checkout.config.networkMap.get(checkout.config.l1ChainId)?.rpcUrls[0],
-    );
-
-    // Child provider is always L2
-    const childProvider = new JsonRpcProvider(
-      checkout.config.networkMap.get(checkout.config.l2ChainId)?.rpcUrls[0],
-    );
-
-    const providers = new Map<ChainId, JsonRpcProvider>();
-    providers.set(checkout.config.l1ChainId, rootProvider);
-    providers.set(checkout.config.l2ChainId, childProvider);
-
-    const tokenBridge = new TokenBridge(new BridgeConfiguration({
-      baseConfig: new ImmutableConfiguration({ environment: checkout.config.environment }),
-      bridgeInstance: ETH_MAINNET_TO_ZKEVM_MAINNET, // TODO
-      rootProvider,
-      childProvider,
-    }));
-
-    // here we call getPendingWithdrawals
     const pendingWithdrawals = await tokenBridge.getPendingWithdrawals({
       recipient: '0x20e9503A6BC31765d3648b4AB67d035AA67c65A6', // has to be the receiver
     });
 
     console.log({ pendingWithdrawals });
 
-    // const localTxs = await getTransactionsDetails(
-    //   checkout.config.environment,
-    //   from?.walletAddress,
-    // );
-
-    // get the token addr on l2
     // get the from_addr on l2
     // get the txn hash
 
-    // eslint-disable-next-line arrow-body-style
-    const transactions: Transaction[] = pendingWithdrawals.pending.map((withdrawal, index) => {
+    const transactions = (await Promise.all(pendingWithdrawals.pending.map(async (withdrawal, index) => {
+      const tokenMapping = await tokenBridge.getTokenMapping({
+        rootToken: withdrawal.token,
+        rootChainId: checkout.config.l1ChainId.toString(),
+        childChainId: checkout.config.l2ChainId.toString(),
+      });
+      if (!tokenMapping.childToken) return null;
+
       return {
         tx_type: TransactionType.BRIDGE,
         details: {
-          from_address: '0xunknown',
-          from_chain: ChainSlug.IMTBL_ZKEVM_MAINNET, // TODO
-          from_token_address: '0x94Eb1f2da28A9D30f9699D8Dc1D59A47F9D354a2', // withdrawal.token, // this is wrong
+          from_address: '', // TODO: Do we need this?
+          from_chain: getChainSlugById(checkout.config.l2ChainId),
+          from_token_address: tokenMapping.childToken,
           to_address: withdrawal.recipient,
-          to_chain: ChainSlug.ETHEREUM, // TODO
+          to_chain: getChainSlugById(checkout.config.l1ChainId),
           to_token_address: withdrawal.token,
           amount: withdrawal.amount.toString(),
           current_status: {
@@ -378,24 +339,20 @@ export function Transactions({
           },
         },
         blockchain_metadata: {
-          transaction_hash: '0xunknown', // TODO
+          transaction_hash: '', // TODO
         },
         created_at: 'TODO',
       };
-    });
+    }))).filter((tx) => tx !== null);
 
-    const tokensWithChainSlug: { [k: string]: string } = {};
-    pendingWithdrawals.pending.forEach(() => {
-      tokensWithChainSlug['0x94Eb1f2da28A9D30f9699D8Dc1D59A47F9D354a2'] = ChainSlug.IMTBL_ZKEVM_MAINNET; // TODO
-    });
-
-    console.log({ tokensWithChainSlug });
+    const tokensWithChainSlug = transactions.reduce<Record<string, ChainSlug>>((acc, tx) =>
+      ({ ...acc, [tx.details.from_token_address]: tx.details.from_chain }), {});
 
     return {
       tokens: await getTokensDetails(tokensWithChainSlug),
       transactions,
     };
-  }, [from, getTransactionsDetails]);
+  }, [from, tokenBridge]);
 
   const { providers } = useInjectedProviders({ checkout });
   const walletOptions = useMemo(() => providers, [providers]);
@@ -412,13 +369,10 @@ export function Transactions({
 
       // these will become a list of pending transactions only
       const knownTxs = data.transactions.filter((txn) => {
-        console.log({ dataTokens: data.tokens });
         const tokens = data.tokens[txn.details.from_chain];
-        console.log({ tokens });
         if (!tokens) return false;
 
         const token = tokens[txn.details.from_token_address.toLowerCase()];
-        console.log({ token });
         if (!token) return false;
 
         return true;
