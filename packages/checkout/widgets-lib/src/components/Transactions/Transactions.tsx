@@ -334,7 +334,7 @@ export function Transactions({
           },
         },
         blockchain_metadata: {
-          transaction_hash: '', // TODO
+          transaction_hash: '', // @dev we don't have the txn hash, but we don't need it.
         },
         created_at: new Date(withdrawal.timeoutStart * 1000).toISOString(),
       };
@@ -362,7 +362,6 @@ export function Transactions({
         return;
       }
 
-      // these will become a list of pending transactions only
       const knownTxs = data.transactions.filter((txn) => {
         const tokens = data.tokens[txn.details.from_chain];
         if (!tokens) return false;
