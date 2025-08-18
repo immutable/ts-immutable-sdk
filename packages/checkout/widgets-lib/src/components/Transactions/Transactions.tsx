@@ -10,9 +10,11 @@ import {
   TokenInfo,
   WalletProviderRdns,
   ChainSlug,
+  Checkout,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { JsonRpcProvider } from 'ethers';
+import { TokenBridge } from '@imtbl/bridge-sdk';
 import { HeaderNavigation } from '../Header/HeaderNavigation';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../Footer/FooterLogo';
@@ -58,6 +60,43 @@ import { WalletChangeEvent } from '../WalletDrawer/WalletDrawerEvents';
 type TransactionsProps = {
   defaultTokenImage: string;
   onBackButtonClick: () => void;
+};
+
+const getTransactionsDetails = async (tokenBridge: TokenBridge, checkout: Checkout, recipient: string) => {
+  const pendingWithdrawals = await tokenBridge.getPendingWithdrawals({ recipient });
+
+  const transactions = (await Promise.all(pendingWithdrawals.pending.map(async (withdrawal, index) => {
+    const tokenMapping = await tokenBridge.getTokenMapping({
+      rootToken: withdrawal.token,
+      rootChainId: checkout.config.l1ChainId.toString(),
+      childChainId: checkout.config.l2ChainId.toString(),
+    });
+    if (!tokenMapping.childToken) return null;
+
+    return {
+      tx_type: TransactionType.BRIDGE,
+      details: {
+        from_address: withdrawal.withdrawer,
+        from_chain: getChainSlugById(checkout.config.l2ChainId),
+        from_token_address: tokenMapping.childToken,
+        to_address: withdrawal.recipient,
+        to_chain: getChainSlugById(checkout.config.l1ChainId),
+        to_token_address: withdrawal.token,
+        amount: withdrawal.amount.toString(),
+        current_status: {
+          status: 'withdrawal_pending',
+          index,
+          withdrawal_ready_at: new Date(withdrawal.timeoutEnd * 1000).toISOString(),
+        },
+      },
+      blockchain_metadata: {
+        transaction_hash: '', // @dev we don't have the txn hash, but we don't need it.
+      },
+      created_at: new Date(withdrawal.timeoutStart * 1000).toISOString(),
+    };
+  }))).filter((tx) => tx !== null);
+
+  return { result: transactions };
 };
 
 export function Transactions({
@@ -305,47 +344,14 @@ export function Transactions({
     if (!from?.walletAddress) return undefined;
     if (!tokenBridge) return undefined;
 
-    const pendingWithdrawals = await tokenBridge.getPendingWithdrawals({
-      recipient: from.walletAddress,
-    });
+    const localTxs = await getTransactionsDetails(tokenBridge, checkout, from.walletAddress);
 
-    const transactions = (await Promise.all(pendingWithdrawals.pending.map(async (withdrawal, index) => {
-      const tokenMapping = await tokenBridge.getTokenMapping({
-        rootToken: withdrawal.token,
-        rootChainId: checkout.config.l1ChainId.toString(),
-        childChainId: checkout.config.l2ChainId.toString(),
-      });
-      if (!tokenMapping.childToken) return null;
-
-      return {
-        tx_type: TransactionType.BRIDGE,
-        details: {
-          from_address: withdrawal.withdrawer,
-          from_chain: getChainSlugById(checkout.config.l2ChainId),
-          from_token_address: tokenMapping.childToken,
-          to_address: withdrawal.recipient,
-          to_chain: getChainSlugById(checkout.config.l1ChainId),
-          to_token_address: withdrawal.token,
-          amount: withdrawal.amount.toString(),
-          current_status: {
-            status: 'withdrawal_pending',
-            index,
-            withdrawal_ready_at: new Date(withdrawal.timeoutEnd * 1000).toISOString(),
-          },
-        },
-        blockchain_metadata: {
-          transaction_hash: '', // @dev we don't have the txn hash, but we don't need it.
-        },
-        created_at: new Date(withdrawal.timeoutStart * 1000).toISOString(),
-      };
-    }))).filter((tx) => tx !== null);
-
-    const tokensWithChainSlug = transactions.reduce<Record<string, ChainSlug>>((acc, tx) =>
+    const tokensWithChainSlug = localTxs.result.reduce<Record<string, ChainSlug>>((acc, tx) =>
       ({ ...acc, [tx.details.from_token_address]: tx.details.from_chain }), {});
 
     return {
       tokens: await getTokensDetails(tokensWithChainSlug),
-      transactions,
+      transactions: localTxs.result,
     };
   }, [from, tokenBridge, checkout, getTokensDetails]);
 
