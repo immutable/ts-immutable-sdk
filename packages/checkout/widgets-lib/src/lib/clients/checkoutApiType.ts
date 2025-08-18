@@ -8,10 +8,6 @@ export const TransactionStatus = {
   WITHDRAWAL_PENDING: 'withdrawal_pending',
 } as const;
 
-export type Transactions = {
-  result: Transaction[]
-};
-
 export type CurrentStatus = {
   status: string;
   withdrawal_ready_at?: string;
