@@ -12,7 +12,7 @@ function BridgeUI() {
     passport.connectEvm().then(() => {
       const checkout = new Checkout({
         baseConfig: {
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
         },
         passport,
       });

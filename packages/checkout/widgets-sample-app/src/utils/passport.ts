@@ -2,7 +2,7 @@ import { Passport } from "@imtbl/passport";
 import { Environment } from "@imtbl/config";
 
 const baseConfig = {
-  environment: Environment.PRODUCTION,
+  environment: Environment.SANDBOX,
 }
 
 export const passport = new Passport({

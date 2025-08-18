@@ -306,10 +306,8 @@ export function Transactions({
     if (!tokenBridge) return undefined;
 
     const pendingWithdrawals = await tokenBridge.getPendingWithdrawals({
-      recipient: '0x20e9503A6BC31765d3648b4AB67d035AA67c65A6', // has to be the receiver
+      recipient: from.walletAddress,
     });
-
-    console.log({ pendingWithdrawals });
 
     const transactions = (await Promise.all(pendingWithdrawals.pending.map(async (withdrawal, index) => {
       const tokenMapping = await tokenBridge.getTokenMapping({
