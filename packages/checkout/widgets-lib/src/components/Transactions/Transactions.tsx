@@ -330,17 +330,15 @@ export function Transactions({
           current_status: {
             status: 'withdrawal_pending',
             index,
-            withdrawal_ready_at: new Date(withdrawal.timeoutEnd).toISOString(),
+            withdrawal_ready_at: new Date(withdrawal.timeoutEnd * 1000).toISOString(),
           },
         },
         blockchain_metadata: {
           transaction_hash: '', // TODO
         },
-        created_at: new Date(withdrawal.timeoutEnd).toISOString(),
+        created_at: new Date(withdrawal.timeoutStart * 1000).toISOString(),
       };
     }))).filter((tx) => tx !== null);
-
-    console.log({ transactions });
 
     const tokensWithChainSlug = transactions.reduce<Record<string, ChainSlug>>((acc, tx) =>
       ({ ...acc, [tx.details.from_token_address]: tx.details.from_chain }), {});
