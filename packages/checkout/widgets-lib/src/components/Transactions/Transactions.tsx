@@ -89,9 +89,6 @@ const getTransactionsDetails = async (tokenBridge: TokenBridge, checkout: Checko
           withdrawal_ready_at: new Date(withdrawal.timeoutEnd * 1000).toISOString(),
         },
       },
-      blockchain_metadata: {
-        transaction_hash: '', // @dev we don't have the txn hash, but we don't need it.
-      },
       created_at: new Date(withdrawal.timeoutStart * 1000).toISOString(),
     };
   }))).filter((tx) => tx !== null);
