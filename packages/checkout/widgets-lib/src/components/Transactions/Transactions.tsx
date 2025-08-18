@@ -142,7 +142,7 @@ export function Transactions({
     }
   }, [checkout, from]);
 
-  const getTokensDetails = async (tokensWithChainSlug: {
+  const getTokensDetails = useCallback(async (tokensWithChainSlug: {
     [p: string]: string;
   }) => {
     const rootChainName = getChainSlugById(checkout.config.l1ChainId);
@@ -226,7 +226,7 @@ export function Transactions({
     });
 
     return { [rootChainName]: rootData, [childChainName]: childData };
-  };
+  }, [checkout, cryptoFiatDispatch, rootChainTokensHashmap, childChainTokensHashmap]);
 
   const handleWalletChange = useCallback(
     async (event: WalletChangeEvent) => {
@@ -272,7 +272,7 @@ export function Transactions({
         setShowWalletDrawer(false);
       }
     },
-    [checkout],
+    [checkout, bridgeDispatch, track],
   );
 
   const handleBackButtonClick = () => {
@@ -347,7 +347,7 @@ export function Transactions({
       tokens: await getTokensDetails(tokensWithChainSlug),
       transactions,
     };
-  }, [from, tokenBridge]);
+  }, [from, tokenBridge, checkout, getTokensDetails]);
 
   const { providers } = useInjectedProviders({ checkout });
   const walletOptions = useMemo(() => providers, [providers]);
@@ -377,14 +377,14 @@ export function Transactions({
 
       setLoading(false);
     })();
-  }, [from, checkout]);
+  }, [from, checkout, fetchData]);
 
   useEffect(() => {
     page({
       userJourney: UserJourney.BRIDGE,
       screen: 'Transactions',
     });
-  }, []);
+  }, [page]);
 
   return (
     <SimpleLayout
