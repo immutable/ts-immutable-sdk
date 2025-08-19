@@ -16,7 +16,7 @@ import { HandoverTarget } from '../../../context/handover-context/HandoverContex
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { isPassportProvider } from '../../../lib/provider';
-import { getRemoteRive } from '../../../lib/utils';
+import { errorToString, getRemoteRive } from '../../../lib/utils';
 import { HandoverDuration } from '../../../context/handover-context/HandoverProvider';
 
 interface StepConfig {
@@ -120,7 +120,7 @@ export function PayWithCoins() {
           onTxnStepExecuteNextTransaction,
         );
       } catch (error) {
-        goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, { error });
+        goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, { error: errorToString(error) });
       }
     };
 
