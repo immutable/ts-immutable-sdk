@@ -23,7 +23,7 @@ import {
   SignCurrencyFilter,
   SquidPostHookCall,
 } from '../primary-sales';
-import { filterAllowedTransactions, hexToText } from '../utils';
+import { errorToString, filterAllowedTransactions, hexToText } from '../utils';
 
 const toSignedProduct = (
   product: SignApiProduct,
@@ -194,7 +194,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         }
         const error: SignOrderError = {
           type: errorType,
-          data: { error: err },
+          data: { error: errorToString(err) },
         };
         setSignError(error);
         return [undefined, error];
