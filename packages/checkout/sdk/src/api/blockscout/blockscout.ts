@@ -1,11 +1,15 @@
 import axios, {
   AxiosError,
+  AxiosResponse,
   HttpStatusCode,
 } from 'axios';
 import { ChainId } from '../../types';
 import {
+  BlockscoutERC20Response,
+  BlockscoutERC20ResponseItem,
   BlockscoutNativeTokenData,
   BlockscoutToken,
+  BlockscoutTokenData,
   BlockscoutTokenPagination,
   BlockscoutTokens,
   BlockscoutTokenType,
@@ -105,17 +109,25 @@ export class Blockscout {
       const cached = this.getCache(url);
       if (cached) return Promise.resolve(cached);
 
-      const response = await this.httpClient.get(url); // success if 2XX response otherwise throw error
+      // success if 2XX response otherwise throw error
+      const response: AxiosResponse<BlockscoutERC20Response> = await this.httpClient.get(url);
 
-      // Normalize the data by ensuring address field is always present
-      // Map address_hash to address if address is not present
-      const normalizedItems = response.data?.items?.map((item: BlockscoutToken) => {
-        const normalizedToken = { ...item.token };
-        if (!normalizedToken.address && (normalizedToken as any).address_hash) {
-          normalizedToken.address = (normalizedToken as any).address_hash;
-        }
-        return { ...item, token: normalizedToken };
-      }) || [];
+      // blockscout changed their API to return address_hash instead of address
+      // map the address_hash to address field so that any further consumer is not affected by the change
+      const normalizedItems: BlockscoutToken[] = response.data?.items?.map(
+        (item: BlockscoutERC20ResponseItem) => {
+          const token: BlockscoutTokenData = {
+            ...item.token,
+            address: item.token.address_hash,
+            holders: item.token.holders_count,
+          };
+
+          return {
+            ...item,
+            token,
+          };
+        },
+      ) || [];
 
       // To get around an issue with native tokens being an ERC-20, there is the need
       // to remove IMX from `resp` and add it back in using getNativeTokenByWalletAddress.
