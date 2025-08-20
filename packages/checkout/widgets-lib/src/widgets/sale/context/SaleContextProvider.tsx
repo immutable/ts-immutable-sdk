@@ -16,6 +16,7 @@ import {
   useState,
 } from 'react';
 import { Environment } from '@imtbl/config';
+import { trackError } from '@imtbl/metrics';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import {
@@ -88,7 +89,7 @@ type SaleContextValues = SaleContextProps & {
     paymentMethod?: SalePaymentTypes | undefined,
     data?: Record<string, unknown>
   ) => void;
-  goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
+  goToErrorView: (type: SaleErrorTypes, data?: Record<string, string>) => void;
   goToSuccessView: (data?: Record<string, unknown>) => void;
   fundingRoutes: FundingRoute[];
   disabledPaymentTypes: SalePaymentTypes[];
@@ -306,12 +307,14 @@ export function SaleContextProvider(props: {
   );
 
   const goToErrorView = useCallback(
-    (errorType: SaleErrorTypes, data: Record<string, unknown> = {}) => {
+    (errorType: SaleErrorTypes, data: Record<string, string> = {}) => {
       errorRetries.current += 1;
       if (errorRetries.current > MAX_ERROR_RETRIES) {
         errorRetries.current = 0;
         setPaymentMethod(undefined);
       }
+
+      trackError('commerce', 'saleError', new Error(errorType), data);
 
       viewDispatch({
         payload: {

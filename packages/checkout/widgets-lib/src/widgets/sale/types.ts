@@ -59,7 +59,7 @@ export type SignOrderInput = {
 
 export type SignOrderError = {
   type: SaleErrorTypes;
-  data?: Record<string, unknown>;
+  data?: Record<string, string>;
 };
 
 export type ExecutedTransaction = {

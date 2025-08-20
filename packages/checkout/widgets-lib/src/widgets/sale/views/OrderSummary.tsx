@@ -32,7 +32,7 @@ import {
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { ViewContext, ViewActions, SharedViews } from '../../../context/view-context/ViewContext';
 import { useHandover } from '../../../lib/hooks/useHandover';
-import { getRemoteRive } from '../../../lib/utils';
+import { errorToString, getRemoteRive } from '../../../lib/utils';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
@@ -202,8 +202,10 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
           },
         },
       });
-    } catch (error: any) {
-      goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, error);
+    } catch (error: unknown) {
+      goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, {
+        error: errorToString(error),
+      });
     }
   }, [fundingBalances, loadingBalances, fundingBalancesResult]);
 
