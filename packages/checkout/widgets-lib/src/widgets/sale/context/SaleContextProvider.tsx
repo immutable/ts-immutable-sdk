@@ -247,7 +247,8 @@ export function SaleContextProvider(props: {
   }, [provider]);
 
   useEffect(() => {
-    if (!checkout || riskAssessment) {
+    // Only run risk assessment when we have meaningful token selection
+    if (!checkout || riskAssessment || !selectedCurrency) {
       return;
     }
 
@@ -258,10 +259,17 @@ export function SaleContextProvider(props: {
         return;
       }
 
-      const assessment = await fetchRiskAssessment([address], checkout.config);
+      // We have meaningful token data - call enhanced risk assessment
+      const assessmentData = [{
+        address,
+        tokenAddr: selectedCurrency.address,
+        amount: orderQuote.totalAmount[selectedCurrency.name].amount.toString(),
+      }];
+
+      const assessment = await fetchRiskAssessment(checkout.config, assessmentData);
       setRiskAssessment(assessment);
     })();
-  }, [checkout, provider]);
+  }, [checkout, provider, selectedCurrency, orderQuote]);
 
   const {
     sign: signOrder,
