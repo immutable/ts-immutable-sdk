@@ -3,10 +3,13 @@ import axios, {
   AxiosResponse,
   HttpStatusCode,
 } from 'axios';
+import { z } from 'zod';
+import { trackError } from '@imtbl/metrics';
 import { ChainId } from '../../types';
 import {
   BlockscoutERC20Response,
   BlockscoutERC20ResponseItem,
+  BlockscoutERC20ResponseSchema,
   BlockscoutNativeTokenData,
   BlockscoutToken,
   BlockscoutTokenData,
@@ -78,6 +81,46 @@ export class Blockscout {
   }
 
   /**
+   * Generic HTTP GET method with schema validation and caching
+   * @param url The URL to fetch from
+   * @param schema Zod schema to validate the response
+   * @returns Promise with validated and typed response data
+   */
+  private async httpGet<T>(url: string, schema: z.ZodSchema<T>): Promise<T> {
+    try {
+      // Cache response data to prevent unnecessary requests
+      const cached = this.getCache(url);
+      if (cached) return Promise.resolve(cached);
+
+      // success if 2XX response otherwise throw error
+      const response: AxiosResponse = await this.httpClient.get(url);
+
+      // Only validate response structure for successful responses (2xx)
+      if (response.status >= 200 && response.status < 300) {
+        try {
+          const validatedData = schema.parse(response.data);
+          this.setCache(url, validatedData);
+          return Promise.resolve(validatedData);
+        } catch (validationError: any) {
+          trackError('checkout', 'blockscout_response_validation_failed', validationError);
+          return Promise.resolve(response.data);
+        }
+      }
+
+      // For non-2xx responses, return data without validation
+      return Promise.resolve(response.data);
+    } catch (err: any) {
+      let code: number = HttpStatusCode.InternalServerError;
+      let message = 'InternalServerError';
+      if (axios.isAxiosError(err)) {
+        code = (err as AxiosError).response?.status || code;
+        message = (err as AxiosError).message;
+      }
+      return Promise.reject({ code, message });
+    }
+  }
+
+  /**
    * isChainSupported verifies if the chain is supported by Blockscout
    * @param chainId
    */
@@ -101,57 +144,42 @@ export class Blockscout {
     tokenType: BlockscoutTokenType,
     nextPage?: BlockscoutTokenPagination | null
   }): Promise<BlockscoutTokens> {
-    try {
-      let url = `${this.url}/api/v2/addresses/${params.walletAddress}/tokens?type=${params.tokenType}`;
-      if (params.nextPage) url += `&${new URLSearchParams(params.nextPage as Record<string, string>)}`;
+    let url = `${this.url}/api/v2/addresses/${params.walletAddress}/tokens?type=${params.tokenType}`;
+    if (params.nextPage) url += `&${new URLSearchParams(params.nextPage as Record<string, string>)}`;
 
-      // Cache response data to prevent unnecessary requests
-      const cached = this.getCache(url);
-      if (cached) return Promise.resolve(cached);
+    // Use the generic httpGet method with schema validation
+    const response = await this.httpGet<BlockscoutERC20Response>(url, BlockscoutERC20ResponseSchema);
 
-      // success if 2XX response otherwise throw error
-      const response: AxiosResponse<BlockscoutERC20Response> = await this.httpClient.get(url);
+    // blockscout changed their API to return address_hash instead of address
+    // map the address_hash to address field so that any further consumer is not affected by the change
+    const normalizedItems: BlockscoutToken[] = response.items?.map(
+      (item: BlockscoutERC20ResponseItem) => {
+        const token: BlockscoutTokenData = {
+          ...item.token,
+          address: item.token.address_hash,
+          holders: item.token.holders_count,
+        };
 
-      // blockscout changed their API to return address_hash instead of address
-      // map the address_hash to address field so that any further consumer is not affected by the change
-      const normalizedItems: BlockscoutToken[] = response.data?.items?.map(
-        (item: BlockscoutERC20ResponseItem) => {
-          const token: BlockscoutTokenData = {
-            ...item.token,
-            address: item.token.address_hash,
-            holders: item.token.holders_count,
-          };
+        return {
+          ...item,
+          token,
+        };
+      },
+    ) || [];
 
-          return {
-            ...item,
-            token,
-          };
-        },
-      ) || [];
+    // To get around an issue with native tokens being an ERC-20, there is the need
+    // to remove IMX from `resp` and add it back in using getNativeTokenByWalletAddress.
+    // This has affected some of the early wallets, and it might not be an issue in mainnet
+    // however, let's enforce it.
+    const data = {
+      items: normalizedItems.filter(
+        (token: BlockscoutToken) => token.token.address && token.token.address !== this.nativeToken.address,
+      ),
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      next_page_params: response.next_page_params,
+    };
 
-      // To get around an issue with native tokens being an ERC-20, there is the need
-      // to remove IMX from `resp` and add it back in using getNativeTokenByWalletAddress.
-      // This has affected some of the early wallets, and it might not be an issue in mainnet
-      // however, let's enforce it.
-      const data = {
-        items: normalizedItems.filter(
-          (token: BlockscoutToken) => token.token.address && token.token.address !== this.nativeToken.address,
-        ),
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        next_page_params: response.data?.next_page_params,
-      };
-
-      this.setCache(url, data);
-      return Promise.resolve(data);
-    } catch (err: any) {
-      let code: number = HttpStatusCode.InternalServerError;
-      let message = 'InternalServerError';
-      if (axios.isAxiosError(err)) {
-        code = (err as AxiosError).response?.status || code;
-        message = (err as AxiosError).message;
-      }
-      return Promise.reject({ code, message });
-    }
+    return Promise.resolve(data);
   }
 
   /**

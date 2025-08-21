@@ -1,6 +1,7 @@
 /* eslint @typescript-eslint/naming-convention: off */
 
 import { HttpStatusCode } from 'axios';
+import { z } from 'zod';
 
 export enum BlockscoutTokenType {
   ERC20 = 'ERC-20',
@@ -62,3 +63,36 @@ export interface BlockscoutNativeTokenData {
   name: string
   symbol: string
 }
+
+// Zod schemas for runtime validation
+export const BlockscoutTokenTypeSchema = z.enum(BlockscoutTokenType);
+
+export const BlockscoutTokenPaginationSchema = z.record(z.string(), z.union([z.string(), z.number(), z.null()]));
+
+export const BlockscoutERC20ResponseItemTokenSchema = z.object({
+  address_hash: z.string().refine(
+    (val) => val.startsWith('0x'),
+    { message: 'address_hash must start with \'0x\'' },
+  ),
+  decimals: z.string(),
+  name: z.string(),
+  symbol: z.string(),
+  holders_count: z.string(),
+  circulating_market_cap: z.string(),
+  exchange_rate: z.string(),
+  total_supply: z.string(),
+  icon_url: z.string(),
+  type: BlockscoutTokenTypeSchema,
+});
+
+export const BlockscoutERC20ResponseItemSchema = z.object({
+  token: BlockscoutERC20ResponseItemTokenSchema,
+  value: z.string(),
+  token_id: z.union([z.string(), z.null()]),
+  token_instance: z.union([z.string(), z.null()]),
+});
+
+export const BlockscoutERC20ResponseSchema = z.object({
+  items: z.array(BlockscoutERC20ResponseItemSchema),
+  next_page_params: z.union([BlockscoutTokenPaginationSchema, z.null()]),
+});
