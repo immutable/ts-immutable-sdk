@@ -480,5 +480,56 @@ describe('Blockscout', () => {
         expect((error as BlockscoutError).message).toEqual('InternalServerError');
       }
     });
+
+    it('calls trackError and returns data when 2xx response fails validation', async () => {
+      // Mock a 200 response with invalid data structure that will fail validation
+      const mockInvalidResponse = {
+        status: 200,
+        statusText: 'OK',
+        data: { balance: '55290000000000000000' }, // Wrong field name - should be 'coin_balance'
+      } as AxiosResponse;
+      mockedHttpClient.get.mockResolvedValueOnce(mockInvalidResponse);
+
+      const client = new Blockscout(mockedHttpClient, ChainId.IMTBL_ZKEVM_TESTNET);
+
+      const result = await client.getNativeTokenByWalletAddress({
+        walletAddress: '0x1234567890',
+      });
+
+      // Should call trackError for validation failure
+      expect(metrics.trackError).toHaveBeenCalledWith(
+        'checkout',
+        'blockscout_response_validation_failed',
+        expect.any(Error),
+      );
+
+      expect(result.value).toEqual(undefined);
+    });
+
+    it('handles valid response with extra properties', async () => {
+      // Mock a 200 response with valid structure but extra unexpected properties
+      const mockResponseWithExtraProperty = {
+        status: 200,
+        statusText: 'OK',
+        data: {
+          coin_balance: '55290000000000000000',
+          hash: '0x933d4CE1B6334d2Ede312765Dc31e3105CA28e31', // Extra property
+          extra_field: 'this should be ignored', // Extra property
+        },
+      } as AxiosResponse;
+      mockedHttpClient.get.mockResolvedValueOnce(mockResponseWithExtraProperty);
+
+      const client = new Blockscout(mockedHttpClient, ChainId.IMTBL_ZKEVM_TESTNET);
+
+      const result = await client.getNativeTokenByWalletAddress({
+        walletAddress: '0x1234567890',
+      });
+
+      // trackError should NOT be called - validation should pass with extra properties stripped
+      expect(metrics.trackError).not.toHaveBeenCalled();
+
+      // Verify the coin_balance was used correctly
+      expect(result.value).toBe('55290000000000000000');
+    });
   });
 });

@@ -19,10 +19,10 @@ export interface BlockscoutERC20ResponseItem {
     name: string
     symbol: string
     holders_count: string
-    circulating_market_cap: string
-    exchange_rate: string
+    circulating_market_cap: string | null
+    exchange_rate: string | null
     total_supply: string
-    icon_url: string;
+    icon_url: string | null
     type: BlockscoutTokenType
   }
   value: string
@@ -78,10 +78,10 @@ export const BlockscoutERC20ResponseItemTokenSchema = z.object({
   name: z.string(),
   symbol: z.string(),
   holders_count: z.string(),
-  circulating_market_cap: z.string(),
-  exchange_rate: z.string(),
+  circulating_market_cap: z.string().nullable(),
+  exchange_rate: z.string().nullable(),
   total_supply: z.string(),
-  icon_url: z.string(),
+  icon_url: z.string().nullable(),
   type: BlockscoutTokenTypeSchema,
 });
 
@@ -95,4 +95,13 @@ export const BlockscoutERC20ResponseItemSchema = z.object({
 export const BlockscoutERC20ResponseSchema = z.object({
   items: z.array(BlockscoutERC20ResponseItemSchema),
   next_page_params: z.union([BlockscoutTokenPaginationSchema, z.null()]),
+});
+
+export interface BlockscoutNativeResponse {
+  coin_balance: string;
+}
+
+export const BlockscoutNativeResponseSchema = z.object({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  coin_balance: z.string(),
 });

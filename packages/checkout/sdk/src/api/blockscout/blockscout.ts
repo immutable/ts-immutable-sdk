@@ -7,6 +7,8 @@ import { z } from 'zod';
 import { trackError } from '@imtbl/metrics';
 import { ChainId } from '../../types';
 import {
+  BlockscoutNativeResponse,
+  BlockscoutNativeResponseSchema,
   BlockscoutERC20Response,
   BlockscoutERC20ResponseItem,
   BlockscoutERC20ResponseSchema,
@@ -102,6 +104,7 @@ export class Blockscout {
           this.setCache(url, validatedData);
           return Promise.resolve(validatedData);
         } catch (validationError: any) {
+          console.log('validationError', validationError);
           trackError('checkout', 'blockscout_response_validation_failed', validationError);
           return Promise.resolve(response.data);
         }
@@ -156,6 +159,7 @@ export class Blockscout {
       (item: BlockscoutERC20ResponseItem) => {
         const token: BlockscoutTokenData = {
           ...item.token,
+          icon_url: item.token.icon_url ?? '',
           address: item.token.address_hash,
           holders: item.token.holders_count,
         };
@@ -188,30 +192,16 @@ export class Blockscout {
    * @returns list of tokens given the wallet address and the token types
    */
   public async getNativeTokenByWalletAddress(params: { walletAddress: string, }): Promise<BlockscoutToken> {
-    try {
-      const url = `${this.url}/api/v2/addresses/${params.walletAddress}`;
+    const url = `${this.url}/api/v2/addresses/${params.walletAddress}`;
 
-      // Cache response data to prevent unnecessary requests
-      const cached = this.getCache(url);
-      if (cached) return Promise.resolve(cached);
+    // Use the generic httpGet method with schema validation
+    const response = await this.httpGet<BlockscoutNativeResponse>(url, BlockscoutNativeResponseSchema);
 
-      const response = await this.httpClient.get(url); // success if 2XX response otherwise throw error
+    const data = {
+      token: this.nativeToken,
+      value: response.coin_balance,
+    };
 
-      const data = {
-        token: this.nativeToken,
-        value: response.data.coin_balance,
-      };
-
-      this.setCache(url, data);
-      return Promise.resolve(data);
-    } catch (err: any) {
-      let code: number = HttpStatusCode.InternalServerError;
-      let message = 'InternalServerError';
-      if (axios.isAxiosError(err)) {
-        code = (err as AxiosError).response?.status || code;
-        message = (err as AxiosError).message;
-      }
-      return Promise.reject({ code, message });
-    }
+    return Promise.resolve(data);
   }
 }
