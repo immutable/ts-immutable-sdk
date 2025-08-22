@@ -167,8 +167,8 @@ export default class MagicTEESigner extends AbstractSigner {
     return withMetricsAsync(async (flow: Flow) => {
       try {
         const startTime = performance.now();
-        const response = await this.magicTeeApiClient.transactionApi.signMessageV1WalletPersonalSignPost({
-          personalSignRequest: {
+        const response = await this.magicTeeApiClient.signOperationsApi.signMessageV1WalletPersonalSignPost({
+          signMessageRequest: {
             message_base64: Buffer.from(messageToSign, 'utf-8').toString('base64'),
             chain: CHAIN_IDENTIFIER,
           },

@@ -13,29 +13,36 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { Chain } from './chain';
 
 /**
  * 
  * @export
- * @interface SignDataRequest
+ * @interface SignMessageResponse
  */
-export interface SignDataRequest {
-    /**
-     * 
-     * @type {Chain}
-     * @memberof SignDataRequest
-     */
-    'chain': Chain;
+export interface SignMessageResponse {
     /**
      * 
      * @type {string}
-     * @memberof SignDataRequest
+     * @memberof SignMessageResponse
      */
-    'raw_data_hash': string;
+    'signature': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SignMessageResponse
+     */
+    'r'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SignMessageResponse
+     */
+    's'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SignMessageResponse
+     */
+    'v'?: string | null;
 }
-
-
 
