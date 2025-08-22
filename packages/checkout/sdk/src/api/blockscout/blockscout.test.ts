@@ -240,19 +240,19 @@ describe('Blockscout', () => {
         statusText: 'Bad Request',
         data: { error: 'Invalid request' }, // This doesn't match BlockscoutERC20Response schema
       } as AxiosResponse;
-      mockedHttpClient.get.mockResolvedValueOnce(mock400Response);
+      mockedHttpClient.get.mockRejectedValueOnce(mock400Response);
 
       const token = BlockscoutTokenType.ERC20;
       const client = new Blockscout(mockedHttpClient, ChainId.IMTBL_ZKEVM_TESTNET);
 
-      // This should return the raw data without validation errors
-      const result = await client.getTokensByWalletAddress({
-        walletAddress: '0x1234567890',
-        tokenType: token,
+      await expect(
+        client.getTokensByWalletAddress({
+          walletAddress: '0x1234567890',
+          tokenType: token,
+        }),
+      ).rejects.toMatchObject({
+        code: HttpStatusCode.InternalServerError,
       });
-
-      // Should return the raw error data without validation
-      expect(result).toEqual({ error: 'Invalid request' });
     });
 
     it('calls trackError and returns data when 2xx response fails validation', async () => {
