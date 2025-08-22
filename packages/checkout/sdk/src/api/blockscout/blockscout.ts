@@ -104,7 +104,6 @@ export class Blockscout {
           this.setCache(url, validatedData);
           return Promise.resolve(validatedData);
         } catch (validationError: any) {
-          console.log('validationError', validationError);
           trackError('checkout', 'blockscout_response_validation_failed', validationError);
           return Promise.resolve(response.data);
         }

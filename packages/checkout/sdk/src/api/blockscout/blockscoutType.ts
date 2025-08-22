@@ -67,7 +67,10 @@ export interface BlockscoutNativeTokenData {
 // Zod schemas for runtime validation
 export const BlockscoutTokenTypeSchema = z.enum(BlockscoutTokenType);
 
-export const BlockscoutTokenPaginationSchema = z.record(z.string(), z.union([z.string(), z.number(), z.null()]));
+export const BlockscoutTokenPaginationSchema = z.record(
+  z.string(),
+  z.union([z.string(), z.number(), z.null()]),
+).nullable();
 
 export const BlockscoutERC20ResponseItemTokenSchema = z.object({
   address_hash: z.string().refine(
@@ -94,7 +97,7 @@ export const BlockscoutERC20ResponseItemSchema = z.object({
 
 export const BlockscoutERC20ResponseSchema = z.object({
   items: z.array(BlockscoutERC20ResponseItemSchema),
-  next_page_params: z.union([BlockscoutTokenPaginationSchema, z.null()]),
+  next_page_params: BlockscoutTokenPaginationSchema,
 });
 
 export interface BlockscoutNativeResponse {
