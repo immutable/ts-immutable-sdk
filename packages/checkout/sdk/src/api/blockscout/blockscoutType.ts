@@ -91,8 +91,8 @@ export const BlockscoutERC20ResponseItemTokenSchema = z.object({
 export const BlockscoutERC20ResponseItemSchema = z.object({
   token: BlockscoutERC20ResponseItemTokenSchema,
   value: z.string(),
-  token_id: z.union([z.string(), z.null()]),
-  token_instance: z.union([z.string(), z.null()]),
+  token_id: z.string().nullable(),
+  token_instance: z.string().nullable(),
 });
 
 export const BlockscoutERC20ResponseSchema = z.object({
