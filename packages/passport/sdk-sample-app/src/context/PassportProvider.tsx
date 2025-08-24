@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import { IMXProvider } from '@imtbl/x-provider';
 import {
-  LinkedWallet, LinkWalletParams, Provider, UserProfile,
+  LinkedWallet, LinkWalletParams, Provider, UserProfile, MarketingConsentStatus,
 } from '@imtbl/passport';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
@@ -179,7 +179,12 @@ export function PassportProvider({
   const popupRedirectGoogle = useCallback(async () => {
     try {
       setIsLoading(true);
-      const userProfile = await passportClient.login({ directLoginMethod: 'google' });
+      const userProfile = await passportClient.login({
+        directLoginOptions: {
+          directLoginMethod: 'google',
+          marketingConsentStatus: MarketingConsentStatus.Unsubscribed,
+        },
+      });
       addMessage('Popup Login (Google)', userProfile);
     } catch (err) {
       addMessage('Popup Login (Google)', err);
@@ -192,7 +197,12 @@ export function PassportProvider({
   const popupRedirectApple = useCallback(async () => {
     try {
       setIsLoading(true);
-      const userProfile = await passportClient.login({ directLoginMethod: 'apple' });
+      const userProfile = await passportClient.login({
+        directLoginOptions: {
+          directLoginMethod: 'apple',
+          marketingConsentStatus: MarketingConsentStatus.Unsubscribed,
+        },
+      });
       addMessage('Popup Login (Apple)', userProfile);
     } catch (err) {
       addMessage('Popup Login (Apple)', err);
@@ -205,7 +215,12 @@ export function PassportProvider({
   const popupRedirectFacebook = useCallback(async () => {
     try {
       setIsLoading(true);
-      const userProfile = await passportClient.login({ directLoginMethod: 'facebook' });
+      const userProfile = await passportClient.login({
+        directLoginOptions: {
+          directLoginMethod: 'facebook',
+          marketingConsentStatus: MarketingConsentStatus.Unsubscribed,
+        },
+      });
       addMessage('Popup Login (Facebook)', userProfile);
     } catch (err) {
       addMessage('Popup Login (Facebook)', err);
@@ -220,8 +235,11 @@ export function PassportProvider({
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({
-        directLoginMethod: 'google',
         useRedirectFlow: true,
+        directLoginOptions: {
+          directLoginMethod: 'google',
+          marketingConsentStatus: MarketingConsentStatus.Unsubscribed,
+        },
       });
       addMessage('Login (Google)', userProfile);
     } catch (err) {
@@ -236,8 +254,11 @@ export function PassportProvider({
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({
-        directLoginMethod: 'apple',
         useRedirectFlow: true,
+        directLoginOptions: {
+          directLoginMethod: 'apple',
+          marketingConsentStatus: MarketingConsentStatus.Unsubscribed,
+        },
       });
       addMessage('Login (Apple)', userProfile);
     } catch (err) {
@@ -252,8 +273,11 @@ export function PassportProvider({
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({
-        directLoginMethod: 'facebook',
         useRedirectFlow: true,
+        directLoginOptions: {
+          directLoginMethod: 'facebook',
+          marketingConsentStatus: MarketingConsentStatus.Unsubscribed,
+        },
       });
       addMessage('Login (Facebook)', userProfile);
     } catch (err) {

@@ -17,6 +17,7 @@ import {
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 import { hexToText } from '../functions/utils';
 import { filterAllowedTransactions } from '../functions/signUtils';
+import { errorToString } from '../../../lib/utils';
 
 type SignApiTransaction = {
   contract_address: string;
@@ -249,7 +250,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         }
         const error: SignOrderError = {
           type: errorType,
-          data: { error: err },
+          data: { error: errorToString(err) },
         };
         setSignError(error);
         return [undefined, error];

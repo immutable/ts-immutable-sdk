@@ -50,6 +50,12 @@ export function NoTransactions(
         >
           {t('views.TRANSACTIONS.status.noTransactions.body')}
         </Body>
+        <Body
+          size="small"
+          sx={noTransactionsBodyStyle}
+        >
+          Can&apos;t find your pending withdrawal? Try connecting with your L1 wallet.
+        </Body>
         {isPassport && (
           <Body
             size="small"
