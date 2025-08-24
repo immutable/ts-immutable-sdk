@@ -72,12 +72,12 @@ jobs:
             sed -i "s/\"version\": \"0.0.0\"/\"version\": \"${{ env.TS_SDK_TAG }}\"/g" sdk/package.json
           fi
 
-      - name: Update 'sdkVersionTag' in 'packages/game-bridge/src/index.ts' from '__SDK_VERSION__' to '${{ env.TS_SDK_TAG }}'
+      - name: Update 'sdkVersionTag' in 'packages/game-bridge/src/index.ts' from '2.4.9' to '${{ env.TS_SDK_TAG }}'
         run: |
           if [[ "$OSTYPE" == "darwin"* ]]; then
-            sed -i '' "s/__SDK_VERSION__/${{ env.TS_SDK_TAG }}/g" packages/game-bridge/src/index.ts
+            sed -i '' "s/2.4.9/${{ env.TS_SDK_TAG }}/g" packages/game-bridge/src/index.ts
           else
-            sed -i "s/__SDK_VERSION__/${{ env.TS_SDK_TAG }}/g" packages/game-bridge/src/index.ts
+            sed -i "s/2.4.9/${{ env.TS_SDK_TAG }}/g" packages/game-bridge/src/index.ts
           fi
 
       - name: Update 'sdkVersionSha' in 'packages/game-bridge/src/index.ts' from '__SDK_VERSION_SHA__' to '${{ env.TS_SDK_HASH }}'

@@ -27,7 +27,7 @@ export default defineConfig((options) => {
       splitting: true,
       esbuildPlugins: [
         replace({ 
-          '__SDK_VERSION__': pkg.version, 
+          '2.4.9': pkg.version, 
         })
       ]
     },

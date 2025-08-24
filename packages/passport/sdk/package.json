@@ -1,7 +1,7 @@
 {
   "name": "@imtbl/passport",
   "description": "Passport module for Immutable SDK",
-  "version": "0.0.0",
+  "version": "2.4.9",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {

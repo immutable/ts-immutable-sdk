@@ -36,7 +36,7 @@ const moduleName = 'gameBridge';
 
 // version check placeholders
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const sdkVersionTag = '__SDK_VERSION__';
+const sdkVersionTag = '2.4.9';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sdkVersionSha = '__SDK_VERSION_SHA__';
 

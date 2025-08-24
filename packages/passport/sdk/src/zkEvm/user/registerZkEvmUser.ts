@@ -70,6 +70,33 @@ export async function registerZkEvmUser({
 
     return registrationResponse.data.counterfactual_address;
   } catch (error) {
-    throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Failed to create counterfactual address: ${error}`);
+    let errorMessage = 'Failed to create counterfactual address';
+    
+    if (error && typeof error === 'object' && 'response' in error) {
+      // Axios error with response
+      const axiosError = error as any;
+      if (axiosError.response) {
+        errorMessage += ` with status ${axiosError.response.status}`;
+        if (axiosError.response.data) {
+          errorMessage += `: ${JSON.stringify(axiosError.response.data)}`;
+        }
+        if (axiosError.response.statusText) {
+          errorMessage += ` (${axiosError.response.statusText})`;
+        }
+      } else if (axiosError.request) {
+        errorMessage += `: Network error - no response received`;
+      } else {
+        errorMessage += `: ${axiosError.message || 'Unknown error'}`;
+      }
+    } else if (error instanceof Error) {
+      errorMessage += `: ${error.message}`;
+      if (error.stack) {
+        errorMessage += `\nStack: ${error.stack}`;
+      }
+    } else {
+      errorMessage += `: ${String(error)}`;
+    }
+    
+    throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, errorMessage);
   }
 }

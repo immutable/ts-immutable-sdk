@@ -36,7 +36,7 @@ export default defineConfig((options) => {
           modules: ['crypto', 'buffer', 'process']
         }),
         replace({ 
-          '__SDK_VERSION__': pkg.version, 
+          '2.4.9': pkg.version, 
           'process.env.CHECKOUT_DEV_MODE': JSON.stringify(process.env.CHECKOUT_DEV_MODE || 'false'),
           'process.env.CHECKOUT_LOCAL_MODE': JSON.stringify(process.env.CHECKOUT_LOCAL_MODE || 'false'),
           'process.versions': JSON.stringify(process.versions || {}),
@@ -56,7 +56,7 @@ export default defineConfig((options) => {
       splitting: true,
       esbuildPlugins: [
         replace({ 
-          '__SDK_VERSION__': pkg.version, 
+          '2.4.9': pkg.version, 
           'process.env.CHECKOUT_DEV_MODE': JSON.stringify(process.env.CHECKOUT_DEV_MODE || 'false'),
           'process.env.CHECKOUT_LOCAL_MODE': JSON.stringify(process.env.CHECKOUT_LOCAL_MODE || 'false'),
           'process.versions': JSON.stringify(process.versions || {}),

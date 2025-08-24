@@ -66,6 +66,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
   });
   const magicTEESigner = new MagicTEESigner(authManager, magicTeeApiClients);
   const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
+  console.log(`multiRollupApiClients.config.passport.baseOptions.headers: ${JSON.stringify(config.multiRollupConfig.passport.baseOptions.headers)}`);
   const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
 
   const immutableXClient = passportModuleConfiguration.overrides

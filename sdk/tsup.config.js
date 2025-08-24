@@ -63,7 +63,7 @@ export default defineConfig((options) => {
           modules: ['crypto', 'buffer', 'process', 'path', 'fs']
         }),
         replace({ 
-          '__SDK_VERSION__': pkg.version, 
+          '2.4.9': pkg.version, 
         })
       ]
     }

@@ -1,7 +1,7 @@
 {
   "name": "@imtbl/sdk",
   "description": "Immutable Typescript SDK",
-  "version": "0.0.0",
+  "version": "4.9.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {

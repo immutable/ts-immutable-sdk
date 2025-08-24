@@ -30,33 +30,42 @@ export default class MagicTEESigner extends AbstractSigner {
   }
 
   private async getUserWallet(): Promise<UserWallet> {
+    console.log(`START getUserWallet...`);
     let { userWallet } = this;
     if (!userWallet) {
+      console.log(`getUserWallet createWallet...`);
       userWallet = await this.createWallet();
+      console.log(`getUserWallet createWallet DONE`);
     }
 
     // Check if the user has changed since the last createWallet request was made. If so, initialise the new user's wallet.
+    console.log(`getUserWallet getUserOrThrow...`);
     const user = await this.getUserOrThrow();
+    console.log(`getUserWallet getUserOrThrow DONE`);
+
     if (user.profile.sub !== userWallet.userIdentifier) {
+      console.log(`getUserWallet createWallet...`);
       userWallet = await this.createWallet();
+      console.log(`getUserWallet createWallet DONE`);
     }
 
-    if (isUserImx(user) && user.imx.userAdminAddress !== userWallet.walletAddress) {
+    if (isUserImx(user) && user.imx.userAdminAddress.toLowerCase() !== userWallet.walletAddress.toLowerCase()) {
       throw new PassportError(
         'Wallet address mismatch.'
-          + `Rollup: IMX, TEE address: ${userWallet.walletAddress}, profile address: ${user.imx.userAdminAddress}`,
+          + `Rollup: IMX, TEE address: ${userWallet.walletAddress.toLowerCase()}, profile address: ${user.imx.userAdminAddress.toLowerCase()}`,
         PassportErrorType.WALLET_CONNECTION_ERROR,
       );
     }
 
-    if (isUserZkEvm(user) && user.zkEvm.userAdminAddress !== userWallet.walletAddress) {
+    if (isUserZkEvm(user) && user.zkEvm.userAdminAddress.toLowerCase() !== userWallet.walletAddress.toLowerCase()) {
       throw new PassportError(
         'Wallet address mismatch.'
-          + `Rollup: zkEVM, TEE address: ${userWallet.walletAddress}, profile address: ${user.zkEvm.userAdminAddress}`,
+          + `Rollup: zkEVM, TEE address: ${userWallet.walletAddress.toLowerCase()}, profile address: ${user.zkEvm.userAdminAddress.toLowerCase()}`,
         PassportErrorType.WALLET_CONNECTION_ERROR,
       );
     }
 
+    console.log(`return userWallet ${userWallet.walletAddress}`)
     return userWallet;
   }
 
@@ -66,6 +75,8 @@ export default class MagicTEESigner extends AbstractSigner {
    * If a createWallet request is already in flight, return the existing promise.
    */
   private async createWallet(): Promise<UserWallet> {
+    console.log(`createWallet...`);
+
     if (this.createWalletPromise) return this.createWalletPromise;
 
     // eslint-disable-next-line no-async-promise-executor
@@ -73,11 +84,18 @@ export default class MagicTEESigner extends AbstractSigner {
       try {
         this.userWallet = null;
 
+        console.log(`createWallet getUserOrThrow...`);
         const user = await this.getUserOrThrow();
+        console.log(`createWallet getUserOrThrow DONE`);
+
+        console.log(`createWallet getHeaders...`);
         const headers = MagicTEESigner.getHeaders(user);
+        console.log(`createWallet getHeaders DONE`);
 
         await withMetricsAsync(async (flow: Flow) => {
           try {
+            console.log(`BEFORE createWalletV1WalletPost...`);
+
             const startTime = performance.now();
             // The createWallet endpoint is idempotent, so it can be called multiple times without causing an error.
             const response = await this.magicTeeApiClient.walletApi.createWalletV1WalletPost(
@@ -95,6 +113,8 @@ export default class MagicTEESigner extends AbstractSigner {
               Math.round(performance.now() - startTime),
             );
 
+            console.log(`createWalletV1WalletPost userIdentifier: ${user.profile.sub}...`);
+            console.log(`createWalletV1WalletPost walletAddress: ${response.data.public_address}...`);
             this.userWallet = {
               userIdentifier: user.profile.sub,
               walletAddress: response.data.public_address,
@@ -128,6 +148,8 @@ export default class MagicTEESigner extends AbstractSigner {
   }
 
   private async getUserOrThrow(): Promise<User> {
+    console.log(`getUserOrThrow...`);
+
     const user = await this.authManager.getUser();
     if (!user) {
       throw new PassportError(
@@ -135,6 +157,8 @@ export default class MagicTEESigner extends AbstractSigner {
         PassportErrorType.NOT_LOGGED_IN_ERROR,
       );
     }
+
+    console.log(`getUserOrThrow return user...`);
     return user;
   }
 
@@ -145,6 +169,8 @@ export default class MagicTEESigner extends AbstractSigner {
         PassportErrorType.NOT_LOGGED_IN_ERROR,
       );
     }
+    console.log(`getHeaders: ${user.idToken}...`);
+
     return {
       Authorization: `Bearer ${user.idToken}`,
     };
@@ -156,19 +182,26 @@ export default class MagicTEESigner extends AbstractSigner {
   }
 
   public async signMessage(message: string | Uint8Array): Promise<string> {
+    console.log(`Start signMessage...`);
     // Call getUserWallet to ensure that the createWallet endpoint has been called at least once,
     // as this is a prerequisite for signing messages.
+    console.log(`SignMessage getUserWallet...`);
     await this.getUserWallet();
+    console.log(`SignMessage getUserWallet DONE`);
 
     const messageToSign = message instanceof Uint8Array ? `0x${Buffer.from(message).toString('hex')}` : message;
+    console.log(`SignMessage getUserOrThrow...`);
     const user = await this.getUserOrThrow();
+    console.log(`SignMessage getHeaders...`);
     const headers = await MagicTEESigner.getHeaders(user);
 
     return withMetricsAsync(async (flow: Flow) => {
       try {
+        console.log(`BEFORE signMessageV1WalletPersonalSignPost`);
+
         const startTime = performance.now();
-        const response = await this.magicTeeApiClient.transactionApi.signMessageV1WalletPersonalSignPost({
-          personalSignRequest: {
+        const response = await this.magicTeeApiClient.signOperationsApi.signMessageV1WalletSignMessagePost({
+          signMessageRequest: {
             message_base64: Buffer.from(messageToSign, 'utf-8').toString('base64'),
             chain: CHAIN_IDENTIFIER,
           },

@@ -6,6 +6,7 @@ packages:
   - "packages/x-provider/src/sample-app"
   - "packages/passport/sdk"
   - "packages/passport/sdk-sample-app"
+  - "packages/passport/game-server"
   - "packages/orderbook"
   - "packages/internal/metrics"
   - "packages/internal/toolkit"
