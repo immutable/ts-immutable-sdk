@@ -35,3 +35,5 @@ examples/**/test-results/
 tests/**/.env
 tests/**/playwright-report/
 tests/**/test-results/
+
+packages/passport/game-server/
