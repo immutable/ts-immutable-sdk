@@ -95,6 +95,9 @@ export default class MagicTEESigner extends AbstractSigner {
               Math.round(performance.now() - startTime),
             );
 
+            // HACK for now
+            await new Promise((delayResolve) => { setTimeout(delayResolve, 500); });
+
             this.userWallet = {
               userIdentifier: user.profile.sub,
               walletAddress: response.data.public_address,
