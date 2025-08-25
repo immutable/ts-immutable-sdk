@@ -49,7 +49,7 @@ describe('MagicTEESigner', () => {
       walletApi: {
         createWalletV1WalletPost: mockCreateWalletV1WalletPost,
       },
-      transactionApi: {
+      signOperationsApi: {
         signMessageV1WalletPersonalSignPost: mockSignMessageV1WalletPersonalSignPost,
       },
     } as any;
@@ -229,7 +229,7 @@ describe('MagicTEESigner', () => {
       expect(signature).toBe('0xsignature123');
       expect(mockSignMessageV1WalletPersonalSignPost).toHaveBeenCalledWith(
         {
-          personalSignRequest: {
+          signMessageRequest: {
             message_base64: Buffer.from(message, 'utf-8').toString('base64'),
             chain: 'ETH',
           },
@@ -245,7 +245,7 @@ describe('MagicTEESigner', () => {
       expect(signature).toBe('0xsignature123');
       expect(mockSignMessageV1WalletPersonalSignPost).toHaveBeenCalledWith(
         {
-          personalSignRequest: {
+          signMessageRequest: {
             message_base64: Buffer.from(`0x${Buffer.from(message).toString('hex')}`, 'utf-8').toString('base64'),
             chain: 'ETH',
           },
