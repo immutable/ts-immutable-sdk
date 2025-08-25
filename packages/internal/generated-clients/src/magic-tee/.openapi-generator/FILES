@@ -5,7 +5,7 @@ api.ts
 base.ts
 common.ts
 configuration.ts
-domain/transaction-api.ts
+domain/sign-operations-api.ts
 domain/wallet-api.ts
 git_push.sh
 index.ts
@@ -13,10 +13,10 @@ models/chain.ts
 models/create-wallet-request-model.ts
 models/httpvalidation-error.ts
 models/index.ts
-models/personal-sign-request.ts
-models/personal-sign-response.ts
 models/sign-data-request.ts
 models/sign-data-response.ts
+models/sign-message-request.ts
+models/sign-message-response.ts
 models/validation-error-loc-inner.ts
 models/validation-error.ts
 models/wallet-response-model.ts
