@@ -240,6 +240,17 @@ export function removeSpace(str: string): string {
   return str.replace(/\s/g, '');
 }
 
+export const errorToString = (error: unknown) => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  return JSON.stringify(error);
+};
+
 export const filterAllowedTransactions = async (
   transactions: SignedTransaction[],
   provider: WrappedBrowserProvider,

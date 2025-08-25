@@ -1,11 +1,15 @@
 import axios, {
   AxiosError,
+  AxiosResponse,
   HttpStatusCode,
 } from 'axios';
 import { ChainId } from '../../types';
 import {
+  BlockscoutERC20Response,
+  BlockscoutERC20ResponseItem,
   BlockscoutNativeTokenData,
   BlockscoutToken,
+  BlockscoutTokenData,
   BlockscoutTokenPagination,
   BlockscoutTokens,
   BlockscoutTokenType,
@@ -105,14 +109,32 @@ export class Blockscout {
       const cached = this.getCache(url);
       if (cached) return Promise.resolve(cached);
 
-      const response = await this.httpClient.get(url); // success if 2XX response otherwise throw error
+      // success if 2XX response otherwise throw error
+      const response: AxiosResponse<BlockscoutERC20Response> = await this.httpClient.get(url);
+
+      // blockscout changed their API to return address_hash instead of address
+      // map the address_hash to address field so that any further consumer is not affected by the change
+      const normalizedItems: BlockscoutToken[] = response.data?.items?.map(
+        (item: BlockscoutERC20ResponseItem) => {
+          const token: BlockscoutTokenData = {
+            ...item.token,
+            address: item.token.address_hash,
+            holders: item.token.holders_count,
+          };
+
+          return {
+            ...item,
+            token,
+          };
+        },
+      ) || [];
 
       // To get around an issue with native tokens being an ERC-20, there is the need
       // to remove IMX from `resp` and add it back in using getNativeTokenByWalletAddress.
       // This has affected some of the early wallets, and it might not be an issue in mainnet
       // however, let's enforce it.
       const data = {
-        items: response.data?.items?.filter(
+        items: normalizedItems.filter(
           (token: BlockscoutToken) => token.token.address && token.token.address !== this.nativeToken.address,
         ),
         // eslint-disable-next-line @typescript-eslint/naming-convention

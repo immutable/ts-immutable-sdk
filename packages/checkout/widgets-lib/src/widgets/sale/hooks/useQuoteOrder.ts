@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Environment } from '@imtbl/config';
 import { WrappedBrowserProvider, SaleItem } from '@imtbl/checkout-sdk';
-import { compareStr } from '../../../lib/utils';
+import { compareStr, errorToString } from '../../../lib/utils';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
 import { OrderQuote, OrderQuoteCurrency, SaleErrorTypes } from '../types';
@@ -26,7 +26,7 @@ export const defaultOrderQuote: OrderQuote = {
 
 export type ConfigError = {
   type: SaleErrorTypes;
-  data?: Record<string, unknown>;
+  data?: Record<string, string>;
 };
 
 export const useQuoteOrder = ({
@@ -46,7 +46,7 @@ export const useQuoteOrder = ({
   ConfigError | undefined
   >(undefined);
 
-  const setError = (error: unknown) => {
+  const setError = (error: string) => {
     setOrderQuoteError({
       type: SaleErrorTypes.SERVICE_BREAKDOWN,
       data: { reason: 'Error fetching settlement currencies', error },
@@ -69,7 +69,7 @@ export const useQuoteOrder = ({
 
         setQueryParams(params.toString());
       } catch (error) {
-        setError(error);
+        setError(errorToString(error));
       }
     })();
   }, [items, provider]);
@@ -102,7 +102,7 @@ export const useQuoteOrder = ({
         );
         setOrderQuote(config);
       } catch (error) {
-        setError(error);
+        setError(errorToString(error));
       } finally {
         fetching.current = false;
       }

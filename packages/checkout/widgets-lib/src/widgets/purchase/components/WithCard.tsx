@@ -53,6 +53,7 @@ export function WithCard(props: WithCardProps) {
     return null;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO: fix this
   const nftData: TransakNFTData[] = useMemo(
     () => signResponse.order.products.map((product) => ({
       collectionAddress: product.collectionAddress,
