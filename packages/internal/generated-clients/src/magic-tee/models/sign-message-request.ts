@@ -20,21 +20,21 @@ import { Chain } from './chain';
 /**
  * 
  * @export
- * @interface SignDataRequest
+ * @interface SignMessageRequest
  */
-export interface SignDataRequest {
+export interface SignMessageRequest {
     /**
      * 
      * @type {Chain}
-     * @memberof SignDataRequest
+     * @memberof SignMessageRequest
      */
     'chain': Chain;
     /**
      * 
      * @type {string}
-     * @memberof SignDataRequest
+     * @memberof SignMessageRequest
      */
-    'raw_data_hash': string;
+    'message_base64': string;
 }
 
 

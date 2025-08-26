@@ -1,3 +1,1 @@
-import MagicAdapter from './magicAdapter';
-
-export default { MagicAdapter };
+export { default as MagicTEESigner } from './magicTEESigner';

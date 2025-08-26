@@ -1,5 +1,5 @@
 import { Environment, ModuleConfiguration } from '@imtbl/config';
-import { EthSigner, IMXClient, StarkSigner } from '@imtbl/x-client';
+import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
 
@@ -36,18 +36,23 @@ export type UserProfile = {
   sub: string;
 };
 
+export enum RollupType {
+  IMX = 'imx',
+  ZKEVM = 'zkEvm',
+}
+
 export type User = {
   idToken?: string;
   accessToken: string;
   refreshToken?: string;
   profile: UserProfile;
   expired?: boolean;
-  imx?: {
+  [RollupType.IMX]?: {
     ethAddress: string;
     starkAddress: string;
     userAdminAddress: string;
   };
-  zkEvm?: {
+  [RollupType.ZKEVM]?: {
     ethAddress: string;
     userAdminAddress: string;
   };
@@ -122,11 +127,11 @@ export interface PassportModuleConfiguration
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
-export type UserImx = WithRequired<User, 'imx'>;
-export type UserZkEvm = WithRequired<User, 'zkEvm'>;
+export type UserImx = WithRequired<User, RollupType.IMX>;
+export type UserZkEvm = WithRequired<User, RollupType.ZKEVM>;
 
-export const isUserZkEvm = (user: User): user is UserZkEvm => !!user.zkEvm;
-export const isUserImx = (user: User): user is UserImx => !!user.imx;
+export const isUserZkEvm = (user: User): user is UserZkEvm => !!user[RollupType.ZKEVM];
+export const isUserImx = (user: User): user is UserImx => !!user[RollupType.IMX];
 
 export type DeviceTokenResponse = {
   access_token: string;
@@ -154,11 +159,6 @@ export type IdTokenPayload = {
 export type PKCEData = {
   state: string;
   verifier: string;
-};
-
-export type IMXSigners = {
-  starkSigner: StarkSigner;
-  ethSigner: EthSigner;
 };
 
 export type LinkWalletParams = {
