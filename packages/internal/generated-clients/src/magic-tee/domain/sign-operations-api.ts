@@ -38,8 +38,8 @@ import { SignMessageResponse } from '../models';
 export const SignOperationsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * 
-         * @summary Sign Data
+         * Signs a hash of arbitrary data using the wallet\'s private key.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet/sign/data\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\",     \"raw_data_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\"   }\' ```  **Example Response:** ```json {   \"message_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\",   \"signature\": \"0x8e7d6c5b4a3928172635445566778899aabbccddeeff00112233445566778899\",   \"r\": \"0x3d4e5f678901234567890abcdef1234567890abcdef1234567890abcdef1234\",   \"s\": \"0x4e5f678901234567890abcdef1234567890abcdef1234567890abcdef123456\",   \"v\": \"27\" } ```
+         * @summary Sign data using the wallet\'s private key.
          * @param {SignDataRequest} signDataRequest 
          * @param {string} [xMagicAPIKey] 
          * @param {string} [xMagicSecretKey] 
@@ -93,118 +93,8 @@ export const SignOperationsApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * Signs a hash of arbitrary data using the wallet\'s private key.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet/sign/data\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\",     \"raw_data_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\"   }\' ```  **Example Response:** ```json {   \"message_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\",   \"signature\": \"0x8e7d6c5b4a3928172635445566778899aabbccddeeff00112233445566778899\",   \"r\": \"0x3d4e5f678901234567890abcdef1234567890abcdef1234567890abcdef1234\",   \"s\": \"0x4e5f678901234567890abcdef1234567890abcdef1234567890abcdef123456\",   \"v\": \"27\" } ```
-         * @summary Sign arbitrary data with the wallet.
-         * @param {SignDataRequest} signDataRequest 
-         * @param {string} [xMagicAPIKey] 
-         * @param {string} [xMagicSecretKey] 
-         * @param {string} [xOIDCProviderID] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        signDataV1WalletSignPost: async (signDataRequest: SignDataRequest, xMagicAPIKey?: string, xMagicSecretKey?: string, xOIDCProviderID?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'signDataRequest' is not null or undefined
-            assertParamExists('signDataV1WalletSignPost', 'signDataRequest', signDataRequest)
-            const localVarPath = `/v1/wallet/sign`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication HTTPBearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (xMagicAPIKey != null) {
-                localVarHeaderParameter['X-Magic-API-Key'] = String(xMagicAPIKey);
-            }
-
-            if (xMagicSecretKey != null) {
-                localVarHeaderParameter['X-Magic-Secret-Key'] = String(xMagicSecretKey);
-            }
-
-            if (xOIDCProviderID != null) {
-                localVarHeaderParameter['X-OIDC-Provider-ID'] = String(xOIDCProviderID);
-            }
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(signDataRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * Signs an arbitrary message using the wallet\'s private key. Useful for authentication and off-chain verification.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet/sign/message\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\",     \"message_base64\": \"bm9uZQ==\"   }\' ```  **Example Response:** ```json {   \"signature\": \"0x0cebb670d8375ac74122b46c44def7e1ce593e80434a3e6557108ae124f8b44f3c5068fc104279fe7f51918cbe4c249d707bc1c0ce2ffb6d201d3cf4e2fdee8d1b\",   \"r\": \"0x0cebb670d8375ac74122b46c44def7e1ce593e80434a3e6557108ae124f8b44f\",   \"s\": \"0x3c5068fc104279fe7f51918cbe4c249d707bc1c0ce2ffb6d201d3cf4e2fdee8d\",   \"v\": \"27\" } ```
-         * @summary Sign a message with the wallet.
-         * @param {SignMessageRequest} signMessageRequest 
-         * @param {string} [xMagicAPIKey] 
-         * @param {string} [xMagicSecretKey] 
-         * @param {string} [xOIDCProviderID] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        signMessageV1WalletPersonalSignPost: async (signMessageRequest: SignMessageRequest, xMagicAPIKey?: string, xMagicSecretKey?: string, xOIDCProviderID?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'signMessageRequest' is not null or undefined
-            assertParamExists('signMessageV1WalletPersonalSignPost', 'signMessageRequest', signMessageRequest)
-            const localVarPath = `/v1/wallet/personal-sign`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication HTTPBearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (xMagicAPIKey != null) {
-                localVarHeaderParameter['X-Magic-API-Key'] = String(xMagicAPIKey);
-            }
-
-            if (xMagicSecretKey != null) {
-                localVarHeaderParameter['X-Magic-Secret-Key'] = String(xMagicSecretKey);
-            }
-
-            if (xOIDCProviderID != null) {
-                localVarHeaderParameter['X-OIDC-Provider-ID'] = String(xOIDCProviderID);
-            }
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(signMessageRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Sign Message
+         * @summary Sign a message using the wallet\'s private key.
          * @param {SignMessageRequest} signMessageRequest 
          * @param {string} [xMagicAPIKey] 
          * @param {string} [xMagicSecretKey] 
@@ -268,8 +158,8 @@ export const SignOperationsApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SignOperationsApiAxiosParamCreator(configuration)
     return {
         /**
-         * 
-         * @summary Sign Data
+         * Signs a hash of arbitrary data using the wallet\'s private key.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet/sign/data\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\",     \"raw_data_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\"   }\' ```  **Example Response:** ```json {   \"message_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\",   \"signature\": \"0x8e7d6c5b4a3928172635445566778899aabbccddeeff00112233445566778899\",   \"r\": \"0x3d4e5f678901234567890abcdef1234567890abcdef1234567890abcdef1234\",   \"s\": \"0x4e5f678901234567890abcdef1234567890abcdef1234567890abcdef123456\",   \"v\": \"27\" } ```
+         * @summary Sign data using the wallet\'s private key.
          * @param {SignDataRequest} signDataRequest 
          * @param {string} [xMagicAPIKey] 
          * @param {string} [xMagicSecretKey] 
@@ -282,36 +172,8 @@ export const SignOperationsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Signs a hash of arbitrary data using the wallet\'s private key.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet/sign/data\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\",     \"raw_data_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\"   }\' ```  **Example Response:** ```json {   \"message_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\",   \"signature\": \"0x8e7d6c5b4a3928172635445566778899aabbccddeeff00112233445566778899\",   \"r\": \"0x3d4e5f678901234567890abcdef1234567890abcdef1234567890abcdef1234\",   \"s\": \"0x4e5f678901234567890abcdef1234567890abcdef1234567890abcdef123456\",   \"v\": \"27\" } ```
-         * @summary Sign arbitrary data with the wallet.
-         * @param {SignDataRequest} signDataRequest 
-         * @param {string} [xMagicAPIKey] 
-         * @param {string} [xMagicSecretKey] 
-         * @param {string} [xOIDCProviderID] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async signDataV1WalletSignPost(signDataRequest: SignDataRequest, xMagicAPIKey?: string, xMagicSecretKey?: string, xOIDCProviderID?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SignDataResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.signDataV1WalletSignPost(signDataRequest, xMagicAPIKey, xMagicSecretKey, xOIDCProviderID, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * Signs an arbitrary message using the wallet\'s private key. Useful for authentication and off-chain verification.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet/sign/message\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\",     \"message_base64\": \"bm9uZQ==\"   }\' ```  **Example Response:** ```json {   \"signature\": \"0x0cebb670d8375ac74122b46c44def7e1ce593e80434a3e6557108ae124f8b44f3c5068fc104279fe7f51918cbe4c249d707bc1c0ce2ffb6d201d3cf4e2fdee8d1b\",   \"r\": \"0x0cebb670d8375ac74122b46c44def7e1ce593e80434a3e6557108ae124f8b44f\",   \"s\": \"0x3c5068fc104279fe7f51918cbe4c249d707bc1c0ce2ffb6d201d3cf4e2fdee8d\",   \"v\": \"27\" } ```
-         * @summary Sign a message with the wallet.
-         * @param {SignMessageRequest} signMessageRequest 
-         * @param {string} [xMagicAPIKey] 
-         * @param {string} [xMagicSecretKey] 
-         * @param {string} [xOIDCProviderID] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async signMessageV1WalletPersonalSignPost(signMessageRequest: SignMessageRequest, xMagicAPIKey?: string, xMagicSecretKey?: string, xOIDCProviderID?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SignMessageResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.signMessageV1WalletPersonalSignPost(signMessageRequest, xMagicAPIKey, xMagicSecretKey, xOIDCProviderID, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Sign Message
+         * @summary Sign a message using the wallet\'s private key.
          * @param {SignMessageRequest} signMessageRequest 
          * @param {string} [xMagicAPIKey] 
          * @param {string} [xMagicSecretKey] 
@@ -334,8 +196,8 @@ export const SignOperationsApiFactory = function (configuration?: Configuration,
     const localVarFp = SignOperationsApiFp(configuration)
     return {
         /**
-         * 
-         * @summary Sign Data
+         * Signs a hash of arbitrary data using the wallet\'s private key.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet/sign/data\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\",     \"raw_data_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\"   }\' ```  **Example Response:** ```json {   \"message_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\",   \"signature\": \"0x8e7d6c5b4a3928172635445566778899aabbccddeeff00112233445566778899\",   \"r\": \"0x3d4e5f678901234567890abcdef1234567890abcdef1234567890abcdef1234\",   \"s\": \"0x4e5f678901234567890abcdef1234567890abcdef1234567890abcdef123456\",   \"v\": \"27\" } ```
+         * @summary Sign data using the wallet\'s private key.
          * @param {SignOperationsApiSignDataV1WalletSignDataPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -344,28 +206,8 @@ export const SignOperationsApiFactory = function (configuration?: Configuration,
             return localVarFp.signDataV1WalletSignDataPost(requestParameters.signDataRequest, requestParameters.xMagicAPIKey, requestParameters.xMagicSecretKey, requestParameters.xOIDCProviderID, options).then((request) => request(axios, basePath));
         },
         /**
-         * Signs a hash of arbitrary data using the wallet\'s private key.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet/sign/data\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\",     \"raw_data_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\"   }\' ```  **Example Response:** ```json {   \"message_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\",   \"signature\": \"0x8e7d6c5b4a3928172635445566778899aabbccddeeff00112233445566778899\",   \"r\": \"0x3d4e5f678901234567890abcdef1234567890abcdef1234567890abcdef1234\",   \"s\": \"0x4e5f678901234567890abcdef1234567890abcdef1234567890abcdef123456\",   \"v\": \"27\" } ```
-         * @summary Sign arbitrary data with the wallet.
-         * @param {SignOperationsApiSignDataV1WalletSignPostRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        signDataV1WalletSignPost(requestParameters: SignOperationsApiSignDataV1WalletSignPostRequest, options?: AxiosRequestConfig): AxiosPromise<SignDataResponse> {
-            return localVarFp.signDataV1WalletSignPost(requestParameters.signDataRequest, requestParameters.xMagicAPIKey, requestParameters.xMagicSecretKey, requestParameters.xOIDCProviderID, options).then((request) => request(axios, basePath));
-        },
-        /**
          * Signs an arbitrary message using the wallet\'s private key. Useful for authentication and off-chain verification.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet/sign/message\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\",     \"message_base64\": \"bm9uZQ==\"   }\' ```  **Example Response:** ```json {   \"signature\": \"0x0cebb670d8375ac74122b46c44def7e1ce593e80434a3e6557108ae124f8b44f3c5068fc104279fe7f51918cbe4c249d707bc1c0ce2ffb6d201d3cf4e2fdee8d1b\",   \"r\": \"0x0cebb670d8375ac74122b46c44def7e1ce593e80434a3e6557108ae124f8b44f\",   \"s\": \"0x3c5068fc104279fe7f51918cbe4c249d707bc1c0ce2ffb6d201d3cf4e2fdee8d\",   \"v\": \"27\" } ```
-         * @summary Sign a message with the wallet.
-         * @param {SignOperationsApiSignMessageV1WalletPersonalSignPostRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        signMessageV1WalletPersonalSignPost(requestParameters: SignOperationsApiSignMessageV1WalletPersonalSignPostRequest, options?: AxiosRequestConfig): AxiosPromise<SignMessageResponse> {
-            return localVarFp.signMessageV1WalletPersonalSignPost(requestParameters.signMessageRequest, requestParameters.xMagicAPIKey, requestParameters.xMagicSecretKey, requestParameters.xOIDCProviderID, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Sign Message
+         * @summary Sign a message using the wallet\'s private key.
          * @param {SignOperationsApiSignMessageV1WalletSignMessagePostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -407,76 +249,6 @@ export interface SignOperationsApiSignDataV1WalletSignDataPostRequest {
      * 
      * @type {string}
      * @memberof SignOperationsApiSignDataV1WalletSignDataPost
-     */
-    readonly xOIDCProviderID?: string
-}
-
-/**
- * Request parameters for signDataV1WalletSignPost operation in SignOperationsApi.
- * @export
- * @interface SignOperationsApiSignDataV1WalletSignPostRequest
- */
-export interface SignOperationsApiSignDataV1WalletSignPostRequest {
-    /**
-     * 
-     * @type {SignDataRequest}
-     * @memberof SignOperationsApiSignDataV1WalletSignPost
-     */
-    readonly signDataRequest: SignDataRequest
-
-    /**
-     * 
-     * @type {string}
-     * @memberof SignOperationsApiSignDataV1WalletSignPost
-     */
-    readonly xMagicAPIKey?: string
-
-    /**
-     * 
-     * @type {string}
-     * @memberof SignOperationsApiSignDataV1WalletSignPost
-     */
-    readonly xMagicSecretKey?: string
-
-    /**
-     * 
-     * @type {string}
-     * @memberof SignOperationsApiSignDataV1WalletSignPost
-     */
-    readonly xOIDCProviderID?: string
-}
-
-/**
- * Request parameters for signMessageV1WalletPersonalSignPost operation in SignOperationsApi.
- * @export
- * @interface SignOperationsApiSignMessageV1WalletPersonalSignPostRequest
- */
-export interface SignOperationsApiSignMessageV1WalletPersonalSignPostRequest {
-    /**
-     * 
-     * @type {SignMessageRequest}
-     * @memberof SignOperationsApiSignMessageV1WalletPersonalSignPost
-     */
-    readonly signMessageRequest: SignMessageRequest
-
-    /**
-     * 
-     * @type {string}
-     * @memberof SignOperationsApiSignMessageV1WalletPersonalSignPost
-     */
-    readonly xMagicAPIKey?: string
-
-    /**
-     * 
-     * @type {string}
-     * @memberof SignOperationsApiSignMessageV1WalletPersonalSignPost
-     */
-    readonly xMagicSecretKey?: string
-
-    /**
-     * 
-     * @type {string}
-     * @memberof SignOperationsApiSignMessageV1WalletPersonalSignPost
      */
     readonly xOIDCProviderID?: string
 }
@@ -524,8 +296,8 @@ export interface SignOperationsApiSignMessageV1WalletSignMessagePostRequest {
  */
 export class SignOperationsApi extends BaseAPI {
     /**
-     * 
-     * @summary Sign Data
+     * Signs a hash of arbitrary data using the wallet\'s private key.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet/sign/data\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\",     \"raw_data_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\"   }\' ```  **Example Response:** ```json {   \"message_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\",   \"signature\": \"0x8e7d6c5b4a3928172635445566778899aabbccddeeff00112233445566778899\",   \"r\": \"0x3d4e5f678901234567890abcdef1234567890abcdef1234567890abcdef1234\",   \"s\": \"0x4e5f678901234567890abcdef1234567890abcdef1234567890abcdef123456\",   \"v\": \"27\" } ```
+     * @summary Sign data using the wallet\'s private key.
      * @param {SignOperationsApiSignDataV1WalletSignDataPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -536,32 +308,8 @@ export class SignOperationsApi extends BaseAPI {
     }
 
     /**
-     * Signs a hash of arbitrary data using the wallet\'s private key.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet/sign/data\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\",     \"raw_data_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\"   }\' ```  **Example Response:** ```json {   \"message_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\",   \"signature\": \"0x8e7d6c5b4a3928172635445566778899aabbccddeeff00112233445566778899\",   \"r\": \"0x3d4e5f678901234567890abcdef1234567890abcdef1234567890abcdef1234\",   \"s\": \"0x4e5f678901234567890abcdef1234567890abcdef1234567890abcdef123456\",   \"v\": \"27\" } ```
-     * @summary Sign arbitrary data with the wallet.
-     * @param {SignOperationsApiSignDataV1WalletSignPostRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof SignOperationsApi
-     */
-    public signDataV1WalletSignPost(requestParameters: SignOperationsApiSignDataV1WalletSignPostRequest, options?: AxiosRequestConfig) {
-        return SignOperationsApiFp(this.configuration).signDataV1WalletSignPost(requestParameters.signDataRequest, requestParameters.xMagicAPIKey, requestParameters.xMagicSecretKey, requestParameters.xOIDCProviderID, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * Signs an arbitrary message using the wallet\'s private key. Useful for authentication and off-chain verification.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet/sign/message\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\",     \"message_base64\": \"bm9uZQ==\"   }\' ```  **Example Response:** ```json {   \"signature\": \"0x0cebb670d8375ac74122b46c44def7e1ce593e80434a3e6557108ae124f8b44f3c5068fc104279fe7f51918cbe4c249d707bc1c0ce2ffb6d201d3cf4e2fdee8d1b\",   \"r\": \"0x0cebb670d8375ac74122b46c44def7e1ce593e80434a3e6557108ae124f8b44f\",   \"s\": \"0x3c5068fc104279fe7f51918cbe4c249d707bc1c0ce2ffb6d201d3cf4e2fdee8d\",   \"v\": \"27\" } ```
-     * @summary Sign a message with the wallet.
-     * @param {SignOperationsApiSignMessageV1WalletPersonalSignPostRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof SignOperationsApi
-     */
-    public signMessageV1WalletPersonalSignPost(requestParameters: SignOperationsApiSignMessageV1WalletPersonalSignPostRequest, options?: AxiosRequestConfig) {
-        return SignOperationsApiFp(this.configuration).signMessageV1WalletPersonalSignPost(requestParameters.signMessageRequest, requestParameters.xMagicAPIKey, requestParameters.xMagicSecretKey, requestParameters.xOIDCProviderID, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Sign Message
+     * @summary Sign a message using the wallet\'s private key.
      * @param {SignOperationsApiSignMessageV1WalletSignMessagePostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

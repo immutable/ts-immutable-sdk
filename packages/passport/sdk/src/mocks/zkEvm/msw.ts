@@ -35,7 +35,7 @@ const mandatoryHandlers = [
       public_address: mockUserZkEvm.zkEvm.userAdminAddress,
     }),
   )),
-  rest.post('https://tee.express.magiclabs.com/v1/wallet/personal-sign', (req, res, ctx) => res(
+  rest.post('https://tee.express.magiclabs.com/v1/wallet/sign/message', (req, res, ctx) => res(
     ctx.status(200),
     ctx.json({
       signature: '0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b',
@@ -56,13 +56,13 @@ export const mswHandlers = {
       internalServerError: rest.post('https://tee.express.magiclabs.com/v1/wallet', (req, res, ctx) => res(ctx.status(500))),
     },
     personalSign: {
-      success: rest.post('https://tee.express.magiclabs.com/v1/wallet/personal-sign', (req, res, ctx) => res(
+      success: rest.post('https://tee.express.magiclabs.com/v1/wallet/sign/message', (req, res, ctx) => res(
         ctx.status(200),
         ctx.json({
           signature: '0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b',
         }),
       )),
-      internalServerError: rest.post('https://tee.express.magiclabs.com/v1/wallet/personal-sign', (req, res, ctx) => res(ctx.status(500))),
+      internalServerError: rest.post('https://tee.express.magiclabs.com/v1/wallet/sign/message', (req, res, ctx) => res(ctx.status(500))),
     },
   },
   counterfactualAddress: {

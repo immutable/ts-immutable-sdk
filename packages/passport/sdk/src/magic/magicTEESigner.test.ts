@@ -18,7 +18,7 @@ describe('MagicTEESigner', () => {
   let mockMagicTeeApiClient: jest.Mocked<MagicTeeApiClients>;
   let mockFlow: any;
   let mockCreateWalletV1WalletPost: jest.Mock;
-  let mockSignMessageV1WalletPersonalSignPost: jest.Mock;
+  let mockSignMessageV1WalletSignMessagePost: jest.Mock;
 
   const mockWalletResponse = {
     data: {
@@ -42,7 +42,7 @@ describe('MagicTEESigner', () => {
 
     // Mock API methods
     mockCreateWalletV1WalletPost = jest.fn();
-    mockSignMessageV1WalletPersonalSignPost = jest.fn();
+    mockSignMessageV1WalletSignMessagePost = jest.fn();
 
     // Mock MagicTeeApiClients
     mockMagicTeeApiClient = {
@@ -50,7 +50,7 @@ describe('MagicTEESigner', () => {
         createWalletV1WalletPost: mockCreateWalletV1WalletPost,
       },
       signOperationsApi: {
-        signMessageV1WalletPersonalSignPost: mockSignMessageV1WalletPersonalSignPost,
+        signMessageV1WalletSignMessagePost: mockSignMessageV1WalletSignMessagePost,
       },
     } as any;
 
@@ -219,7 +219,7 @@ describe('MagicTEESigner', () => {
     beforeEach(() => {
       mockAuthManager.getUser.mockResolvedValue(mockUser);
       mockCreateWalletV1WalletPost.mockResolvedValue(mockWalletResponse);
-      mockSignMessageV1WalletPersonalSignPost.mockResolvedValue(mockSignatureResponse);
+      mockSignMessageV1WalletSignMessagePost.mockResolvedValue(mockSignatureResponse);
     });
 
     it('should sign string message successfully', async () => {
@@ -227,7 +227,7 @@ describe('MagicTEESigner', () => {
       const signature = await magicTEESigner.signMessage(message);
 
       expect(signature).toBe('0xsignature123');
-      expect(mockSignMessageV1WalletPersonalSignPost).toHaveBeenCalledWith(
+      expect(mockSignMessageV1WalletSignMessagePost).toHaveBeenCalledWith(
         {
           signMessageRequest: {
             message_base64: Buffer.from(message, 'utf-8').toString('base64'),
@@ -243,7 +243,7 @@ describe('MagicTEESigner', () => {
       const signature = await magicTEESigner.signMessage(message);
 
       expect(signature).toBe('0xsignature123');
-      expect(mockSignMessageV1WalletPersonalSignPost).toHaveBeenCalledWith(
+      expect(mockSignMessageV1WalletSignMessagePost).toHaveBeenCalledWith(
         {
           signMessageRequest: {
             message_base64: Buffer.from(`0x${Buffer.from(message).toString('hex')}`, 'utf-8').toString('base64'),
@@ -274,7 +274,7 @@ describe('MagicTEESigner', () => {
         },
       };
       (isAxiosError as unknown as jest.Mock).mockReturnValue(true);
-      mockSignMessageV1WalletPersonalSignPost.mockRejectedValue(apiError);
+      mockSignMessageV1WalletSignMessagePost.mockRejectedValue(apiError);
 
       await expect(magicTEESigner.signMessage('test')).rejects.toThrow(
         'Failed to create signature using EOA with status 400: {"message":"Invalid signature request"}',
@@ -287,7 +287,7 @@ describe('MagicTEESigner', () => {
         message: 'Network Error',
       };
       (isAxiosError as unknown as jest.Mock).mockReturnValue(true);
-      mockSignMessageV1WalletPersonalSignPost.mockRejectedValue(networkError);
+      mockSignMessageV1WalletSignMessagePost.mockRejectedValue(networkError);
 
       await expect(magicTEESigner.signMessage('test')).rejects.toThrow(
         'Failed to create signature using EOA: Network Error',
@@ -297,7 +297,7 @@ describe('MagicTEESigner', () => {
     it('should handle non-axios errors gracefully', async () => {
       const genericError = new Error('Generic error');
       (isAxiosError as unknown as jest.Mock).mockReturnValue(false);
-      mockSignMessageV1WalletPersonalSignPost.mockRejectedValue(genericError);
+      mockSignMessageV1WalletSignMessagePost.mockRejectedValue(genericError);
 
       await expect(magicTEESigner.signMessage('test')).rejects.toThrow(
         'Failed to create signature using EOA: Generic error',
@@ -309,7 +309,7 @@ describe('MagicTEESigner', () => {
 
       expect(withMetricsAsync).toHaveBeenCalledWith(
         expect.any(Function),
-        'magicPersonalSign',
+        'magicSignMessage',
       );
       expect(trackDuration).toHaveBeenCalledWith(
         'passport',
@@ -323,7 +323,7 @@ describe('MagicTEESigner', () => {
 
       // Should call both createWallet and signMessage
       expect(mockCreateWalletV1WalletPost).toHaveBeenCalled();
-      expect(mockSignMessageV1WalletPersonalSignPost).toHaveBeenCalled();
+      expect(mockSignMessageV1WalletSignMessagePost).toHaveBeenCalled();
     });
   });
 

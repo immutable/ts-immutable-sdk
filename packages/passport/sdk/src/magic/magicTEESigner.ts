@@ -41,7 +41,7 @@ export default class MagicTEESigner extends AbstractSigner {
       userWallet = await this.createWallet();
     }
 
-    if (isUserImx(user) && user.imx.userAdminAddress !== userWallet.walletAddress) {
+    if (isUserImx(user) && user.imx.userAdminAddress.toLowerCase() !== userWallet.walletAddress.toLowerCase()) {
       throw new PassportError(
         'Wallet address mismatch.'
           + `Rollup: IMX, TEE address: ${userWallet.walletAddress}, profile address: ${user.imx.userAdminAddress}`,
@@ -49,7 +49,7 @@ export default class MagicTEESigner extends AbstractSigner {
       );
     }
 
-    if (isUserZkEvm(user) && user.zkEvm.userAdminAddress !== userWallet.walletAddress) {
+    if (isUserZkEvm(user) && user.zkEvm.userAdminAddress.toLowerCase() !== userWallet.walletAddress.toLowerCase()) {
       throw new PassportError(
         'Wallet address mismatch.'
           + `Rollup: zkEVM, TEE address: ${userWallet.walletAddress}, profile address: ${user.zkEvm.userAdminAddress}`,
@@ -167,7 +167,7 @@ export default class MagicTEESigner extends AbstractSigner {
     return withMetricsAsync(async (flow: Flow) => {
       try {
         const startTime = performance.now();
-        const response = await this.magicTeeApiClient.signOperationsApi.signMessageV1WalletPersonalSignPost({
+        const response = await this.magicTeeApiClient.signOperationsApi.signMessageV1WalletSignMessagePost({
           signMessageRequest: {
             message_base64: Buffer.from(messageToSign, 'utf-8').toString('base64'),
             chain: CHAIN_IDENTIFIER,
@@ -196,7 +196,7 @@ export default class MagicTEESigner extends AbstractSigner {
 
         throw new Error(errorMessage);
       }
-    }, 'magicPersonalSign');
+    }, 'magicSignMessage');
   }
 
   // eslint-disable-next-line class-methods-use-this
