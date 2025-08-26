@@ -3,6 +3,7 @@ import { AxiosResponse, HttpStatusCode } from 'axios';
 import { Blockscout } from './blockscout';
 import {
   BlockscoutError,
+  BlockscoutERC20Response,
   BlockscoutTokenType,
 } from './blockscoutType';
 import { BLOCKSCOUT_CHAIN_URL_MAP, NATIVE } from '../../env';
@@ -40,16 +41,19 @@ describe('Blockscout', () => {
     it('success', async () => {
       const mockResponse = {
         status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any,
         data:
           {
             items: [
               {
                 token: {
-                  address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                  address_hash: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
                   circulating_market_cap: '639486814.4877648',
                   decimals: '18',
                   exchange_rate: '0.568914',
-                  holders: '71451',
+                  holders_count: '71451',
                   icon_url: 'https://assets.coingecko.com',
                   name: 'Immutable X',
                   symbol: 'IMX',
@@ -62,11 +66,11 @@ describe('Blockscout', () => {
               },
               {
                 token: {
-                  address: '',
+                  address_hash: '',
                   circulating_market_cap: '639486814.4877648',
                   decimals: '18',
                   exchange_rate: '0.568914',
-                  holders: '71451',
+                  holders_count: '71451',
                   icon_url: 'https://assets.coingecko.com',
                   name: 'Immutable X',
                   symbol: 'IMX',
@@ -80,7 +84,7 @@ describe('Blockscout', () => {
             ],
             next_page_params: null,
           },
-      } as AxiosResponse;
+      } as AxiosResponse<BlockscoutERC20Response>;
       mockedHttpClient.get.mockResolvedValueOnce(mockResponse);
 
       const token = BlockscoutTokenType.ERC20;
