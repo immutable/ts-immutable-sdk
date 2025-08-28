@@ -99,9 +99,17 @@ describe('Passport', () => {
   const mockLoginWithOidc = jest.fn();
   const mockMagicRequest = jest.fn();
   const mockMagicUserIsLoggedIn = jest.fn();
+  let originalWindowOpen: any;
 
   beforeEach(() => {
     jest.resetAllMocks();
+
+    // Mock window.open to handle popup detection in authManager
+    originalWindowOpen = window.open;
+    window.open = jest.fn().mockReturnValue({
+      closed: false,
+      close: jest.fn(),
+    });
 
     mockMagicUserIsLoggedIn.mockResolvedValue(true);
     (UserManager as jest.Mock).mockImplementation(() => ({
@@ -122,6 +130,8 @@ describe('Passport', () => {
 
   afterEach(() => {
     resetMswHandlers();
+    // Restore original window.open
+    window.open = originalWindowOpen;
   });
 
   afterAll(async () => {

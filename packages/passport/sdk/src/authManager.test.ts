@@ -82,8 +82,6 @@ const zkEvmProfileData = {
 const mockErrorMsg = 'NONO';
 
 describe('AuthManager', () => {
-  afterEach(jest.resetAllMocks);
-
   let authManager: AuthManager;
   let mockSigninPopup: jest.Mock;
   let mockSigninCallback: jest.Mock;
@@ -96,8 +94,16 @@ describe('AuthManager', () => {
   let mockOverlayAppend: jest.Mock;
   let mockOverlayRemove: jest.Mock;
   let mockRevokeTokens: jest.Mock;
+  let originalWindowOpen: any;
 
   beforeEach(() => {
+    // Store original window.open and replace with mock globally
+    originalWindowOpen = window.open;
+    window.open = jest.fn().mockReturnValue({
+      closed: false,
+      close: jest.fn(),
+    });
+
     mockSigninPopup = jest.fn();
     mockSigninCallback = jest.fn();
     mockSigninRedirectCallback = jest.fn();
@@ -130,6 +136,12 @@ describe('AuthManager', () => {
       remove: mockOverlayRemove,
     });
     authManager = new AuthManager(getConfig());
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+    // Restore original window.open
+    window.open = originalWindowOpen;
   });
 
   describe('constructor', () => {
@@ -204,6 +216,90 @@ describe('AuthManager', () => {
       });
     });
 
+    describe('popup closed detection', () => {
+      let mockPopupRef: any;
+      let mockSetInterval: jest.SpyInstance;
+      let mockClearInterval: jest.SpyInstance;
+
+      beforeEach(() => {
+        mockPopupRef = {
+          closed: false,
+          close: jest.fn(),
+        };
+
+        // Override the global mock for these tests
+        (window.open as jest.Mock).mockReturnValue(mockPopupRef);
+
+        mockSetInterval = jest.spyOn(global, 'setInterval');
+        mockClearInterval = jest.spyOn(global, 'clearInterval');
+      });
+
+      afterEach(() => {
+        mockSetInterval.mockRestore();
+        mockClearInterval.mockRestore();
+      });
+
+      it('should reject with "Popup closed by user" when popup is closed during authentication', async () => {
+        // Mock signinPopup to return a promise that never resolves (simulating long authentication)
+        const signinPromise = new Promise<any>(() => {
+          // Promise never resolves to simulate ongoing authentication
+        });
+        mockSigninPopup.mockReturnValue(signinPromise);
+
+        // Start the login process
+        const loginPromise = authManager.login();
+
+        // Wait for the polling to be set up
+        await new Promise((resolve) => {
+          setTimeout(resolve, 10);
+        });
+
+        // Verify polling was set up
+        expect(mockSetInterval).toHaveBeenCalledWith(expect.any(Function), 500);
+
+        // Get the polling function and simulate popup being closed
+        const pollingCallback = mockSetInterval.mock.calls[0][0];
+        mockPopupRef.closed = true;
+        pollingCallback(); // Manually trigger the polling callback
+
+        // Expect the login to reject with popup closed error
+        await expect(loginPromise).rejects.toThrow('Popup closed by user');
+      });
+
+      it('should clean up timer when user authentication completes successfully', async () => {
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+        await authManager.login();
+
+        // Verify timer was cleared
+        expect(mockClearInterval).toHaveBeenCalled();
+        // Verify popup was closed
+        expect(mockPopupRef.close).toHaveBeenCalled();
+      });
+
+      it('should fall back to original behavior when popup reference is not available', async () => {
+        // Mock window.open to return null (popup blocked or failed)
+        (window.open as jest.Mock).mockReturnValue(null);
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+        const result = await authManager.login();
+
+        expect(result).toEqual(mockUser);
+        // Should not set up polling when no popup reference
+        expect(mockSetInterval).not.toHaveBeenCalled();
+      });
+
+      it('should use correct polling duration constant', async () => {
+        const neverResolvingPromise = new Promise(() => {});
+        mockSigninPopup.mockReturnValue(neverResolvingPromise);
+
+        authManager.login().catch(() => {}); // Ignore rejection for this test
+
+        // Verify the polling interval uses the correct constant (500ms)
+        expect(mockSetInterval).toHaveBeenCalledWith(expect.any(Function), 500);
+      });
+    });
+
     describe('when the user has registered for imx', () => {
       it('should populate the imx object', async () => {
         mockSigninPopup.mockResolvedValue(mockOidcUser);
@@ -269,7 +365,9 @@ describe('AuthManager', () => {
     });
 
     it('should throw the error if user is failed to login', async () => {
-      mockSigninPopup.mockRejectedValue(new Error(mockErrorMsg));
+      mockSigninPopup.mockImplementation(() => {
+        throw new Error(mockErrorMsg);
+      });
 
       await expect(() => authManager.login()).rejects.toThrow(
         new PassportError(
@@ -282,7 +380,9 @@ describe('AuthManager', () => {
 
     describe('when the popup is blocked', () => {
       beforeEach(() => {
-        mockSigninPopup.mockRejectedValueOnce(new Error('Attempted to navigate on a disposed window'));
+        mockSigninPopup.mockImplementationOnce(() => {
+          throw new Error('Attempted to navigate on a disposed window');
+        });
       });
 
       it('should render the blocked popup overlay', async () => {
@@ -326,7 +426,9 @@ describe('AuthManager', () => {
 
         describe('and the user closes the popup', () => {
           it('should throw an error', async () => {
-            mockSigninPopup.mockRejectedValueOnce(new Error('Popup closed by user'));
+            mockSigninPopup.mockImplementationOnce(() => {
+              throw new Error('Popup closed by user');
+            });
 
             await expect(() => authManager.login()).rejects.toThrow(
               new Error('Popup closed by user'),
@@ -368,7 +470,9 @@ describe('AuthManager', () => {
 
     describe('when getUser throws an error', () => {
       it('calls attempts to sign in the user using signinPopup', async () => {
-        mockGetUser.mockRejectedValue(new Error(mockErrorMsg));
+        mockGetUser.mockImplementation(() => {
+          throw new Error(mockErrorMsg);
+        });
         mockSigninPopup.mockReturnValue(mockOidcUser);
         (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(false);
 
@@ -380,6 +484,30 @@ describe('AuthManager', () => {
   });
 
   describe('loginCallback', () => {
+    let mockSigninPopupCallback: jest.Mock;
+
+    beforeEach(() => {
+      mockSigninPopupCallback = jest.fn();
+      (UserManager as jest.Mock).mockImplementation((config) => ({
+        signinPopup: mockSigninPopup,
+        signinCallback: mockSigninCallback,
+        signinPopupCallback: mockSigninPopupCallback,
+        signinRedirectCallback: mockSigninRedirectCallback,
+        signoutRedirect: mockSignoutRedirect,
+        signoutSilent: mockSignoutSilent,
+        getUser: mockGetUser,
+        signinSilent: mockSigninSilent,
+        storeUser: mockStoreUser,
+        revokeTokens: mockRevokeTokens,
+        settings: {
+          metadata: {
+            end_session_endpoint: config.metadata?.end_session_endpoint,
+          },
+        },
+      }));
+      authManager = new AuthManager(getConfig());
+    });
+
     it('should call login callback', async () => {
       await authManager.loginCallback();
 
@@ -437,7 +565,9 @@ describe('AuthManager', () => {
           logoutMode: 'redirect',
         });
         const manager = new AuthManager(configuration);
-        mockRevokeTokens.mockRejectedValue(new Error(mockErrorMsg));
+        mockRevokeTokens.mockImplementation(() => {
+          throw new Error(mockErrorMsg);
+        });
 
         await expect(() => manager.logout()).rejects.toThrow(
           new PassportError(
@@ -453,7 +583,9 @@ describe('AuthManager', () => {
           logoutMode: 'silent',
         });
         const manager = new AuthManager(configuration);
-        mockRevokeTokens.mockRejectedValue(new Error(mockErrorMsg));
+        mockRevokeTokens.mockImplementation(() => {
+          throw new Error(mockErrorMsg);
+        });
 
         await expect(() => manager.logout()).rejects.toThrow(
           new PassportError(
@@ -471,7 +603,9 @@ describe('AuthManager', () => {
       });
       const manager = new AuthManager(configuration);
 
-      mockSignoutRedirect.mockRejectedValue(new Error(mockErrorMsg));
+      mockSignoutRedirect.mockImplementation(() => {
+        throw new Error(mockErrorMsg);
+      });
 
       await expect(() => manager.logout()).rejects.toThrow(
         new PassportError(
@@ -488,7 +622,9 @@ describe('AuthManager', () => {
       });
       const manager = new AuthManager(configuration);
 
-      mockSignoutSilent.mockRejectedValue(new Error(mockErrorMsg));
+      mockSignoutSilent.mockImplementation(() => {
+        throw new Error(mockErrorMsg);
+      });
 
       await expect(() => manager.logout()).rejects.toThrow(
         new PassportError(
