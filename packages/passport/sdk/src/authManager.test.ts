@@ -104,6 +104,14 @@ describe('AuthManager', () => {
       close: jest.fn(),
     });
 
+    // Mock crypto.randomUUID globally for all tests
+    Object.defineProperty(window, 'crypto', {
+      value: {
+        randomUUID: jest.fn().mockReturnValue('mock-uuid-12345'),
+      },
+      writable: true,
+    });
+
     mockSigninPopup = jest.fn();
     mockSigninCallback = jest.fn();
     mockSigninRedirectCallback = jest.fn();
@@ -437,6 +445,48 @@ describe('AuthManager', () => {
             expect(mockSigninPopup).toHaveBeenCalledTimes(2);
             expect(mockOverlayRemove).toHaveBeenCalled();
           });
+        });
+      });
+
+      describe('when tryAgainOnClick is called multiple times', () => {
+        it('should call window.open with the same popupWindowTarget to focus existing popup', async () => {
+          let tryAgainCallback: (() => Promise<void>) | undefined;
+
+          mockOverlayAppend.mockImplementation(async (tryAgain: () => Promise<void>) => {
+            tryAgainCallback = tryAgain;
+            // First call - should open new popup
+            await tryAgain();
+          });
+
+          mockSigninPopup.mockReturnValue(mockOidcUser);
+
+          const loginPromise = authManager.login();
+
+          // Wait for the overlay to be set up
+          await new Promise((resolve) => { setTimeout(resolve, 10); });
+
+          // Verify the popupWindowTarget was generated
+          const expectedTarget = 'mock-uuid-12345';
+
+          // Verify first signinPopup call used the target
+          expect(mockSigninPopup).toHaveBeenCalledWith(
+            expect.objectContaining({
+              popupWindowTarget: expectedTarget,
+            }),
+          );
+
+          // Reset window.open mock to track subsequent calls
+          (window.open as jest.Mock).mockClear();
+
+          // Call tryAgain again - should focus existing popup
+          if (tryAgainCallback) {
+            await tryAgainCallback();
+          }
+
+          // Verify window.open was called with empty URL and the same target
+          expect(window.open).toHaveBeenCalledWith('', expectedTarget);
+
+          await loginPromise;
         });
       });
 
@@ -1029,7 +1079,7 @@ describe('AuthManager', () => {
           width: 410,
           height: 450,
         },
-        popupWindowTarget: 'passportLoginPrompt',
+        popupWindowTarget: expect.any(String),
       });
     });
 
@@ -1047,7 +1097,7 @@ describe('AuthManager', () => {
           width: 410,
           height: 450,
         },
-        popupWindowTarget: 'passportLoginPrompt',
+        popupWindowTarget: expect.any(String),
       });
     });
   });
