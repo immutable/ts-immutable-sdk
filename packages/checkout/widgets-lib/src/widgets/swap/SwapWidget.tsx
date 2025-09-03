@@ -194,7 +194,8 @@ export default function SwapWidget({
   }, [checkout, provider]);
 
   useEffect(() => {
-    if (!checkout || swapState.riskAssessment) {
+    // Only run risk assessment when we have meaningful token and amount data
+    if (!checkout || swapState.riskAssessment || !fromTokenAddress || !amount) {
       return;
     }
 
@@ -205,7 +206,14 @@ export default function SwapWidget({
         return;
       }
 
-      const assessment = await fetchRiskAssessment([address], checkout.config);
+      // We have meaningful token data - call enhanced risk assessment
+      const assessmentData = [{
+        address,
+        tokenAddr: fromTokenAddress,
+        amount,
+      }];
+
+      const assessment = await fetchRiskAssessment(checkout.config, assessmentData);
       swapDispatch({
         payload: {
           type: SwapActions.SET_RISK_ASSESSMENT,
@@ -213,7 +221,7 @@ export default function SwapWidget({
         },
       });
     })();
-  }, [checkout, provider]);
+  }, [checkout, provider, fromTokenAddress, amount]);
 
   useEffect(() => {
     swapDispatch({

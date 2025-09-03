@@ -226,12 +226,15 @@ export class Checkout {
   }
 
   /**
-   * Fetches the risk assessment for the given addresses.
-   * @param {string[]} addresses - The addresses to assess.
+   * Fetches risk assessment for the given assessment data.
+   * @param {Array<{address: string; tokenAddr: string; amount: string}>} assessmentData
+   *   Assessment data with addresses and required token context.
    * @returns {Promise<AssessmentResult>} - A promise that resolves to the risk assessment result.
    */
-  public async getRiskAssessment(addresses: string[]): Promise<AssessmentResult> {
-    return await fetchRiskAssessment(addresses, this.config);
+  public async getRiskAssessment(
+    assessmentData: Array<{ address: string; tokenAddr: string; amount: string }>,
+  ): Promise<AssessmentResult> {
+    return await fetchRiskAssessment(this.config, assessmentData);
   }
 
   /**

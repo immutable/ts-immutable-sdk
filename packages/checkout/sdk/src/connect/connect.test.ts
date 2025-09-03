@@ -7,6 +7,9 @@ import { checkIsWalletConnected, connectSite, requestPermissions } from './conne
 import { WrappedBrowserProvider, WalletAction, WalletProviderName } from '../types';
 import { CheckoutErrorType } from '../errors';
 import { createProvider } from '../provider';
+import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
+
+jest.mock('../config/remoteConfigFetcher');
 
 let windowSpy: any;
 
@@ -26,6 +29,13 @@ describe('connect', () => {
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
     }));
+
+    // Mock RemoteConfigFetcher to prevent test failures
+    (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
+      getConfig: jest.fn().mockResolvedValue({
+        segmentPublishableKey: 'test-key',
+      }),
+    });
   });
 
   afterEach(() => {
