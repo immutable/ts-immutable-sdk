@@ -111,6 +111,14 @@ describe('Passport', () => {
       close: jest.fn(),
     });
 
+    // Mock crypto.randomUUID for authManager login functionality
+    Object.defineProperty(window, 'crypto', {
+      value: {
+        randomUUID: jest.fn().mockReturnValue('mock-uuid-12345'),
+      },
+      writable: true,
+    });
+
     mockMagicUserIsLoggedIn.mockResolvedValue(true);
     (UserManager as jest.Mock).mockImplementation(() => ({
       signinPopup: mockSigninPopup,

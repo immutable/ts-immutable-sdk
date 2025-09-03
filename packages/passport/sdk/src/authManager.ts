@@ -228,7 +228,7 @@ export default class AuthManager {
    */
   public async login(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<User> {
     return withPassportError<User>(async () => {
-      const popupWindowTarget = 'passportLoginPrompt';
+      const popupWindowTarget = window.crypto.randomUUID();
       const signinPopup = async () => {
         const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptions);
 
