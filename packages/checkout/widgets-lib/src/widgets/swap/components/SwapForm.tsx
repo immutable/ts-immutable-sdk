@@ -861,7 +861,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     const riskAssessmentData = [{
       address,
       tokenAddr: fromToken.address,
-      amount: fromAmount,
+      amount: parseUnits(fromAmount, fromToken.decimals).toString(),
     }];
 
     const riskAssessment = await fetchRiskAssessmentV2(riskAssessmentData, checkout.config);
