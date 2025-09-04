@@ -828,12 +828,12 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       control: 'Swap',
       controlType: 'Button',
       extras: {
-        swapFromAddress: data?.fromTokenAddress,
-        swapFromAmount: data?.fromAmount,
-        swapFromTokenSymbol: data?.fromTokenSymbol,
-        swapToAddress: data?.toTokenAddress,
-        swapToAmount: data?.toAmount,
-        swapToTokenSymbol: data?.toTokenSymbol,
+        swapFromAddress: fromToken?.address,
+        swapFromAmount: fromAmount,
+        swapFromTokenSymbol: fromToken?.symbol,
+        swapToAddress: toToken?.address,
+        swapToAmount: toAmount,
+        swapToTokenSymbol: toToken?.symbol,
         isSwapFormValid: isValid,
         hasFundsForGas: !insufficientFundsForGas,
         autoProceed,
@@ -854,12 +854,14 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       return;
     }
 
-    // As this is post form data validation, the fallback values is unecessary and only to satisfy type correctess.
-    // Ideally once the form data is validated it should be converted into a not null type to reflect its validity.
+    if (!fromToken?.address || !fromAmount) {
+      throw new Error('Invalid form data: fromToken.Address or fromAmount is missing');
+    }
+
     const riskAssessmentData = [{
       address,
-      tokenAddr: data?.fromTokenAddress || '',
-      amount: data?.fromAmount || '',
+      tokenAddr: fromToken.address,
+      amount: fromAmount,
     }];
 
     const riskAssessment = await fetchRiskAssessmentV2(riskAssessmentData, checkout.config);
