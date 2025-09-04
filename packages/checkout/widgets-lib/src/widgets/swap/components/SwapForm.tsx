@@ -7,7 +7,7 @@ import {
 } from '@biom3/react';
 import {
   fetchRiskAssessmentV2,
-  isAddressSanctioned,
+  isSingleAddressSanctioned,
   TokenInfo,
   WidgetTheme,
 } from '@imtbl/checkout-sdk';
@@ -864,7 +864,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
     const riskAssessment = await fetchRiskAssessmentV2(riskAssessmentData, checkout.config);
 
-    if (riskAssessment && isAddressSanctioned(riskAssessment)) {
+    if (riskAssessment && isSingleAddressSanctioned(riskAssessment, address)) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
