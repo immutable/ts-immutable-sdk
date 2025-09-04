@@ -1,7 +1,7 @@
 import {
   CheckoutConfiguration,
   fetchRiskAssessmentV2,
-  isAddressSanctioned,
+  resultHasSanctionedWallets,
 } from '@imtbl/checkout-sdk';
 
 type TokenAmount = {
@@ -20,5 +20,5 @@ export const checkSanctionedAddresses = async (
     tokenAddr: amount.address,
   }));
   const result = await fetchRiskAssessmentV2(assessmentData, config);
-  return isAddressSanctioned(result, undefined);
+  return resultHasSanctionedWallets(result);
 };
