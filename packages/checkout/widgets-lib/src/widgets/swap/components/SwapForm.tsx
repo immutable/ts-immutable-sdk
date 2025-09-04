@@ -5,8 +5,12 @@ import {
 import {
   Box, ButtCon, Heading, Icon, OptionKey, Tooltip, Body,
 } from '@biom3/react';
-import { isAddressSanctioned, TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
-
+import {
+  fetchRiskAssessment,
+  isAddressSanctioned,
+  TokenInfo,
+  WidgetTheme,
+} from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
@@ -92,7 +96,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       tokenBalances,
       network,
       autoProceed,
-      riskAssessment,
     },
   } = useContext(SwapContext);
 
@@ -815,18 +818,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
   const sendTransaction = async () => {
     if (!quote) return;
-    if (riskAssessment && isAddressSanctioned(riskAssessment)) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SwapWidgetViews.SERVICE_UNAVAILABLE,
-          },
-        },
-      });
 
-      return;
-    }
     const transaction = quote;
     const isValid = SwapFormValidator();
     // Tracking swap from data here and is valid or not to understand behaviour
@@ -852,6 +844,28 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     if (insufficientFundsForGas) {
       cancelAutoProceed();
       openNotEnoughImxDrawer();
+      return;
+    }
+
+    // Perform sanctions check once we have valid asset and amount data
+    const address = await (await provider?.getSigner())?.getAddress();
+
+    if (!address) {
+      return;
+    }
+
+    const riskAssessment = await fetchRiskAssessment([address], checkout.config);
+
+    if (riskAssessment && isAddressSanctioned(riskAssessment)) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SwapWidgetViews.SERVICE_UNAVAILABLE,
+          },
+        },
+      });
+
       return;
     }
 
@@ -959,7 +973,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
               testInputMode="decimal"
               textInputValue={fromAmount}
               textInputPlaceholder={t('views.SWAP.swapForm.from.inputPlaceholder')}
-              textInputSubtext={`${t('views.SWAP.content.fiatPricePrefix')} 
+              textInputSubtext={`${t('views.SWAP.content.fiatPricePrefix')}
               $${formatZeroAmount(
                 fromFiatValue,
                 true,

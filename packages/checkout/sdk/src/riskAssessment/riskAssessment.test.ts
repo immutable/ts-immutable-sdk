@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
-import { fetchRiskAssessment, isAddressSanctioned } from './riskAssessment';
+import { fetchRiskAssessment } from './riskAssessment';
+import { isAddressSanctioned } from './common';
 import { CheckoutConfiguration } from '../config';
 
 jest.mock('axios');

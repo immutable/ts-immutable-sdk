@@ -9,7 +9,6 @@ import {
 import {
   TokenFilterTypes, IMTBLWidgetEvents, SwapWidgetParams,
   SwapDirection,
-  fetchRiskAssessment,
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
@@ -190,28 +189,6 @@ export default function SwapWidget({
       if (viewState.view.type === SharedViews.LOADING_VIEW) {
         showSwapView();
       }
-    })();
-  }, [checkout, provider]);
-
-  useEffect(() => {
-    if (!checkout || swapState.riskAssessment) {
-      return;
-    }
-
-    (async () => {
-      const address = await (await provider?.getSigner())?.getAddress();
-
-      if (!address) {
-        return;
-      }
-
-      const assessment = await fetchRiskAssessment([address], checkout.config);
-      swapDispatch({
-        payload: {
-          type: SwapActions.SET_RISK_ASSESSMENT,
-          riskAssessment: assessment,
-        },
-      });
     })();
   }, [checkout, provider]);
 
