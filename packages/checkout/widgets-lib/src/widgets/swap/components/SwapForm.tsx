@@ -5,8 +5,12 @@ import {
 import {
   Box, ButtCon, Heading, Icon, OptionKey, Tooltip, Body,
 } from '@biom3/react';
-import { isAddressSanctioned, TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
-
+import {
+  fetchRiskAssessmentV2,
+  isSingleAddressSanctioned,
+  TokenInfo,
+  WidgetTheme,
+} from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
@@ -92,7 +96,6 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       tokenBalances,
       network,
       autoProceed,
-      riskAssessment,
     },
   } = useContext(SwapContext);
 
@@ -815,18 +818,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
 
   const sendTransaction = async () => {
     if (!quote) return;
-    if (riskAssessment && isAddressSanctioned(riskAssessment)) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SwapWidgetViews.SERVICE_UNAVAILABLE,
-          },
-        },
-      });
 
-      return;
-    }
     const transaction = quote;
     const isValid = SwapFormValidator();
     // Tracking swap from data here and is valid or not to understand behaviour
@@ -836,12 +828,12 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       control: 'Swap',
       controlType: 'Button',
       extras: {
-        swapFromAddress: data?.fromTokenAddress,
-        swapFromAmount: data?.fromAmount,
-        swapFromTokenSymbol: data?.fromTokenSymbol,
-        swapToAddress: data?.toTokenAddress,
-        swapToAmount: data?.toAmount,
-        swapToTokenSymbol: data?.toTokenSymbol,
+        swapFromAddress: fromToken?.address,
+        swapFromAmount: fromAmount,
+        swapFromTokenSymbol: fromToken?.symbol,
+        swapToAddress: toToken?.address,
+        swapToAmount: toAmount,
+        swapToTokenSymbol: toToken?.symbol,
         isSwapFormValid: isValid,
         hasFundsForGas: !insufficientFundsForGas,
         autoProceed,
@@ -852,6 +844,38 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
     if (insufficientFundsForGas) {
       cancelAutoProceed();
       openNotEnoughImxDrawer();
+      return;
+    }
+
+    // Perform sanctions check once we have valid asset and amount data
+    const address = await (await provider?.getSigner())?.getAddress();
+
+    if (!address) {
+      return;
+    }
+
+    if (!fromToken?.address || !fromAmount) {
+      throw new Error('Invalid form data: fromToken.Address or fromAmount is missing');
+    }
+
+    const riskAssessmentData = [{
+      address,
+      tokenAddr: fromToken.address,
+      amount: parseUnits(fromAmount, fromToken.decimals),
+    }];
+
+    const riskAssessment = await fetchRiskAssessmentV2(riskAssessmentData, checkout.config);
+
+    if (riskAssessment && isSingleAddressSanctioned(riskAssessment, address)) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SwapWidgetViews.SERVICE_UNAVAILABLE,
+          },
+        },
+      });
+
       return;
     }
 
@@ -959,7 +983,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
               testInputMode="decimal"
               textInputValue={fromAmount}
               textInputPlaceholder={t('views.SWAP.swapForm.from.inputPlaceholder')}
-              textInputSubtext={`${t('views.SWAP.content.fiatPricePrefix')} 
+              textInputSubtext={`${t('views.SWAP.content.fiatPricePrefix')}
               $${formatZeroAmount(
                 fromFiatValue,
                 true,
