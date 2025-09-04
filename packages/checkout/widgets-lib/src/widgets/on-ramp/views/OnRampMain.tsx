@@ -1,10 +1,11 @@
 import { Passport } from '@imtbl/passport';
 import { Box } from '@biom3/react';
 import {
+  useCallback,
   useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import {
-  ExchangeType, fetchRiskAssessment, IMTBLWidgetEvents, isAddressSanctioned,
+  ExchangeType, IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
 import url from 'url';
 import { useTranslation } from 'react-i18next';
@@ -74,7 +75,7 @@ export function OnRampMain({
 
   const { track } = useAnalytics();
 
-  const trackSegmentEvents = async (
+  const trackSegmentEvents = useCallback(async (
     event: TransakEventData,
     walletAddress: string,
   ) => {
@@ -139,9 +140,9 @@ export function OnRampMain({
         break;
       default:
     }
-  };
+  }, [isPassport, track]);
 
-  const transakEventHandler = (event: TransakEventData) => {
+  const transakEventHandler = useCallback((event: TransakEventData) => {
     if (eventTimer.current) clearTimeout(eventTimer.current);
 
     if (event.event_id === TransakEvents.TRANSAK_WIDGET_OPEN) {
@@ -221,7 +222,7 @@ export function OnRampMain({
         },
       });
     }
-  };
+  }, [viewDispatch, tokenAmount, tokenAddress, viewState.view.data?.amount, viewState.view.data?.tokenAddress]);
 
   useEffect(() => {
     if (!checkout || !provider) return;
@@ -229,24 +230,6 @@ export function OnRampMain({
     let userWalletAddress = '';
 
     (async () => {
-      const walletAddress = await (await provider.getSigner()).getAddress();
-
-      const assessment = await fetchRiskAssessment([walletAddress], checkout.config);
-
-      if (isAddressSanctioned(assessment)) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
-              error: new Error('Sanctioned address'),
-            },
-          },
-        });
-
-        return;
-      }
-
       const params = {
         exchangeType: ExchangeType.ONRAMP,
         browserProvider: provider,
@@ -279,7 +262,7 @@ export function OnRampMain({
       }
     };
     window.addEventListener('message', handleTransakEvents);
-  }, [checkout, provider, tokenAmount, tokenAddress, passport]);
+  }, [checkout, provider, tokenAmount, tokenAddress, passport, trackSegmentEvents, transakEventHandler]);
 
   return (
     <Box sx={boxMainStyle(showIframe)}>
