@@ -6,7 +6,7 @@ import {
   Box, ButtCon, Heading, Icon, OptionKey, Tooltip, Body,
 } from '@biom3/react';
 import {
-  fetchRiskAssessment,
+  fetchRiskAssessmentV2,
   isAddressSanctioned,
   TokenInfo,
   WidgetTheme,
@@ -854,7 +854,15 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       return;
     }
 
-    const riskAssessment = await fetchRiskAssessment([address], checkout.config);
+    // As this is post form data validation, the fallback values is unecessary and only to satisfy type correctess.
+    // Ideally once the form data is validated it should be converted into a not null type to reflect its validity.
+    const riskAssessmentData = [{
+      address,
+      tokenAddr: data?.fromTokenAddress || '',
+      amount: data?.fromAmount || '',
+    }];
+
+    const riskAssessment = await fetchRiskAssessmentV2(riskAssessmentData, checkout.config);
 
     if (riskAssessment && isAddressSanctioned(riskAssessment)) {
       viewDispatch({
