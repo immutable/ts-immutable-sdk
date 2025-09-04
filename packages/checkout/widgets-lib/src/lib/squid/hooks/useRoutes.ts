@@ -3,7 +3,6 @@ import { RouteResponse, ActionType } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
 import { useRef } from 'react';
 import { formatUnits } from 'ethers';
-import { WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { delay } from '../../../functions/delay';
 import { sortRoutesByFastestTime } from '../functions/sortRoutesByFastestTime';
 import { retry } from '../../retry';
@@ -14,12 +13,13 @@ import {
 } from '../types';
 import { SquidPostHook } from '../../primary-sales';
 import { SQUID_NATIVE_TOKEN } from '../config';
-import { findToken } from '../functions/findToken';
 import { isRouteToAmountGreaterThanToAmount } from '../functions/isRouteToAmountGreaterThanToAmount';
-import { useRouteCalculation } from './useRouteCalculation';
 import { RouteError } from '../RouteError';
-
-const INSUFFICIENT_GAS_THRESHOLD = 0.1;
+import {
+  calculateFromAmountFromRoute,
+  convertToFormattedFromAmount,
+  getSufficientFromAmounts,
+} from '../functions/routeCalculation';
 
 export const useRoutes = () => {
   const latestRequestIdRef = useRef<number>(0);
@@ -29,71 +29,6 @@ export const useRoutes = () => {
       toProvider,
     },
   } = useProvidersContext();
-
-  const { calculateFromAmount, calculateFromAmountFromRoute, convertToFormattedFromAmount } = useRouteCalculation();
-
-  const getFromAmountData = (
-    tokens: Token[],
-    balance: TokenBalance,
-    toAmount: string,
-    toChainId: string,
-    toTokenAddress: string,
-    additionalBuffer: number = 0,
-  ): FromAmountData | undefined => {
-    const fromToken = findToken(
-      tokens,
-      balance.address,
-      balance.chainId.toString(),
-    );
-    const toToken = findToken(tokens, toTokenAddress, toChainId);
-
-    if (!fromToken || !toToken) {
-      return undefined;
-    }
-
-    return {
-      fromToken,
-      fromAmount: calculateFromAmount(
-        fromToken,
-        toToken,
-        toAmount,
-        additionalBuffer,
-      ),
-      toToken,
-      toAmount,
-      balance,
-      additionalBuffer,
-    };
-  };
-
-  const getSufficientFromAmounts = (
-    tokens: Token[],
-    balances: TokenBalance[],
-    toChainId: string,
-    toTokenAddress: string,
-    toAmount: string,
-  ): FromAmountData[] => {
-    const filteredBalances = balances.filter(
-      (balance) => !(
-        balance.address.toLowerCase() === toTokenAddress.toLowerCase()
-          && balance.chainId === toChainId
-      ),
-    );
-
-    const fromAmountDataArray: FromAmountData[] = filteredBalances
-      .map((balance) => getFromAmountData(tokens, balance, toAmount, toChainId, toTokenAddress))
-      .filter((value) => value !== undefined);
-
-    return fromAmountDataArray.filter((data: FromAmountData) => {
-      const formattedBalance = formatUnits(
-        data.balance.balance,
-        data.balance.decimals,
-      );
-      return (
-        parseFloat(formattedBalance.toString()) > parseFloat(data.fromAmount)
-      );
-    });
-  };
 
   const getRouteWithRetry = async (
     squid: Squid,
@@ -357,53 +292,8 @@ export const useRoutes = () => {
     }
   };
 
-  const hasSufficientBalance = (
-    balances: TokenBalance[],
-    toTokenAddress: string,
-    toChainId: string,
-    toAmount: string,
-  ): boolean => {
-    const matchingTokens = balances.filter(
-      (balance) => balance.address.toLowerCase() === toTokenAddress.toLowerCase()
-        && balance.chainId.toString() === toChainId.toString(),
-    );
-
-    if (matchingTokens.length > 0) {
-      return matchingTokens.some((balance) => {
-        const tokenAmount = parseFloat(formatUnits(balance.balance, balance.decimals));
-        return tokenAmount >= parseFloat(toAmount);
-      });
-    }
-
-    return false;
-  };
-
-  const hasSufficientGas = (
-    balances: TokenBalance[],
-    selectedChainId: string | number,
-    provider: WrappedBrowserProvider | undefined,
-  ): boolean => {
-    if (!provider) return false;
-    if (isPassportProvider(provider)) return true;
-
-    const nativeCurrencyBalance = balances.find(
-      (balance) => balance.address.toLowerCase() === SQUID_NATIVE_TOKEN.toLowerCase()
-        && balance.chainId.toString() === selectedChainId.toString(),
-    );
-    if (!nativeCurrencyBalance) return false;
-
-    const nativeCurrencyBalanceAmount = parseFloat(
-      formatUnits(nativeCurrencyBalance.balance, nativeCurrencyBalance.decimals),
-    );
-    if (nativeCurrencyBalanceAmount < INSUFFICIENT_GAS_THRESHOLD) return false;
-    return true;
-  };
-
   return {
-    hasSufficientBalance,
-    hasSufficientGas,
     fetchRoutes,
-    getFromAmountData,
     getRoute,
   };
 };

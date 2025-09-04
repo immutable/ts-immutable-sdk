@@ -46,6 +46,12 @@ import {
 } from '../types';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { PurchaseWidgetViews } from '../../../context/view-context/PurchaseViewContextTypes';
+import {
+  getFromAmountData,
+  hasSufficientBalance,
+  hasSufficientGas,
+} from '../../../lib/squid/functions/routeCalculation';
+import { waitForReceipt } from '../../../lib/squid/functions/execute';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -109,12 +115,12 @@ export function Purchase({
   } = useProvidersContext();
 
   const {
-    fetchRoutes, getRoute, getFromAmountData, hasSufficientBalance, hasSufficientGas,
+    fetchRoutes, getRoute,
   } = useRoutes();
   const { providers } = useInjectedProviders({ checkout });
 
   const {
-    getAllowance, approve, execute, getStatus, waitForReceipt,
+    getAllowance, approve, execute, getStatus,
   } = useExecute(UserJourney.PURCHASE, (err) => {
     // eslint-disable-next-line no-console
     console.log('useExecute err', err);

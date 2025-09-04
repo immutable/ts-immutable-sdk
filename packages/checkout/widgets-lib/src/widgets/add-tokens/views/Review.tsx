@@ -66,6 +66,7 @@ import {
 } from '../AddTokensWidgetEvents';
 import { useErrorHandler } from '../hooks/useErrorHandler';
 import { AddTokensHandoverStep, useHandoverConfig } from '../hooks/useHandoverConfig';
+import { getFromAmountData } from '../../../lib/squid/functions/routeCalculation';
 
 interface ReviewProps {
   data: AddTokensReviewData;
@@ -116,7 +117,7 @@ export function Review({
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [showSecuringQuote, setShowSecuringQuote] = useState(false);
   const [showAddressMissmatchDrawer, setShowAddressMissmatchDrawer] = useState(false);
-  const { getFromAmountData, getRoute } = useRoutes();
+  const { getRoute } = useRoutes();
   const { showHandover } = useHandoverConfig(checkout.config.environment);
 
   const { onTransactionError } = useErrorHandler();
