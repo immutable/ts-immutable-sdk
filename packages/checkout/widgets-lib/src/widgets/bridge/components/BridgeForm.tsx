@@ -5,9 +5,11 @@ import {
   OptionKey,
 } from '@biom3/react';
 import {
-  fetchRiskAssessment,
+  fetchRiskAssessmentV2,
   GetBalanceResult, WidgetTheme,
+  resultHasSanctionedWallets,
 } from '@imtbl/checkout-sdk';
+import { parseUnits } from 'ethers';
 import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
@@ -62,6 +64,7 @@ export function BridgeForm(props: BridgeFormProps) {
       to,
       amount,
       token,
+      tokenBridge,
     },
   } = useContext(BridgeContext);
 
@@ -177,27 +180,6 @@ export function BridgeForm(props: BridgeFormProps) {
     [formToken, tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId],
   );
 
-  useEffect(() => {
-    if (!checkout || !from || !to) {
-      return;
-    }
-
-    (async () => {
-      const addresses = [from.walletAddress];
-      if (to.walletAddress.toLowerCase() !== from.walletAddress.toLowerCase()) {
-        addresses.push(to.walletAddress);
-      }
-
-      const assessment = await fetchRiskAssessment(addresses, checkout.config);
-      bridgeDispatch({
-        payload: {
-          type: BridgeActions.SET_RISK_ASSESSMENT,
-          riskAssessment: assessment,
-        },
-      });
-    })();
-  }, [checkout, from, to]);
-
   const canFetchEstimates = (silently: boolean): boolean => {
     if (Number.isNaN(parseFloat(formAmount))) return false;
     if (parseFloat(formAmount) <= 0) return false;
@@ -266,9 +248,70 @@ export function BridgeForm(props: BridgeFormProps) {
     return true;
   }, [formToken, formAmount, setTokenError, setAmountError]);
 
+  const getRiskAssessment = useCallback(async () => {
+    if (!from || !to || !formToken || !formAmount || !tokenBridge || !formToken.token.address) return false;
+
+    const addresses = [from.walletAddress];
+    if (to.walletAddress.toLowerCase() !== from.walletAddress.toLowerCase()) {
+      addresses.push(to.walletAddress);
+    }
+
+    // Determine if we're bridging from L1 to L2 (deposit)
+    const isDeposit = checkout.config.l2ChainId === to.network;
+
+    let tokenAddress = formToken.token.address;
+
+    // If we are bridging IN from L1 to L2, we need to find the token address on our chain
+    if (isDeposit) {
+      try {
+        const tokenMapping = await tokenBridge.getTokenMapping({
+          rootToken: formToken.token.address,
+          rootChainId: from.network.toString(),
+          childChainId: to.network.toString(),
+        });
+
+        // Use child token address if mapping exists, otherwise use original token address
+        tokenAddress = tokenMapping.childToken ?? formToken.token.address;
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn('Failed to get token mapping for risk assessment:', error);
+      }
+    }
+
+    // Create risk assessment data array
+    const riskAssessmentData = [{
+      address: from.walletAddress,
+      tokenAddr: tokenAddress,
+      amount: parseUnits(formAmount, formToken.token.decimals),
+    }];
+
+    // Add second wallet if different
+    if (to.walletAddress.toLowerCase() !== from.walletAddress.toLowerCase()) {
+      riskAssessmentData.push({
+        address: to.walletAddress,
+        tokenAddr: tokenAddress,
+        amount: parseUnits(formAmount, formToken.token.decimals),
+      });
+    }
+
+    return fetchRiskAssessmentV2(riskAssessmentData, checkout.config);
+  }, [from, to, formToken, formAmount, tokenBridge, checkout]);
+
   const submitBridgeValues = useCallback(async () => {
     if (!bridgeFormValidator()) return;
     if (!checkout || !from?.browserProvider || !formToken) return;
+
+    // perform sanctions check
+    const riskAssessment = await getRiskAssessment();
+    if (riskAssessment && resultHasSanctionedWallets(riskAssessment)) {
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_RISK_ASSESSMENT,
+          riskAssessment,
+        },
+      });
+      return;
+    }
 
     track({
       userJourney: UserJourney.BRIDGE,
@@ -298,10 +341,15 @@ export function BridgeForm(props: BridgeFormProps) {
       },
     });
   }, [
-    checkout,
-    from?.browserProvider,
+    bridgeDispatch,
     bridgeFormValidator,
+    checkout,
+    formAmount,
     formToken,
+    from,
+    getRiskAssessment,
+    track,
+    viewDispatch,
   ]);
 
   const retrySubmitBridgeValues = async () => {
