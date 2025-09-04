@@ -15,7 +15,7 @@ type SanctionsCheckV2RequestItem = {
 type AssessmentData = {
   address: string;
   tokenAddr: string;
-  amount: string;
+  amount: bigint;
 };
 
 export const fetchRiskAssessmentV2 = async (
@@ -41,7 +41,7 @@ export const fetchRiskAssessmentV2 = async (
     const requestPayload: SanctionsCheckV2RequestItem[] = assessmentData.map((data) => ({
       address: data.address,
       token_addr: data.tokenAddr,
-      amount: data.amount,
+      amount: data.amount.toString(),
     }));
 
     const response = await axios.post<RiskAssessmentResponse[]>(

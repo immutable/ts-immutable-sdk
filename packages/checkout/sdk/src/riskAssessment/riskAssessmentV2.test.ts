@@ -45,8 +45,8 @@ describe('riskAssessmentV2', () => {
 
       const sanctions = await fetchRiskAssessmentV2(
         [
-          { address: address1, tokenAddr: '0xtest1', amount: '100' },
-          { address: address2, tokenAddr: '0xtest2', amount: '200' },
+          { address: address1, tokenAddr: '0xtest1', amount: BigInt(100) },
+          { address: address2, tokenAddr: '0xtest2', amount: BigInt(200) },
         ],
         mockedConfig,
       );
@@ -64,7 +64,8 @@ describe('riskAssessmentV2', () => {
       const address1 = '0x1234567890';
 
       const sanctions = await fetchRiskAssessmentV2(
-        [{ address: address1, tokenAddr: 'native', amount: '100' }], // Include required fields even when disabled,
+        // Include required fields even when disabled
+        [{ address: address1, tokenAddr: 'native', amount: BigInt(100) }],
         mockedConfig,
       );
 
@@ -87,7 +88,7 @@ describe('riskAssessmentV2', () => {
       mockedAxios.post.mockResolvedValueOnce(mockRiskResponse);
 
       const sanctions = await fetchRiskAssessmentV2(
-        [{ address: address1, tokenAddr: '0xtest', amount: '100' }],
+        [{ address: address1, tokenAddr: '0xtest', amount: BigInt(100) }],
         mockedConfig,
       );
 
