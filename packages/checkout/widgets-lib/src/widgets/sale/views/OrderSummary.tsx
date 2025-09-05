@@ -108,7 +108,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     }
 
     if (!fundingItem.token.address) {
-      throw new Error('Invalid data: fundingItem.token is missing');
+      throw new Error('Invalid data: fundingItem.token.address is missing');
     }
 
     const riskAssessmentData = [{
