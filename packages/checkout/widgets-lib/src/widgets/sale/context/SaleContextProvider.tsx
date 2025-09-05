@@ -246,6 +246,9 @@ export function SaleContextProvider(props: {
     getUserInfo();
   }, [provider]);
 
+  // TODO: check if this is can be removed. It is used on switching payment method to credit/debit.
+  // Need to check with legal if we can remove the sanction check for fiat payments and rely on
+  // third party checks, as our V2 sanctions API required token details.
   useEffect(() => {
     if (!checkout || riskAssessment) {
       return;

@@ -1,7 +1,7 @@
 import { Box, Heading } from '@biom3/react';
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isAddressSanctioned, SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { fetchRiskAssessmentV2, isSingleAddressSanctioned, SalePaymentTypes } from '@imtbl/checkout-sdk';
 
 import {
   OrderSummarySubViews,
@@ -33,6 +33,7 @@ import { HandoverTarget } from '../../../context/handover-context/HandoverContex
 import { ViewContext, ViewActions, SharedViews } from '../../../context/view-context/ViewContext';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { errorToString, getRemoteRive } from '../../../lib/utils';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
@@ -50,9 +51,11 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     selectedCurrency,
     setPaymentMethod,
     environment,
-    riskAssessment,
     paymentMethod,
   } = useSaleContext();
+
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
 
   const { viewDispatch, viewState } = useContext(ViewContext);
   const { cryptoFiatDispatch, cryptoFiatState } = useContext(CryptoFiatContext);
@@ -92,8 +95,31 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     signAndProceed(selectedCurrency?.address);
   };
 
-  const onProceedToBuy = (fundingBalance: FundingBalance) => {
-    if (riskAssessment && isAddressSanctioned(riskAssessment)) {
+  const onProceedToBuy = useCallback(async (fundingBalance: FundingBalance) => {
+    if (!checkout || !provider) return;
+
+    const { type, fundingItem } = fundingBalance;
+
+    // Perform sanctions check once we have valid asset and amount data
+    const address = await (await provider?.getSigner())?.getAddress();
+
+    if (!address) {
+      return;
+    }
+
+    if (!fundingItem.token.address) {
+      throw new Error('Invalid data: fundingItem.token is missing');
+    }
+
+    const riskAssessmentData = [{
+      address,
+      tokenAddr: fundingItem.token.address,
+      amount: fundingItem.fundsRequired.amount,
+    }];
+
+    const riskAssessment = await fetchRiskAssessmentV2(riskAssessmentData, checkout.config);
+
+    if (riskAssessment && isSingleAddressSanctioned(riskAssessment, address)) {
       const error = new Error('Sanctioned address');
       sendFailedEvent(error.message, {}, [], undefined, { riskAssessment, paymentMethod });
 
@@ -109,8 +135,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
 
       return;
     }
-
-    const { type, fundingItem } = fundingBalance;
 
     sendProceedToPay(
       SaleWidgetViews.ORDER_SUMMARY,
@@ -138,7 +162,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         },
       },
     });
-  };
+  }, [paymentMethod, sendFailedEvent, viewDispatch, checkout, provider]);
 
   const {
     fundingBalances,
