@@ -145,9 +145,7 @@ export function BridgeForm(props: BridgeFormProps) {
     tokenBalances,
     cryptoFiatState.conversions,
     defaultTokenAddress,
-    hasSetDefaultState.current,
     formatTokenOptionsId,
-    formatZeroAmount,
   ]);
 
   useEffect(() => {
@@ -171,13 +169,13 @@ export function BridgeForm(props: BridgeFormProps) {
         amount: '',
       },
     });
-  }, [amount, token, tokenBalances]);
+  }, [amount, token, tokenBalances, bridgeDispatch]);
 
   const selectedOption = useMemo(
     () => (formToken && formToken.token
       ? formatTokenOptionsId(formToken.token.symbol, formToken.token.address)
       : undefined),
-    [formToken, tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId],
+    [formToken, formatTokenOptionsId],
   );
 
   const canFetchEstimates = (silently: boolean): boolean => {
@@ -237,7 +235,7 @@ export function BridgeForm(props: BridgeFormProps) {
       formToken.token.symbol,
       cryptoFiatState.conversions,
     ));
-  }, [formAmount, formToken]);
+  }, [formAmount, formToken, cryptoFiatState.conversions]);
 
   const bridgeFormValidator = useCallback((): boolean => {
     const validateTokenError = validateToken(formToken);
@@ -257,7 +255,7 @@ export function BridgeForm(props: BridgeFormProps) {
     }
 
     // Determine if we're bridging from L1 to L2 (deposit)
-    const isDeposit = checkout.config.l2ChainId === to.network;
+    const isDeposit = checkout.config.l2ChainId === to.network && from.network !== checkout.config.l1ChainId;
 
     let tokenAddress = formToken.token.address;
 
@@ -310,7 +308,6 @@ export function BridgeForm(props: BridgeFormProps) {
           riskAssessment,
         },
       });
-      return;
     }
 
     track({
