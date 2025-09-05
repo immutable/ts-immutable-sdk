@@ -256,7 +256,7 @@ export function BridgeForm(props: BridgeFormProps) {
     }
 
     // Determine if we're bridging from L1 to L2 (deposit)
-    const isDeposit = checkout.config.l2ChainId === to.network && from.network !== checkout.config.l1ChainId;
+    const isDeposit = checkout.config.l2ChainId === to.network && from.network === checkout.config.l1ChainId;
 
     let tokenAddress = formToken.token.address;
 
@@ -269,8 +269,12 @@ export function BridgeForm(props: BridgeFormProps) {
           childChainId: to.network.toString(),
         });
 
+        if (!tokenMapping.childToken) {
+          throw new Error(`Token mapping not found for deposit token ${formToken.token.address}`);
+        }
+
         // Use child token address if mapping exists, otherwise use original token address
-        tokenAddress = tokenMapping.childToken ?? formToken.token.address;
+        tokenAddress = tokenMapping.childToken;
       } catch (error) {
         trackError('commerce', 'bridgeForm', error instanceof Error ? error : new Error(String(error)));
       }
