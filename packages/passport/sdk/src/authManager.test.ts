@@ -2,7 +2,7 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User as OidcUser, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import jwt_decode from 'jwt-decode';
 import AuthManager from './authManager';
-import Overlay from './overlay';
+import ConfirmationOverlay from './overlay/confirmationOverlay';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
@@ -139,7 +139,7 @@ describe('AuthManager', () => {
         },
       },
     }));
-    (Overlay as jest.Mock).mockReturnValue({
+    (ConfirmationOverlay as jest.Mock).mockReturnValue({
       append: mockOverlayAppend,
       remove: mockOverlayRemove,
     });
@@ -411,7 +411,7 @@ describe('AuthManager', () => {
         const result = await am.login();
 
         expect(result).toEqual(mockUser);
-        expect(Overlay).toHaveBeenCalledWith(configWithPopupOverlayOptions.popupOverlayOptions, true);
+        expect(ConfirmationOverlay).toHaveBeenCalledWith(configWithPopupOverlayOptions.popupOverlayOptions, true);
         expect(mockOverlayAppend).toHaveBeenCalledTimes(1);
       });
 

@@ -183,7 +183,6 @@ export enum MarketingConsentStatus {
 }
 
 export type DirectLoginOptions = {
-  directLoginMethod: DirectLoginMethod;
   marketingConsentStatus?: MarketingConsentStatus;
 } & (
   | { directLoginMethod: 'email'; email: string }
