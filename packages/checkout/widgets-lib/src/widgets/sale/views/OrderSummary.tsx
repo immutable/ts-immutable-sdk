@@ -1,6 +1,7 @@
 import { Box, Heading } from '@biom3/react';
 import { useCallback, useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { parseUnits } from 'ethers';
 import { fetchRiskAssessmentV2, isSingleAddressSanctioned, SalePaymentTypes } from '@imtbl/checkout-sdk';
 
 import {
@@ -34,6 +35,7 @@ import { ViewContext, ViewActions, SharedViews } from '../../../context/view-con
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { errorToString, getRemoteRive } from '../../../lib/utils';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import { getPricingBySymbol } from '../utils/pricing';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
@@ -52,6 +54,8 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     setPaymentMethod,
     environment,
     paymentMethod,
+    orderQuote,
+    items,
   } = useSaleContext();
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -100,6 +104,18 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
 
     const { type, fundingItem } = fundingBalance;
 
+    // Calculate total amount from all order items for risk assessment
+    // Based on how item prices are calculated in OrderItems.tsx
+    const totalAmount = items.reduce((total, item) => {
+      const pricing = getPricingBySymbol(
+        fundingItem.token.symbol,
+        orderQuote?.products[item.productId]?.pricing,
+        cryptoFiatState.conversions,
+      );
+      const itemAmount = pricing?.amount || 0;
+      return total + itemAmount;
+    }, 0);
+
     // Perform sanctions check once we have valid asset and amount data
     const address = await (await provider?.getSigner())?.getAddress();
 
@@ -114,7 +130,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     const riskAssessmentData = [{
       address,
       tokenAddr: fundingItem.token.address,
-      amount: fundingItem.fundsRequired.amount,
+      amount: parseUnits(totalAmount.toString(), fundingItem.token.decimals),
     }];
 
     const riskAssessment = await fetchRiskAssessmentV2(riskAssessmentData, checkout.config);
