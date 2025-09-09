@@ -33,4 +33,5 @@ StandardAnalyticsActions
 >({
   writeKey: '',
   appName: productName,
+  storageKeyPrefix: 'checkoutWidgets',
 });
