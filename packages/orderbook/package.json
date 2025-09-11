@@ -7,7 +7,7 @@
     "@imtbl/config": "workspace:*",
     "@imtbl/metrics": "workspace:*",
     "@opensea/seaport-js": "4.0.3",
-    "axios": "^1.6.5",
+    "axios": "^1.12.0",
     "ethers": "^6.13.4",
     "form-data": "^4.0.0",
     "merkletreejs": "^0.3.11"
