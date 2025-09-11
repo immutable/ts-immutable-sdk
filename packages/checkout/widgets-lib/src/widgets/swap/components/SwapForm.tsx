@@ -6,8 +6,6 @@ import {
   Box, ButtCon, Heading, Icon, OptionKey, Tooltip, Body,
 } from '@biom3/react';
 import {
-  fetchRiskAssessmentV2,
-  isSingleAddressSanctioned,
   TokenInfo,
   WidgetTheme,
 } from '@imtbl/checkout-sdk';
@@ -57,6 +55,7 @@ import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-contex
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { Fees } from './Fees';
 import { useCryptoUSDConversion } from '../../../lib/hooks/useCryptoUSDConversion';
+import { fetchRiskAssessment, isSingleAddressSanctioned } from '../../../lib/riskAssessment';
 
 const MAX_PRICE_IMPACT_PERCENTAGE = 15;
 
@@ -864,7 +863,7 @@ export function SwapForm({ data, theme, cancelAutoProceed }: SwapFromProps) {
       amount: parseUnits(fromAmount, fromToken.decimals),
     }];
 
-    const riskAssessment = await fetchRiskAssessmentV2(riskAssessmentData, checkout.config);
+    const riskAssessment = await fetchRiskAssessment(riskAssessmentData, checkout.config);
 
     if (riskAssessment && isSingleAddressSanctioned(riskAssessment, address)) {
       viewDispatch({

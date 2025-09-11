@@ -156,15 +156,6 @@ export type {
   CheckoutWidgetsVersionConfig,
 } from './types';
 
-export {
-  fetchRiskAssessment,
-  fetchRiskAssessmentV2,
-  isAddressSanctioned,
-  isSingleAddressSanctioned,
-  resultHasSanctionedWallets,
-} from './riskAssessment';
-export type { AssessmentResult } from './riskAssessment';
-
 export type { ErrorType } from './errors';
 
 export { CheckoutErrorType, CheckoutError } from './errors';

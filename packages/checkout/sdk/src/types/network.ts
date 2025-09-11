@@ -85,3 +85,9 @@ export type NetworkDetails = {
 };
 
 export type NetworkMap = Map<ChainId, NetworkDetails>;
+
+export type AssessmentResult = {
+  [address: string]: {
+    sanctioned: boolean;
+  };
+};
