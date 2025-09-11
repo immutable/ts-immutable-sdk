@@ -8,7 +8,7 @@
     "@ethereumjs/wallet": "^2.0.4",
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
-    "axios": "^1.6.5",
+    "axios": "^1.12.0",
     "bn.js": "^5.2.1",
     "elliptic": "^6.6.1",
     "enc-utils": "^3.0.0",
