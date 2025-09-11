@@ -65,6 +65,7 @@ import {
   TokenFilterTypes,
   TokenInfo,
   ValidateProviderOptions, CreateProviderResult,
+  AssessmentResult,
 } from './types';
 import { CancelParams } from './types/cancel';
 import { SellParams } from './types/sell';
@@ -72,7 +73,6 @@ import { SwapParams, SwapQuoteResult, SwapResult } from './types/swap';
 import { WidgetsInit } from './types/widgets';
 import { isMatchingAddress } from './utils/utils';
 import * as wallet from './wallet';
-import { AssessmentResult, fetchRiskAssessment, isAddressSanctioned } from './riskAssessment';
 import { globalPackageVersion } from './env';
 
 const SANDBOX_CONFIGURATION = {
@@ -227,21 +227,24 @@ export class Checkout {
 
   /**
    * Fetches the risk assessment for the given addresses.
+   * @deprecated This method is deprecated and will be removed in a future version.
    * @param {string[]} addresses - The addresses to assess.
    * @returns {Promise<AssessmentResult>} - A promise that resolves to the risk assessment result.
    */
   public async getRiskAssessment(addresses: string[]): Promise<AssessmentResult> {
-    return await fetchRiskAssessment(addresses, this.config);
+    return Object.fromEntries(addresses.map((address) => [address.toLowerCase(), { sanctioned: false }]));
   }
 
   /**
    * Helper method that checks if given risk assessment results contain sanctioned addresses.
+   * @deprecated This method is deprecated and will be removed in a future version.
    * @param {AssessmentResult} assessment - Risk assessment to analyse.
    * @param {string} [address] - If defined, only sanctions for the given address will be checked.
    * @returns {boolean} - Result of the check.
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public checkIsAddressSanctioned(assessment: AssessmentResult, address?: string): boolean {
-    return isAddressSanctioned(assessment, address);
+    return false;
   }
 
   /**

@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import axios, { AxiosResponse } from 'axios';
+import { CheckoutConfiguration } from '@imtbl/checkout-sdk';
 import { fetchRiskAssessment } from './riskAssessment';
-import { isAddressSanctioned } from './common';
-import { CheckoutConfiguration } from '../config';
 
 jest.mock('axios');
 
@@ -44,7 +44,10 @@ describe('riskAssessment', () => {
       mockedAxios.post.mockResolvedValueOnce(mockRiskResponse);
 
       const sanctions = await fetchRiskAssessment(
-        [address1, address2],
+        [
+          { address: address1, tokenAddr: '0xtest1', amount: BigInt(100) },
+          { address: address2, tokenAddr: '0xtest2', amount: BigInt(200) },
+        ],
         mockedConfig,
       );
 
@@ -61,7 +64,8 @@ describe('riskAssessment', () => {
       const address1 = '0x1234567890';
 
       const sanctions = await fetchRiskAssessment(
-        [address1],
+        // Include required fields even when disabled
+        [{ address: address1, tokenAddr: 'native', amount: BigInt(100) }],
         mockedConfig,
       );
 
@@ -69,7 +73,7 @@ describe('riskAssessment', () => {
       expect(mockedAxios.post).not.toHaveBeenCalled();
     });
 
-    it('should return default risk assessment not found for address', async () => {
+    it('should return default risk assessment on empty response', async () => {
       mockRemoteConfig.mockResolvedValue({
         enabled: true,
         levels: ['severe'],
@@ -84,48 +88,11 @@ describe('riskAssessment', () => {
       mockedAxios.post.mockResolvedValueOnce(mockRiskResponse);
 
       const sanctions = await fetchRiskAssessment(
-        [address1],
+        [{ address: address1, tokenAddr: '0xtest', amount: BigInt(100) }],
         mockedConfig,
       );
 
       expect(sanctions[address1.toLowerCase()]).toEqual({ sanctioned: false });
-    });
-  });
-
-  describe('isAddressSanctioned', () => {
-    it('should return true if any address is sanctioned', () => {
-      const assessment = {
-        '0x9999999123123123': {
-          sanctioned: false,
-        },
-        '0xabcdef1234567890': {
-          sanctioned: true,
-        },
-      };
-
-      expect(isAddressSanctioned(assessment)).toBe(true);
-    });
-
-    it('should return true if single address is sanctioned', () => {
-      const address = '0x1234567890ABCdef';
-      const assessment = {
-        [address.toLowerCase()]: {
-          sanctioned: true,
-        },
-      };
-
-      expect(isAddressSanctioned(assessment, address)).toBe(true);
-    });
-
-    it('should return false if single address is not sanctioned', () => {
-      const address = '0x1234567890ABCdef';
-      const assessment = {
-        [address.toLowerCase()]: {
-          sanctioned: false,
-        },
-      };
-
-      expect(isAddressSanctioned(assessment, address)).toBe(false);
     });
   });
 });

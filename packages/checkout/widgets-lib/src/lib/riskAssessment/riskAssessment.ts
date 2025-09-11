@@ -1,15 +1,7 @@
 import axios from 'axios';
-import { IMMUTABLE_API_BASE_URL } from '../env';
-import { RiskAssessmentConfig } from '../types';
-import { CheckoutConfiguration } from '../config';
-import { AssessmentResult, RiskAssessmentResponse } from './common';
-
-// New type for v2 request items
-type SanctionsCheckV2RequestItem = {
-  address: string;
-  amount: string;
-  token_addr: string;
-};
+import { CheckoutConfiguration, IMMUTABLE_API_BASE_URL, RemoteConfiguration } from '@imtbl/checkout-sdk';
+import { AssessmentResult } from './common';
+import { RiskAssessmentResponse, SanctionsCheckV2RequestItem } from './api';
 
 // Simplified assessment data - no redundant address info
 type AssessmentData = {
@@ -18,7 +10,9 @@ type AssessmentData = {
   amount: bigint;
 };
 
-export const fetchRiskAssessmentV2 = async (
+type RiskAssessmentConfig = RemoteConfiguration['riskAssessment'];
+
+export const fetchRiskAssessment = async (
   assessmentData: AssessmentData[],
   config: CheckoutConfiguration,
 ): Promise<AssessmentResult> => {
@@ -40,6 +34,7 @@ export const fetchRiskAssessmentV2 = async (
     // Prepare v2 request payload - always include token data
     const requestPayload: SanctionsCheckV2RequestItem[] = assessmentData.map((data) => ({
       address: data.address,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       token_addr: data.tokenAddr,
       amount: data.amount.toString(),
     }));

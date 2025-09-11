@@ -1,9 +1,3 @@
-export type RiskAssessmentResponse = {
-  address: string;
-  risk: RiskAssessmentLevel;
-  risk_reason: string;
-};
-
 export enum RiskAssessmentLevel {
   LOW = 'Low',
   MEDIUM = 'Medium',
@@ -15,18 +9,6 @@ export type AssessmentResult = {
   [address: string]: {
     sanctioned: boolean;
   };
-};
-
-// deprecated  - please use isSingleAddressSanctioned or resultHasSanctionedWallets
-export const isAddressSanctioned = (
-  riskAssessment: AssessmentResult,
-  address?: string,
-): boolean => {
-  if (address) {
-    return riskAssessment[address.toLowerCase()].sanctioned;
-  }
-
-  return Object.values(riskAssessment).some((assessment) => assessment.sanctioned);
 };
 
 export const isSingleAddressSanctioned = (
