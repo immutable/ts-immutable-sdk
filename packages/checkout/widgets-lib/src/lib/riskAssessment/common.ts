@@ -18,18 +18,6 @@ export type AssessmentResult = {
   };
 };
 
-// deprecated  - please use isSingleAddressSanctioned or resultHasSanctionedWallets
-export const isAddressSanctioned = (
-  riskAssessment: AssessmentResult,
-  address?: string,
-): boolean => {
-  if (address) {
-    return riskAssessment[address.toLowerCase()].sanctioned;
-  }
-
-  return Object.values(riskAssessment).some((assessment) => assessment.sanctioned);
-};
-
 export const isSingleAddressSanctioned = (
   riskAssessment: AssessmentResult,
   address: string,

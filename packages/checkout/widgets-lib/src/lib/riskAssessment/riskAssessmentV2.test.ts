@@ -2,7 +2,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { CheckoutConfiguration } from '@imtbl/checkout-sdk';
 import { fetchRiskAssessmentV2 } from './riskAssessmentV2';
-import { isAddressSanctioned } from './common';
 
 jest.mock('axios');
 
@@ -94,43 +93,6 @@ describe('riskAssessmentV2', () => {
       );
 
       expect(sanctions[address1.toLowerCase()]).toEqual({ sanctioned: false });
-    });
-  });
-
-  describe('isAddressSanctioned', () => {
-    it('should return true if any address is sanctioned', () => {
-      const assessment = {
-        '0x9999999123123123': {
-          sanctioned: false,
-        },
-        '0xabcdef1234567890': {
-          sanctioned: true,
-        },
-      };
-
-      expect(isAddressSanctioned(assessment)).toBe(true);
-    });
-
-    it('should return true if single address is sanctioned', () => {
-      const address = '0x1234567890ABCdef';
-      const assessment = {
-        [address.toLowerCase()]: {
-          sanctioned: true,
-        },
-      };
-
-      expect(isAddressSanctioned(assessment, address)).toBe(true);
-    });
-
-    it('should return false if single address is not sanctioned', () => {
-      const address = '0x1234567890ABCdef';
-      const assessment = {
-        [address.toLowerCase()]: {
-          sanctioned: false,
-        },
-      };
-
-      expect(isAddressSanctioned(assessment, address)).toBe(false);
     });
   });
 });
