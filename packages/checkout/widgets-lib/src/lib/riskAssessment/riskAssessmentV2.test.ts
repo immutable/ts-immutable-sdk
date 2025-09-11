@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import axios, { AxiosResponse } from 'axios';
-import { fetchRiskAssessment } from './riskAssessment';
+import { CheckoutConfiguration } from '@imtbl/checkout-sdk';
+import { fetchRiskAssessmentV2 } from './riskAssessmentV2';
 import { isAddressSanctioned } from './common';
-import { CheckoutConfiguration } from '../config';
 
 jest.mock('axios');
 
-describe('riskAssessment', () => {
+describe('riskAssessmentV2', () => {
   const mockedAxios = axios as jest.Mocked<typeof axios>;
   const mockRemoteConfig = jest.fn();
 
@@ -19,7 +20,7 @@ describe('riskAssessment', () => {
     jest.clearAllMocks();
   });
 
-  describe('fetchRiskAssessment', () => {
+  describe('fetchRiskAssessmentV2', () => {
     it('should fetch risk assessment and process it according to config', async () => {
       mockRemoteConfig.mockResolvedValue({
         enabled: true,
@@ -43,8 +44,11 @@ describe('riskAssessment', () => {
       } as AxiosResponse;
       mockedAxios.post.mockResolvedValueOnce(mockRiskResponse);
 
-      const sanctions = await fetchRiskAssessment(
-        [address1, address2],
+      const sanctions = await fetchRiskAssessmentV2(
+        [
+          { address: address1, tokenAddr: '0xtest1', amount: BigInt(100) },
+          { address: address2, tokenAddr: '0xtest2', amount: BigInt(200) },
+        ],
         mockedConfig,
       );
 
@@ -60,8 +64,9 @@ describe('riskAssessment', () => {
 
       const address1 = '0x1234567890';
 
-      const sanctions = await fetchRiskAssessment(
-        [address1],
+      const sanctions = await fetchRiskAssessmentV2(
+        // Include required fields even when disabled
+        [{ address: address1, tokenAddr: 'native', amount: BigInt(100) }],
         mockedConfig,
       );
 
@@ -69,7 +74,7 @@ describe('riskAssessment', () => {
       expect(mockedAxios.post).not.toHaveBeenCalled();
     });
 
-    it('should return default risk assessment not found for address', async () => {
+    it('should return default risk assessment on empty response', async () => {
       mockRemoteConfig.mockResolvedValue({
         enabled: true,
         levels: ['severe'],
@@ -83,8 +88,8 @@ describe('riskAssessment', () => {
       } as AxiosResponse;
       mockedAxios.post.mockResolvedValueOnce(mockRiskResponse);
 
-      const sanctions = await fetchRiskAssessment(
-        [address1],
+      const sanctions = await fetchRiskAssessmentV2(
+        [{ address: address1, tokenAddr: '0xtest', amount: BigInt(100) }],
         mockedConfig,
       );
 

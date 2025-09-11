@@ -5,9 +5,7 @@ import {
   OptionKey,
 } from '@biom3/react';
 import {
-  fetchRiskAssessmentV2,
   GetBalanceResult, WidgetTheme,
-  resultHasSanctionedWallets,
 } from '@imtbl/checkout-sdk';
 import { parseUnits } from 'ethers';
 import {
@@ -42,6 +40,7 @@ import {
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { TokenSelectShimmer } from './TokenSelectShimmer';
+import { fetchRiskAssessmentV2, resultHasSanctionedWallets } from '../../../lib/riskAssessment';
 
 interface BridgeFormProps {
   testId?: string;

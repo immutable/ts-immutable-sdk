@@ -1,45 +1,16 @@
-import axios from 'axios';
-import { IMMUTABLE_API_BASE_URL } from '../env';
-import { RiskAssessmentConfig } from '../types';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { CheckoutConfiguration } from '../config';
-import { AssessmentResult, RiskAssessmentResponse } from './common';
+import { AssessmentResult } from './common';
 
+/**
+ * @deprecated This function is deprecated and will be removed.
+ * @param addresses
+ * @param config
+ * @returns
+ */
 export const fetchRiskAssessment = async (
   addresses: string[],
   config: CheckoutConfiguration,
-): Promise<AssessmentResult> => {
-  const result = Object.fromEntries(
-    addresses.map((address) => [address.toLowerCase(), { sanctioned: false }]),
-  );
-
-  const riskConfig = (await config.remote.getConfig('riskAssessment')) as
-    | RiskAssessmentConfig
-    | undefined;
-
-  if (!riskConfig?.enabled) {
-    return result;
-  }
-
-  try {
-    const riskLevels = riskConfig?.levels.map((l) => l.toLowerCase()) ?? [];
-
-    const response = await axios.post<RiskAssessmentResponse[]>(
-      `${IMMUTABLE_API_BASE_URL[config.environment]}/v1/sanctions/check`,
-      {
-        addresses,
-      },
-    );
-
-    for (const assessment of response.data) {
-      result[assessment.address.toLowerCase()].sanctioned = riskLevels.includes(
-        assessment.risk.toLowerCase(),
-      );
-    }
-
-    return result;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error fetching risk assessment', error);
-    return result;
-  }
-};
+): Promise<AssessmentResult> => Object.fromEntries(
+  addresses.map((address) => [address.toLowerCase(), { sanctioned: false }]),
+);
