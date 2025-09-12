@@ -158,7 +158,6 @@ export type {
 
 export {
   fetchRiskAssessment,
-  fetchRiskAssessmentV2,
   isAddressSanctioned,
   isSingleAddressSanctioned,
   resultHasSanctionedWallets,

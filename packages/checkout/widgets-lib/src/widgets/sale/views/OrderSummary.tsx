@@ -2,7 +2,7 @@ import { Box, Heading } from '@biom3/react';
 import { useCallback, useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { parseUnits } from 'ethers';
-import { fetchRiskAssessmentV2, isSingleAddressSanctioned, SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 
 import {
   OrderSummarySubViews,
@@ -36,6 +36,7 @@ import { useHandover } from '../../../lib/hooks/useHandover';
 import { errorToString, getRemoteRive } from '../../../lib/utils';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { getPricingBySymbol } from '../utils/pricing';
+import { fetchRiskAssessmentV2, isSingleAddressSanctioned } from '../../../lib/riskAssessment';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
