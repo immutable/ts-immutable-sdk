@@ -1,8 +1,7 @@
 import {
   CheckoutConfiguration,
-  fetchRiskAssessmentV2,
-  resultHasSanctionedWallets,
 } from '@imtbl/checkout-sdk';
+import { fetchRiskAssessmentV2, resultHasSanctionedWallets } from '../lib/riskAssessment';
 
 type TokenAmount = {
   address: string;
