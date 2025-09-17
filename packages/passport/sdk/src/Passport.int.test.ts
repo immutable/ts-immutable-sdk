@@ -76,8 +76,8 @@ const oidcConfiguration: OidcConfiguration = {
   logoutRedirectUri,
 };
 
-const getZkEvmProvider = async () => {
-  const passport = new Passport({
+const getPassport = () => (
+  new Passport({
     baseConfig: new ImmutableConfiguration({
       environment: Environment.SANDBOX,
     }),
@@ -87,8 +87,14 @@ const getZkEvmProvider = async () => {
     popupRedirectUri,
     logoutRedirectUri,
     scope: 'openid offline_access profile email transact',
-  });
+    popupOverlayOptions: {
+      disableHeadlessLoginPromptOverlay: true,
+    },
+  })
+);
 
+const getZkEvmProvider = async () => {
+  const passport = getPassport();
   return await passport.connectEvm();
 };
 
@@ -357,17 +363,7 @@ describe('Passport', () => {
         mockSigninPopup.mockResolvedValue(mockOidcUserZkevm);
         mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
 
-        const passport = new Passport({
-          baseConfig: new ImmutableConfiguration({
-            environment: Environment.SANDBOX,
-          }),
-          audience: 'platform_api',
-          clientId,
-          redirectUri,
-          popupRedirectUri,
-          logoutRedirectUri,
-          scope: 'openid offline_access profile email transact',
-        });
+        const passport = getPassport();
 
         // user isn't logged in, so wont set signer when provider is instantiated
         // #doc request-accounts

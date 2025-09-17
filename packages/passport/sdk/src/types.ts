@@ -89,6 +89,7 @@ export interface PassportOverrides {
 export interface PopupOverlayOptions {
   disableGenericPopupOverlay?: boolean;
   disableBlockedPopupOverlay?: boolean;
+  disableHeadlessLoginPromptOverlay?: boolean;
 }
 
 export interface PassportModuleConfiguration

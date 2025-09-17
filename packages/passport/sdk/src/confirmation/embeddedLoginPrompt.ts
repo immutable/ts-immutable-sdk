@@ -21,8 +21,7 @@ export default class EmbeddedLoginPrompt {
   }
 
   private getHref = () => (
-    // `${this.config.authenticationDomain}/im-embedded-login-prompt?client_id=${this.config.oidcConfiguration.clientId}`
-    `http://localhost:3001/im-embedded-login-prompt?client_id=${this.config.oidcConfiguration.clientId}`
+    `${this.config.authenticationDomain}/im-embedded-login-prompt?client_id=${this.config.oidcConfiguration.clientId}`
   );
 
   private static appendIFrameStylesIfNeeded = () => {
@@ -86,8 +85,7 @@ export default class EmbeddedLoginPrompt {
       const embeddedLoginPrompt = this.getEmbeddedLoginIFrame();
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
-          // origin !== this.config.authenticationDomain
-          origin !== 'http://localhost:3001'
+          origin !== this.config.authenticationDomain
           || data.eventType !== EMBEDDED_LOGIN_PROMPT_EVENT_TYPE
         ) {
           return;

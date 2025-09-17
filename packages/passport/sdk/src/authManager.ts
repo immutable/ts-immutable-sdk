@@ -235,7 +235,7 @@ export default class AuthManager {
       let directLoginOptionsToUse: DirectLoginOptions | undefined;
       if (directLoginOptions) {
         directLoginOptionsToUse = directLoginOptions;
-      } else {
+      } else if (!this.config.popupOverlayOptions.disableHeadlessLoginPromptOverlay) {
         directLoginOptionsToUse = await this.embeddedLoginPrompt.displayEmbeddedLoginPrompt();
       }
 
