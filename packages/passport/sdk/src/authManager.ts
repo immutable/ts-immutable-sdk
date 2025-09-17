@@ -239,8 +239,6 @@ export default class AuthManager {
         directLoginOptionsToUse = await this.embeddedLoginPrompt.displayEmbeddedLoginPrompt();
       }
 
-      console.log('directLoginOptionsToUse', directLoginOptionsToUse);
-
       const popupWindowTarget = window.crypto.randomUUID();
       const signinPopup = async () => {
         const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptionsToUse);

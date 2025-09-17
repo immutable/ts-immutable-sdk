@@ -1,4 +1,4 @@
-import { DirectLoginMethod, MarketingConsentStatus } from "../types";
+import { DirectLoginMethod, MarketingConsentStatus } from '../types';
 
 export enum ConfirmationSendMessage {
   CONFIRMATION_START = 'confirmation_start',

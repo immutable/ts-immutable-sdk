@@ -129,7 +129,7 @@ export const getOverlay = (contents: string): string => `
     </div>
   `;
 
-  export const getEmbeddedLoginPromptOverlay = (): string => `
+export const getEmbeddedLoginPromptOverlay = (): string => `
     <div
       id="${PASSPORT_OVERLAY_ID}"
       style="
@@ -153,6 +153,7 @@ export const getOverlay = (contents: string): string => `
           display: flex !important;
           flex-direction: column !important;
           align-items: center !important;
+          width: 100% !important;
         "
       />
     </div>

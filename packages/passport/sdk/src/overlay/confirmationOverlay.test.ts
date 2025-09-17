@@ -42,13 +42,19 @@ describe('confirmationOverlay', () => {
   });
 
   it('should not append generic overlay when overlays disabled', () => {
-    const overlay = new ConfirmationOverlay({ disableGenericPopupOverlay: true, disableBlockedPopupOverlay: true }, false);
+    const overlay = new ConfirmationOverlay({
+      disableGenericPopupOverlay: true,
+      disableBlockedPopupOverlay: true,
+    }, false);
     overlay.append(() => {}, () => {});
     expect(document.body.innerHTML).not.toContain('passport-overlay');
   });
 
   it('should not append blocked overlay when overlays disabled', () => {
-    const overlay = new ConfirmationOverlay({ disableGenericPopupOverlay: true, disableBlockedPopupOverlay: true }, true);
+    const overlay = new ConfirmationOverlay({
+      disableGenericPopupOverlay: true,
+      disableBlockedPopupOverlay: true,
+    }, true);
     overlay.append(() => {}, () => {});
     expect(document.body.innerHTML).not.toContain('passport-overlay');
   });
