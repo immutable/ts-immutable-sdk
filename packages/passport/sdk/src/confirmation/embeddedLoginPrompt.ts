@@ -1,5 +1,3 @@
-import { trackError } from '@imtbl/metrics';
-
 import {
   EMBEDDED_LOGIN_PROMPT_EVENT_TYPE,
   EmbeddedLoginPromptResult,
@@ -12,6 +10,7 @@ import { DirectLoginOptions } from '../types';
 const LOGIN_PROMPT_WINDOW_HEIGHT = 560;
 const LOGIN_PROMPT_WINDOW_WIDTH = 440;
 const LOGIN_PROMPT_WINDOW_BORDER_RADIUS = '16px';
+const LOGIN_PROMPT_KEYFRAME_STYLES_ID = 'passport-embedded-login-keyframes';
 
 export default class EmbeddedLoginPrompt {
   private config: PassportConfiguration;
@@ -20,26 +19,66 @@ export default class EmbeddedLoginPrompt {
     this.config = config;
   }
 
-  private getHref = (clientId: string) => (
-    // `${this.config.authenticationDomain}/im-embedded-login-prompt?client_id=${clientId}`
-    `http://localhost:3001/im-embedded-login-prompt?client_id=${clientId}`
-  );
+  private getHref = () => (
+    // `${this.config.authenticationDomain}/im-embedded-login-prompt?client_id=${this.config.oidcConfiguration.clientId}`
+    `http://localhost:3001/im-embedded-login-prompt?client_id=${this.config.oidcConfiguration.clientId}`
+  )
+
+  private addKeyframesIfNeeded = () => {
+    if (document.getElementById(LOGIN_PROMPT_KEYFRAME_STYLES_ID)) {
+      return;
+    }
+
+    const style = document.createElement('style');
+    style.id = LOGIN_PROMPT_KEYFRAME_STYLES_ID;
+    style.textContent = `
+      @keyframes passportEmbeddedLoginPromptPopBounceIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.05);
+        }
+        70% {
+          transform: scale(0.98);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    `;
+    
+    document.head.appendChild(style);
+  }
 
   private getEmbeddedLoginIFrame = () => {
     const embeddedLoginPrompt = document.createElement('iframe');
-    embeddedLoginPrompt.src = this.getHref(this.config.oidcConfiguration.clientId);
-    embeddedLoginPrompt.style.width = `${LOGIN_PROMPT_WINDOW_WIDTH}px`;
-    embeddedLoginPrompt.style.height = `${LOGIN_PROMPT_WINDOW_HEIGHT}px`;
+    embeddedLoginPrompt.src = this.getHref();
+    embeddedLoginPrompt.style.width = '100vw';
+    embeddedLoginPrompt.style.height = '100vh';
+    embeddedLoginPrompt.style.maxWidth = `${LOGIN_PROMPT_WINDOW_WIDTH}px`;
+    embeddedLoginPrompt.style.maxHeight = `${LOGIN_PROMPT_WINDOW_HEIGHT}px`;
     embeddedLoginPrompt.style.borderRadius = LOGIN_PROMPT_WINDOW_BORDER_RADIUS;
+
+    // Animation styles
+    embeddedLoginPrompt.style.opacity = '0';
+    embeddedLoginPrompt.style.transform = 'scale(0.9)';
+    embeddedLoginPrompt.style.animation = 'passportEmbeddedLoginPromptPopBounceIn 0.6s ease-out 0.2s forwards';
+    this.addKeyframesIfNeeded();
 
     return embeddedLoginPrompt;
   }
 
-  displayEmbeddedLoginPrompt(): Promise<DirectLoginOptions> {
+  public displayEmbeddedLoginPrompt(): Promise<DirectLoginOptions> {
     return new Promise((resolve, reject) => {
       const embeddedLoginPrompt = this.getEmbeddedLoginIFrame();
-      console.log('embeddedLoginPrompt', embeddedLoginPrompt);
-
+      const closeWindow = () => {
+        window.removeEventListener('message', messageHandler);
+        EmbeddedLoginPromptOverlay.remove();
+      }
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
           // origin !== this.config.authenticationDomain
@@ -65,31 +104,28 @@ export default class EmbeddedLoginPrompt {
                 marketingConsentStatus: loginMethod.marketingConsent,
               };
             }
-            resolve(result);
-            this.closeWindow();
-            break;
+            closeWindow();
+            return resolve(result);
           }
           case EmbeddedLoginPromptReceiveMessage.LOGIN_PROMPT_ERROR: {
-            this.closeWindow();
-            reject(new Error('Error during embedded login prompt'));
-            break;
+            closeWindow();
+            return reject(new Error('Error during embedded login prompt'));
+          }
+          case EmbeddedLoginPromptReceiveMessage.LOGIN_PROMPT_CLOSED: {
+            closeWindow();
+            return reject(new Error('Popup closed by user'));
           }
           default:
-            this.closeWindow();
-            reject(new Error('Unsupported message type'));
+            closeWindow();
+            return reject(new Error('Unsupported message type'));
         }
       };
 
       window.addEventListener('message', messageHandler);
       EmbeddedLoginPromptOverlay.appendOverlay(embeddedLoginPrompt, () => {
-        this.closeWindow();
-        window.removeEventListener('message', messageHandler);
-        reject(new Error('Popup closed by user'));
+        closeWindow();
+        return reject(new Error('Popup closed by user'));
       });
     });
-  }
-
-  closeWindow() {
-    EmbeddedLoginPromptOverlay.remove();
   }
 }

@@ -17,6 +17,7 @@ export enum ConfirmationReceiveMessage {
 export enum EmbeddedLoginPromptReceiveMessage {
   LOGIN_METHOD_SELECTED = 'login_method_selected',
   LOGIN_PROMPT_ERROR = 'login_prompt_error',
+  LOGIN_PROMPT_CLOSED = 'login_prompt_closed',
 }
 
 export type ConfirmationResult = {

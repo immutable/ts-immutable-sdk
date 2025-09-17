@@ -143,6 +143,8 @@ export const getOverlay = (contents: string): string => `
         justify-content: center !important;
         align-items: center !important;
         z-index: 2147483647 !important;
+        background: rgba(247, 247, 247, 0.24) !important;
+        opacity: 1 !important;
       "
     >
       <div
@@ -151,7 +153,6 @@ export const getOverlay = (contents: string): string => `
           display: flex !important;
           flex-direction: column !important;
           align-items: center !important;
-          max-width: 400px !important;
         "
       />
     </div>

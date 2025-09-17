@@ -31,12 +31,6 @@ export default class EmbeddedLoginPromptOverlay {
 
       overlay.addEventListener('click', onCloseListener);
 
-      // const closeButton = document.querySelector<HTMLButtonElement>(`#${PASSPORT_OVERLAY_CLOSE_ID}`);
-      // if (closeButton) {
-      //   this.closeButton = closeButton;
-      //   this.onCloseListener = onCloseListener;
-      //   closeButton.addEventListener('click', onCloseListener);
-      // }
       this.overlay = overlay;
     }
   }
