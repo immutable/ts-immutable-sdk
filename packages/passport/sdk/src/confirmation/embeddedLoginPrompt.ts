@@ -93,18 +93,18 @@ export default class EmbeddedLoginPrompt {
 
         switch (data.messageType as EmbeddedLoginPromptReceiveMessage) {
           case EmbeddedLoginPromptReceiveMessage.LOGIN_METHOD_SELECTED: {
-            const loginMethod = data.loginMethod as EmbeddedLoginPromptResult;
+            const loginMethod = data.payload as EmbeddedLoginPromptResult;
             let result: DirectLoginOptions;
-            if (loginMethod.loginType === 'email') {
+            if (loginMethod.directLoginMethod === 'email') {
               result = {
                 directLoginMethod: 'email',
-                marketingConsentStatus: loginMethod.marketingConsent,
-                email: loginMethod.emailAddress,
+                marketingConsentStatus: loginMethod.marketingConsentStatus,
+                email: loginMethod.email,
               };
             } else {
               result = {
-                directLoginMethod: loginMethod.loginType,
-                marketingConsentStatus: loginMethod.marketingConsent,
+                directLoginMethod: loginMethod.directLoginMethod,
+                marketingConsentStatus: loginMethod.marketingConsentStatus,
               };
             }
             window.removeEventListener('message', messageHandler);
@@ -115,7 +115,7 @@ export default class EmbeddedLoginPrompt {
           case EmbeddedLoginPromptReceiveMessage.LOGIN_PROMPT_ERROR: {
             window.removeEventListener('message', messageHandler);
             EmbeddedLoginPromptOverlay.remove();
-            reject(new Error('Error during embedded login prompt'));
+            reject(new Error('Error during embedded login prompt', { cause: data.payload }));
             break;
           }
           case EmbeddedLoginPromptReceiveMessage.LOGIN_PROMPT_CLOSED: {

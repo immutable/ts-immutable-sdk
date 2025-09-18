@@ -25,10 +25,10 @@ export type ConfirmationResult = {
 };
 
 export type EmbeddedLoginPromptResult = {
-  marketingConsent: MarketingConsentStatus;
+  marketingConsentStatus: MarketingConsentStatus;
 } & (
-  | { loginType: 'email'; emailAddress: string }
-  | { loginType: Exclude<DirectLoginMethod, 'email'>; emailAddress?: never }
+  | { directLoginMethod: 'email'; email: string }
+  | { directLoginMethod: Exclude<DirectLoginMethod, 'email'>; email?: never }
 );
 
 export const PASSPORT_CONFIRMATION_EVENT_TYPE = 'imx_passport_confirmation';
