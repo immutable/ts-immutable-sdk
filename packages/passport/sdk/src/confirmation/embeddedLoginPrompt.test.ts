@@ -157,9 +157,9 @@ describe('EmbeddedLoginPrompt', () => {
 
     it('should resolve with email login options when email method is selected', async () => {
       const mockLoginResult: EmbeddedLoginPromptResult = {
-        loginType: 'email',
-        emailAddress: 'test@example.com',
-        marketingConsent: MarketingConsentStatus.OptedIn,
+        directLoginMethod: 'email',
+        email: 'test@example.com',
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
       };
 
       const promise = embeddedLoginPrompt.displayEmbeddedLoginPrompt();
@@ -170,7 +170,7 @@ describe('EmbeddedLoginPrompt', () => {
         data: {
           eventType: EMBEDDED_LOGIN_PROMPT_EVENT_TYPE,
           messageType: EmbeddedLoginPromptReceiveMessage.LOGIN_METHOD_SELECTED,
-          loginMethod: mockLoginResult,
+          payload: mockLoginResult,
         },
         origin: mockConfig.authenticationDomain,
       };
@@ -191,8 +191,8 @@ describe('EmbeddedLoginPrompt', () => {
 
     it('should resolve with non-email login options when non-email method is selected', async () => {
       const mockLoginResult: EmbeddedLoginPromptResult = {
-        loginType: 'google',
-        marketingConsent: MarketingConsentStatus.Unsubscribed,
+        directLoginMethod: 'google',
+        marketingConsentStatus: MarketingConsentStatus.Unsubscribed,
       };
 
       const promise = embeddedLoginPrompt.displayEmbeddedLoginPrompt();
@@ -203,7 +203,7 @@ describe('EmbeddedLoginPrompt', () => {
         data: {
           eventType: EMBEDDED_LOGIN_PROMPT_EVENT_TYPE,
           messageType: EmbeddedLoginPromptReceiveMessage.LOGIN_METHOD_SELECTED,
-          loginMethod: mockLoginResult,
+          payload: mockLoginResult,
         },
         origin: mockConfig.authenticationDomain,
       };
@@ -290,7 +290,7 @@ describe('EmbeddedLoginPrompt', () => {
         data: {
           eventType: EMBEDDED_LOGIN_PROMPT_EVENT_TYPE,
           messageType: EmbeddedLoginPromptReceiveMessage.LOGIN_METHOD_SELECTED,
-          loginMethod: { loginType: 'google', marketingConsent: MarketingConsentStatus.OptedIn },
+          payload: { directLoginMethod: 'google', marketingConsentStatus: MarketingConsentStatus.OptedIn },
         },
         origin: 'https://malicious-site.com',
       };
@@ -311,7 +311,7 @@ describe('EmbeddedLoginPrompt', () => {
         data: {
           eventType: 'WRONG_EVENT_TYPE',
           messageType: EmbeddedLoginPromptReceiveMessage.LOGIN_METHOD_SELECTED,
-          loginMethod: { loginType: 'google', marketingConsent: MarketingConsentStatus.OptedIn },
+          payload: { directLoginMethod: 'google', marketingConsentStatus: MarketingConsentStatus.OptedIn },
         },
         origin: mockConfig.authenticationDomain,
       };
