@@ -1088,6 +1088,13 @@ describe('AuthManager', () => {
       expect(url.searchParams.get('marketingConsent')).toEqual(MarketingConsentStatus.OptedIn);
       expect(url.searchParams.get('audience')).toEqual('test-audience');
     });
+
+    it('should include im_passport_trace_id parameter when imPassportTraceId is provided', async () => {
+      const result = await authManager.getPKCEAuthorizationUrl(undefined, 'test-trace-id');
+      const url = new URL(result);
+
+      expect(url.searchParams.get('im_passport_trace_id')).toEqual('test-trace-id');
+    });
   });
 
   describe('login with directLoginMethod', () => {
