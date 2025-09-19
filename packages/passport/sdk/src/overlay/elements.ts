@@ -144,7 +144,8 @@ export const getEmbeddedLoginPromptOverlay = (): string => `
         align-items: center !important;
         z-index: 2147483647 !important;
         background: rgba(247, 247, 247, 0.24) !important;
-        opacity: 1 !important;
+        animation-name: passportEmbeddedLoginPromptOverlayFadeIn;
+        animation-duration: 0.8s;
       "
     >
       <div

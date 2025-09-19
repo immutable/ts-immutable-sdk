@@ -34,14 +34,14 @@ export default class EmbeddedLoginPrompt {
     style.textContent = `
       @keyframes passportEmbeddedLoginPromptPopBounceIn {
         0% {
-          opacity: 0;
+          opacity: 0.5;
           transform: scale(0.9);
         }
         50% {
           opacity: 1;
           transform: scale(1.05);
         }
-        70% {
+        75% {
           transform: scale(0.98);
         }
         100% {
@@ -54,6 +54,15 @@ export default class EmbeddedLoginPrompt {
         #${LOGIN_PROMPT_IFRAME_ID} {
           width: 100% !important;
           max-width: none !important;
+        }
+      }
+
+      @keyframes passportEmbeddedLoginPromptOverlayFadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
         }
       }
     `;
@@ -74,7 +83,7 @@ export default class EmbeddedLoginPrompt {
     // Animation styles
     embeddedLoginPrompt.style.opacity = '0';
     embeddedLoginPrompt.style.transform = 'scale(0.9)';
-    embeddedLoginPrompt.style.animation = 'passportEmbeddedLoginPromptPopBounceIn 0.6s ease-out 0.2s forwards';
+    embeddedLoginPrompt.style.animation = 'passportEmbeddedLoginPromptPopBounceIn 0.8s ease 0.2s forwards';
     EmbeddedLoginPrompt.appendIFrameStylesIfNeeded();
 
     return embeddedLoginPrompt;
