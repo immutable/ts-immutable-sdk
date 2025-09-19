@@ -26,6 +26,7 @@ export type ConfirmationResult = {
 
 export type EmbeddedLoginPromptResult = {
   marketingConsentStatus: MarketingConsentStatus;
+  imPassportTraceId: string;
 } & (
   | { directLoginMethod: 'email'; email: string }
   | { directLoginMethod: Exclude<DirectLoginMethod, 'email'>; email?: never }
