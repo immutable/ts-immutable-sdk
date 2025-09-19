@@ -396,7 +396,10 @@ export default class AuthManager {
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
-  public async getPKCEAuthorizationUrl(directLoginOptions?: DirectLoginOptions): Promise<string> {
+  public async getPKCEAuthorizationUrl(
+    directLoginOptions?: DirectLoginOptions,
+    imPassportTraceId?: string,
+  ): Promise<string> {
     const verifier = base64URLEncode(window.crypto.getRandomValues(new Uint8Array(32)));
     const challenge = base64URLEncode(await sha256(verifier));
 
@@ -435,6 +438,10 @@ export default class AuthManager {
       if (directLoginOptions.marketingConsentStatus) {
         pKCEAuthorizationUrl.searchParams.set('marketingConsent', directLoginOptions.marketingConsentStatus);
       }
+    }
+
+    if (imPassportTraceId) {
+      pKCEAuthorizationUrl.searchParams.set('im_passport_trace_id', imPassportTraceId);
     }
 
     return pKCEAuthorizationUrl.toString();

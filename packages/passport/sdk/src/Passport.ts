@@ -266,11 +266,12 @@ export class Passport {
   /**
    * Initiates a PKCE flow login.
    * @param {DirectLoginOptions} [directLoginOptions] - If provided, directly redirects to the specified login method
+   * @param {string} [imPassportTraceId] - The trace ID for the PKCE flow
    * @returns {string} The authorization URL for the PKCE flow
    */
-  public loginWithPKCEFlow(directLoginOptions?: DirectLoginOptions): Promise<string> {
+  public loginWithPKCEFlow(directLoginOptions?: DirectLoginOptions, imPassportTraceId?: string): Promise<string> {
     return withMetricsAsync(
-      async () => await this.authManager.getPKCEAuthorizationUrl(directLoginOptions),
+      async () => await this.authManager.getPKCEAuthorizationUrl(directLoginOptions, imPassportTraceId),
       'loginWithPKCEFlow',
     );
   }
