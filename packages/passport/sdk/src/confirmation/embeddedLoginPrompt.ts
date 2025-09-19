@@ -1,3 +1,4 @@
+import { Detail, getDetail } from '@imtbl/metrics';
 import {
   EMBEDDED_LOGIN_PROMPT_EVENT_TYPE,
   EmbeddedLoginPromptResult,
@@ -5,7 +6,6 @@ import {
 } from './types';
 import { PassportConfiguration } from '../config';
 import EmbeddedLoginPromptOverlay from '../overlay/embeddedLoginPromptOverlay';
-import { DirectLoginOptions } from '../types';
 
 const LOGIN_PROMPT_WINDOW_HEIGHT = 560;
 const LOGIN_PROMPT_WINDOW_WIDTH = 440;
@@ -21,7 +21,9 @@ export default class EmbeddedLoginPrompt {
   }
 
   private getHref = () => (
-    `${this.config.authenticationDomain}/im-embedded-login-prompt?client_id=${this.config.oidcConfiguration.clientId}`
+    `${this.config.authenticationDomain}/im-embedded-login-prompt`
+    + `?client_id=${this.config.oidcConfiguration.clientId}`
+    + `&rid=${getDetail(Detail.RUNTIME_ID)}`
   );
 
   private static appendIFrameStylesIfNeeded = () => {
@@ -89,7 +91,7 @@ export default class EmbeddedLoginPrompt {
     return embeddedLoginPrompt;
   };
 
-  public displayEmbeddedLoginPrompt(): Promise<DirectLoginOptions> {
+  public displayEmbeddedLoginPrompt(): Promise<EmbeddedLoginPromptResult> {
     return new Promise((resolve, reject) => {
       const embeddedLoginPrompt = this.getEmbeddedLoginIFrame();
       const messageHandler = ({ data, origin }: MessageEvent) => {
@@ -102,20 +104,7 @@ export default class EmbeddedLoginPrompt {
 
         switch (data.messageType as EmbeddedLoginPromptReceiveMessage) {
           case EmbeddedLoginPromptReceiveMessage.LOGIN_METHOD_SELECTED: {
-            const loginMethod = data.payload as EmbeddedLoginPromptResult;
-            let result: DirectLoginOptions;
-            if (loginMethod.directLoginMethod === 'email') {
-              result = {
-                directLoginMethod: 'email',
-                marketingConsentStatus: loginMethod.marketingConsentStatus,
-                email: loginMethod.email,
-              };
-            } else {
-              result = {
-                directLoginMethod: loginMethod.directLoginMethod,
-                marketingConsentStatus: loginMethod.marketingConsentStatus,
-              };
-            }
+            const result = data.payload as EmbeddedLoginPromptResult;
             window.removeEventListener('message', messageHandler);
             EmbeddedLoginPromptOverlay.remove();
             resolve(result);
@@ -136,7 +125,7 @@ export default class EmbeddedLoginPrompt {
           default:
             window.removeEventListener('message', messageHandler);
             EmbeddedLoginPromptOverlay.remove();
-            reject(new Error('Unsupported message type'));
+            reject(new Error(`Unsupported message type: ${data.messageType}`));
             break;
         }
       };

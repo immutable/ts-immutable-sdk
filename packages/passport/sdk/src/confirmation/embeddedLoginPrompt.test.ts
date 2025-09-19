@@ -6,7 +6,7 @@ import {
   EmbeddedLoginPromptReceiveMessage,
   EmbeddedLoginPromptResult,
 } from './types';
-import { DirectLoginOptions, MarketingConsentStatus } from '../types';
+import { MarketingConsentStatus } from '../types';
 
 // Mock dependencies
 jest.mock('../overlay/embeddedLoginPromptOverlay');
@@ -63,7 +63,7 @@ describe('EmbeddedLoginPrompt', () => {
   describe('getHref', () => {
     it('should generate correct href with client ID', () => {
       const href = (embeddedLoginPrompt as any).getHref();
-      expect(href).toBe(`https://auth.immutable.com/im-embedded-login-prompt?client_id=${mockClientId}`);
+      expect(href).toBe(`https://auth.immutable.com/im-embedded-login-prompt?client_id=${mockClientId}&rid=undefined`);
     });
   });
 
@@ -160,6 +160,7 @@ describe('EmbeddedLoginPrompt', () => {
         directLoginMethod: 'email',
         email: 'test@example.com',
         marketingConsentStatus: MarketingConsentStatus.OptedIn,
+        imPassportTraceId: 'test-im-passport-trace-id',
       };
 
       const promise = embeddedLoginPrompt.displayEmbeddedLoginPrompt();
@@ -178,10 +179,11 @@ describe('EmbeddedLoginPrompt', () => {
       messageHandler(mockEvent);
 
       const result = await promise;
-      const expectedResult: DirectLoginOptions = {
+      const expectedResult: EmbeddedLoginPromptResult = {
         directLoginMethod: 'email',
         marketingConsentStatus: MarketingConsentStatus.OptedIn,
         email: 'test@example.com',
+        imPassportTraceId: 'test-im-passport-trace-id',
       };
 
       expect(result).toEqual(expectedResult);
@@ -193,6 +195,7 @@ describe('EmbeddedLoginPrompt', () => {
       const mockLoginResult: EmbeddedLoginPromptResult = {
         directLoginMethod: 'google',
         marketingConsentStatus: MarketingConsentStatus.Unsubscribed,
+        imPassportTraceId: 'test-im-passport-trace-id',
       };
 
       const promise = embeddedLoginPrompt.displayEmbeddedLoginPrompt();
@@ -211,9 +214,10 @@ describe('EmbeddedLoginPrompt', () => {
       messageHandler(mockEvent);
 
       const result = await promise;
-      const expectedResult: DirectLoginOptions = {
+      const expectedResult: EmbeddedLoginPromptResult = {
         directLoginMethod: 'google',
         marketingConsentStatus: MarketingConsentStatus.Unsubscribed,
+        imPassportTraceId: 'test-im-passport-trace-id',
       };
 
       expect(result).toEqual(expectedResult);
@@ -276,7 +280,7 @@ describe('EmbeddedLoginPrompt', () => {
 
       messageHandler(mockEvent);
 
-      await expect(promise).rejects.toThrow('Unsupported message type');
+      await expect(promise).rejects.toThrow('Unsupported message type: UNKNOWN_MESSAGE_TYPE');
       expect(mockRemoveEventListener).toHaveBeenCalledWith('message', messageHandler);
       expect(mockOverlay.remove).toHaveBeenCalled();
     });
