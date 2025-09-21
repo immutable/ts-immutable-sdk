@@ -1,15 +1,4 @@
-export type RiskAssessmentResponse = {
-  address: string;
-  risk: RiskAssessmentLevel;
-  risk_reason: string;
-};
-
-export enum RiskAssessmentLevel {
-  LOW = 'Low',
-  MEDIUM = 'Medium',
-  HIGH = 'High',
-  SEVERE = 'Severe',
-}
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 export type AssessmentResult = {
   [address: string]: {
@@ -17,23 +6,33 @@ export type AssessmentResult = {
   };
 };
 
-// deprecated  - please use isSingleAddressSanctioned or resultHasSanctionedWallets
+/**
+ * @deprecated This function is deprecated and will be removed.
+ * @param riskAssessment
+ * @param address
+ * @returns
+ */
 export const isAddressSanctioned = (
   riskAssessment: AssessmentResult,
   address?: string,
-): boolean => {
-  if (address) {
-    return riskAssessment[address.toLowerCase()].sanctioned;
-  }
+): boolean => false;
 
-  return Object.values(riskAssessment).some((assessment) => assessment.sanctioned);
-};
-
+/**
+ * @deprecated This function is deprecated and will be removed.
+ * @param riskAssessment
+ * @param address
+ * @returns
+ */
 export const isSingleAddressSanctioned = (
   riskAssessment: AssessmentResult,
   address: string,
-): boolean => riskAssessment[address.toLowerCase()].sanctioned;
+): boolean => false;
 
+/**
+ * @deprecated This function is deprecated and will be removed.
+ * @param riskAssessment
+ * @returns
+ */
 export const resultHasSanctionedWallets = (
   riskAssessment: AssessmentResult,
-): boolean => Object.values(riskAssessment).some((assessment) => assessment.sanctioned);
+): boolean => false;
