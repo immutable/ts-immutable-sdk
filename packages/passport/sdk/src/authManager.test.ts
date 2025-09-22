@@ -415,6 +415,14 @@ describe('AuthManager', () => {
         });
         const am = new AuthManager(configWithPopupOverlayOptions, mockEmbeddedLoginPrompt);
 
+        // Mock the embedded login prompt to return a result
+        const mockEmbeddedLoginPromptResult = {
+          directLoginMethod: 'google' as const,
+          marketingConsentStatus: MarketingConsentStatus.OptedIn,
+          imPassportTraceId: 'test-trace-id',
+        };
+        mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt.mockResolvedValue(mockEmbeddedLoginPromptResult);
+
         mockSigninPopup.mockReturnValue(mockOidcUser);
         // Simulate `tryAgainOnClick` being called so that the `login()` promise can resolve
         mockOverlayAppend.mockImplementation(async (tryAgainOnClick: () => Promise<void>) => {
@@ -1080,6 +1088,13 @@ describe('AuthManager', () => {
       expect(url.searchParams.get('marketingConsent')).toEqual(MarketingConsentStatus.OptedIn);
       expect(url.searchParams.get('audience')).toEqual('test-audience');
     });
+
+    it('should include im_passport_trace_id parameter when imPassportTraceId is provided', async () => {
+      const result = await authManager.getPKCEAuthorizationUrl(undefined, 'test-trace-id');
+      const url = new URL(result);
+
+      expect(url.searchParams.get('im_passport_trace_id')).toEqual('test-trace-id');
+    });
   });
 
   describe('login with directLoginMethod', () => {
@@ -1178,8 +1193,12 @@ describe('AuthManager', () => {
     });
 
     it('should call displayEmbeddedLoginPrompt when no directLoginOptions provided and overlay is enabled', async () => {
-      const mockDirectLoginOptions = { directLoginMethod: 'google' as const };
-      mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt.mockResolvedValue(mockDirectLoginOptions);
+      const mockEmbeddedLoginPromptResult = {
+        directLoginMethod: 'google' as const,
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+        imPassportTraceId: 'test-trace-id',
+      };
+      mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt.mockResolvedValue(mockEmbeddedLoginPromptResult);
       mockSigninPopup.mockResolvedValue(mockOidcUser);
 
       await authManager.login();
@@ -1190,6 +1209,8 @@ describe('AuthManager', () => {
           rid: '',
           third_party_a_id: '',
           direct: 'google',
+          marketingConsent: MarketingConsentStatus.OptedIn,
+          im_passport_trace_id: 'test-trace-id',
         },
         popupWindowFeatures: {
           width: 410,
@@ -1234,12 +1255,13 @@ describe('AuthManager', () => {
     });
 
     it('should handle email login method from embedded prompt', async () => {
-      const mockDirectLoginOptions = {
+      const mockEmbeddedLoginPromptResult = {
         directLoginMethod: 'email' as const,
         email: 'test@example.com',
         marketingConsentStatus: MarketingConsentStatus.OptedIn,
+        imPassportTraceId: 'test-trace-id-email',
       };
-      mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt.mockResolvedValue(mockDirectLoginOptions);
+      mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt.mockResolvedValue(mockEmbeddedLoginPromptResult);
       mockSigninPopup.mockResolvedValue(mockOidcUser);
 
       await authManager.login('anonymous-id');
@@ -1252,6 +1274,7 @@ describe('AuthManager', () => {
           direct: 'email',
           email: 'test@example.com',
           marketingConsent: MarketingConsentStatus.OptedIn,
+          im_passport_trace_id: 'test-trace-id-email',
         },
         popupWindowFeatures: {
           width: 410,

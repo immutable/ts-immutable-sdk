@@ -183,7 +183,11 @@ export default class AuthManager {
     });
   };
 
-  private buildExtraQueryParams(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Record<string, string> {
+  private buildExtraQueryParams(
+    anonymousId?: string,
+    directLoginOptions?: DirectLoginOptions,
+    imPassportTraceId?: string,
+  ): Record<string, string> {
     const params: Record<string, string> = {
       ...(this.userManager.settings?.extraQueryParams ?? {}),
       rid: getDetail(Detail.RUNTIME_ID) || '',
@@ -206,6 +210,10 @@ export default class AuthManager {
       if (directLoginOptions.marketingConsentStatus) {
         params.marketingConsent = directLoginOptions.marketingConsentStatus;
       }
+    }
+
+    if (imPassportTraceId) {
+      params.im_passport_trace_id = imPassportTraceId;
     }
 
     return params;
@@ -232,16 +240,24 @@ export default class AuthManager {
    */
   public async login(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<User> {
     return withPassportError<User>(async () => {
+      // If directLoginOptions are provided, then the consumer has rendered their own initial login screen.
+      // If not, display the embedded login prompt and pass the returned direct login options and imPassportTraceId to the login popup.
       let directLoginOptionsToUse: DirectLoginOptions | undefined;
+      let imPassportTraceId: string | undefined;
       if (directLoginOptions) {
         directLoginOptionsToUse = directLoginOptions;
       } else if (!this.config.popupOverlayOptions.disableHeadlessLoginPromptOverlay) {
-        directLoginOptionsToUse = await this.embeddedLoginPrompt.displayEmbeddedLoginPrompt();
+        const {
+          imPassportTraceId: embeddedLoginPromptImPassportTraceId,
+          ...embeddedLoginPromptDirectLoginOptions
+        } = await this.embeddedLoginPrompt.displayEmbeddedLoginPrompt();
+        directLoginOptionsToUse = embeddedLoginPromptDirectLoginOptions;
+        imPassportTraceId = embeddedLoginPromptImPassportTraceId;
       }
 
       const popupWindowTarget = window.crypto.randomUUID();
       const signinPopup = async () => {
-        const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptionsToUse);
+        const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptionsToUse, imPassportTraceId);
 
         const userPromise = this.userManager.signinPopup({
           extraQueryParams,
@@ -380,7 +396,10 @@ export default class AuthManager {
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
-  public async getPKCEAuthorizationUrl(directLoginOptions?: DirectLoginOptions): Promise<string> {
+  public async getPKCEAuthorizationUrl(
+    directLoginOptions?: DirectLoginOptions,
+    imPassportTraceId?: string,
+  ): Promise<string> {
     const verifier = base64URLEncode(window.crypto.getRandomValues(new Uint8Array(32)));
     const challenge = base64URLEncode(await sha256(verifier));
 
@@ -419,6 +438,10 @@ export default class AuthManager {
       if (directLoginOptions.marketingConsentStatus) {
         pKCEAuthorizationUrl.searchParams.set('marketingConsent', directLoginOptions.marketingConsentStatus);
       }
+    }
+
+    if (imPassportTraceId) {
+      pKCEAuthorizationUrl.searchParams.set('im_passport_trace_id', imPassportTraceId);
     }
 
     return pKCEAuthorizationUrl.toString();

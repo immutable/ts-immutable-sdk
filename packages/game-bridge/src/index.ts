@@ -362,7 +362,8 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
         const request = data ? JSON.parse(data) : {};
         const directLoginOptions: passport.DirectLoginOptions | undefined = request?.directLoginOptions;
-        const url = await getPassportClient().loginWithPKCEFlow(directLoginOptions);
+        const imPassportTraceId: string | undefined = request?.imPassportTraceId;
+        const url = await getPassportClient().loginWithPKCEFlow(directLoginOptions, imPassportTraceId);
         trackDuration(moduleName, 'performedGetPkceAuthUrl', mt(markStart));
         callbackToGame({
           responseFor: fxName,
