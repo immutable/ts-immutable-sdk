@@ -89,6 +89,7 @@ export interface PassportOverrides {
 export interface PopupOverlayOptions {
   disableGenericPopupOverlay?: boolean;
   disableBlockedPopupOverlay?: boolean;
+  disableHeadlessLoginPromptOverlay?: boolean;
 }
 
 export interface PassportModuleConfiguration
@@ -183,7 +184,6 @@ export enum MarketingConsentStatus {
 }
 
 export type DirectLoginOptions = {
-  directLoginMethod: DirectLoginMethod;
   marketingConsentStatus?: MarketingConsentStatus;
 } & (
   | { directLoginMethod: 'email'; email: string }

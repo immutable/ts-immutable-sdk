@@ -27,7 +27,7 @@ import {
   User,
   UserProfile,
 } from './types';
-import { ConfirmationScreen } from './confirmation';
+import { ConfirmationScreen, EmbeddedLoginPrompt } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
 import { Provider } from './zkEvm/types';
 import TypedEventEmitter from './utils/typedEventEmitter';
@@ -57,7 +57,8 @@ const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfigura
 
 export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
   const config = new PassportConfiguration(passportModuleConfiguration);
-  const authManager = new AuthManager(config);
+  const embeddedLoginPrompt = new EmbeddedLoginPrompt(config);
+  const authManager = new AuthManager(config, embeddedLoginPrompt);
   const magicProviderProxyFactory = new MagicProviderProxyFactory(authManager, config);
   const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
   const confirmationScreen = new ConfirmationScreen(config);
@@ -91,6 +92,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     authManager,
     magicAdapter,
     confirmationScreen,
+    embeddedLoginPrompt,
     immutableXClient,
     multiRollupApiClients,
     passportEventEmitter,
@@ -105,6 +107,8 @@ export class Passport {
   private readonly config: PassportConfiguration;
 
   private readonly confirmationScreen: ConfirmationScreen;
+
+  private readonly embeddedLoginPrompt: EmbeddedLoginPrompt;
 
   private readonly immutableXClient: IMXClient;
 
@@ -125,6 +129,7 @@ export class Passport {
     this.authManager = privateVars.authManager;
     this.magicAdapter = privateVars.magicAdapter;
     this.confirmationScreen = privateVars.confirmationScreen;
+    this.embeddedLoginPrompt = privateVars.embeddedLoginPrompt;
     this.immutableXClient = privateVars.immutableXClient;
     this.multiRollupApiClients = privateVars.multiRollupApiClients;
     this.passportEventEmitter = privateVars.passportEventEmitter;

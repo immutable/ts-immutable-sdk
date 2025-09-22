@@ -3,13 +3,13 @@ import { trackError } from '@imtbl/metrics';
 
 import {
   ConfirmationResult,
-  PASSPORT_EVENT_TYPE,
-  ReceiveMessage,
-  SendMessage,
+  PASSPORT_CONFIRMATION_EVENT_TYPE,
+  ConfirmationReceiveMessage,
+  ConfirmationSendMessage,
 } from './types';
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
-import Overlay from '../overlay';
+import ConfirmationOverlay from '../overlay/confirmationOverlay';
 
 const CONFIRMATION_WINDOW_TITLE = 'Confirm this transaction';
 const CONFIRMATION_WINDOW_HEIGHT = 720;
@@ -30,7 +30,7 @@ export default class ConfirmationScreen {
 
   private popupOptions: { width: number; height: number } | undefined;
 
-  private overlay: Overlay | undefined;
+  private overlay: ConfirmationOverlay | undefined;
 
   private overlayClosed: boolean;
 
@@ -67,30 +67,30 @@ export default class ConfirmationScreen {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
           origin !== this.config.passportDomain
-          || data.eventType !== PASSPORT_EVENT_TYPE
+          || data.eventType !== PASSPORT_CONFIRMATION_EVENT_TYPE
         ) {
           return;
         }
 
-        switch (data.messageType as ReceiveMessage) {
-          case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
+        switch (data.messageType as ConfirmationReceiveMessage) {
+          case ConfirmationReceiveMessage.CONFIRMATION_WINDOW_READY: {
             this.confirmationWindow?.postMessage({
-              eventType: PASSPORT_EVENT_TYPE,
-              messageType: SendMessage.CONFIRMATION_START,
+              eventType: PASSPORT_CONFIRMATION_EVENT_TYPE,
+              messageType: ConfirmationSendMessage.CONFIRMATION_START,
             }, this.config.passportDomain);
             break;
           }
-          case ReceiveMessage.TRANSACTION_CONFIRMED: {
+          case ConfirmationReceiveMessage.TRANSACTION_CONFIRMED: {
             this.closeWindow();
             resolve({ confirmed: true });
             break;
           }
-          case ReceiveMessage.TRANSACTION_REJECTED: {
+          case ConfirmationReceiveMessage.TRANSACTION_REJECTED: {
             this.closeWindow();
             resolve({ confirmed: false });
             break;
           }
-          case ReceiveMessage.TRANSACTION_ERROR: {
+          case ConfirmationReceiveMessage.TRANSACTION_ERROR: {
             this.closeWindow();
             reject(new Error('Error during transaction confirmation'));
             break;
@@ -123,29 +123,29 @@ export default class ConfirmationScreen {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
           origin !== this.config.passportDomain
-          || data.eventType !== PASSPORT_EVENT_TYPE
+          || data.eventType !== PASSPORT_CONFIRMATION_EVENT_TYPE
         ) {
           return;
         }
-        switch (data.messageType as ReceiveMessage) {
-          case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
+        switch (data.messageType as ConfirmationReceiveMessage) {
+          case ConfirmationReceiveMessage.CONFIRMATION_WINDOW_READY: {
             this.confirmationWindow?.postMessage({
-              eventType: PASSPORT_EVENT_TYPE,
-              messageType: SendMessage.CONFIRMATION_START,
+              eventType: PASSPORT_CONFIRMATION_EVENT_TYPE,
+              messageType: ConfirmationSendMessage.CONFIRMATION_START,
             }, this.config.passportDomain);
             break;
           }
-          case ReceiveMessage.MESSAGE_CONFIRMED: {
+          case ConfirmationReceiveMessage.MESSAGE_CONFIRMED: {
             this.closeWindow();
             resolve({ confirmed: true });
             break;
           }
-          case ReceiveMessage.MESSAGE_REJECTED: {
+          case ConfirmationReceiveMessage.MESSAGE_REJECTED: {
             this.closeWindow();
             resolve({ confirmed: false });
             break;
           }
-          case ReceiveMessage.MESSAGE_ERROR: {
+          case ConfirmationReceiveMessage.MESSAGE_ERROR: {
             this.closeWindow();
             reject(new Error('Error during message confirmation'));
             break;
@@ -194,12 +194,12 @@ export default class ConfirmationScreen {
         width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
         height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
       });
-      this.overlay = new Overlay(this.config.popupOverlayOptions);
+      this.overlay = new ConfirmationOverlay(this.config.popupOverlayOptions);
     } catch (error) {
       // If an error is thrown here then the popup is blocked
       const errorMessage = error instanceof Error ? error.message : String(error);
       trackError('passport', 'confirmationPopupDenied', new Error(errorMessage));
-      this.overlay = new Overlay(this.config.popupOverlayOptions, true);
+      this.overlay = new ConfirmationOverlay(this.config.popupOverlayOptions, true);
     }
 
     this.overlay.append(

@@ -28,8 +28,9 @@ import {
   isUserImx,
 } from './types';
 import { PassportConfiguration } from './config';
-import Overlay from './overlay';
+import ConfirmationOverlay from './overlay/confirmationOverlay';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
+import { EmbeddedLoginPrompt } from './confirmation';
 
 const LOGIN_POPUP_CLOSED_POLLING_DURATION = 500;
 
@@ -111,6 +112,8 @@ export default class AuthManager {
 
   private readonly config: PassportConfiguration;
 
+  private readonly embeddedLoginPrompt: EmbeddedLoginPrompt;
+
   private readonly logoutMode: Exclude<OidcConfiguration['logoutMode'], undefined>;
 
   /**
@@ -118,10 +121,11 @@ export default class AuthManager {
    */
   private refreshingPromise: Promise<User | null> | null = null;
 
-  constructor(config: PassportConfiguration) {
+  constructor(config: PassportConfiguration, embeddedLoginPrompt: EmbeddedLoginPrompt) {
     this.config = config;
     this.userManager = new UserManager(getAuthConfiguration(config));
     this.deviceCredentialsManager = new DeviceCredentialsManager();
+    this.embeddedLoginPrompt = embeddedLoginPrompt;
     this.logoutMode = config.oidcConfiguration.logoutMode || 'redirect';
   }
 
@@ -228,9 +232,16 @@ export default class AuthManager {
    */
   public async login(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<User> {
     return withPassportError<User>(async () => {
+      let directLoginOptionsToUse: DirectLoginOptions | undefined;
+      if (directLoginOptions) {
+        directLoginOptionsToUse = directLoginOptions;
+      } else if (!this.config.popupOverlayOptions.disableHeadlessLoginPromptOverlay) {
+        directLoginOptionsToUse = await this.embeddedLoginPrompt.displayEmbeddedLoginPrompt();
+      }
+
       const popupWindowTarget = window.crypto.randomUUID();
       const signinPopup = async () => {
-        const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptions);
+        const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptionsToUse);
 
         const userPromise = this.userManager.signinPopup({
           extraQueryParams,
@@ -287,7 +298,7 @@ export default class AuthManager {
 
             // Popup was blocked; append the blocked popup overlay to allow the user to try again.
             let popupHasBeenOpened: boolean = false;
-            const overlay = new Overlay(this.config.popupOverlayOptions, true);
+            const overlay = new ConfirmationOverlay(this.config.popupOverlayOptions, true);
             overlay.append(
               async () => {
                 try {
