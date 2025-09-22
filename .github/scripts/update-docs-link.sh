@@ -51,7 +51,7 @@ MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
   echo "major: $major minor: $minor patch: $patch"
   # Update versions in the browserBundle docs (https://docs.immutable.com/docs/x/sdks/typescript/#browser-bundle)
   FILES=(
-    docs/main/sdks/zkEVM/typescript/_zkevmtypescript.mdx
+    docs/main/reference/typescript/_partials/_zkevmtypescript.mdx
     docs/main/x/sdks/typescript/_starkextypescript.mdx
   )
   for FILE in "${FILES[@]}"
