@@ -133,17 +133,17 @@ export const getEmbeddedLoginPromptOverlay = (): string => `
     <div
       id="${PASSPORT_OVERLAY_ID}"
       style="
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
-        z-index: 2147483647 !important;
-        background: rgba(247, 247, 247, 0.24) !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 2147483647;
+        background: rgba(247, 247, 247, 0.24);
         animation-name: passportEmbeddedLoginPromptOverlayFadeIn;
         animation-duration: 0.8s;
       "
@@ -151,10 +151,10 @@ export const getEmbeddedLoginPromptOverlay = (): string => `
       <div
         id="${PASSPORT_OVERLAY_CONTENTS_ID}"
         style="
-          display: flex !important;
-          flex-direction: column !important;
-          align-items: center !important;
-          width: 100% !important;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
         "
       />
     </div>
