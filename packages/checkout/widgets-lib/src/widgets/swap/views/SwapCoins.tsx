@@ -32,6 +32,8 @@ export interface SwapCoinsProps {
   fromTokenAddress?: string;
   toTokenAddress?: string;
   showBackButton?: boolean;
+  showTitle?: boolean;
+  showSubTitle?: boolean;
 }
 
 export function SwapCoins({
@@ -42,6 +44,8 @@ export function SwapCoins({
   fromTokenAddress,
   toTokenAddress,
   showBackButton,
+  showTitle = true,
+  showSubTitle = true,
 }: SwapCoinsProps) {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
@@ -88,7 +92,7 @@ export function SwapCoins({
     <SimpleLayout
       header={!autoProceed ? (
         <HeaderNavigation
-          title={t('views.SWAP.header.title')}
+          title={showTitle ? t('views.SWAP.header.title') : undefined}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
           showBack={showBackButton}
           onBackButtonClick={() => {
@@ -119,6 +123,7 @@ export function SwapCoins({
             toTokenAddress,
           }}
           theme={theme}
+          showSubTitle={showSubTitle}
         />
         <NotEnoughImx
           environment={checkout?.config.environment ?? Environment.PRODUCTION}

@@ -30,4 +30,8 @@ export type SwapWidgetParams = {
   direction?: SwapDirection;
   /** Whether to show a back button on the first screen, on click triggers REQUEST_GO_BACK event */
   showBackButton?: boolean;
+  /** Whether to show the title on the first screen */
+  showTitle?: boolean;
+  /** Whether to show the subtitle on the first screen */
+  showSubTitle?: boolean;
 };

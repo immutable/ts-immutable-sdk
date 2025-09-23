@@ -69,6 +69,8 @@ export default function SwapWidget({
   autoProceed,
   direction,
   showBackButton,
+  showTitle,
+  showSubTitle,
   walletProviderName,
 }: SwapWidgetInputs) {
   const { t } = useTranslation();
@@ -257,6 +259,8 @@ export default function SwapWidget({
               fromTokenAddress={viewState.view.data?.fromTokenAddress ?? fromTokenAddress}
               toTokenAddress={viewState.view.data?.toTokenAddress ?? toTokenAddress}
               showBackButton={showBackButton}
+              showTitle={showTitle}
+              showSubTitle={showSubTitle}
             />
             )}
             {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (

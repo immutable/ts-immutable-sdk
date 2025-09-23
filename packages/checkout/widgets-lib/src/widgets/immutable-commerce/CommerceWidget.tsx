@@ -201,9 +201,11 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
   );
 
   /*
-   * Show back button
+   * Show back button, title and subtitle
    */
-  const showBackButton = !!view.data?.showBackButton;
+  const showBackButton = view.data?.showBackButton;
+  const showTitle = view.data?.showTitle;
+  const showSubTitle = view.data?.showSubTitle;
 
   return (
     <ViewContextProvider>
@@ -318,6 +320,8 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
                   {...(view.data.params || {})}
                   {...(view.data.config || {})}
                   showBackButton={showBackButton}
+                  showTitle={showTitle}
+                  showSubTitle={showSubTitle}
                 />
               )}
               {view.type === CommerceFlowType.ONRAMP && (
