@@ -267,7 +267,7 @@ export function SwapForm({
             icon: token.icon,
           } as CoinSelectorOptionProps),
       ),
-    [allowedTokens, formatTokenOptionsId],
+    [allowedTokens, fromToken],
   );
 
   // ------------------//
