@@ -33,9 +33,6 @@ function SwapUI() {
       // fromTokenAddress: '0x3B2d8A1931736Fc321C24864BceEe981B11c3c57',
       // toTokenAddress: "0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439",
       autoProceed: isAutoProceed,
-      showBackButton: false,
-      showTitle: false,
-      showSubTitle: false,
     });
     swap.addListener(SwapEventType.SUCCESS, (data: SwapSuccess) => {
     })
