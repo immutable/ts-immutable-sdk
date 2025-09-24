@@ -319,7 +319,7 @@ export function FundingRouteExecute({
         <BridgeWidget {...bridgeParams!} config={config} checkout={checkout!} />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_SWAP && (
-        <SwapWidget {...swapParams!} config={config} />
+        <SwapWidget {...swapParams!} config={config} swapConfig={{ showTitle: true, showSubTitle: true }} />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_ON_RAMP && (
         <OnRampWidget config={config} {...onRampParams} />
