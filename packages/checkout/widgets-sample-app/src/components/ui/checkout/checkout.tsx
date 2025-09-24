@@ -28,6 +28,7 @@ import {
   WalletProviderName,
   Widget,
   SalePaymentTypes,
+  WalletProviderRdns,
 } from "@imtbl/checkout-sdk";
 import { Passport } from "@imtbl/passport";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
@@ -287,9 +288,15 @@ function CheckoutUI() {
       config: {
         theme,
         language,
+        CONNECT: {
+          // blocklistWalletRdns: [WalletProviderRdns.METAMASK],
+        },
         // SWAP: {},
         TRANSFER: {
           customTitle: "Dromedary Transfer",
+        },
+        SALE: {
+          hideExcludedPaymentTypes: true,
         },
         // ONRAMP: {},
       },
