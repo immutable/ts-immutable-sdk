@@ -26,6 +26,6 @@ export interface FiatRampParams {
   tokenAmount?: string;
   tokenAddress?: string;
   passport?: any;
-  hideMenu?: boolean;
-  exchangeScreenTitle?: string;
+  showMenu?: boolean;
+  customSubTitle?: string;
 }

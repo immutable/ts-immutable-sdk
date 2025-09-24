@@ -1,7 +1,7 @@
 import {
   useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
-import { IMTBLWidgetEvents, OnRampWidgetParams } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, OnRampWidgetParams, OnrampWidgetConfiguration } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { NATIVE } from '../../lib';
@@ -28,12 +28,11 @@ import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailabl
 
 export type OnRampWidgetInputs = OnRampWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
-  hideMenu?: boolean;
-  exchangeScreenTitle?: string;
+  onrampConfig?: OnrampWidgetConfiguration;
 };
 
 export default function OnRampWidget({
-  amount, tokenAddress, config, showBackButton, hideMenu, exchangeScreenTitle,
+  amount, tokenAddress, config, showBackButton, onrampConfig,
 }: OnRampWidgetInputs) {
   const {
     isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
@@ -141,8 +140,8 @@ export default function OnRampWidget({
               tknAddr ?? viewState.view.data?.tokenAddress
           }
           showBackButton={showBackButton}
-          hideMenu={hideMenu}
-          exchangeScreenTitle={exchangeScreenTitle}
+          showMenu={onrampConfig?.showMenu}
+          customSubTitle={onrampConfig?.customSubTitle}
         />
       )}
 

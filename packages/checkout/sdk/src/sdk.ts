@@ -669,8 +669,8 @@ export class Checkout {
       tokenSymbol,
       email,
       allowedTokens,
-      hideMenu: params.hideMenu,
-      exchangeScreenTitle: params.exchangeScreenTitle,
+      showMenu: params.showMenu,
+      customSubTitle: params.customSubTitle,
     } as FiatRampWidgetParams);
   }
 
