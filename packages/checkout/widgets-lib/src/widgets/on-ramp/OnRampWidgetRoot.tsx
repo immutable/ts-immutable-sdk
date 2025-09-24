@@ -102,6 +102,8 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
                     amount={this.parameters.amount}
                     config={this.strongConfig()}
                     showBackButton={this.parameters.showBackButton}
+                    hideMenu={this.properties.config?.hideMenu}
+                    exchangeScreenTitle={this.properties.config?.exchangeScreenTitle}
                   />
                 </Suspense>
               </ConnectLoader>

@@ -27,11 +27,13 @@ import { OrderInProgress } from './views/OrderInProgress';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 
 export type OnRampWidgetInputs = OnRampWidgetParams & {
-  config: StrongCheckoutWidgetsConfig
+  config: StrongCheckoutWidgetsConfig;
+  hideMenu?: boolean;
+  exchangeScreenTitle?: string;
 };
 
 export default function OnRampWidget({
-  amount, tokenAddress, config, showBackButton,
+  amount, tokenAddress, config, showBackButton, hideMenu, exchangeScreenTitle,
 }: OnRampWidgetInputs) {
   const {
     isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
@@ -139,6 +141,8 @@ export default function OnRampWidget({
               tknAddr ?? viewState.view.data?.tokenAddress
           }
           showBackButton={showBackButton}
+          hideMenu={hideMenu}
+          exchangeScreenTitle={exchangeScreenTitle}
         />
       )}
 
