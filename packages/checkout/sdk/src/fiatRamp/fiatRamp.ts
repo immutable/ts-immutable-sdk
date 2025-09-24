@@ -51,10 +51,10 @@ export class FiatRampService {
       defaultPaymentMethod: 'credit_debit_card',
       disablePaymentMethods: '',
       productsAvailed: 'buy',
-      exchangeScreenTitle: params.customSubTitle === '' ? 'Buy' : (params.customSubTitle ?? 'Buy'),
+      exchangeScreenTitle: params.customSubTitle === '' ? ' ' : (params.customSubTitle ?? 'Buy'),
       themeColor: '0D0D0D',
       defaultCryptoCurrency: params.tokenSymbol || 'IMX',
-      hideMenu: !(params.showMenu ?? false),
+      hideMenu: !params.showMenu,
     };
 
     if (params.isPassport && params.email) {
