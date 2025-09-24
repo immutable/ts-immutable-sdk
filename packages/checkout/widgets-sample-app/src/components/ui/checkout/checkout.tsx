@@ -266,7 +266,7 @@ function CheckoutUI() {
     unmount();
     mounted.current = true;
     console.log({params});
-    widget?.mount("widget-root", params); // some params go here
+    widget?.mount("widget-root", params);
   };
 
   // should wait until browserProvider is set to render widget?
@@ -282,7 +282,7 @@ function CheckoutUI() {
     if (widgetsFactory === undefined) return undefined;
     if (renderAfterConnect && !browserProvider) return undefined;
 
-    return widgetsFactory.create(WidgetType.IMMUTABLE_COMMERCE, { // other params go here
+    return widgetsFactory.create(WidgetType.IMMUTABLE_COMMERCE, {
       provider: browserProvider,
       config: {
         theme,
@@ -290,8 +290,8 @@ function CheckoutUI() {
         SWAP: {
         },
         // TRANSFER: {
-        //   // showTitle: false,
-        //   // showSubTitle: false,
+        //   showTitle: false,
+        //   showSubTitle: false,
         // },
         ONRAMP: {
           // showTitle: false,
