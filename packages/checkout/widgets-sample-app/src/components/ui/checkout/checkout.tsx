@@ -287,16 +287,11 @@ function CheckoutUI() {
       config: {
         theme,
         language,
-        SWAP: {
+        // SWAP: {},
+        TRANSFER: {
+          customTitle: "Dromedary Transfer",
         },
-        // TRANSFER: {
-        //   showTitle: false,
-        //   showSubTitle: false,
-        // },
-        ONRAMP: {
-          // showTitle: false,
-          // showSubTitle: false,
-        },
+        // ONRAMP: {},
       },
     });
   }, [widgetsFactory, browserProvider, renderAfterConnect]);
