@@ -331,8 +331,8 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
               {view.type === CommerceFlowType.TRANSFER && (
                 <TransferWidget
                   config={widgetsConfig}
+                  transferConfig={view.data.config}
                   {...(view.data.params || {})}
-                  {...(view.data.config || {})}
                   showBackButton={showBackButton}
                 />
               )}
