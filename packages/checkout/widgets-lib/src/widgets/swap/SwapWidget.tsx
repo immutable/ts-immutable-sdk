@@ -10,7 +10,6 @@ import {
   TokenFilterTypes, IMTBLWidgetEvents, SwapWidgetParams,
   SwapDirection,
   WalletProviderName,
-  SwapWidgetConfiguration,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { SwapCoins } from './views/SwapCoins';
@@ -60,7 +59,7 @@ import { GeoblockLoader } from './GeoblockLoader';
 
 export type SwapWidgetInputs = SwapWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
-  swapConfig: SwapWidgetConfiguration;
+  swapConfig: { showTitle: boolean; showSubTitle: boolean };
 };
 
 export default function SwapWidget({

@@ -32,8 +32,8 @@ export interface SwapCoinsProps {
   fromTokenAddress?: string;
   toTokenAddress?: string;
   showBackButton?: boolean;
-  showTitle?: boolean;
-  showSubTitle?: boolean;
+  showTitle: boolean;
+  showSubTitle: boolean;
 }
 
 export function SwapCoins({
@@ -44,8 +44,8 @@ export function SwapCoins({
   fromTokenAddress,
   toTokenAddress,
   showBackButton,
-  showTitle = true,
-  showSubTitle = true,
+  showTitle,
+  showSubTitle,
 }: SwapCoinsProps) {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);

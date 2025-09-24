@@ -107,8 +107,8 @@ export class Swap extends Base<WidgetType.SWAP> {
                     showBackButton={this.parameters.showBackButton}
                     walletProviderName={this.parameters.walletProviderName}
                     swapConfig={{
-                      showTitle: this.properties.config?.showTitle,
-                      showSubTitle: this.properties.config?.showSubTitle,
+                      showTitle: this.properties.config?.showTitle ?? true,
+                      showSubTitle: this.properties.config?.showSubTitle ?? true,
                     }}
                   />
                 </Suspense>

@@ -288,8 +288,8 @@ function CheckoutUI() {
         theme,
         language,
         SWAP: {
-          showTitle: false,
-          showSubTitle: false,
+          // showTitle: false,
+          // showSubTitle: false,
         },
         // TRANSFER: {
         //   // showTitle: false,
