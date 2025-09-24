@@ -78,7 +78,7 @@ export interface SwapFromProps {
   data?: SwapFormData;
   theme: WidgetTheme;
   cancelAutoProceed: () => void;
-  showSubTitle: boolean;
+  subTitle: string;
 }
 
 class PriceImpactError extends Error {
@@ -89,7 +89,7 @@ class PriceImpactError extends Error {
 }
 
 export function SwapForm({
-  data, theme, cancelAutoProceed, showSubTitle,
+  data, theme, cancelAutoProceed, subTitle,
 }: SwapFromProps) {
   const { t } = useTranslation();
   const {
@@ -109,7 +109,6 @@ export function SwapForm({
     ? NATIVE
     : `${symbol.toLowerCase()}-${address!.toLowerCase()}`), []);
 
-  // const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { conversions: usdConversions } = useCryptoUSDConversion(checkout?.config.environment);
   const { viewDispatch } = useContext(ViewContext);
 
@@ -942,13 +941,13 @@ export function SwapForm({
         marginBottom: 'base.spacing.x2',
       }}
       >
-        {showSubTitle ? (
+        {subTitle !== '' ? (
           <Heading
             size="small"
             weight="regular"
             sx={{ paddingBottom: 'base.spacing.x4' }}
           >
-            {t('views.SWAP.content.title')}
+            {subTitle}
           </Heading>
         ) : null}
         <Box
