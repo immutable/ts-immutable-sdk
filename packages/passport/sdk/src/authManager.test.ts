@@ -1045,26 +1045,38 @@ describe('AuthManager', () => {
 
     it('should include direct parameter when directLoginMethod is provided', async () => {
       const directLoginMethod = 'apple';
-      const result = await authManager.getPKCEAuthorizationUrl({ directLoginMethod });
+      const result = await authManager.getPKCEAuthorizationUrl({
+        directLoginMethod,
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('apple');
+      expect(url.searchParams.get('marketingConsent')).toEqual(MarketingConsentStatus.OptedIn);
     });
 
     it('should include direct parameter for google login method', async () => {
       const directLoginMethod = 'google';
-      const result = await authManager.getPKCEAuthorizationUrl({ directLoginMethod });
+      const result = await authManager.getPKCEAuthorizationUrl({
+        directLoginMethod,
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('google');
+      expect(url.searchParams.get('marketingConsent')).toEqual(MarketingConsentStatus.OptedIn);
     });
 
     it('should include direct parameter for facebook login method', async () => {
       const directLoginMethod = 'facebook';
-      const result = await authManager.getPKCEAuthorizationUrl({ directLoginMethod });
+      const result = await authManager.getPKCEAuthorizationUrl({
+        directLoginMethod,
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('facebook');
+      expect(url.searchParams.get('marketingConsent')).toEqual(MarketingConsentStatus.OptedIn);
     });
 
     it('should include audience parameter when specified in config', async () => {
@@ -1081,7 +1093,10 @@ describe('AuthManager', () => {
       const configWithAudience = getConfig({ audience: 'test-audience' });
       const am = new AuthManager(configWithAudience, mockEmbeddedLoginPrompt);
 
-      const result = await am.getPKCEAuthorizationUrl({ directLoginMethod: 'apple', marketingConsentStatus: MarketingConsentStatus.OptedIn });
+      const result = await am.getPKCEAuthorizationUrl({
+        directLoginMethod: 'apple',
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
       const url = new URL(result);
 
       expect(url.searchParams.get('direct')).toEqual('apple');
@@ -1101,13 +1116,17 @@ describe('AuthManager', () => {
     it('should pass directLoginMethod to login popup', async () => {
       mockSigninPopup.mockResolvedValue(mockOidcUser);
 
-      await authManager.login('anonymous-id', { directLoginMethod: 'apple' });
+      await authManager.login('anonymous-id', {
+        directLoginMethod: 'apple',
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
 
       expect(mockSigninPopup).toHaveBeenCalledWith({
         extraQueryParams: {
           rid: '',
           third_party_a_id: 'anonymous-id',
           direct: 'apple',
+          marketingConsent: MarketingConsentStatus.OptedIn,
         },
         popupWindowFeatures: {
           width: 410,
@@ -1158,13 +1177,17 @@ describe('AuthManager', () => {
     });
 
     it('should pass directLoginMethod to redirect login', async () => {
-      await authManager.loginWithRedirect('anonymous-id', { directLoginMethod: 'google' });
+      await authManager.loginWithRedirect('anonymous-id', {
+        directLoginMethod: 'google',
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
 
       expect(mockSigninRedirect).toHaveBeenCalledWith({
         extraQueryParams: {
           rid: '',
           third_party_a_id: 'anonymous-id',
           direct: 'google',
+          marketingConsent: MarketingConsentStatus.OptedIn,
         },
       });
     });
@@ -1223,7 +1246,10 @@ describe('AuthManager', () => {
     it('should not call displayEmbeddedLoginPrompt when directLoginOptions are provided', async () => {
       mockSigninPopup.mockResolvedValue(mockOidcUser);
 
-      await authManager.login('anonymous-id', { directLoginMethod: 'apple' });
+      await authManager.login('anonymous-id', {
+        directLoginMethod: 'apple',
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
 
       expect(mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt).not.toHaveBeenCalled();
       expect(mockSigninPopup).toHaveBeenCalledWith({
@@ -1231,6 +1257,7 @@ describe('AuthManager', () => {
           rid: '',
           third_party_a_id: 'anonymous-id',
           direct: 'apple',
+          marketingConsent: MarketingConsentStatus.OptedIn,
         },
         popupWindowFeatures: {
           width: 410,
