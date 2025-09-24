@@ -198,6 +198,7 @@ function CheckoutUI() {
       amount: "10",
       fromTokenAddress: "native",
       toTokenAddress: "0x3B2d8A1931736Fc321C24864BceEe981B11c3c57",
+      showBackButton: true,
     },
     WALLET: {
       flow: CommerceFlowType.WALLET,
@@ -286,17 +287,15 @@ function CheckoutUI() {
       config: {
         theme,
         language,
-        // SWAP: {},
-        // BRIDGE: {},
-        // CONNECT: {},
-        // ONRAMP: {},
-        SALE: {
-          hideExcludedPaymentTypes: true,
-          waitFulfillmentSettlements: false,
+        SWAP: {
         },
-        WALLET: {
-          showDisconnectButton: true,
-          showNetworkMenu: true,
+        // TRANSFER: {
+        //   showTitle: false,
+        //   showSubTitle: false,
+        // },
+        ONRAMP: {
+          // showTitle: false,
+          // showSubTitle: false,
         },
       },
     });
@@ -397,7 +396,6 @@ function CheckoutUI() {
       const params = new URLSearchParams(window.location.search);
       params.set("environment", environment);
       window.location.href = `${window.location.href}?${params.toString()}`;
-
     }
   }, [environment, prevEnvironment]);
 

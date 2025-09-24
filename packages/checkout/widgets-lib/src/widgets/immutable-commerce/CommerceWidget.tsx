@@ -315,8 +315,8 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
               {view.type === CommerceFlowType.SWAP && (
                 <SwapWidget
                   config={widgetsConfig}
+                  swapConfig={view.data.config}
                   {...(view.data.params || {})}
-                  {...(view.data.config || {})}
                   showBackButton={showBackButton}
                 />
               )}
