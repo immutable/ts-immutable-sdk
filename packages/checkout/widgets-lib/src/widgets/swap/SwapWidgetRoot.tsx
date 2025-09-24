@@ -105,9 +105,11 @@ export class Swap extends Base<WidgetType.SWAP> {
                     autoProceed={this.parameters.autoProceed}
                     direction={this.parameters.direction ?? SwapDirection.FROM}
                     showBackButton={this.parameters.showBackButton}
-                    showTitle={this.parameters.showTitle}
-                    showSubTitle={this.parameters.showSubTitle}
                     walletProviderName={this.parameters.walletProviderName}
+                    swapConfig={{
+                      showTitle: this.properties.config?.showTitle,
+                      showSubTitle: this.properties.config?.showSubTitle,
+                    }}
                   />
                 </Suspense>
               </ConnectLoader>

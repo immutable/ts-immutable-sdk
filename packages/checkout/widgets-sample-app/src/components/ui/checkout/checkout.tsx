@@ -198,6 +198,7 @@ function CheckoutUI() {
       amount: "10",
       fromTokenAddress: "native",
       toTokenAddress: "0x3B2d8A1931736Fc321C24864BceEe981B11c3c57",
+      showBackButton: true,
     },
     WALLET: {
       flow: CommerceFlowType.WALLET,
@@ -265,7 +266,7 @@ function CheckoutUI() {
     unmount();
     mounted.current = true;
     console.log({params});
-    widget?.mount("widget-root", params);
+    widget?.mount("widget-root", params); // some params go here
   };
 
   // should wait until browserProvider is set to render widget?
@@ -281,22 +282,22 @@ function CheckoutUI() {
     if (widgetsFactory === undefined) return undefined;
     if (renderAfterConnect && !browserProvider) return undefined;
 
-    return widgetsFactory.create(WidgetType.IMMUTABLE_COMMERCE, {
+    return widgetsFactory.create(WidgetType.IMMUTABLE_COMMERCE, { // other params go here
       provider: browserProvider,
       config: {
         theme,
         language,
-        // SWAP: {},
-        // BRIDGE: {},
-        // CONNECT: {},
-        // ONRAMP: {},
-        SALE: {
-          hideExcludedPaymentTypes: true,
-          waitFulfillmentSettlements: false,
+        SWAP: {
+          showTitle: false,
+          showSubTitle: false,
         },
-        WALLET: {
-          showDisconnectButton: true,
-          showNetworkMenu: true,
+        // TRANSFER: {
+        //   // showTitle: false,
+        //   // showSubTitle: false,
+        // },
+        ONRAMP: {
+          // showTitle: false,
+          // showSubTitle: false,
         },
       },
     });
@@ -397,7 +398,6 @@ function CheckoutUI() {
       const params = new URLSearchParams(window.location.search);
       params.set("environment", environment);
       window.location.href = `${window.location.href}?${params.toString()}`;
-
     }
   }, [environment, prevEnvironment]);
 

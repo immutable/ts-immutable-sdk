@@ -59,6 +59,7 @@ export type CommerceWidgetInputs = {
 };
 
 export default function CommerceWidget(props: CommerceWidgetInputs) {
+  console.log({ f: 'CommerceWidget', c: 'CommerceWidget', props });
   const {
     flowParams, flowConfig, widgetsConfig, checkout, browserProvider,
   } = props;
@@ -203,9 +204,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
   /*
    * Show back button, title and subtitle
    */
-  const showBackButton = view.data?.showBackButton;
-  const showTitle = view.data?.showTitle;
-  const showSubTitle = view.data?.showSubTitle;
+  const showBackButton = !!view.data?.showBackButton;
 
   return (
     <ViewContextProvider>
@@ -317,11 +316,14 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
               {view.type === CommerceFlowType.SWAP && (
                 <SwapWidget
                   config={widgetsConfig}
+                  swapConfig={{
+                    showTitle: true,
+                    showSubTitle: true,
+                    ...view.data.config,
+                  }}
                   {...(view.data.params || {})}
                   {...(view.data.config || {})}
                   showBackButton={showBackButton}
-                  showTitle={showTitle}
-                  showSubTitle={showSubTitle}
                 />
               )}
               {view.type === CommerceFlowType.ONRAMP && (
