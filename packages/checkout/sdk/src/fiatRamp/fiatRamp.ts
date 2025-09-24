@@ -54,7 +54,7 @@ export class FiatRampService {
       exchangeScreenTitle: params.customSubTitle === '' ? ' ' : (params.customSubTitle ?? 'Buy'),
       themeColor: '0D0D0D',
       defaultCryptoCurrency: params.tokenSymbol || 'IMX',
-      hideMenu: !params.showMenu,
+      hideMenu: !(params.showMenu ?? true),
     };
 
     if (params.isPassport && params.email) {
