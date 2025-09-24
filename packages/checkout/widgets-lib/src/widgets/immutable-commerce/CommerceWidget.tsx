@@ -59,7 +59,6 @@ export type CommerceWidgetInputs = {
 };
 
 export default function CommerceWidget(props: CommerceWidgetInputs) {
-  console.log({ f: 'CommerceWidget', c: 'CommerceWidget', props });
   const {
     flowParams, flowConfig, widgetsConfig, checkout, browserProvider,
   } = props;
@@ -202,7 +201,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
   );
 
   /*
-   * Show back button, title and subtitle
+   * Show back button
    */
   const showBackButton = !!view.data?.showBackButton;
 

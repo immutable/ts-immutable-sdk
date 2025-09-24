@@ -300,9 +300,6 @@ export class CommerceWidgetRoot extends Base<WidgetType.IMMUTABLE_COMMERCE> {
   }
 
   protected render() {
-    console.log({
-      f: 'render', c: 'CommerceWidgetRoot', params: this.parameters, propsConfig: this.properties.config,
-    });
     if (!this.reactRoot) return;
 
     const { t } = i18n;
