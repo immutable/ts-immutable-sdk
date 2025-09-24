@@ -139,7 +139,7 @@ export function TransferForm({
     <SimpleLayout
       header={(
         <HeaderNavigation
-          title={title} // t('views.TRANSFER.header.title')}
+          title={title}
           onCloseButtonClick={() => sendCloseWidgetEvent(eventTarget)}
           showBack={showBackButton}
           onBackButtonClick={() => {
