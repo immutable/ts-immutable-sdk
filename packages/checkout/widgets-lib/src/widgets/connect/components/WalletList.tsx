@@ -55,9 +55,16 @@ export interface WalletListProps {
   targetWalletRdns?: string;
   targetChainId: ChainId;
   allowedChains: ChainId[];
-  blocklistWalletRdns?: string[];
+  allowlistWalletRdns?: string[];
+  blocklistWalletRdns: string[];
   isCheckNetworkEnabled: boolean;
 }
+
+// eslint-disable-next-line max-len
+const getAllowedProviders = (providers: EIP6963ProviderDetail[], allowlist: string[] | undefined, blocklist: string[]) =>
+  (allowlist ?
+    providers.filter((provider) => allowlist.includes(provider.info.rdns) && !blocklist.includes(provider.info.rdns)) :
+    providers);
 
 export function WalletList(props: WalletListProps) {
   const { t } = useTranslation();
@@ -66,8 +73,9 @@ export function WalletList(props: WalletListProps) {
     targetChainId,
     allowedChains,
     isCheckNetworkEnabled,
+    allowlistWalletRdns,
+    blocklistWalletRdns,
   } = props;
-  const blocklistWalletRdns = props?.blocklistWalletRdns || [];
   const {
     connectDispatch,
     connectState: { checkout },
@@ -83,24 +91,26 @@ export function WalletList(props: WalletListProps) {
   const [showNonPassportWarning, setShowNonPassportWarning] = useState(false);
   const [chosenProviderDetail, setChosenProviderDetail] = useState<EIP6963ProviderDetail>();
 
+  const allowedProviders = useMemo(
+    () => getAllowedProviders(providers, allowlistWalletRdns, blocklistWalletRdns),
+    [providers, allowlistWalletRdns, blocklistWalletRdns],
+  );
+  console.log({ allowedProviders, allowlistWalletRdns });
+
   const filteredProviders = useMemo(
-    () => providers
+    () => allowedProviders
       .filter(
         (provider) => !(provider.info.rdns === WalletProviderRdns.PASSPORT),
-      )
-      .filter(
-        (provider) => !blocklistWalletRdns.includes(provider.info.rdns),
       ),
-    [providers],
+    [allowedProviders],
   );
 
   // Don't allow Passport if targetChainId is L1
   const passportProviderDetail = useMemo(
     () => targetChainId !== checkout!.config.l1ChainId
-      && providers
-        .filter((provider) => !blocklistWalletRdns.includes(provider.info.rdns))
+      && allowedProviders
         .find((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT),
-    [providers, checkout],
+    [allowedProviders, checkout, targetChainId],
   );
 
   const selectBrowserProvider = useCallback(

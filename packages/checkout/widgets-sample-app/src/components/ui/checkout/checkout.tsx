@@ -289,7 +289,7 @@ function CheckoutUI() {
         theme,
         language,
         CONNECT: {
-          blocklistWalletRdns: [WalletProviderRdns.METAMASK],
+          allowlistWalletRdns: [WalletProviderRdns.PASSPORT],
         },
         // SWAP: {},
         TRANSFER: {

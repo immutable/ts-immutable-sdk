@@ -83,6 +83,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       checkout: this.checkout,
       allowedChains: [this.checkout.config.l1ChainId, this.checkout.config.l2ChainId],
       blocklistWalletRdns: [],
+      targetWalletRdns: undefined,
     };
 
     this.reactRoot.render(

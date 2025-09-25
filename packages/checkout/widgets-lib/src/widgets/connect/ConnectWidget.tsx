@@ -80,6 +80,7 @@ export default function ConnectWidget({
   targetWalletRdns,
   targetChainId,
   allowedChains,
+  allowlistWalletRdns,
   blocklistWalletRdns,
   deepLink = ConnectWidgetViews.CONNECT_WALLET,
   isCheckNetworkEnabled,
@@ -219,7 +220,8 @@ export default function ConnectWidget({
               targetWalletRdns={targetWalletRdns}
               targetChainId={targetChain}
               allowedChains={allowedChains ?? [targetChain]}
-              blocklistWalletRdns={blocklistWalletRdns}
+              allowlistWalletRdns={allowlistWalletRdns}
+              blocklistWalletRdns={blocklistWalletRdns ?? []}
               checkNetwork={isCheckNetworkEnabled ?? true}
               showBackButton={showBackButton}
               onBackButtonClick={sendGoBackEventOverride}

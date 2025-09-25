@@ -37,12 +37,14 @@ export interface ConnectLoaderProps {
 
 export interface ConnectLoaderParams {
   targetChainId: ChainId;
-  walletProviderName?: WalletProviderName;
-  browserProvider?: WrappedBrowserProvider;
+  walletProviderName: WalletProviderName | undefined;
+  browserProvider: WrappedBrowserProvider | undefined;
   checkout: Checkout;
   allowedChains: ChainId[];
   isCheckNetworkEnabled?: boolean;
+  allowlistWalletRdns: string[] | undefined;
   blocklistWalletRdns: string[];
+  targetWalletRdns: string | undefined;
 }
 
 export function ConnectLoader({
@@ -61,6 +63,7 @@ export function ConnectLoader({
     allowedChains,
     browserProvider,
     isCheckNetworkEnabled,
+    allowlistWalletRdns,
     blocklistWalletRdns,
   } = params;
 
@@ -255,6 +258,7 @@ export function ConnectLoader({
                     <ConnectWidget
                       config={widgetConfig}
                       targetChainId={targetChainId}
+                      allowlistWalletRdns={allowlistWalletRdns}
                       blocklistWalletRdns={blocklistWalletRdns}
                       browserProvider={provider}
                       checkout={checkout}

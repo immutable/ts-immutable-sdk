@@ -85,6 +85,8 @@ export class Swap extends Base<WidgetType.SWAP> {
       checkout: this.checkout,
       allowedChains: [this.checkout.config.l2ChainId],
       blocklistWalletRdns: [],
+      allowlistWalletRdns: undefined,
+      targetWalletRdns: undefined,
     };
 
     this.reactRoot!.render(
