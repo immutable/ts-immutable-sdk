@@ -70,5 +70,6 @@ module.exports = {
     "jsx-a11y/control-has-associated-label": "off",
     "react/jsx-props-no-spreading": "off",
     "implicit-arrow-linebreak": "off",
+    "operator-linebreak": "off",
   }
 }
