@@ -181,7 +181,7 @@ function CheckoutUI() {
   >({
     CONNECT: {
       flow: CommerceFlowType.CONNECT,
-      // blocklistWalletRdns: ["io.metamask"],
+      blocklistWalletRdns: ["io.metamask"],
       // targetChainId: ChainId.SEPOLIA,
       // targetWalletRdns: "io.metamask",
       theme: WidgetTheme.LIGHT,
@@ -289,7 +289,7 @@ function CheckoutUI() {
         theme,
         language,
         CONNECT: {
-          allowlistWalletRdns: [WalletProviderRdns.PASSPORT],
+
         },
         // SWAP: {},
         TRANSFER: {
