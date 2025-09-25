@@ -26,8 +26,6 @@ export function getConnectLoaderParams(
           checkout.config.l2ChainId,
         ],
         allowlistWalletRdns: flowConfig.CONNECT?.allowlistWalletRdns,
-        blocklistWalletRdns: flowConfig.CONNECT?.blocklistWalletRdns ?? [],
-        targetWalletRdns: flowConfig.CONNECT?.targetWalletRdns,
         walletProviderName: undefined,
       };
     case CommerceFlowType.ONRAMP:
@@ -41,8 +39,6 @@ export function getConnectLoaderParams(
           checkout.config.l2ChainId,
         ],
         allowlistWalletRdns: flowConfig.CONNECT?.allowlistWalletRdns,
-        blocklistWalletRdns: flowConfig.CONNECT?.blocklistWalletRdns ?? [],
-        targetWalletRdns: flowConfig.CONNECT?.targetWalletRdns,
         walletProviderName: undefined,
       };
     case CommerceFlowType.SALE:
@@ -54,8 +50,6 @@ export function getConnectLoaderParams(
         targetChainId: checkout.config.l2ChainId,
         allowedChains: [checkout.config.l2ChainId],
         allowlistWalletRdns: flowConfig.CONNECT?.allowlistWalletRdns,
-        blocklistWalletRdns: flowConfig.CONNECT?.blocklistWalletRdns ?? [],
-        targetWalletRdns: flowConfig.CONNECT?.targetWalletRdns,
         walletProviderName: undefined,
       };
     default:

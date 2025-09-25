@@ -5,6 +5,4 @@ import { WidgetConfiguration } from './widget';
  */
 export type ConnectWidgetConfiguration = {
   allowlistWalletRdns?: string[];
-  blocklistWalletRdns?: string[];
-  targetWalletRdns?: string;
 } & WidgetConfiguration;

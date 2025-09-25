@@ -43,8 +43,6 @@ export interface ConnectLoaderParams {
   allowedChains: ChainId[];
   isCheckNetworkEnabled?: boolean;
   allowlistWalletRdns: string[] | undefined;
-  blocklistWalletRdns: string[];
-  targetWalletRdns: string | undefined;
 }
 
 export function ConnectLoader({
@@ -64,7 +62,6 @@ export function ConnectLoader({
     browserProvider,
     isCheckNetworkEnabled,
     allowlistWalletRdns,
-    blocklistWalletRdns,
   } = params;
 
   const { t } = useTranslation();
@@ -259,7 +256,6 @@ export function ConnectLoader({
                       config={widgetConfig}
                       targetChainId={targetChainId}
                       allowlistWalletRdns={allowlistWalletRdns}
-                      blocklistWalletRdns={blocklistWalletRdns}
                       browserProvider={provider}
                       checkout={checkout}
                       deepLink={deepLink}
