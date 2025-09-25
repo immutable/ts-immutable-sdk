@@ -63,8 +63,8 @@ export interface WalletListProps {
 // eslint-disable-next-line max-len
 const getAllowedProviders = (providers: EIP6963ProviderDetail[], allowlist: string[] | undefined, blocklist: string[]) =>
   (allowlist ?
-    providers.filter((provider) => allowlist.includes(provider.info.rdns) && !blocklist.includes(provider.info.rdns)) :
-    providers);
+    providers.filter((provider) => !blocklist.includes(provider.info.rdns) && allowlist.includes(provider.info.rdns)) :
+    providers.filter((provider) => !blocklist.includes(provider.info.rdns)));
 
 export function WalletList(props: WalletListProps) {
   const { t } = useTranslation();
