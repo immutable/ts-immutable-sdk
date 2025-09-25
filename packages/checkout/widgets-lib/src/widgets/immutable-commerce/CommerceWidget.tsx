@@ -63,8 +63,6 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
     flowParams, flowConfig, widgetsConfig, checkout, browserProvider,
   } = props;
 
-  console.log({ flowConfig }); // contains CONNECT.blocklistWalletRdns
-
   const { t } = useTranslation();
   const viewState = useViewState();
   const [{ view, history }, viewDispatch] = viewState;

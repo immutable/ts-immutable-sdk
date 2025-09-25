@@ -95,7 +95,6 @@ export function WalletList(props: WalletListProps) {
     () => getAllowedProviders(providers, allowlistWalletRdns, blocklistWalletRdns),
     [providers, allowlistWalletRdns, blocklistWalletRdns],
   );
-  console.log({ allowedProviders, allowlistWalletRdns });
 
   const filteredProviders = useMemo(
     () => allowedProviders
