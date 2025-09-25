@@ -26,6 +26,8 @@ import {
   PassportModuleConfiguration,
   User,
   UserProfile,
+  ConnectEvmArguments,
+  LoginArguments,
 } from './types';
 import { ConfirmationScreen, EmbeddedLoginPrompt } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
@@ -163,9 +165,7 @@ export class Passport {
    * @param {boolean} options.announceProvider - Whether to announce the provider via EIP-6963 for wallet discovery (defaults to true)
    * @returns {Provider} The EVM provider instance
    */
-  public connectEvm(options: {
-    announceProvider: boolean
-  } = { announceProvider: true }): Promise<Provider> {
+  public connectEvm(options: ConnectEvmArguments = { announceProvider: true }): Promise<Provider> {
     return withMetricsAsync(async () => {
       const provider = new ZkEvmProvider({
         passportEventEmitter: this.passportEventEmitter,
@@ -203,13 +203,7 @@ export class Passport {
    * @throws {Error} If retrieving the cached user session fails (except for "Unknown or invalid refresh token" errors)
    *                and useCachedSession is true
    */
-  public async login(options?: {
-    useCachedSession?: boolean;
-    anonymousId?: string;
-    useSilentLogin?: boolean;
-    useRedirectFlow?: boolean;
-    directLoginOptions?: DirectLoginOptions;
-  }): Promise<UserProfile | null> {
+  public async login(options?: LoginArguments): Promise<UserProfile | null> {
     return withMetricsAsync(async () => {
       const { useCachedSession = false, useSilentLogin } = options || {};
       let user: User | null = null;

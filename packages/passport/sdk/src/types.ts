@@ -178,6 +178,18 @@ export type LinkedWallet = {
   clientName: string;
 };
 
+export type ConnectEvmArguments = {
+  announceProvider: boolean;
+};
+
+export type LoginArguments = {
+  useCachedSession?: boolean;
+  anonymousId?: string;
+  useSilentLogin?: boolean;
+  useRedirectFlow?: boolean;
+  directLoginOptions?: DirectLoginOptions;
+};
+
 export enum MarketingConsentStatus {
   OptedIn = 'opted_in',
   Unsubscribed = 'unsubscribed',
