@@ -19,6 +19,8 @@ export {
 export type {
   LinkWalletParams,
   LinkedWallet,
+  ConnectEvmArguments,
+  LoginArguments,
   UserProfile,
   PassportOverrides,
   PassportModuleConfiguration,
