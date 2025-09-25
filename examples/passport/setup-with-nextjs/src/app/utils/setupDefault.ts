@@ -27,6 +27,7 @@ export const passportInstanceWithDisabledOverlays = new passport.Passport({
   popupOverlayOptions: {
     disableGenericPopupOverlay: true,
     disableBlockedPopupOverlay: true,
+    disableHeadlessLoginPromptOverlay: true,
   },
 });
 

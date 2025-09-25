@@ -295,9 +295,6 @@ function CheckoutUI() {
         TRANSFER: {
           customTitle: "Dromedary Transfer",
         },
-        SALE: {
-          hideExcludedPaymentTypes: true,
-        },
         // ONRAMP: {},
       },
     });
