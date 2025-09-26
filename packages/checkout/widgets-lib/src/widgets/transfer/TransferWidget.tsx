@@ -204,7 +204,8 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
           viewState={viewState}
           setViewState={setViewState}
           onSend={onSend}
-          showBackButton={props.showBackButton}
+          showBackButton={props.showBackButton ?? false}
+          showHeader={props.transferConfig.showHeader ?? true}
           title={props.transferConfig.customTitle ?? t('views.TRANSFER.header.title')}
         />
       );
