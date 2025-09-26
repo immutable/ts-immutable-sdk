@@ -36,7 +36,7 @@ export function TransferForm({
   viewState: TransferFormState;
   setViewState: Dispatch<SetStateAction<TransferState>>;
   onSend: () => void;
-  showBackButton: boolean;
+  showBackButton: boolean | undefined;
   showHeader: boolean;
   title: string;
 }) {
