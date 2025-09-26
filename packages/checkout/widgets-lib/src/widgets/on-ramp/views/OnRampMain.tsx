@@ -43,6 +43,7 @@ interface OnRampProps {
   passport?: Passport;
   showBackButton?: boolean;
   showMenu?: boolean;
+  customTitle?: string;
   customSubTitle?: string;
 }
 export function OnRampMain({
@@ -52,6 +53,7 @@ export function OnRampMain({
   tokenAddress,
   showBackButton,
   showMenu,
+  customTitle,
   customSubTitle,
 }: OnRampProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -275,7 +277,7 @@ export function OnRampMain({
       <SimpleLayout
         header={(
           <HeaderNavigation
-            title={t('views.ONRAMP.header.title')}
+            title={customTitle ?? t('views.ONRAMP.header.title')}
             onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
             showBack={showBack}
             onBackButtonClick={() => {

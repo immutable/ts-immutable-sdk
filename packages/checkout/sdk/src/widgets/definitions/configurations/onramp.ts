@@ -6,6 +6,8 @@ import { WidgetConfiguration } from './widget';
 export type OnrampWidgetConfiguration = {
   /** Whether to show the menu in the Transak widget (default: true) */
   showMenu?: boolean;
+  /** The custom title to display in the widget header */
+  customTitle?: string;
   /** The custom subtitle to display on the exchange screen in the Transak widget (default: 'Buy') */
   customSubTitle?: string;
 } & WidgetConfiguration;
