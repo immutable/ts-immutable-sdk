@@ -29,6 +29,7 @@ export function TransferForm({
   setViewState,
   onSend,
   showBackButton,
+  showHeader,
   title,
 }: {
   config: StrongCheckoutWidgetsConfig;
@@ -36,6 +37,7 @@ export function TransferForm({
   setViewState: Dispatch<SetStateAction<TransferState>>;
   onSend: () => void;
   showBackButton: boolean | undefined;
+  showHeader: boolean;
   title: string;
 }) {
   const { t } = useTranslation();
@@ -137,7 +139,7 @@ export function TransferForm({
 
   return (
     <SimpleLayout
-      header={(
+      header={showHeader ? (
         <HeaderNavigation
           title={title}
           onCloseButtonClick={() => sendCloseWidgetEvent(eventTarget)}
@@ -150,7 +152,7 @@ export function TransferForm({
             );
           }}
         />
-      )}
+      ) : undefined}
     >
       <Stack
         justifyContent="space-between"
