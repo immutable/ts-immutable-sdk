@@ -8,7 +8,7 @@
     "@imtbl/x-client": "workspace:*",
     "@magic-ext/oidc": "12.0.5",
     "@metamask/detect-provider": "^2.0.0",
-    "axios": "^1.6.5",
+    "axios": "^1.12.0",
     "bn.js": "^5.2.1",
     "enc-utils": "^3.0.0",
     "ethers": "^6.13.4",

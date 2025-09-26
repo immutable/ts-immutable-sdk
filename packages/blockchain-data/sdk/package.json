@@ -7,7 +7,7 @@
   "dependencies": {
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
-    "axios": "^1.6.5"
+    "axios": "^1.12.0"
   },
   "devDependencies": {
     "@swc/core": "^1.3.36",
