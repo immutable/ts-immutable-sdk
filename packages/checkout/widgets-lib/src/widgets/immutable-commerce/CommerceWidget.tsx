@@ -324,7 +324,7 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
                 <OnRampWidget
                   config={widgetsConfig}
                   {...(view.data.params || {})}
-                  {...(view.data.config || {})}
+                  onrampConfig={view.data.config}
                   showBackButton={showBackButton}
                 />
               )}

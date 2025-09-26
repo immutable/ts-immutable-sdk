@@ -42,6 +42,8 @@ interface OnRampProps {
   tokenAddress?: string;
   passport?: Passport;
   showBackButton?: boolean;
+  showMenu?: boolean;
+  customSubTitle?: string;
 }
 export function OnRampMain({
   passport,
@@ -49,6 +51,8 @@ export function OnRampMain({
   tokenAmount,
   tokenAddress,
   showBackButton,
+  showMenu,
+  customSubTitle,
 }: OnRampProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -236,6 +240,8 @@ export function OnRampMain({
         tokenAddress,
         tokenAmount,
         passport,
+        showMenu,
+        customSubTitle,
       };
 
       setWidgetUrl(await checkout.createFiatRampUrl(params));
