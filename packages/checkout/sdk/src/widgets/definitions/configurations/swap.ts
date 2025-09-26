@@ -6,4 +6,5 @@ import { WidgetConfiguration } from './widget';
 export type SwapWidgetConfiguration = {
   customTitle?: string;
   customSubTitle?: string;
+  showHeader?: boolean;
 } & WidgetConfiguration;

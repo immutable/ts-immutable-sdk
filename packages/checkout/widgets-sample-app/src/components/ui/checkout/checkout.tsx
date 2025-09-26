@@ -287,7 +287,11 @@ function CheckoutUI() {
       config: {
         theme,
         language,
-        // SWAP: {},
+        /*
+        SWAP: {
+          showHeader: true,
+        },
+        */
         TRANSFER: {
           customTitle: "Dromedary Transfer",
         },
