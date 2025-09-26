@@ -74,6 +74,7 @@ export class Wallet extends Base<WidgetType.WALLET> {
       browserProvider: this.browserProvider,
       checkout: this.checkout,
       allowedChains: [this.checkout.config.l1ChainId, this.checkout.config.l2ChainId],
+      allowlistWalletRdns: undefined,
     };
 
     this.reactRoot.render(

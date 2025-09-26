@@ -124,6 +124,8 @@ export class Sale extends Base<WidgetType.SALE> {
       browserProvider: this.browserProvider,
       checkout: this.checkout,
       allowedChains: [this.checkout.config.l2ChainId],
+      allowlistWalletRdns: undefined,
+      walletProviderName: undefined,
     };
     const config = this.strongConfig();
 
