@@ -1,6 +1,6 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable max-len */
-import { TransferWidgetParams } from '@imtbl/checkout-sdk';
+import { TransferWidgetConfiguration, TransferWidgetParams } from '@imtbl/checkout-sdk';
 import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
@@ -32,6 +32,7 @@ import { EventTargetContext } from '../../context/event-target-context/EventTarg
 
 export type TransferWidgetInputs = TransferWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
+  transferConfig: TransferWidgetConfiguration;
 };
 
 const TRANSACTION_CANCELLED_ERROR_CODE = -32003;
@@ -191,7 +192,7 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
         setViewState({ ...viewState, type: 'FORM' }); // TODO: We should be showing a failed view here
       }
     }
-  }, [viewState, eventTarget]);
+  }, [viewState, eventTarget, track]);
 
   switch (viewState.type) {
     case 'INITIALISING':
@@ -204,6 +205,7 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
           setViewState={setViewState}
           onSend={onSend}
           showBackButton={props.showBackButton}
+          title={props.transferConfig.customTitle ?? t('views.TRANSFER.header.title')}
         />
       );
     case 'AWAITING_APPROVAL':

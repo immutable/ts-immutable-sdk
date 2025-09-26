@@ -198,6 +198,7 @@ function CheckoutUI() {
       amount: "10",
       fromTokenAddress: "native",
       toTokenAddress: "0x3B2d8A1931736Fc321C24864BceEe981B11c3c57",
+      showBackButton: true,
     },
     WALLET: {
       flow: CommerceFlowType.WALLET,
@@ -287,17 +288,10 @@ function CheckoutUI() {
         theme,
         language,
         // SWAP: {},
-        // BRIDGE: {},
-        // CONNECT: {},
+        TRANSFER: {
+          customTitle: "Dromedary Transfer",
+        },
         // ONRAMP: {},
-        SALE: {
-          hideExcludedPaymentTypes: true,
-          waitFulfillmentSettlements: false,
-        },
-        WALLET: {
-          showDisconnectButton: true,
-          showNetworkMenu: true,
-        },
       },
     });
   }, [widgetsFactory, browserProvider, renderAfterConnect]);
@@ -397,7 +391,6 @@ function CheckoutUI() {
       const params = new URLSearchParams(window.location.search);
       params.set("environment", environment);
       window.location.href = `${window.location.href}?${params.toString()}`;
-
     }
   }, [environment, prevEnvironment]);
 
