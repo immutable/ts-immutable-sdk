@@ -7,7 +7,7 @@ import {
 import { PassportConfiguration } from '../config';
 import EmbeddedLoginPromptOverlay from '../overlay/embeddedLoginPromptOverlay';
 
-const LOGIN_PROMPT_WINDOW_HEIGHT = 560;
+const LOGIN_PROMPT_WINDOW_HEIGHT = 660;
 const LOGIN_PROMPT_WINDOW_WIDTH = 440;
 const LOGIN_PROMPT_WINDOW_BORDER_RADIUS = '16px';
 const LOGIN_PROMPT_KEYFRAME_STYLES_ID = 'passport-embedded-login-keyframes';
