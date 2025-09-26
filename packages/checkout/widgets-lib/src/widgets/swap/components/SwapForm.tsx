@@ -79,6 +79,7 @@ export interface SwapFromProps {
   theme: WidgetTheme;
   cancelAutoProceed: () => void;
   subTitle: string;
+  transparentOverlay: boolean;
 }
 
 class PriceImpactError extends Error {
@@ -89,7 +90,7 @@ class PriceImpactError extends Error {
 }
 
 export function SwapForm({
-  data, theme, cancelAutoProceed, subTitle,
+  data, theme, cancelAutoProceed, subTitle, transparentOverlay,
 }: SwapFromProps) {
   const { t } = useTranslation();
   const {
@@ -1009,6 +1010,7 @@ export function SwapForm({
               screen="SwapCoins"
               environment={checkout?.config.environment}
               theme={theme}
+              transparentOverlay={transparentOverlay}
             />
           </Box>
 
@@ -1087,6 +1089,7 @@ export function SwapForm({
               screen="SwapCoins"
               environment={checkout?.config.environment}
               theme={theme}
+              transparentOverlay={transparentOverlay}
             />
           </Box>
         </Box>

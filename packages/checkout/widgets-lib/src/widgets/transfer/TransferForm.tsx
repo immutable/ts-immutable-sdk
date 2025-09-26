@@ -31,6 +31,7 @@ export function TransferForm({
   showBackButton,
   showHeader,
   title,
+  transparentOverlay,
 }: {
   config: StrongCheckoutWidgetsConfig;
   viewState: TransferFormState;
@@ -39,6 +40,7 @@ export function TransferForm({
   showBackButton: boolean | undefined;
   showHeader: boolean;
   title: string;
+  transparentOverlay: boolean;
 }) {
   const { t } = useTranslation();
   const { track } = useAnalytics();
@@ -189,6 +191,7 @@ export function TransferForm({
               userJourney={UserJourney.TRANSFER}
               screen="TransferToken"
               control="Token"
+              transparentOverlay={transparentOverlay}
             />
           </Stack>
           <Stack gap="base.spacing.x1">

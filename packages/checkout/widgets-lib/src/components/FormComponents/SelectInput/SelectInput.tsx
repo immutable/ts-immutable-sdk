@@ -12,7 +12,6 @@ import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface SelectInputProps {
-
   testId: string;
   options: CoinSelectorOptionProps[];
   selectTextAlign?: 'left' | 'right';
@@ -39,6 +38,7 @@ interface SelectInputProps {
   userJourney: UserJourney;
   screen: string;
   control: string;
+  transparentOverlay: boolean;
   environment?: Environment;
   theme?: WidgetTheme;
 }
@@ -70,6 +70,7 @@ export function SelectInput({
   userJourney,
   screen,
   control,
+  transparentOverlay,
   environment,
   theme,
 }: SelectInputProps) {
@@ -92,6 +93,7 @@ export function SelectInput({
           screen={screen}
           environment={environment}
           theme={theme}
+          transparentOverlay={transparentOverlay}
         />
       </Box>
       <Box sx={inputStyle}>

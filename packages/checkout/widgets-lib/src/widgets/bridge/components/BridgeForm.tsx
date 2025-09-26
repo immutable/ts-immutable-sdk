@@ -50,6 +50,7 @@ interface BridgeFormProps {
   defaultTokenImage: string;
   environment?: Environment;
   theme?: WidgetTheme;
+  transparentOverlay: boolean;
 }
 
 export function BridgeForm(props: BridgeFormProps) {
@@ -78,6 +79,7 @@ export function BridgeForm(props: BridgeFormProps) {
     defaultTokenImage,
     environment,
     theme,
+    transparentOverlay,
   } = props;
 
   const { track } = useAnalytics();
@@ -389,6 +391,7 @@ export function BridgeForm(props: BridgeFormProps) {
               defaultTokenImage={defaultTokenImage}
               environment={environment}
               theme={theme}
+              transparentOverlay={transparentOverlay}
             />
             <TextInputForm
               testId="bridge-amount"
