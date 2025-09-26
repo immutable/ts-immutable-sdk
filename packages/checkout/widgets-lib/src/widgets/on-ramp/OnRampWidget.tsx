@@ -141,6 +141,7 @@ export default function OnRampWidget({
           }
           showBackButton={showBackButton}
           showMenu={onrampConfig?.showMenu}
+          customTitle={onrampConfig?.customTitle}
           customSubTitle={onrampConfig?.customSubTitle}
         />
       )}
