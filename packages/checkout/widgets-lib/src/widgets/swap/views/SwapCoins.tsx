@@ -32,6 +32,7 @@ export interface SwapCoinsProps {
   fromTokenAddress?: string;
   toTokenAddress?: string;
   showBackButton?: boolean;
+  showHeader?: boolean;
   title: string;
   subTitle: string;
 }
@@ -44,6 +45,7 @@ export function SwapCoins({
   fromTokenAddress,
   toTokenAddress,
   showBackButton,
+  showHeader,
   title,
   subTitle,
 }: SwapCoinsProps) {
@@ -90,7 +92,7 @@ export function SwapCoins({
 
   return (
     <SimpleLayout
-      header={!autoProceed ? (
+      header={!autoProceed && showHeader ? (
         <HeaderNavigation
           title={title}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
@@ -103,7 +105,7 @@ export function SwapCoins({
             );
           }}
         />
-      ) : ''}
+      ) : undefined}
       footer={<QuickswapFooter environment={checkout?.config.environment} theme={theme} />}
     >
       <Box
