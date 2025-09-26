@@ -37,7 +37,6 @@ export default class EmbeddedLoginPrompt {
       @keyframes passportEmbeddedLoginPromptPopBounceIn {
         0% {
           opacity: 0.5;
-          transform: scale(0.9);
         }
         50% {
           opacity: 1;
@@ -84,8 +83,8 @@ export default class EmbeddedLoginPrompt {
 
     // Animation styles
     embeddedLoginPrompt.style.opacity = '0';
-    embeddedLoginPrompt.style.transform = 'scale(0.9)';
-    embeddedLoginPrompt.style.animation = 'passportEmbeddedLoginPromptPopBounceIn 0.8s ease 0.2s forwards';
+    embeddedLoginPrompt.style.transform = 'scale(0.6)';
+    embeddedLoginPrompt.style.animation = 'passportEmbeddedLoginPromptPopBounceIn 1s ease forwards';
     EmbeddedLoginPrompt.appendIFrameStylesIfNeeded();
 
     return embeddedLoginPrompt;
