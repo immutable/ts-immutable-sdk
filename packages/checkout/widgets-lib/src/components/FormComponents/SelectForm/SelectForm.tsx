@@ -27,6 +27,7 @@ interface SelectFormProps {
   control: string;
   environment?: Environment;
   theme?: WidgetTheme,
+  transparentOverlay: boolean;
 }
 
 export function SelectForm({
@@ -44,6 +45,7 @@ export function SelectForm({
   userJourney,
   screen,
   control,
+  transparentOverlay,
   environment = Environment.PRODUCTION,
   theme = WidgetTheme.DARK,
 }: SelectFormProps) {
@@ -87,6 +89,7 @@ export function SelectForm({
         optionsLoading={optionsLoading ?? false}
         visible={coinSelectorOpen}
         onCloseDrawer={() => setCoinSelectorOpen(false)}
+        transparentOverlay={transparentOverlay}
       />
       <FormControlWrapper
         testId={`${testId}-select-control`}

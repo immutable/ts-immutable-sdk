@@ -34,6 +34,7 @@ export interface SwapCoinsProps {
   showBackButton?: boolean;
   title: string;
   subTitle: string;
+  transparentOverlay: boolean;
 }
 
 export function SwapCoins({
@@ -46,6 +47,7 @@ export function SwapCoins({
   showBackButton,
   title,
   subTitle,
+  transparentOverlay,
 }: SwapCoinsProps) {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
@@ -124,6 +126,7 @@ export function SwapCoins({
           }}
           theme={theme}
           subTitle={subTitle}
+          transparentOverlay={transparentOverlay}
         />
         <NotEnoughImx
           environment={checkout?.config.environment ?? Environment.PRODUCTION}

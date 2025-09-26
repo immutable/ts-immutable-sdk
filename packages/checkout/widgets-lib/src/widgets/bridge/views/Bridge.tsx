@@ -24,6 +24,7 @@ export interface BridgeProps {
   tokenAddress?: string;
   defaultTokenImage: string;
   theme: WidgetTheme;
+  transparentOverlay: boolean;
 }
 
 export function Bridge({
@@ -31,6 +32,7 @@ export function Bridge({
   tokenAddress,
   defaultTokenImage,
   theme,
+  transparentOverlay,
 }: BridgeProps) {
   const { t } = useTranslation();
   const { bridgeState, bridgeDispatch } = useContext(BridgeContext);
@@ -123,6 +125,7 @@ export function Bridge({
         defaultTokenImage={defaultTokenImage}
         environment={checkout?.config.environment}
         theme={theme}
+        transparentOverlay={transparentOverlay}
       />
     </SimpleLayout>
   );
