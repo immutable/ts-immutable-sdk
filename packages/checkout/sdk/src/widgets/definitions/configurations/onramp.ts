@@ -10,4 +10,6 @@ export type OnrampWidgetConfiguration = {
   customTitle?: string;
   /** The custom subtitle to display on the exchange screen in the Transak widget (default: 'Buy') */
   customSubTitle?: string;
+  /** Whether to show the header (default: true) */
+  showHeader?: boolean;
 } & WidgetConfiguration;
