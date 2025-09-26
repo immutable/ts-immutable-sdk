@@ -31,13 +31,13 @@ describe('signMetaTransactions', () => {
         data: '0x',
       },
     ];
-    const nonce = 0;
-    const chainId = 1779;
+    const nonce = 0n;
+    const chainId = 1779n;
 
     const signature = await signMetaTransactions(
       transactions,
       nonce,
-      BigInt(chainId),
+      chainId,
       walletAddress,
       signer,
     );

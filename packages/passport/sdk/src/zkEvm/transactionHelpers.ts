@@ -1,7 +1,6 @@
 import { Flow } from '@imtbl/metrics';
 import {
   Signer, TransactionRequest, JsonRpcProvider,
-  BigNumberish,
 } from 'ethers';
 import {
   getEip155ChainId,
@@ -11,7 +10,7 @@ import {
   getNonce,
 } from './walletHelpers';
 import { RelayerClient } from './relayerClient';
-import GuardianClient, { convertBigNumberishToString } from '../guardian';
+import GuardianClient from '../guardian';
 import {
   FeeOption,
   MetaTransaction,
@@ -75,11 +74,10 @@ const getFeeOption = async (
  */
 const buildMetaTransactions = async (
   transactionRequest: TransactionRequest,
-  rpcProvider: JsonRpcProvider,
   relayerClient: RelayerClient,
   zkevmAddress: string,
-  nonceSpace?: bigint,
-): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
+  flow: Flow,
+): Promise<MetaTransaction[]> => {
   if (!transactionRequest.to) {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
@@ -87,39 +85,27 @@ const buildMetaTransactions = async (
     );
   }
 
-  const metaTransaction: MetaTransaction = {
+  const metaTransactions: MetaTransaction[] = [{
     to: transactionRequest.to.toString(),
     data: transactionRequest.data,
-    nonce: BigInt(0), // NOTE: We don't need a valid nonce to estimate the fee
     value: transactionRequest.value,
     revertOnError: true,
-  };
+  }];
 
   // Estimate the fee and get the nonce from the smart wallet
-  const [nonce, feeOption] = await Promise.all([
-    getNonce(rpcProvider, zkevmAddress, nonceSpace),
-    getFeeOption(metaTransaction, zkevmAddress, relayerClient),
-  ]);
-
-  // Build the meta transactions array with a valid nonce and fee transaction
-  const metaTransactions: [MetaTransaction, ...MetaTransaction[]] = [
-    {
-      ...metaTransaction,
-      nonce,
-    },
-  ];
+  const feeOption = await getFeeOption(metaTransactions[0], zkevmAddress, relayerClient);
 
   // Add a fee transaction if the fee is non-zero
   const feeValue = BigInt(feeOption.tokenPrice);
   if (feeValue !== BigInt(0)) {
     metaTransactions.push({
-      nonce,
       to: feeOption.recipientAddress,
       value: feeValue,
       revertOnError: true,
     });
   }
 
+  flow.addEvent('endBuildMetaTransactions');
   return metaTransactions;
 };
 
@@ -166,6 +152,12 @@ export const pollRelayerTransaction = async (
   return relayerTransaction;
 };
 
+const detectNetwork = async (rpcProvider: JsonRpcProvider, flow: Flow) => {
+  const network = await rpcProvider.getNetwork();
+  flow.addEvent('endDetectNetwork');
+  return network;
+};
+
 export const prepareAndSignTransaction = async ({
   transactionRequest,
   ethSigner,
@@ -177,30 +169,23 @@ export const prepareAndSignTransaction = async ({
   nonceSpace,
   isBackgroundTransaction,
 }: TransactionParams & { transactionRequest: TransactionRequest }) => {
-  const { chainId } = await rpcProvider.getNetwork();
-  const chainIdBigNumber = BigInt(chainId);
-  flow.addEvent('endDetectNetwork');
-
-  const metaTransactions = await buildMetaTransactions(
-    transactionRequest,
-    rpcProvider,
-    relayerClient,
-    zkEvmAddress,
-    nonceSpace,
-  );
-  flow.addEvent('endBuildMetaTransactions');
-
-  const { nonce } = metaTransactions[0];
-  if (typeof nonce === 'undefined') {
-    throw new Error('Failed to retrieve nonce from the smart wallet');
-  }
+  const [metaTransactions, nonce, network] = await Promise.all([
+    buildMetaTransactions(
+      transactionRequest,
+      relayerClient,
+      zkEvmAddress,
+      flow,
+    ),
+    getNonce(rpcProvider, zkEvmAddress, nonceSpace),
+    detectNetwork(rpcProvider, flow),
+  ]);
 
   // Parallelize the validation and signing of the transaction
   // without waiting for the validation to complete
   const validateTransaction = async () => {
     await guardianClient.validateEVMTransaction({
-      chainId: getEip155ChainId(Number(chainId)),
-      nonce: convertBigNumberishToString(nonce),
+      chainId: getEip155ChainId(Number(network.chainId)),
+      nonce: nonce.toString(),
       metaTransactions,
       isBackgroundTransaction,
     });
@@ -213,7 +198,7 @@ export const prepareAndSignTransaction = async ({
     const signed = await signMetaTransactions(
       metaTransactions,
       nonce,
-      chainIdBigNumber,
+      network.chainId,
       zkEvmAddress,
       ethSigner,
     );
@@ -234,7 +219,7 @@ export const prepareAndSignTransaction = async ({
 
 const buildMetaTransactionForEjection = async (
   transactionRequest: TransactionRequest,
-): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
+): Promise<MetaTransaction> => {
   if (!transactionRequest.to) {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
@@ -242,29 +227,34 @@ const buildMetaTransactionForEjection = async (
     );
   }
 
-  if (typeof transactionRequest.nonce === 'undefined') {
+  const metaTransaction: MetaTransaction = {
+    to: transactionRequest.to.toString(),
+    data: transactionRequest.data,
+    value: transactionRequest.value,
+    revertOnError: true,
+  };
+
+  return metaTransaction;
+};
+
+const parseNonce = (transactionRequest: TransactionRequest): bigint => {
+  if (typeof transactionRequest.nonce === 'undefined' || transactionRequest.nonce === null) {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
       'im_signEjectionTransaction requires a "nonce" field',
     );
   }
+  return BigInt(transactionRequest.nonce);
+};
 
-  if (!transactionRequest.chainId) {
+const parseChainId = (transactionRequest: TransactionRequest): bigint => {
+  if (typeof transactionRequest.chainId === 'undefined' || transactionRequest.chainId === null) {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
       'im_signEjectionTransaction requires a "chainId" field',
     );
   }
-
-  const metaTransaction: MetaTransaction = {
-    to: transactionRequest.to.toString(),
-    data: transactionRequest.data,
-    nonce: transactionRequest.nonce ?? undefined,
-    value: transactionRequest.value,
-    revertOnError: true,
-  };
-
-  return [metaTransaction];
+  return BigInt(transactionRequest.chainId);
 };
 
 export const prepareAndSignEjectionTransaction = async ({
@@ -273,15 +263,17 @@ export const prepareAndSignEjectionTransaction = async ({
   zkEvmAddress,
   flow,
 }: EjectionTransactionParams & { transactionRequest: TransactionRequest }): Promise<EjectionTransactionResponse> => {
+  const nonce = parseNonce(transactionRequest);
+  const chainId = parseChainId(transactionRequest);
   const metaTransaction = await buildMetaTransactionForEjection(
     transactionRequest,
   );
   flow.addEvent('endBuildMetaTransactions');
 
   const signedTransaction = await signMetaTransactions(
-    metaTransaction,
-    transactionRequest.nonce as BigNumberish,
-    BigInt(transactionRequest.chainId ?? 0),
+    [metaTransaction],
+    nonce,
+    chainId,
     zkEvmAddress,
     ethSigner,
   );
