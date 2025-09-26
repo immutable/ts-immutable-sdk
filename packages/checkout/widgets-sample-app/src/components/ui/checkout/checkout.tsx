@@ -291,7 +291,13 @@ function CheckoutUI() {
         TRANSFER: {
           customTitle: "Dromedary Transfer",
         },
-        // ONRAMP: {},
+        /*
+        ONRAMP: {
+          customTitle: "Dromedary On-Ramp",
+          customSubTitle: "Camel On-Ramp",
+          showMenu: true,
+        },
+        */
       },
     });
   }, [widgetsFactory, browserProvider, renderAfterConnect]);
