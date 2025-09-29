@@ -65,6 +65,13 @@ describe('EmbeddedLoginPrompt', () => {
       const href = (embeddedLoginPrompt as any).getHref();
       expect(href).toBe(`https://auth.immutable.com/im-embedded-login-prompt?client_id=${mockClientId}&rid=undefined`);
     });
+
+    it('should generate correct href with anonymous ID', () => {
+      const anonymousId = 'hello-world-123';
+      const href = (embeddedLoginPrompt as any).getHref(anonymousId);
+      expect(href).toBe('https://auth.immutable.com/im-embedded-login-prompt?'
+        + `client_id=${mockClientId}&rid=undefined&third_party_a_id=${anonymousId}`);
+    });
   });
 
   describe('appendIFrameStylesIfNeeded', () => {
