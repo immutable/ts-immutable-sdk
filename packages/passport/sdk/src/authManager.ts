@@ -250,7 +250,7 @@ export default class AuthManager {
         const {
           imPassportTraceId: embeddedLoginPromptImPassportTraceId,
           ...embeddedLoginPromptDirectLoginOptions
-        } = await this.embeddedLoginPrompt.displayEmbeddedLoginPrompt();
+        } = await this.embeddedLoginPrompt.displayEmbeddedLoginPrompt(anonymousId);
         directLoginOptionsToUse = embeddedLoginPromptDirectLoginOptions;
         imPassportTraceId = embeddedLoginPromptImPassportTraceId;
       }
