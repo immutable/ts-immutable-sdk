@@ -1,5 +1,4 @@
 import {
-  BridgeWidgetConfiguration,
   BridgeWidgetParams,
   Checkout,
   IMTBLWidgetEvents,
@@ -69,7 +68,6 @@ export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
   checkout: Checkout;
   browserProvider?: WrappedBrowserProvider;
-  bridgeConfig?: BridgeWidgetConfiguration;
 };
 
 export default function BridgeWidget({
@@ -79,7 +77,6 @@ export default function BridgeWidget({
   amount,
   tokenAddress,
   showBackButton,
-  bridgeConfig,
 }: BridgeWidgetInputs) {
   const { t } = useTranslation();
   const {
@@ -88,6 +85,7 @@ export default function BridgeWidget({
     isSwapEnabled,
     isBridgeEnabled,
     theme,
+    themeOverrides,
   } = config;
   const defaultTokenImage = getDefaultTokenImage(checkout.config.environment, theme);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
@@ -214,7 +212,7 @@ export default function BridgeWidget({
               tokenAddress={tokenAddress}
               defaultTokenImage={defaultTokenImage}
               theme={theme}
-              transparentOverlay={bridgeConfig?.transparentOverlay ?? false}
+              themeOverrides={themeOverrides}
             />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_REVIEW && (
