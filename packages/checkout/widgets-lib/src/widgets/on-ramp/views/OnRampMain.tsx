@@ -56,7 +56,7 @@ export function OnRampMain({
   showMenu,
   customTitle,
   customSubTitle,
-  showHeader,
+  showHeader = true,
 }: OnRampProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -277,7 +277,7 @@ export function OnRampMain({
   return (
     <Box sx={boxMainStyle(showIframe)}>
       <SimpleLayout
-        header={(showHeader ?? true) ? (
+        header={showHeader ? (
           <HeaderNavigation
             title={customTitle ?? t('views.ONRAMP.header.title')}
             onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
