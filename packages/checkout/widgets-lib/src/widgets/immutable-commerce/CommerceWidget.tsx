@@ -246,7 +246,6 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
             checkout={checkout}
             browserProvider={browserProvider}
             showBackButton={showBackButton}
-            bridgeConfig={view.data.config}
             {...(view.data.params || {})}
           />
         )}

@@ -49,8 +49,6 @@ export class CommerceWidgetRoot extends Base<WidgetType.IMMUTABLE_COMMERCE> {
       else validatedConfig.theme = WidgetTheme.DARK;
     }
 
-    console.log({ validatedConfig });
-
     // TODO: validate configs for each widget
     return {
       config: validatedConfig,
@@ -305,8 +303,6 @@ export class CommerceWidgetRoot extends Base<WidgetType.IMMUTABLE_COMMERCE> {
     if (!this.reactRoot) return;
 
     const { t } = i18n;
-
-    console.log({ strongConfig: this.strongConfig() });
 
     this.reactRoot.render(
       <CustomAnalyticsProvider checkout={this.checkout}>
