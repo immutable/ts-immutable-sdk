@@ -68,6 +68,7 @@ describe('withDefaultWidgetConfig', () => {
       } as any),
     ).toEqual({
       theme: DEFAULT_THEME,
+      themeOverrides: {},
       environment: Environment.PRODUCTION,
       isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
       isSwapEnabled: DEFAULT_SWAP_ENABLED,
