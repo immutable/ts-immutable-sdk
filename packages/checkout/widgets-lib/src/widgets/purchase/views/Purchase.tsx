@@ -5,6 +5,7 @@ import {
 import {
   Checkout, WalletProviderRdns, EIP6963ProviderInfo, ChainId,
   WrappedBrowserProvider,
+  ThemeOverrides,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { t } from 'i18next';
@@ -59,6 +60,7 @@ interface PurchaseProps {
   showBackButton?: boolean;
   onCloseButtonClick?: () => void;
   onBackButtonClick?: () => void;
+  themeOverrides: ThemeOverrides;
 }
 
 export function Purchase({
@@ -67,6 +69,7 @@ export function Purchase({
   onCloseButtonClick,
   showBackButton,
   onBackButtonClick,
+  themeOverrides,
 }: PurchaseProps) {
   const [showPayWithWalletDrawer, setShowPayWithWalletDrawer] = useState(false);
   const [showDeliverToWalletDrawer, setShowDeliverToWalletDrawer] = useState(false);
@@ -686,12 +689,14 @@ export function Purchase({
         onConnect={handleWalletConnected}
         insufficientBalance={insufficientBalance}
         showOnRampOption={shouldShowOnRampOption}
+        drawerBackground={themeOverrides.drawerBackground}
       />
       <PurchaseDeliverToWalletDrawer
         visible={showDeliverToWalletDrawer}
         walletOptions={walletOptions}
         onClose={handleDeliverToWalletClose}
         onConnect={() => undefined}
+        drawerBackground={themeOverrides.drawerBackground}
       />
       <RouteOptionsDrawer
         checkout={checkout}

@@ -1,7 +1,7 @@
 import { useContext, useEffect } from 'react';
 import { Body, Box, Heading } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
-import { ChainId } from '@imtbl/checkout-sdk';
+import { ChainId, ThemeOverrides } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -17,6 +17,7 @@ export interface ConnectWalletProps {
   checkNetwork: boolean;
   showBackButton?: boolean;
   onBackButtonClick?: () => void;
+  themeOverrides: ThemeOverrides;
 }
 
 export function ConnectWallet({
@@ -27,6 +28,7 @@ export function ConnectWallet({
   checkNetwork,
   showBackButton,
   onBackButtonClick,
+  themeOverrides,
 }: ConnectWalletProps) {
   const { t } = useTranslation();
   const {
@@ -88,6 +90,7 @@ export function ConnectWallet({
           allowedChains={allowedChains}
           blocklistWalletRdns={blocklistWalletRdns}
           isCheckNetworkEnabled={checkNetwork}
+          themeOverrides={themeOverrides}
         />
       </Box>
     </SimpleLayout>

@@ -204,7 +204,7 @@ export default function BridgeWidget({
       <BridgeContext.Provider value={bridgeReducerValues}>
         <CryptoFiatProvider environment={environment}>
           {viewState.view.type === BridgeWidgetViews.WALLET_NETWORK_SELECTION && (
-            <WalletNetworkSelectionView showBackButton={showBackButton} />
+            <WalletNetworkSelectionView showBackButton={showBackButton} themeOverrides={themeOverrides} />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_FORM && (
             <Bridge
@@ -259,7 +259,11 @@ export default function BridgeWidget({
             />
           )}
           {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (
-            <Transactions onBackButtonClick={goBackToWalletNetworkSelector} defaultTokenImage={defaultTokenImage} />
+            <Transactions
+              onBackButtonClick={goBackToWalletNetworkSelector}
+              defaultTokenImage={defaultTokenImage}
+              themeOverrides={themeOverrides}
+            />
           )}
           {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL && (
             <ClaimWithdrawal transaction={viewState.view.transaction} />

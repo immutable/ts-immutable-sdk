@@ -191,6 +191,7 @@ export default function PurchaseWidget({
                 checkout={checkout}
                 environmentId={environmentId!}
                 showBackButton={showBackButton}
+                themeOverrides={config.themeOverrides}
                 onCloseButtonClick={() => sendPurchaseCloseEvent(eventTarget)}
                 onBackButtonClick={() => {
                   orchestrationEvents.sendRequestGoBackEvent(

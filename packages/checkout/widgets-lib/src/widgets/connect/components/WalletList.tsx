@@ -7,6 +7,7 @@ import {
   WrappedBrowserProvider,
   WalletProviderName,
   WalletProviderRdns,
+  ThemeOverrides,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -57,6 +58,7 @@ export interface WalletListProps {
   allowedChains: ChainId[];
   blocklistWalletRdns?: string[];
   isCheckNetworkEnabled: boolean;
+  themeOverrides: ThemeOverrides;
 }
 
 export function WalletList(props: WalletListProps) {
@@ -66,6 +68,7 @@ export function WalletList(props: WalletListProps) {
     targetChainId,
     allowedChains,
     isCheckNetworkEnabled,
+    themeOverrides,
   } = props;
   const blocklistWalletRdns = props?.blocklistWalletRdns || [];
   const {
@@ -434,6 +437,7 @@ export function WalletList(props: WalletListProps) {
           setShowWalletDrawer(show);
         }}
         onWalletChange={handleWalletChange}
+        drawerBackground={themeOverrides.drawerBackground}
       />
 
       <ChangedYourMindDrawer

@@ -35,7 +35,9 @@ interface WalletDrawerProps {
     label: string;
     rdns: string;
   }[];
+  drawerBackground: string | undefined;
 }
+
 export function WalletDrawer({
   testId,
   drawerText,
@@ -48,6 +50,7 @@ export function WalletDrawer({
   menuItemSize,
   bottomSlot,
   disabledOptions,
+  drawerBackground,
 }: WalletDrawerProps) {
   const { t } = useTranslation();
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
@@ -105,6 +108,7 @@ export function WalletDrawer({
         setShowDrawer(false);
       }}
       visible={showDrawer}
+      bgOverlaySx={drawerBackground ? { background: drawerBackground } : undefined}
     >
       {showWalletSelectorTarget && (
         <Drawer.Target>
