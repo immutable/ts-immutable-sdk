@@ -4,7 +4,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { IMTBLWidgetEvents, WidgetTheme } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, ThemeOverrides, WidgetTheme } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
@@ -26,6 +26,7 @@ import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 
 export interface SwapCoinsProps {
   theme: WidgetTheme;
+  themeOverrides: ThemeOverrides;
   cancelAutoProceed: () => void;
   fromAmount?: string;
   toAmount?: string;
@@ -34,11 +35,11 @@ export interface SwapCoinsProps {
   showBackButton?: boolean;
   title: string;
   subTitle: string;
-  transparentOverlay: boolean;
 }
 
 export function SwapCoins({
   theme,
+  themeOverrides,
   cancelAutoProceed,
   fromAmount,
   toAmount,
@@ -47,7 +48,6 @@ export function SwapCoins({
   showBackButton,
   title,
   subTitle,
-  transparentOverlay,
 }: SwapCoinsProps) {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
@@ -125,8 +125,8 @@ export function SwapCoins({
             toTokenAddress,
           }}
           theme={theme}
+          themeOverrides={themeOverrides}
           subTitle={subTitle}
-          transparentOverlay={transparentOverlay}
         />
         <NotEnoughImx
           environment={checkout?.config.environment ?? Environment.PRODUCTION}

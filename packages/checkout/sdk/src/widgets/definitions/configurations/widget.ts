@@ -1,4 +1,4 @@
-import { WidgetTheme } from './theme';
+import { ThemeOverrides, WidgetTheme } from './theme';
 
 /**
  * Widget Configuration represents the shared configuration options for the Commerce Widgets.
@@ -9,6 +9,7 @@ import { WidgetTheme } from './theme';
 export type WidgetConfiguration = {
   /** The theme of the Commerce Widget (default: "DARK") */
   theme?: WidgetTheme;
+  themeOverrides?: ThemeOverrides;
   language?: WidgetLanguage;
   walletConnect?: WalletConnectConfig;
 };

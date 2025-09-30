@@ -1,5 +1,5 @@
 import { Box, OptionKey } from '@biom3/react';
-import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { ThemeOverrides, WidgetTheme } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import {
   inputStyle,
@@ -38,9 +38,9 @@ interface SelectInputProps {
   userJourney: UserJourney;
   screen: string;
   control: string;
-  transparentOverlay: boolean;
   environment?: Environment;
-  theme?: WidgetTheme;
+  theme: WidgetTheme;
+  themeOverrides: ThemeOverrides;
 }
 
 export function SelectInput({
@@ -70,9 +70,9 @@ export function SelectInput({
   userJourney,
   screen,
   control,
-  transparentOverlay,
   environment,
   theme,
+  themeOverrides,
 }: SelectInputProps) {
   return (
     <Box sx={selectInputBoxStyle}>
@@ -93,7 +93,7 @@ export function SelectInput({
           screen={screen}
           environment={environment}
           theme={theme}
-          transparentOverlay={transparentOverlay}
+          themeOverrides={themeOverrides}
         />
       </Box>
       <Box sx={inputStyle}>

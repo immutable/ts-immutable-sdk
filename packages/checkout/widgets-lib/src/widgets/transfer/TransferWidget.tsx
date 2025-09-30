@@ -207,7 +207,6 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
           showBackButton={props.showBackButton}
           showHeader={props.transferConfig.showHeader ?? true}
           title={props.transferConfig.customTitle ?? t('views.TRANSFER.header.title')}
-          transparentOverlay={props.transferConfig.transparentOverlay ?? false}
         />
       );
     case 'AWAITING_APPROVAL':

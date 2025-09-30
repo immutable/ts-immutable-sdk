@@ -71,7 +71,7 @@ export default function SwapWidget({
   autoProceed,
   direction,
   showBackButton,
-  swapConfig: { customTitle, customSubTitle, transparentOverlay },
+  swapConfig: { customTitle, customSubTitle },
   walletProviderName,
 }: SwapWidgetInputs) {
   const { t } = useTranslation();
@@ -81,6 +81,7 @@ export default function SwapWidget({
 
   const {
     theme,
+    themeOverrides,
     isOnRampEnabled,
     isSwapEnabled,
     isBridgeEnabled,
@@ -254,6 +255,7 @@ export default function SwapWidget({
             {viewState.view.type === SwapWidgetViews.SWAP && (
             <SwapCoins
               theme={theme}
+              themeOverrides={themeOverrides}
               cancelAutoProceed={cancelAutoProceed}
               fromAmount={viewState.view.data?.fromAmount ?? fromAmount}
               toAmount={viewState.view.data?.toAmount ?? toAmount}
@@ -262,7 +264,6 @@ export default function SwapWidget({
               showBackButton={showBackButton}
               title={customTitle ?? t('views.SWAP.header.title')}
               subTitle={customSubTitle ?? t('views.SWAP.content.title')}
-              transparentOverlay={transparentOverlay ?? false}
             />
             )}
             {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (

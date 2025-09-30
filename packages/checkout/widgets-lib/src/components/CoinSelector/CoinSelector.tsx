@@ -18,7 +18,7 @@ type CoinSelectorProps = {
   optionsLoading?: boolean;
   children?: any;
   visible?: boolean;
-  transparentOverlay: boolean;
+  drawerBackground: string | undefined;
 };
 
 const filterOptions = (filterBy: string, options: CoinSelectorOptionProps[]) => {
@@ -29,7 +29,7 @@ const filterOptions = (filterBy: string, options: CoinSelectorOptionProps[]) => 
 };
 
 export function CoinSelector({
-  heading, options, defaultTokenImage, optionsLoading, children, onCloseDrawer, visible, transparentOverlay,
+  heading, options, defaultTokenImage, optionsLoading, children, onCloseDrawer, visible, drawerBackground,
 }: CoinSelectorProps) {
   const { t } = useTranslation();
 
@@ -57,7 +57,7 @@ export function CoinSelector({
       size="full"
       onCloseDrawer={handleCloseDrawer}
       visible={visible}
-      bgOverlaySx={transparentOverlay ? { backgroundColor: 'transparent' } : undefined}
+      bgOverlaySx={drawerBackground ? { background: drawerBackground } : undefined}
     >
       <Drawer.Target>
         {children}

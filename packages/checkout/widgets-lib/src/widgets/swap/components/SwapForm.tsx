@@ -6,6 +6,7 @@ import {
   Box, ButtCon, Heading, Icon, OptionKey, Tooltip, Body,
 } from '@biom3/react';
 import {
+  ThemeOverrides,
   TokenInfo,
   WidgetTheme,
 } from '@imtbl/checkout-sdk';
@@ -77,9 +78,9 @@ let quoteRequest: CancellablePromise<any>;
 export interface SwapFromProps {
   data?: SwapFormData;
   theme: WidgetTheme;
+  themeOverrides: ThemeOverrides;
   cancelAutoProceed: () => void;
   subTitle: string;
-  transparentOverlay: boolean;
 }
 
 class PriceImpactError extends Error {
@@ -90,7 +91,7 @@ class PriceImpactError extends Error {
 }
 
 export function SwapForm({
-  data, theme, cancelAutoProceed, subTitle, transparentOverlay,
+  data, theme, themeOverrides, cancelAutoProceed, subTitle,
 }: SwapFromProps) {
   const { t } = useTranslation();
   const {
@@ -1010,7 +1011,7 @@ export function SwapForm({
               screen="SwapCoins"
               environment={checkout?.config.environment}
               theme={theme}
-              transparentOverlay={transparentOverlay}
+              themeOverrides={themeOverrides}
             />
           </Box>
 
@@ -1089,7 +1090,7 @@ export function SwapForm({
               screen="SwapCoins"
               environment={checkout?.config.environment}
               theme={theme}
-              transparentOverlay={transparentOverlay}
+              themeOverrides={themeOverrides}
             />
           </Box>
         </Box>
