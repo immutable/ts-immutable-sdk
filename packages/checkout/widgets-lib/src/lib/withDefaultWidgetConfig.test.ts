@@ -12,7 +12,7 @@ import {
 
 describe('withDefaultWidgetConfig', () => {
   it('empty config returns defaults', () => {
-    expect(withDefaultWidgetConfigs({})).toEqual({
+    expect(withDefaultWidgetConfigs({} as any)).toEqual({
       theme: DEFAULT_THEME,
       environment: DEFAULT_ENV,
       isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
@@ -20,7 +20,7 @@ describe('withDefaultWidgetConfig', () => {
       isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
       isAddTokensEnabled: DEFAULT_ADD_TOKENS_ENABLED,
     });
-    expect(withDefaultWidgetConfigs(undefined)).toEqual({
+    expect(withDefaultWidgetConfigs(undefined as any)).toEqual({
       theme: DEFAULT_THEME,
       environment: DEFAULT_ENV,
       isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
@@ -34,7 +34,7 @@ describe('withDefaultWidgetConfig', () => {
     expect(
       withDefaultWidgetConfigs({
         environment: Environment.PRODUCTION,
-      }),
+      } as any),
     ).toEqual({
       theme: DEFAULT_THEME,
       environment: Environment.PRODUCTION,
@@ -46,7 +46,7 @@ describe('withDefaultWidgetConfig', () => {
     expect(
       withDefaultWidgetConfigs({
         isOnRampEnabled: false,
-      }),
+      } as any),
     ).toEqual({
       theme: DEFAULT_THEME,
       environment: DEFAULT_ENV,
@@ -61,7 +61,7 @@ describe('withDefaultWidgetConfig', () => {
     expect(
       withDefaultWidgetConfigs({
         environment: Environment.PRODUCTION,
-      }),
+      } as any),
     ).toEqual({
       theme: DEFAULT_THEME,
       environment: Environment.PRODUCTION,
@@ -74,7 +74,7 @@ describe('withDefaultWidgetConfig', () => {
     expect(
       withDefaultWidgetConfigs({
         environment: Environment.SANDBOX,
-      }),
+      } as any),
     ).toEqual({
       theme: DEFAULT_THEME,
       environment: Environment.SANDBOX,
@@ -87,7 +87,7 @@ describe('withDefaultWidgetConfig', () => {
     expect(
       withDefaultWidgetConfigs({
         environment: 'unknown' as Environment,
-      }),
+      } as any),
     ).toEqual({
       theme: DEFAULT_THEME,
       environment: DEFAULT_ENV,
@@ -102,7 +102,7 @@ describe('withDefaultWidgetConfig', () => {
     expect(
       withDefaultWidgetConfigs({
         theme: WidgetTheme.DARK,
-      }),
+      } as any),
     ).toEqual({
       theme: WidgetTheme.DARK,
       environment: DEFAULT_ENV,
@@ -115,7 +115,7 @@ describe('withDefaultWidgetConfig', () => {
     expect(
       withDefaultWidgetConfigs({
         theme: WidgetTheme.LIGHT,
-      }),
+      } as any),
     ).toEqual({
       theme: WidgetTheme.LIGHT,
       environment: DEFAULT_ENV,
@@ -128,7 +128,7 @@ describe('withDefaultWidgetConfig', () => {
     expect(
       withDefaultWidgetConfigs({
         theme: 'unknown' as Environment,
-      }),
+      } as any),
     ).toEqual({
       theme: DEFAULT_THEME,
       environment: DEFAULT_ENV,
