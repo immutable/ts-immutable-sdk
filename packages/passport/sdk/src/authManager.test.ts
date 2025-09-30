@@ -1324,5 +1324,21 @@ describe('AuthManager', () => {
 
       expect(mockSigninPopup).not.toHaveBeenCalled();
     });
+
+    it('should pass anonymousId to displayEmbeddedLoginPrompt', async () => {
+      const anonymousId = 'test-anonymous-id-12345';
+      const mockEmbeddedLoginPromptResult = {
+        directLoginMethod: 'google' as const,
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+        imPassportTraceId: 'test-trace-id',
+      };
+      mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt.mockResolvedValue(mockEmbeddedLoginPromptResult);
+      mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+      await authManager.login(anonymousId);
+
+      expect(mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt).toHaveBeenCalledWith(anonymousId);
+      expect(mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt).toHaveBeenCalledTimes(1);
+    });
   });
 });
