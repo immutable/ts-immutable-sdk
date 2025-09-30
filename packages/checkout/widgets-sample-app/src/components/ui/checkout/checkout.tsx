@@ -300,6 +300,7 @@ function CheckoutUI() {
           customTitle: "Dromedary On-Ramp",
           customSubTitle: "Camel On-Ramp",
           showMenu: true,
+          showHeader: true,
         },
         */
       },
