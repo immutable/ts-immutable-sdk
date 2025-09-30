@@ -4,7 +4,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { TokenFilterTypes, WidgetTheme } from '@imtbl/checkout-sdk';
+import { ThemeOverrides, TokenFilterTypes, WidgetTheme } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
@@ -24,7 +24,7 @@ export interface BridgeProps {
   tokenAddress?: string;
   defaultTokenImage: string;
   theme: WidgetTheme;
-  transparentOverlay: boolean;
+  themeOverrides: ThemeOverrides;
 }
 
 export function Bridge({
@@ -32,7 +32,7 @@ export function Bridge({
   tokenAddress,
   defaultTokenImage,
   theme,
-  transparentOverlay,
+  themeOverrides,
 }: BridgeProps) {
   const { t } = useTranslation();
   const { bridgeState, bridgeDispatch } = useContext(BridgeContext);
@@ -125,7 +125,7 @@ export function Bridge({
         defaultTokenImage={defaultTokenImage}
         environment={checkout?.config.environment}
         theme={theme}
-        transparentOverlay={transparentOverlay}
+        themeOverrides={themeOverrides}
       />
     </SimpleLayout>
   );

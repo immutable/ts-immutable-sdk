@@ -5,6 +5,5 @@ import { WidgetConfiguration } from './widget';
  */
 export type TransferWidgetConfiguration = {
   customTitle?: string;
-  transparentOverlay?: boolean;
   showHeader?: boolean;
 } & WidgetConfiguration;

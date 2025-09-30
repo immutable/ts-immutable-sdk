@@ -5,7 +5,7 @@ import {
   OptionKey,
 } from '@biom3/react';
 import {
-  GetBalanceResult, WidgetTheme,
+  GetBalanceResult, ThemeOverrides, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { parseUnits } from 'ethers';
 import {
@@ -49,8 +49,8 @@ interface BridgeFormProps {
   isTokenBalancesLoading?: boolean;
   defaultTokenImage: string;
   environment?: Environment;
-  theme?: WidgetTheme;
-  transparentOverlay: boolean;
+  theme: WidgetTheme;
+  themeOverrides: ThemeOverrides;
 }
 
 export function BridgeForm(props: BridgeFormProps) {
@@ -79,7 +79,7 @@ export function BridgeForm(props: BridgeFormProps) {
     defaultTokenImage,
     environment,
     theme,
-    transparentOverlay,
+    themeOverrides,
   } = props;
 
   const { track } = useAnalytics();
@@ -391,7 +391,7 @@ export function BridgeForm(props: BridgeFormProps) {
               defaultTokenImage={defaultTokenImage}
               environment={environment}
               theme={theme}
-              transparentOverlay={transparentOverlay}
+              themeOverrides={themeOverrides}
             />
             <TextInputForm
               testId="bridge-amount"
