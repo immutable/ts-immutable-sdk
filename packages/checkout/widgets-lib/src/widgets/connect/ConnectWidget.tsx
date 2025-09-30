@@ -225,6 +225,7 @@ export default function ConnectWidget({
               checkNetwork={isCheckNetworkEnabled ?? true}
               showBackButton={showBackButton}
               onBackButtonClick={sendGoBackEventOverride}
+              themeOverrides={config.themeOverrides}
             />
           )}
           {view.type === ConnectWidgetViews.SWITCH_NETWORK && isZkEvmChainId(targetChain) && (

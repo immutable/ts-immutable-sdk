@@ -287,6 +287,9 @@ function CheckoutUI() {
       provider: browserProvider,
       config: {
         theme,
+        themeOverrides: {
+          drawerBackground: 'transparent',
+        },
         language,
         /*
         SWAP: {

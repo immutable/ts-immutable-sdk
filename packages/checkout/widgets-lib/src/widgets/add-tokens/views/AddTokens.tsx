@@ -817,6 +817,7 @@ export function AddTokens({
             onConnect={handleWalletConnected}
             insufficientBalance={insufficientBalance}
             showOnRampOption={shouldShowOnRampOption || !selectedToken}
+            drawerBackground={config.themeOverrides?.drawerBackground}
           />
           <RouteOptionsDrawer
             checkout={checkout}
@@ -835,6 +836,7 @@ export function AddTokens({
             walletOptions={walletOptions}
             onClose={handleDeliverToClose}
             onConnect={handleWalletConnected}
+            drawerBackground={config.themeOverrides?.drawerBackground}
           />
           <OnboardingDrawer environment={checkout?.config.environment!} />
         </Stack>

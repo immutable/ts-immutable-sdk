@@ -189,6 +189,8 @@ export function TransferForm({
               userJourney={UserJourney.TRANSFER}
               screen="TransferToken"
               control="Token"
+              theme={config.theme}
+              themeOverrides={config.themeOverrides}
             />
           </Stack>
           <Stack gap="base.spacing.x1">

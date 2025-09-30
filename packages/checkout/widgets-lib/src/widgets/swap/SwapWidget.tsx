@@ -81,6 +81,7 @@ export default function SwapWidget({
 
   const {
     theme,
+    themeOverrides,
     isOnRampEnabled,
     isSwapEnabled,
     isBridgeEnabled,
@@ -254,6 +255,7 @@ export default function SwapWidget({
             {viewState.view.type === SwapWidgetViews.SWAP && (
             <SwapCoins
               theme={theme}
+              themeOverrides={themeOverrides}
               cancelAutoProceed={cancelAutoProceed}
               fromAmount={viewState.view.data?.fromAmount ?? fromAmount}
               toAmount={viewState.view.data?.toAmount ?? toAmount}

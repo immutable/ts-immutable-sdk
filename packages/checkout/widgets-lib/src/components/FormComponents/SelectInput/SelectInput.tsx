@@ -1,5 +1,5 @@
 import { Box, OptionKey } from '@biom3/react';
-import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { ThemeOverrides, WidgetTheme } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import {
   inputStyle,
@@ -12,7 +12,6 @@ import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface SelectInputProps {
-
   testId: string;
   options: CoinSelectorOptionProps[];
   selectTextAlign?: 'left' | 'right';
@@ -40,7 +39,8 @@ interface SelectInputProps {
   screen: string;
   control: string;
   environment?: Environment;
-  theme?: WidgetTheme;
+  theme: WidgetTheme;
+  themeOverrides: ThemeOverrides;
 }
 
 export function SelectInput({
@@ -72,6 +72,7 @@ export function SelectInput({
   control,
   environment,
   theme,
+  themeOverrides,
 }: SelectInputProps) {
   return (
     <Box sx={selectInputBoxStyle}>
@@ -92,6 +93,7 @@ export function SelectInput({
           screen={screen}
           environment={environment}
           theme={theme}
+          themeOverrides={themeOverrides}
         />
       </Box>
       <Box sx={inputStyle}>

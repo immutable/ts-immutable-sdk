@@ -7,6 +7,7 @@ import {
   WrappedBrowserProvider,
   WalletProviderName,
   WalletProviderRdns,
+  ThemeOverrides,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -58,6 +59,7 @@ export interface WalletListProps {
   allowlistWalletRdns?: string[];
   blocklistWalletRdns: string[];
   isCheckNetworkEnabled: boolean;
+  themeOverrides: ThemeOverrides;
 }
 
 // eslint-disable-next-line max-len
@@ -73,6 +75,7 @@ export function WalletList(props: WalletListProps) {
     targetChainId,
     allowedChains,
     isCheckNetworkEnabled,
+    themeOverrides,
     allowlistWalletRdns,
     blocklistWalletRdns,
   } = props;
@@ -443,6 +446,7 @@ export function WalletList(props: WalletListProps) {
           setShowWalletDrawer(show);
         }}
         onWalletChange={handleWalletChange}
+        drawerBackground={themeOverrides.drawerBackground}
       />
 
       <ChangedYourMindDrawer

@@ -1,7 +1,7 @@
 import { useContext, useEffect } from 'react';
 import { ButtCon } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, ThemeOverrides } from '@imtbl/checkout-sdk';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
@@ -16,9 +16,11 @@ import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 
 type WalletNetworkSelectionViewProps = {
   showBackButton?: boolean;
+  themeOverrides: ThemeOverrides;
 };
 export function WalletNetworkSelectionView({
   showBackButton,
+  themeOverrides,
 }: WalletNetworkSelectionViewProps) {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
@@ -68,7 +70,7 @@ export function WalletNetworkSelectionView({
       )}
       footer={<FooterLogo />}
     >
-      <WalletAndNetworkSelector />
+      <WalletAndNetworkSelector themeOverrides={themeOverrides} />
     </SimpleLayout>
   );
 }
