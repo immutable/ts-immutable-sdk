@@ -45,6 +45,7 @@ interface OnRampProps {
   showMenu?: boolean;
   customTitle?: string;
   customSubTitle?: string;
+  showHeader?: boolean;
 }
 export function OnRampMain({
   passport,
@@ -55,6 +56,7 @@ export function OnRampMain({
   showMenu,
   customTitle,
   customSubTitle,
+  showHeader = true,
 }: OnRampProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -275,7 +277,7 @@ export function OnRampMain({
   return (
     <Box sx={boxMainStyle(showIframe)}>
       <SimpleLayout
-        header={(
+        header={showHeader ? (
           <HeaderNavigation
             title={customTitle ?? t('views.ONRAMP.header.title')}
             onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
@@ -288,7 +290,7 @@ export function OnRampMain({
               );
             }}
           />
-        )}
+        ) : undefined}
         footerBackgroundColor="base.color.translucent.emphasis.200"
       >
         <Box sx={containerStyle(showIframe)}>

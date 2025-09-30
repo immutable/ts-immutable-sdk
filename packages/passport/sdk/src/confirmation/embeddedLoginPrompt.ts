@@ -20,11 +20,17 @@ export default class EmbeddedLoginPrompt {
     this.config = config;
   }
 
-  private getHref = () => (
-    `${this.config.authenticationDomain}/im-embedded-login-prompt`
+  private getHref = (anonymousId?: string) => {
+    let href = `${this.config.authenticationDomain}/im-embedded-login-prompt`
     + `?client_id=${this.config.oidcConfiguration.clientId}`
-    + `&rid=${getDetail(Detail.RUNTIME_ID)}`
-  );
+    + `&rid=${getDetail(Detail.RUNTIME_ID)}`;
+
+    if (anonymousId) {
+      href += `&third_party_a_id=${anonymousId}`;
+    }
+
+    return href;
+  };
 
   private static appendIFrameStylesIfNeeded = () => {
     if (document.getElementById(LOGIN_PROMPT_KEYFRAME_STYLES_ID)) {
@@ -71,10 +77,10 @@ export default class EmbeddedLoginPrompt {
     document.head.appendChild(style);
   };
 
-  private getEmbeddedLoginIFrame = () => {
+  private getEmbeddedLoginIFrame = (anonymousId?: string) => {
     const embeddedLoginPrompt = document.createElement('iframe');
     embeddedLoginPrompt.id = LOGIN_PROMPT_IFRAME_ID;
-    embeddedLoginPrompt.src = this.getHref();
+    embeddedLoginPrompt.src = this.getHref(anonymousId);
     embeddedLoginPrompt.style.height = '100vh';
     embeddedLoginPrompt.style.width = '100vw';
     embeddedLoginPrompt.style.maxHeight = `${LOGIN_PROMPT_WINDOW_HEIGHT}px`;
@@ -90,9 +96,9 @@ export default class EmbeddedLoginPrompt {
     return embeddedLoginPrompt;
   };
 
-  public displayEmbeddedLoginPrompt(): Promise<EmbeddedLoginPromptResult> {
+  public displayEmbeddedLoginPrompt(anonymousId?: string): Promise<EmbeddedLoginPromptResult> {
     return new Promise((resolve, reject) => {
-      const embeddedLoginPrompt = this.getEmbeddedLoginIFrame();
+      const embeddedLoginPrompt = this.getEmbeddedLoginIFrame(anonymousId);
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
           origin !== this.config.authenticationDomain

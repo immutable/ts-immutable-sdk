@@ -80,8 +80,8 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
   const { provider } = commerceState;
 
   const connectLoaderParams = useMemo(
-    () => getConnectLoaderParams(view, checkout, provider || browserProvider),
-    [view, checkout, provider, browserProvider],
+    () => getConnectLoaderParams(view, flowConfig, checkout, provider || browserProvider),
+    [view, flowConfig, checkout, provider, browserProvider],
   );
 
   const connectLoaderSuccessEvent = (

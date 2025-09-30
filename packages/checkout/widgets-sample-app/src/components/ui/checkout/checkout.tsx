@@ -28,6 +28,7 @@ import {
   WalletProviderName,
   Widget,
   SalePaymentTypes,
+  WalletProviderRdns,
 } from "@imtbl/checkout-sdk";
 import { Passport } from "@imtbl/passport";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
@@ -180,7 +181,7 @@ function CheckoutUI() {
   >({
     CONNECT: {
       flow: CommerceFlowType.CONNECT,
-      // blocklistWalletRdns: ["io.metamask"],
+      blocklistWalletRdns: ["io.metamask"],
       // targetChainId: ChainId.SEPOLIA,
       // targetWalletRdns: "io.metamask",
       theme: WidgetTheme.LIGHT,
@@ -290,7 +291,14 @@ function CheckoutUI() {
           drawerBackground: 'transparent',
         },
         language,
-        // SWAP: {},
+        /*
+        SWAP: {
+          showHeader: true,
+        },
+        */
+        CONNECT: {
+
+        },
         TRANSFER: {
           customTitle: "Dromedary Transfer",
         },
@@ -299,6 +307,7 @@ function CheckoutUI() {
           customTitle: "Dromedary On-Ramp",
           customSubTitle: "Camel On-Ramp",
           showMenu: true,
+          showHeader: true,
         },
         */
       },

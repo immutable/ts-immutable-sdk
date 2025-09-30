@@ -143,6 +143,7 @@ export default function OnRampWidget({
           showMenu={onrampConfig?.showMenu}
           customTitle={onrampConfig?.customTitle}
           customSubTitle={onrampConfig?.customSubTitle}
+          showHeader={onrampConfig?.showHeader}
         />
       )}
 

@@ -84,6 +84,7 @@ export class Swap extends Base<WidgetType.SWAP> {
       browserProvider: this.browserProvider,
       checkout: this.checkout,
       allowedChains: [this.checkout.config.l2ChainId],
+      allowlistWalletRdns: undefined,
     };
 
     this.reactRoot!.render(
@@ -109,6 +110,7 @@ export class Swap extends Base<WidgetType.SWAP> {
                     swapConfig={{
                       customTitle: this.properties.config?.customTitle,
                       customSubTitle: this.properties.config?.customSubTitle,
+                      showHeader: this.properties.config?.showHeader,
                     }}
                   />
                 </Suspense>

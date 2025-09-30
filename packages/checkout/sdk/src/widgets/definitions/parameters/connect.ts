@@ -15,4 +15,6 @@ export type ConnectWidgetParams = {
   targetWalletRdns?: string | WalletProviderRdns;
   /** List of wallets rdns to exclude from the connect widget */
   blocklistWalletRdns?: string[];
+  /** List of wallets rdns to include in the connect widget */
+  allowlistWalletRdns?: string[];
 };

@@ -13,7 +13,8 @@ export interface ConnectWalletProps {
   targetWalletRdns?: string,
   targetChainId: ChainId;
   allowedChains: ChainId[];
-  blocklistWalletRdns?: string[];
+  allowlistWalletRdns?: string[];
+  blocklistWalletRdns: string[];
   checkNetwork: boolean;
   showBackButton?: boolean;
   onBackButtonClick?: () => void;
@@ -24,6 +25,7 @@ export function ConnectWallet({
   targetWalletRdns,
   targetChainId,
   allowedChains,
+  allowlistWalletRdns,
   blocklistWalletRdns,
   checkNetwork,
   showBackButton,
@@ -88,6 +90,7 @@ export function ConnectWallet({
           targetWalletRdns={targetWalletRdns}
           targetChainId={targetChainId}
           allowedChains={allowedChains}
+          allowlistWalletRdns={allowlistWalletRdns}
           blocklistWalletRdns={blocklistWalletRdns}
           isCheckNetworkEnabled={checkNetwork}
           themeOverrides={themeOverrides}
