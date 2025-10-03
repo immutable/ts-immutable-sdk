@@ -188,7 +188,7 @@ function Request({ showModal, setShowModal }: ModalProps) {
       const newParams = params;
       request.params.forEach((param, i) => {
         try {
-          newParams[i] = JSON.stringify(param);  
+          newParams[i] = JSON.stringify(param);
         } catch (err) {
           newParams[i] = param;
         }
