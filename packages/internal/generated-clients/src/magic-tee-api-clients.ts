@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { TransactionApi, WalletApi } from './magic-tee';
+import { SignOperationsApi, WalletApi } from './magic-tee';
 
 export type MagicTeeApiClientsConfig = {
   basePath: string;
@@ -9,7 +9,7 @@ export type MagicTeeApiClientsConfig = {
 };
 
 export class MagicTeeApiClients {
-  public transactionApi: TransactionApi;
+  public signOperationsApi: SignOperationsApi;
 
   public walletApi: WalletApi;
 
@@ -23,7 +23,7 @@ export class MagicTeeApiClients {
       },
     });
 
-    this.transactionApi = new TransactionApi(undefined, config.basePath, instance);
+    this.signOperationsApi = new SignOperationsApi(undefined, config.basePath, instance);
     this.walletApi = new WalletApi(undefined, config.basePath, instance);
   }
 }

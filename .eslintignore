@@ -16,4 +16,7 @@ jest.*.js
 **playground**/
 examples/**/*
 
+# generated clients
+packages/internal/generated-clients/src/
+
 # put module specific ignore paths here

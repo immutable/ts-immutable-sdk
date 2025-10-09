@@ -17,14 +17,32 @@
 /**
  * 
  * @export
- * @interface WalletResponseModel
+ * @interface SignMessageResponse
  */
-export interface WalletResponseModel {
+export interface SignMessageResponse {
     /**
      * 
      * @type {string}
-     * @memberof WalletResponseModel
+     * @memberof SignMessageResponse
      */
-    'public_address': string;
+    'signature': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SignMessageResponse
+     */
+    'r'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SignMessageResponse
+     */
+    's'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SignMessageResponse
+     */
+    'v'?: string | null;
 }
 

@@ -90,10 +90,11 @@ generate-magic-tee-openapi: get-magic-tee-openapi generate-magic-tee-client
 
 .PHONY: get-magic-tee-openapi
 get-magic-tee-openapi:
-	rm -f src/magic-tee-openapi.json && touch src/magic-tee-openapi.json && \
-	curl -H "Accept: application/json+v3" \
-    https://tee.express.magiclabs.com/openapi.json \
-    -o src/magic-tee-openapi.json
+	@echo "ERROR: Magic no longer publish the openapi.json publicly. See here for more info: https://imtbl.slack.com/archives/C026SDS8BB6/p1760015314854609?thread_ts=1758166417.641399&cid=C026SDS8BB6"
+# rm -f src/magic-tee-openapi.json && touch src/magic-tee-openapi.json && \
+# curl -H "Accept: application/json+v3" \
+# https://tee.express.magiclabs.com/openapi.json \
+# -o src/magic-tee-openapi.json
 
 .PHONY: generate-magic-tee-client
 generate-magic-tee-client:
