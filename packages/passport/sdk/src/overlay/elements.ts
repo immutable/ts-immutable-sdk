@@ -5,6 +5,7 @@ import {
   PASSPORT_OVERLAY_CLOSE_ID,
   PASSPORT_OVERLAY_ID,
   PASSPORT_OVERLAY_TRY_AGAIN_ID,
+  PASSPORT_OVERLAY_CONTENTS_ID,
 } from './constants';
 
 const getCloseButton = (): string => `
@@ -29,7 +30,27 @@ const getCloseButton = (): string => `
     </button>
   `;
 
+const getTryAgainButton = () => `
+  <button
+    id="${PASSPORT_OVERLAY_TRY_AGAIN_ID}"
+    style="
+      margin-top: 27px !important;
+      color: #f3f3f3 !important;
+      background: transparent !important;
+      padding: 12px 24px !important;
+      border-radius: 30px !important;
+      border: 2px solid #f3f3f3 !important;
+      font-size: 1em !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+    "
+  >
+    Try again
+  </button>
+`;
+
 const getBlockedContents = () => `
+    ${IMMUTABLE_LOGO_SVG}
     <div
       style="
         color: #e01a3d !important;
@@ -52,9 +73,11 @@ const getBlockedContents = () => `
       If the problem continues, adjust your<br />
       browser settings.
     </p>
+    ${getTryAgainButton()}
   `;
 
 const getGenericContents = () => `
+    ${IMMUTABLE_LOGO_SVG}
     <p style="
         color: #b6b6b6 !important;
         text-align: center !important;
@@ -63,28 +86,10 @@ const getGenericContents = () => `
     >
       Secure pop-up not showing?<br />We'll help you re-launch
     </p>
+    ${getTryAgainButton()}
   `;
 
-const getTryAgainButton = () => `
-    <button
-      id="${PASSPORT_OVERLAY_TRY_AGAIN_ID}"
-      style="
-        margin-top: 27px !important;
-        color: #f3f3f3 !important;
-        background: transparent !important;
-        padding: 12px 24px !important;
-        border-radius: 30px !important;
-        border: 2px solid #f3f3f3 !important;
-        font-size: 1em !important;
-        font-weight: 500 !important;
-        cursor: pointer !important;
-      "
-    >
-      Try again
-    </button>
-  `;
-
-const getOverlay = (contents: string): string => `
+export const getOverlay = (contents: string): string => `
     <div
       id="${PASSPORT_OVERLAY_ID}"
       style="
@@ -111,6 +116,7 @@ const getOverlay = (contents: string): string => `
     >
       ${getCloseButton()}
       <div
+        id="${PASSPORT_OVERLAY_CONTENTS_ID}"
         style="
           display: flex !important;
           flex-direction: column !important;
@@ -118,10 +124,39 @@ const getOverlay = (contents: string): string => `
           max-width: 400px !important;
         "
       >
-        ${IMMUTABLE_LOGO_SVG}
-        ${contents}
-        ${getTryAgainButton()}
+        ${contents ?? ''}
       </div>
+    </div>
+  `;
+
+export const getEmbeddedLoginPromptOverlay = (): string => `
+    <div
+      id="${PASSPORT_OVERLAY_ID}"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 2147483647;
+        background: rgba(247, 247, 247, 0.24);
+        animation-name: passportEmbeddedLoginPromptOverlayFadeIn;
+        animation-duration: 0.8s;
+      "
+    >
+      <div
+        id="${PASSPORT_OVERLAY_CONTENTS_ID}"
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+        "
+      />
     </div>
   `;
 

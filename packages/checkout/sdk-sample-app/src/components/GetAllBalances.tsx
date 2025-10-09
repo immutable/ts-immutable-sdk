@@ -18,11 +18,11 @@ export default function GetAllBalances(props: BalanceProps) {
 
   async function getAllBalances() {
     if (!checkout) {
-      console.error('missing checkout, please connect frist');
+      console.error('missing checkout, please connect first');
       return;
     }
     if (!provider) {
-      console.error('missing provider, please connect frist');
+      console.error('missing provider, please connect first');
       return;
     }
     setError(null);

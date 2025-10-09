@@ -11,6 +11,8 @@ export interface FiatRampWidgetParams {
   tokenSymbol?: string;
   email?: string;
   allowedTokens?: string[];
+  showMenu?: boolean;
+  customSubTitle?: string;
 }
 
 export class FiatRampService {
@@ -49,9 +51,10 @@ export class FiatRampService {
       defaultPaymentMethod: 'credit_debit_card',
       disablePaymentMethods: '',
       productsAvailed: 'buy',
-      exchangeScreenTitle: 'Buy',
+      exchangeScreenTitle: params.customSubTitle === '' ? ' ' : (params.customSubTitle ?? 'Buy'),
       themeColor: '0D0D0D',
       defaultCryptoCurrency: params.tokenSymbol || 'IMX',
+      hideMenu: !(params.showMenu ?? true),
     };
 
     if (params.isPassport && params.email) {

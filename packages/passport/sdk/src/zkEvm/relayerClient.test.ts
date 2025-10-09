@@ -72,7 +72,7 @@ describe('relayerClient', () => {
       });
     });
 
-    it('throws HTTP error for non-ok response', async () => {
+    it('throws error from JSON response when response contains error field', async () => {
       const to = '0xd64b0d2d72bb1b3f18046b8a7fc6c9ee6bccd287';
       const data = '0x123';
 
@@ -84,7 +84,23 @@ describe('relayerClient', () => {
       });
 
       await expect(relayerClient.ethSendTransaction(to, data)).rejects.toThrow(
-        'Relayer HTTP error: 401. Content: "{"error":"invalid_token"}"',
+        'invalid_token',
+      );
+    });
+
+    it('throws HTTP error for non-ok response without error field', async () => {
+      const to = '0xd64b0d2d72bb1b3f18046b8a7fc6c9ee6bccd287';
+      const data = '0x123';
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        text: () => Promise.resolve('{"result":"some_result"}'),
+      });
+
+      await expect(relayerClient.ethSendTransaction(to, data)).rejects.toThrow(
+        'Relayer HTTP error: 500. Content: "{"result":"some_result"}"',
       );
     });
 

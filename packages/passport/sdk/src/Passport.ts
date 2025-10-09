@@ -16,6 +16,8 @@ import MagicTeeAdapter from './magic/magicTeeAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
+  DirectLoginOptions,
+  DeviceTokenResponse,
   isUserImx,
   isUserZkEvm,
   LinkedWallet,
@@ -25,8 +27,10 @@ import {
   PassportModuleConfiguration,
   User,
   UserProfile,
+  ConnectEvmArguments,
+  LoginArguments,
 } from './types';
-import { ConfirmationScreen } from './confirmation';
+import { ConfirmationScreen, EmbeddedLoginPrompt } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
 import { Provider } from './zkEvm/types';
 import TypedEventEmitter from './utils/typedEventEmitter';
@@ -56,7 +60,8 @@ const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfigura
 
 export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
   const config = new PassportConfiguration(passportModuleConfiguration);
-  const authManager = new AuthManager(config);
+  const embeddedLoginPrompt = new EmbeddedLoginPrompt(config);
+  const authManager = new AuthManager(config, embeddedLoginPrompt);
   const magicProviderProxyFactory = new MagicProviderProxyFactory(authManager, config);
   const magicAdapter = new MagicAdapter(config, magicProviderProxyFactory);
   const confirmationScreen = new ConfirmationScreen(config);
@@ -98,6 +103,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     magicAdapter,
     magicTeeAdapter,
     confirmationScreen,
+    embeddedLoginPrompt,
     immutableXClient,
     multiRollupApiClients,
     passportEventEmitter,
@@ -112,6 +118,8 @@ export class Passport {
   private readonly config: PassportConfiguration;
 
   private readonly confirmationScreen: ConfirmationScreen;
+
+  private readonly embeddedLoginPrompt: EmbeddedLoginPrompt;
 
   private readonly immutableXClient: IMXClient;
 
@@ -135,6 +143,7 @@ export class Passport {
     this.magicAdapter = privateVars.magicAdapter;
     this.magicTeeAdapter = privateVars.magicTeeAdapter;
     this.confirmationScreen = privateVars.confirmationScreen;
+    this.embeddedLoginPrompt = privateVars.embeddedLoginPrompt;
     this.immutableXClient = privateVars.immutableXClient;
     this.multiRollupApiClients = privateVars.multiRollupApiClients;
     this.passportEventEmitter = privateVars.passportEventEmitter;
@@ -168,9 +177,7 @@ export class Passport {
    * @param {boolean} options.announceProvider - Whether to announce the provider via EIP-6963 for wallet discovery (defaults to true)
    * @returns {Promise<Provider>} The EVM provider instance
    */
-  public async connectEvm(options: {
-    announceProvider: boolean
-  } = { announceProvider: true }): Promise<Provider> {
+  public async connectEvm(options: ConnectEvmArguments = { announceProvider: true }): Promise<Provider> {
     return withMetricsAsync(async () => {
       let user: User | null = null;
       try {
@@ -200,8 +207,6 @@ export class Passport {
     }, 'connectEvm', false);
   }
 
-  #loginPromise: Promise<UserProfile | null> | null = null;
-
   /**
    * Initiates the login process.
    * @param {Object} options - Login options
@@ -209,23 +214,17 @@ export class Passport {
    * @param {string} [options.anonymousId] - ID used to enrich Passport internal metrics
    * @param {boolean} [options.useSilentLogin] - If true, attempts silent authentication without user interaction.
    *                                            Note: This takes precedence over useCachedSession if both are true
+   * @param {boolean} [options.useRedirectFlow] - If true, uses redirect flow instead of popup flow
+   * @param {DirectLoginOptions} [options.directLoginOptions] - If provided, contains login method and marketing consent options
+   * @param {string} [options.directLoginOptions.directLoginMethod] - The login method to use (e.g., 'google', 'apple', 'email')
+   * @param {MarketingConsentStatus} [options.directLoginOptions.marketingConsentStatus] - Marketing consent status ('opted_in' or 'unsubscribed')
+   * @param {string} [options.directLoginOptions.email] - Required when directLoginMethod is 'email'
    * @returns {Promise<UserProfile | null>} A promise that resolves to the user profile if logged in, null otherwise
    * @throws {Error} If retrieving the cached user session fails (except for "Unknown or invalid refresh token" errors)
    *                and useCachedSession is true
    */
-  public async login(options?: {
-    useCachedSession?: boolean;
-    anonymousId?: string;
-    useSilentLogin?: boolean;
-    useRedirectFlow?: boolean;
-  }): Promise<UserProfile | null> {
-    // If there's already a login in progress, return that promise
-    if (this.#loginPromise) {
-      return this.#loginPromise;
-    }
-
-    // Create and store the login promise
-    this.#loginPromise = withMetricsAsync(async () => {
+  public async login(options?: LoginArguments): Promise<UserProfile | null> {
+    return withMetricsAsync(async () => {
       const { useCachedSession = false, useSilentLogin } = options || {};
       let user: User | null = null;
 
@@ -245,9 +244,9 @@ export class Passport {
         user = await this.authManager.forceUserRefresh();
       } else if (!user && !useCachedSession) {
         if (options?.useRedirectFlow) {
-          await this.authManager.loginWithRedirect(options?.anonymousId);
+          await this.authManager.loginWithRedirect(options?.anonymousId, options?.directLoginOptions);
         } else {
-          user = await this.authManager.login(options?.anonymousId);
+          user = await this.authManager.login(options?.anonymousId, options?.directLoginOptions);
         }
       }
 
@@ -260,14 +259,6 @@ export class Passport {
 
       return user ? user.profile : null;
     }, 'login');
-
-    try {
-      const result = await this.#loginPromise;
-      return result;
-    } finally {
-      // Reset the login promise when the login process completes
-      this.#loginPromise = null;
-    }
   }
 
   /**
@@ -288,10 +279,15 @@ export class Passport {
 
   /**
    * Initiates a PKCE flow login.
+   * @param {DirectLoginOptions} [directLoginOptions] - If provided, directly redirects to the specified login method
+   * @param {string} [imPassportTraceId] - The trace ID for the PKCE flow
    * @returns {string} The authorization URL for the PKCE flow
    */
-  public loginWithPKCEFlow(): Promise<string> {
-    return withMetricsAsync(async () => await this.authManager.getPKCEAuthorizationUrl(), 'loginWithPKCEFlow');
+  public loginWithPKCEFlow(directLoginOptions?: DirectLoginOptions, imPassportTraceId?: string): Promise<string> {
+    return withMetricsAsync(
+      async () => await this.authManager.getPKCEAuthorizationUrl(directLoginOptions, imPassportTraceId),
+      'loginWithPKCEFlow',
+    );
   }
 
   /**
@@ -312,6 +308,14 @@ export class Passport {
       this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
       return user.profile;
     }, 'loginWithPKCEFlowCallback');
+  }
+
+  public async storeTokens(tokenResponse: DeviceTokenResponse): Promise<UserProfile> {
+    return withMetricsAsync(async () => {
+      const user = await this.authManager.storeTokens(tokenResponse);
+      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+      return user.profile;
+    }, 'storeTokens');
   }
 
   /**
@@ -338,7 +342,7 @@ export class Passport {
    * Returns the logout URL for the current user.
    * @returns {Promise<string>} The logout URL
    */
-  public async getLogoutUrl(): Promise<string> {
+  public async getLogoutUrl(): Promise<string | null> {
     return withMetricsAsync(async () => {
       await this.authManager.removeUser();
       await this.magicAdapter.logout();

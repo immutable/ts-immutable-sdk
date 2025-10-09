@@ -136,7 +136,8 @@ export async function getNetworkInfo(
  * You get "Error: could not coalesce error....".
  * This is a workaround to check if the error is an unrecognised chain error.
  * */
-const isUnrecognisedChainError = (err: any) => err.error?.data?.originalError?.code === UNRECOGNISED_CHAIN_ERROR_CODE;
+const isUnrecognisedChainError = (err: any) => err.error?.data?.originalError?.code === UNRECOGNISED_CHAIN_ERROR_CODE
+  || err.error?.code === UNRECOGNISED_CHAIN_ERROR_CODE;
 
 export async function switchWalletNetwork(
   config: CheckoutConfiguration,

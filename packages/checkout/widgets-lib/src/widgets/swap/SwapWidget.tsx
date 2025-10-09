@@ -9,8 +9,8 @@ import {
 import {
   TokenFilterTypes, IMTBLWidgetEvents, SwapWidgetParams,
   SwapDirection,
-  fetchRiskAssessment,
   WalletProviderName,
+  SwapWidgetConfiguration,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { SwapCoins } from './views/SwapCoins';
@@ -60,6 +60,7 @@ import { GeoblockLoader } from './GeoblockLoader';
 
 export type SwapWidgetInputs = SwapWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
+  swapConfig: SwapWidgetConfiguration;
 };
 
 export default function SwapWidget({
@@ -70,6 +71,7 @@ export default function SwapWidget({
   autoProceed,
   direction,
   showBackButton,
+  swapConfig: { customTitle, customSubTitle, showHeader },
   walletProviderName,
 }: SwapWidgetInputs) {
   const { t } = useTranslation();
@@ -79,6 +81,7 @@ export default function SwapWidget({
 
   const {
     theme,
+    themeOverrides,
     isOnRampEnabled,
     isSwapEnabled,
     isBridgeEnabled,
@@ -194,28 +197,6 @@ export default function SwapWidget({
   }, [checkout, provider]);
 
   useEffect(() => {
-    if (!checkout || swapState.riskAssessment) {
-      return;
-    }
-
-    (async () => {
-      const address = await (await provider?.getSigner())?.getAddress();
-
-      if (!address) {
-        return;
-      }
-
-      const assessment = await fetchRiskAssessment([address], checkout.config);
-      swapDispatch({
-        payload: {
-          type: SwapActions.SET_RISK_ASSESSMENT,
-          riskAssessment: assessment,
-        },
-      });
-    })();
-  }, [checkout, provider]);
-
-  useEffect(() => {
     swapDispatch({
       payload: {
         type: SwapActions.SET_AUTO_PROCEED,
@@ -274,12 +255,16 @@ export default function SwapWidget({
             {viewState.view.type === SwapWidgetViews.SWAP && (
             <SwapCoins
               theme={theme}
+              themeOverrides={themeOverrides}
               cancelAutoProceed={cancelAutoProceed}
               fromAmount={viewState.view.data?.fromAmount ?? fromAmount}
               toAmount={viewState.view.data?.toAmount ?? toAmount}
               fromTokenAddress={viewState.view.data?.fromTokenAddress ?? fromTokenAddress}
               toTokenAddress={viewState.view.data?.toTokenAddress ?? toTokenAddress}
               showBackButton={showBackButton}
+              showHeader={showHeader ?? true}
+              title={customTitle ?? t('views.SWAP.header.title')}
+              subTitle={customSubTitle ?? t('views.SWAP.content.title')}
             />
             )}
             {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (

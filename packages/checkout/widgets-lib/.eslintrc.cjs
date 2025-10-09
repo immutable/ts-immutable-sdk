@@ -1,5 +1,5 @@
 module.exports = {
-  "extends": ["../../../.eslintrc"],
+  "extends": ["../../../.eslintrc", 'plugin:react-hooks/recommended'],
   "ignorePatterns": ["jest.config.*", "rollup.config.*"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -70,5 +70,6 @@ module.exports = {
     "jsx-a11y/control-has-associated-label": "off",
     "react/jsx-props-no-spreading": "off",
     "implicit-arrow-linebreak": "off",
+    "operator-linebreak": "off",
   }
 }

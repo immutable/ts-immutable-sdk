@@ -13,9 +13,10 @@ import { getDetail, Detail } from '@imtbl/metrics';
 import localForage from 'localforage';
 import DeviceCredentialsManager from './storage/device_credentials_manager';
 import logger from './utils/logger';
-import { isTokenExpired } from './utils/token';
+import { isAccessTokenExpiredOrExpiring } from './utils/token';
 import { PassportError, PassportErrorType, withPassportError } from './errors/passportError';
 import {
+  DirectLoginOptions,
   PassportMetadata,
   User,
   DeviceTokenResponse,
@@ -27,8 +28,11 @@ import {
   isUserImx,
 } from './types';
 import { PassportConfiguration } from './config';
-import Overlay from './overlay';
+import ConfirmationOverlay from './overlay/confirmationOverlay';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
+import { EmbeddedLoginPrompt } from './confirmation';
+
+const LOGIN_POPUP_CLOSED_POLLING_DURATION = 500;
 
 const formUrlEncodedHeader = {
   headers: {
@@ -37,7 +41,12 @@ const formUrlEncodedHeader = {
 };
 
 const logoutEndpoint = '/v2/logout';
+const crossSdkBridgeLogoutEndpoint = '/im-logged-out';
 const authorizeEndpoint = '/authorize';
+
+const getLogoutEndpointPath = (crossSdkBridgeEnabled: boolean): string => (
+  crossSdkBridgeEnabled ? crossSdkBridgeLogoutEndpoint : logoutEndpoint
+);
 
 const getAuthConfiguration = (config: PassportConfiguration): UserManagerSettings => {
   const { authenticationDomain, oidcConfiguration } = config;
@@ -52,7 +61,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
   }
   const userStore = new WebStorageStateStore({ store });
 
-  const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain.replace(/^(?:https?:\/\/)?(.*)/, 'https://$1'));
+  const endSessionEndpoint = new URL(getLogoutEndpointPath(config.crossSdkBridgeEnabled), authenticationDomain.replace(/^(?:https?:\/\/)?(.*)/, 'https://$1'));
   endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
   if (oidcConfiguration.logoutRedirectUri) {
     endSessionEndpoint.searchParams.set('returnTo', oidcConfiguration.logoutRedirectUri);
@@ -76,7 +85,6 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
     userStore,
     revokeTokenTypes: ['refresh_token'],
     extraQueryParams: {
-      ...config.extraQueryParams,
       ...(oidcConfiguration.audience ? { audience: oidcConfiguration.audience } : {}),
     },
   };
@@ -104,6 +112,8 @@ export default class AuthManager {
 
   private readonly config: PassportConfiguration;
 
+  private readonly embeddedLoginPrompt: EmbeddedLoginPrompt;
+
   private readonly logoutMode: Exclude<OidcConfiguration['logoutMode'], undefined>;
 
   /**
@@ -111,10 +121,11 @@ export default class AuthManager {
    */
   private refreshingPromise: Promise<User | null> | null = null;
 
-  constructor(config: PassportConfiguration) {
+  constructor(config: PassportConfiguration, embeddedLoginPrompt: EmbeddedLoginPrompt) {
     this.config = config;
     this.userManager = new UserManager(getAuthConfiguration(config));
     this.deviceCredentialsManager = new DeviceCredentialsManager();
+    this.embeddedLoginPrompt = embeddedLoginPrompt;
     this.logoutMode = config.oidcConfiguration.logoutMode || 'redirect';
   }
 
@@ -172,15 +183,49 @@ export default class AuthManager {
     });
   };
 
-  public async loginWithRedirect(anonymousId?: string): Promise<void> {
+  private buildExtraQueryParams(
+    anonymousId?: string,
+    directLoginOptions?: DirectLoginOptions,
+    imPassportTraceId?: string,
+  ): Record<string, string> {
+    const params: Record<string, string> = {
+      ...(this.userManager.settings?.extraQueryParams ?? {}),
+      rid: getDetail(Detail.RUNTIME_ID) || '',
+      third_party_a_id: anonymousId || '',
+    };
+
+    if (directLoginOptions) {
+      // If method is email, only include direct login params if email is valid
+      if (directLoginOptions.directLoginMethod === 'email') {
+        const emailValue = directLoginOptions.email;
+        if (emailValue) {
+          params.direct = directLoginOptions.directLoginMethod;
+          params.email = emailValue;
+        }
+        // If email method but no valid email, disregard both direct and email params
+      } else {
+        // For non-email methods (social login), always include direct param
+        params.direct = directLoginOptions.directLoginMethod;
+      }
+      if (directLoginOptions.marketingConsentStatus) {
+        params.marketingConsent = directLoginOptions.marketingConsentStatus;
+      }
+    }
+
+    if (imPassportTraceId) {
+      params.im_passport_trace_id = imPassportTraceId;
+    }
+
+    return params;
+  }
+
+  public async loginWithRedirect(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<void> {
     await this.userManager.clearStaleState();
     return withPassportError<void>(async () => {
+      const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptions);
+
       await this.userManager.signinRedirect({
-        extraQueryParams: {
-          ...(this.userManager.settings?.extraQueryParams ?? {}),
-          rid: getDetail(Detail.RUNTIME_ID) || '',
-          third_party_a_id: anonymousId || '',
-        },
+        extraQueryParams,
       });
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
@@ -188,24 +233,71 @@ export default class AuthManager {
   /**
    * login
    * @param anonymousId Caller can pass an anonymousId if they want to associate their user's identity with immutable's internal instrumentation.
+   * @param directLoginOptions If provided, contains login method and marketing consent options
+   * @param directLoginOptions.directLoginMethod The login method to use (e.g., 'google', 'apple', 'email')
+   * @param directLoginOptions.marketingConsentStatus Marketing consent status ('opted_in' or 'unsubscribed')
+   * @param directLoginOptions.email Required when directLoginMethod is 'email'
    */
-  public async login(anonymousId?: string): Promise<User> {
+  public async login(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<User> {
     return withPassportError<User>(async () => {
-      const popupWindowTarget = 'passportLoginPrompt';
-      const signinPopup = async () => (
-        this.userManager.signinPopup({
-          extraQueryParams: {
-            ...(this.userManager.settings?.extraQueryParams ?? {}),
-            rid: getDetail(Detail.RUNTIME_ID) || '',
-            third_party_a_id: anonymousId || '',
-          },
+      // If directLoginOptions are provided, then the consumer has rendered their own initial login screen.
+      // If not, display the embedded login prompt and pass the returned direct login options and imPassportTraceId to the login popup.
+      let directLoginOptionsToUse: DirectLoginOptions | undefined;
+      let imPassportTraceId: string | undefined;
+      if (directLoginOptions) {
+        directLoginOptionsToUse = directLoginOptions;
+      } else if (!this.config.popupOverlayOptions.disableHeadlessLoginPromptOverlay) {
+        const {
+          imPassportTraceId: embeddedLoginPromptImPassportTraceId,
+          ...embeddedLoginPromptDirectLoginOptions
+        } = await this.embeddedLoginPrompt.displayEmbeddedLoginPrompt(anonymousId);
+        directLoginOptionsToUse = embeddedLoginPromptDirectLoginOptions;
+        imPassportTraceId = embeddedLoginPromptImPassportTraceId;
+      }
+
+      const popupWindowTarget = window.crypto.randomUUID();
+      const signinPopup = async () => {
+        const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptionsToUse, imPassportTraceId);
+
+        const userPromise = this.userManager.signinPopup({
+          extraQueryParams,
           popupWindowFeatures: {
             width: 410,
             height: 450,
           },
           popupWindowTarget,
-        })
-      );
+        });
+
+        // ID-3950: https://github.com/authts/oidc-client-ts/issues/2043
+        // The promise returned from `signinPopup` no longer rejects when the popup is closed.
+        // We can prevent this from impacting consumers by obtaining a reference to the popup and rejecting the promise
+        // that is returned by this method if the popup is closed by the user.
+
+        // Attempt to get a reference to the popup window
+        const popupRef = window.open('', popupWindowTarget);
+        if (popupRef) {
+          // Create a promise that rejects when popup is closed
+          const popupClosedPromise = new Promise<never>((_, reject) => {
+            const timer = setInterval(() => {
+              if (popupRef.closed) {
+                clearInterval(timer);
+                reject(new Error('Popup closed by user'));
+              }
+            }, LOGIN_POPUP_CLOSED_POLLING_DURATION);
+
+            // Clean up timer when the user promise resolves/rejects
+            userPromise.finally(() => {
+              clearInterval(timer);
+              popupRef.close();
+            });
+          });
+
+          // Race between user authentication and popup being closed
+          return Promise.race([userPromise, popupClosedPromise]);
+        }
+
+        return userPromise;
+      };
 
       // This promise attempts to open the signin popup, and displays the blocked popup overlay if necessary.
       return new Promise((resolve, reject) => {
@@ -222,7 +314,7 @@ export default class AuthManager {
 
             // Popup was blocked; append the blocked popup overlay to allow the user to try again.
             let popupHasBeenOpened: boolean = false;
-            const overlay = new Overlay(this.config.popupOverlayOptions, true);
+            const overlay = new ConfirmationOverlay(this.config.popupOverlayOptions, true);
             overlay.append(
               async () => {
                 try {
@@ -268,8 +360,33 @@ export default class AuthManager {
     return user || this.login();
   }
 
+  private static shouldUseSigninPopupCallback(): boolean {
+    // ID-3950: https://github.com/authts/oidc-client-ts/issues/2043
+    // Detect when the login was initiated via a popup
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const stateParam = urlParams.get('state');
+      const localStorageKey = `oidc.${stateParam}`;
+
+      const localStorageValue = localStorage.getItem(localStorageKey);
+      const loginState = JSON.parse(localStorageValue || '{}');
+
+      return loginState?.request_type === 'si:p';
+    } catch (err) {
+      return false;
+    }
+  }
+
   public async loginCallback(): Promise<undefined | User> {
     return withPassportError<undefined | User>(async () => {
+      // ID-3950: https://github.com/authts/oidc-client-ts/issues/2043
+      // When using `signinPopup` to initiate a login, call the `signinPopupCallback` method and
+      // set the `keepOpen` flag to `true`, as the `login` method is now responsible for closing the popup.
+      // See the comment in the `login` method for more details.
+      if (AuthManager.shouldUseSigninPopupCallback()) {
+        await this.userManager.signinPopupCallback(undefined, true);
+        return undefined;
+      }
       const oidcUser = await this.userManager.signinCallback();
       if (!oidcUser) {
         return undefined;
@@ -279,7 +396,10 @@ export default class AuthManager {
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
-  public async getPKCEAuthorizationUrl(): Promise<string> {
+  public async getPKCEAuthorizationUrl(
+    directLoginOptions?: DirectLoginOptions,
+    imPassportTraceId?: string,
+  ): Promise<string> {
     const verifier = base64URLEncode(window.crypto.getRandomValues(new Uint8Array(32)));
     const challenge = base64URLEncode(await sha256(verifier));
 
@@ -302,6 +422,27 @@ export default class AuthManager {
 
     if (scope) pKCEAuthorizationUrl.searchParams.set('scope', scope);
     if (audience) pKCEAuthorizationUrl.searchParams.set('audience', audience);
+
+    if (directLoginOptions) {
+      // If method is email, only include direct login params if email is valid
+      if (directLoginOptions.directLoginMethod === 'email') {
+        const emailValue = directLoginOptions.email;
+        if (emailValue) {
+          pKCEAuthorizationUrl.searchParams.set('direct', directLoginOptions.directLoginMethod);
+          pKCEAuthorizationUrl.searchParams.set('email', emailValue);
+        }
+      } else {
+        // For non-email methods (social login), always include direct param
+        pKCEAuthorizationUrl.searchParams.set('direct', directLoginOptions.directLoginMethod);
+      }
+      if (directLoginOptions.marketingConsentStatus) {
+        pKCEAuthorizationUrl.searchParams.set('marketingConsent', directLoginOptions.marketingConsentStatus);
+      }
+    }
+
+    if (imPassportTraceId) {
+      pKCEAuthorizationUrl.searchParams.set('im_passport_trace_id', imPassportTraceId);
+    }
 
     return pKCEAuthorizationUrl.toString();
   }
@@ -342,15 +483,23 @@ export default class AuthManager {
     return response.data;
   }
 
+  public async storeTokens(tokenResponse: DeviceTokenResponse): Promise<User> {
+    return withPassportError<User>(async () => {
+      const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
+      const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
+      await this.userManager.storeUser(oidcUser);
+
+      return user;
+    }, PassportErrorType.AUTHENTICATION_ERROR);
+  }
+
   public async logout(): Promise<void> {
     return withPassportError<void>(async () => {
+      await this.userManager.revokeTokens(['refresh_token']);
+
       if (this.logoutMode === 'silent') {
-        await Promise.all([
-          this.userManager.revokeTokens(['refresh_token']),
-          this.userManager.signoutSilent(),
-        ]);
+        await this.userManager.signoutSilent();
       } else {
-        await this.userManager.revokeTokens(['refresh_token']);
         await this.userManager.signoutRedirect();
       }
     }, PassportErrorType.LOGOUT_ERROR);
@@ -364,15 +513,15 @@ export default class AuthManager {
     return this.userManager.removeUser();
   }
 
-  public async getLogoutUrl(): Promise<string> {
-    const { authenticationDomain, oidcConfiguration } = this.config;
+  public async getLogoutUrl(): Promise<string | null> {
+    const endSessionEndpoint = this.userManager.settings?.metadata?.end_session_endpoint;
 
-    const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain);
-    endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
+    if (!endSessionEndpoint) {
+      logger.warn('Failed to get logout URL');
+      return null;
+    }
 
-    if (oidcConfiguration.logoutRedirectUri) endSessionEndpoint.searchParams.set('returnTo', oidcConfiguration.logoutRedirectUri);
-
-    return endSessionEndpoint.toString();
+    return endSessionEndpoint;
   }
 
   public forceUserRefreshInBackground() {
@@ -469,13 +618,15 @@ export default class AuthManager {
     const oidcUser = await this.userManager.getUser();
     if (!oidcUser) return null;
 
-    if (!isTokenExpired(oidcUser)) {
+    // if the token is not expired or expiring in 30 seconds or less, return the user
+    if (!isAccessTokenExpiredOrExpiring(oidcUser)) {
       const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
       if (user && typeAssertion(user)) {
         return user;
       }
     }
 
+    // if the token is expired or expiring in 30 seconds or less, refresh the token
     if (oidcUser.refresh_token) {
       const user = await this.refreshTokenAndUpdatePromise();
       if (user && typeAssertion(user)) {

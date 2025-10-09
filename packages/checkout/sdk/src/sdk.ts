@@ -227,6 +227,7 @@ export class Checkout {
 
   /**
    * Fetches the risk assessment for the given addresses.
+   * @deprecated This function is deprecated and will be removed.
    * @param {string[]} addresses - The addresses to assess.
    * @returns {Promise<AssessmentResult>} - A promise that resolves to the risk assessment result.
    */
@@ -236,6 +237,7 @@ export class Checkout {
 
   /**
    * Helper method that checks if given risk assessment results contain sanctioned addresses.
+   * @deprecated This function is deprecated and will be removed.
    * @param {AssessmentResult} assessment - Risk assessment to analyse.
    * @param {string} [address] - If defined, only sanctions for the given address will be checked.
    * @returns {boolean} - Result of the check.
@@ -667,6 +669,8 @@ export class Checkout {
       tokenSymbol,
       email,
       allowedTokens,
+      showMenu: params.showMenu,
+      customSubTitle: params.customSubTitle,
     } as FiatRampWidgetParams);
   }
 

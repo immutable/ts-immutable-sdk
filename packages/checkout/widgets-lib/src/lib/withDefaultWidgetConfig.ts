@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { ThemeOverrides, WidgetTheme } from '@imtbl/checkout-sdk';
 import {
   DEFAULT_ADD_TOKENS_ENABLED,
   DEFAULT_BRIDGE_ENABLED,
@@ -11,6 +11,7 @@ import {
 
 export type StrongCheckoutWidgetsConfig = {
   theme: WidgetTheme;
+  themeOverrides: ThemeOverrides;
   environment: Environment;
   isOnRampEnabled: boolean;
   isSwapEnabled: boolean;
@@ -38,9 +39,18 @@ function getValidBoolean(defaultValue: boolean, value?: string): boolean {
 }
 
 export const withDefaultWidgetConfigs = (
-  configs?: any,
+  configs: {
+    theme: WidgetTheme | undefined;
+    themeOverrides: ThemeOverrides | undefined;
+    environment: Environment;
+    isOnRampEnabled: boolean;
+    isSwapEnabled: boolean;
+    isBridgeEnabled: boolean;
+    isAddTokensEnabled?: boolean; // TODO: why is this optional?
+  },
 ): StrongCheckoutWidgetsConfig => ({
   theme: getValidTheme(configs?.theme),
+  themeOverrides: configs?.themeOverrides ?? {},
   environment: getValidEnvironment(configs?.environment),
   isOnRampEnabled: getValidBoolean(
     DEFAULT_ON_RAMP_ENABLED,

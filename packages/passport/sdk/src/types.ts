@@ -3,6 +3,13 @@ import { EthSigner, IMXClient, StarkSigner } from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
 
+/**
+ * Direct login method identifier
+ * Known providers: 'google', 'apple', 'facebook'
+ * Additional providers may be supported server-side
+ */
+export type DirectLoginMethod = string;
+
 export enum PassportEvents {
   LOGGED_OUT = 'loggedOut',
   LOGGED_IN = 'loggedIn',
@@ -86,6 +93,7 @@ export interface PassportOverrides {
 export interface PopupOverlayOptions {
   disableGenericPopupOverlay?: boolean;
   disableBlockedPopupOverlay?: boolean;
+  disableHeadlessLoginPromptOverlay?: boolean;
 }
 
 export interface PassportModuleConfiguration
@@ -115,11 +123,6 @@ export interface PassportModuleConfiguration
    * to approve a deploy transaction before signing.
    */
   forceScwDeployBeforeMessageSignature?: boolean;
-
-  /**
-   * Extra query params to be sent to the OIDC provider.
-   */
-  extraQueryParams?: Record<string, string>;
 }
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
@@ -178,3 +181,27 @@ export type LinkedWallet = {
   name?: string;
   clientName: string;
 };
+
+export type ConnectEvmArguments = {
+  announceProvider: boolean;
+};
+
+export type LoginArguments = {
+  useCachedSession?: boolean;
+  anonymousId?: string;
+  useSilentLogin?: boolean;
+  useRedirectFlow?: boolean;
+  directLoginOptions?: DirectLoginOptions;
+};
+
+export enum MarketingConsentStatus {
+  OptedIn = 'opted_in',
+  Unsubscribed = 'unsubscribed',
+}
+
+export type DirectLoginOptions = {
+  marketingConsentStatus: MarketingConsentStatus;
+} & (
+  | { directLoginMethod: 'email'; email: string }
+  | { directLoginMethod: Exclude<DirectLoginMethod, 'email'>; email?: never }
+);

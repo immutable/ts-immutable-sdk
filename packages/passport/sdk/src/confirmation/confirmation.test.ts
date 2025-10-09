@@ -7,7 +7,7 @@ import ConfirmationScreen from './confirmation';
 import SpyInstance = jest.SpyInstance;
 import { testConfig } from '../test/mocks';
 import { PassportConfiguration } from '../config';
-import { PASSPORT_EVENT_TYPE, ReceiveMessage } from './types';
+import { PASSPORT_CONFIRMATION_EVENT_TYPE, ConfirmationReceiveMessage } from './types';
 
 let windowSpy: SpyInstance;
 const closeMock = jest.fn();
@@ -92,8 +92,8 @@ describe('confirmation', () => {
       const mockedWindowReadyValue = {
         origin: testConfig.passportDomain,
         data: {
-          eventType: PASSPORT_EVENT_TYPE,
-          messageType: ReceiveMessage.CONFIRMATION_WINDOW_READY,
+          eventType: PASSPORT_CONFIRMATION_EVENT_TYPE,
+          messageType: ConfirmationReceiveMessage.CONFIRMATION_WINDOW_READY,
         },
       };
       addEventListenerMock
@@ -126,8 +126,8 @@ describe('confirmation', () => {
             callback({
               origin: testConfig.passportDomain,
               data: {
-                eventType: PASSPORT_EVENT_TYPE,
-                messageType: ReceiveMessage.TRANSACTION_REJECTED,
+                eventType: PASSPORT_CONFIRMATION_EVENT_TYPE,
+                messageType: ConfirmationReceiveMessage.TRANSACTION_REJECTED,
               },
             });
           });
@@ -179,8 +179,8 @@ describe('confirmation', () => {
       const mockedWindowReadyValue = {
         origin: testConfig.passportDomain,
         data: {
-          eventType: PASSPORT_EVENT_TYPE,
-          messageType: ReceiveMessage.CONFIRMATION_WINDOW_READY,
+          eventType: PASSPORT_CONFIRMATION_EVENT_TYPE,
+          messageType: ConfirmationReceiveMessage.CONFIRMATION_WINDOW_READY,
         },
       };
       addEventListenerMock
@@ -209,8 +209,8 @@ describe('confirmation', () => {
             callback({
               origin: testConfig.passportDomain,
               data: {
-                eventType: PASSPORT_EVENT_TYPE,
-                messageType: ReceiveMessage.MESSAGE_REJECTED,
+                eventType: PASSPORT_CONFIRMATION_EVENT_TYPE,
+                messageType: ConfirmationReceiveMessage.MESSAGE_REJECTED,
               },
             });
           });

@@ -28,6 +28,7 @@ import {
   WalletProviderName,
   Widget,
   SalePaymentTypes,
+  WalletProviderRdns,
 } from "@imtbl/checkout-sdk";
 import { Passport } from "@imtbl/passport";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
@@ -180,7 +181,7 @@ function CheckoutUI() {
   >({
     CONNECT: {
       flow: CommerceFlowType.CONNECT,
-      // blocklistWalletRdns: ["io.metamask"],
+      blocklistWalletRdns: ["io.metamask"],
       // targetChainId: ChainId.SEPOLIA,
       // targetWalletRdns: "io.metamask",
       theme: WidgetTheme.LIGHT,
@@ -198,6 +199,7 @@ function CheckoutUI() {
       amount: "10",
       fromTokenAddress: "native",
       toTokenAddress: "0x3B2d8A1931736Fc321C24864BceEe981B11c3c57",
+      showBackButton: true,
     },
     WALLET: {
       flow: CommerceFlowType.WALLET,
@@ -285,19 +287,29 @@ function CheckoutUI() {
       provider: browserProvider,
       config: {
         theme,
+        themeOverrides: {
+          drawerBackground: 'transparent',
+        },
         language,
-        // SWAP: {},
-        // BRIDGE: {},
-        // CONNECT: {},
-        // ONRAMP: {},
-        SALE: {
-          hideExcludedPaymentTypes: true,
-          waitFulfillmentSettlements: false,
+        /*
+        SWAP: {
+          showHeader: true,
         },
-        WALLET: {
-          showDisconnectButton: true,
-          showNetworkMenu: true,
+        */
+        CONNECT: {
+
         },
+        TRANSFER: {
+          customTitle: "Dromedary Transfer",
+        },
+        /*
+        ONRAMP: {
+          customTitle: "Dromedary On-Ramp",
+          customSubTitle: "Camel On-Ramp",
+          showMenu: true,
+          showHeader: true,
+        },
+        */
       },
     });
   }, [widgetsFactory, browserProvider, renderAfterConnect]);
@@ -397,7 +409,6 @@ function CheckoutUI() {
       const params = new URLSearchParams(window.location.search);
       params.set("environment", environment);
       window.location.href = `${window.location.href}?${params.toString()}`;
-
     }
   }, [environment, prevEnvironment]);
 

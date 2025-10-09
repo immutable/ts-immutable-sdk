@@ -16,6 +16,7 @@ type DeliverToWalletDrawerProps = {
     provider: WrappedBrowserProvider,
     providerInfo: EIP6963ProviderInfo
   ) => void;
+  drawerBackground: string | undefined;
 };
 
 export function DeliverToWalletDrawer({
@@ -23,6 +24,7 @@ export function DeliverToWalletDrawer({
   onClose,
   onConnect,
   walletOptions,
+  drawerBackground,
 }: DeliverToWalletDrawerProps) {
   const {
     providersState: { fromProviderInfo },
@@ -50,6 +52,7 @@ export function DeliverToWalletDrawer({
       providerType="to"
       walletOptions={walletOptions}
       onConnect={handleOnConnect}
+      drawerBackground={drawerBackground}
       getShouldRequestWalletPermissions={
         selectedSameFromWalletType
       }

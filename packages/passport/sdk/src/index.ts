@@ -19,8 +19,15 @@ export {
 export type {
   LinkWalletParams,
   LinkedWallet,
+  ConnectEvmArguments,
+  LoginArguments,
   UserProfile,
   PassportOverrides,
   PassportModuleConfiguration,
   DeviceTokenResponse,
+  DirectLoginOptions,
+  DirectLoginMethod,
+} from './types';
+export {
+  MarketingConsentStatus,
 } from './types';

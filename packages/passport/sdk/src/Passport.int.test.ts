@@ -29,6 +29,17 @@ const redirectUri = 'example.com';
 const popupRedirectUri = 'example.com';
 const logoutRedirectUri = 'example.com';
 const clientId = 'clientId123';
+const now = Math.floor(Date.now() / 1000);
+const oneHourLater = now + 3600;
+
+const mockValidAccessToken = encode({
+  iss: 'https://example.auth0.com/',
+  aud: 'https://api.example.com/',
+  sub: 'sub123',
+  iat: now,
+  exp: oneHourLater,
+}, 'secret');
+
 const mockOidcUser = {
   profile: {
     sub: 'sub123',
@@ -37,13 +48,20 @@ const mockOidcUser = {
   },
   expired: false,
   id_token: mockValidIdToken,
-  access_token: 'accessToken123',
+  access_token: mockValidAccessToken,
   refresh_token: 'refreshToken123',
 };
 
 const mockOidcUserZkevm = {
   ...mockOidcUser,
   id_token: encode({
+    iss: 'https://example.auth0.com/',
+    aud: 'clientId123',
+    sub: 'sub123',
+    iat: now,
+    exp: oneHourLater,
+    email: 'test@example.com',
+    nickname: 'test',
     passport: {
       zkevm_eth_address: mockUserZkEvm.zkEvm.ethAddress,
       zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
@@ -58,8 +76,8 @@ const oidcConfiguration: OidcConfiguration = {
   logoutRedirectUri,
 };
 
-const getZkEvmProvider = async () => {
-  const passport = new Passport({
+const getPassport = () => (
+  new Passport({
     baseConfig: new ImmutableConfiguration({
       environment: Environment.SANDBOX,
     }),
@@ -69,8 +87,14 @@ const getZkEvmProvider = async () => {
     popupRedirectUri,
     logoutRedirectUri,
     scope: 'openid offline_access profile email transact',
-  });
+    popupOverlayOptions: {
+      disableHeadlessLoginPromptOverlay: true,
+    },
+  })
+);
 
+const getZkEvmProvider = async () => {
+  const passport = getPassport();
   return await passport.connectEvm();
 };
 
@@ -81,9 +105,25 @@ describe('Passport', () => {
   const mockLoginWithOidc = jest.fn();
   const mockMagicRequest = jest.fn();
   const mockMagicUserIsLoggedIn = jest.fn();
+  let originalWindowOpen: any;
 
   beforeEach(() => {
     jest.resetAllMocks();
+
+    // Mock window.open to handle popup detection in authManager
+    originalWindowOpen = window.open;
+    window.open = jest.fn().mockReturnValue({
+      closed: false,
+      close: jest.fn(),
+    });
+
+    // Mock crypto.randomUUID for authManager login functionality
+    Object.defineProperty(window, 'crypto', {
+      value: {
+        randomUUID: jest.fn().mockReturnValue('mock-uuid-12345'),
+      },
+      writable: true,
+    });
 
     mockMagicUserIsLoggedIn.mockResolvedValue(true);
     (UserManager as jest.Mock).mockImplementation(() => ({
@@ -104,6 +144,8 @@ describe('Passport', () => {
 
   afterEach(() => {
     resetMswHandlers();
+    // Restore original window.open
+    window.open = originalWindowOpen;
   });
 
   afterAll(async () => {
@@ -332,17 +374,7 @@ describe('Passport', () => {
         mockSigninPopup.mockResolvedValue(mockOidcUserZkevm);
         mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
 
-        const passport = new Passport({
-          baseConfig: new ImmutableConfiguration({
-            environment: Environment.SANDBOX,
-          }),
-          audience: 'platform_api',
-          clientId,
-          redirectUri,
-          popupRedirectUri,
-          logoutRedirectUri,
-          scope: 'openid offline_access profile email transact',
-        });
+        const passport = getPassport();
 
         // user isn't logged in, so wont set signer when provider is instantiated
         // #doc request-accounts

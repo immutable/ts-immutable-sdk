@@ -29,12 +29,16 @@ export function TransferForm({
   setViewState,
   onSend,
   showBackButton,
+  showHeader,
+  title,
 }: {
   config: StrongCheckoutWidgetsConfig;
   viewState: TransferFormState;
   setViewState: Dispatch<SetStateAction<TransferState>>;
   onSend: () => void;
   showBackButton: boolean | undefined;
+  showHeader: boolean;
+  title: string;
 }) {
   const { t } = useTranslation();
   const { track } = useAnalytics();
@@ -92,7 +96,7 @@ export function TransferForm({
       if (typeof optionKey !== 'string') throw new Error('Invalid token address');
       setViewState((s) => ({ ...s, tokenAddress: optionKey, amountError: '' }));
     },
-    [tokenOptions, token],
+    [setViewState, track],
   );
 
   const handleMaxButtonClick = useCallback(() => {
@@ -111,22 +115,22 @@ export function TransferForm({
       if (!token.balance) throw new Error('Token balance not found');
       return { ...s, amount: token.balance.fullBalance };
     });
-  }, [tokenOptions, token]);
+  }, [token, setViewState, track]);
 
   const handleRecipientAddressChange = useCallback((value: string) => {
     setViewState((s) => ({ ...s, toAddress: value, toAddressError: '' }));
-  }, []);
+  }, [setViewState]);
 
   const handleAmountChange = useCallback((value: string) => {
     setViewState((s) => ({ ...s, amount: value, amountError: '' }));
-  }, []);
+  }, [setViewState]);
 
   const selectSubtext = useMemo(() => {
     if (!token) return '';
     return `${t('views.TRANSFER.content.availableBalancePrefix')} ${
       token.balance?.formattedAmount
     }`;
-  }, [token]);
+  }, [token, t]);
 
   const isButtonDisabled = useMemo(
     () => !viewState.amount || !viewState.toAddress || !token,
@@ -135,9 +139,9 @@ export function TransferForm({
 
   return (
     <SimpleLayout
-      header={(
+      header={showHeader ? (
         <HeaderNavigation
-          title={t('views.TRANSFER.header.title')}
+          title={title}
           onCloseButtonClick={() => sendCloseWidgetEvent(eventTarget)}
           showBack={showBackButton}
           onBackButtonClick={() => {
@@ -148,7 +152,7 @@ export function TransferForm({
             );
           }}
         />
-      )}
+      ) : undefined}
     >
       <Stack
         justifyContent="space-between"
@@ -185,6 +189,8 @@ export function TransferForm({
               userJourney={UserJourney.TRANSFER}
               screen="TransferToken"
               control="Token"
+              theme={config.theme}
+              themeOverrides={config.themeOverrides}
             />
           </Stack>
           <Stack gap="base.spacing.x1">

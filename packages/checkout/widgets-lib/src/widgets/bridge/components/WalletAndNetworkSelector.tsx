@@ -12,7 +12,7 @@ import {
   useState,
 } from 'react';
 import {
-  ChainId, WalletProviderName, WalletProviderRdns, WrappedBrowserProvider,
+  ChainId, ThemeOverrides, WalletProviderName, WalletProviderRdns, WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
@@ -43,7 +43,7 @@ import { WalletChangeEvent } from '../../../components/WalletDrawer/WalletDrawer
 
 const testId = 'wallet-network-selector';
 
-export function WalletAndNetworkSelector() {
+export function WalletAndNetworkSelector({ themeOverrides }: { themeOverrides: ThemeOverrides }) {
   const { t } = useTranslation();
   const {
     bridgeState: { checkout, from, to },
@@ -475,6 +475,7 @@ export function WalletAndNetworkSelector() {
         setShowDrawer={setFromWalletDrawerOpen}
         walletOptions={fromWalletSelectorOptions}
         onWalletChange={handleFromWalletConnection}
+        drawerBackground={themeOverrides.drawerBackground}
       />
 
       {/* From selections have been made */}
@@ -521,6 +522,7 @@ export function WalletAndNetworkSelector() {
               showDrawer={toWalletDrawerOpen}
               setShowDrawer={setToWalletDrawerOpen}
               onWalletChange={handleToWalletSelection}
+              drawerBackground={themeOverrides.drawerBackground}
             />
           </Box>
         </Box>

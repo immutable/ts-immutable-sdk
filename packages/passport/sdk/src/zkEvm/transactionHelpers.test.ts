@@ -322,6 +322,48 @@ describe('transactionHelpers', () => {
         flow,
       })).rejects.toThrow('Transaction send failed');
     });
+
+    it('throws an error when imGetFeeOptions returns undefined', async () => {
+      (relayerClient.imGetFeeOptions as jest.Mock).mockResolvedValue(undefined);
+
+      await expect(prepareAndSignTransaction({
+        transactionRequest,
+        ethSigner,
+        rpcProvider,
+        guardianClient,
+        relayerClient,
+        zkEvmAddress,
+        flow,
+      })).rejects.toThrow('Invalid fee options received from relayer');
+    });
+
+    it('throws an error when imGetFeeOptions returns null', async () => {
+      (relayerClient.imGetFeeOptions as jest.Mock).mockResolvedValue(null);
+
+      await expect(prepareAndSignTransaction({
+        transactionRequest,
+        ethSigner,
+        rpcProvider,
+        guardianClient,
+        relayerClient,
+        zkEvmAddress,
+        flow,
+      })).rejects.toThrow('Invalid fee options received from relayer');
+    });
+
+    it('throws an error when imGetFeeOptions returns a non-array', async () => {
+      (relayerClient.imGetFeeOptions as jest.Mock).mockResolvedValue({ invalid: 'response' });
+
+      await expect(prepareAndSignTransaction({
+        transactionRequest,
+        ethSigner,
+        rpcProvider,
+        guardianClient,
+        relayerClient,
+        zkEvmAddress,
+        flow,
+      })).rejects.toThrow('Invalid fee options received from relayer');
+    });
   });
 
   describe('prepareAndSignEjectionTransaction', () => {

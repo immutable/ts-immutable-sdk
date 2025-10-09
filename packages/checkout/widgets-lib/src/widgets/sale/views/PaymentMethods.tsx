@@ -1,7 +1,7 @@
 import { Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 
-import { isAddressSanctioned, SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -32,10 +32,9 @@ export function PaymentMethods() {
     invalidParameters,
     disabledPaymentTypes,
     hideExcludedPaymentTypes,
-    riskAssessment,
   } = useSaleContext();
   const {
-    sendFailedEvent, sendPageView, sendCloseEvent, sendSelectedPaymentMethod,
+    sendPageView, sendCloseEvent, sendSelectedPaymentMethod,
   } = useSaleEvent();
 
   const handleOptionClick = (type: SalePaymentTypes) => {
@@ -51,25 +50,6 @@ export function PaymentMethods() {
       paymentMethod
       && [SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT].includes(paymentMethod)
     ) {
-      if (riskAssessment && isAddressSanctioned(riskAssessment)) {
-        const error = new Error('Sanctioned address');
-        sendFailedEvent(error.message, {}, [], undefined, { riskAssessment, paymentMethod });
-
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
-              error,
-            },
-          },
-        });
-
-        setPaymentMethod(undefined);
-
-        return;
-      }
-
       sign(SignPaymentTypes.FIAT, undefined, () => {
         viewDispatch({
           payload: {

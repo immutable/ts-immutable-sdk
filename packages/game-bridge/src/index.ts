@@ -9,7 +9,18 @@ import {
   trackDuration,
   identify,
 } from '@imtbl/metrics';
-import { BrowserProvider } from 'ethers';
+// eslint-disable-next-line import/no-duplicates
+import * as ethers from 'ethers';
+// eslint-disable-next-line import/no-duplicates
+import { BrowserProvider, getAddress } from 'ethers';
+
+// This patches a bundler issue where @0xsequence/core expects
+// `ethers.getAddress` to exist on the `ethers` namespace, but Parcel
+// fails to attach it in a global build. This ensures the function is
+// available before any Passport code executes.
+if (typeof ethers === 'object' && !ethers.getAddress) {
+  (ethers as any).getAddress = getAddress;
+}
 
 /* eslint-disable no-undef */
 const scope = 'openid offline_access profile email transact';
@@ -42,6 +53,7 @@ const PASSPORT_FUNCTIONS = {
   getEmail: 'getEmail',
   getPassportId: 'getPassportId',
   getLinkedAddresses: 'getLinkedAddresses',
+  storeTokens: 'storeTokens',
   imx: {
     getAddress: 'getAddress',
     isRegisteredOffchain: 'isRegisteredOffchain',
@@ -233,7 +245,6 @@ window.callFunction = async (jsonData: string) => {
               scope,
               crossSdkBridgeEnabled: true,
               logoutMode,
-              extraQueryParams: request.extraQueryParams,
               overrides: {
                 authenticationDomain: 'https://auth.dev.immutable.com',
                 magicPublishableApiKey: 'pk_live_4058236363130CA9', // Public key
@@ -269,7 +280,6 @@ window.callFunction = async (jsonData: string) => {
               crossSdkBridgeEnabled: true,
               jsonRpcReferrer: 'http://imtblgamesdk.local',
               logoutMode,
-              extraQueryParams: request.extraQueryParams,
             };
           }
 
@@ -351,7 +361,10 @@ window.callFunction = async (jsonData: string) => {
         break;
       }
       case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
-        const url = await getPassportClient().loginWithPKCEFlow();
+        const request = data ? JSON.parse(data) : {};
+        const directLoginOptions: passport.DirectLoginOptions | undefined = request?.directLoginOptions;
+        const imPassportTraceId: string | undefined = request?.imPassportTraceId;
+        const url = await getPassportClient().loginWithPKCEFlow(directLoginOptions, imPassportTraceId);
         trackDuration(moduleName, 'performedGetPkceAuthUrl', mt(markStart));
         callbackToGame({
           responseFor: fxName,
@@ -498,6 +511,19 @@ window.callFunction = async (jsonData: string) => {
           success: true,
           error: null,
           result: linkedAddresses,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.storeTokens: {
+        const tokenResponse = JSON.parse(data);
+        const response = await getPassportClient().storeTokens(tokenResponse);
+        trackDuration(moduleName, 'performedStoreTokens', mt(markStart));
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          error: null,
+          result: response,
         });
         break;
       }

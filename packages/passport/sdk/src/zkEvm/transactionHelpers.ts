@@ -57,6 +57,10 @@ const getFeeOption = async (
     transactions,
   );
 
+  if (!feeOptions || !Array.isArray(feeOptions)) {
+    throw new Error('Invalid fee options received from relayer');
+  }
+
   const imxFeeOption = feeOptions.find(
     (feeOption) => feeOption.tokenSymbol === 'IMX',
   );

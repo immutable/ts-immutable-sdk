@@ -2,12 +2,13 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User as OidcUser, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import jwt_decode from 'jwt-decode';
 import AuthManager from './authManager';
-import Overlay from './overlay';
+import ConfirmationOverlay from './overlay/confirmationOverlay';
+import EmbeddedLoginPrompt from './confirmation/embeddedLoginPrompt';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
-import { isTokenExpired } from './utils/token';
-import { isUserZkEvm, PassportModuleConfiguration } from './types';
+import { isAccessTokenExpiredOrExpiring } from './utils/token';
+import { isUserZkEvm, MarketingConsentStatus, PassportModuleConfiguration } from './types';
 
 jest.mock('jwt-decode');
 jest.mock('oidc-client-ts', () => ({
@@ -17,13 +18,15 @@ jest.mock('oidc-client-ts', () => ({
   WebStorageStateStore: jest.fn(),
 }));
 jest.mock('./utils/token');
-jest.mock('./overlay');
+jest.mock('./overlay/confirmationOverlay');
+jest.mock('./confirmation/embeddedLoginPrompt');
 
 const authenticationDomain = 'auth.immutable.com';
 const clientId = '11111';
 const redirectUri = 'https://test.com';
 const popupRedirectUri = `${redirectUri}-popup`;
 const logoutEndpoint = '/v2/logout';
+const crossSdkBridgeLogoutEndpoint = '/im-logged-out';
 const logoutRedirectUri = `${redirectUri}logout/callback`;
 
 const getConfig = (values?: Partial<PassportModuleConfiguration>) => new PassportConfiguration({
@@ -34,6 +37,9 @@ const getConfig = (values?: Partial<PassportModuleConfiguration>) => new Passpor
   redirectUri,
   popupRedirectUri,
   scope: 'email profile',
+  popupOverlayOptions: {
+    disableHeadlessLoginPromptOverlay: true,
+  },
   ...values,
 });
 
@@ -81,8 +87,6 @@ const zkEvmProfileData = {
 const mockErrorMsg = 'NONO';
 
 describe('AuthManager', () => {
-  afterEach(jest.resetAllMocks);
-
   let authManager: AuthManager;
   let mockSigninPopup: jest.Mock;
   let mockSigninCallback: jest.Mock;
@@ -95,8 +99,25 @@ describe('AuthManager', () => {
   let mockOverlayAppend: jest.Mock;
   let mockOverlayRemove: jest.Mock;
   let mockRevokeTokens: jest.Mock;
+  let mockEmbeddedLoginPrompt: jest.Mocked<EmbeddedLoginPrompt>;
+  let originalWindowOpen: any;
 
   beforeEach(() => {
+    // Store original window.open and replace with mock globally
+    originalWindowOpen = window.open;
+    window.open = jest.fn().mockReturnValue({
+      closed: false,
+      close: jest.fn(),
+    });
+
+    // Mock crypto.randomUUID globally for all tests
+    Object.defineProperty(window, 'crypto', {
+      value: {
+        randomUUID: jest.fn().mockReturnValue('mock-uuid-12345'),
+      },
+      writable: true,
+    });
+
     mockSigninPopup = jest.fn();
     mockSigninCallback = jest.fn();
     mockSigninRedirectCallback = jest.fn();
@@ -108,7 +129,7 @@ describe('AuthManager', () => {
     mockOverlayAppend = jest.fn();
     mockOverlayRemove = jest.fn();
     mockRevokeTokens = jest.fn();
-    (UserManager as jest.Mock).mockReturnValue({
+    (UserManager as jest.Mock).mockImplementation((config) => ({
       signinPopup: mockSigninPopup,
       signinCallback: mockSigninCallback,
       signinRedirectCallback: mockSigninRedirectCallback,
@@ -118,18 +139,36 @@ describe('AuthManager', () => {
       signinSilent: mockSigninSilent,
       storeUser: mockStoreUser,
       revokeTokens: mockRevokeTokens,
-    });
-    (Overlay as jest.Mock).mockReturnValue({
+      settings: {
+        metadata: {
+          end_session_endpoint: config.metadata?.end_session_endpoint,
+        },
+      },
+    }));
+    (ConfirmationOverlay as jest.Mock).mockReturnValue({
       append: mockOverlayAppend,
       remove: mockOverlayRemove,
     });
-    authManager = new AuthManager(getConfig());
+
+    mockEmbeddedLoginPrompt = {
+      displayEmbeddedLoginPrompt: jest.fn(),
+    } as unknown as jest.Mocked<EmbeddedLoginPrompt>;
+
+    (EmbeddedLoginPrompt as unknown as jest.Mock).mockImplementation(() => mockEmbeddedLoginPrompt);
+
+    authManager = new AuthManager(getConfig(), mockEmbeddedLoginPrompt);
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+    // Restore original window.open
+    window.open = originalWindowOpen;
   });
 
   describe('constructor', () => {
     it('should initialise AuthManager with the correct default configuration', () => {
       const config = getConfig();
-      const am = new AuthManager(config);
+      const am = new AuthManager(config, mockEmbeddedLoginPrompt);
       expect(am).toBeDefined();
       expect(UserManager).toBeCalledWith({
         authority: config.authenticationDomain,
@@ -158,7 +197,7 @@ describe('AuthManager', () => {
         const configWithAudience = getConfig({
           audience: 'audience',
         });
-        const am = new AuthManager(configWithAudience);
+        const am = new AuthManager(configWithAudience, mockEmbeddedLoginPrompt);
         expect(am).toBeDefined();
         expect(UserManager).toBeCalledWith(expect.objectContaining({
           extraQueryParams: {
@@ -172,7 +211,7 @@ describe('AuthManager', () => {
     describe('when a logoutRedirectUri is specified', () => {
       it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', () => {
         const configWithLogoutRedirectUri = getConfig({ logoutRedirectUri });
-        const am = new AuthManager(configWithLogoutRedirectUri);
+        const am = new AuthManager(configWithLogoutRedirectUri, mockEmbeddedLoginPrompt);
 
         const uri = new URL(logoutEndpoint, `https://${authenticationDomain}`);
         uri.searchParams.append('client_id', clientId);
@@ -195,6 +234,90 @@ describe('AuthManager', () => {
 
         const result = await authManager.login();
         expect(result).toEqual(mockUser);
+      });
+    });
+
+    describe('popup closed detection', () => {
+      let mockPopupRef: any;
+      let mockSetInterval: jest.SpyInstance;
+      let mockClearInterval: jest.SpyInstance;
+
+      beforeEach(() => {
+        mockPopupRef = {
+          closed: false,
+          close: jest.fn(),
+        };
+
+        // Override the global mock for these tests
+        (window.open as jest.Mock).mockReturnValue(mockPopupRef);
+
+        mockSetInterval = jest.spyOn(global, 'setInterval');
+        mockClearInterval = jest.spyOn(global, 'clearInterval');
+      });
+
+      afterEach(() => {
+        mockSetInterval.mockRestore();
+        mockClearInterval.mockRestore();
+      });
+
+      it('should reject with "Popup closed by user" when popup is closed during authentication', async () => {
+        // Mock signinPopup to return a promise that never resolves (simulating long authentication)
+        const signinPromise = new Promise<any>(() => {
+          // Promise never resolves to simulate ongoing authentication
+        });
+        mockSigninPopup.mockReturnValue(signinPromise);
+
+        // Start the login process
+        const loginPromise = authManager.login();
+
+        // Wait for the polling to be set up
+        await new Promise((resolve) => {
+          setTimeout(resolve, 10);
+        });
+
+        // Verify polling was set up
+        expect(mockSetInterval).toHaveBeenCalledWith(expect.any(Function), 500);
+
+        // Get the polling function and simulate popup being closed
+        const pollingCallback = mockSetInterval.mock.calls[0][0];
+        mockPopupRef.closed = true;
+        pollingCallback(); // Manually trigger the polling callback
+
+        // Expect the login to reject with popup closed error
+        await expect(loginPromise).rejects.toThrow('Popup closed by user');
+      });
+
+      it('should clean up timer when user authentication completes successfully', async () => {
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+        await authManager.login();
+
+        // Verify timer was cleared
+        expect(mockClearInterval).toHaveBeenCalled();
+        // Verify popup was closed
+        expect(mockPopupRef.close).toHaveBeenCalled();
+      });
+
+      it('should fall back to original behavior when popup reference is not available', async () => {
+        // Mock window.open to return null (popup blocked or failed)
+        (window.open as jest.Mock).mockReturnValue(null);
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+        const result = await authManager.login();
+
+        expect(result).toEqual(mockUser);
+        // Should not set up polling when no popup reference
+        expect(mockSetInterval).not.toHaveBeenCalled();
+      });
+
+      it('should use correct polling duration constant', async () => {
+        const neverResolvingPromise = new Promise(() => { });
+        mockSigninPopup.mockReturnValue(neverResolvingPromise);
+
+        authManager.login().catch(() => { }); // Ignore rejection for this test
+
+        // Verify the polling interval uses the correct constant (500ms)
+        expect(mockSetInterval).toHaveBeenCalledWith(expect.any(Function), 500);
       });
     });
 
@@ -263,7 +386,9 @@ describe('AuthManager', () => {
     });
 
     it('should throw the error if user is failed to login', async () => {
-      mockSigninPopup.mockRejectedValue(new Error(mockErrorMsg));
+      mockSigninPopup.mockImplementation(() => {
+        throw new Error(mockErrorMsg);
+      });
 
       await expect(() => authManager.login()).rejects.toThrow(
         new PassportError(
@@ -276,7 +401,9 @@ describe('AuthManager', () => {
 
     describe('when the popup is blocked', () => {
       beforeEach(() => {
-        mockSigninPopup.mockRejectedValueOnce(new Error('Attempted to navigate on a disposed window'));
+        mockSigninPopup.mockImplementationOnce(() => {
+          throw new Error('Attempted to navigate on a disposed window');
+        });
       });
 
       it('should render the blocked popup overlay', async () => {
@@ -286,7 +413,15 @@ describe('AuthManager', () => {
             disableBlockedPopupOverlay: false,
           },
         });
-        const am = new AuthManager(configWithPopupOverlayOptions);
+        const am = new AuthManager(configWithPopupOverlayOptions, mockEmbeddedLoginPrompt);
+
+        // Mock the embedded login prompt to return a result
+        const mockEmbeddedLoginPromptResult = {
+          directLoginMethod: 'google' as const,
+          marketingConsentStatus: MarketingConsentStatus.OptedIn,
+          imPassportTraceId: 'test-trace-id',
+        };
+        mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt.mockResolvedValue(mockEmbeddedLoginPromptResult);
 
         mockSigninPopup.mockReturnValue(mockOidcUser);
         // Simulate `tryAgainOnClick` being called so that the `login()` promise can resolve
@@ -297,7 +432,7 @@ describe('AuthManager', () => {
         const result = await am.login();
 
         expect(result).toEqual(mockUser);
-        expect(Overlay).toHaveBeenCalledWith(configWithPopupOverlayOptions.popupOverlayOptions, true);
+        expect(ConfirmationOverlay).toHaveBeenCalledWith(configWithPopupOverlayOptions.popupOverlayOptions, true);
         expect(mockOverlayAppend).toHaveBeenCalledTimes(1);
       });
 
@@ -320,7 +455,9 @@ describe('AuthManager', () => {
 
         describe('and the user closes the popup', () => {
           it('should throw an error', async () => {
-            mockSigninPopup.mockRejectedValueOnce(new Error('Popup closed by user'));
+            mockSigninPopup.mockImplementationOnce(() => {
+              throw new Error('Popup closed by user');
+            });
 
             await expect(() => authManager.login()).rejects.toThrow(
               new Error('Popup closed by user'),
@@ -329,6 +466,48 @@ describe('AuthManager', () => {
             expect(mockSigninPopup).toHaveBeenCalledTimes(2);
             expect(mockOverlayRemove).toHaveBeenCalled();
           });
+        });
+      });
+
+      describe('when tryAgainOnClick is called multiple times', () => {
+        it('should call window.open with the same popupWindowTarget to focus existing popup', async () => {
+          let tryAgainCallback: (() => Promise<void>) | undefined;
+
+          mockOverlayAppend.mockImplementation(async (tryAgain: () => Promise<void>) => {
+            tryAgainCallback = tryAgain;
+            // First call - should open new popup
+            await tryAgain();
+          });
+
+          mockSigninPopup.mockReturnValue(mockOidcUser);
+
+          const loginPromise = authManager.login();
+
+          // Wait for the overlay to be set up
+          await new Promise((resolve) => { setTimeout(resolve, 10); });
+
+          // Verify the popupWindowTarget was generated
+          const expectedTarget = 'mock-uuid-12345';
+
+          // Verify first signinPopup call used the target
+          expect(mockSigninPopup).toHaveBeenCalledWith(
+            expect.objectContaining({
+              popupWindowTarget: expectedTarget,
+            }),
+          );
+
+          // Reset window.open mock to track subsequent calls
+          (window.open as jest.Mock).mockClear();
+
+          // Call tryAgain again - should focus existing popup
+          if (tryAgainCallback) {
+            await tryAgainCallback();
+          }
+
+          // Verify window.open was called with empty URL and the same target
+          expect(window.open).toHaveBeenCalledWith('', expectedTarget);
+
+          await loginPromise;
         });
       });
 
@@ -352,7 +531,7 @@ describe('AuthManager', () => {
     describe('when getUser returns a user', () => {
       it('should return the user', async () => {
         mockGetUser.mockReturnValue(mockOidcUser);
-        (isTokenExpired as jest.Mock).mockReturnValue(false);
+        (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(false);
 
         const result = await authManager.getUserOrLogin();
 
@@ -362,9 +541,11 @@ describe('AuthManager', () => {
 
     describe('when getUser throws an error', () => {
       it('calls attempts to sign in the user using signinPopup', async () => {
-        mockGetUser.mockRejectedValue(new Error(mockErrorMsg));
+        mockGetUser.mockImplementation(() => {
+          throw new Error(mockErrorMsg);
+        });
         mockSigninPopup.mockReturnValue(mockOidcUser);
-        (isTokenExpired as jest.Mock).mockReturnValue(false);
+        (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(false);
 
         const result = await authManager.getUserOrLogin();
 
@@ -374,6 +555,30 @@ describe('AuthManager', () => {
   });
 
   describe('loginCallback', () => {
+    let mockSigninPopupCallback: jest.Mock;
+
+    beforeEach(() => {
+      mockSigninPopupCallback = jest.fn();
+      (UserManager as jest.Mock).mockImplementation((config) => ({
+        signinPopup: mockSigninPopup,
+        signinCallback: mockSigninCallback,
+        signinPopupCallback: mockSigninPopupCallback,
+        signinRedirectCallback: mockSigninRedirectCallback,
+        signoutRedirect: mockSignoutRedirect,
+        signoutSilent: mockSignoutSilent,
+        getUser: mockGetUser,
+        signinSilent: mockSigninSilent,
+        storeUser: mockStoreUser,
+        revokeTokens: mockRevokeTokens,
+        settings: {
+          metadata: {
+            end_session_endpoint: config.metadata?.end_session_endpoint,
+          },
+        },
+      }));
+      authManager = new AuthManager(getConfig(), mockEmbeddedLoginPrompt);
+    });
+
     it('should call login callback', async () => {
       await authManager.loginCallback();
 
@@ -393,7 +598,7 @@ describe('AuthManager', () => {
       const configuration = getConfig({
         logoutMode: 'redirect',
       });
-      const manager = new AuthManager(configuration);
+      const manager = new AuthManager(configuration, mockEmbeddedLoginPrompt);
 
       await manager.logout();
 
@@ -405,7 +610,7 @@ describe('AuthManager', () => {
       const configuration = getConfig({
         logoutMode: undefined,
       });
-      const manager = new AuthManager(configuration);
+      const manager = new AuthManager(configuration, mockEmbeddedLoginPrompt);
 
       await manager.logout();
 
@@ -417,7 +622,7 @@ describe('AuthManager', () => {
       const configuration = getConfig({
         logoutMode: 'silent',
       });
-      const manager = new AuthManager(configuration);
+      const manager = new AuthManager(configuration, mockEmbeddedLoginPrompt);
 
       await manager.logout();
 
@@ -430,8 +635,10 @@ describe('AuthManager', () => {
         const configuration = getConfig({
           logoutMode: 'redirect',
         });
-        const manager = new AuthManager(configuration);
-        mockRevokeTokens.mockRejectedValue(new Error(mockErrorMsg));
+        const manager = new AuthManager(configuration, mockEmbeddedLoginPrompt);
+        mockRevokeTokens.mockImplementation(() => {
+          throw new Error(mockErrorMsg);
+        });
 
         await expect(() => manager.logout()).rejects.toThrow(
           new PassportError(
@@ -446,8 +653,10 @@ describe('AuthManager', () => {
         const configuration = getConfig({
           logoutMode: 'silent',
         });
-        const manager = new AuthManager(configuration);
-        mockRevokeTokens.mockRejectedValue(new Error(mockErrorMsg));
+        const manager = new AuthManager(configuration, mockEmbeddedLoginPrompt);
+        mockRevokeTokens.mockImplementation(() => {
+          throw new Error(mockErrorMsg);
+        });
 
         await expect(() => manager.logout()).rejects.toThrow(
           new PassportError(
@@ -455,8 +664,7 @@ describe('AuthManager', () => {
             PassportErrorType.LOGOUT_ERROR,
           ),
         );
-        // In silent mode, signoutSilent is called in parallel with revokeTokens
-        expect(mockSignoutSilent).toHaveBeenCalled();
+        expect(mockSignoutSilent).not.toHaveBeenCalled();
       });
     });
 
@@ -464,9 +672,11 @@ describe('AuthManager', () => {
       const configuration = getConfig({
         logoutMode: 'redirect',
       });
-      const manager = new AuthManager(configuration);
+      const manager = new AuthManager(configuration, mockEmbeddedLoginPrompt);
 
-      mockSignoutRedirect.mockRejectedValue(new Error(mockErrorMsg));
+      mockSignoutRedirect.mockImplementation(() => {
+        throw new Error(mockErrorMsg);
+      });
 
       await expect(() => manager.logout()).rejects.toThrow(
         new PassportError(
@@ -481,9 +691,11 @@ describe('AuthManager', () => {
       const configuration = getConfig({
         logoutMode: 'silent',
       });
-      const manager = new AuthManager(configuration);
+      const manager = new AuthManager(configuration, mockEmbeddedLoginPrompt);
 
-      mockSignoutSilent.mockRejectedValue(new Error(mockErrorMsg));
+      mockSignoutSilent.mockImplementation(() => {
+        throw new Error(mockErrorMsg);
+      });
 
       await expect(() => manager.logout()).rejects.toThrow(
         new PassportError(
@@ -510,16 +722,67 @@ describe('AuthManager', () => {
   describe('getUser', () => {
     it('should retrieve the user from the userManager and return the domain model', async () => {
       mockGetUser.mockReturnValue(mockOidcUser);
-      (isTokenExpired as jest.Mock).mockReturnValue(false);
+      (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(false);
 
       const result = await authManager.getUser();
 
       expect(result).toEqual(mockUser);
     });
 
+    it('should return null when user has no idToken', async () => {
+      const userWithoutIdToken = { ...mockOidcUser, id_token: undefined, refresh_token: undefined };
+      mockGetUser.mockReturnValue(userWithoutIdToken);
+      // Restore real function behavior for this test
+      (isAccessTokenExpiredOrExpiring as jest.Mock).mockImplementation(
+        jest.requireActual('./utils/token').isAccessTokenExpiredOrExpiring,
+      );
+
+      const result = await authManager.getUser();
+
+      expect(result).toBeNull();
+    });
+
+    it('should refresh token when access token is expired or expiring', async () => {
+      const userWithExpiringAccessToken = { ...mockOidcUser };
+      mockGetUser.mockReturnValue(userWithExpiringAccessToken);
+      (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(true);
+      mockSigninSilent.mockResolvedValue(mockOidcUser);
+
+      const result = await authManager.getUser();
+
+      expect(mockSigninSilent).toBeCalledTimes(1);
+      expect(result).toEqual(mockUser);
+    });
+
+    it('should handle user with missing access token', async () => {
+      const userWithoutAccessToken = { ...mockOidcUser, access_token: undefined };
+      mockGetUser.mockReturnValue(userWithoutAccessToken);
+      // Restore real function behavior for this test
+      (isAccessTokenExpiredOrExpiring as jest.Mock).mockImplementation(
+        jest.requireActual('./utils/token').isAccessTokenExpiredOrExpiring,
+      );
+      mockSigninSilent.mockResolvedValue(mockOidcUser);
+
+      const result = await authManager.getUser();
+
+      expect(mockSigninSilent).toBeCalledTimes(1);
+      expect(result).toEqual(mockUser);
+    });
+
+    it('should return user directly when access token is not expired or expiring', async () => {
+      const freshUser = { ...mockOidcUser };
+      mockGetUser.mockReturnValue(freshUser);
+      (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(false);
+
+      const result = await authManager.getUser();
+
+      expect(mockSigninSilent).not.toHaveBeenCalled();
+      expect(result).toEqual(mockUser);
+    });
+
     it('should call signinSilent and returns user when user token is expired with the refresh token', async () => {
       mockGetUser.mockReturnValue(mockOidcExpiredUser);
-      (isTokenExpired as jest.Mock).mockReturnValue(true);
+      (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(true);
       mockSigninSilent.mockResolvedValue(mockOidcUser);
 
       const result = await authManager.getUser();
@@ -530,7 +793,7 @@ describe('AuthManager', () => {
 
     it('should reject with an error when signinSilent throws a string', async () => {
       mockGetUser.mockReturnValue(mockOidcExpiredUser);
-      (isTokenExpired as jest.Mock).mockReturnValue(true);
+      (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(true);
       mockSigninSilent.mockRejectedValue('oops');
 
       await expect(() => authManager.getUser()).rejects.toThrow(
@@ -543,7 +806,7 @@ describe('AuthManager', () => {
 
     it('should return null when the user token is expired without refresh token', async () => {
       mockGetUser.mockReturnValue(mockOidcExpiredNoRefreshTokenUser);
-      (isTokenExpired as jest.Mock).mockReturnValue(true);
+      (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(true);
 
       const result = await authManager.getUser();
 
@@ -553,7 +816,7 @@ describe('AuthManager', () => {
 
     it('should return null when the user token is expired with the refresh token, but signinSilent returns null', async () => {
       mockGetUser.mockReturnValue(mockOidcExpiredUser);
-      (isTokenExpired as jest.Mock).mockReturnValue(true);
+      (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(true);
       mockSigninSilent.mockResolvedValue(null);
       const result = await authManager.getUser();
 
@@ -584,7 +847,7 @@ describe('AuthManager', () => {
       describe('when the user is expired', () => {
         it('should only call refresh the token once', async () => {
           mockGetUser.mockReturnValue(mockOidcExpiredUser);
-          (isTokenExpired as jest.Mock).mockReturnValue(true);
+          (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(true);
           mockSigninSilent.mockReturnValue(mockOidcUser);
 
           await Promise.allSettled([
@@ -600,7 +863,7 @@ describe('AuthManager', () => {
     describe('when the user does not meet the type assertion', () => {
       it('should return null', async () => {
         mockGetUser.mockReturnValue(mockOidcUser);
-        (isTokenExpired as jest.Mock).mockReturnValue(false);
+        (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(false);
 
         const result = await authManager.getUser(isUserZkEvm);
 
@@ -617,7 +880,7 @@ describe('AuthManager', () => {
             zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
           },
         });
-        (isTokenExpired as jest.Mock).mockReturnValue(false);
+        (isAccessTokenExpiredOrExpiring as jest.Mock).mockReturnValue(false);
 
         const result = await authManager.getUser(isUserZkEvm);
 
@@ -666,9 +929,11 @@ describe('AuthManager', () => {
         it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', async () => {
           mockGetUser.mockReturnValue(mockOidcUser);
 
-          const am = new AuthManager(getConfig({ logoutRedirectUri }));
+          const am = new AuthManager(getConfig({ logoutRedirectUri }), mockEmbeddedLoginPrompt);
           const result = await am.getLogoutUrl();
-          const uri = new URL(result);
+
+          expect(result).not.toBeNull();
+          const uri = new URL(result!);
 
           expect(uri.hostname).toEqual(authenticationDomain);
           expect(uri.pathname).toEqual(logoutEndpoint);
@@ -681,15 +946,399 @@ describe('AuthManager', () => {
         it('should return the endSessionEndpoint without a `returnTo` or `client_id` query string params', async () => {
           mockGetUser.mockReturnValue(mockOidcUser);
 
-          const am = new AuthManager(getConfig());
+          const am = new AuthManager(getConfig(), mockEmbeddedLoginPrompt);
           const result = await am.getLogoutUrl();
-          const uri = new URL(result);
+
+          expect(result).not.toBeNull();
+          const uri = new URL(result!);
 
           expect(uri.hostname).toEqual(authenticationDomain);
           expect(uri.pathname).toEqual(logoutEndpoint);
           expect(uri.searchParams.get('client_id')).toEqual(clientId);
         });
       });
+
+      describe('when crossSdkBridgeEnabled is true', () => {
+        it('should use the bridge logout endpoint path', async () => {
+          mockGetUser.mockReturnValue(mockOidcUser);
+
+          const am = new AuthManager(
+            getConfig({
+              crossSdkBridgeEnabled: true,
+              logoutRedirectUri,
+            }),
+            mockEmbeddedLoginPrompt,
+          );
+          const result = await am.getLogoutUrl();
+
+          expect(result).not.toBeNull();
+          const uri = new URL(result!);
+
+          expect(uri.hostname).toEqual(authenticationDomain);
+          expect(uri.pathname).toEqual(crossSdkBridgeLogoutEndpoint);
+          expect(uri.searchParams.get('client_id')).toEqual(clientId);
+          expect(uri.searchParams.get('returnTo')).toEqual(logoutRedirectUri);
+        });
+      });
+    });
+
+    describe('when end_session_endpoint is not available', () => {
+      it('should return null', async () => {
+        const am = new AuthManager(getConfig(), mockEmbeddedLoginPrompt);
+        // eslint-disable-next-line @typescript-eslint/dot-notation
+        am['userManager'].settings.metadata!.end_session_endpoint = undefined;
+
+        const result = await am.getLogoutUrl();
+        expect(result).toBeNull();
+      });
+    });
+  });
+
+  describe('getPKCEAuthorizationUrl', () => {
+    beforeEach(() => {
+      // Mock crypto.getRandomValues for PKCE verifier and state generation
+      const mockArrayBuffer = new ArrayBuffer(32);
+      const mockUint8Array = new Uint8Array([
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+        17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+      ]);
+      Object.defineProperty(window, 'crypto', {
+        value: {
+          getRandomValues: jest.fn().mockReturnValue(mockUint8Array),
+          subtle: {
+            digest: jest.fn().mockResolvedValue(mockArrayBuffer),
+          },
+        },
+        writable: true,
+      });
+
+      // Mock TextEncoder
+      global.TextEncoder = jest.fn().mockImplementation(() => ({
+        encode: jest.fn().mockReturnValue(mockUint8Array),
+      }));
+
+      // Mock btoa function used in base64URLEncode
+      global.btoa = jest.fn().mockReturnValue('bW9ja2VkLWJhc2U2NC1zdHJpbmc=');
+    });
+
+    it('should generate a PKCE authorization URL with required parameters', async () => {
+      const result = await authManager.getPKCEAuthorizationUrl();
+      const url = new URL(result);
+
+      expect(url.hostname).toEqual(authenticationDomain);
+      expect(url.pathname).toEqual('/authorize');
+      expect(url.searchParams.get('response_type')).toEqual('code');
+      expect(url.searchParams.get('code_challenge_method')).toEqual('S256');
+      expect(url.searchParams.get('client_id')).toEqual(clientId);
+      expect(url.searchParams.get('redirect_uri')).toEqual(redirectUri);
+      expect(url.searchParams.get('scope')).toEqual('email profile');
+      expect(url.searchParams.get('code_challenge')).toEqual('bW9ja2VkLWJhc2U2NC1zdHJpbmc');
+      expect(url.searchParams.get('state')).toEqual('bW9ja2VkLWJhc2U2NC1zdHJpbmc');
+    });
+
+    it('should not include direct parameter when directLoginMethod is not provided', async () => {
+      const result = await authManager.getPKCEAuthorizationUrl();
+      const url = new URL(result);
+
+      expect(url.searchParams.get('direct')).toBeNull();
+    });
+
+    it('should include direct parameter when directLoginMethod is provided', async () => {
+      const directLoginMethod = 'apple';
+      const result = await authManager.getPKCEAuthorizationUrl({
+        directLoginMethod,
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
+      const url = new URL(result);
+
+      expect(url.searchParams.get('direct')).toEqual('apple');
+      expect(url.searchParams.get('marketingConsent')).toEqual(MarketingConsentStatus.OptedIn);
+    });
+
+    it('should include direct parameter for google login method', async () => {
+      const directLoginMethod = 'google';
+      const result = await authManager.getPKCEAuthorizationUrl({
+        directLoginMethod,
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
+      const url = new URL(result);
+
+      expect(url.searchParams.get('direct')).toEqual('google');
+      expect(url.searchParams.get('marketingConsent')).toEqual(MarketingConsentStatus.OptedIn);
+    });
+
+    it('should include direct parameter for facebook login method', async () => {
+      const directLoginMethod = 'facebook';
+      const result = await authManager.getPKCEAuthorizationUrl({
+        directLoginMethod,
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
+      const url = new URL(result);
+
+      expect(url.searchParams.get('direct')).toEqual('facebook');
+      expect(url.searchParams.get('marketingConsent')).toEqual(MarketingConsentStatus.OptedIn);
+    });
+
+    it('should include audience parameter when specified in config', async () => {
+      const configWithAudience = getConfig({ audience: 'test-audience' });
+      const am = new AuthManager(configWithAudience, mockEmbeddedLoginPrompt);
+
+      const result = await am.getPKCEAuthorizationUrl();
+      const url = new URL(result);
+
+      expect(url.searchParams.get('audience')).toEqual('test-audience');
+    });
+
+    it('should include both direct and audience parameters', async () => {
+      const configWithAudience = getConfig({ audience: 'test-audience' });
+      const am = new AuthManager(configWithAudience, mockEmbeddedLoginPrompt);
+
+      const result = await am.getPKCEAuthorizationUrl({
+        directLoginMethod: 'apple',
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
+      const url = new URL(result);
+
+      expect(url.searchParams.get('direct')).toEqual('apple');
+      expect(url.searchParams.get('marketingConsent')).toEqual(MarketingConsentStatus.OptedIn);
+      expect(url.searchParams.get('audience')).toEqual('test-audience');
+    });
+
+    it('should include im_passport_trace_id parameter when imPassportTraceId is provided', async () => {
+      const result = await authManager.getPKCEAuthorizationUrl(undefined, 'test-trace-id');
+      const url = new URL(result);
+
+      expect(url.searchParams.get('im_passport_trace_id')).toEqual('test-trace-id');
+    });
+  });
+
+  describe('login with directLoginMethod', () => {
+    it('should pass directLoginMethod to login popup', async () => {
+      mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+      await authManager.login('anonymous-id', {
+        directLoginMethod: 'apple',
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
+
+      expect(mockSigninPopup).toHaveBeenCalledWith({
+        extraQueryParams: {
+          rid: '',
+          third_party_a_id: 'anonymous-id',
+          direct: 'apple',
+          marketingConsent: MarketingConsentStatus.OptedIn,
+        },
+        popupWindowFeatures: {
+          width: 410,
+          height: 450,
+        },
+        popupWindowTarget: expect.any(String),
+      });
+    });
+
+    it('should not include direct parameter when directLoginMethod is not provided', async () => {
+      mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+      await authManager.login('anonymous-id');
+
+      expect(mockSigninPopup).toHaveBeenCalledWith({
+        extraQueryParams: {
+          rid: '',
+          third_party_a_id: 'anonymous-id',
+        },
+        popupWindowFeatures: {
+          width: 410,
+          height: 450,
+        },
+        popupWindowTarget: expect.any(String),
+      });
+    });
+  });
+
+  describe('loginWithRedirect with directLoginMethod', () => {
+    let mockSigninRedirect: jest.Mock;
+
+    beforeEach(() => {
+      mockSigninRedirect = jest.fn();
+      (UserManager as jest.Mock).mockReturnValue({
+        signinPopup: mockSigninPopup,
+        signinCallback: mockSigninCallback,
+        signinRedirectCallback: mockSigninRedirectCallback,
+        signoutRedirect: mockSignoutRedirect,
+        signoutSilent: mockSignoutSilent,
+        getUser: mockGetUser,
+        signinSilent: mockSigninSilent,
+        storeUser: mockStoreUser,
+        revokeTokens: mockRevokeTokens,
+        signinRedirect: mockSigninRedirect,
+        clearStaleState: jest.fn(),
+      });
+      authManager = new AuthManager(getConfig(), mockEmbeddedLoginPrompt);
+    });
+
+    it('should pass directLoginMethod to redirect login', async () => {
+      await authManager.loginWithRedirect('anonymous-id', {
+        directLoginMethod: 'google',
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
+
+      expect(mockSigninRedirect).toHaveBeenCalledWith({
+        extraQueryParams: {
+          rid: '',
+          third_party_a_id: 'anonymous-id',
+          direct: 'google',
+          marketingConsent: MarketingConsentStatus.OptedIn,
+        },
+      });
+    });
+
+    it('should not include direct parameter when directLoginMethod is not provided', async () => {
+      await authManager.loginWithRedirect('anonymous-id');
+
+      expect(mockSigninRedirect).toHaveBeenCalledWith({
+        extraQueryParams: {
+          rid: '',
+          third_party_a_id: 'anonymous-id',
+        },
+      });
+    });
+  });
+
+  describe('login with displayEmbeddedLoginPrompt', () => {
+    beforeEach(() => {
+      // Enable headless login prompt overlay for these tests
+      const configWithEmbeddedPrompt = getConfig({
+        popupOverlayOptions: {
+          disableHeadlessLoginPromptOverlay: false,
+        },
+      });
+      authManager = new AuthManager(configWithEmbeddedPrompt, mockEmbeddedLoginPrompt);
+    });
+
+    it('should call displayEmbeddedLoginPrompt when no directLoginOptions provided and overlay is enabled', async () => {
+      const mockEmbeddedLoginPromptResult = {
+        directLoginMethod: 'google' as const,
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+        imPassportTraceId: 'test-trace-id',
+      };
+      mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt.mockResolvedValue(mockEmbeddedLoginPromptResult);
+      mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+      await authManager.login();
+
+      expect(mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt).toHaveBeenCalledTimes(1);
+      expect(mockSigninPopup).toHaveBeenCalledWith({
+        extraQueryParams: {
+          rid: '',
+          third_party_a_id: '',
+          direct: 'google',
+          marketingConsent: MarketingConsentStatus.OptedIn,
+          im_passport_trace_id: 'test-trace-id',
+        },
+        popupWindowFeatures: {
+          width: 410,
+          height: 450,
+        },
+        popupWindowTarget: expect.any(String),
+      });
+    });
+
+    it('should not call displayEmbeddedLoginPrompt when directLoginOptions are provided', async () => {
+      mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+      await authManager.login('anonymous-id', {
+        directLoginMethod: 'apple',
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+      });
+
+      expect(mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt).not.toHaveBeenCalled();
+      expect(mockSigninPopup).toHaveBeenCalledWith({
+        extraQueryParams: {
+          rid: '',
+          third_party_a_id: 'anonymous-id',
+          direct: 'apple',
+          marketingConsent: MarketingConsentStatus.OptedIn,
+        },
+        popupWindowFeatures: {
+          width: 410,
+          height: 450,
+        },
+        popupWindowTarget: expect.any(String),
+      });
+    });
+
+    it('should not call displayEmbeddedLoginPrompt when overlay is disabled', async () => {
+      const configWithDisabledPrompt = getConfig({
+        popupOverlayOptions: {
+          disableHeadlessLoginPromptOverlay: true,
+        },
+      });
+      const authManagerWithDisabledPrompt = new AuthManager(configWithDisabledPrompt, mockEmbeddedLoginPrompt);
+      mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+      await authManagerWithDisabledPrompt.login();
+
+      expect(mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt).not.toHaveBeenCalled();
+    });
+
+    it('should handle email login method from embedded prompt', async () => {
+      const mockEmbeddedLoginPromptResult = {
+        directLoginMethod: 'email' as const,
+        email: 'test@example.com',
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+        imPassportTraceId: 'test-trace-id-email',
+      };
+      mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt.mockResolvedValue(mockEmbeddedLoginPromptResult);
+      mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+      await authManager.login('anonymous-id');
+
+      expect(mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt).toHaveBeenCalledTimes(1);
+      expect(mockSigninPopup).toHaveBeenCalledWith({
+        extraQueryParams: {
+          rid: '',
+          third_party_a_id: 'anonymous-id',
+          direct: 'email',
+          email: 'test@example.com',
+          marketingConsent: MarketingConsentStatus.OptedIn,
+          im_passport_trace_id: 'test-trace-id-email',
+        },
+        popupWindowFeatures: {
+          width: 410,
+          height: 450,
+        },
+        popupWindowTarget: expect.any(String),
+      });
+    });
+
+    it('should propagate errors from displayEmbeddedLoginPrompt', async () => {
+      const embeddedPromptError = new Error('Popup closed by user');
+      mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt.mockRejectedValue(embeddedPromptError);
+
+      await expect(() => authManager.login()).rejects.toThrow(
+        new PassportError(
+          'Popup closed by user',
+          PassportErrorType.AUTHENTICATION_ERROR,
+        ),
+      );
+
+      expect(mockSigninPopup).not.toHaveBeenCalled();
+    });
+
+    it('should pass anonymousId to displayEmbeddedLoginPrompt', async () => {
+      const anonymousId = 'test-anonymous-id-12345';
+      const mockEmbeddedLoginPromptResult = {
+        directLoginMethod: 'google' as const,
+        marketingConsentStatus: MarketingConsentStatus.OptedIn,
+        imPassportTraceId: 'test-trace-id',
+      };
+      mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt.mockResolvedValue(mockEmbeddedLoginPromptResult);
+      mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+      await authManager.login(anonymousId);
+
+      expect(mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt).toHaveBeenCalledWith(anonymousId);
+      expect(mockEmbeddedLoginPrompt.displayEmbeddedLoginPrompt).toHaveBeenCalledTimes(1);
     });
   });
 });

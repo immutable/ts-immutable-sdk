@@ -135,4 +135,4 @@ jobs:
         run: pnpm install --frozen-lockfile=false
 
       - name: Run functional tests
-        run: pnpm --filter "@tests/*" --parallel func-test:ci
+        run: pnpm --filter "@tests/func-tests-zkevm" --parallel func-test:ci

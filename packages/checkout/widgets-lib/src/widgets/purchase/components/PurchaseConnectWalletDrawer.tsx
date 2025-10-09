@@ -37,6 +37,7 @@ type PurchaseConnectWalletDrawerProps = {
     rdns: string;
   }[];
   shouldIdentifyUser?: boolean;
+  drawerBackground: string | undefined;
 };
 
 export function PurchaseConnectWalletDrawer({
@@ -51,6 +52,7 @@ export function PurchaseConnectWalletDrawer({
   menuItemSize = 'small',
   disabledOptions = [],
   shouldIdentifyUser = true,
+  drawerBackground,
 }: PurchaseConnectWalletDrawerProps) {
   const {
     providersState: { checkout },
@@ -178,6 +180,7 @@ export function PurchaseConnectWalletDrawer({
         }}
         onWalletChange={handleOnWalletChangeEvent}
         bottomSlot={bottomSlot}
+        drawerBackground={drawerBackground}
       />
       <UnableToConnectDrawer
         visible={showUnableToConnectDrawer}
