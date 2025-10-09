@@ -150,7 +150,7 @@ describe('MagicTEESigner', () => {
       mockCreateWalletV1WalletPost.mockRejectedValue(apiError);
 
       await expect(magicTEESigner.getAddress()).rejects.toThrow(
-        'Magic: Failed to initialise EOA with status 500: {"message":"Internal server error"}',
+        'MagicTEE: Failed to initialise EOA with status 500: {"message":"Internal server error"}',
       );
     });
 
@@ -164,7 +164,7 @@ describe('MagicTEESigner', () => {
       mockCreateWalletV1WalletPost.mockRejectedValue(networkError);
 
       await expect(magicTEESigner.getAddress()).rejects.toThrow(
-        'Magic: Failed to initialise EOA: Network Error',
+        'MagicTEE: Failed to initialise EOA: Network Error',
       );
     });
 
@@ -175,7 +175,7 @@ describe('MagicTEESigner', () => {
       mockCreateWalletV1WalletPost.mockRejectedValue(genericError);
 
       await expect(magicTEESigner.getAddress()).rejects.toThrow(
-        'Magic: Failed to initialise EOA: Generic error',
+        'MagicTEE: Failed to initialise EOA: Generic error',
       );
     });
 
@@ -275,7 +275,7 @@ describe('MagicTEESigner', () => {
       mockSignMessageV1WalletSignMessagePost.mockRejectedValue(apiError);
 
       await expect(magicTEESigner.signMessage('test')).rejects.toThrow(
-        'Magic: Failed to sign message using EOA with status 400: {"message":"Invalid signature request"}',
+        'MagicTEE: Failed to sign message using EOA with status 400: {"message":"Invalid signature request"}',
       );
     });
 
@@ -288,7 +288,7 @@ describe('MagicTEESigner', () => {
       mockSignMessageV1WalletSignMessagePost.mockRejectedValue(networkError);
 
       await expect(magicTEESigner.signMessage('test')).rejects.toThrow(
-        'Magic: Failed to sign message using EOA: Network Error',
+        'MagicTEE: Failed to sign message using EOA: Network Error',
       );
     });
 
@@ -298,7 +298,7 @@ describe('MagicTEESigner', () => {
       mockSignMessageV1WalletSignMessagePost.mockRejectedValue(genericError);
 
       await expect(magicTEESigner.signMessage('test')).rejects.toThrow(
-        'Magic: Failed to sign message using EOA: Generic error',
+        'MagicTEE: Failed to sign message using EOA: Generic error',
       );
     });
 
