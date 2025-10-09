@@ -18,6 +18,7 @@ type CoinSelectorProps = {
   optionsLoading?: boolean;
   children?: any;
   visible?: boolean;
+  drawerBackground: string | undefined;
 };
 
 const filterOptions = (filterBy: string, options: CoinSelectorOptionProps[]) => {
@@ -28,7 +29,7 @@ const filterOptions = (filterBy: string, options: CoinSelectorOptionProps[]) => 
 };
 
 export function CoinSelector({
-  heading, options, defaultTokenImage, optionsLoading, children, onCloseDrawer, visible,
+  heading, options, defaultTokenImage, optionsLoading, children, onCloseDrawer, visible, drawerBackground,
 }: CoinSelectorProps) {
   const { t } = useTranslation();
 
@@ -43,7 +44,7 @@ export function CoinSelector({
       return options;
     }
     return filterOptions(searchValue, options);
-  }, [options, searchValue, filterOptions]);
+  }, [options, searchValue]);
 
   const handleCloseDrawer = () => {
     setSearchValue('');
@@ -51,7 +52,13 @@ export function CoinSelector({
   };
 
   return (
-    <Drawer headerBarTitle={heading} size="full" onCloseDrawer={handleCloseDrawer} visible={visible}>
+    <Drawer
+      headerBarTitle={heading}
+      size="full"
+      onCloseDrawer={handleCloseDrawer}
+      visible={visible}
+      bgOverlaySx={drawerBackground ? { background: drawerBackground } : undefined}
+    >
       <Drawer.Target>
         {children}
       </Drawer.Target>

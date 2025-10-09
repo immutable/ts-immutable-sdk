@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 
 export const PASSPORT_OVERLAY_ID = 'passport-overlay';
+export const PASSPORT_OVERLAY_CONTENTS_ID = 'passport-overlay-contents';
 export const PASSPORT_OVERLAY_CLOSE_ID = `${PASSPORT_OVERLAY_ID}-close`;
 export const PASSPORT_OVERLAY_TRY_AGAIN_ID = `${PASSPORT_OVERLAY_ID}-try-again`;
 

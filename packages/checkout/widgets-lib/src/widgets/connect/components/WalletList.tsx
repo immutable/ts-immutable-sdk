@@ -7,6 +7,7 @@ import {
   WrappedBrowserProvider,
   WalletProviderName,
   WalletProviderRdns,
+  ThemeOverrides,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -55,9 +56,17 @@ export interface WalletListProps {
   targetWalletRdns?: string;
   targetChainId: ChainId;
   allowedChains: ChainId[];
-  blocklistWalletRdns?: string[];
+  allowlistWalletRdns?: string[];
+  blocklistWalletRdns: string[];
   isCheckNetworkEnabled: boolean;
+  themeOverrides: ThemeOverrides;
 }
+
+// eslint-disable-next-line max-len
+const getAllowedProviders = (providers: EIP6963ProviderDetail[], allowlist: string[] | undefined, blocklist: string[]) =>
+  (allowlist ?
+    providers.filter((provider) => !blocklist.includes(provider.info.rdns) && allowlist.includes(provider.info.rdns)) :
+    providers.filter((provider) => !blocklist.includes(provider.info.rdns)));
 
 export function WalletList(props: WalletListProps) {
   const { t } = useTranslation();
@@ -66,8 +75,10 @@ export function WalletList(props: WalletListProps) {
     targetChainId,
     allowedChains,
     isCheckNetworkEnabled,
+    themeOverrides,
+    allowlistWalletRdns,
+    blocklistWalletRdns,
   } = props;
-  const blocklistWalletRdns = props?.blocklistWalletRdns || [];
   const {
     connectDispatch,
     connectState: { checkout },
@@ -83,24 +94,25 @@ export function WalletList(props: WalletListProps) {
   const [showNonPassportWarning, setShowNonPassportWarning] = useState(false);
   const [chosenProviderDetail, setChosenProviderDetail] = useState<EIP6963ProviderDetail>();
 
+  const allowedProviders = useMemo(
+    () => getAllowedProviders(providers, allowlistWalletRdns, blocklistWalletRdns),
+    [providers, allowlistWalletRdns, blocklistWalletRdns],
+  );
+
   const filteredProviders = useMemo(
-    () => providers
+    () => allowedProviders
       .filter(
         (provider) => !(provider.info.rdns === WalletProviderRdns.PASSPORT),
-      )
-      .filter(
-        (provider) => !blocklistWalletRdns.includes(provider.info.rdns),
       ),
-    [providers],
+    [allowedProviders],
   );
 
   // Don't allow Passport if targetChainId is L1
   const passportProviderDetail = useMemo(
     () => targetChainId !== checkout!.config.l1ChainId
-      && providers
-        .filter((provider) => !blocklistWalletRdns.includes(provider.info.rdns))
+      && allowedProviders
         .find((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT),
-    [providers, checkout],
+    [allowedProviders, checkout, targetChainId],
   );
 
   const selectBrowserProvider = useCallback(
@@ -434,6 +446,7 @@ export function WalletList(props: WalletListProps) {
           setShowWalletDrawer(show);
         }}
         onWalletChange={handleWalletChange}
+        drawerBackground={themeOverrides.drawerBackground}
       />
 
       <ChangedYourMindDrawer

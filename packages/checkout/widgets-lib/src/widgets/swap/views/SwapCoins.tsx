@@ -4,7 +4,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { IMTBLWidgetEvents, WidgetTheme } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, ThemeOverrides, WidgetTheme } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
@@ -26,22 +26,30 @@ import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 
 export interface SwapCoinsProps {
   theme: WidgetTheme;
+  themeOverrides: ThemeOverrides;
   cancelAutoProceed: () => void;
   fromAmount?: string;
   toAmount?: string;
   fromTokenAddress?: string;
   toTokenAddress?: string;
   showBackButton?: boolean;
+  showHeader?: boolean;
+  title: string;
+  subTitle: string;
 }
 
 export function SwapCoins({
   theme,
+  themeOverrides,
   cancelAutoProceed,
   fromAmount,
   toAmount,
   fromTokenAddress,
   toTokenAddress,
   showBackButton,
+  showHeader,
+  title,
+  subTitle,
 }: SwapCoinsProps) {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
@@ -86,9 +94,9 @@ export function SwapCoins({
 
   return (
     <SimpleLayout
-      header={!autoProceed ? (
+      header={!autoProceed && showHeader ? (
         <HeaderNavigation
-          title={t('views.SWAP.header.title')}
+          title={title}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
           showBack={showBackButton}
           onBackButtonClick={() => {
@@ -99,7 +107,7 @@ export function SwapCoins({
             );
           }}
         />
-      ) : ''}
+      ) : undefined}
       footer={<QuickswapFooter environment={checkout?.config.environment} theme={theme} />}
     >
       <Box
@@ -119,6 +127,8 @@ export function SwapCoins({
             toTokenAddress,
           }}
           theme={theme}
+          themeOverrides={themeOverrides}
+          subTitle={subTitle}
         />
         <NotEnoughImx
           environment={checkout?.config.environment ?? Environment.PRODUCTION}

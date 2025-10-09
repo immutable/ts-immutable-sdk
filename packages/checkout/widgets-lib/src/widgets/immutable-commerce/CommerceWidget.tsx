@@ -80,8 +80,8 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
   const { provider } = commerceState;
 
   const connectLoaderParams = useMemo(
-    () => getConnectLoaderParams(view, checkout, provider || browserProvider),
-    [view, checkout, provider, browserProvider],
+    () => getConnectLoaderParams(view, flowConfig, checkout, provider || browserProvider),
+    [view, flowConfig, checkout, provider, browserProvider],
   );
 
   const connectLoaderSuccessEvent = (
@@ -315,8 +315,8 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
               {view.type === CommerceFlowType.SWAP && (
                 <SwapWidget
                   config={widgetsConfig}
+                  swapConfig={view.data.config}
                   {...(view.data.params || {})}
-                  {...(view.data.config || {})}
                   showBackButton={showBackButton}
                 />
               )}
@@ -324,15 +324,15 @@ export default function CommerceWidget(props: CommerceWidgetInputs) {
                 <OnRampWidget
                   config={widgetsConfig}
                   {...(view.data.params || {})}
-                  {...(view.data.config || {})}
+                  onrampConfig={view.data.config}
                   showBackButton={showBackButton}
                 />
               )}
               {view.type === CommerceFlowType.TRANSFER && (
                 <TransferWidget
                   config={widgetsConfig}
+                  transferConfig={view.data.config}
                   {...(view.data.params || {})}
-                  {...(view.data.config || {})}
                   showBackButton={showBackButton}
                 />
               )}

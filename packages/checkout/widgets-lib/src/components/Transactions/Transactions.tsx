@@ -11,6 +11,7 @@ import {
   WalletProviderRdns,
   ChainSlug,
   Checkout,
+  ThemeOverrides,
 } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { JsonRpcProvider } from 'ethers';
@@ -60,6 +61,7 @@ import { WalletChangeEvent } from '../WalletDrawer/WalletDrawerEvents';
 type TransactionsProps = {
   defaultTokenImage: string;
   onBackButtonClick: () => void;
+  themeOverrides: ThemeOverrides;
 };
 
 const getTransactionsDetails = async (tokenBridge: TokenBridge, checkout: Checkout, recipient: string) => {
@@ -99,6 +101,7 @@ const getTransactionsDetails = async (tokenBridge: TokenBridge, checkout: Checko
 export function Transactions({
   defaultTokenImage,
   onBackButtonClick,
+  themeOverrides,
 }: TransactionsProps) {
   const {
     eventTargetState: { eventTarget },
@@ -448,6 +451,7 @@ export function Transactions({
             setShowWalletDrawer(show);
           }}
           onWalletChange={handleWalletChange}
+          drawerBackground={themeOverrides.drawerBackground}
         />
       </Box>
     </SimpleLayout>

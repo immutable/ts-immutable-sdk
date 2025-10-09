@@ -78,6 +78,7 @@ export class PassportConfiguration {
     this.popupOverlayOptions = popupOverlayOptions || {
       disableGenericPopupOverlay: false,
       disableBlockedPopupOverlay: false,
+      disableHeadlessLoginPromptOverlay: false,
     };
     if (overrides) {
       validateConfiguration(

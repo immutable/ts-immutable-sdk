@@ -191,6 +191,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   protected strongConfig(): StrongCheckoutWidgetsConfig {
     return withDefaultWidgetConfigs({
       theme: this.properties.config?.theme,
+      themeOverrides: this.properties.config?.themeOverrides,
       environment: this.checkout.config.environment,
       isOnRampEnabled: this.checkout.config.isOnRampEnabled,
       isSwapEnabled: this.checkout.config.isSwapEnabled,

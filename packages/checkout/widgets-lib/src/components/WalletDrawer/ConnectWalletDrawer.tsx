@@ -46,6 +46,7 @@ type ConnectWalletDrawerProps = {
   }[];
   getShouldRequestWalletPermissions?: (providerInfo: EIP6963ProviderInfo) => boolean | undefined;
   shouldIdentifyUser?: boolean;
+  drawerBackground: string | undefined;
 };
 
 export function ConnectWalletDrawer({
@@ -61,6 +62,7 @@ export function ConnectWalletDrawer({
   disabledOptions = [],
   getShouldRequestWalletPermissions,
   shouldIdentifyUser = true,
+  drawerBackground,
 }: ConnectWalletDrawerProps) {
   const {
     providersState: { checkout, fromProvider, lockedToProvider },
@@ -222,6 +224,7 @@ export function ConnectWalletDrawer({
         }}
         onWalletChange={handleOnWalletChangeEvent}
         bottomSlot={bottomSlot}
+        drawerBackground={drawerBackground}
       />
       <UnableToConnectDrawer
         visible={showUnableToConnectDrawer}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert, Button, Form, Image, Offcanvas, Spinner, Stack, Table,
 } from 'react-bootstrap';
@@ -25,7 +25,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
   const { sdkClient } = useImmutableProvider();
   const { imxProvider } = usePassportProvider();
 
-  const getOrders = async (e?: React.FormEvent<HTMLFormElement>) => {
+  const getOrders = useCallback(async (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     e?.stopPropagation();
 
@@ -45,11 +45,11 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
       setOrders(result.result);
       setLoadingOrders(false);
     }
-  };
+  }, [sdkClient, showTradeModal, sellTokenName]);
 
   useEffect(() => {
     getOrders().catch(console.error);
-  }, [showTradeModal, sdkClient, getOrders]);
+  }, [getOrders]);
 
   const handleCloseTrade = () => {
     setLoadingTrade(false);

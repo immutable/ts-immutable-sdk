@@ -20,7 +20,7 @@ function Message() {
         sx={{ width: '100%' }}
         position={{ x: 'right', y: 'top' }}
       >
-        <Form>
+        <Form style={{ width: 'inherit' }}>
           <Form.Group>
             <Form.Control
               as="textarea"

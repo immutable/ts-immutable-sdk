@@ -3,7 +3,7 @@ import {
 } from '@biom3/react';
 import { useCallback, useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
-import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { ThemeOverrides, WidgetTheme } from '@imtbl/checkout-sdk';
 import { TokenImage } from '../../TokenImage/TokenImage';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 import { CoinSelector } from '../../CoinSelector/CoinSelector';
@@ -26,7 +26,8 @@ interface SelectFormProps {
   screen: string;
   control: string;
   environment?: Environment;
-  theme?: WidgetTheme,
+  theme: WidgetTheme,
+  themeOverrides: ThemeOverrides,
 }
 
 export function SelectForm({
@@ -45,7 +46,8 @@ export function SelectForm({
   screen,
   control,
   environment = Environment.PRODUCTION,
-  theme = WidgetTheme.DARK,
+  theme,
+  themeOverrides,
 }: SelectFormProps) {
   const { track } = useAnalytics();
   const [coinSelectorOpen, setCoinSelectorOpen] = useState<boolean>(false);
@@ -87,6 +89,7 @@ export function SelectForm({
         optionsLoading={optionsLoading ?? false}
         visible={coinSelectorOpen}
         onCloseDrawer={() => setCoinSelectorOpen(false)}
+        drawerBackground={themeOverrides.drawerBackground}
       />
       <FormControlWrapper
         testId={`${testId}-select-control`}

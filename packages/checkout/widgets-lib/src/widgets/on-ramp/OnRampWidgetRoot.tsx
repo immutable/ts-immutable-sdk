@@ -82,6 +82,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       browserProvider: this.browserProvider,
       checkout: this.checkout,
       allowedChains: [this.checkout.config.l1ChainId, this.checkout.config.l2ChainId],
+      allowlistWalletRdns: undefined,
     };
 
     this.reactRoot.render(
@@ -102,6 +103,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
                     amount={this.parameters.amount}
                     config={this.strongConfig()}
                     showBackButton={this.parameters.showBackButton}
+                    onrampConfig={this.properties.config}
                   />
                 </Suspense>
               </ConnectLoader>

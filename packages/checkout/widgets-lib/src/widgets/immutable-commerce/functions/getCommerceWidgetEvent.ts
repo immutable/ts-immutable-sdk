@@ -12,6 +12,7 @@ import {
   PurchaseEventType,
   SaleEventType,
   SwapEventType,
+  TransferEventType,
   WalletEventType,
 } from '@imtbl/checkout-sdk';
 
@@ -349,6 +350,41 @@ function mapPurchaseWidgetEvent(
 }
 
 /**
+ * Map Transfer Widget Events
+ */
+function mapTransferWidgetEvent(
+  event: CustomEvent<{ type: TransferEventType; data: Record<string, unknown> }>,
+): CommerceEventDetail {
+  const { type, data } = event.detail;
+
+  switch (type) {
+    case TransferEventType.SUCCESS:
+      return {
+        type: CommerceEventType.SUCCESS,
+        data: {
+          type: CommerceSuccessEventType.TRANSFER_SUCCESS,
+          data,
+        },
+      };
+    case TransferEventType.FAILURE:
+      return {
+        type: CommerceEventType.FAILURE,
+        data: {
+          type: CommerceFailureEventType.TRANSFER_FAILED,
+          data,
+        },
+      };
+    case TransferEventType.CLOSE_WIDGET:
+      return {
+        type: CommerceEventType.CLOSE,
+        data: {},
+      };
+    default:
+      throw new Error(`Unknown transfer event type "${event.detail.type}"`);
+  }
+}
+
+/**
  * Map widget events to commerce widget event detail
  */
 export function getCommerceWidgetEvent(
@@ -378,6 +414,8 @@ export function getCommerceWidgetEvent(
       return mapSaleWidgetEvent(event);
     case IMTBLWidgetEvents.IMTBL_PURCHASE_WIDGET_EVENT:
       return mapPurchaseWidgetEvent(event);
+    case IMTBLWidgetEvents.IMTBL_TRANSFER_WIDGET_EVENT:
+      return mapTransferWidgetEvent(event);
     default:
       throw new Error(`Unknown widget event type "${event.type}"`);
   }

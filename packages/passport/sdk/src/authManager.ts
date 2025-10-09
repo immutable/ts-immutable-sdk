@@ -28,8 +28,11 @@ import {
   isUserImx,
 } from './types';
 import { PassportConfiguration } from './config';
-import Overlay from './overlay';
+import ConfirmationOverlay from './overlay/confirmationOverlay';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
+import { EmbeddedLoginPrompt } from './confirmation';
+
+const LOGIN_POPUP_CLOSED_POLLING_DURATION = 500;
 
 const formUrlEncodedHeader = {
   headers: {
@@ -109,6 +112,8 @@ export default class AuthManager {
 
   private readonly config: PassportConfiguration;
 
+  private readonly embeddedLoginPrompt: EmbeddedLoginPrompt;
+
   private readonly logoutMode: Exclude<OidcConfiguration['logoutMode'], undefined>;
 
   /**
@@ -116,10 +121,11 @@ export default class AuthManager {
    */
   private refreshingPromise: Promise<User | null> | null = null;
 
-  constructor(config: PassportConfiguration) {
+  constructor(config: PassportConfiguration, embeddedLoginPrompt: EmbeddedLoginPrompt) {
     this.config = config;
     this.userManager = new UserManager(getAuthConfiguration(config));
     this.deviceCredentialsManager = new DeviceCredentialsManager();
+    this.embeddedLoginPrompt = embeddedLoginPrompt;
     this.logoutMode = config.oidcConfiguration.logoutMode || 'redirect';
   }
 
@@ -177,7 +183,11 @@ export default class AuthManager {
     });
   };
 
-  private buildExtraQueryParams(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Record<string, string> {
+  private buildExtraQueryParams(
+    anonymousId?: string,
+    directLoginOptions?: DirectLoginOptions,
+    imPassportTraceId?: string,
+  ): Record<string, string> {
     const params: Record<string, string> = {
       ...(this.userManager.settings?.extraQueryParams ?? {}),
       rid: getDetail(Detail.RUNTIME_ID) || '',
@@ -200,6 +210,10 @@ export default class AuthManager {
       if (directLoginOptions.marketingConsentStatus) {
         params.marketingConsent = directLoginOptions.marketingConsentStatus;
       }
+    }
+
+    if (imPassportTraceId) {
+      params.im_passport_trace_id = imPassportTraceId;
     }
 
     return params;
@@ -226,11 +240,26 @@ export default class AuthManager {
    */
   public async login(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<User> {
     return withPassportError<User>(async () => {
-      const popupWindowTarget = 'passportLoginPrompt';
-      const signinPopup = async () => {
-        const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptions);
+      // If directLoginOptions are provided, then the consumer has rendered their own initial login screen.
+      // If not, display the embedded login prompt and pass the returned direct login options and imPassportTraceId to the login popup.
+      let directLoginOptionsToUse: DirectLoginOptions | undefined;
+      let imPassportTraceId: string | undefined;
+      if (directLoginOptions) {
+        directLoginOptionsToUse = directLoginOptions;
+      } else if (!this.config.popupOverlayOptions.disableHeadlessLoginPromptOverlay) {
+        const {
+          imPassportTraceId: embeddedLoginPromptImPassportTraceId,
+          ...embeddedLoginPromptDirectLoginOptions
+        } = await this.embeddedLoginPrompt.displayEmbeddedLoginPrompt(anonymousId);
+        directLoginOptionsToUse = embeddedLoginPromptDirectLoginOptions;
+        imPassportTraceId = embeddedLoginPromptImPassportTraceId;
+      }
 
-        return this.userManager.signinPopup({
+      const popupWindowTarget = window.crypto.randomUUID();
+      const signinPopup = async () => {
+        const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptionsToUse, imPassportTraceId);
+
+        const userPromise = this.userManager.signinPopup({
           extraQueryParams,
           popupWindowFeatures: {
             width: 410,
@@ -238,6 +267,36 @@ export default class AuthManager {
           },
           popupWindowTarget,
         });
+
+        // ID-3950: https://github.com/authts/oidc-client-ts/issues/2043
+        // The promise returned from `signinPopup` no longer rejects when the popup is closed.
+        // We can prevent this from impacting consumers by obtaining a reference to the popup and rejecting the promise
+        // that is returned by this method if the popup is closed by the user.
+
+        // Attempt to get a reference to the popup window
+        const popupRef = window.open('', popupWindowTarget);
+        if (popupRef) {
+          // Create a promise that rejects when popup is closed
+          const popupClosedPromise = new Promise<never>((_, reject) => {
+            const timer = setInterval(() => {
+              if (popupRef.closed) {
+                clearInterval(timer);
+                reject(new Error('Popup closed by user'));
+              }
+            }, LOGIN_POPUP_CLOSED_POLLING_DURATION);
+
+            // Clean up timer when the user promise resolves/rejects
+            userPromise.finally(() => {
+              clearInterval(timer);
+              popupRef.close();
+            });
+          });
+
+          // Race between user authentication and popup being closed
+          return Promise.race([userPromise, popupClosedPromise]);
+        }
+
+        return userPromise;
       };
 
       // This promise attempts to open the signin popup, and displays the blocked popup overlay if necessary.
@@ -255,7 +314,7 @@ export default class AuthManager {
 
             // Popup was blocked; append the blocked popup overlay to allow the user to try again.
             let popupHasBeenOpened: boolean = false;
-            const overlay = new Overlay(this.config.popupOverlayOptions, true);
+            const overlay = new ConfirmationOverlay(this.config.popupOverlayOptions, true);
             overlay.append(
               async () => {
                 try {
@@ -301,8 +360,33 @@ export default class AuthManager {
     return user || this.login();
   }
 
+  private static shouldUseSigninPopupCallback(): boolean {
+    // ID-3950: https://github.com/authts/oidc-client-ts/issues/2043
+    // Detect when the login was initiated via a popup
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const stateParam = urlParams.get('state');
+      const localStorageKey = `oidc.${stateParam}`;
+
+      const localStorageValue = localStorage.getItem(localStorageKey);
+      const loginState = JSON.parse(localStorageValue || '{}');
+
+      return loginState?.request_type === 'si:p';
+    } catch (err) {
+      return false;
+    }
+  }
+
   public async loginCallback(): Promise<undefined | User> {
     return withPassportError<undefined | User>(async () => {
+      // ID-3950: https://github.com/authts/oidc-client-ts/issues/2043
+      // When using `signinPopup` to initiate a login, call the `signinPopupCallback` method and
+      // set the `keepOpen` flag to `true`, as the `login` method is now responsible for closing the popup.
+      // See the comment in the `login` method for more details.
+      if (AuthManager.shouldUseSigninPopupCallback()) {
+        await this.userManager.signinPopupCallback(undefined, true);
+        return undefined;
+      }
       const oidcUser = await this.userManager.signinCallback();
       if (!oidcUser) {
         return undefined;
@@ -312,7 +396,10 @@ export default class AuthManager {
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
-  public async getPKCEAuthorizationUrl(directLoginOptions?: DirectLoginOptions): Promise<string> {
+  public async getPKCEAuthorizationUrl(
+    directLoginOptions?: DirectLoginOptions,
+    imPassportTraceId?: string,
+  ): Promise<string> {
     const verifier = base64URLEncode(window.crypto.getRandomValues(new Uint8Array(32)));
     const challenge = base64URLEncode(await sha256(verifier));
 
@@ -351,6 +438,10 @@ export default class AuthManager {
       if (directLoginOptions.marketingConsentStatus) {
         pKCEAuthorizationUrl.searchParams.set('marketingConsent', directLoginOptions.marketingConsentStatus);
       }
+    }
+
+    if (imPassportTraceId) {
+      pKCEAuthorizationUrl.searchParams.set('im_passport_trace_id', imPassportTraceId);
     }
 
     return pKCEAuthorizationUrl.toString();

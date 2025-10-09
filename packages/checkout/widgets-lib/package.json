@@ -24,7 +24,7 @@
     "@imtbl/cryptofiat": "workspace:*",
     "@imtbl/dex-sdk": "workspace:*",
     "@imtbl/passport": "workspace:*",
-    "@imtbl/react-analytics": "0.3.2-alpha",
+    "@imtbl/react-analytics": "0.3.4-alpha",
     "@rive-app/react-canvas-lite": "^4.9.0",
     "@walletconnect/ethereum-provider": "^2.11.1",
     "@walletconnect/modal": "^2.6.2",

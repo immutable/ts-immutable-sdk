@@ -15,6 +15,7 @@ type PurchaseDeliverToWalletDrawerProps = {
     provider: BrowserProvider,
     providerInfo: EIP6963ProviderInfo
   ) => void;
+  drawerBackground: string | undefined;
 };
 
 export function PurchaseDeliverToWalletDrawer({
@@ -22,6 +23,7 @@ export function PurchaseDeliverToWalletDrawer({
   onClose,
   onConnect,
   walletOptions,
+  drawerBackground,
 }: PurchaseDeliverToWalletDrawerProps) {
   const handleOnConnect = (
     provider: BrowserProvider,
@@ -39,6 +41,7 @@ export function PurchaseDeliverToWalletDrawer({
       providerType="to"
       walletOptions={walletOptions}
       onConnect={handleOnConnect}
+      drawerBackground={drawerBackground}
     />
   );
 }

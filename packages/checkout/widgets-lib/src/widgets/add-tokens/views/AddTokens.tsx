@@ -30,6 +30,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { ActionType } from '@0xsquid/squid-types';
 import { trackFlow } from '@imtbl/metrics';
+import { parseUnits } from 'ethers/utils';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -423,23 +424,6 @@ export function AddTokens({
   }, [checkout, id]);
 
   const sendRequestOnRampEvent = async () => {
-    if (
-      toAddress
-      && (await checkSanctionedAddresses([toAddress], checkout.config))
-    ) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
-            error: new Error('Sanctioned address'),
-          },
-        },
-      });
-
-      return;
-    }
-
     track({
       userJourney: UserJourney.ADD_TOKENS,
       screen: 'InputScreen',
@@ -501,6 +485,7 @@ export function AddTokens({
       && toAddress
       && (await checkSanctionedAddresses(
         [fromAddress, toAddress],
+        { address: selectedToken.address, amount: parseUnits(selectedAmount, selectedToken.decimals) },
         checkout.config,
       ))
     ) {
@@ -832,6 +817,7 @@ export function AddTokens({
             onConnect={handleWalletConnected}
             insufficientBalance={insufficientBalance}
             showOnRampOption={shouldShowOnRampOption || !selectedToken}
+            drawerBackground={config.themeOverrides?.drawerBackground}
           />
           <RouteOptionsDrawer
             checkout={checkout}
@@ -850,6 +836,7 @@ export function AddTokens({
             walletOptions={walletOptions}
             onClose={handleDeliverToClose}
             onConnect={handleWalletConnected}
+            drawerBackground={config.themeOverrides?.drawerBackground}
           />
           <OnboardingDrawer environment={checkout?.config.environment!} />
         </Stack>

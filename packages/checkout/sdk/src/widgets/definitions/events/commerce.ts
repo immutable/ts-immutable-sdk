@@ -17,6 +17,7 @@ import {
 import { SwapFailed, SwapRejected, SwapSuccess } from './swap';
 import { WalletNetworkSwitch } from './wallet';
 import { AddTokensFailed, AddTokensSuccess, AddTokensConnectSuccess } from './addTokens';
+import { TransferSuccess, TransferFailed } from './transfer';
 
 export enum CommerceEventType {
   INITIALISED = 'INITIALISED',
@@ -38,6 +39,7 @@ export enum CommerceSuccessEventType {
   BRIDGE_CLAIM_WITHDRAWAL_SUCCESS = 'BRIDGE_CLAIM_WITHDRAWAL_SUCCESS',
   ADD_TOKENS_SUCCESS = 'ADD_TOKENS_SUCCESS',
   ADD_TOKENS_CONNECT_SUCCESS = 'ADD_TOKENS_CONNECT_SUCCESS',
+  TRANSFER_SUCCESS = 'TRANSFER_SUCCESS',
 }
 
 export enum CommerceFailureEventType {
@@ -49,6 +51,7 @@ export enum CommerceFailureEventType {
   SALE_FAILED = 'SALE_FAILED',
   ONRAMP_FAILED = 'ONRAMP_FAILED',
   ADD_TOKENS_FAILED = 'ADD_TOKENS_FAILED',
+  TRANSFER_FAILED = 'TRANSFER_FAILED',
 }
 
 export enum CommerceUserActionEventType {
@@ -111,6 +114,11 @@ export type CommerceAddTokensConnectSuccessEvent = {
   data: AddTokensConnectSuccess;
 };
 
+export type CommerceTransferSuccessEvent = {
+  type: CommerceSuccessEventType.TRANSFER_SUCCESS;
+  data: TransferSuccess;
+};
+
 export type CommerceSuccessEvent =
   | CommerceAddTokensSuccessEvent
   | CommerceAddTokensConnectSuccessEvent
@@ -120,7 +128,8 @@ export type CommerceSuccessEvent =
   | CommerceOnRampSuccessEvent
   | CommerceSwapSuccessEvent
   | CommerceSaleSuccessEvent
-  | CommerceSaleSuccessfulTransactionEvent;
+  | CommerceSaleSuccessfulTransactionEvent
+  | CommerceTransferSuccessEvent;
 
 export type CommerceBridgeFailureEvent = {
   type: CommerceFailureEventType.BRIDGE_FAILED;
@@ -162,6 +171,11 @@ export type CommerceAddTokensFailureEvent = {
   data: AddTokensFailed;
 };
 
+export type CommerceTransferFailureEvent = {
+  type: CommerceFailureEventType.TRANSFER_FAILED;
+  data: TransferFailed;
+};
+
 export type CommerceFailureEvent =
   | CommerceAddTokensFailureEvent
   | CommerceBridgeFailureEvent
@@ -170,7 +184,8 @@ export type CommerceFailureEvent =
   | CommerceOnRampFailureEvent
   | CommerceSwapFailureEvent
   | CommerceSwapRejectedEvent
-  | CommerceSaleFailureEvent;
+  | CommerceSaleFailureEvent
+  | CommerceTransferFailureEvent;
 
 export type CommercePaymentMethodSelectedEvent = {
   type: CommerceUserActionEventType.PAYMENT_METHOD_SELECTED;

@@ -5,6 +5,7 @@ import {
 import {
   Checkout, WalletProviderRdns, EIP6963ProviderInfo, ChainId,
   WrappedBrowserProvider,
+  ThemeOverrides,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { t } from 'i18next';
@@ -46,6 +47,12 @@ import {
 } from '../types';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { PurchaseWidgetViews } from '../../../context/view-context/PurchaseViewContextTypes';
+import {
+  getFromAmountData,
+  hasSufficientBalance,
+  hasSufficientGas,
+} from '../../../lib/squid/functions/routeCalculation';
+import { waitForReceipt } from '../../../lib/squid/functions/execute';
 
 interface PurchaseProps {
   checkout: Checkout;
@@ -53,6 +60,7 @@ interface PurchaseProps {
   showBackButton?: boolean;
   onCloseButtonClick?: () => void;
   onBackButtonClick?: () => void;
+  themeOverrides: ThemeOverrides;
 }
 
 export function Purchase({
@@ -61,6 +69,7 @@ export function Purchase({
   onCloseButtonClick,
   showBackButton,
   onBackButtonClick,
+  themeOverrides,
 }: PurchaseProps) {
   const [showPayWithWalletDrawer, setShowPayWithWalletDrawer] = useState(false);
   const [showDeliverToWalletDrawer, setShowDeliverToWalletDrawer] = useState(false);
@@ -109,12 +118,12 @@ export function Purchase({
   } = useProvidersContext();
 
   const {
-    fetchRoutes, getRoute, getFromAmountData, hasSufficientBalance, hasSufficientGas,
+    fetchRoutes, getRoute,
   } = useRoutes();
   const { providers } = useInjectedProviders({ checkout });
 
   const {
-    getAllowance, approve, execute, getStatus, waitForReceipt,
+    getAllowance, approve, execute, getStatus,
   } = useExecute(UserJourney.PURCHASE, (err) => {
     // eslint-disable-next-line no-console
     console.log('useExecute err', err);
@@ -680,12 +689,14 @@ export function Purchase({
         onConnect={handleWalletConnected}
         insufficientBalance={insufficientBalance}
         showOnRampOption={shouldShowOnRampOption}
+        drawerBackground={themeOverrides.drawerBackground}
       />
       <PurchaseDeliverToWalletDrawer
         visible={showDeliverToWalletDrawer}
         walletOptions={walletOptions}
         onClose={handleDeliverToWalletClose}
         onConnect={() => undefined}
+        drawerBackground={themeOverrides.drawerBackground}
       />
       <RouteOptionsDrawer
         checkout={checkout}

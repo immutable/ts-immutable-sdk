@@ -6,7 +6,7 @@ import { SwapWidgetConfiguration } from './swap';
 import { OnrampWidgetConfiguration } from './onramp';
 import { SaleWidgetConfiguration } from './sale';
 import { AddTokensWidgetConfiguration } from './addTokens';
-
+import { TransferWidgetConfiguration } from './transfer';
 import { WidgetConfiguration } from './widget';
 
 export type CommerceWidgetConfiguration = {
@@ -17,4 +17,5 @@ export type CommerceWidgetConfiguration = {
   ONRAMP?: Omit<OnrampWidgetConfiguration, keyof WidgetConfiguration>;
   SALE?: Omit<SaleWidgetConfiguration, keyof WidgetConfiguration>;
   ADD_TOKENS?: Omit<AddTokensWidgetConfiguration, keyof WidgetConfiguration>;
+  TRANSFER?: Omit<TransferWidgetConfiguration, keyof WidgetConfiguration>;
 } & Omit<WidgetConfiguration, 'walletConnect'>;
