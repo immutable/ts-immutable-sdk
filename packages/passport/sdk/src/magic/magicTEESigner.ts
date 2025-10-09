@@ -100,7 +100,7 @@ export default class MagicTEESigner extends AbstractSigner {
 
             return resolve(this.userWallet);
           } catch (error) {
-            let errorMessage: string = 'Failed to create wallet';
+            let errorMessage: string = 'Magic: Failed to initialise EOA';
 
             if (isAxiosError(error)) {
               if (error.response) {
@@ -180,7 +180,7 @@ export default class MagicTEESigner extends AbstractSigner {
 
         return response.data.signature;
       } catch (error) {
-        let errorMessage: string = 'Failed to create signature using EOA';
+        let errorMessage: string = 'Magic: Failed to sign message using EOA';
 
         if (isAxiosError(error)) {
           if (error.response) {
