@@ -86,7 +86,6 @@ describe('MagicTEESigner', () => {
       expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
         {
           xMagicChain: 'ETH',
-          createWalletRequestModel: {},
         },
         { headers: { Authorization: `Bearer ${mockUser.idToken}` } },
       );
@@ -416,7 +415,6 @@ describe('MagicTEESigner', () => {
         expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
           {
             xMagicChain: 'ETH',
-            createWalletRequestModel: {},
           },
           { headers: { Authorization: `Bearer ${imxUserWithMatchingAddress.idToken}` } },
         );
@@ -464,7 +462,6 @@ describe('MagicTEESigner', () => {
         expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
           {
             xMagicChain: 'ETH',
-            createWalletRequestModel: {},
           },
           { headers: { Authorization: `Bearer ${zkEvmUserWithMatchingAddress.idToken}` } },
         );
@@ -482,7 +479,6 @@ describe('MagicTEESigner', () => {
         expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
           {
             xMagicChain: 'ETH',
-            createWalletRequestModel: {},
           },
           { headers: { Authorization: `Bearer ${mockUser.idToken}` } },
         );

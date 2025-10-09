@@ -17,14 +17,26 @@
 /**
  * 
  * @export
- * @interface WalletResponseModel
+ * @interface IdentityProviderCreateSchema
  */
-export interface WalletResponseModel {
+export interface IdentityProviderCreateSchema {
     /**
      * 
      * @type {string}
-     * @memberof WalletResponseModel
+     * @memberof IdentityProviderCreateSchema
      */
-    'public_address': string;
+    'issuer': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof IdentityProviderCreateSchema
+     */
+    'audience': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof IdentityProviderCreateSchema
+     */
+    'jwks_uri': string;
 }
 
