@@ -128,7 +128,7 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
         overrides: {
           authenticationDomain: 'https://auth.dev.immutable.com',
           magicPublishableApiKey: 'pk_live_4058236363130CA9',
-          magicProviderId: 'C9odf7hU4EQ5EufcfgYfcBaT5V6LhocXyiPRhIjw2EY=',
+          magicProviderId: 'd196052b-8175-4a45-ba13-838a715d370f',
           passportDomain: 'https://passport.dev.immutable.com',
           imxPublicApiDomain: 'https://api.dev.immutable.com',
           imxApiClients: new ImxApiClients(createConfig({

@@ -248,7 +248,7 @@ window.callFunction = async (jsonData: string) => {
               overrides: {
                 authenticationDomain: 'https://auth.dev.immutable.com',
                 magicPublishableApiKey: 'pk_live_4058236363130CA9', // Public key
-                magicProviderId: 'C9odf7hU4EQ5EufcfgYfcBaT5V6LhocXyiPRhIjw2EY=', // Public key
+                magicProviderId: 'd196052b-8175-4a45-ba13-838a715d370f', // Public key
                 passportDomain: 'https://passport.dev.immutable.com',
                 imxPublicApiDomain: 'https://api.dev.immutable.com',
                 immutableXClient: new xClient.IMXClient({

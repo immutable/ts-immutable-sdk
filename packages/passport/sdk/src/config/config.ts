@@ -120,7 +120,7 @@ export class PassportConfiguration {
         case Environment.PRODUCTION: {
           this.authenticationDomain = 'https://auth.immutable.com';
           this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
-          this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
+          this.magicProviderId = 'aa80b860-8869-4f13-9000-6a6ad3d20017';
           this.passportDomain = 'https://passport.immutable.com';
           this.imxPublicApiDomain = 'https://api.immutable.com';
           this.zkEvmRpcUrl = 'https://rpc.immutable.com';
@@ -132,7 +132,7 @@ export class PassportConfiguration {
         default: {
           this.authenticationDomain = 'https://auth.immutable.com';
           this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
-          this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
+          this.magicProviderId = 'aa80b860-8869-4f13-9000-6a6ad3d20017';
           this.passportDomain = 'https://passport.sandbox.immutable.com';
           this.imxPublicApiDomain = 'https://api.sandbox.immutable.com';
           this.zkEvmRpcUrl = 'https://rpc.testnet.immutable.com';
