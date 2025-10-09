@@ -13,9 +13,6 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { Chain } from './chain';
 
 /**
  * 
@@ -25,17 +22,9 @@ import { Chain } from './chain';
 export interface CreateWalletRequestModel {
     /**
      * 
-     * @type {Chain}
-     * @memberof CreateWalletRequestModel
-     */
-    'chain': Chain;
-    /**
-     * 
      * @type {boolean}
      * @memberof CreateWalletRequestModel
      */
     'should_sync_to_fortmatic'?: boolean | null;
 }
-
-
 

@@ -22,7 +22,8 @@
 
 export const Chain = {
     Eth: 'ETH',
-    Sol: 'SOL'
+    Sol: 'SOL',
+    Btc: 'BTC'
 } as const;
 
 export type Chain = typeof Chain[keyof typeof Chain];

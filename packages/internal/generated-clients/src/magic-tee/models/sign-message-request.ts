@@ -13,9 +13,6 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { Chain } from './chain';
 
 /**
  * 
@@ -25,17 +22,9 @@ import { Chain } from './chain';
 export interface SignMessageRequest {
     /**
      * 
-     * @type {Chain}
-     * @memberof SignMessageRequest
-     */
-    'chain': Chain;
-    /**
-     * 
      * @type {string}
      * @memberof SignMessageRequest
      */
     'message_base64': string;
 }
-
-
 

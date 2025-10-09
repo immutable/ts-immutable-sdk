@@ -82,9 +82,8 @@ export default class MagicTEESigner extends AbstractSigner {
             // The createWallet endpoint is idempotent, so it can be called multiple times without causing an error.
             const response = await this.magicTeeApiClient.walletApi.createWalletV1WalletPost(
               {
-                createWalletRequestModel: {
-                  chain: CHAIN_IDENTIFIER,
-                },
+                createWalletRequestModel: {},
+                xMagicChain: CHAIN_IDENTIFIER,
               },
               { headers },
             );
@@ -170,8 +169,8 @@ export default class MagicTEESigner extends AbstractSigner {
         const response = await this.magicTeeApiClient.signOperationsApi.signMessageV1WalletSignMessagePost({
           signMessageRequest: {
             message_base64: Buffer.from(messageToSign, 'utf-8').toString('base64'),
-            chain: CHAIN_IDENTIFIER,
           },
+          xMagicChain: CHAIN_IDENTIFIER,
         }, { headers });
 
         trackDuration(

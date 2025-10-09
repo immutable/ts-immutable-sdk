@@ -38,6 +38,7 @@ export const WalletApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * Creates a new wallet for the given chain and returns its public address.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\"   }\' ```  **Example Response:** ```json {   \"public_address\": \"0x6b422EefBFBc47a6900A1fc5454Ef4b940B7e36e\" } ```
          * @summary Create a new wallet.
+         * @param {Chain} xMagicChain 
          * @param {CreateWalletRequestModel} createWalletRequestModel 
          * @param {string} [xMagicAPIKey] 
          * @param {string} [xMagicSecretKey] 
@@ -45,7 +46,9 @@ export const WalletApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createWalletV1WalletPost: async (createWalletRequestModel: CreateWalletRequestModel, xMagicAPIKey?: string, xMagicSecretKey?: string, xOIDCProviderID?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createWalletV1WalletPost: async (xMagicChain: Chain, createWalletRequestModel: CreateWalletRequestModel, xMagicAPIKey?: string, xMagicSecretKey?: string, xOIDCProviderID?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'xMagicChain' is not null or undefined
+            assertParamExists('createWalletV1WalletPost', 'xMagicChain', xMagicChain)
             // verify required parameter 'createWalletRequestModel' is not null or undefined
             assertParamExists('createWalletV1WalletPost', 'createWalletRequestModel', createWalletRequestModel)
             const localVarPath = `/v1/wallet`;
@@ -63,6 +66,12 @@ export const WalletApiAxiosParamCreator = function (configuration?: Configuratio
             // authentication HTTPBearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (xMagicChain != null) {
+                localVarHeaderParameter['X-Magic-Chain'] = typeof xMagicChain === 'string'
+                    ? xMagicChain
+                    : JSON.stringify(xMagicChain);
+            }
 
             if (xMagicAPIKey != null) {
                 localVarHeaderParameter['X-Magic-API-Key'] = String(xMagicAPIKey);
@@ -93,16 +102,16 @@ export const WalletApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * Returns the wallet\'s public address for the given chain.  **Example cURL:** ```bash curl -X GET \'https://tee.express.magiclabs.com/v1/wallet?chain=ETH\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' ```  **Example Response:** ```json {   \"public_address\": \"0x6b422EefBFBc47a6900A1fc5454Ef4b940B7e36e\" } ```
          * @summary Get wallet details.
-         * @param {Chain} chain 
+         * @param {Chain} xMagicChain 
          * @param {string} [xMagicAPIKey] 
          * @param {string} [xMagicSecretKey] 
          * @param {string} [xOIDCProviderID] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getWalletV1WalletGet: async (chain: Chain, xMagicAPIKey?: string, xMagicSecretKey?: string, xOIDCProviderID?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'chain' is not null or undefined
-            assertParamExists('getWalletV1WalletGet', 'chain', chain)
+        getWalletV1WalletGet: async (xMagicChain: Chain, xMagicAPIKey?: string, xMagicSecretKey?: string, xOIDCProviderID?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'xMagicChain' is not null or undefined
+            assertParamExists('getWalletV1WalletGet', 'xMagicChain', xMagicChain)
             const localVarPath = `/v1/wallet`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -119,8 +128,10 @@ export const WalletApiAxiosParamCreator = function (configuration?: Configuratio
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-            if (chain !== undefined) {
-                localVarQueryParameter['chain'] = chain;
+            if (xMagicChain != null) {
+                localVarHeaderParameter['X-Magic-Chain'] = typeof xMagicChain === 'string'
+                    ? xMagicChain
+                    : JSON.stringify(xMagicChain);
             }
 
             if (xMagicAPIKey != null) {
@@ -159,6 +170,7 @@ export const WalletApiFp = function(configuration?: Configuration) {
         /**
          * Creates a new wallet for the given chain and returns its public address.  **Example cURL:** ```bash curl -X POST \'https://tee.express.magiclabs.com/v1/wallet\' \\   -H \'Content-Type: application/json\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' \\   -d \'{     \"chain\": \"ETH\"   }\' ```  **Example Response:** ```json {   \"public_address\": \"0x6b422EefBFBc47a6900A1fc5454Ef4b940B7e36e\" } ```
          * @summary Create a new wallet.
+         * @param {Chain} xMagicChain 
          * @param {CreateWalletRequestModel} createWalletRequestModel 
          * @param {string} [xMagicAPIKey] 
          * @param {string} [xMagicSecretKey] 
@@ -166,22 +178,22 @@ export const WalletApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createWalletV1WalletPost(createWalletRequestModel: CreateWalletRequestModel, xMagicAPIKey?: string, xMagicSecretKey?: string, xOIDCProviderID?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WalletResponseModel>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createWalletV1WalletPost(createWalletRequestModel, xMagicAPIKey, xMagicSecretKey, xOIDCProviderID, options);
+        async createWalletV1WalletPost(xMagicChain: Chain, createWalletRequestModel: CreateWalletRequestModel, xMagicAPIKey?: string, xMagicSecretKey?: string, xOIDCProviderID?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WalletResponseModel>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createWalletV1WalletPost(xMagicChain, createWalletRequestModel, xMagicAPIKey, xMagicSecretKey, xOIDCProviderID, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * Returns the wallet\'s public address for the given chain.  **Example cURL:** ```bash curl -X GET \'https://tee.express.magiclabs.com/v1/wallet?chain=ETH\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' ```  **Example Response:** ```json {   \"public_address\": \"0x6b422EefBFBc47a6900A1fc5454Ef4b940B7e36e\" } ```
          * @summary Get wallet details.
-         * @param {Chain} chain 
+         * @param {Chain} xMagicChain 
          * @param {string} [xMagicAPIKey] 
          * @param {string} [xMagicSecretKey] 
          * @param {string} [xOIDCProviderID] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getWalletV1WalletGet(chain: Chain, xMagicAPIKey?: string, xMagicSecretKey?: string, xOIDCProviderID?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WalletResponseModel>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getWalletV1WalletGet(chain, xMagicAPIKey, xMagicSecretKey, xOIDCProviderID, options);
+        async getWalletV1WalletGet(xMagicChain: Chain, xMagicAPIKey?: string, xMagicSecretKey?: string, xOIDCProviderID?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WalletResponseModel>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getWalletV1WalletGet(xMagicChain, xMagicAPIKey, xMagicSecretKey, xOIDCProviderID, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -202,7 +214,7 @@ export const WalletApiFactory = function (configuration?: Configuration, basePat
          * @throws {RequiredError}
          */
         createWalletV1WalletPost(requestParameters: WalletApiCreateWalletV1WalletPostRequest, options?: AxiosRequestConfig): AxiosPromise<WalletResponseModel> {
-            return localVarFp.createWalletV1WalletPost(requestParameters.createWalletRequestModel, requestParameters.xMagicAPIKey, requestParameters.xMagicSecretKey, requestParameters.xOIDCProviderID, options).then((request) => request(axios, basePath));
+            return localVarFp.createWalletV1WalletPost(requestParameters.xMagicChain, requestParameters.createWalletRequestModel, requestParameters.xMagicAPIKey, requestParameters.xMagicSecretKey, requestParameters.xOIDCProviderID, options).then((request) => request(axios, basePath));
         },
         /**
          * Returns the wallet\'s public address for the given chain.  **Example cURL:** ```bash curl -X GET \'https://tee.express.magiclabs.com/v1/wallet?chain=ETH\' \\   -H \'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...\' \\   -H \'X-Magic-API-Key: your-magic-api-key\' \\   -H \'X-OIDC-Provider-ID: your-oidc-provider-id\' ```  **Example Response:** ```json {   \"public_address\": \"0x6b422EefBFBc47a6900A1fc5454Ef4b940B7e36e\" } ```
@@ -212,7 +224,7 @@ export const WalletApiFactory = function (configuration?: Configuration, basePat
          * @throws {RequiredError}
          */
         getWalletV1WalletGet(requestParameters: WalletApiGetWalletV1WalletGetRequest, options?: AxiosRequestConfig): AxiosPromise<WalletResponseModel> {
-            return localVarFp.getWalletV1WalletGet(requestParameters.chain, requestParameters.xMagicAPIKey, requestParameters.xMagicSecretKey, requestParameters.xOIDCProviderID, options).then((request) => request(axios, basePath));
+            return localVarFp.getWalletV1WalletGet(requestParameters.xMagicChain, requestParameters.xMagicAPIKey, requestParameters.xMagicSecretKey, requestParameters.xOIDCProviderID, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -223,6 +235,13 @@ export const WalletApiFactory = function (configuration?: Configuration, basePat
  * @interface WalletApiCreateWalletV1WalletPostRequest
  */
 export interface WalletApiCreateWalletV1WalletPostRequest {
+    /**
+     * 
+     * @type {Chain}
+     * @memberof WalletApiCreateWalletV1WalletPost
+     */
+    readonly xMagicChain: Chain
+
     /**
      * 
      * @type {CreateWalletRequestModel}
@@ -263,7 +282,7 @@ export interface WalletApiGetWalletV1WalletGetRequest {
      * @type {Chain}
      * @memberof WalletApiGetWalletV1WalletGet
      */
-    readonly chain: Chain
+    readonly xMagicChain: Chain
 
     /**
      * 
@@ -303,7 +322,7 @@ export class WalletApi extends BaseAPI {
      * @memberof WalletApi
      */
     public createWalletV1WalletPost(requestParameters: WalletApiCreateWalletV1WalletPostRequest, options?: AxiosRequestConfig) {
-        return WalletApiFp(this.configuration).createWalletV1WalletPost(requestParameters.createWalletRequestModel, requestParameters.xMagicAPIKey, requestParameters.xMagicSecretKey, requestParameters.xOIDCProviderID, options).then((request) => request(this.axios, this.basePath));
+        return WalletApiFp(this.configuration).createWalletV1WalletPost(requestParameters.xMagicChain, requestParameters.createWalletRequestModel, requestParameters.xMagicAPIKey, requestParameters.xMagicSecretKey, requestParameters.xOIDCProviderID, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -315,7 +334,7 @@ export class WalletApi extends BaseAPI {
      * @memberof WalletApi
      */
     public getWalletV1WalletGet(requestParameters: WalletApiGetWalletV1WalletGetRequest, options?: AxiosRequestConfig) {
-        return WalletApiFp(this.configuration).getWalletV1WalletGet(requestParameters.chain, requestParameters.xMagicAPIKey, requestParameters.xMagicSecretKey, requestParameters.xOIDCProviderID, options).then((request) => request(this.axios, this.basePath));
+        return WalletApiFp(this.configuration).getWalletV1WalletGet(requestParameters.xMagicChain, requestParameters.xMagicAPIKey, requestParameters.xMagicSecretKey, requestParameters.xOIDCProviderID, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

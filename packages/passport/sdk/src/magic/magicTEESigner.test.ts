@@ -85,9 +85,8 @@ describe('MagicTEESigner', () => {
       expect(address).toBe(mockUserZkEvm.zkEvm.userAdminAddress);
       expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
         {
-          createWalletRequestModel: {
-            chain: 'ETH',
-          },
+          xMagicChain: 'ETH',
+          createWalletRequestModel: {},
         },
         { headers: { Authorization: `Bearer ${mockUser.idToken}` } },
       );
@@ -229,9 +228,9 @@ describe('MagicTEESigner', () => {
       expect(signature).toBe('0xsignature123');
       expect(mockSignMessageV1WalletSignMessagePost).toHaveBeenCalledWith(
         {
+          xMagicChain: 'ETH',
           signMessageRequest: {
             message_base64: Buffer.from(message, 'utf-8').toString('base64'),
-            chain: 'ETH',
           },
         },
         { headers: { Authorization: `Bearer ${mockUser.idToken}` } },
@@ -245,9 +244,9 @@ describe('MagicTEESigner', () => {
       expect(signature).toBe('0xsignature123');
       expect(mockSignMessageV1WalletSignMessagePost).toHaveBeenCalledWith(
         {
+          xMagicChain: 'ETH',
           signMessageRequest: {
             message_base64: Buffer.from(`0x${Buffer.from(message).toString('hex')}`, 'utf-8').toString('base64'),
-            chain: 'ETH',
           },
         },
         { headers: { Authorization: `Bearer ${mockUser.idToken}` } },
@@ -416,9 +415,8 @@ describe('MagicTEESigner', () => {
         expect(address).toBe(mockWalletResponse.data.public_address);
         expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
           {
-            createWalletRequestModel: {
-              chain: 'ETH',
-            },
+            xMagicChain: 'ETH',
+            createWalletRequestModel: {},
           },
           { headers: { Authorization: `Bearer ${imxUserWithMatchingAddress.idToken}` } },
         );
@@ -465,9 +463,8 @@ describe('MagicTEESigner', () => {
         expect(address).toBe(mockWalletResponse.data.public_address);
         expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
           {
-            createWalletRequestModel: {
-              chain: 'ETH',
-            },
+            xMagicChain: 'ETH',
+            createWalletRequestModel: {},
           },
           { headers: { Authorization: `Bearer ${zkEvmUserWithMatchingAddress.idToken}` } },
         );
@@ -484,9 +481,8 @@ describe('MagicTEESigner', () => {
         expect(address).toBe(mockWalletResponse.data.public_address);
         expect(mockCreateWalletV1WalletPost).toHaveBeenCalledWith(
           {
-            createWalletRequestModel: {
-              chain: 'ETH',
-            },
+            xMagicChain: 'ETH',
+            createWalletRequestModel: {},
           },
           { headers: { Authorization: `Bearer ${mockUser.idToken}` } },
         );
