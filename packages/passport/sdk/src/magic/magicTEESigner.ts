@@ -38,7 +38,7 @@ export default class MagicTEESigner extends AbstractSigner {
     // Check if the user has changed since the last createWallet request was made. If so, initialise the new user's wallet.
     const user = await this.getUserOrThrow();
     if (user.profile.sub !== userWallet.userIdentifier) {
-      userWallet = await this.createWallet();
+      userWallet = await this.createWallet(user);
     }
 
     if (isUserImx(user) && user.imx.userAdminAddress.toLowerCase() !== userWallet.walletAddress.toLowerCase()) {
@@ -65,7 +65,7 @@ export default class MagicTEESigner extends AbstractSigner {
    * The createWallet endpoint is idempotent, so it can be called multiple times without causing an error.
    * If a createWallet request is already in flight, return the existing promise.
    */
-  private async createWallet(): Promise<UserWallet> {
+  private async createWallet(user?: User): Promise<UserWallet> {
     if (this.createWalletPromise) return this.createWalletPromise;
 
     // eslint-disable-next-line no-async-promise-executor
@@ -73,8 +73,8 @@ export default class MagicTEESigner extends AbstractSigner {
       try {
         this.userWallet = null;
 
-        const user = await this.getUserOrThrow();
-        const headers = MagicTEESigner.getHeaders(user);
+        const authenticatedUser = user || await this.getUserOrThrow();
+        const headers = MagicTEESigner.getHeaders(authenticatedUser);
 
         await withMetricsAsync(async (flow: Flow) => {
           try {
@@ -94,7 +94,7 @@ export default class MagicTEESigner extends AbstractSigner {
             );
 
             this.userWallet = {
-              userIdentifier: user.profile.sub,
+              userIdentifier: authenticatedUser.profile.sub,
               walletAddress: response.data.public_address,
             };
 
