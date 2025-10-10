@@ -1,1 +1,723 @@
-{"openapi":"3.1.0","info":{"title":"TEE Express","description":"\nTEE Express is a service that simplifies wallet management for developers. Unlike traditional wallet solutions that require complex key management, TEE Express handles all key management internally, providing a streamlined API for wallet operations.\nTEE Express leverages secure enclave technology to ensure that private keys never leave the secure environment. All wallet operations, including creation, signing, and key management, are performed within a trusted execution environment (TEE). This provides enterprise-grade security while maintaining the simplicity of a REST API.\n\nThe service supports Ethereum wallets and provides endpoints for wallet creation, transaction signing, and message signing. All operations are authenticated using JWT tokens passed in the Authorization header, ensuring secure access to user wallets.\n\n**Migration Notice:**\nIf you're an existing customer, your users' wallets have been automatically migrated to TEE Express. There's no action required on your part - all existing wallets are now accessible through the TEE Express API using the same JWT tokens you currently use for authentication.\n\nSimply update your API calls to use the TEE Express endpoints, and pass your existing JWT token in the Authorization header for all requests.\n\n**Authentication:**\n- An API key via the `X-Magic-API-Key` header or a secret key via the `X-Magic-Secret-Key` header.\n- The OIDC provider ID via the `X-OIDC-Provider-ID` header.\n- Bearer token in the `Authorization` header.\n\n**Data Hashing for Signing:**\n\nFor personal sign operations, encode your data as base64:\n\n```typescript\nconst message = Buffer.from(data, 'utf-8').toString('base64');\n```\n\nFor signing transaction data or other structured data, provide a keccak256 hash:\n\n```typescript\nimport {\n  MessageTypes,\n  SignTypedDataVersion,\n  TypedDataUtils,\n  TypedDataV1,\n  TypedMessage,\n  typedSignatureHash,\n} from '@metamask/eth-sig-util';\nimport { resolveProperties, Signature, Transaction, TransactionLike, TransactionRequest } from 'ethers';\n\nconst computeEip712Hash = (\n  data: TypedMessage<MessageTypes>,\n  version: SignTypedDataVersion.V3 | SignTypedDataVersion.V4,\n): string => {\n  const hashBuffer = TypedDataUtils.eip712Hash(data, version);\n  return '0x' + hashBuffer.toString('hex');\n};\n\nconst personalSign = async (data: string) => {\n  const message = Buffer.from(data, 'utf-8').toString('base64');\n  const body = { message_base64: message, chain: 'ETH' };\n  return await fetch('/v1/wallet/personal-sign', { method: 'POST', body: JSON.stringify(body) });\n};\n\nconst signTypedDataV1 = async (data: TypedDataV1) => {\n  const rawDataHash = typedSignatureHash(data);\n  const body = { raw_data_hash: rawDataHash, chain: 'ETH' };\n  return await fetch('/v1/wallet/sign', { method: 'POST', body: JSON.stringify(body) });\n};\n\nconst signTypedDataV3 = async (data: TypedMessage<MessageTypes>) => {\n  const rawDataHash = computeEip712Hash(data, SignTypedDataVersion.V3);\n  const body = { raw_data_hash: rawDataHash, chain: 'ETH' };\n  return await fetch('/v1/wallet/sign', { method: 'POST', body: JSON.stringify(body) });\n};\n\nconst signTypedDataV4 = async (data: TypedMessage<MessageTypes>) => {\n  const rawDataHash = computeEip712Hash(data, SignTypedDataVersion.V4);\n  const body = { raw_data_hash: rawDataHash, chain: 'ETH' };\n  return await fetch('/v1/wallet/sign', { method: 'POST', body: JSON.stringify(body) });\n};\n\nconst signTransaction = async (tx: TransactionRequest) => {\n  const resolvedTx = await resolveProperties(tx);\n  const txForSigning = { ...resolvedTx };\n  delete txForSigning.from;\n\n  const btx = Transaction.from(txForSigning as TransactionLike);\n\n  const body = { raw_data_hash: btx.unsignedHash, chain: 'ETH' };\n  const res = await fetch('/v1/wallet/sign', { method: 'POST', body: JSON.stringify(body) });\n  const { r, s, v } = res.json();\n  btx.signature = Signature.from({ r, s, v });\n  return btx.serialized;\n};\n```\n","version":"0.1.0"},"paths":{"/v1/wallet/personal-sign":{"post":{"tags":["Transaction"],"summary":"Sign a message with the wallet.","description":"Signs an arbitrary message using the wallet's private key. Useful for authentication and off-chain verification.\n\n**Example cURL:**\n```bash\ncurl -X POST 'https://tee.express.magiclabs.com/v1/wallet/personal-sign' \\\n  -H 'Content-Type: application/json' \\\n  -H 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...' \\\n  -H 'X-Magic-API-Key: your-magic-api-key' \\\n  -H 'X-OIDC-Provider-ID: your-oidc-provider-id' \\\n  -d '{\n    \"chain\": \"ETH\",\n    \"message_base64\": \"bm9uZQ==\"\n  }'\n```\n\n**Example Response:**\n```json\n{\n  \"signature\": \"0x0cebb670d8375ac74122b46c44def7e1ce593e80434a3e6557108ae124f8b44f3c5068fc104279fe7f51918cbe4c249d707bc1c0ce2ffb6d201d3cf4e2fdee8d1b\",\n  \"r\": \"0x0cebb670d8375ac74122b46c44def7e1ce593e80434a3e6557108ae124f8b44f\",\n  \"s\": \"0x3c5068fc104279fe7f51918cbe4c249d707bc1c0ce2ffb6d201d3cf4e2fdee8d\",\n  \"v\": \"27\"\n}\n```","operationId":"sign_message_v1_wallet_personal_sign_post","security":[{"HTTPBearer":[]}],"parameters":[{"name":"X-Magic-API-Key","in":"header","required":false,"schema":{"type":"string","title":"X-Magic-Api-Key"}},{"name":"X-Magic-Secret-Key","in":"header","required":false,"schema":{"type":"string","title":"X-Magic-Secret-Key"}},{"name":"X-OIDC-Provider-ID","in":"header","required":false,"schema":{"type":"string","title":"X-Oidc-Provider-Id"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"anyOf":[{"$ref":"#/components/schemas/PersonalSignRequest"},{"type":"array","items":{"$ref":"#/components/schemas/PersonalSignRequest"}}],"title":"Item"}}}},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"anyOf":[{"$ref":"#/components/schemas/PersonalSignResponse"},{"type":"array","items":{"$ref":"#/components/schemas/PersonalSignResponse"}}],"title":"Response Sign Message V1 Wallet Personal Sign Post"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/v1/wallet/sign":{"post":{"tags":["Transaction"],"summary":"Sign arbitrary data with the wallet.","description":"Signs a hash of arbitrary data using the wallet's private key.\n\n**Example cURL:**\n```bash\ncurl -X POST 'https://tee.express.magiclabs.com/v1/wallet/sign' \\\n  -H 'Content-Type: application/json' \\\n  -H 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...' \\\n  -H 'X-Magic-API-Key: your-magic-api-key' \\\n  -H 'X-OIDC-Provider-ID: your-oidc-provider-id' \\\n  -d '{\n    \"chain\": \"ETH\",\n    \"raw_data_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\"\n  }'\n```\n\n**Example Response:**\n```json\n{\n  \"message_hash\": \"0xabc123def4567890abc123def4567890abc123def4567890abc123def4567890\",\n  \"signature\": \"0x8e7d6c5b4a3928172635445566778899aabbccddeeff00112233445566778899\",\n  \"r\": \"0x3d4e5f678901234567890abcdef1234567890abcdef1234567890abcdef1234\",\n  \"s\": \"0x4e5f678901234567890abcdef1234567890abcdef1234567890abcdef123456\",\n  \"v\": \"27\"\n}\n```","operationId":"sign_data_v1_wallet_sign_post","security":[{"HTTPBearer":[]}],"parameters":[{"name":"X-Magic-API-Key","in":"header","required":false,"schema":{"type":"string","title":"X-Magic-Api-Key"}},{"name":"X-Magic-Secret-Key","in":"header","required":false,"schema":{"type":"string","title":"X-Magic-Secret-Key"}},{"name":"X-OIDC-Provider-ID","in":"header","required":false,"schema":{"type":"string","title":"X-Oidc-Provider-Id"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/SignDataRequest"}}}},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/SignDataResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/v1/wallet":{"get":{"tags":["Wallet"],"summary":"Get wallet details.","description":"Returns the wallet's public address for the given chain.\n\n**Example cURL:**\n```bash\ncurl -X GET 'https://tee.express.magiclabs.com/v1/wallet?chain=ETH' \\\n  -H 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...' \\\n  -H 'X-Magic-API-Key: your-magic-api-key' \\\n  -H 'X-OIDC-Provider-ID: your-oidc-provider-id'\n```\n\n**Example Response:**\n```json\n{\n  \"public_address\": \"0x6b422EefBFBc47a6900A1fc5454Ef4b940B7e36e\"\n}\n```","operationId":"get_wallet_v1_wallet_get","security":[{"HTTPBearer":[]}],"parameters":[{"name":"chain","in":"query","required":true,"schema":{"$ref":"#/components/schemas/Chain"}},{"name":"X-Magic-API-Key","in":"header","required":false,"schema":{"type":"string","title":"X-Magic-Api-Key"}},{"name":"X-Magic-Secret-Key","in":"header","required":false,"schema":{"type":"string","title":"X-Magic-Secret-Key"}},{"name":"X-OIDC-Provider-ID","in":"header","required":false,"schema":{"type":"string","title":"X-Oidc-Provider-Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"anyOf":[{"$ref":"#/components/schemas/WalletResponseModel"},{"type":"null"}],"title":"Response Get Wallet V1 Wallet Get"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}},"post":{"tags":["Wallet"],"summary":"Create a new wallet.","description":"Creates a new wallet for the given chain and returns its public address.\n\n**Example cURL:**\n```bash\ncurl -X POST 'https://tee.express.magiclabs.com/v1/wallet' \\\n  -H 'Content-Type: application/json' \\\n  -H 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNhYVl5dGR3d2UwMzJzMXIzVElyOSJ9...' \\\n  -H 'X-Magic-API-Key: your-magic-api-key' \\\n  -H 'X-OIDC-Provider-ID: your-oidc-provider-id' \\\n  -d '{\n    \"chain\": \"ETH\"\n  }'\n```\n\n**Example Response:**\n```json\n{\n  \"public_address\": \"0x6b422EefBFBc47a6900A1fc5454Ef4b940B7e36e\"\n}\n```","operationId":"create_wallet_v1_wallet_post","security":[{"HTTPBearer":[]}],"parameters":[{"name":"X-Magic-API-Key","in":"header","required":false,"schema":{"type":"string","title":"X-Magic-Api-Key"}},{"name":"X-Magic-Secret-Key","in":"header","required":false,"schema":{"type":"string","title":"X-Magic-Secret-Key"}},{"name":"X-OIDC-Provider-ID","in":"header","required":false,"schema":{"type":"string","title":"X-Oidc-Provider-Id"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateWalletRequestModel"}}}},"responses":{"201":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/WalletResponseModel"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}}},"components":{"schemas":{"Chain":{"type":"string","enum":["ETH"],"title":"Chain"},"CreateWalletRequestModel":{"properties":{"chain":{"$ref":"#/components/schemas/Chain"}},"type":"object","required":["chain"],"title":"CreateWalletRequestModel"},"HTTPValidationError":{"properties":{"detail":{"items":{"$ref":"#/components/schemas/ValidationError"},"type":"array","title":"Detail"}},"type":"object","title":"HTTPValidationError"},"PersonalSignRequest":{"properties":{"chain":{"$ref":"#/components/schemas/Chain"},"message_base64":{"type":"string","title":"Message Base64"}},"type":"object","required":["chain","message_base64"],"title":"PersonalSignRequest"},"PersonalSignResponse":{"properties":{"signature":{"type":"string","title":"Signature"},"r":{"type":"string","title":"R"},"s":{"type":"string","title":"S"},"v":{"type":"string","title":"V"}},"type":"object","required":["signature","r","s","v"],"title":"PersonalSignResponse"},"SignDataRequest":{"properties":{"chain":{"$ref":"#/components/schemas/Chain"},"raw_data_hash":{"type":"string","title":"Raw Data Hash"}},"type":"object","required":["chain","raw_data_hash"],"title":"SignDataRequest"},"SignDataResponse":{"properties":{"message_hash":{"type":"string","title":"Message Hash"},"signature":{"type":"string","title":"Signature"},"r":{"type":"string","title":"R"},"s":{"type":"string","title":"S"},"v":{"type":"string","title":"V"}},"type":"object","required":["message_hash","signature","r","s","v"],"title":"SignDataResponse"},"ValidationError":{"properties":{"loc":{"items":{"anyOf":[{"type":"string"},{"type":"integer"}]},"type":"array","title":"Location"},"msg":{"type":"string","title":"Message"},"type":{"type":"string","title":"Error Type"}},"type":"object","required":["loc","msg","type"],"title":"ValidationError"},"WalletResponseModel":{"properties":{"public_address":{"type":"string","title":"Public Address"}},"type":"object","required":["public_address"],"title":"WalletResponseModel"}},"securitySchemes":{"HTTPBearer":{"type":"http","scheme":"bearer"}}}}
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/v1/wallet": {
+      "post": {
+        "tags": ["Wallet"],
+        "summary": "Create Wallet",
+        "operationId": "create_wallet_v1_wallet_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Magic-Chain",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Chain"
+            }
+          },
+          {
+            "name": "X-Magic-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Api-Key"
+            }
+          },
+          {
+            "name": "X-Magic-Secret-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Secret-Key"
+            }
+          },
+          {
+            "name": "X-OIDC-Provider-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Oidc-Provider-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletResponseModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/wallet/sign/data": {
+      "post": {
+        "tags": ["Sign Operations"],
+        "summary": "Sign Data",
+        "operationId": "sign_data_v1_wallet_sign_data_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Magic-Chain",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Chain"
+            }
+          },
+          {
+            "name": "X-Magic-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Api-Key"
+            }
+          },
+          {
+            "name": "X-Magic-Secret-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Secret-Key"
+            }
+          },
+          {
+            "name": "X-OIDC-Provider-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Oidc-Provider-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignDataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignDataResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/wallet/sign/message": {
+      "post": {
+        "tags": ["Sign Operations"],
+        "summary": "Sign Message",
+        "operationId": "sign_message_v1_wallet_sign_message_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Magic-Chain",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Chain"
+            }
+          },
+          {
+            "name": "X-Magic-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Api-Key"
+            }
+          },
+          {
+            "name": "X-Magic-Secret-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Secret-Key"
+            }
+          },
+          {
+            "name": "X-OIDC-Provider-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Oidc-Provider-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignMessageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/identity/provider": {
+      "post": {
+        "tags": ["Identity Provider"],
+        "summary": "Create Identity Provider",
+        "operationId": "create_identity_provider_v1_identity_provider_post",
+        "parameters": [
+          {
+            "name": "X-Magic-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Api-Key"
+            }
+          },
+          {
+            "name": "X-Magic-Secret-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Secret-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdentityProviderCreateSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentityProviderModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Identity Provider"],
+        "summary": "Get Identity Providers",
+        "operationId": "get_identity_providers_v1_identity_provider_get",
+        "parameters": [
+          {
+            "name": "X-Magic-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Api-Key"
+            }
+          },
+          {
+            "name": "X-Magic-Secret-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Secret-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IdentityProviderModel"
+                  },
+                  "title": "Response Get Identity Providers V1 Identity Provider Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/identity/provider/{id}": {
+      "patch": {
+        "tags": ["Identity Provider"],
+        "summary": "Update Identity Provider",
+        "operationId": "update_identity_provider_v1_identity_provider__id__patch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "X-Magic-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Api-Key"
+            }
+          },
+          {
+            "name": "X-Magic-Secret-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Secret-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdentityProviderUpdateSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentityProviderModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Identity Provider"],
+        "summary": "Delete Identity Provider",
+        "operationId": "delete_identity_provider_v1_identity_provider__id__delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "X-Magic-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Api-Key"
+            }
+          },
+          {
+            "name": "X-Magic-Secret-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Magic-Secret-Key"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "IdentityProviderCreateSchema": {
+        "properties": {
+          "issuer": {
+            "type": "string",
+            "title": "Issuer"
+          },
+          "audience": {
+            "type": "string",
+            "title": "Audience"
+          },
+          "jwks_uri": {
+            "type": "string",
+            "title": "Jwks Uri"
+          }
+        },
+        "type": "object",
+        "required": ["issuer", "audience", "jwks_uri"],
+        "title": "IdentityProviderCreateSchema"
+      },
+      "IdentityProviderModel": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "issuer": {
+            "type": "string",
+            "title": "Issuer"
+          },
+          "audience": {
+            "type": "string",
+            "title": "Audience"
+          },
+          "jwks_uri": {
+            "type": "string",
+            "title": "Jwks Uri"
+          }
+        },
+        "type": "object",
+        "required": ["id", "issuer", "audience", "jwks_uri"],
+        "title": "IdentityProviderModel"
+      },
+      "IdentityProviderUpdateSchema": {
+        "properties": {
+          "issuer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issuer"
+          },
+          "audience": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audience"
+          },
+          "jwks_uri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jwks Uri"
+          }
+        },
+        "type": "object",
+        "title": "IdentityProviderUpdateSchema"
+      },
+      "SignDataRequest": {
+        "properties": {
+          "raw_data_hash": {
+            "type": "string",
+            "title": "Raw Data Hash"
+          },
+          "one_time_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "One Time Code"
+          }
+        },
+        "type": "object",
+        "required": ["raw_data_hash"],
+        "title": "SignDataRequest"
+      },
+      "SignDataResponse": {
+        "properties": {
+          "message_hash": {
+            "type": "string",
+            "title": "Message Hash"
+          },
+          "signature": {
+            "type": "string",
+            "title": "Signature"
+          },
+          "r": {
+            "type": "string",
+            "title": "R"
+          },
+          "s": {
+            "type": "string",
+            "title": "S"
+          },
+          "v": {
+            "type": "string",
+            "title": "V"
+          }
+        },
+        "type": "object",
+        "required": ["message_hash", "signature", "r", "s", "v"],
+        "title": "SignDataResponse"
+      },
+      "SignMessageRequest": {
+        "properties": {
+          "message_base64": {
+            "type": "string",
+            "title": "Message Base64"
+          }
+        },
+        "type": "object",
+        "required": ["message_base64"],
+        "title": "SignMessageRequest"
+      },
+      "SignMessageResponse": {
+        "properties": {
+          "signature": {
+            "type": "string",
+            "title": "Signature"
+          },
+          "r": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "R"
+          },
+          "s": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "S"
+          },
+          "v": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "V"
+          }
+        },
+        "type": "object",
+        "required": ["signature"],
+        "title": "SignMessageResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      },
+      "WalletResponseModel": {
+        "properties": {
+          "public_address": {
+            "type": "string",
+            "title": "Public Address"
+          }
+        },
+        "type": "object",
+        "required": ["public_address"],
+        "title": "WalletResponseModel"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

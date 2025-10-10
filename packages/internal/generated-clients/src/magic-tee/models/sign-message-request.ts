@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface SignMessageRequest
+ */
+export interface SignMessageRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof SignMessageRequest
+     */
+    'message_base64': string;
+}
+
