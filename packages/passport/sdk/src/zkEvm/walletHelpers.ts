@@ -1,6 +1,5 @@
 import { walletContracts } from '@0xsequence/abi';
 import { v1 as sequenceCoreV1 } from '@0xsequence/core';
-import { trackDuration } from '@imtbl/metrics';
 import {
   BigNumberish, Contract, getBytes, hashMessage,
   Interface, keccak256, Signer, solidityPacked, ZeroAddress,
@@ -129,15 +128,7 @@ export const signMetaTransactions = async (
 
   // Sign the digest
   const hashArray = getBytes(hash);
-
-  const startTime = performance.now();
   const ethsigNoType = await signer.signMessage(hashArray);
-  trackDuration(
-    'passport',
-    'magicSignMessageGetSignedMetaTransactions',
-    Math.round(performance.now() - startTime),
-  );
-
   const signedDigest = `${ethsigNoType}${ETH_SIGN_FLAG}`;
 
   // Add metadata
@@ -226,14 +217,7 @@ export const signAndPackTypedData = async (
   // Sign the sub digest
   // https://github.com/immutable/wallet-contracts/blob/7824b5f24b2e0eb2dc465ecb5cd71f3984556b73/src/contracts/modules/commons/ModuleAuth.sol#L155
   const hashArray = getBytes(hash);
-
-  const startTime = performance.now();
   const eoaSignature = await signer.signMessage(hashArray);
-  trackDuration(
-    'passport',
-    'magicSignMessageTypedData',
-    Math.round(performance.now() - startTime),
-  );
   const eoaAddress = await signer.getAddress();
 
   return packSignatures(eoaSignature, eoaAddress, relayerSignature);

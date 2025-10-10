@@ -11,6 +11,7 @@ export const transactionHash = '0x867';
 
 const mandatoryHandlers = [
   rest.get('https://api.sandbox.immutable.com/v1/sdk/session-activity/check', async (req, res, ctx) => res(ctx.status(404))),
+  rest.post('https://api.immutable.com/v1/sdk/metrics', async (req, res, ctx) => res(ctx.status(200))),
   rest.post('https://rpc.testnet.immutable.com', async (req, res, ctx) => {
     const body = await req.json<JsonRpcRequestPayload>();
     switch (body.method) {
@@ -28,10 +29,42 @@ const mandatoryHandlers = [
       }
     }
   }),
+  rest.post('https://tee.express.magiclabs.com/v1/wallet', (req, res, ctx) => res(
+    ctx.status(201),
+    ctx.json({
+      public_address: mockUserZkEvm.zkEvm.userAdminAddress,
+    }),
+  )),
+  rest.post('https://tee.express.magiclabs.com/v1/wallet/sign/message', (req, res, ctx) => res(
+    ctx.status(200),
+    ctx.json({
+      signature: '0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b',
+    }),
+  )),
 ];
 
 const chainName = `${encodeURIComponent(ChainName.IMTBL_ZKEVM_TESTNET)}`;
 export const mswHandlers = {
+  magicTEE: {
+    createWallet: {
+      success: rest.post('https://tee.express.magiclabs.com/v1/wallet', (req, res, ctx) => res(
+        ctx.status(201),
+        ctx.json({
+          public_address: mockUserZkEvm.zkEvm.userAdminAddress,
+        }),
+      )),
+      internalServerError: rest.post('https://tee.express.magiclabs.com/v1/wallet', (req, res, ctx) => res(ctx.status(500))),
+    },
+    personalSign: {
+      success: rest.post('https://tee.express.magiclabs.com/v1/wallet/sign/message', (req, res, ctx) => res(
+        ctx.status(200),
+        ctx.json({
+          signature: '0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b',
+        }),
+      )),
+      internalServerError: rest.post('https://tee.express.magiclabs.com/v1/wallet/sign/message', (req, res, ctx) => res(ctx.status(500))),
+    },
+  },
   counterfactualAddress: {
     success: rest.post(
       `https://api.sandbox.immutable.com/v2/chains/${chainName}/passport/counterfactual-address`,

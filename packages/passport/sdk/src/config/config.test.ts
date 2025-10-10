@@ -48,7 +48,7 @@ describe('Config', () => {
         expect.objectContaining({
           authenticationDomain: 'https://auth.immutable.com',
           magicPublishableApiKey: 'pk_live_10F423798A540ED7',
-          magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
+          magicProviderId: 'aa80b860-8869-4f13-9000-6a6ad3d20017',
           passportDomain: 'https://passport.sandbox.immutable.com',
           oidcConfiguration,
         }),
@@ -70,7 +70,7 @@ describe('Config', () => {
         expect.objectContaining({
           authenticationDomain: 'https://auth.immutable.com',
           magicPublishableApiKey: 'pk_live_10F423798A540ED7',
-          magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
+          magicProviderId: 'aa80b860-8869-4f13-9000-6a6ad3d20017',
           passportDomain: 'https://passport.immutable.com',
           oidcConfiguration,
         }),

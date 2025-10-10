@@ -1,7 +1,7 @@
 import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { PassportImxProviderFactory } from './passportImxProviderFactory';
-import MagicAdapter from '../magic/magicAdapter';
+import MagicTEESigner from '../magic/magicTEESigner';
 import AuthManager from '../authManager';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportEventMap } from '../types';
@@ -20,7 +20,7 @@ describe('PassportImxProviderFactory', () => {
   };
   const imxApiClients = new ImxApiClients({} as any);
 
-  const mockMagicAdapter = {};
+  const mockMagicTEESigner = {};
   const immutableXClient = {
     usersApi: {},
   } as IMXClient;
@@ -29,7 +29,7 @@ describe('PassportImxProviderFactory', () => {
   const passportImxProviderFactory = new PassportImxProviderFactory({
     immutableXClient,
     authManager: mockAuthManager as unknown as AuthManager,
-    magicAdapter: mockMagicAdapter as unknown as MagicAdapter,
+    magicTEESigner: mockMagicTEESigner as unknown as MagicTEESigner,
     passportEventEmitter,
     imxApiClients,
     guardianClient,
@@ -77,7 +77,7 @@ describe('PassportImxProviderFactory', () => {
       expect(result).toBe(mockPassportImxProvider);
       expect(mockAuthManager.getUserOrLogin).toHaveBeenCalledTimes(1);
       expect(PassportImxProvider).toHaveBeenCalledWith({
-        magicAdapter: mockMagicAdapter,
+        magicTEESigner: mockMagicTEESigner,
         authManager: mockAuthManager,
         immutableXClient,
         passportEventEmitter,
