@@ -24,7 +24,7 @@ describe('formatError', () => {
       environment: Environment.SANDBOX,
     }));
     await expect(client.getUser('')).rejects.toThrowError(
-      'Error: Request failed with status code 405',
+      'Error: Request failed with status code 404',
     );
   });
 
