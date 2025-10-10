@@ -40,7 +40,7 @@ export class PassportConfiguration {
 
   readonly magicTeeBasePath: string = 'https://tee.express.magiclabs.com';
 
-  readonly magicTeeTimeout: number = 6000;
+  readonly magicTeeTimeout: number = 10000;
 
   readonly oidcConfiguration: OidcConfiguration;
 
