@@ -8,16 +8,15 @@ import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
-import { ActionType, TransactionAction, TransactionPurpose } from '@imtbl/orderbook';
 import { PreparedTransactionRequest } from 'ethers';
 
-function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitted }: RequestExampleProps) {
+function SeaportCancel({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const { orderbookClient } = useImmutableProvider();
   const { zkEvmProvider } = usePassportProvider();
 
-  const [listingIds, setListingIds] = useState<string>('');
+  const [orderIds, setOrderIds] = useState<string>('');
   const [walletAddress, setWalletAddress] = useState<string>('');
-  const [isBuldingTransaction, setIsBuildingTransaction] = useState<boolean>(false);
+  const [isBuildingTransaction, setIsBuildingTransaction] = useState<boolean>(false);
   const [transaction, setTransaction] = useState<PreparedTransactionRequest>();
   const [transactionError, setTransactionError] = useState<string>('');
 
@@ -44,7 +43,7 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
   useEffect(() => {
     setTransactionError('');
     setTransaction(undefined);
-  }, [listingIds]);
+  }, [orderIds]);
 
   const validate = useCallback(async () => {
     setTransactionError('');
@@ -52,56 +51,18 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
     setIsBuildingTransaction(true);
 
     try {
-      const fulfillResponse = await orderbookClient.fulfillBulkOrders(
-        listingIds.replaceAll(' ', '').split(',').map((orderId) => ({
-          listingId: orderId,
-          takerFees: [],
-        })),
+      const { cancellationAction } = await orderbookClient.cancelOrdersOnChain(
+        orderIds.replaceAll(' ', '').split(','),
         walletAddress,
       );
 
-      if (!fulfillResponse.sufficientBalance) {
-        setTransactionError('Insufficient balance to fulfill the order(s)');
-        return;
-      }
-
-      const {
-        actions, unfulfillableOrders,
-      } = fulfillResponse;
-
-      if (unfulfillableOrders.length > 0) {
-        setTransactionError('Not all orders are fulfillable');
-        return;
-      }
-
-      const verifyAction = actions.find((action) => (
-        action.type === ActionType.TRANSACTION && action.purpose === TransactionPurpose.APPROVAL
-      )) as TransactionAction | undefined;
-
-      if (verifyAction) {
-        const approvalTransaction = await verifyAction.buildTransaction();
-        await zkEvmProvider?.request({
-          method: 'eth_sendTransaction',
-          params: [approvalTransaction],
-        });
-      }
-
-      const transactionAction = actions.find((action) => (
-        action.type === ActionType.TRANSACTION && action.purpose === TransactionPurpose.FULFILL_ORDER
-      )) as TransactionAction | undefined;
-
-      if (!transactionAction) {
-        setTransactionError('Failed to find transaction to process');
-        return;
-      }
-
-      setTransaction(await transactionAction.buildTransaction());
+      setTransaction(await cancellationAction.buildTransaction());
     } catch (err) {
-      setTransactionError(`Failed to retrieve Seaport orders: ${err}`);
+      setTransactionError(`Failed to build Seaport cancellation transaction: ${err}`);
     } finally {
       setIsBuildingTransaction(false);
     }
-  }, [listingIds, orderbookClient, walletAddress, zkEvmProvider]);
+  }, [orderIds, orderbookClient, walletAddress]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -114,8 +75,8 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
   }, [handleExampleSubmitted, transaction]);
 
   return (
-    <Accordion.Item eventKey="6">
-      <Accordion.Header>Seaport Fulfill Available Advanced Orders</Accordion.Header>
+    <Accordion.Item eventKey="7">
+      <Accordion.Header>Seaport Cancel</Accordion.Header>
       <Accordion.Body>
         <Form onSubmit={handleSubmit} className="mb-4">
           <Form.Group className="mb-3">
@@ -131,15 +92,15 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>
-              Listing IDs (comma separated)
+              Order IDs (comma separated)
             </Form.Label>
             <Form.Control
               required
               type="text"
-              value={listingIds}
+              value={orderIds}
               isValid={transaction && !transactionError}
-              isInvalid={!!transactionError || !listingIds}
-              onChange={(e) => setListingIds(e.target.value)}
+              isInvalid={!!transactionError || !orderIds}
+              onChange={(e) => setOrderIds(e.target.value)}
             />
             <Form.Control.Feedback type="invalid">
               {transactionError}
@@ -147,7 +108,7 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
           </Form.Group>
           <Stack direction="horizontal" gap={3}>
             <WorkflowButton
-              disabled={disabled || isBuldingTransaction || !!transaction}
+              disabled={disabled || isBuildingTransaction || !!transaction}
               type="button"
               onClick={validate}
             >
@@ -159,7 +120,7 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
             >
               Submit
             </WorkflowButton>
-            { isBuldingTransaction && <Spinner /> }
+            { isBuildingTransaction && <Spinner /> }
           </Stack>
         </Form>
       </Accordion.Body>
@@ -167,4 +128,4 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
   );
 }
 
-export default SeaportFulfillAvailableAdvancedOrders;
+export default SeaportCancel;

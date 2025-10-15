@@ -37,13 +37,18 @@ export interface ViewOffersModalProps extends ModalProps {
   onClose?: () => void;
 }
 
+export type HandleExampleSubmitted = (
+  request: RequestArguments,
+  onSuccess?: (result?: any) => Promise<void>,
+) => Promise<void>;
+
 export interface RequestExampleProps {
-  handleExampleSubmitted: (request: RequestArguments) => Promise<void>;
+  handleExampleSubmitted: HandleExampleSubmitted;
   disabled: boolean;
 }
 
 export interface RequestExampleAccordionProps {
   disabled: boolean;
-  handleExampleSubmitted: (request: RequestArguments) => Promise<void>;
+  handleExampleSubmitted: HandleExampleSubmitted;
   examples: Array<ComponentType<RequestExampleProps>>;
 }
