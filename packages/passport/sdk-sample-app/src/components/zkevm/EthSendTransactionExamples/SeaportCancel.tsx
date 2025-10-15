@@ -62,7 +62,7 @@ function SeaportCancel({ disabled, handleExampleSubmitted }: RequestExampleProps
     } finally {
       setIsBuildingTransaction(false);
     }
-  }, [orderIds, orderbookClient, walletAddress, zkEvmProvider]);
+  }, [orderIds, orderbookClient, walletAddress]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

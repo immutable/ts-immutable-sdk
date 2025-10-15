@@ -13,7 +13,7 @@ import {
   TransactionAction,
   TransactionPurpose,
 } from '@imtbl/orderbook';
-import { TypedDataEncoder } from 'ethers';
+import { BrowserProvider, TypedDataEncoder } from 'ethers';
 
 type TokenType = 'NATIVE' | 'ERC20';
 
@@ -100,30 +100,36 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
         throw new Error('Units for sale must be greater than 0');
       }
 
-      const { actions, orderComponents, orderHash } = await orderbookClient.prepareListing({
+      const preparedListing = await orderbookClient.prepareListing({
         makerAddress: walletAddress,
         buy,
         sell,
       });
 
       if (submitTransaction) {
-        const approvalActions = actions.filter((action) => (
+        const approvalActions = preparedListing.actions.filter((action) => (
           action.type === ActionType.TRANSACTION && action.purpose === TransactionPurpose.APPROVAL
         )) as TransactionAction[];
-  
+
         for (const approvalAction of approvalActions) {
+          // eslint-disable-next-line no-await-in-loop
           const unsignedTx = await approvalAction.buildTransaction();
-          const receipt = await zkEvmProvider!.request({
+
+          // eslint-disable-next-line no-await-in-loop
+          const transactionHash = await zkEvmProvider!.request({
             method: 'eth_sendTransaction',
             params: [unsignedTx],
           });
+
+          // eslint-disable-next-line no-await-in-loop
+          await new BrowserProvider(zkEvmProvider!).waitForTransaction(transactionHash);
         }
 
-        setOrderComponents(orderComponents);
-        setOrderHash(orderHash);
+        setOrderComponents(preparedListing.orderComponents);
+        setOrderHash(preparedListing.orderHash);
       }
 
-      const signAction = actions.find((action) => (
+      const signAction = preparedListing.actions.find((action) => (
         action.type === ActionType.SIGNABLE && action.purpose === SignablePurpose.CREATE_LISTING
       )) as SignableAction | undefined;
 
@@ -161,15 +167,12 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
     let onSuccess;
     if (submitTransaction) {
       onSuccess = async (result: any) => {
-        console.log('onSuccess', result);
-        const createListingResult = await orderbookClient.createListing({
+        await orderbookClient.createListing({
           orderComponents: orderComponents!,
           orderHash,
           orderSignature: result,
           makerFees: [],
         });
-
-        console.log('createListing result', createListingResult);
       };
     }
 
