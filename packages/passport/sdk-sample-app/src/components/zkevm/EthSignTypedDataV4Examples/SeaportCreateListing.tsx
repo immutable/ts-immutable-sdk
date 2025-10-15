@@ -177,7 +177,15 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
       method: 'eth_signTypedData_v4',
       params: [walletAddress, transaction],
     }, onSuccess);
-  }, [handleExampleSubmitted, transaction, walletAddress, orderComponents, orderHash, submitTransaction]);
+  }, [
+    handleExampleSubmitted,
+    transaction,
+    walletAddress,
+    orderComponents,
+    orderHash,
+    submitTransaction,
+    orderbookClient,
+  ]);
 
   return (
     <Accordion.Item eventKey="3">
