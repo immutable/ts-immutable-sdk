@@ -101,7 +101,7 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
     } finally {
       setIsBuildingTransaction(false);
     }
-  }, [listingIds, orderbookClient, walletAddress]);
+  }, [listingIds, orderbookClient, walletAddress, zkEvmProvider]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
