@@ -16,7 +16,7 @@ function SeaportCancel({ disabled, handleExampleSubmitted }: RequestExampleProps
 
   const [orderIds, setOrderIds] = useState<string>('');
   const [walletAddress, setWalletAddress] = useState<string>('');
-  const [isBuldingTransaction, setIsBuildingTransaction] = useState<boolean>(false);
+  const [isBuildingTransaction, setIsBuildingTransaction] = useState<boolean>(false);
   const [transaction, setTransaction] = useState<PreparedTransactionRequest>();
   const [transactionError, setTransactionError] = useState<string>('');
 
@@ -108,7 +108,7 @@ function SeaportCancel({ disabled, handleExampleSubmitted }: RequestExampleProps
           </Form.Group>
           <Stack direction="horizontal" gap={3}>
             <WorkflowButton
-              disabled={disabled || isBuldingTransaction || !!transaction}
+              disabled={disabled || isBuildingTransaction || !!transaction}
               type="button"
               onClick={validate}
             >
@@ -120,7 +120,7 @@ function SeaportCancel({ disabled, handleExampleSubmitted }: RequestExampleProps
             >
               Submit
             </WorkflowButton>
-            { isBuldingTransaction && <Spinner /> }
+            { isBuildingTransaction && <Spinner /> }
           </Stack>
         </Form>
       </Accordion.Body>

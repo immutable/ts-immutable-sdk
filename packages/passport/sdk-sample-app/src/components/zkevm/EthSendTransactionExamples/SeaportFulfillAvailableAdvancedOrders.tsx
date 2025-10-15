@@ -53,7 +53,7 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
 
     try {
       const fulfillResponse = await orderbookClient.fulfillBulkOrders(
-        listingIds.replace(' ', '').split(',').map((orderId) => ({
+        listingIds.replaceAll(' ', '').split(',').map((orderId) => ({
           listingId: orderId,
           takerFees: [],
         })),
@@ -101,7 +101,7 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
     } finally {
       setIsBuildingTransaction(false);
     }
-  }, [listingIds, orderbookClient, walletAddress, zkEvmProvider]);
+  }, [listingIds, orderbookClient, walletAddress]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
