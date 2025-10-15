@@ -52,7 +52,7 @@ function SeaportCancel({ disabled, handleExampleSubmitted }: RequestExampleProps
 
     try {
       const { cancellationAction } = await orderbookClient.cancelOrdersOnChain(
-        orderIds.replace(' ', '').split(','),
+        orderIds.replaceAll(' ', '').split(','),
         walletAddress,
       );
 
