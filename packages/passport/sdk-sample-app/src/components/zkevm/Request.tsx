@@ -169,13 +169,16 @@ function Request({ showModal, setShowModal }: ModalProps) {
     setShowModal(false);
   };
 
-  const performRequest = async (request: RequestArguments) => {
+  const performRequest = async (request: RequestArguments, onSuccess?: (result?: any) => Promise<void>) => {
     setInvalid(false);
     setLoadingRequest(true);
     try {
       const result = await zkEvmProvider?.request(request);
       setLoadingRequest(false);
       addMessage(request.method, result);
+      if (onSuccess) {
+        await onSuccess(result);
+      }
       handleClose();
     } catch (err) {
       addMessage('Request', err);
@@ -183,7 +186,7 @@ function Request({ showModal, setShowModal }: ModalProps) {
     }
   };
 
-  const handleExampleSubmitted = async (request: RequestArguments) => {
+  const handleExampleSubmitted = async (request: RequestArguments, onSuccess?: (result?: any) => Promise<void>) => {
     if (request.params) {
       const newParams = params;
       request.params.forEach((param, i) => {
@@ -195,7 +198,7 @@ function Request({ showModal, setShowModal }: ModalProps) {
       });
       setParams(newParams);
     }
-    await performRequest(request);
+    return performRequest(request, onSuccess);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

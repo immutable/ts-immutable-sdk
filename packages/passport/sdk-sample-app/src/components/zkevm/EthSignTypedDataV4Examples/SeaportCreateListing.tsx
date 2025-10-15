@@ -9,7 +9,9 @@ import { RequestExampleProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import {
-  ActionType, ERC1155Item, ERC721Item, SignableAction, SignablePurpose,
+  ActionType, ERC1155Item, ERC721Item, CreateListingParams, SignableAction, SignablePurpose,
+  TransactionAction,
+  TransactionPurpose,
 } from '@imtbl/orderbook';
 import { TypedDataEncoder } from 'ethers';
 
@@ -32,6 +34,9 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
   const [sellTokenUnits, setSellTokenUnits] = useState<string>('1');
   const [showSellTokenUnitsField, setShowSellTokenUnitsField] = useState(false);
   const [sellTokenType, setSellTokenType] = useState<'ERC721' | 'ERC1155'>('ERC721');
+  const [submitTransaction, setSubmitTransaction] = useState<boolean>(false);
+  const [orderComponents, setOrderComponents] = useState<CreateListingParams['orderComponents'] | undefined>();
+  const [orderHash, setOrderHash] = useState<string>('');
 
   const seaportContractAddress = useMemo(
     () => (
@@ -67,6 +72,9 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
     setBuyType('NATIVE');
     setSellTokenUnits('1');
     setShowSellTokenUnitsField(false);
+    setSubmitTransaction(false);
+    setOrderComponents(undefined);
+    setOrderHash('');
   };
 
   const validate = useCallback(async () => {
@@ -92,11 +100,28 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
         throw new Error('Units for sale must be greater than 0');
       }
 
-      const { actions } = await orderbookClient.prepareListing({
+      const { actions, orderComponents, orderHash } = await orderbookClient.prepareListing({
         makerAddress: walletAddress,
         buy,
         sell,
       });
+
+      if (submitTransaction) {
+        const approvalActions = actions.filter((action) => (
+          action.type === ActionType.TRANSACTION && action.purpose === TransactionPurpose.APPROVAL
+        )) as TransactionAction[];
+  
+        for (const approvalAction of approvalActions) {
+          const unsignedTx = await approvalAction.buildTransaction();
+          const receipt = await zkEvmProvider!.request({
+            method: 'eth_sendTransaction',
+            params: [unsignedTx],
+          });
+        }
+
+        setOrderComponents(orderComponents);
+        setOrderHash(orderHash);
+      }
 
       const signAction = actions.find((action) => (
         action.type === ActionType.SIGNABLE && action.purpose === SignablePurpose.CREATE_LISTING
@@ -117,7 +142,7 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
       setIsBuildingTransaction(false);
     }
   }, [NFTContractAddress, buyAmount, buyType, orderbookClient,
-    tokenContractAddress, tokenId, walletAddress, sellTokenUnits, sellTokenType]);
+    tokenContractAddress, tokenId, walletAddress, sellTokenUnits, sellTokenType, submitTransaction, zkEvmProvider]);
 
   const handleSetSellTokenType = (e: React.ChangeEvent<HTMLSelectElement>) => {
     resetForm();
@@ -133,19 +158,31 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
     e.preventDefault();
     e.stopPropagation();
 
+    let onSuccess;
+    if (submitTransaction) {
+      onSuccess = async (result: any) => {
+        console.log('onSuccess', result);
+        const createListingResult = await orderbookClient.createListing({
+          orderComponents: orderComponents!,
+          orderHash,
+          orderSignature: result,
+          makerFees: [],
+        });
+
+        console.log('createListing result', createListingResult);
+      };
+    }
+
     return handleExampleSubmitted({
       method: 'eth_signTypedData_v4',
       params: [walletAddress, transaction],
-    });
-  }, [handleExampleSubmitted, transaction, walletAddress]);
+    }, onSuccess);
+  }, [handleExampleSubmitted, transaction, walletAddress, orderComponents, orderHash, submitTransaction]);
 
   return (
     <Accordion.Item eventKey="3">
       <Accordion.Header>Seaport Create Listing</Accordion.Header>
       <Accordion.Body>
-        <Alert variant="warning">
-          Note: This method only returns a signed message, it does not submit an order to the orderbook.
-        </Alert>
         {transactionError
         && (
         <Alert variant="danger" style={{ wordBreak: 'break-word' }}>
@@ -253,6 +290,15 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
               isValid={transaction && !transactionError}
               isInvalid={!!transactionError}
               onChange={(e) => setBuyAmount(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Check
+              onClick={() => {
+                setSubmitTransaction(!submitTransaction);
+              }}
+              type="checkbox"
+              label="Submit Transaction"
             />
           </Form.Group>
           <Stack direction="horizontal" gap={3}>
