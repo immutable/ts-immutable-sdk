@@ -4,7 +4,6 @@ import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleTextBody } from '../../components/Body/SimpleTextBody';
 import { NoServiceHero } from '../../components/Hero/NoServiceHero';
-import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { ServiceType } from './serviceTypes';
 
 export interface ServiceUnavailableToRegionErrorViewProps {
@@ -14,6 +13,7 @@ export interface ServiceUnavailableToRegionErrorViewProps {
   onPrimaryButtonClick?: () => void;
   secondaryActionText?: string;
   onSecondaryButtonClick?: () => void;
+  showHeader?: boolean;
 }
 
 export function ServiceUnavailableToRegionErrorView({
@@ -23,17 +23,17 @@ export function ServiceUnavailableToRegionErrorView({
   onPrimaryButtonClick,
   secondaryActionText,
   onSecondaryButtonClick,
+  showHeader = true,
 }: ServiceUnavailableToRegionErrorViewProps) {
   const { t } = useTranslation();
 
   return (
     <SimpleLayout
-      header={
+      header={showHeader ? (
         <HeaderNavigation transparent onCloseButtonClick={onCloseClick} />
-      }
+      ) : undefined}
       heroContent={<NoServiceHero />}
       floatHeader
-      footer={<FooterLogo />}
       testId="service-unavailable-to-region-error-view"
     >
       <SimpleTextBody heading={t(`views.SERVICE_UNAVAILABLE_ERROR_VIEW.heading.${service}`)}>
@@ -42,7 +42,7 @@ export function ServiceUnavailableToRegionErrorView({
           components={{
             quickswapLink: <Link
               size="small"
-              rc={<a target="_blank" href="https://quickswap.exchange" rel="noreferrer" />}
+              rc={<a target="_blank" href="https://dapp.quickswap.exchange/?chainId=13371" rel="noreferrer" />}
             />,
             immutableSupport: <Link
               size="small"

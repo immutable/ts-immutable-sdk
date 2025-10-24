@@ -411,6 +411,7 @@ export default function SwapWidget({
         <ServiceUnavailableToRegionErrorView
           service={ServiceType.SWAP}
           onCloseClick={() => sendSwapWidgetCloseEvent(window)}
+          showHeader={showHeader}
           primaryActionText={
             topUpOptions && topUpOptions?.length > 0
               ? t(topUpOptions[0].textKey)
