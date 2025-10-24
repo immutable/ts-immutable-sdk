@@ -14,6 +14,7 @@ export interface ServiceUnavailableToRegionErrorViewProps {
   onPrimaryButtonClick?: () => void;
   secondaryActionText?: string;
   onSecondaryButtonClick?: () => void;
+  showHeader?: boolean;
 }
 
 export function ServiceUnavailableToRegionErrorView({
@@ -23,14 +24,15 @@ export function ServiceUnavailableToRegionErrorView({
   onPrimaryButtonClick,
   secondaryActionText,
   onSecondaryButtonClick,
+  showHeader = true,
 }: ServiceUnavailableToRegionErrorViewProps) {
   const { t } = useTranslation();
 
   return (
     <SimpleLayout
-      header={
+      header={showHeader ? (
         <HeaderNavigation transparent onCloseButtonClick={onCloseClick} />
-      }
+      ) : undefined}
       heroContent={<NoServiceHero />}
       floatHeader
       footer={<FooterLogo />}
