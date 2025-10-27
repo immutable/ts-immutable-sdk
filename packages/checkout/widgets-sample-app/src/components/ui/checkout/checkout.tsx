@@ -301,6 +301,8 @@ function CheckoutUI() {
         },
         TRANSFER: {
           customTitle: "Dromedary Transfer",
+          customCoinAmountTitle: "Send dromedary",
+          // showHeader: false,
         },
         /*
         ONRAMP: {

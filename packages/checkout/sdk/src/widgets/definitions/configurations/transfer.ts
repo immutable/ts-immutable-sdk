@@ -5,6 +5,6 @@ import { WidgetConfiguration } from './widget';
  */
 export type TransferWidgetConfiguration = {
   customTitle?: string;
+  customCoinAmountTitle?: string;
   showHeader?: boolean;
-  showCoinAmountHeading?: boolean;
 } & WidgetConfiguration;
