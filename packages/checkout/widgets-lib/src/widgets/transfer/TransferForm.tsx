@@ -30,6 +30,7 @@ export function TransferForm({
   onSend,
   showBackButton,
   showHeader,
+  showCoinAmountHeading,
   title,
 }: {
   config: StrongCheckoutWidgetsConfig;
@@ -38,6 +39,7 @@ export function TransferForm({
   onSend: () => void;
   showBackButton: boolean | undefined;
   showHeader: boolean;
+  showCoinAmountHeading: boolean;
   title: string;
 }) {
   const { t } = useTranslation();
@@ -165,9 +167,11 @@ export function TransferForm({
       >
         <Stack gap="base.spacing.x9">
           <Stack gap="base.spacing.x1">
-            <Heading size="xSmall">
-              {t('views.TRANSFER.form.coinAmountHeading')}
-            </Heading>
+            {showCoinAmountHeading && (
+              <Heading size="xSmall">
+                {t('views.TRANSFER.form.coinAmountHeading')}
+              </Heading>
+            )}
             <SelectInput
               testId="transfer-token-select"
               options={tokenOptions}
