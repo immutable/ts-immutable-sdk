@@ -31,6 +31,7 @@ export function TransferForm({
   showBackButton,
   showHeader,
   title,
+  coinAmountTitle,
 }: {
   config: StrongCheckoutWidgetsConfig;
   viewState: TransferFormState;
@@ -39,6 +40,7 @@ export function TransferForm({
   showBackButton: boolean | undefined;
   showHeader: boolean;
   title: string;
+  coinAmountTitle: string;
 }) {
   const { t } = useTranslation();
   const { track } = useAnalytics();
@@ -166,7 +168,7 @@ export function TransferForm({
         <Stack gap="base.spacing.x9">
           <Stack gap="base.spacing.x1">
             <Heading size="xSmall">
-              {t('views.TRANSFER.form.coinAmountHeading')}
+              {coinAmountTitle}
             </Heading>
             <SelectInput
               testId="transfer-token-select"

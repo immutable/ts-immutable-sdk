@@ -207,6 +207,7 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
           showBackButton={props.showBackButton}
           showHeader={props.transferConfig.showHeader ?? true}
           title={props.transferConfig.customTitle ?? t('views.TRANSFER.header.title')}
+          coinAmountTitle={props.transferConfig.customCoinAmountTitle ?? t('views.TRANSFER.form.coinAmountHeading')}
         />
       );
     case 'AWAITING_APPROVAL':
