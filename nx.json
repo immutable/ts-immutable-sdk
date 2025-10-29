@@ -90,6 +90,5 @@
     }
   },
   "defaultBase": "main",
-  "parallel": 8,
-  "nxCloudAccessToken": "Mzg3ZGY1MWUtYmYyNy00ZmE4LTkyNDAtYjYxZmJmYmE4NWQ3fHJlYWQ="
+  "parallel": 8
 }
