@@ -12,7 +12,7 @@ export function LoadingView({ loadingText, textDuration, containerSx = {} }: Loa
 
   return (
     <SimpleLayout containerSx={containerSx}>
-      <LoadingOverlay visible>
+      <LoadingOverlay visible testId="checkout-loading-view">
         <LoadingOverlay.Content>
           <LoadingOverlay.Content.LoopingText
             text={[...text]}
