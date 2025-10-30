@@ -1,7 +1,7 @@
 import { ExchangeType } from '../types/fiatRamp';
 import { OnRampConfig, OnRampProvider, OnRampProviderFees } from '../types';
 import { CheckoutConfiguration } from '../config';
-import { TRANSAK_API_BASE_URL } from '../env';
+import { IMMUTABLE_API_BASE_URL } from '../env';
 
 export interface FiatRampWidgetParams {
   exchangeType: ExchangeType;
@@ -44,25 +44,25 @@ export class FiatRampService {
       'onramp',
     )) as OnRampConfig;
 
-    const widgetUrl = TRANSAK_API_BASE_URL[this.config.environment];
+    const createWidgetUrl = `${IMMUTABLE_API_BASE_URL[this.config.environment]}/checkout/v1/widget-url`;
     let widgetParams: Record<string, any> = {
-      apiKey: onRampConfig[OnRampProvider.TRANSAK].publishableApiKey,
+      api_key: onRampConfig[OnRampProvider.TRANSAK].publishableApiKey,
       network: 'immutablezkevm',
-      defaultPaymentMethod: 'credit_debit_card',
-      disablePaymentMethods: '',
-      productsAvailed: 'buy',
-      exchangeScreenTitle: params.customSubTitle === '' ? ' ' : (params.customSubTitle ?? 'Buy'),
-      themeColor: '0D0D0D',
-      defaultCryptoCurrency: params.tokenSymbol || 'IMX',
-      hideMenu: !(params.showMenu ?? true),
+      default_payment_method: 'credit_debit_card',
+      disable_payment_methods: '',
+      products_availed: 'buy',
+      exchange_screen_title: params.customSubTitle === '' ? ' ' : (params.customSubTitle ?? 'Buy'),
+      theme_color: '0D0D0D',
+      default_crypto_currency: params.tokenSymbol || 'IMX',
+      hide_menu: !(params.showMenu ?? true),
     };
 
     if (params.isPassport && params.email) {
       widgetParams = {
         ...widgetParams,
         email: encodeURIComponent(params.email),
-        isAutoFillUserData: true,
-        disableWalletAddressForm: true,
+        is_auto_fill_user_data: true,
+        disable_wallet_address_form: true,
       };
     }
 
@@ -72,14 +72,14 @@ export class FiatRampService {
     if (params.tokenAmount && params.tokenSymbol) {
       widgetParams = {
         ...widgetParams,
-        defaultCryptoAmount: params.tokenAmount,
-        cryptoCurrencyCode: params.tokenSymbol,
+        default_crypto_amount: params.tokenAmount,
+        crypto_currency_code: params.tokenSymbol,
       };
     } else {
       widgetParams = {
         ...widgetParams,
-        defaultFiatAmount: 50,
-        defaultFiatCurrency: 'usd',
+        default_fiat_amount: 50,
+        default_fiat_currency: 'usd',
       };
     }
 
@@ -93,10 +93,21 @@ export class FiatRampService {
     if (params.allowedTokens) {
       widgetParams = {
         ...widgetParams,
-        cryptoCurrencyList: params.allowedTokens?.join(',').toLowerCase(),
+        crypto_currency_list: params.allowedTokens?.join(',').toLowerCase(),
       };
     }
 
-    return `${widgetUrl}?${new URLSearchParams(widgetParams).toString()}`;
+    console.log({ widgetParams });
+
+    const response = await fetch(createWidgetUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(widgetParams),
+    });
+    const data = await response.json();
+    console.log({ data });
+    return data.url;
   }
 }
