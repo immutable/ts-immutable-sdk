@@ -284,9 +284,9 @@ export function OnRampMain({
       transakIframeId,
     ) as HTMLIFrameElement | null;
 
-    const handleTransakEvents = (event: any) => {
-      if (!domIframe) return;
+    if (!domIframe) return;
 
+    const handleTransakEvents = (event: any) => {
       const host = url.parse(event.origin)?.host?.toLowerCase();
       if (
         event.source === domIframe.contentWindow
