@@ -99,8 +99,6 @@ export class FiatRampService {
     }
 
     const response = await axios.post(createWidgetUrl, widgetParams);
-    const { data } = response;
-
-    return data.url;
+    return response.data.url;
   }
 }
