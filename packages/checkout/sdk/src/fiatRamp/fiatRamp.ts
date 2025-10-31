@@ -1,8 +1,8 @@
-import axios from 'axios';
 import { ExchangeType } from '../types/fiatRamp';
 import { OnRampConfig, OnRampProvider, OnRampProviderFees } from '../types';
 import { CheckoutConfiguration } from '../config';
 import { IMMUTABLE_API_BASE_URL } from '../env';
+import { HttpClient } from '../api/http';
 
 export interface FiatRampWidgetParams {
   exchangeType: ExchangeType;
@@ -34,12 +34,16 @@ export class FiatRampService {
     return config[OnRampProvider.TRANSAK]?.fees;
   }
 
-  public async createWidgetUrl(params: FiatRampWidgetParams): Promise<string> {
-    return await this.getTransakWidgetUrl(params);
+  public async createWidgetUrl(
+    params: FiatRampWidgetParams,
+    httpClient = new HttpClient(),
+  ): Promise<string> {
+    return await this.getTransakWidgetUrl(params, httpClient);
   }
 
   private async getTransakWidgetUrl(
     params: FiatRampWidgetParams,
+    httpClient: HttpClient,
   ): Promise<string> {
     const onRampConfig = (await this.config.remote.getConfig(
       'onramp',
@@ -61,7 +65,7 @@ export class FiatRampService {
     if (params.isPassport && params.email) {
       widgetParams = {
         ...widgetParams,
-        email: encodeURIComponent(params.email),
+        email: params.email,
         is_auto_fill_user_data: true,
         disable_wallet_address_form: true,
       };
@@ -87,7 +91,7 @@ export class FiatRampService {
     if (params.walletAddress) {
       widgetParams = {
         ...widgetParams,
-        walletAddress: params.walletAddress,
+        wallet_address: params.walletAddress,
       };
     }
 
@@ -98,7 +102,7 @@ export class FiatRampService {
       };
     }
 
-    const response = await axios.post(createWidgetUrl, widgetParams);
+    const response = await httpClient.post(createWidgetUrl, widgetParams, { method: 'POST' });
     return response.data.url;
   }
 }
