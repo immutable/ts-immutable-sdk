@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { ExchangeType } from '../types/fiatRamp';
 import { OnRampConfig, OnRampProvider, OnRampProviderFees } from '../types';
 import { CheckoutConfiguration } from '../config';
@@ -97,17 +98,9 @@ export class FiatRampService {
       };
     }
 
-    console.log({ widgetParams });
+    const response = await axios.post(createWidgetUrl, widgetParams);
+    const { data } = response;
 
-    const response = await fetch(createWidgetUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(widgetParams),
-    });
-    const data = await response.json();
-    console.log({ data });
     return data.url;
   }
 }
