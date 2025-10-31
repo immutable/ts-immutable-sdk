@@ -5,7 +5,9 @@ import {
   useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import {
+  Checkout,
   ExchangeType, IMTBLWidgetEvents,
+  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
 import url from 'url';
 import { useTranslation } from 'react-i18next';
@@ -47,6 +49,48 @@ interface OnRampProps {
   customSubTitle?: string;
   showHeader?: boolean;
 }
+
+function useWidgetUrl(
+  checkout: Checkout | undefined,
+  provider: WrappedBrowserProvider | undefined,
+  tokenAddress: string | undefined,
+  tokenAmount: string | undefined,
+  passport: Passport | undefined,
+  showMenu: boolean | undefined,
+  customSubTitle: string | undefined,
+) {
+  const [widgetUrl, setWidgetUrl] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!checkout || !provider) return;
+
+    const params = {
+      exchangeType: ExchangeType.ONRAMP,
+      browserProvider: provider,
+      tokenAddress,
+      tokenAmount,
+      passport,
+      showMenu,
+      customSubTitle,
+    };
+
+    checkout.createFiatRampUrl(params).then(setWidgetUrl);
+  }, [checkout, provider, tokenAddress, tokenAmount, passport, showMenu, customSubTitle]);
+
+  return widgetUrl;
+}
+
+function useWalletAddress(provider: WrappedBrowserProvider | undefined) {
+  const [userWalletAddress, setUserWalletAddress] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!provider) return;
+    provider.getSigner().then((signer) => signer.getAddress()).then(setUserWalletAddress);
+  }, [provider]);
+
+  return userWalletAddress;
+}
+
 export function OnRampMain({
   passport,
   showIframe,
@@ -66,7 +110,8 @@ export function OnRampMain({
 
   const { t } = useTranslation();
   const { viewState, viewDispatch } = useContext(ViewContext);
-  const [widgetUrl, setWidgetUrl] = useState<string>('');
+  const widgetUrl = useWidgetUrl(checkout, provider, tokenAddress, tokenAmount, passport, showMenu, customSubTitle);
+  const userWalletAddress = useWalletAddress(provider);
 
   const eventTimer = useRef<number | undefined>();
 
@@ -233,30 +278,11 @@ export function OnRampMain({
   }, [viewDispatch, tokenAmount, tokenAddress, viewState.view.data?.amount, viewState.view.data?.tokenAddress]);
 
   useEffect(() => {
-    if (!checkout || !provider) return;
+    if (!userWalletAddress) return;
 
-    let userWalletAddress = '';
-
-    (async () => {
-      const params = {
-        exchangeType: ExchangeType.ONRAMP,
-        browserProvider: provider,
-        tokenAddress,
-        tokenAmount,
-        passport,
-        showMenu,
-        customSubTitle,
-      };
-
-      setWidgetUrl(await checkout.createFiatRampUrl(params));
-      userWalletAddress = await (await provider!.getSigner()).getAddress();
-    })();
-
-    const domIframe: HTMLIFrameElement = document.getElementById(
+    const domIframe = document.getElementById(
       transakIframeId,
-    ) as HTMLIFrameElement;
-
-    if (!domIframe) return;
+    ) as HTMLIFrameElement | null;
 
     const handleTransakEvents = (event: any) => {
       if (!domIframe) return;
@@ -271,8 +297,14 @@ export function OnRampMain({
         transakEventHandler(event.data);
       }
     };
+
     window.addEventListener('message', handleTransakEvents);
-  }, [checkout, provider, tokenAmount, tokenAddress, passport, trackSegmentEvents, transakEventHandler]);
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      window.removeEventListener('message', handleTransakEvents);
+    };
+  }, [trackSegmentEvents, transakEventHandler, userWalletAddress]);
 
   return (
     <Box sx={boxMainStyle(showIframe)}>
