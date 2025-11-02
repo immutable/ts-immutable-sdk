@@ -278,8 +278,6 @@ export function OnRampMain({
   }, [viewDispatch, tokenAmount, tokenAddress, viewState.view.data?.amount, viewState.view.data?.tokenAddress]);
 
   useEffect(() => {
-    if (!userWalletAddress) return;
-
     const domIframe = document.getElementById(
       transakIframeId,
     ) as HTMLIFrameElement | null;
@@ -293,7 +291,7 @@ export function OnRampMain({
         && host
         && TRANSAK_ORIGIN.includes(host)
       ) {
-        trackSegmentEvents(event.data, userWalletAddress);
+        trackSegmentEvents(event.data, userWalletAddress ?? '');
         transakEventHandler(event.data);
       }
     };
