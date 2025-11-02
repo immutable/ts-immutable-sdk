@@ -137,6 +137,10 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
         body: JSON.stringify(requestBody),
       });
 
+      if (!widgetUrlResponse.ok) {
+        throw new Error('Failed to get widget URL');
+      }
+
       const { url } = await widgetUrlResponse.json();
       return url;
     } catch {
