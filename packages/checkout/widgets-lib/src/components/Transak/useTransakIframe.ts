@@ -119,10 +119,13 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
         nft_transaction_id: nftTransactionId,
         theme_color: '0D0D0D',
         exchange_screen_title: exchangeScreenTitle,
-        email,
         wallet_address: walletAddress,
         partner_order_id: partnerOrderId,
       };
+
+      if (email) {
+        requestBody.email = email;
+      }
 
       if (excludeFiatCurrencies) {
         requestBody.exclude_fiat_currencies = excludeFiatCurrencies.join(',');
