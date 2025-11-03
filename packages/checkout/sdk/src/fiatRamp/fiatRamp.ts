@@ -7,13 +7,13 @@ import { HttpClient } from '../api/http';
 export interface FiatRampWidgetParams {
   exchangeType: ExchangeType;
   isPassport: boolean;
-  walletAddress?: string;
-  tokenAmount?: string;
-  tokenSymbol?: string;
-  email?: string;
-  allowedTokens?: string[];
-  showMenu?: boolean;
-  customSubTitle?: string;
+  walletAddress: string | undefined;
+  tokenAmount: string | undefined;
+  tokenSymbol: string | undefined;
+  email: string | undefined;
+  allowedTokens: string[] | undefined;
+  showMenu: boolean | undefined;
+  customSubTitle: string | undefined;
 }
 
 export class FiatRampService {
@@ -57,7 +57,7 @@ export class FiatRampService {
       disable_payment_methods: '',
       products_availed: 'buy',
       exchange_screen_title: params.customSubTitle === '' ? ' ' : (params.customSubTitle ?? 'Buy'),
-      theme_color: '0D0D0D',
+      theme_color: 'FFFFFF', // this only controls the background colour of the Buy button
       default_crypto_currency: params.tokenSymbol || 'IMX',
       hide_menu: !(params.showMenu ?? true),
     };

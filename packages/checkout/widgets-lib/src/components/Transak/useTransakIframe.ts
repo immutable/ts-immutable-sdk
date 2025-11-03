@@ -29,21 +29,9 @@ type UseTransakIframeProps = {
 
 const MAX_GAS_LIMIT = '30000000';
 
-// TODO: Move to common config file inside Checkout SDK while refactoring onRamp
-// TODO: Get transak config from checkout SDK
-export const TRANSAK_WIDGET_BASE_URL = {
-  [Environment.SANDBOX]: 'https://global-stg.transak.com',
-  [Environment.PRODUCTION]: 'https://global.transak.com/',
-};
-
 export const TRANSAK_API_BASE_URL = {
   [Environment.SANDBOX]: 'https://api-stg.transak.com',
   [Environment.PRODUCTION]: 'https://api.transak.com',
-};
-
-export const TRANSAK_ENVIRONMENT = {
-  [Environment.SANDBOX]: 'STAGING',
-  [Environment.PRODUCTION]: 'PRODUCTION',
 };
 
 export const TRANSAK_API_KEY = {

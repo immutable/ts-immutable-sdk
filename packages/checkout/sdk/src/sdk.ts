@@ -8,7 +8,7 @@ import * as balances from './balances';
 import { CheckoutConfiguration } from './config';
 import * as connect from './connect';
 import { CheckoutError, CheckoutErrorType } from './errors';
-import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
+import { FiatRampService } from './fiatRamp';
 import * as gasEstimatorService from './gasEstimate';
 import * as network from './network';
 import * as provider from './provider';
@@ -671,7 +671,7 @@ export class Checkout {
       allowedTokens,
       showMenu: params.showMenu,
       customSubTitle: params.customSubTitle,
-    } as FiatRampWidgetParams);
+    });
   }
 
   /**
