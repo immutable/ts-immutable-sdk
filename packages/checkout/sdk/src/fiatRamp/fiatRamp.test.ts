@@ -106,10 +106,10 @@ describe('FiatRampService', () => {
 
     it(`should return widget url with non-configurable query params when onRampProvider is Transak' +
       'and default to IMX`, async () => {
-      const params: FiatRampWidgetParams = {
+      const params = {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
-      };
+      } as FiatRampWidgetParams;
       const result = await fiatRampService.createWidgetUrl(params, mockedHttpClient);
       expect(result).toContain('https://global-stg.transak.com');
       expect(mockedHttpClient.post).toHaveBeenCalledWith(
@@ -123,11 +123,11 @@ describe('FiatRampService', () => {
 
     it(`should return widget url with encoded email, isAutoFillUserData and disableWalletAddressForm query params
     for passport users`, async () => {
-      const params: FiatRampWidgetParams = {
+      const params = {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: true,
         email: 'passport.user@immutable.com',
-      };
+      } as FiatRampWidgetParams;
       const result = await fiatRampService.createWidgetUrl(params, mockedHttpClient);
       expect(result).toContain('https://global-stg.transak.com');
       expect(mockedHttpClient.post).toHaveBeenCalledWith(
@@ -143,10 +143,10 @@ describe('FiatRampService', () => {
 
     it(`should return widget url with defaultFiatAmount and defaultCryptoCurrency query params when tokenAmount and
     tokenSymbol are not present`, async () => {
-      const params: FiatRampWidgetParams = {
+      const params = {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
-      };
+      } as FiatRampWidgetParams;
       const result = await fiatRampService.createWidgetUrl(params, mockedHttpClient);
       expect(result).toContain('https://global-stg.transak.com');
       expect(mockedHttpClient.post).toHaveBeenCalledWith(
@@ -161,12 +161,12 @@ describe('FiatRampService', () => {
 
     it(`should return widget url with defaultCryptoAmount and cryptoCurrencyCode query params when tokenAmount and
     tokenSymbol is present`, async () => {
-      const params: FiatRampWidgetParams = {
+      const params = {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
         tokenAmount: '100',
         tokenSymbol: 'ETH',
-      };
+      } as FiatRampWidgetParams;
       const result = await fiatRampService.createWidgetUrl(params, mockedHttpClient);
       expect(result).toContain('https://global-stg.transak.com');
       expect(mockedHttpClient.post).toHaveBeenCalledWith(
@@ -180,11 +180,11 @@ describe('FiatRampService', () => {
     });
 
     it('should return widget url with walletAddress query params when walletAddress is present', async () => {
-      const params: FiatRampWidgetParams = {
+      const params = {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
         walletAddress: '0x1234567890',
-      };
+      } as FiatRampWidgetParams;
       const result = await fiatRampService.createWidgetUrl(params, mockedHttpClient);
       expect(result).toContain('https://global-stg.transak.com');
       expect(mockedHttpClient.post).toHaveBeenCalledWith(
@@ -197,11 +197,11 @@ describe('FiatRampService', () => {
     });
 
     it('should return widget url with allowed crypto tokens in query params when allowed list is present', async () => {
-      const params: FiatRampWidgetParams = {
+      const params = {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
         allowedTokens: ['ETH', 'IMX'],
-      };
+      } as FiatRampWidgetParams;
       const result = await fiatRampService.createWidgetUrl(params, mockedHttpClient);
       expect(result).toContain('https://global-stg.transak.com');
       expect(mockedHttpClient.post).toHaveBeenCalledWith(
