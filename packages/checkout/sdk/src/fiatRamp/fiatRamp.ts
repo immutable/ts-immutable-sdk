@@ -50,6 +50,7 @@ export class FiatRampService {
     )) as OnRampConfig;
 
     const createWidgetUrl = `${IMMUTABLE_API_BASE_URL[this.config.environment]}/checkout/v1/widget-url`;
+
     let widgetParams: Record<string, any> = {
       api_key: onRampConfig[OnRampProvider.TRANSAK].publishableApiKey,
       network: 'immutablezkevm',
@@ -60,6 +61,7 @@ export class FiatRampService {
       theme_color: 'FFFFFF', // this only controls the background colour of the Buy button
       default_crypto_currency: params.tokenSymbol || 'IMX',
       hide_menu: !(params.showMenu ?? true),
+      referrer_domain: window.location.origin,
     };
 
     if (params.isPassport && params.email) {
