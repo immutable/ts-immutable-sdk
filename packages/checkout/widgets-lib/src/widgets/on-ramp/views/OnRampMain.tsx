@@ -7,8 +7,8 @@ import {
 import {
   Checkout,
   ExchangeType, IMTBLWidgetEvents,
-  WrappedBrowserProvider,
 } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import url from 'url';
 import { useTranslation } from 'react-i18next';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -52,7 +52,7 @@ interface OnRampProps {
 
 function useWidgetUrl(
   checkout: Checkout | undefined,
-  provider: WrappedBrowserProvider | undefined,
+  provider: Web3Provider | undefined,
   tokenAddress: string | undefined,
   tokenAmount: string | undefined,
   passport: Passport | undefined,
@@ -80,7 +80,7 @@ function useWidgetUrl(
   return widgetUrl;
 }
 
-function useWalletAddress(provider: WrappedBrowserProvider | undefined) {
+function useWalletAddress(provider: Web3Provider | undefined) {
   const [userWalletAddress, setUserWalletAddress] = useState<string | undefined>(undefined);
 
   useEffect(() => {
