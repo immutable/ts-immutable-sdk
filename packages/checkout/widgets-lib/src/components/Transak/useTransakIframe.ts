@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { useCallback, useEffect, useState } from 'react';
 import { Environment } from '@imtbl/config';
 
@@ -28,26 +29,20 @@ type UseTransakIframeProps = {
 
 const MAX_GAS_LIMIT = '30000000';
 
-// TODO: Move to common config file inside Checkout SDK while refactoring onRamp
-// TODO: Get transak config from checkout SDK
-export const TRANSAK_WIDGET_BASE_URL = {
-  [Environment.SANDBOX]: 'https://global-stg.transak.com',
-  [Environment.PRODUCTION]: 'https://global.transak.com/',
-};
-
 export const TRANSAK_API_BASE_URL = {
   [Environment.SANDBOX]: 'https://api-stg.transak.com',
   [Environment.PRODUCTION]: 'https://api.transak.com',
 };
 
-export const TRANSAK_ENVIRONMENT = {
-  [Environment.SANDBOX]: 'STAGING',
-  [Environment.PRODUCTION]: 'PRODUCTION',
-};
-
 export const TRANSAK_API_KEY = {
   [Environment.SANDBOX]: 'd14b44fb-0f84-4db5-affb-e044040d724b',
   [Environment.PRODUCTION]: 'ad1bca70-d917-4628-bb0f-5609537498bc',
+};
+
+export const IMMUTABLE_API_BASE_URL = {
+  development: 'https://api.dev.immutable.com',
+  [Environment.SANDBOX]: 'https://api.sandbox.immutable.com',
+  [Environment.PRODUCTION]: 'https://api.immutable.com',
 };
 
 export const useTransakIframe = (props: UseTransakIframeProps) => {
@@ -64,7 +59,10 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
         estimatedGasLimit,
         cryptoCurrencyCode,
         excludeFiatCurrencies,
-        ...restWidgetParams
+        exchangeScreenTitle,
+        email,
+        walletAddress,
+        partnerOrderId,
       } = transakParams;
 
       // FIXME: defaulting to first nft in the list
@@ -104,21 +102,39 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
 
       const { id: nftTransactionId } = await response.json();
 
-      const baseWidgetUrl = `${TRANSAK_WIDGET_BASE_URL[environment]}?`;
-      const queryParams = new URLSearchParams({
-        apiKey: TRANSAK_API_KEY[environment],
-        environment: TRANSAK_ENVIRONMENT[environment],
-        isNFT: 'true',
-        nftTransactionId,
-        themeColor: '0D0D0D',
-        ...restWidgetParams,
-      });
+      const requestBody: Record<string, unknown> = {
+        api_key: TRANSAK_API_KEY[environment],
+        nft_transaction_id: nftTransactionId,
+        theme_color: '0D0D0D',
+        exchange_screen_title: exchangeScreenTitle,
+        wallet_address: walletAddress,
+        partner_order_id: partnerOrderId,
+        referrer_domain: window.location.origin,
+      };
 
-      if (excludeFiatCurrencies) {
-        queryParams.append('excludeFiatCurrencies', excludeFiatCurrencies.join(','));
+      if (email) {
+        requestBody.email = email;
       }
 
-      return `${baseWidgetUrl}${queryParams.toString()}`;
+      if (excludeFiatCurrencies) {
+        requestBody.exclude_fiat_currencies = excludeFiatCurrencies.join(',');
+      }
+
+      const widgetUrlResponse = await fetch(`${IMMUTABLE_API_BASE_URL[environment]}/checkout/v1/widget-url`, {
+        method: 'POST',
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!widgetUrlResponse.ok) {
+        throw new Error('Failed to get widget URL');
+      }
+
+      const { url } = await widgetUrlResponse.json();
+      return url;
     } catch {
       onError?.();
     }

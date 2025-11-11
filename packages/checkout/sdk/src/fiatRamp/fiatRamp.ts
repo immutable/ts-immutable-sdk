@@ -1,16 +1,19 @@
 import { ExchangeType } from '../types/fiatRamp';
 import { OnRampConfig, OnRampProvider, OnRampProviderFees } from '../types';
 import { CheckoutConfiguration } from '../config';
-import { TRANSAK_API_BASE_URL } from '../env';
+import { IMMUTABLE_API_BASE_URL } from '../env';
+import { HttpClient } from '../api/http';
 
 export interface FiatRampWidgetParams {
   exchangeType: ExchangeType;
   isPassport: boolean;
-  walletAddress?: string;
-  tokenAmount?: string;
-  tokenSymbol?: string;
-  email?: string;
-  allowedTokens?: string[];
+  walletAddress: string | undefined;
+  tokenAmount: string | undefined;
+  tokenSymbol: string | undefined;
+  email: string | undefined;
+  allowedTokens: string[] | undefined;
+  showMenu: boolean | undefined;
+  customSubTitle: string | undefined;
 }
 
 export class FiatRampService {
@@ -31,35 +34,42 @@ export class FiatRampService {
     return config[OnRampProvider.TRANSAK]?.fees;
   }
 
-  public async createWidgetUrl(params: FiatRampWidgetParams): Promise<string> {
-    return await this.getTransakWidgetUrl(params);
+  public async createWidgetUrl(
+    params: FiatRampWidgetParams,
+    httpClient = new HttpClient(),
+  ): Promise<string> {
+    return await this.getTransakWidgetUrl(params, httpClient);
   }
 
   private async getTransakWidgetUrl(
     params: FiatRampWidgetParams,
+    httpClient: HttpClient,
   ): Promise<string> {
     const onRampConfig = (await this.config.remote.getConfig(
       'onramp',
     )) as OnRampConfig;
 
-    const widgetUrl = TRANSAK_API_BASE_URL[this.config.environment];
+    const createWidgetUrl = `${IMMUTABLE_API_BASE_URL[this.config.environment]}/checkout/v1/widget-url`;
+
     let widgetParams: Record<string, any> = {
-      apiKey: onRampConfig[OnRampProvider.TRANSAK].publishableApiKey,
+      api_key: onRampConfig[OnRampProvider.TRANSAK].publishableApiKey,
       network: 'immutablezkevm',
-      defaultPaymentMethod: 'credit_debit_card',
-      disablePaymentMethods: '',
-      productsAvailed: 'buy',
-      exchangeScreenTitle: 'Buy',
-      themeColor: '0D0D0D',
-      defaultCryptoCurrency: params.tokenSymbol || 'IMX',
+      default_payment_method: 'credit_debit_card',
+      disable_payment_methods: '',
+      products_availed: 'buy',
+      exchange_screen_title: params.customSubTitle === '' ? ' ' : (params.customSubTitle ?? 'Buy'),
+      theme_color: 'FFFFFF', // this only controls the background colour of the Buy button
+      default_crypto_currency: params.tokenSymbol || 'IMX',
+      hide_menu: !(params.showMenu ?? true),
+      referrer_domain: window.location.origin,
     };
 
     if (params.isPassport && params.email) {
       widgetParams = {
         ...widgetParams,
-        email: encodeURIComponent(params.email),
-        isAutoFillUserData: true,
-        disableWalletAddressForm: true,
+        email: params.email,
+        is_auto_fill_user_data: true,
+        disable_wallet_address_form: true,
       };
     }
 
@@ -69,31 +79,32 @@ export class FiatRampService {
     if (params.tokenAmount && params.tokenSymbol) {
       widgetParams = {
         ...widgetParams,
-        defaultCryptoAmount: params.tokenAmount,
-        cryptoCurrencyCode: params.tokenSymbol,
+        default_crypto_amount: params.tokenAmount,
+        crypto_currency_code: params.tokenSymbol,
       };
     } else {
       widgetParams = {
         ...widgetParams,
-        defaultFiatAmount: 50,
-        defaultFiatCurrency: 'usd',
+        default_fiat_amount: 50,
+        default_fiat_currency: 'usd',
       };
     }
 
     if (params.walletAddress) {
       widgetParams = {
         ...widgetParams,
-        walletAddress: params.walletAddress,
+        wallet_address: params.walletAddress,
       };
     }
 
     if (params.allowedTokens) {
       widgetParams = {
         ...widgetParams,
-        cryptoCurrencyList: params.allowedTokens?.join(',').toLowerCase(),
+        crypto_currency_list: params.allowedTokens?.join(',').toLowerCase(),
       };
     }
 
-    return `${widgetUrl}?${new URLSearchParams(widgetParams).toString()}`;
+    const response = await httpClient.post(createWidgetUrl, widgetParams, { method: 'POST' });
+    return response.data.url;
   }
 }
