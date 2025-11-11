@@ -121,6 +121,7 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
         exchange_screen_title: exchangeScreenTitle,
         wallet_address: walletAddress,
         partner_order_id: partnerOrderId,
+        referrer_domain: window.location.origin,
       };
 
       if (email) {
