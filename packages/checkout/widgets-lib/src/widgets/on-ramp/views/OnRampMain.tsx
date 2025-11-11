@@ -66,7 +66,7 @@ function useWidgetUrl(
 
     const params = {
       exchangeType: ExchangeType.ONRAMP,
-      browserProvider: provider,
+      web3Provider: provider,
       tokenAddress,
       tokenAmount,
       passport,
@@ -85,7 +85,10 @@ function useWalletAddress(provider: Web3Provider | undefined) {
 
   useEffect(() => {
     if (!provider) return;
-    provider.getSigner().then((signer) => signer.getAddress()).then(setUserWalletAddress);
+    (async () => {
+      const walletAddress = await provider.getSigner().getAddress();
+      setUserWalletAddress(walletAddress);
+    })();
   }, [provider]);
 
   return userWalletAddress;
