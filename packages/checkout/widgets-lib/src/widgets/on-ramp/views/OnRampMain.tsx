@@ -1,11 +1,14 @@
 import { Passport } from '@imtbl/passport';
 import { Box } from '@biom3/react';
 import {
+  useCallback,
   useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import {
-  ExchangeType, fetchRiskAssessment, IMTBLWidgetEvents, isAddressSanctioned,
+  Checkout,
+  ExchangeType, IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import url from 'url';
 import { useTranslation } from 'react-i18next';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -31,6 +34,7 @@ import { ConnectLoaderContext } from '../../../context/connect-loader-context/Co
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { TRANSAK_ORIGIN } from '../../../components/Transak/useTransakEvents';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
+import { isPassportProvider } from '../../../lib/provider';
 
 const transakIframeId = 'transak-iframe';
 const IN_PROGRESS_VIEW_DELAY_MS = 6000; // 6 second
@@ -40,13 +44,66 @@ interface OnRampProps {
   tokenAddress?: string;
   passport?: Passport;
   showBackButton?: boolean;
+  showMenu?: boolean;
+  customTitle?: string;
+  customSubTitle?: string;
+  showHeader?: boolean;
 }
+
+function useWidgetUrl(
+  checkout: Checkout | undefined,
+  provider: Web3Provider | undefined,
+  tokenAddress: string | undefined,
+  tokenAmount: string | undefined,
+  passport: Passport | undefined,
+  showMenu: boolean | undefined,
+  customSubTitle: string | undefined,
+) {
+  const [widgetUrl, setWidgetUrl] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!checkout || !provider) return;
+
+    const params = {
+      exchangeType: ExchangeType.ONRAMP,
+      web3Provider: provider,
+      tokenAddress,
+      tokenAmount,
+      passport,
+      showMenu,
+      customSubTitle,
+    };
+
+    checkout.createFiatRampUrl(params).then(setWidgetUrl);
+  }, [checkout, provider, tokenAddress, tokenAmount, passport, showMenu, customSubTitle]);
+
+  return widgetUrl;
+}
+
+function useWalletAddress(provider: Web3Provider | undefined) {
+  const [userWalletAddress, setUserWalletAddress] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!provider) return;
+    (async () => {
+      const walletAddress = await provider.getSigner().getAddress();
+      setUserWalletAddress(walletAddress);
+    })();
+  }, [provider]);
+
+  return userWalletAddress;
+}
+
 export function OnRampMain({
   passport,
   showIframe,
   tokenAmount,
   tokenAddress,
   showBackButton,
+  showMenu,
+  customTitle,
+  customSubTitle,
+  showHeader = true,
 }: OnRampProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -56,16 +113,17 @@ export function OnRampMain({
 
   const { t } = useTranslation();
   const { viewState, viewDispatch } = useContext(ViewContext);
-  const [widgetUrl, setWidgetUrl] = useState<string>('');
+  const widgetUrl = useWidgetUrl(checkout, provider, tokenAddress, tokenAmount, passport, showMenu, customSubTitle);
+  const userWalletAddress = useWalletAddress(provider);
 
   const eventTimer = useRef<number | undefined>();
 
-  const isPassport = !!passport && (provider?.provider as any)?.isPassport;
+  const isPassport = !!passport && isPassportProvider(provider);
 
   const openedFromTopUpView = useMemo(
     () => viewState.history.length > 2
       && viewState.history[viewState.history.length - 2].type
-        === SharedViews.TOP_UP_VIEW,
+       === SharedViews.TOP_UP_VIEW,
     [viewState.history],
   );
 
@@ -73,7 +131,7 @@ export function OnRampMain({
 
   const { track } = useAnalytics();
 
-  const trackSegmentEvents = async (
+  const trackSegmentEvents = useCallback(async (
     event: TransakEventData,
     walletAddress: string,
   ) => {
@@ -138,9 +196,9 @@ export function OnRampMain({
         break;
       default:
     }
-  };
+  }, [isPassport, track]);
 
-  const transakEventHandler = (event: TransakEventData) => {
+  const transakEventHandler = useCallback((event: TransakEventData) => {
     if (eventTimer.current) clearTimeout(eventTimer.current);
 
     if (event.event_id === TransakEvents.TRANSAK_WIDGET_OPEN) {
@@ -220,72 +278,41 @@ export function OnRampMain({
         },
       });
     }
-  };
+  }, [viewDispatch, tokenAmount, tokenAddress, viewState.view.data?.amount, viewState.view.data?.tokenAddress]);
 
   useEffect(() => {
-    if (!checkout || !provider) return;
-
-    let userWalletAddress = '';
-
-    (async () => {
-      const walletAddress = await provider.getSigner().getAddress();
-
-      const assessment = await fetchRiskAssessment([walletAddress], checkout.config);
-
-      if (isAddressSanctioned(assessment)) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
-              error: new Error('Sanctioned address'),
-            },
-          },
-        });
-
-        return;
-      }
-
-      const params = {
-        exchangeType: ExchangeType.ONRAMP,
-        web3Provider: provider,
-        tokenAddress,
-        tokenAmount,
-        passport,
-      };
-
-      setWidgetUrl(await checkout.createFiatRampUrl(params));
-      userWalletAddress = await provider!.getSigner().getAddress();
-    })();
-
-    const domIframe: HTMLIFrameElement = document.getElementById(
+    const domIframe = document.getElementById(
       transakIframeId,
-    ) as HTMLIFrameElement;
+    ) as HTMLIFrameElement | null;
 
     if (!domIframe) return;
 
     const handleTransakEvents = (event: any) => {
-      if (!domIframe) return;
-
       const host = url.parse(event.origin)?.host?.toLowerCase();
       if (
         event.source === domIframe.contentWindow
         && host
         && TRANSAK_ORIGIN.includes(host)
       ) {
-        trackSegmentEvents(event.data, userWalletAddress);
+        trackSegmentEvents(event.data, userWalletAddress ?? '');
         transakEventHandler(event.data);
       }
     };
+
     window.addEventListener('message', handleTransakEvents);
-  }, [checkout, provider, tokenAmount, tokenAddress, passport]);
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      window.removeEventListener('message', handleTransakEvents);
+    };
+  }, [trackSegmentEvents, transakEventHandler, userWalletAddress]);
 
   return (
     <Box sx={boxMainStyle(showIframe)}>
       <SimpleLayout
-        header={(
+        header={showHeader ? (
           <HeaderNavigation
-            title={t('views.ONRAMP.header.title')}
+            title={customTitle ?? t('views.ONRAMP.header.title')}
             onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
             showBack={showBack}
             onBackButtonClick={() => {
@@ -296,7 +323,7 @@ export function OnRampMain({
               );
             }}
           />
-        )}
+        ) : undefined}
         footerBackgroundColor="base.color.translucent.emphasis.200"
       >
         <Box sx={containerStyle(showIframe)}>
@@ -311,6 +338,7 @@ export function OnRampMain({
               border: 'none',
               position: 'absolute',
             }}
+            referrerPolicy="strict-origin-when-cross-origin"
           />
         </Box>
       </SimpleLayout>

@@ -99,6 +99,7 @@ export function TransakIframe(props: TransakIframeProps) {
       }}
       onLoad={onLoad}
       onError={() => onFailedToLoad?.()}
+      referrerPolicy="strict-origin-when-cross-origin"
     />
   );
 }
