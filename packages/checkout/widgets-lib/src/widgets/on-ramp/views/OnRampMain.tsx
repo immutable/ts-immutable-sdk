@@ -338,6 +338,7 @@ export function OnRampMain({
               border: 'none',
               position: 'absolute',
             }}
+            referrerPolicy="strict-origin-when-cross-origin"
           />
         </Box>
       </SimpleLayout>
