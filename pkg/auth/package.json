@@ -5,8 +5,6 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@imtbl/config": "workspace:*",
-    "@imtbl/metrics": "workspace:*",
     "oidc-client-ts": "3.3.0"
   },
   "devDependencies": {
