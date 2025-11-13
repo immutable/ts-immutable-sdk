@@ -25,6 +25,8 @@ export interface ConfirmationScreenConfig {
   passportDomain: string;
   /** Overlay options */
   popupOverlayOptions?: PopupOverlayOptions;
+  /** Enable cross-SDK bridge mode - skips opening confirmation popups */
+  crossSdkBridgeEnabled?: boolean;
 }
 
 /**
@@ -32,10 +34,15 @@ export interface ConfirmationScreenConfig {
  */
 export class ConfirmationScreen {
   private config: ConfirmationScreenConfig;
+
   private confirmationWindow: Window | undefined;
+
   private popupOptions: { width: number; height: number } | undefined;
+
   private overlay: ConfirmationOverlay | undefined;
+
   private overlayClosed: boolean;
+
   private timer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(config: ConfirmationScreenConfig) {
@@ -172,6 +179,11 @@ export class ConfirmationScreen {
    * Show loading screen
    */
   loading(popupOptions?: { width: number; height: number }) {
+    if (this.config.crossSdkBridgeEnabled) {
+      // Skip opening confirmation window if cross-SDK bridge is enabled
+      return;
+    }
+
     this.popupOptions = popupOptions;
 
     try {
@@ -183,13 +195,13 @@ export class ConfirmationScreen {
       });
       this.overlay = new ConfirmationOverlay(
         this.config.popupOverlayOptions || {},
-        false
+        false,
       );
     } catch (error) {
       // If an error is thrown here then the popup is blocked
       this.overlay = new ConfirmationOverlay(
         this.config.popupOverlayOptions || {},
-        true
+        true,
       );
     }
 
@@ -273,4 +285,3 @@ export class ConfirmationScreen {
     } catch { /* Empty */ }
   }
 }
-

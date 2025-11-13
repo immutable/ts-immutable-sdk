@@ -1,4 +1,3 @@
-
 import type { User } from '@imtbl/auth';
 import { toHex, createPublicClient, http } from 'viem';
 import { JsonRpcError, RpcErrorCode } from './errors';
@@ -27,7 +26,7 @@ export interface TransactionRequest {
 }
 
 export function buildMetaTransaction(
-  request: TransactionRequest
+  request: TransactionRequest,
 ): MetaTransaction {
   if (!request.to) {
     throw new Error('TransactionRequest.to is required');
@@ -45,7 +44,6 @@ export function buildMetaTransaction(
   };
 }
 
-
 /**
  * Gets nonce from smart contract wallet via RPC
  * Encodes nonce with space: space in upper 160 bits, nonce in lower 96 bits
@@ -54,7 +52,7 @@ export function buildMetaTransaction(
 export async function getNonce(
   rpcUrl: string,
   smartContractWalletAddress: string,
-  nonceSpace?: bigint
+  nonceSpace?: bigint,
 ): Promise<bigint> {
   const space = nonceSpace || BigInt(0);
   const functionSelector = getFunctionSelector('readNonce(uint256)');
@@ -77,14 +75,21 @@ export async function getNonce(
     }
 
     return BigInt(0);
-  } catch (error: any) {
-    if (error?.message?.includes('BAD_DATA') || error?.message?.includes('execution reverted')) {
+  } catch (error: unknown) {
+    // If wallet is not deployed, RPC call will fail
+    // Return 0 nonce for undeployed wallets
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (
+      errorMessage.includes('BAD_DATA')
+      || errorMessage.includes('execution reverted')
+      || errorMessage.includes('revert')
+      || errorMessage.includes('invalid opcode')
+    ) {
       return BigInt(0);
     }
     throw error;
   }
 }
-
 
 /**
  * Builds meta-transactions array with fee transaction
@@ -97,12 +102,12 @@ export async function buildMetaTransactions(
   zkevmAddress: string,
   chainId: number,
   user: User,
-  nonceSpace?: bigint
+  nonceSpace?: bigint,
 ): Promise<{ transactions: [MetaTransaction, ...MetaTransaction[]]; nonce: bigint }> {
   if (!transactionRequest.to || typeof transactionRequest.to !== 'string') {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
-      'eth_sendTransaction requires a "to" field'
+      'eth_sendTransaction requires a "to" field',
     );
   }
 
@@ -144,7 +149,7 @@ export async function validateAndSignTransaction(
   signer: Signer,
   guardianClient: GuardianClient,
   user: User,
-  isBackgroundTransaction: boolean = false
+  isBackgroundTransaction: boolean = false,
 ): Promise<string> {
   const [, signedTransactionData] = await Promise.all([
     guardianClient.validateEVMTransaction({
@@ -160,12 +165,9 @@ export async function validateAndSignTransaction(
       nonce,
       chainId,
       walletAddress,
-      signer
+      signer,
     ),
   ]);
 
   return signedTransactionData;
 }
-
-
-

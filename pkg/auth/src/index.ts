@@ -161,7 +161,7 @@ export class Auth {
     }
   }
 
-  async logout(): Promise<void> {
+  async logoutRedirect(): Promise<void> {
     await this.userManager.signoutRedirect();
   }
 

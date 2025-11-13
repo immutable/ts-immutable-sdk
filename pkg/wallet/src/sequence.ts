@@ -3,11 +3,13 @@
  * Minimal implementation for Immutable wallet signature format
  */
 
-import { isAddress, keccak256, encodeAbiParameters, fromHex } from 'viem';
+import {
+  isAddress, keccak256, encodeAbiParameters, fromHex,
+} from 'viem';
 import { cleanSignature, cleanAddress, removeHexPrefix } from './utils/hex';
 import { JsonRpcError, RpcErrorCode } from './errors';
 import type { Signer } from './signer/signer';
-import { encodeMessageSubDigest } from './signer/signing';
+import { encodeMessageSubDigest } from './utils/subdigest';
 import { getFunctionSelector } from './utils/abi';
 import type { MetaTransaction } from './metatransaction';
 
@@ -69,8 +71,10 @@ export function encodeSignature(options: EncodeSignatureOptions): string {
     // bits 2-7: weight (0-63)
     const isDynamic = signer.isDynamic ? 1 : 0;
     const unrecovered = signer.unrecovered !== false ? 1 : 0; // Default to true
+    // eslint-disable-next-line no-bitwise
     const weight = signer.weight & 0x3f; // Mask to 6 bits
-    
+
+    // eslint-disable-next-line no-bitwise
     const flagsByte = (isDynamic | (unrecovered << 1) | (weight << 2)).toString(16).padStart(2, '0');
     encoded += flagsByte;
 
@@ -96,19 +100,23 @@ export function encodeSignature(options: EncodeSignatureOptions): string {
  */
 export function decodeSignature(signature: string): DecodedSignature {
   const hex = removeHexPrefix(signature);
-  
+
   if (hex.length < 8) {
     throw new Error('Invalid signature: too short');
   }
 
   // Read version (1 byte)
-  const version = parseInt(hex.slice(0, 2), 16);
+  const versionHex = hex.slice(0, 2);
+  const version = parseInt(
+    versionHex,
+    16,
+  );
 
   // Read threshold (1 byte)
   const threshold = parseInt(hex.slice(2, 4), 16);
 
   // Skip reserved byte (offset 4-6)
-  
+
   // Read signers count (1 byte)
   const signersCount = parseInt(hex.slice(6, 8), 16);
 
@@ -124,8 +132,11 @@ export function decodeSignature(signature: string): DecodedSignature {
     const flagsByte = parseInt(hex.slice(offset, offset + 2), 16);
     offset += 2;
 
+    // eslint-disable-next-line no-bitwise
     const isDynamic = (flagsByte & 0x01) !== 0;
+    // eslint-disable-next-line no-bitwise
     const unrecovered = (flagsByte & 0x02) !== 0;
+    // eslint-disable-next-line no-bitwise
     const weight = (flagsByte >> 2) & 0x3f;
 
     // Read signature (65 bytes = 130 hex chars)
@@ -166,21 +177,21 @@ export function decodeSignature(signature: string): DecodedSignature {
 export function packSignatures(
   eoaSignature: string,
   eoaAddress: string,
-  relayerSignature: string
+  relayerSignature: string,
 ): string {
   // Validate address format
   if (!isAddress(eoaAddress)) {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
-      `Invalid address: ${eoaAddress}`
+      `Invalid address: ${eoaAddress}`,
     );
   }
 
   // Decode relayer signature (add 0x prefix if missing, and version/threshold prefix)
-  const relayerSigWithPrefix = relayerSignature.startsWith('0x') 
-    ? relayerSignature 
+  const relayerSigWithPrefix = relayerSignature.startsWith('0x')
+    ? relayerSignature
     : `0x0000${relayerSignature}`; // Add version/threshold prefix for decoding
-  
+
   const decoded = decodeSignature(relayerSigWithPrefix);
   const relayerSigners = decoded.signers;
 
@@ -222,7 +233,7 @@ export async function signMetaTransactions(
   nonce: bigint,
   chainId: bigint,
   walletAddress: string,
-  signer: Signer
+  signer: Signer,
 ): Promise<string> {
   // Get digest of transactions and nonce
   const META_TRANSACTIONS_TYPE = `tuple(
@@ -239,11 +250,11 @@ export async function signMetaTransactions(
       { type: 'uint256' },
       { type: META_TRANSACTIONS_TYPE },
     ],
-    [nonce, metaTransactions] as readonly [bigint, readonly MetaTransaction[]]
+    [nonce, metaTransactions] as readonly [bigint, readonly MetaTransaction[]],
   );
-  
+
   const digest = keccak256(packMetaTransactionsNonceData);
-  
+
   // Create sub-digest with chain ID and wallet address
   const completePayload = encodeMessageSubDigest(chainId, walletAddress, digest);
   const hash = keccak256(`0x${Buffer.from(completePayload, 'utf8').toString('hex')}` as `0x${string}`);
@@ -274,21 +285,23 @@ export async function signMetaTransactions(
   // Encode parameters
   const encodedParams = encodeAbiParameters(
     [
-      { type: 'tuple[]', components: [
-        { name: 'delegateCall', type: 'bool' },
-        { name: 'revertOnError', type: 'bool' },
-        { name: 'gasLimit', type: 'uint256' },
-        { name: 'target', type: 'address' },
-        { name: 'value', type: 'uint256' },
-        { name: 'data', type: 'bytes' },
-      ]},
+      {
+        type: 'tuple[]',
+        components: [
+          { name: 'delegateCall', type: 'bool' },
+          { name: 'revertOnError', type: 'bool' },
+          { name: 'gasLimit', type: 'uint256' },
+          { name: 'target', type: 'address' },
+          { name: 'value', type: 'uint256' },
+          { name: 'data', type: 'bytes' },
+        ],
+      },
       { type: 'uint256' },
       { type: 'bytes' },
     ],
-    [metaTransactions as any, nonce, encodedSignature as `0x${string}`]
+    [metaTransactions as any, nonce, encodedSignature as `0x${string}`],
   );
 
   // Prepend function selector
   return executeSelector + encodedParams.slice(2);
 }
-

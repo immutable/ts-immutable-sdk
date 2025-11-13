@@ -45,4 +45,3 @@ export const openPopupCenter = ({
   newWindow.focus();
   return newWindow;
 };
-

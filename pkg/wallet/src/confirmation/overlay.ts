@@ -13,6 +13,7 @@ const PASSPORT_OVERLAY_CONTENTS_ID = 'passport-overlay-contents';
 const PASSPORT_OVERLAY_CLOSE_ID = `${PASSPORT_OVERLAY_ID}-close`;
 const PASSPORT_OVERLAY_TRY_AGAIN_ID = `${PASSPORT_OVERLAY_ID}-try-again`;
 
+/* eslint-disable max-len */
 const CLOSE_BUTTON_SVG = `
   <svg
     viewBox="0 0 20 20"
@@ -234,10 +235,15 @@ export const getGenericOverlay = () => getOverlay(getGenericContents());
  */
 export class ConfirmationOverlay {
   private disableGenericPopupOverlay: boolean;
+
   private disableBlockedPopupOverlay: boolean;
+
   private overlay: HTMLDivElement | undefined;
+
   private isBlockedOverlay: boolean;
+
   private tryAgainListener: (() => void) | undefined;
+
   private onCloseListener: (() => void) | undefined;
 
   constructor(popupOverlayOptions: PopupOverlayOptions, isBlockedOverlay: boolean = false) {
@@ -286,6 +292,7 @@ export class ConfirmationOverlay {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   update(tryAgainOnClick: () => void) {
     const tryAgainButton = document.getElementById(PASSPORT_OVERLAY_TRY_AGAIN_ID);
     if (tryAgainButton) {
@@ -293,7 +300,7 @@ export class ConfirmationOverlay {
         Object.assign(document.createElement('button'), {
           innerHTML: getTryAgainButton().match(/<button[^>]*>([\s\S]*?)<\/button>/)![1],
           onclick: tryAgainOnClick,
-        })
+        }),
       );
     }
   }
@@ -305,4 +312,3 @@ export class ConfirmationOverlay {
     }
   }
 }
-

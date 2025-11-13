@@ -5,7 +5,7 @@
 
 export interface AuthenticatedFetchOptions {
   method?: string;
-  body?: any;
+  body?: unknown;
   token?: string;
   headers?: Record<string, string>;
 }
@@ -13,9 +13,9 @@ export interface AuthenticatedFetchOptions {
 /**
  * Makes an authenticated HTTP request
  */
-export async function authenticatedFetch<T = any>(
+export async function authenticatedFetch<T = unknown>(
   url: string,
-  options: AuthenticatedFetchOptions = {}
+  options: AuthenticatedFetchOptions = {},
 ): Promise<T> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -23,14 +23,17 @@ export async function authenticatedFetch<T = any>(
   };
 
   if (options.token) {
-    headers['Authorization'] = `Bearer ${options.token}`;
+    headers.Authorization = `Bearer ${options.token}`;
   }
 
-  const response = await fetch(url, {
+  const fetchOptions: RequestInit = {
     method: options.method || 'GET',
     headers,
-    ...(options.body && { body: JSON.stringify(options.body) }),
-  });
+  };
+  if (options.body) {
+    fetchOptions.body = JSON.stringify(options.body);
+  }
+  const response = await fetch(url, fetchOptions);
 
   if (!response.ok) {
     const text = await response.text();
@@ -43,11 +46,11 @@ export async function authenticatedFetch<T = any>(
 /**
  * Makes a JSON-RPC request (for relayer)
  */
-export async function jsonRpcRequest<T = any>(
+export async function jsonRpcRequest<T = unknown>(
   url: string,
   method: string,
-  params: any[] = [],
-  token?: string
+  params: unknown[] = [],
+  token?: string,
 ): Promise<T> {
   const body = {
     jsonrpc: '2.0',
@@ -62,7 +65,7 @@ export async function jsonRpcRequest<T = any>(
       method: 'POST',
       body,
       token,
-    }
+    },
   );
 
   if (response.error) {
@@ -71,4 +74,3 @@ export async function jsonRpcRequest<T = any>(
 
   return response.result as T;
 }
-

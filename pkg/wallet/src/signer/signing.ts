@@ -1,8 +1,10 @@
-import { hashTypedData, hashMessage, keccak256, hexToBytes } from 'viem';
-import type { TypedDataPayload } from '../relayer';
+import {
+  hashTypedData, hashMessage, keccak256, hexToBytes,
+} from 'viem';
+import type { TypedDataPayload } from '../types';
 import { packSignatures } from '../sequence';
 import type { Signer } from './signer';
-import { removeHexPrefix } from '../utils/hex';
+import { encodeMessageSubDigest } from '../utils/subdigest';
 
 /**
  * Signs ERC-191 message with Immutable wallet sub-digest
@@ -12,7 +14,7 @@ export async function signERC191Message(
   chainId: bigint,
   payload: string,
   signer: Signer,
-  walletAddress: string
+  walletAddress: string,
 ): Promise<string> {
   const digest = hashMessage(payload);
   const subDigest = encodeMessageSubDigest(chainId, walletAddress, digest);
@@ -31,7 +33,7 @@ export async function signTypedData(
   relayerSignature: string,
   chainId: bigint,
   walletAddress: string,
-  signer: Signer
+  signer: Signer,
 ): Promise<string> {
   const { EIP712Domain, ...types } = typedData.types;
 
@@ -57,21 +59,4 @@ export async function signTypedData(
   const eoaAddress = await signer.getAddress();
 
   return packSignatures(eoaSignature, eoaAddress, relayerSignature);
-}
-
-/**
- * Encodes message sub-digest for Immutable wallet contract authentication
- * Format: \x19\x01{chainId}{walletAddress}{digest}
- */
-export function encodeMessageSubDigest(
-  chainId: bigint,
-  walletAddress: string,
-  digest: string
-): string {
-  const prefix = '\x19\x01';
-  const chainIdHex = chainId.toString(16).padStart(64, '0');
-  const address = removeHexPrefix(walletAddress).toLowerCase();
-  const digestHex = removeHexPrefix(digest);
-  
-  return prefix + chainIdHex + address + digestHex;
 }

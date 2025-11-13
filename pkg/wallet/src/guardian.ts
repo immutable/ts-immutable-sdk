@@ -6,7 +6,7 @@
 import type { User } from '@imtbl/auth';
 import { JsonRpcError, RpcErrorCode } from './errors';
 import { getEip155ChainId } from './utils/chain';
-import type { TypedDataPayload } from './relayer';
+import type { TypedDataPayload } from './types';
 import { ConfirmationScreen } from './confirmation/confirmation';
 import { authenticatedFetch } from './utils/http-client';
 
@@ -14,6 +14,8 @@ export interface GuardianClientConfig {
   guardianUrl: string;
   /** Confirmation screen for showing confirmation UI */
   confirmationScreen: ConfirmationScreen;
+  /** Enable cross-SDK bridge mode - throws errors instead of showing confirmation popups */
+  crossSdkBridgeEnabled: boolean;
 }
 
 /**
@@ -58,27 +60,35 @@ export class GuardianClient {
             payload,
           },
           token: user.access_token,
-        }
+        },
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new JsonRpcError(
         RpcErrorCode.INTERNAL_ERROR,
-        `Message failed to validate: ${error.message}`
+        `Message failed to validate: ${errorMessage}`,
       );
     }
 
     // Handle confirmation if required
     if (data.confirmationRequired && data.messageId) {
+      if (this.config.crossSdkBridgeEnabled) {
+        throw new JsonRpcError(
+          RpcErrorCode.TRANSACTION_REJECTED,
+          'Transaction rejected - confirmation required but cross-SDK bridge mode is enabled',
+        );
+      }
+
       const confirmed = await this.handleMessageConfirmation(
         data.messageId,
         walletAddress,
-        'erc191'
+        'erc191',
       );
 
       if (!confirmed) {
         throw new JsonRpcError(
           RpcErrorCode.TRANSACTION_REJECTED,
-          'Signature rejected by user'
+          'Signature rejected by user',
         );
       }
     }
@@ -87,7 +97,12 @@ export class GuardianClient {
   /**
    * Evaluates an EIP-712 message
    */
-  async evaluateEIP712Message(payload: TypedDataPayload, walletAddress: string, chainId: number, user: User): Promise<void> {
+  async evaluateEIP712Message(
+    payload: TypedDataPayload,
+    walletAddress: string,
+    chainId: number,
+    user: User,
+  ): Promise<void> {
     // User is guaranteed to be authenticated when this is called
     // (ensured by ensureAuthenticated() in provider)
     // Trust provider - use access_token directly
@@ -103,27 +118,35 @@ export class GuardianClient {
             payload,
           },
           token: user.access_token,
-        }
+        },
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new JsonRpcError(
         RpcErrorCode.INTERNAL_ERROR,
-        `Message failed to validate: ${error.message}`
+        `Message failed to validate: ${errorMessage}`,
       );
     }
 
     // Handle confirmation if required
     if (data.confirmationRequired && data.messageId) {
+      if (this.config.crossSdkBridgeEnabled) {
+        throw new JsonRpcError(
+          RpcErrorCode.TRANSACTION_REJECTED,
+          'Transaction rejected - confirmation required but cross-SDK bridge mode is enabled',
+        );
+      }
+
       const confirmed = await this.handleMessageConfirmation(
         data.messageId,
         walletAddress,
-        'eip712'
+        'eip712',
       );
 
       if (!confirmed) {
         throw new JsonRpcError(
           RpcErrorCode.TRANSACTION_REJECTED,
-          'Signature rejected by user'
+          'Signature rejected by user',
         );
       }
     }
@@ -135,12 +158,12 @@ export class GuardianClient {
   private async handleMessageConfirmation(
     messageId: string,
     walletAddress: string,
-    messageType: 'erc191' | 'eip712'
+    messageType: 'erc191' | 'eip712',
   ): Promise<boolean> {
     const result = await this.config.confirmationScreen.requestMessageConfirmation(
       messageId,
       walletAddress,
-      messageType
+      messageType,
     );
     return result.confirmed;
   }
@@ -151,12 +174,12 @@ export class GuardianClient {
   private async handleTransactionConfirmation(
     transactionId: string,
     walletAddress: string,
-    chainId: number
+    chainId: number,
   ): Promise<boolean> {
     const result = await this.config.confirmationScreen.requestConfirmation(
       transactionId,
       walletAddress,
-      getEip155ChainId(chainId)
+      getEip155ChainId(chainId),
     );
     return result.confirmed;
   }
@@ -165,6 +188,7 @@ export class GuardianClient {
    * Maps meta-transactions to Guardian API format
    * Guardian-specific transformation logic (converts bigint to string for JSON)
    */
+  // eslint-disable-next-line class-methods-use-this
   private mapMetaTransactionsForGuardian(
     metaTransactions: Array<{
       target: `0x${string}`;
@@ -173,15 +197,15 @@ export class GuardianClient {
       gasLimit: bigint;
       delegateCall: boolean;
       revertOnError: boolean;
-    }>
+    }>,
   ): Array<{
-    delegateCall: boolean;
-    revertOnError: boolean;
-    gasLimit: string;
-    target: string;
-    value: string;
-    data: string;
-  }> {
+      delegateCall: boolean;
+      revertOnError: boolean;
+      gasLimit: string;
+      target: string;
+      value: string;
+      data: string;
+    }> {
     return metaTransactions.map((tx) => ({
       delegateCall: tx.delegateCall,
       revertOnError: tx.revertOnError,
@@ -240,27 +264,35 @@ export class GuardianClient {
             },
           },
           token: user.access_token,
-        }
+        },
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new JsonRpcError(
         RpcErrorCode.INTERNAL_ERROR,
-        `Transaction failed to validate: ${error.message}`
+        `Transaction failed to validate: ${errorMessage}`,
       );
     }
 
     // Handle confirmation if required
     if (data.confirmationRequired && data.transactionId) {
+      if (this.config.crossSdkBridgeEnabled) {
+        throw new JsonRpcError(
+          RpcErrorCode.TRANSACTION_REJECTED,
+          'Transaction rejected - confirmation required but cross-SDK bridge mode is enabled',
+        );
+      }
+
       const confirmed = await this.handleTransactionConfirmation(
         data.transactionId,
         walletAddress,
-        parseInt(chainId.split(':')[1] || chainId)
+        parseInt(chainId.split(':')[1] || chainId, 10),
       );
 
       if (!confirmed) {
         throw new JsonRpcError(
           RpcErrorCode.TRANSACTION_REJECTED,
-          'Transaction rejected by user'
+          'Transaction rejected by user',
         );
       }
     } else if (!isBackgroundTransaction) {

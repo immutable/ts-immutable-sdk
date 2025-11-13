@@ -32,21 +32,21 @@ export async function prepareAndSignEjectionTransaction({
   if (!transactionRequest.to || typeof transactionRequest.to !== 'string') {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
-      'im_signEjectionTransaction requires a "to" field'
+      'im_signEjectionTransaction requires a "to" field',
     );
   }
 
   if (typeof transactionRequest.nonce === 'undefined') {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
-      'im_signEjectionTransaction requires a "nonce" field'
+      'im_signEjectionTransaction requires a "nonce" field',
     );
   }
 
   if (!transactionRequest.chainId) {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
-      'im_signEjectionTransaction requires a "chainId" field'
+      'im_signEjectionTransaction requires a "chainId" field',
     );
   }
 
@@ -63,7 +63,7 @@ export async function prepareAndSignEjectionTransaction({
     nonce,
     chainIdBigInt,
     zkEvmAddress,
-    ethSigner
+    ethSigner,
   );
 
   return {

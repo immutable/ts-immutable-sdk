@@ -3,26 +3,11 @@
  */
 
 import type { User } from '@imtbl/auth';
+import { encodeAbiParameters } from 'viem';
 import { getEip155ChainId } from './utils/chain';
 import { jsonRpcRequest } from './utils/http-client';
-import { encodeAbiParameters } from 'viem';
 import type { MetaTransaction } from './metatransaction';
-
-export interface TypedDataPayload {
-  types: {
-    EIP712Domain: Array<{ name: string; type: string }>;
-    [key: string]: Array<{ name: string; type: string }>;
-  };
-  domain: {
-    name?: string;
-    version?: string;
-    chainId?: number | string;
-    verifyingContract?: string;
-    salt?: string;
-  };
-  primaryType: string;
-  message: Record<string, any>;
-}
+import type { TypedDataPayload } from './types';
 
 export interface RelayerClientConfig {
   relayerUrl: string;
@@ -52,7 +37,7 @@ export class RelayerClient {
   /**
    * Makes a request to the relayer API
    */
-  private async request(method: string, params: any[], user: User): Promise<any> {
+  private async request<T = unknown>(method: string, params: unknown[], user: User): Promise<T> {
     // User is guaranteed to be authenticated when this is called
     // (ensured by ensureAuthenticated() in provider)
     // Keep defensive check here as final safety net
@@ -60,11 +45,11 @@ export class RelayerClient {
       throw new Error('User not authenticated');
     }
 
-    return jsonRpcRequest(
+    return jsonRpcRequest<T>(
       `${this.config.relayerUrl}/v1/transactions`,
       method,
       params,
-      user.access_token
+      user.access_token,
     );
   }
 
@@ -72,7 +57,7 @@ export class RelayerClient {
    * Sends a transaction via relayer
    */
   async ethSendTransaction(to: string, data: string, chainId: number, user: User): Promise<string> {
-    return this.request('eth_sendTransaction', [{
+    return this.request<string>('eth_sendTransaction', [{
       to,
       data,
       chainId: getEip155ChainId(chainId),
@@ -82,15 +67,23 @@ export class RelayerClient {
   /**
    * Gets transaction by hash
    */
-  async imGetTransactionByHash(hash: string, user: User): Promise<any> {
-    return this.request('im_getTransactionByHash', [hash], user);
+  async imGetTransactionByHash(hash: string, user: User): Promise<{
+    status: string;
+    hash?: string;
+    statusMessage?: string;
+  }> {
+    return this.request<{
+      status: string;
+      hash?: string;
+      statusMessage?: string;
+    }>('im_getTransactionByHash', [hash], user);
   }
 
   /**
    * Signs a message via relayer
    */
   async imSign(address: string, message: string, chainId: number, user: User): Promise<string> {
-    return this.request('im_sign', [{
+    return this.request<string>('im_sign', [{
       chainId: getEip155ChainId(chainId),
       address,
       message,
@@ -101,7 +94,7 @@ export class RelayerClient {
    * Signs typed data via relayer
    */
   async imSignTypedData(address: string, payload: TypedDataPayload, chainId: number, user: User): Promise<string> {
-    return this.request('im_signTypedData', [{
+    return this.request<string>('im_signTypedData', [{
       chainId: getEip155ChainId(chainId),
       address,
       eip712Payload: payload,
@@ -111,8 +104,13 @@ export class RelayerClient {
   /**
    * Gets fee options for a transaction
    */
-  async imGetFeeOptions(userAddress: string, data: string, chainId: number, user: User): Promise<FeeOption[] | undefined> {
-    return this.request('im_getFeeOptions', [{
+  async imGetFeeOptions(
+    userAddress: string,
+    data: string,
+    chainId: number,
+    user: User,
+  ): Promise<FeeOption[] | undefined> {
+    return this.request<FeeOption[] | undefined>('im_getFeeOptions', [{
       userAddress,
       data,
       chainId: getEip155ChainId(chainId),
@@ -127,7 +125,7 @@ export class RelayerClient {
     walletAddress: string,
     transactions: MetaTransaction[],
     chainId: number,
-    user: User
+    user: User,
   ): Promise<FeeOption> {
     const META_TRANSACTIONS_TYPE = `tuple(
       bool delegateCall,
@@ -140,7 +138,7 @@ export class RelayerClient {
 
     const encodedTransactions = encodeAbiParameters(
       [{ type: META_TRANSACTIONS_TYPE }],
-      [transactions]
+      [transactions],
     );
 
     const feeOptions = await this.imGetFeeOptions(walletAddress, encodedTransactions, chainId, user);
@@ -150,9 +148,9 @@ export class RelayerClient {
     }
 
     const imxFeeOption = feeOptions.find(
-      (feeOption) => feeOption.tokenSymbol === 'IMX'
+      (feeOption) => feeOption.tokenSymbol === 'IMX',
     );
-    
+
     if (!imxFeeOption) {
       throw new Error('Failed to retrieve fees for IMX token');
     }
@@ -160,4 +158,3 @@ export class RelayerClient {
     return imxFeeOption;
   }
 }
-

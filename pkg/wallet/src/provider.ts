@@ -3,8 +3,10 @@
  */
 
 import type { User, Auth } from '@imtbl/auth';
+import {
+  toHex, fromHex, createPublicClient, http, isAddress, hexToString,
+} from 'viem';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './errors';
-import { toHex, fromHex, createPublicClient, http, isAddress } from 'viem';
 import { getFunctionSelector } from './utils/abi';
 import type { Signer } from './signer/signer';
 import { MagicTEESigner } from './signer/magic';
@@ -12,21 +14,12 @@ import { RelayerClient } from './relayer';
 import { GuardianClient } from './guardian';
 import { ApiClient } from './api';
 import { ConfirmationScreen } from './confirmation/confirmation';
-import { hexToString } from './utils/hex';
 import { packSignatures } from './sequence';
 import { signERC191Message, signTypedData } from './signer/signing';
 import { buildMetaTransactions, validateAndSignTransaction } from './metatransaction';
 import { prepareAndSignEjectionTransaction } from './ejection';
 import type { TransactionRequest } from './metatransaction';
-
-function getPassportDomain(chains: ChainConfig[]): string {
-  const isSandbox = chains.some(chain =>
-    chain.apiUrl.includes('sandbox') || chain.apiUrl.includes('testnet')
-  );
-  return isSandbox
-    ? 'https://passport.sandbox.immutable.com'
-    : 'https://passport.immutable.com';
-}
+import type { TypedDataPayload } from './types';
 
 /**
  * Simple event emitter for provider events
@@ -46,7 +39,7 @@ class SimpleEventEmitter {
   }
 
   emit(event: string, ...args: any[]): void {
-    this.listeners.get(event)?.forEach(listener => listener(...args));
+    this.listeners.get(event)?.forEach((listener) => listener(...args));
   }
 }
 
@@ -83,6 +76,8 @@ export interface ProviderConfig {
     disableGenericPopupOverlay?: boolean;
     disableBlockedPopupOverlay?: boolean;
   };
+  /** Enable cross-SDK bridge mode - skips confirmation popups, throws errors instead */
+  crossSdkBridgeEnabled?: boolean;
 }
 
 /**
@@ -94,17 +89,17 @@ export interface Provider {
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
   request(args: RequestArguments): Promise<any>;
-  
+
   /**
    * Subscribe to provider events
    */
   on(event: string, listener: (...args: any[]) => void): void;
-  
+
   /**
    * Unsubscribe from provider events
    */
   removeListener(event: string, listener: (...args: any[]) => void): void;
-  
+
   /**
    * Indicates this is a Passport provider
    */
@@ -116,7 +111,7 @@ export interface Provider {
  */
 export interface RequestArguments {
   method: string;
-  params?: Array<any>;
+  params?: unknown[];
 }
 
 /**
@@ -133,19 +128,34 @@ export class PassportEVMProvider implements Provider {
   public readonly isPassport: boolean = true;
 
   private chains: Map<number, ChainConfig>;
+
   private currentChainId: number;
+
   private currentRpcUrl: string;
+
   private eventEmitter: SimpleEventEmitter;
+
   private authenticatedUser?: User;
+
   private auth?: Auth;
+
   private signer?: Signer;
+
   private walletAddress?: string;
+
   private passportDomain: string;
+
+  private crossSdkBridgeEnabled: boolean;
+
   // Clients are always initialized in constructor via initializeClients()
   private relayerClient!: RelayerClient;
+
   private guardianClient!: GuardianClient;
+
   private apiClient!: ApiClient;
+
   private confirmationScreen: ConfirmationScreen;
+
   // Cached HTTP transport for RPC calls (recreated when chain switches)
   private rpcTransport = http('');
 
@@ -171,28 +181,30 @@ export class PassportEVMProvider implements Provider {
     this.authenticatedUser = config.authenticatedUser;
     this.auth = config.auth;
     this.eventEmitter = new SimpleEventEmitter();
-    
+
     // Initialize RPC transport
     this.rpcTransport = http(this.currentRpcUrl);
-    
+
     // Determine passport domain from chain config
-    this.passportDomain = getPassportDomain(config.chains);
-    
+    this.passportDomain = 'https://passport.immutable.com';
+    this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled || false;
+
     // Initialize confirmation screen
     this.confirmationScreen = new ConfirmationScreen({
       passportDomain: this.passportDomain,
       popupOverlayOptions: config.popupOverlayOptions,
+      crossSdkBridgeEnabled: this.crossSdkBridgeEnabled,
     });
-    
+
     // Initialize clients eagerly (they can exist without authenticated user)
     // Clients are stateless - user is passed as parameter to methods
-    this.initializeClients();
-    
+    this.initializeClients(config.crossSdkBridgeEnabled || false);
+
     // If auth client provided, set it up (will try to get existing user)
     if (this.auth) {
       this.setAuth(this.auth);
     }
-    
+
     // If authenticated user provided, set it up
     if (this.authenticatedUser) {
       this.setAuthenticatedUser(this.authenticatedUser);
@@ -203,7 +215,7 @@ export class PassportEVMProvider implements Provider {
    * Initializes or updates API clients
    * Clients can be created without authenticated user - they'll fail on requests until user is set
    */
-  private initializeClients(): void {
+  private initializeClients(crossSdkBridgeEnabled: boolean): void {
     const chainConfig = this.chains.get(this.currentChainId)!;
 
     this.relayerClient = new RelayerClient({
@@ -213,6 +225,7 @@ export class PassportEVMProvider implements Provider {
     this.guardianClient = new GuardianClient({
       guardianUrl: chainConfig.apiUrl,
       confirmationScreen: this.confirmationScreen,
+      crossSdkBridgeEnabled,
     });
 
     this.apiClient = new ApiClient({
@@ -227,7 +240,7 @@ export class PassportEVMProvider implements Provider {
    */
   private setAuthenticatedUser(user: User): void {
     this.authenticatedUser = user;
-    this.initializeClients();
+    this.initializeClients(this.crossSdkBridgeEnabled);
     this.initializeSigner();
   }
 
@@ -244,21 +257,18 @@ export class PassportEVMProvider implements Provider {
     const magicTeeBasePath = isSandbox
       ? 'https://api.sandbox.immutable.com/magic-tee'
       : 'https://api.immutable.com/magic-tee';
-    
-    // Magic config values - these should be consistent across environments
-    // TODO: These might need to come from config or environment
-    const magicPublishableApiKey = process.env.MAGIC_PUBLISHABLE_API_KEY || '';
-    const magicProviderId = process.env.MAGIC_PROVIDER_ID || 'immutable';
 
-    // Only initialize if we have the required config
-    if (magicPublishableApiKey && magicProviderId) {
-      this.signer = new MagicTEESigner({
-        magicTeeBasePath,
-        magicPublishableApiKey,
-        magicProviderId,
-        authenticatedUser: this.authenticatedUser,
-      });
-    }
+    // Magic config values - hardcoded (same for production and sandbox)
+    // These match the values from the original Passport SDK
+    const magicPublishableApiKey = 'pk_live_10F423798A540ED7';
+    const magicProviderId = 'aa80b860-8869-4f13-9000-6a6ad3d20017';
+
+    this.signer = new MagicTEESigner({
+      magicTeeBasePath,
+      magicPublishableApiKey,
+      magicProviderId,
+      authenticatedUser: this.authenticatedUser,
+    });
   }
 
   /**
@@ -299,20 +309,22 @@ export class PassportEVMProvider implements Provider {
     if (!this.chains.has(chainId)) {
       throw new JsonRpcError(
         ProviderErrorCode.UNSUPPORTED_METHOD,
-        `Chain ${chainId} not supported`
+        `Chain ${chainId} not supported`,
       );
     }
 
     this.currentChainId = chainId;
     const chainConfig = this.chains.get(chainId)!;
-    
+
     this.currentRpcUrl = chainConfig.rpcUrl;
-    
+
     // Recreate RPC transport for new chain
     this.rpcTransport = http(this.currentRpcUrl);
 
     // Reinitialize clients with new chain config (always, regardless of user)
-    this.initializeClients();
+    // Note: crossSdkBridgeEnabled is stored in confirmationScreen config, so we need to read it back
+    // For simplicity, we'll store it as a private field
+    this.initializeClients(this.crossSdkBridgeEnabled);
 
     // Emit chainChanged event
     this.eventEmitter.emit('chainChanged', toHex(chainId));
@@ -326,21 +338,11 @@ export class PassportEVMProvider implements Provider {
   }
 
   /**
-   * Gets the wallet address from authenticated user
+   * Gets the cached wallet address
+   * Returns undefined if wallet not yet registered (call eth_requestAccounts to register)
    */
   private async getWalletAddress(): Promise<string | undefined> {
-    if (this.walletAddress) {
-      return this.walletAddress;
-    }
-
-    if (!this.authenticatedUser) {
-      return undefined;
-    }
-
-    // Try to extract from user profile (if already registered)
-    // The profile might contain zkEVM address in custom claims
-    // For now, return undefined - will be set during registration
-    return undefined;
+    return this.walletAddress;
   }
 
   /**
@@ -351,7 +353,7 @@ export class PassportEVMProvider implements Provider {
     if (!address) {
       throw new JsonRpcError(
         ProviderErrorCode.UNAUTHORIZED,
-        'Unauthorised - call eth_requestAccounts first'
+        'Unauthorised - call eth_requestAccounts first',
       );
     }
     return address;
@@ -370,7 +372,7 @@ export class PassportEVMProvider implements Provider {
     if (!this.signer) {
       throw new JsonRpcError(
         ProviderErrorCode.UNAUTHORIZED,
-        'Signer not available. User must be authenticated for signing operations.'
+        'Signer not available. User must be authenticated for signing operations.',
       );
     }
     return this.signer;
@@ -394,10 +396,9 @@ export class PassportEVMProvider implements Provider {
 
     throw new JsonRpcError(
       ProviderErrorCode.UNAUTHORIZED,
-      'User not authenticated. Please provide an auth client or login first.'
+      'User not authenticated. Please provide an auth client or login first.',
     );
   }
-
 
   /**
    * Handles eth_requestAccounts
@@ -433,7 +434,7 @@ export class PassportEVMProvider implements Provider {
       chainName,
       ethereumAddress,
       ethereumSignature,
-      this.authenticatedUser!
+      this.authenticatedUser!,
     );
 
     this.walletAddress = counterfactualAddress;
@@ -454,14 +455,14 @@ export class PassportEVMProvider implements Provider {
     if (!transactionRequest?.to || typeof transactionRequest.to !== 'string') {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
-        'Transaction must include to field'
+        'Transaction must include to field',
       );
     }
 
     if (!isAddress(transactionRequest.to)) {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
-        `Invalid address: ${transactionRequest.to}`
+        `Invalid address: ${transactionRequest.to}`,
       );
     }
 
@@ -476,7 +477,7 @@ export class PassportEVMProvider implements Provider {
       this.relayerClient,
       address,
       this.currentChainId,
-      this.authenticatedUser!
+      this.authenticatedUser!,
     );
 
     const chainId = BigInt(this.currentChainId);
@@ -490,7 +491,7 @@ export class PassportEVMProvider implements Provider {
       signer,
       this.guardianClient,
       this.authenticatedUser!,
-      false
+      false,
     );
 
     // Send to relayer
@@ -498,7 +499,7 @@ export class PassportEVMProvider implements Provider {
       address, // to is the wallet address
       signedTransactionData,
       this.currentChainId,
-      this.authenticatedUser!
+      this.authenticatedUser!,
     );
 
     // Poll for transaction hash
@@ -507,38 +508,45 @@ export class PassportEVMProvider implements Provider {
 
   /**
    * Polls relayer for transaction hash
+   * authenticatedUser is guaranteed by callers (ensureAuthenticated called before this)
    */
   private async pollTransaction(relayerId: string): Promise<string> {
-    if (!this.authenticatedUser) {
-      throw new JsonRpcError(
-        ProviderErrorCode.UNAUTHORIZED,
-        'User not authenticated'
-      );
-    }
-
     const maxAttempts = 30;
     const delayMs = 1000;
 
+    // Polling loop - await is intentional
+    // eslint-disable-next-line no-await-in-loop
     for (let i = 0; i < maxAttempts; i++) {
-      const tx = await this.relayerClient.imGetTransactionByHash(relayerId, this.authenticatedUser);
+      // authenticatedUser is guaranteed by callers (ensureAuthenticated called before this)
+      // eslint-disable-next-line no-await-in-loop
+      const tx = await this.relayerClient.imGetTransactionByHash(relayerId, this.authenticatedUser!);
 
       if (tx.status === 'SUCCESSFUL' || tx.status === 'SUBMITTED') {
+        if (!tx.hash) {
+          throw new JsonRpcError(
+            RpcErrorCode.INTERNAL_ERROR,
+            'Transaction hash not available',
+          );
+        }
         return tx.hash;
       }
 
       if (tx.status === 'REVERTED' || tx.status === 'FAILED') {
         throw new JsonRpcError(
           RpcErrorCode.TRANSACTION_REJECTED,
-          tx.statusMessage || 'Transaction failed'
+          tx.statusMessage || 'Transaction failed',
         );
       }
 
-      await new Promise(resolve => setTimeout(resolve, delayMs));
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise<void>((resolve) => {
+        setTimeout(() => resolve(), delayMs);
+      });
     }
 
     throw new JsonRpcError(
       RpcErrorCode.RPC_SERVER_ERROR,
-      'Transaction polling timeout'
+      'Transaction polling timeout',
     );
   }
 
@@ -556,7 +564,7 @@ export class PassportEVMProvider implements Provider {
     if (!fromAddress || !message) {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
-        'personal_sign requires an address and a message'
+        'personal_sign requires an address and a message',
       );
     }
 
@@ -564,20 +572,19 @@ export class PassportEVMProvider implements Provider {
     if (!isAddress(fromAddress)) {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
-        `Invalid address: ${fromAddress}`
+        `Invalid address: ${fromAddress}`,
       );
     }
 
     if (fromAddress.toLowerCase() !== address.toLowerCase()) {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
-        'personal_sign requires the signer to be the from address'
+        'personal_sign requires the signer to be the from address',
       );
     }
 
-
     // Convert hex to string if needed
-    const payload = hexToString(message);
+    const payload = hexToString(message as `0x${string}`);
     const chainId = BigInt(this.currentChainId);
 
     // Evaluate with guardian (passes wallet address for confirmation)
@@ -614,7 +621,7 @@ export class PassportEVMProvider implements Provider {
       this.relayerClient,
       address,
       this.currentChainId,
-      this.authenticatedUser!
+      this.authenticatedUser!,
     );
 
     const chainId = BigInt(this.currentChainId);
@@ -628,7 +635,7 @@ export class PassportEVMProvider implements Provider {
       signer,
       this.guardianClient,
       this.authenticatedUser!,
-      false
+      false,
     );
 
     // Send to relayer
@@ -636,9 +643,9 @@ export class PassportEVMProvider implements Provider {
       address,
       signedTransactionData,
       this.currentChainId,
-      this.authenticatedUser!
+      this.authenticatedUser!,
     );
-    
+
     // Wait for deployment to complete
     await this.pollTransaction(relayerId);
   }
@@ -657,7 +664,7 @@ export class PassportEVMProvider implements Provider {
     if (!fromAddress || !typedDataParam) {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
-        'eth_signTypedData_v4 requires an address and typed data'
+        'eth_signTypedData_v4 requires an address and typed data',
       );
     }
 
@@ -665,35 +672,38 @@ export class PassportEVMProvider implements Provider {
     if (!isAddress(fromAddress)) {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
-        `Invalid address: ${fromAddress}`
+        `Invalid address: ${fromAddress}`,
       );
     }
 
     // Parse typed data
-    const typedData: any = typeof typedDataParam === 'string'
-      ? JSON.parse(typedDataParam)
-      : typedDataParam;
+    const typedData: TypedDataPayload = typeof typedDataParam === 'string'
+      ? JSON.parse(typedDataParam) as TypedDataPayload
+      : typedDataParam as TypedDataPayload;
 
     // Validate typed data structure
     if (!typedData.types || !typedData.domain || !typedData.primaryType || !typedData.message) {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
-        'Invalid typed data: missing required fields'
+        'Invalid typed data: missing required fields',
       );
     }
 
     // Validate chainId matches current chain
     if (typedData.domain.chainId) {
-      const providedChainId = typeof typedData.domain.chainId === 'string'
-        ? (typedData.domain.chainId.startsWith('0x')
-            ? parseInt(typedData.domain.chainId, 16)
-            : parseInt(typedData.domain.chainId, 10))
-        : typedData.domain.chainId;
+      let providedChainId: number;
+      if (typeof typedData.domain.chainId === 'string') {
+        providedChainId = typedData.domain.chainId.startsWith('0x')
+          ? parseInt(typedData.domain.chainId, 16)
+          : parseInt(typedData.domain.chainId, 10);
+      } else {
+        providedChainId = typedData.domain.chainId;
+      }
 
       if (BigInt(providedChainId) !== BigInt(this.currentChainId)) {
         throw new JsonRpcError(
           RpcErrorCode.INVALID_PARAMS,
-          `Invalid chainId, expected ${this.currentChainId}`
+          `Invalid chainId, expected ${this.currentChainId}`,
         );
       }
     }
@@ -701,17 +711,27 @@ export class PassportEVMProvider implements Provider {
     const chainId = BigInt(this.currentChainId);
 
     // Evaluate with guardian (passes wallet address for confirmation)
-    await this.guardianClient.evaluateEIP712Message(typedData, address, this.currentChainId, this.authenticatedUser!);
+    await this.guardianClient.evaluateEIP712Message(
+      typedData,
+      address,
+      this.currentChainId,
+      this.authenticatedUser!,
+    );
 
     // Get relayer signature
-    const relayerSignature = await this.relayerClient.imSignTypedData(address, typedData, this.currentChainId, this.authenticatedUser!);
+    const relayerSignature = await this.relayerClient.imSignTypedData(
+      address,
+      typedData,
+      this.currentChainId,
+      this.authenticatedUser!,
+    );
 
     // If signer has signTypedData method, use it (ethers/viem signers)
     if (signer.signTypedData) {
       const eoaSignature = await signer.signTypedData(
         typedData.domain,
         typedData.types,
-        typedData.message
+        typedData.message,
       );
       const eoaAddress = await signer.getAddress();
       return packSignatures(eoaSignature, eoaAddress, relayerSignature);
@@ -729,7 +749,7 @@ export class PassportEVMProvider implements Provider {
     if (!chainIdHex) {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
-        'chainId is required'
+        'chainId is required',
       );
     }
 
@@ -749,7 +769,7 @@ export class PassportEVMProvider implements Provider {
     if (!chainParams?.chainId || !chainParams?.rpcUrls?.[0]) {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
-        'chainId and rpcUrls are required'
+        'chainId and rpcUrls are required',
       );
     }
 
@@ -757,15 +777,19 @@ export class PassportEVMProvider implements Provider {
       ? Number(fromHex(chainParams.chainId as `0x${string}`, 'number'))
       : chainParams.chainId;
 
-    // Extract API URLs from chain params or use defaults
-    const apiUrl = chainParams.apiUrl || this.chains.get(this.currentChainId)?.apiUrl || '';
-    const relayerUrl = chainParams.relayerUrl || this.chains.get(this.currentChainId)?.relayerUrl || '';
+    // Require API URLs - don't use defaults from current chain (they may be wrong)
+    if (!chainParams.apiUrl || !chainParams.relayerUrl) {
+      throw new JsonRpcError(
+        RpcErrorCode.INVALID_PARAMS,
+        'apiUrl and relayerUrl are required when adding a new chain',
+      );
+    }
 
     this.addChain({
       chainId,
       rpcUrl: chainParams.rpcUrls[0],
-      relayerUrl,
-      apiUrl,
+      relayerUrl: chainParams.relayerUrl,
+      apiUrl: chainParams.apiUrl,
       name: chainParams.chainName || `Chain ${chainId}`,
     });
 
@@ -787,7 +811,7 @@ export class PassportEVMProvider implements Provider {
     if (!params || params.length !== 1) {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
-        'im_signEjectionTransaction requires a singular param (transaction)'
+        'im_signEjectionTransaction requires a singular param (transaction)',
       );
     }
 
@@ -811,7 +835,7 @@ export class PassportEVMProvider implements Provider {
     if (!clientId) {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
-        'im_addSessionActivity requires a clientId'
+        'im_addSessionActivity requires a clientId',
       );
     }
 
@@ -838,21 +862,25 @@ export class PassportEVMProvider implements Provider {
       return;
     }
 
-    const apiUrl = chainConfig.apiUrl;
-    const isSandbox = apiUrl.includes('sandbox') || apiUrl.includes('testnet');
-    
     // Session activity always uses production API
     const sessionActivityUrl = 'https://api.immutable.com/v1/sdk/session-activity/check';
+    const params = new URLSearchParams({
+      clientId,
+      wallet: walletAddress,
+      checkCount: '0',
+      sendCount: '0',
+    });
+    const url = `${sessionActivityUrl}?${params.toString()}`;
 
     try {
       const response = await fetch(
-        `${sessionActivityUrl}?clientId=${encodeURIComponent(clientId)}&wallet=${encodeURIComponent(walletAddress)}&checkCount=0&sendCount=0`,
+        url,
         {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${this.authenticatedUser.access_token}`,
+            Authorization: `Bearer ${this.authenticatedUser.access_token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -863,7 +891,7 @@ export class PassportEVMProvider implements Provider {
       }
 
       const data = await response.json();
-      
+
       // If contract address and function name are provided, send a background transaction
       if (data.contractAddress && data.functionName) {
         // Send background transaction in nonce space 1
@@ -871,7 +899,7 @@ export class PassportEVMProvider implements Provider {
           walletAddress,
           data.contractAddress,
           data.functionName,
-          data.delay
+          data.delay,
         );
       }
     } catch (error) {
@@ -886,7 +914,7 @@ export class PassportEVMProvider implements Provider {
     walletAddress: string,
     contractAddress: string,
     functionName: string,
-    delay?: number
+    delay?: number,
   ): Promise<void> {
     try {
       await this.ensureAuthenticated();
@@ -907,7 +935,7 @@ export class PassportEVMProvider implements Provider {
         walletAddress,
         this.currentChainId,
         this.authenticatedUser!,
-        nonceSpace
+        nonceSpace,
       );
 
       const chainId = BigInt(this.currentChainId);
@@ -921,7 +949,7 @@ export class PassportEVMProvider implements Provider {
         signer,
         this.guardianClient,
         this.authenticatedUser!,
-        true // isBackgroundTransaction
+        true, // isBackgroundTransaction
       );
 
       // Send to relayer
@@ -929,12 +957,14 @@ export class PassportEVMProvider implements Provider {
         walletAddress,
         signedTransactionData,
         this.currentChainId,
-        this.authenticatedUser!
+        this.authenticatedUser!,
       );
 
       // Wait for delay if specified
       if (delay && delay > 0) {
-        await new Promise(resolve => setTimeout(resolve, delay * 1000));
+        await new Promise<void>((resolve) => {
+          setTimeout(() => resolve(), delay * 1000);
+        });
       }
     } catch (error) {
       // Silently fail - background transaction is non-critical
@@ -1004,7 +1034,7 @@ export class PassportEVMProvider implements Provider {
           default:
             throw new JsonRpcError(
               ProviderErrorCode.UNSUPPORTED_METHOD,
-              `Method ${request.method} not supported`
+              `Method ${request.method} not supported`,
             );
         }
       }
@@ -1017,7 +1047,7 @@ export class PassportEVMProvider implements Provider {
       default: {
         throw new JsonRpcError(
           ProviderErrorCode.UNSUPPORTED_METHOD,
-          `Method ${request.method} not supported`
+          `Method ${request.method} not supported`,
         );
       }
     }
@@ -1026,7 +1056,7 @@ export class PassportEVMProvider implements Provider {
   /**
    * EIP-1193 request method
    */
-  public async request(request: RequestArguments): Promise<any> {
+  public async request(request: RequestArguments): Promise<unknown> {
     try {
       return await this.performRequest(request);
     } catch (error) {

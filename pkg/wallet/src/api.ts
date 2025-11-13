@@ -25,7 +25,7 @@ export class ApiClient {
    */
   async listChains(): Promise<Array<{ id: string; name: string }>> {
     const data = await authenticatedFetch<{ result?: Array<{ id: string; name: string }> }>(
-      `${this.config.apiUrl}/v1/chains`
+      `${this.config.apiUrl}/v1/chains`,
     );
     return data.result || [];
   }
@@ -37,7 +37,7 @@ export class ApiClient {
     chainName: string,
     ethereumAddress: string,
     ethereumSignature: string,
-    user: User
+    user: User,
   ): Promise<string> {
     // User is guaranteed to be authenticated when this is called
     // (ensured by ensureAuthenticated() in provider)
@@ -52,7 +52,7 @@ export class ApiClient {
           ethereum_signature: ethereumSignature,
         },
         token: user.access_token,
-      }
+      },
     );
     return data.counterfactual_address;
   }
@@ -63,11 +63,10 @@ export class ApiClient {
   async getChainName(chainId: number): Promise<string> {
     const chains = await this.listChains();
     const eipChainId = getEip155ChainId(chainId);
-    const chain = chains.find(c => c.id === eipChainId);
+    const chain = chains.find((c) => c.id === eipChainId);
     if (!chain) {
       throw new Error(`Chain ${chainId} not found`);
     }
     return chain.name;
   }
 }
-
