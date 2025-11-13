@@ -1,16 +1,6 @@
 /**
  * Sequence signature encoding/decoding
- * Minimal implementation replacing @0xsequence/core dependency
- * 
- * Sequence signature format:
- * - version (1 byte): 0x00 or 0x01
- * - threshold (1 byte): number of signatures required
- * - signers: array of signer data
- *   - isDynamic (1 bit): whether signer is dynamic
- *   - unrecovered (1 bit): whether signature is unrecovered
- *   - weight (6 bits): weight of signer
- *   - signature (65 bytes): actual signature
- *   - address (20 bytes, optional): signer address
+ * Minimal implementation for Immutable wallet signature format
  */
 
 import { isAddress, keccak256, encodeAbiParameters, fromHex } from 'viem';
@@ -209,11 +199,10 @@ export function packSignatures(
     },
   ];
 
-  // Sort signers by address (if address present)
+  // Sort signers by address (lexicographic comparison)
   const sortedSigners = combinedSigners.sort((a, b) => {
     if (!a.address || !b.address) return 0;
-    const diff = BigInt(a.address) - BigInt(b.address);
-    return diff === 0n ? 0 : diff < 0n ? -1 : 1;
+    return a.address.toLowerCase().localeCompare(b.address.toLowerCase());
   });
 
   // Re-encode with threshold 2

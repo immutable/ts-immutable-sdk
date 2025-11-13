@@ -1,10 +1,3 @@
-/**
- * @imtbl/auth - Minimal authentication package
- * 
- * Provides OAuth-based authentication for Immutable Passport.
- * Can be used standalone or passed to wallet/Passport clients for enhanced functionality.
- */
-
 import {
   UserManager,
   UserManagerSettings,
@@ -13,7 +6,6 @@ import {
   InMemoryWebStorage,
 } from 'oidc-client-ts';
 
-// Re-export User from oidc-client-ts as the main User type
 export type { User } from 'oidc-client-ts';
 
 /**
@@ -44,17 +36,14 @@ export interface LoginOptions {
   marketingConsent?: 'opted_in' | 'unsubscribed';
 }
 
-/**
- * Builds UserManagerSettings from AuthConfig
- */
 function buildUserManagerSettings(config: AuthConfig): UserManagerSettings {
   const authDomain = 'https://auth.immutable.com';
-  
+
   // Use localStorage in browser, InMemoryWebStorage for SSR
-  const store: Storage = typeof window !== 'undefined' 
-    ? window.localStorage 
+  const store: Storage = typeof window !== 'undefined'
+    ? window.localStorage
     : new InMemoryWebStorage();
-  
+
   const userStore = new WebStorageStateStore({ store });
 
   // Build logout endpoint
@@ -88,9 +77,6 @@ function buildUserManagerSettings(config: AuthConfig): UserManagerSettings {
   return settings;
 }
 
-/**
- * Builds extra query parameters for login
- */
 function buildExtraQueryParams(options?: LoginOptions): Record<string, string> {
   const params: Record<string, string> = {};
 
@@ -109,33 +95,11 @@ function buildExtraQueryParams(options?: LoginOptions): Record<string, string> {
 }
 
 /**
- * Minimal authentication client
- *
- * @example
- * ```typescript
- * import { Auth } from '@imtbl/auth';
- *
- * const auth = new Auth({
- *   clientId: 'your-client-id',
- *   redirectUri: 'https://your-app.com/callback'
- * });
- *
- * // Login with popup
- * const user = await auth.loginPopup();
- * console.log(user?.profile.email);
- *
- * // Or login with redirect
- * await auth.loginRedirect();
- * // Then on callback page:
- * const user = await auth.handleRedirect();
- * ```
+ * OAuth-based authentication client for Immutable Passport
  */
 export class Auth {
   private userManager: UserManager;
 
-  /**
-   * Creates a new Auth instance
-   */
   constructor(config: AuthConfig) {
     if (!config.clientId) {
       throw new Error('clientId is required');
@@ -147,11 +111,6 @@ export class Auth {
     this.userManager = new UserManager(buildUserManagerSettings(config));
   }
 
-  /**
-   * Initiates login with popup window
-   * @param options Optional login options
-   * @returns Promise resolving to User, or null if cancelled
-   */
   async loginPopup(options?: LoginOptions): Promise<User | null> {
     try {
       await this.userManager.clearStaleState();
@@ -167,7 +126,7 @@ export class Auth {
 
       return oidcUser;
     } catch (error) {
-      // Return null if popup was closed by user, otherwise pass through error
+      // Return null if popup was closed by user
       if (error instanceof Error && error.message.includes('Popup closed')) {
         return null;
       }
@@ -175,10 +134,6 @@ export class Auth {
     }
   }
 
-  /**
-   * Initiates login with redirect
-   * @param options Optional login options
-   */
   async loginRedirect(options?: LoginOptions): Promise<void> {
     await this.userManager.clearStaleState();
 
@@ -186,20 +141,11 @@ export class Auth {
     await this.userManager.signinRedirect({ extraQueryParams });
   }
 
-  /**
-   * Handles OAuth callback after redirect
-   * Call this on your callback page after loginRedirect()
-   * @returns Promise resolving to User, or null if no user
-   */
   async handleRedirect(): Promise<User | null> {
     const oidcUser = await this.userManager.signinCallback();
     return oidcUser || null;
   }
 
-  /**
-   * Gets the current authenticated user
-   * @returns Promise resolving to User, or null if not authenticated
-   */
   async getUser(): Promise<User | null> {
     try {
       const oidcUser = await this.userManager.getUser();
@@ -208,35 +154,21 @@ export class Auth {
       }
       return oidcUser;
     } catch (error) {
-      // If user not found, return null (not an error)
       if (error instanceof Error && error.message.includes('user not found')) {
         return null;
       }
-      // Pass through other errors - they're already well-formed
       throw error;
     }
   }
 
-  /**
-   * Logs out the current user
-   */
   async logout(): Promise<void> {
-    // Pass through errors - oidc-client-ts errors are already clear
     await this.userManager.signoutRedirect();
   }
 
-  /**
-   * Logs out silently (without redirect)
-   */
   async logoutSilent(): Promise<void> {
-    // Pass through errors - oidc-client-ts errors are already clear
     await this.userManager.signoutSilent();
   }
 
-  /**
-   * Refreshes the access token if expired
-   * Called automatically by oidc-client-ts when needed, but can be called manually
-   */
   async refreshToken(): Promise<void> {
     const oidcUser = await this.userManager.getUser();
     if (!oidcUser) {

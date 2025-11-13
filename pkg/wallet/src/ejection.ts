@@ -29,8 +29,7 @@ export async function prepareAndSignEjectionTransaction({
   zkEvmAddress: string;
   chainId: number;
 }): Promise<EjectionTransactionResponse> {
-  // Validate required fields
-  if (!transactionRequest.to) {
+  if (!transactionRequest.to || typeof transactionRequest.to !== 'string') {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
       'im_signEjectionTransaction requires a "to" field'

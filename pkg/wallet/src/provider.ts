@@ -1,6 +1,5 @@
 /**
- * PassportEVMProvider - Minimal EIP-1193 provider for Immutable EVM chains
- * 
+ * EIP-1193 compatible provider for Immutable zkEVM
  */
 
 import type { User, Auth } from '@imtbl/auth';
@@ -20,12 +19,8 @@ import { buildMetaTransactions, validateAndSignTransaction } from './metatransac
 import { prepareAndSignEjectionTransaction } from './ejection';
 import type { TransactionRequest } from './metatransaction';
 
-/**
- * Gets passport domain based on chain configuration
- */
 function getPassportDomain(chains: ChainConfig[]): string {
-  // If any chain uses sandbox API, use sandbox passport domain
-  const isSandbox = chains.some(chain => 
+  const isSandbox = chains.some(chain =>
     chain.apiUrl.includes('sandbox') || chain.apiUrl.includes('testnet')
   );
   return isSandbox
@@ -237,8 +232,7 @@ export class PassportEVMProvider implements Provider {
   }
 
   /**
-   * Initializes MagicTEESigner automatically when user is authenticated
-   * Signer is handled internally - clients should not need to provide their own
+   * Initializes Magic TEE signer when user is authenticated
    */
   private initializeSigner(): void {
     if (!this.authenticatedUser) {
@@ -268,8 +262,7 @@ export class PassportEVMProvider implements Provider {
   }
 
   /**
-   * Sets the auth client (internal use only)
-   * For automatic login/getUser - handled internally by provider
+   * Sets auth client for automatic login
    * @internal
    */
   private setAuth(auth: Auth): void {
@@ -285,13 +278,10 @@ export class PassportEVMProvider implements Provider {
   }
 
   /**
-   * Sets the signer (internal use only)
-   * Signer is automatically initialized when user is authenticated.
-   * This method is kept for backward compatibility but should not be used by clients.
-   * 
+   * Sets signer (internal use only)
    * @internal
    */
-  setSigner(signer: Signer): void {
+  private setSigner(signer: Signer): void {
     this.signer = signer;
   }
 
@@ -387,15 +377,13 @@ export class PassportEVMProvider implements Provider {
   }
 
   /**
-   * Ensures user is authenticated, automatically triggers login if auth client is provided
+   * Ensures user is authenticated, triggers login automatically if auth client provided
    */
   private async ensureAuthenticated(): Promise<void> {
-    // If already authenticated, return
     if (this.authenticatedUser) {
       return;
     }
 
-    // If auth client provided, automatically trigger login
     if (this.auth) {
       const user = await this.auth.loginPopup();
       if (user) {
@@ -404,34 +392,12 @@ export class PassportEVMProvider implements Provider {
       }
     }
 
-    // If still not authenticated, throw error
     throw new JsonRpcError(
       ProviderErrorCode.UNAUTHORIZED,
       'User not authenticated. Please provide an auth client or login first.'
     );
   }
 
-  /**
-   * Ensures everything is ready for signing operations
-   * Automatically triggers login if auth client is provided
-   */
-  private async ensureSigningReady(): Promise<{
-    address: string;
-    signer: Signer;
-    relayerClient: RelayerClient;
-    guardianClient: GuardianClient;
-  }> {
-    // Ensure authenticated (will auto-login if auth client provided)
-    await this.ensureAuthenticated();
-    
-    // Ensure wallet address (will register if needed)
-    const address = await this.ensureWalletAddress();
-    
-    // Ensure signer is set
-    const signer = this.ensureSigner();
-    
-    return { address, signer, relayerClient: this.relayerClient, guardianClient: this.guardianClient };
-  }
 
   /**
    * Handles eth_requestAccounts
@@ -480,18 +446,18 @@ export class PassportEVMProvider implements Provider {
    * Handles eth_sendTransaction
    */
   private async handleSendTransaction(params: any[]): Promise<string> {
+    await this.ensureAuthenticated();
     const address = await this.ensureWalletAddress();
-    const { signer, relayerClient, guardianClient } = await this.ensureSigningReady();
+    const signer = this.ensureSigner();
 
     const transactionRequest = params[0];
-    if (!transactionRequest?.to) {
+    if (!transactionRequest?.to || typeof transactionRequest.to !== 'string') {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
         'Transaction must include to field'
       );
     }
 
-    // Validate address format
     if (!isAddress(transactionRequest.to)) {
       throw new JsonRpcError(
         RpcErrorCode.INVALID_PARAMS,
@@ -507,7 +473,7 @@ export class PassportEVMProvider implements Provider {
         value: transactionRequest.value ? BigInt(transactionRequest.value) : undefined,
       },
       this.currentRpcUrl,
-      relayerClient,
+      this.relayerClient,
       address,
       this.currentChainId,
       this.authenticatedUser!
@@ -522,13 +488,13 @@ export class PassportEVMProvider implements Provider {
       chainId,
       address,
       signer,
-      guardianClient,
+      this.guardianClient,
       this.authenticatedUser!,
       false
     );
 
     // Send to relayer
-    const relayerId = await relayerClient.ethSendTransaction(
+    const relayerId = await this.relayerClient.ethSendTransaction(
       address, // to is the wallet address
       signedTransactionData,
       this.currentChainId,
@@ -536,13 +502,13 @@ export class PassportEVMProvider implements Provider {
     );
 
     // Poll for transaction hash
-    return this.pollTransaction(relayerId, relayerClient);
+    return this.pollTransaction(relayerId);
   }
 
   /**
    * Polls relayer for transaction hash
    */
-  private async pollTransaction(relayerId: string, relayerClient: RelayerClient): Promise<string> {
+  private async pollTransaction(relayerId: string): Promise<string> {
     if (!this.authenticatedUser) {
       throw new JsonRpcError(
         ProviderErrorCode.UNAUTHORIZED,
@@ -554,7 +520,7 @@ export class PassportEVMProvider implements Provider {
     const delayMs = 1000;
 
     for (let i = 0; i < maxAttempts; i++) {
-      const tx = await relayerClient.imGetTransactionByHash(relayerId, this.authenticatedUser);
+      const tx = await this.relayerClient.imGetTransactionByHash(relayerId, this.authenticatedUser);
 
       if (tx.status === 'SUCCESSFUL' || tx.status === 'SUBMITTED') {
         return tx.hash;
@@ -580,7 +546,9 @@ export class PassportEVMProvider implements Provider {
    * Handles personal_sign
    */
   private async handlePersonalSign(params: any[]): Promise<string> {
-    const { address, signer, relayerClient, guardianClient } = await this.ensureSigningReady();
+    await this.ensureAuthenticated();
+    const address = await this.ensureWalletAddress();
+    const signer = this.ensureSigner();
 
     const message: string = params[0];
     const fromAddress: string = params[1];
@@ -613,12 +581,12 @@ export class PassportEVMProvider implements Provider {
     const chainId = BigInt(this.currentChainId);
 
     // Evaluate with guardian (passes wallet address for confirmation)
-    await guardianClient.evaluateERC191Message(payload, address, this.currentChainId, this.authenticatedUser!);
+    await this.guardianClient.evaluateERC191Message(payload, address, this.currentChainId, this.authenticatedUser!);
 
     // Sign with EOA and get relayer signature in parallel
     const [eoaSignature, relayerSignature] = await Promise.all([
       signERC191Message(chainId, payload, signer, address),
-      relayerClient.imSign(address, payload, this.currentChainId, this.authenticatedUser!),
+      this.relayerClient.imSign(address, payload, this.currentChainId, this.authenticatedUser!),
     ]);
 
     const eoaAddress = await signer.getAddress();
@@ -631,8 +599,9 @@ export class PassportEVMProvider implements Provider {
    * Deploys the smart contract wallet by sending a zero-value transaction
    */
   private async deployWallet(): Promise<void> {
+    await this.ensureAuthenticated();
     const address = await this.ensureWalletAddress();
-    const { signer, relayerClient, guardianClient } = await this.ensureSigningReady();
+    const signer = this.ensureSigner();
 
     // Build meta-transactions for deployment (zero-value transaction to self)
     const { transactions: metaTransactions, nonce } = await buildMetaTransactions(
@@ -642,7 +611,7 @@ export class PassportEVMProvider implements Provider {
         value: BigInt(0),
       },
       this.currentRpcUrl,
-      relayerClient,
+      this.relayerClient,
       address,
       this.currentChainId,
       this.authenticatedUser!
@@ -657,13 +626,13 @@ export class PassportEVMProvider implements Provider {
       chainId,
       address,
       signer,
-      guardianClient,
+      this.guardianClient,
       this.authenticatedUser!,
       false
     );
 
     // Send to relayer
-    const relayerId = await relayerClient.ethSendTransaction(
+    const relayerId = await this.relayerClient.ethSendTransaction(
       address,
       signedTransactionData,
       this.currentChainId,
@@ -671,14 +640,16 @@ export class PassportEVMProvider implements Provider {
     );
     
     // Wait for deployment to complete
-    await this.pollTransaction(relayerId, relayerClient);
+    await this.pollTransaction(relayerId);
   }
 
   /**
    * Handles eth_signTypedData_v4
    */
   private async handleSignTypedDataV4(params: any[]): Promise<string> {
-    const { address, signer, relayerClient, guardianClient } = await this.ensureSigningReady();
+    await this.ensureAuthenticated();
+    const address = await this.ensureWalletAddress();
+    const signer = this.ensureSigner();
 
     const fromAddress: string = params[0];
     const typedDataParam: string | object = params[1];
@@ -730,10 +701,10 @@ export class PassportEVMProvider implements Provider {
     const chainId = BigInt(this.currentChainId);
 
     // Evaluate with guardian (passes wallet address for confirmation)
-    await guardianClient.evaluateEIP712Message(typedData, address, this.currentChainId, this.authenticatedUser!);
+    await this.guardianClient.evaluateEIP712Message(typedData, address, this.currentChainId, this.authenticatedUser!);
 
     // Get relayer signature
-    const relayerSignature = await relayerClient.imSignTypedData(address, typedData, this.currentChainId, this.authenticatedUser!);
+    const relayerSignature = await this.relayerClient.imSignTypedData(address, typedData, this.currentChainId, this.authenticatedUser!);
 
     // If signer has signTypedData method, use it (ethers/viem signers)
     if (signer.signTypedData) {
@@ -809,8 +780,9 @@ export class PassportEVMProvider implements Provider {
     data: string;
     chainId: string;
   }> {
+    await this.ensureAuthenticated();
     const address = await this.ensureWalletAddress();
-    const { signer } = await this.ensureSigningReady();
+    const signer = this.ensureSigner();
 
     if (!params || params.length !== 1) {
       throw new JsonRpcError(
@@ -917,7 +889,8 @@ export class PassportEVMProvider implements Provider {
     delay?: number
   ): Promise<void> {
     try {
-      const { signer, relayerClient, guardianClient } = await this.ensureSigningReady();
+      await this.ensureAuthenticated();
+      const signer = this.ensureSigner();
 
       // Encode function call (simple function with no parameters)
       const functionSelector = getFunctionSelector(`${functionName}()`);
@@ -930,7 +903,7 @@ export class PassportEVMProvider implements Provider {
           data: functionSelector,
         },
         this.currentRpcUrl,
-        relayerClient,
+        this.relayerClient,
         walletAddress,
         this.currentChainId,
         this.authenticatedUser!,
@@ -946,13 +919,13 @@ export class PassportEVMProvider implements Provider {
         chainId,
         walletAddress,
         signer,
-        guardianClient,
+        this.guardianClient,
         this.authenticatedUser!,
         true // isBackgroundTransaction
       );
 
       // Send to relayer
-      await relayerClient.ethSendTransaction(
+      await this.relayerClient.ethSendTransaction(
         walletAddress,
         signedTransactionData,
         this.currentChainId,

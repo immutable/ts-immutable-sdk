@@ -35,8 +35,10 @@ export interface EIP6963AnnounceProviderEvent extends CustomEvent<EIP6963Provide
  */
 function generateUUID(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    // eslint-disable-next-line @typescript-eslint/no-bitwise
+    const r = Math.floor(Math.random() * 16);
+    // eslint-disable-next-line @typescript-eslint/no-bitwise
+    const v = c === 'x' ? r : (r % 4) + 8;
     return v.toString(16);
   });
 }
@@ -69,4 +71,3 @@ export function announceProvider(detail: EIP6963ProviderDetail): void {
   const handler = () => window.dispatchEvent(event);
   window.addEventListener('eip6963:requestProvider', handler);
 }
-

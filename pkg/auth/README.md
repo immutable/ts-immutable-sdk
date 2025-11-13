@@ -1,6 +1,6 @@
 # @imtbl/auth
 
-Minimal authentication package for Immutable Passport. Provides OAuth-based authentication that can be used standalone or passed to other SDK packages for enhanced functionality.
+Minimal OAuth-based authentication package for Immutable Passport. Provides a thin wrapper around `oidc-client-ts` for OAuth/OIDC authentication flows.
 
 ## Installation
 
@@ -12,9 +12,7 @@ pnpm add @imtbl/auth
 yarn add @imtbl/auth
 ```
 
-## Usage
-
-### Basic Authentication with Popup
+## Quick Start
 
 ```typescript
 import { Auth } from '@imtbl/auth';
@@ -22,69 +20,83 @@ import { Auth } from '@imtbl/auth';
 const auth = new Auth({
   clientId: 'your-client-id',
   redirectUri: 'https://your-app.com/callback',
-  environment: 'production',
 });
 
 // Login with popup
 const user = await auth.loginPopup();
 console.log(user?.profile.email);
-console.log(user?.access_token); // Direct access to tokens
+console.log(user?.access_token);
 
 // Get current user
 const currentUser = await auth.getUser();
-if (currentUser) {
-  console.log(currentUser.id_token); // Access ID token
-  console.log(currentUser.expired); // Check if expired
-}
 
 // Logout
 await auth.logout();
 ```
 
-### With Redirect Flow
+## Usage
+
+### Popup Flow
+
+```typescript
+const auth = new Auth({
+  clientId: 'your-client-id',
+  redirectUri: 'https://your-app.com/callback',
+});
+
+const user = await auth.loginPopup();
+if (user) {
+  console.log(user.access_token);
+  console.log(user.id_token);
+  console.log(user.profile.email);
+}
+```
+
+### Redirect Flow
 
 ```typescript
 // On your login page
 await auth.loginRedirect();
 
-// On your callback page
+// On your callback page (e.g., /callback)
 const user = await auth.handleRedirect();
-console.log(user?.profile.email);
-console.log(user?.access_token); // Direct access to tokens
+if (user) {
+  console.log(user.access_token);
+}
 ```
 
-### Standalone Usage
-
-The auth package can be used completely independently:
+### Direct Login Methods
 
 ```typescript
-import { Auth } from '@imtbl/auth';
+// Google login
+await auth.loginPopup({ directLoginMethod: 'google' });
 
-const auth = new Auth({ clientId: '...', redirectUri: '...' });
-const user = await auth.loginPopup();
-const accessToken = user?.access_token;
+// Apple login
+await auth.loginPopup({ directLoginMethod: 'apple' });
 
-// Use token for API calls
-fetch('https://api.example.com/data', {
-  headers: {
-    Authorization: `Bearer ${accessToken}`,
-  },
+// Email login
+await auth.loginPopup({
+  directLoginMethod: 'email',
+  email: 'user@example.com',
 });
 ```
 
-### With Wallet Package
+### Token Management
 
 ```typescript
-import { Auth } from '@imtbl/auth';
-import { Wallet } from '@imtbl/wallet';
-
-const auth = new Auth({ clientId: '...', redirectUri: '...' });
-await auth.loginPopup();
 const user = await auth.getUser();
 
-// Pass authenticated user to wallet for enhanced features
-const wallet = new Wallet({ authenticatedUser: user });
-const provider = await wallet.connect();
+if (user) {
+  // Check if token is expired
+  if (user.expired) {
+    await auth.refreshToken();
+  }
+  
+  // Access tokens directly
+  const accessToken = user.access_token;
+  const idToken = user.id_token;
+  const refreshToken = user.refresh_token;
+}
 ```
 
 ## API Reference
@@ -97,38 +109,54 @@ const provider = await wallet.connect();
 new Auth(config: AuthConfig)
 ```
 
+**Config Options:**
+- `clientId` (required): OAuth client ID
+- `redirectUri` (required): OAuth redirect URI
+- `popupRedirectUri` (optional): Custom popup redirect URI (defaults to `redirectUri`)
+- `logoutRedirectUri` (optional): Custom logout redirect URI
+- `scope` (optional): OAuth scope (defaults to `'openid profile email'`)
+
 #### Methods
 
-- `loginPopup(options?: LoginOptions): Promise<OidcUser | null>` - Login with popup window
+- `loginPopup(options?: LoginOptions): Promise<User | null>` - Login with popup window
 - `loginRedirect(options?: LoginOptions): Promise<void>` - Login with redirect flow
-- `handleRedirect(): Promise<OidcUser | null>` - Handle OAuth callback after redirect
-- `getUser(): Promise<OidcUser | null>` - Gets current authenticated user
-- `logout(): Promise<void>` - Logs out current user (with redirect)
-- `logoutSilent(): Promise<void>` - Logs out silently (without redirect)
-- `refreshToken(): Promise<void>` - Refreshes access token if expired
+- `handleRedirect(): Promise<User | null>` - Handle OAuth callback after redirect
+- `getUser(): Promise<User | null>` - Get current authenticated user
+- `logout(): Promise<void>` - Logout with redirect
+- `logoutSilent(): Promise<void>` - Logout silently (without redirect)
+- `refreshToken(): Promise<void>` - Refresh access token if expired
 
 ### Types
 
-- `OidcUser` - OIDC user object from oidc-client-ts (includes `id_token`, `access_token`, `refresh_token`, `profile`, `expired`, `expires_at`, `scope`, etc.)
+- `User` - OIDC user object from `oidc-client-ts` (includes `id_token`, `access_token`, `refresh_token`, `profile`, `expired`, `expires_at`, `scope`, etc.)
 - `AuthConfig` - Configuration options
-- `LoginOptions` - Login options (direct method, email, marketing consent) - works for both popup and redirect flows
+- `LoginOptions` - Login options:
+  - `directLoginMethod?: string` - Direct login method (`'google'`, `'apple'`, `'email'`)
+  - `email?: string` - Email address (required when `directLoginMethod` is `'email'`)
+  - `marketingConsent?: 'opted_in' | 'unsubscribed'` - Marketing consent status
 
-### Accessing Tokens
+## Integration with Wallet Package
 
-Since methods return `OidcUser` directly, you can access tokens and user info:
+The auth package can be used standalone or passed to the wallet package for automatic authentication:
 
 ```typescript
-const user = await auth.getUser();
-if (user) {
-  const accessToken = user.access_token;
-  const idToken = user.id_token;
-  const email = user.profile.email;
-  const isExpired = user.expired;
-  const expiresAt = user.expires_at;
-}
+import { Auth } from '@imtbl/auth';
+import { connectWallet } from '@imtbl/wallet';
+
+const auth = new Auth({ clientId: '...', redirectUri: '...' });
+
+// Pass auth client - login handled automatically when needed
+const provider = await connectWallet({ auth });
+
+// User will be prompted to login automatically when required
+const accounts = await provider.request({ method: 'eth_requestAccounts' });
 ```
+
+## Storage
+
+- **Browser**: Uses `localStorage` for token storage
+- **SSR**: Uses `InMemoryWebStorage` (tokens not persisted)
 
 ## License
 
 Apache-2.0
-
