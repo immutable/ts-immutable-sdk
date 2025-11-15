@@ -21,6 +21,7 @@ yalc.lock
 package-lock.json
 
 docs/
+.cursor-docs/
 
 
 

@@ -2,7 +2,7 @@
  * EIP-1193 compatible provider for Immutable zkEVM
  */
 
-import type { User, Auth } from '@imtbl/auth';
+import { type User, Auth } from '@imtbl/auth';
 import {
   toHex, fromHex, createPublicClient, http, isAddress, hexToString,
 } from 'viem';
@@ -288,6 +288,20 @@ export class PassportEVMProvider implements Provider {
   }
 
   /**
+   * Creates a shared auth client for wallet-only mode
+   * Used when apps don't provide their own OAuth client
+   * @internal
+   */
+  // eslint-disable-next-line class-methods-use-this
+  private createSharedAuthClient(): Auth {
+    return new Auth({
+      clientId: 'immutable-passport-wallet-only', // Shared OAuth client ID for wallet-only mode
+      redirectUri: 'https://passport.immutable.com/wallet-callback', // This callback page is hosted by Passport and handles OAuth redirects
+      scope: 'openid transact', // Wallet-only scope, no profile/email access
+    });
+  }
+
+  /**
    * Sets signer (internal use only)
    * @internal
    */
@@ -380,29 +394,42 @@ export class PassportEVMProvider implements Provider {
 
   /**
    * Ensures user is authenticated, triggers login automatically if auth client provided
+   * If no auth client is provided, creates a shared auth client for wallet-only mode
    */
   private async ensureAuthenticated(): Promise<void> {
     if (this.authenticatedUser) {
       return;
     }
 
-    if (this.auth) {
-      const user = await this.auth.loginPopup();
-      if (user) {
-        this.setAuthenticatedUser(user);
-        return;
-      }
+    // If no auth client provided, create shared client for wallet-only mode
+    if (!this.auth) {
+      this.auth = this.createSharedAuthClient();
+    }
+
+    // Attempt to get existing user first (checks localStorage/session)
+    const existingUser = await this.auth.getUser();
+    if (existingUser) {
+      this.setAuthenticatedUser(existingUser);
+      return;
+    }
+
+    // No existing user, trigger login popup
+    const user = await this.auth.loginPopup();
+    if (user) {
+      this.setAuthenticatedUser(user);
+      return;
     }
 
     throw new JsonRpcError(
       ProviderErrorCode.UNAUTHORIZED,
-      'User not authenticated. Please provide an auth client or login first.',
+      'User not authenticated. Login popup was closed or cancelled.',
     );
   }
 
   /**
    * Handles eth_requestAccounts
-   * Automatically triggers login if auth client is provided and user not authenticated
+   * Automatically triggers login if user not authenticated
+   * If no auth client is provided, uses shared client ID for wallet-only mode
    */
   private async handleRequestAccounts(): Promise<string[]> {
     // Check if we already have a wallet address
@@ -412,7 +439,7 @@ export class PassportEVMProvider implements Provider {
       return [address];
     }
 
-    // Ensure authenticated (will auto-login if auth client provided)
+    // Ensure authenticated (will auto-login using shared client if no auth provided)
     await this.ensureAuthenticated();
 
     // Ensure signer is set
