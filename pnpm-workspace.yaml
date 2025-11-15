@@ -23,6 +23,8 @@ packages:
   - "packages/game-bridge"
   - "packages/webhook/sdk"
   - "packages/minting-backend/sdk"
+  - "pkg/auth"
+  - "pkg/wallet"
   - "tests/**"
   - "examples/passport/**"
   - "examples/orderbook/**"
