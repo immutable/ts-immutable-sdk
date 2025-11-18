@@ -1,5 +1,7 @@
 packages:
   - "sdk"
+  - "packages/auth"
+  - "packages/wallet"
   - "packages/config"
   - "packages/x-client"
   - "packages/x-provider"

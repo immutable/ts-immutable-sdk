@@ -6,7 +6,7 @@ import {
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
-import GuardianClient from '../../guardian';
+import { GuardianClient } from '@imtbl/wallet';
 
 type CancelOrderParams = {
   request: imx.GetSignableCancelOrderRequest;

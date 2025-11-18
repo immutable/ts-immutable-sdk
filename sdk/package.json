@@ -5,12 +5,14 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
+    "@imtbl/auth": "workspace:*",
     "@imtbl/blockchain-data": "workspace:*",
     "@imtbl/checkout-sdk": "workspace:*",
     "@imtbl/config": "workspace:*",
     "@imtbl/minting-backend": "workspace:*",
     "@imtbl/orderbook": "workspace:*",
     "@imtbl/passport": "workspace:*",
+    "@imtbl/wallet": "workspace:*",
     "@imtbl/webhook": "workspace:*",
     "@imtbl/x-client": "workspace:*",
     "@imtbl/x-provider": "workspace:*"

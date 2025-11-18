@@ -182,6 +182,9 @@ export type ConnectEvmArguments = {
   announceProvider: boolean;
 };
 
+// Export ZkEvmProvider for return type
+export type { ZkEvmProvider } from '@imtbl/wallet';
+
 export type LoginArguments = {
   useCachedSession?: boolean;
   anonymousId?: string;

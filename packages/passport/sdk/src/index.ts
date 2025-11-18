@@ -1,21 +1,28 @@
 export { PassportError } from './errors/passportError';
 export { Passport } from './Passport';
+
+// Re-export wallet types for backward compatibility
 export {
   ProviderEvent,
-} from './zkEvm/types';
-export type {
-  RequestArguments,
-  JsonRpcRequestPayload,
-  JsonRpcResponsePayload,
-  JsonRpcRequestCallback,
-  Provider, AccountsChangedEvent,
-  TypedDataPayload,
-} from './zkEvm/types';
-export {
   JsonRpcError,
   ProviderErrorCode,
   RpcErrorCode,
-} from './zkEvm/JsonRpcError';
+} from '@imtbl/wallet';
+export type {
+  RequestArguments,
+  Provider,
+  AccountsChangedEvent,
+  TypedDataPayload,
+  EIP6963ProviderInfo,
+  EIP6963ProviderDetail,
+} from '@imtbl/wallet';
+
+// Re-export auth types
+export type {
+  User,
+} from '@imtbl/auth';
+
+// Export passport-specific types
 export type {
   LinkWalletParams,
   LinkedWallet,
@@ -27,6 +34,7 @@ export type {
   DeviceTokenResponse,
   DirectLoginOptions,
   DirectLoginMethod,
+  ZkEvmProvider,
 } from './types';
 export {
   MarketingConsentStatus,

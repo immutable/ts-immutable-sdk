@@ -1,0 +1,41 @@
+{
+  "name": "@imtbl/wallet",
+  "version": "0.0.0",
+  "description": "Wallet SDK for Immutable",
+  "main": "dist/node/index.js",
+  "module": "dist/node/index.mjs",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": {
+        "browser": "./dist/browser/index.mjs",
+        "default": "./dist/node/index.mjs"
+      },
+      "require": "./dist/node/index.js"
+    }
+  },
+  "scripts": {
+    "build": "pnpm transpile && pnpm typegen",
+    "transpile": "tsup src/index.ts --config ../../tsup.config.js",
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types"
+  },
+  "dependencies": {
+    "@imtbl/auth": "workspace:*",
+    "@imtbl/config": "workspace:*",
+    "@imtbl/generated-clients": "workspace:*",
+    "@imtbl/metrics": "workspace:*",
+    "@magic-ext/oidc": "12.0.5",
+    "@magic-sdk/provider": "^29.0.5",
+    "@metamask/detect-provider": "^2.0.0",
+    "axios": "^1.6.5",
+    "ethers": "^6.13.4",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@imtbl/toolkit": "workspace:*",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.2"
+  }
+}
+
