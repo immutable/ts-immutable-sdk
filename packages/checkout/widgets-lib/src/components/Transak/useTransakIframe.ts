@@ -27,7 +27,7 @@ type UseTransakIframeProps = {
   onError?: () => void;
 };
 
-const MAX_GAS_LIMIT = '30000000';
+const MAX_GAS_LIMIT = 30000000;
 
 export const TRANSAK_API_BASE_URL = {
   [Environment.SANDBOX]: 'https://api-stg.transak.com',
