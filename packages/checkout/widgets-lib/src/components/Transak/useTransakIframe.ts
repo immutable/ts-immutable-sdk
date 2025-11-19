@@ -69,42 +69,25 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
       // as transak currently only supports on nft at a time
       const nftData = nfts?.slice(0, 1)
         .map((item) => ({
-          ...item,
-          imageURL: sanitizeToLatin1(item.imageURL),
-          nftName: sanitizeToLatin1(item.nftName),
+          collection_address: item.collectionAddress,
+          image_url: sanitizeToLatin1(item.imageURL),
+          nft_name: sanitizeToLatin1(item.nftName),
+          nft_type: item.nftType,
+          price: item.price,
+          quantity: item.quantity,
+          token_id: item.tokenID,
         }));
 
       const gasLimit = estimatedGasLimit > 0 ? estimatedGasLimit : MAX_GAS_LIMIT;
 
-      const params = {
-        contractId,
-        cryptoCurrencyCode,
-        calldata,
-        nftData,
-        estimatedGasLimit: gasLimit.toString(),
-      };
-
-      // eslint-disable-next-line max-len
-      const baseApiUrl = `${TRANSAK_API_BASE_URL[environment]}/cryptocoverage/api/v1/public/one-click-protocol/nft-transaction-id`;
-
-      const response = await fetch(baseApiUrl, {
-        method: 'POST',
-        headers: {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(params),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get NFT transaction ID');
-      }
-
-      const { id: nftTransactionId } = await response.json();
-
       const requestBody: Record<string, unknown> = {
+        is_nft: true,
+        contract_id: contractId,
+        crypto_currency_code: cryptoCurrencyCode,
+        calldata,
+        nft_data: nftData,
+        estimated_gas_limit: gasLimit,
         api_key: TRANSAK_API_KEY[environment],
-        nft_transaction_id: nftTransactionId,
         theme_color: '0D0D0D',
         exchange_screen_title: exchangeScreenTitle,
         wallet_address: walletAddress,
