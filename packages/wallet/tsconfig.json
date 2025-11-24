@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDirs": ["src"],
-    "customConditions": ["development"]
+    "customConditions": ["development"],
+    "types": ["node"]
   },
   "include": ["src", "src/types.ts"],
   "exclude": [
