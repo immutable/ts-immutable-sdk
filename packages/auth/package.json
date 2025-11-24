@@ -19,7 +19,9 @@
     "build": "pnpm transpile && pnpm typegen",
     "transpile": "tsup src/index.ts --config ../../tsup.config.js",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
-    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0"
+    "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
+    "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
   },
   "dependencies": {
     "@imtbl/config": "workspace:*",
@@ -35,6 +37,9 @@
     "@types/node": "^18.14.2",
     "tsup": "^8.3.0",
     "typescript": "^5.6.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
 
