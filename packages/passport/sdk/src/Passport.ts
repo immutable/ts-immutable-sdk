@@ -67,8 +67,6 @@ const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfigura
 
 export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
   const config = new PassportConfiguration(passportModuleConfiguration);
-  const embeddedLoginPrompt = new EmbeddedLoginPrompt(config);
-  const authManager = new AuthManager(config, embeddedLoginPrompt);
   // Create auth configuration for confirmation screen
   const authConfig = new AuthConfiguration({
     ...passportModuleConfiguration,
@@ -78,6 +76,8 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     passportDomain: config.passportDomain,
   });
 
+  const embeddedLoginPrompt = new EmbeddedLoginPrompt(authConfig);
+  const authManager = new AuthManager(authConfig, embeddedLoginPrompt);
   const confirmationScreen = new ConfirmationScreen(authConfig);
   const magicTeeApiClients = new MagicTeeApiClients({
     basePath: config.magicTeeBasePath,
