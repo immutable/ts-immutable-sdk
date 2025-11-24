@@ -41,7 +41,7 @@
     "react-dom": "^18.2.0",
     "react-i18next": "^13.5.0",
     "ts-deepmerge": "^7.0.2",
-    "uuid": "^8.3.2"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@0xsquid/squid-types": "^0.1.108",

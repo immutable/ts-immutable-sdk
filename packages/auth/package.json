@@ -24,10 +24,10 @@
   "dependencies": {
     "@imtbl/config": "workspace:*",
     "@imtbl/metrics": "workspace:*",
-    "axios": "^1.6.2",
+    "axios": "^1.6.5",
     "jwt-decode": "^3.1.2",
     "localforage": "^1.10.0",
-    "oidc-client-ts": "^2.4.0",
+    "oidc-client-ts": "3.3.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
