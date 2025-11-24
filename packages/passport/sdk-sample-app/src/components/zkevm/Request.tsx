@@ -187,7 +187,7 @@ function Request({ showModal, setShowModal }: ModalProps) {
   };
 
   const handleExampleSubmitted = async (request: RequestArguments, onSuccess?: (result?: any) => Promise<void>) => {
-    if (request.params) {
+    if (request.params && Array.isArray(request.params)) {
       const newParams = params;
       request.params.forEach((param, i) => {
         try {
