@@ -2,6 +2,10 @@
   "name": "@imtbl/wallet",
   "version": "0.0.0",
   "description": "Wallet SDK for Immutable",
+  "author": "Immutable",
+  "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
+  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "license": "Apache-2.0",
   "main": "dist/node/index.js",
   "module": "dist/node/index.mjs",
   "types": "dist/types/index.d.ts",
@@ -46,6 +50,7 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "repository": "immutable/ts-immutable-sdk.git"
 }
 
