@@ -50,6 +50,10 @@ export class PassportConfiguration {
 
   readonly relayerUrl: string;
 
+  readonly arbOneRpcUrl: string;
+
+  readonly sequenceIdentityInstrumentEndpoint?: string;
+
   readonly multiRollupConfig: MultiRollupAPIConfiguration;
 
   readonly crossSdkBridgeEnabled: boolean;
@@ -103,7 +107,9 @@ export class PassportConfiguration {
       this.magicPublishableApiKey = overrides.magicPublishableApiKey;
       this.magicProviderId = overrides.magicProviderId;
       this.zkEvmRpcUrl = overrides.zkEvmRpcUrl;
-      this.relayerUrl = overrides.relayerUrl;
+      this.relayerUrl = 'http://localhost:8070/relayer-mr';//overrides.relayerUrl;
+      this.arbOneRpcUrl = 'https://sepolia-rollup.arbitrum.io/rpc';//overrides.arbOneRpcUrl || 'https://arb1.arbitrum.io/rpc';
+      this.sequenceIdentityInstrumentEndpoint = overrides.sequenceIdentityInstrumentEndpoint;
       this.multiRollupConfig = {
         indexer: createConfig({
           basePath: overrides.indexerMrBasePath,
@@ -112,7 +118,7 @@ export class PassportConfiguration {
           basePath: overrides.orderBookMrBasePath,
         }),
         passport: createConfig({
-          basePath: overrides.passportMrBasePath,
+          basePath: 'http://localhost:8071',//overrides.passportMrBasePath,
         }),
       };
     } else {
@@ -125,6 +131,7 @@ export class PassportConfiguration {
           this.imxPublicApiDomain = 'https://api.immutable.com';
           this.zkEvmRpcUrl = 'https://rpc.immutable.com';
           this.relayerUrl = 'https://api.immutable.com/relayer-mr';
+          this.arbOneRpcUrl = 'https://arb1.arbitrum.io/rpc';
           this.multiRollupConfig = multiRollupConfig.getProduction();
           break;
         }
@@ -137,6 +144,7 @@ export class PassportConfiguration {
           this.imxPublicApiDomain = 'https://api.sandbox.immutable.com';
           this.zkEvmRpcUrl = 'https://rpc.testnet.immutable.com';
           this.relayerUrl = 'https://api.sandbox.immutable.com/relayer-mr';
+          this.arbOneRpcUrl = 'https://sepolia-rollup.arbitrum.io/rpc';
           this.multiRollupConfig = multiRollupConfig.getSandbox();
           break;
         }

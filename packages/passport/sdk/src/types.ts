@@ -39,6 +39,7 @@ export type UserProfile = {
 export enum RollupType {
   IMX = 'imx',
   ZKEVM = 'zkEvm',
+  ARBONE = 'arbOne',
 }
 
 export type User = {
@@ -56,6 +57,9 @@ export type User = {
     ethAddress: string;
     userAdminAddress: string;
   };
+  [RollupType.ARBONE]?: {
+    ethAddress: string;
+  };
 };
 
 export type PassportMetadata = {
@@ -64,6 +68,7 @@ export type PassportMetadata = {
   imx_user_admin_address: string;
   zkevm_eth_address: string;
   zkevm_user_admin_address: string;
+  arbone_eth_address?: string;
 };
 
 export interface OidcConfiguration {
@@ -85,6 +90,8 @@ export interface PassportOverrides {
   immutableXClient: IMXClient;
   zkEvmRpcUrl: string;
   relayerUrl: string;
+  arbOneRpcUrl?: string;
+  sequenceIdentityInstrumentEndpoint?: string;
   indexerMrBasePath: string;
   orderBookMrBasePath: string;
   passportMrBasePath: string;
@@ -130,9 +137,11 @@ type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 export type UserImx = WithRequired<User, RollupType.IMX>;
 export type UserZkEvm = WithRequired<User, RollupType.ZKEVM>;
+export type UserArbOne = WithRequired<User, RollupType.ARBONE>;
 
 export const isUserZkEvm = (user: User): user is UserZkEvm => !!user[RollupType.ZKEVM];
 export const isUserImx = (user: User): user is UserImx => !!user[RollupType.IMX];
+export const isUserArbOne = (user: User): user is UserArbOne => !!user[RollupType.ARBONE];
 
 export type DeviceTokenResponse = {
   access_token: string;
@@ -178,8 +187,14 @@ export type LinkedWallet = {
   clientName: string;
 };
 
+export enum EvmChain {
+  ZKEVM = 'zkevm',
+  ARBONE = 'arbone',
+}
+
 export type ConnectEvmArguments = {
-  announceProvider: boolean;
+  announceProvider?: boolean;
+  chain?: EvmChain;
 };
 
 export type LoginArguments = {

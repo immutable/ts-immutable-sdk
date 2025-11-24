@@ -216,6 +216,7 @@ export class ZkEvmProvider implements Provider {
 
         const flow = trackFlow('passport', 'ethSendTransaction');
 
+        console.log(`request.params ${JSON.stringify(request.params)}`);
         try {
           return await this.#guardianClient.withConfirmationScreen({
             width: 480,

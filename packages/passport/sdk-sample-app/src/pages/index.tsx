@@ -10,10 +10,11 @@ import { useStatusProvider } from '@/context/StatusProvider';
 import { BASE_PATH } from '@/config';
 import PassportMethods from '@/components/PassportMethods';
 import ZkEvmWorkflow from '@/components/zkevm/ZkEvmWorkflow';
+import ArbOneWorkflow from '@/components/arbone/ArbOneWorkflow';
 
 export default function Home() {
   const { isLoading } = useStatusProvider();
-  const { imxProvider, zkEvmProvider } = usePassportProvider();
+  const { imxProvider, zkEvmProvider, arbOneProvider } = usePassportProvider();
 
   return (
     <>
@@ -26,7 +27,7 @@ export default function Home() {
       <main>
         <Container>
           <Row className="my-3">
-            <Environment disabled={isLoading || !!imxProvider || !!zkEvmProvider} />
+            <Environment disabled={isLoading || !!imxProvider || !!zkEvmProvider || !!arbOneProvider} />
           </Row>
           <Row className="my-3">
             <PassportMethods />
@@ -36,6 +37,9 @@ export default function Home() {
           </Row>
           <Row className="my-3">
             <ZkEvmWorkflow />
+          </Row>
+          <Row className="my-3">
+            <ArbOneWorkflow />
           </Row>
           <Row className="mb-3">
             <Message />

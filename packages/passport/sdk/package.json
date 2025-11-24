@@ -5,8 +5,13 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@0xsequence/abi": "^2.0.25",
-    "@0xsequence/core": "^2.0.25",
+    "@0xsequence/abi": "2.3.34",
+    "@0xsequence/core": "2.3.34",
+    "@0xsequence/identity-instrument": "0.0.0-20251120164619",
+    "@0xsequence/network": "^2.3.35",
+    "@0xsequence/wallet-core": "0.0.0-20251120164619",
+    "@0xsequence/wallet-primitives": "0.0.0-20251120164619",
+    "@0xsequence/wallet-wdk": "0.0.0-20251120164619",
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
     "@imtbl/metrics": "workspace:*",
@@ -23,6 +28,7 @@
     "localforage": "^1.10.0",
     "magic-sdk": "^29.0.5",
     "oidc-client-ts": "3.3.0",
+    "ox": "^0.9.14",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

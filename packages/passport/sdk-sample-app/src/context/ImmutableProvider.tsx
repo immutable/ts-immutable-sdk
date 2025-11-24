@@ -136,10 +136,12 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
           })),
           immutableXClient: new IMXClient(getSdkConfig(EnvironmentNames.DEV)),
           zkEvmRpcUrl: 'https://rpc.dev.immutable.com',
-          relayerUrl: 'https://api.dev.immutable.com/relayer-mr',
+          relayerUrl: 'http://localhost:8070/relayer-mr',
           indexerMrBasePath: 'https://api.dev.immutable.com',
           orderBookMrBasePath: 'https://api.dev.immutable.com',
-          passportMrBasePath: 'https://api.dev.immutable.com',
+          passportMrBasePath: 'http://localhost:8071',
+          sequenceIdentityInstrumentEndpoint: 'https://next-identity.sequence-dev.app/',
+          arbOneRpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
         },
         ...sharedConfigurationValues,
       };
@@ -184,7 +186,7 @@ const getOrderbookConfig = (environment: EnvironmentNames): ModuleConfiguration<
 };
 
 const ImmutableContext = createContext<{
-  passportClient: Passport,
+  passportClient: Passport | null,
   sdkClient: ImmutableX,
   orderbookClient: Orderbook,
   blockchainData: BlockchainData,
@@ -193,7 +195,7 @@ const ImmutableContext = createContext<{
 }>({
       sdkClient: new ImmutableX(getSdkConfig(EnvironmentNames.DEV)),
       orderbookClient: new Orderbook(getOrderbookConfig(EnvironmentNames.DEV)),
-      passportClient: new Passport(getPassportConfig(EnvironmentNames.DEV)),
+      passportClient: null, // Initialize as null during SSR
       environment: EnvironmentNames.DEV,
       blockchainData: new BlockchainData(getBlockchainDataConfig(EnvironmentNames.DEV)),
     });
@@ -211,8 +213,8 @@ export function ImmutableProvider({
   const [orderbookClient, setOrderbookClient] = useState<Orderbook>(
     useContext(ImmutableContext).orderbookClient,
   );
-  const [passportClient, setPassportClient] = useState<Passport>(
-    useContext(ImmutableContext).passportClient,
+  const [passportClient, setPassportClient] = useState<Passport | null>(
+    null, // Start as null for SSR
   );
 
   const [blockchainData, setBlockchainData] = useState<BlockchainData>(
@@ -220,15 +222,18 @@ export function ImmutableProvider({
   );
 
   useEffect(() => {
-    const passportInstance = new Passport(getPassportConfig(environment));
-    Object.defineProperty(window, 'passport', {
-      configurable: true,
-      value: passportInstance,
-    });
-    setSdkClient(new ImmutableX(getSdkConfig(environment)));
-    setOrderbookClient(new Orderbook(getOrderbookConfig(environment)));
-    setPassportClient(passportInstance);
-    setBlockchainData(new BlockchainData(getBlockchainDataConfig(environment)));
+    // Only initialize Passport on the client side
+    if (typeof window !== 'undefined') {
+      const passportInstance = new Passport(getPassportConfig(environment));
+      Object.defineProperty(window, 'passport', {
+        configurable: true,
+        value: passportInstance,
+      });
+      setSdkClient(new ImmutableX(getSdkConfig(environment)));
+      setOrderbookClient(new Orderbook(getOrderbookConfig(environment)));
+      setPassportClient(passportInstance);
+      setBlockchainData(new BlockchainData(getBlockchainDataConfig(environment)));
+    }
   }, [environment]);
 
   const providerValues = useMemo(() => ({

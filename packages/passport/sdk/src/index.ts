@@ -27,7 +27,17 @@ export type {
   DeviceTokenResponse,
   DirectLoginOptions,
   DirectLoginMethod,
+  User,
+  UserImx,
+  UserZkEvm,
+  UserArbOne,
 } from './types';
 export {
   MarketingConsentStatus,
+  PassportEvents,
+  RollupType,
+  EvmChain,
+  isUserImx,
+  isUserZkEvm,
+  isUserArbOne,
 } from './types';
