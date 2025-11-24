@@ -71,8 +71,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
   const authManager = new AuthManager(config, embeddedLoginPrompt);
   // Create auth configuration for confirmation screen
   const authConfig = new AuthConfiguration({
-    clientId: passportModuleConfiguration.clientId,
-    redirectUri: passportModuleConfiguration.redirectUri,
+    ...passportModuleConfiguration,
     authenticationDomain: config.authenticationDomain,
     crossSdkBridgeEnabled: passportModuleConfiguration.crossSdkBridgeEnabled,
     popupOverlayOptions: passportModuleConfiguration.popupOverlayOptions,
