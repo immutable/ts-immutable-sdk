@@ -5,9 +5,9 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
 import { convertToSignableToken } from '@imtbl/toolkit';
+import { GuardianClient } from '@imtbl/wallet';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
-import { GuardianClient } from '@imtbl/wallet';
 
 const ERC721 = 'ERC721';
 

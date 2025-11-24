@@ -3,7 +3,7 @@ import {
   AuthModuleConfiguration,
   PopupOverlayOptions,
 } from './types';
-import { AuthError, AuthErrorType } from './errors';
+import { PassportError, PassportErrorType } from './errors';
 
 const validateConfiguration = <T>(
   configuration: T,
@@ -18,9 +18,9 @@ const validateConfiguration = <T>(
     const errorMessage = prefix
       ? `${prefix} - ${missingKeys} cannot be null`
       : `${missingKeys} cannot be null`;
-    throw new AuthError(
+    throw new PassportError(
       errorMessage,
-      AuthErrorType.INVALID_CONFIGURATION,
+      PassportErrorType.INVALID_CONFIGURATION,
     );
   }
 };
@@ -38,9 +38,13 @@ export interface IAuthConfiguration {
 
 export class AuthConfiguration implements IAuthConfiguration {
   readonly authenticationDomain: string;
+
   readonly passportDomain: string;
+
   readonly oidcConfiguration: OidcConfiguration;
+
   readonly crossSdkBridgeEnabled: boolean;
+
   readonly popupOverlayOptions?: PopupOverlayOptions;
 
   constructor({
@@ -54,14 +58,13 @@ export class AuthConfiguration implements IAuthConfiguration {
       'clientId',
       'redirectUri',
     ]);
-    
+
     this.oidcConfiguration = oidcConfiguration;
     this.crossSdkBridgeEnabled = crossSdkBridgeEnabled || false;
     this.popupOverlayOptions = popupOverlayOptions;
-    
+
     // Default to production auth domain if not provided
     this.authenticationDomain = authenticationDomain || 'https://auth.immutable.com';
     this.passportDomain = passportDomain || 'https://passport.immutable.com';
   }
 }
-

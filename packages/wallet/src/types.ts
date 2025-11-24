@@ -1,6 +1,6 @@
 import { Environment, ModuleConfiguration } from '@imtbl/config';
 import { Flow } from '@imtbl/metrics';
-import { User, RollupType } from '@imtbl/auth';
+import { User } from '@imtbl/auth';
 
 // Re-export auth types for convenience
 export type {

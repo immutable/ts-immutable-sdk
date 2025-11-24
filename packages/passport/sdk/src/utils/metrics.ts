@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // Simple pass-through for metrics since core functionality is in wallet
 export const withMetricsAsync = async <T>(
   fn: () => Promise<T>,
@@ -5,4 +6,3 @@ export const withMetricsAsync = async <T>(
   _track: boolean = true,
   _flow?: any,
 ): Promise<T> => fn();
-

@@ -3,12 +3,19 @@ import { WalletModuleConfiguration } from './types';
 
 export class WalletConfiguration {
   readonly environment: Environment;
+
   readonly passportDomain: string;
+
   readonly zkEvmRpcUrl: string;
+
   readonly relayerUrl: string;
+
   readonly indexerMrBasePath: string;
+
   readonly jsonRpcReferrer?: string;
+
   readonly forceScwDeployBeforeMessageSignature: boolean;
+
   readonly crossSdkBridgeEnabled: boolean;
 
   constructor(config: WalletModuleConfiguration) {
@@ -42,4 +49,3 @@ export class WalletConfiguration {
     }
   }
 }
-

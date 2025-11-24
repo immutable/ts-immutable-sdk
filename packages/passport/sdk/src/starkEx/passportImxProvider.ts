@@ -15,7 +15,7 @@ import {
 } from '@imtbl/generated-clients';
 import { TransactionResponse } from 'ethers';
 import { AuthManager } from '@imtbl/auth';
-import { GuardianClient } from '@imtbl/wallet';
+import { GuardianClient, MagicTEESigner, TypedEventEmitter } from '@imtbl/wallet';
 import {
   PassportEventMap, PassportEvents, UserImx, User, isUserImx,
 } from '../types';
@@ -26,7 +26,6 @@ import {
 import registerOffchain from './workflows/registerOffchain';
 import { getStarkSigner } from './getStarkSigner';
 import { withMetricsAsync } from '../utils/metrics';
-import { MagicTEESigner, TypedEventEmitter } from '@imtbl/wallet';
 
 export interface PassportImxProviderOptions {
   authManager: AuthManager;

@@ -1,8 +1,8 @@
 import { imx } from '@imtbl/generated-clients';
 import { StarkSigner } from '@imtbl/x-client';
+import { GuardianClient } from '@imtbl/wallet';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
-import { GuardianClient } from '@imtbl/wallet';
 
 type CreateTradeParams = {
   request: imx.GetSignableTradeRequest;

@@ -31,4 +31,3 @@ export async function withWalletError<T>(
     throw new WalletError(err?.message ?? 'Unknown error', defaultErrorType);
   }
 }
-

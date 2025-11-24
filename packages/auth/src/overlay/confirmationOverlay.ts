@@ -50,7 +50,9 @@ export default class ConfirmationOverlay {
     if (!this.overlay) {
       addLink({ id: 'link-googleapis', href: 'https://fonts.googleapis.com' });
       addLink({ id: 'link-gstatic', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' });
-      addLink({ id: 'link-roboto', href: 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap', rel: 'stylesheet' });
+      const robotoFontUrl = 'https://fonts.googleapis.com/css2?'
+        + 'family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap';
+      addLink({ id: 'link-roboto', href: robotoFontUrl, rel: 'stylesheet' });
 
       const overlay = document.createElement('div');
       overlay.innerHTML = this.isBlockedOverlay ? getBlockedOverlay() : getGenericOverlay();

@@ -14,7 +14,7 @@ import localForage from 'localforage';
 import DeviceCredentialsManager from './storage/device_credentials_manager';
 import logger from './utils/logger';
 import { isAccessTokenExpiredOrExpiring } from './utils/token';
-import { AuthError, AuthErrorType, withAuthError } from './errors';
+import { PassportError, PassportErrorType, withPassportError } from './errors';
 import {
   DirectLoginOptions,
   PassportMetadata,
@@ -53,7 +53,7 @@ const getAuthConfiguration = (config: IAuthConfiguration): UserManagerSettings =
 
   let store;
   if (config.crossSdkBridgeEnabled) {
-    store = new LocalForageAsyncStorage('ImmutableSDKAuth', localForage.INDEXEDDB);
+    store = new LocalForageAsyncStorage('ImmutableSDKPassport', localForage.INDEXEDDB);
   } else if (typeof window !== 'undefined') {
     store = window.localStorage;
   } else {
@@ -61,7 +61,10 @@ const getAuthConfiguration = (config: IAuthConfiguration): UserManagerSettings =
   }
   const userStore = new WebStorageStateStore({ store });
 
-  const endSessionEndpoint = new URL(getLogoutEndpointPath(config.crossSdkBridgeEnabled), authenticationDomain.replace(/^(?:https?:\/\/)?(.*)/, 'https://$1'));
+  const endSessionEndpoint = new URL(
+    getLogoutEndpointPath(config.crossSdkBridgeEnabled),
+    authenticationDomain.replace(/^(?:https?:\/\/)?(.*)/, 'https://$1'),
+  );
   endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
   if (oidcConfiguration.logoutRedirectUri) {
     endSessionEndpoint.searchParams.set('returnTo', oidcConfiguration.logoutRedirectUri);
@@ -79,7 +82,6 @@ const getAuthConfiguration = (config: IAuthConfiguration): UserManagerSettings =
       end_session_endpoint: endSessionEndpoint.toString(),
       revocation_endpoint: `${authenticationDomain}/oauth/revoke`,
     },
-    mergeClaimsStrategy: { array: 'merge' },
     automaticSilentRenew: false, // Disabled until https://github.com/authts/oidc-client-ts/issues/430 has been resolved
     scope: oidcConfiguration.scope,
     userStore,
@@ -87,7 +89,7 @@ const getAuthConfiguration = (config: IAuthConfiguration): UserManagerSettings =
     extraQueryParams: {
       ...(oidcConfiguration.audience ? { audience: oidcConfiguration.audience } : {}),
     },
-  };
+  } as UserManagerSettings;
 
   return baseConfiguration;
 };
@@ -221,13 +223,13 @@ export default class AuthManager {
 
   public async loginWithRedirect(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<void> {
     await this.userManager.clearStaleState();
-    return withAuthError<void>(async () => {
+    return withPassportError<void>(async () => {
       const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptions);
 
       await this.userManager.signinRedirect({
         extraQueryParams,
       });
-    }, AuthErrorType.AUTHENTICATION_ERROR);
+    }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
   /**
@@ -239,7 +241,7 @@ export default class AuthManager {
    * @param directLoginOptions.email Required when directLoginMethod is 'email'
    */
   public async login(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<User> {
-    return withAuthError<User>(async () => {
+    return withPassportError<User>(async () => {
       // If directLoginOptions are provided, then the consumer has rendered their own initial login screen.
       // If not, display the embedded login prompt and pass the returned direct login options and imPassportTraceId to the login popup.
       let directLoginOptionsToUse: DirectLoginOptions | undefined;
@@ -250,10 +252,8 @@ export default class AuthManager {
         const {
           imPassportTraceId: embeddedLoginPromptImPassportTraceId,
           ...embeddedLoginPromptDirectLoginOptions
-        } = this.embeddedLoginPrompt 
-          ? await this.embeddedLoginPrompt.displayEmbeddedLoginPrompt(anonymousId) 
-          : { imPassportTraceId: undefined };
-        directLoginOptionsToUse = (embeddedLoginPromptDirectLoginOptions as any).directLoginMethod ? embeddedLoginPromptDirectLoginOptions as DirectLoginOptions : undefined;
+        } = await this.embeddedLoginPrompt.displayEmbeddedLoginPrompt(anonymousId);
+        directLoginOptionsToUse = embeddedLoginPromptDirectLoginOptions;
         imPassportTraceId = embeddedLoginPromptImPassportTraceId;
       }
 
@@ -348,7 +348,7 @@ export default class AuthManager {
             );
           });
       });
-    }, AuthErrorType.AUTHENTICATION_ERROR);
+    }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
   public async getUserOrLogin(): Promise<User> {
@@ -380,7 +380,7 @@ export default class AuthManager {
   }
 
   public async loginCallback(): Promise<undefined | User> {
-    return withAuthError<undefined | User>(async () => {
+    return withPassportError<undefined | User>(async () => {
       // ID-3950: https://github.com/authts/oidc-client-ts/issues/2043
       // When using `signinPopup` to initiate a login, call the `signinPopupCallback` method and
       // set the `keepOpen` flag to `true`, as the `login` method is now responsible for closing the popup.
@@ -395,7 +395,7 @@ export default class AuthManager {
       }
 
       return AuthManager.mapOidcUserToDomainModel(oidcUser);
-    }, AuthErrorType.AUTHENTICATION_ERROR);
+    }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
   public async getPKCEAuthorizationUrl(
@@ -450,7 +450,7 @@ export default class AuthManager {
   }
 
   public async loginWithPKCEFlowCallback(authorizationCode: string, state: string): Promise<User> {
-    return withAuthError<User>(async () => {
+    return withPassportError<User>(async () => {
       const pkceData = this.deviceCredentialsManager.getPKCEData();
       if (!pkceData) {
         throw new Error('No code verifier or state for PKCE');
@@ -466,7 +466,7 @@ export default class AuthManager {
       await this.userManager.storeUser(oidcUser);
 
       return user;
-    }, AuthErrorType.AUTHENTICATION_ERROR);
+    }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
   private async getPKCEToken(authorizationCode: string, codeVerifier: string): Promise<DeviceTokenResponse> {
@@ -486,17 +486,17 @@ export default class AuthManager {
   }
 
   public async storeTokens(tokenResponse: DeviceTokenResponse): Promise<User> {
-    return withAuthError<User>(async () => {
+    return withPassportError<User>(async () => {
       const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
       const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
       await this.userManager.storeUser(oidcUser);
 
       return user;
-    }, AuthErrorType.AUTHENTICATION_ERROR);
+    }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
   public async logout(): Promise<void> {
-    return withAuthError<void>(async () => {
+    return withPassportError<void>(async () => {
       await this.userManager.revokeTokens(['refresh_token']);
 
       if (this.logoutMode === 'silent') {
@@ -504,7 +504,7 @@ export default class AuthManager {
       } else {
         await this.userManager.signoutRedirect();
       }
-    }, AuthErrorType.LOGOUT_ERROR);
+    }, PassportErrorType.LOGOUT_ERROR);
   }
 
   public async logoutSilentCallback(url: string): Promise<void> {
@@ -556,16 +556,16 @@ export default class AuthManager {
         }
         resolve(null);
       } catch (err) {
-        let passportErrorType = AuthErrorType.AUTHENTICATION_ERROR;
+        let passportErrorType = PassportErrorType.AUTHENTICATION_ERROR;
         let errorMessage = 'Failed to refresh token';
         let removeUser = true;
 
         if (err instanceof ErrorTimeout) {
-          passportErrorType = AuthErrorType.SILENT_LOGIN_ERROR;
+          passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
           errorMessage = `${errorMessage}: ${err.message}`;
           removeUser = false;
         } else if (err instanceof ErrorResponse) {
-          passportErrorType = AuthErrorType.NOT_LOGGED_IN_ERROR;
+          passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
           errorMessage = `${errorMessage}: ${err.message || err.error_description}`;
         } else if (err instanceof Error) {
           errorMessage = `${errorMessage}: ${err.message}`;
@@ -583,7 +583,7 @@ export default class AuthManager {
           }
         }
 
-        reject(new AuthError(errorMessage, passportErrorType));
+        reject(new PassportError(errorMessage, passportErrorType));
       } finally {
         this.refreshingPromise = null; // Reset the promise after completion
       }

@@ -20,13 +20,14 @@ export type {
   IdTokenPayload,
   PKCEData,
 } from './types';
-export { isUserZkEvm, isUserImx, RollupType, MarketingConsentStatus } from './types';
+export {
+  isUserZkEvm, isUserImx, RollupType, MarketingConsentStatus,
+} from './types';
 
 // Export errors
-export { AuthError, AuthErrorType } from './errors';
+export { PassportError, PassportErrorType, withPassportError } from './errors';
 
 // Export confirmation and overlay classes
 export { default as ConfirmationScreen } from './confirmation/confirmation';
 export { default as EmbeddedLoginPrompt } from './confirmation/embeddedLoginPrompt';
 export { default as ConfirmationOverlay } from './overlay/confirmationOverlay';
-

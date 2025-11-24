@@ -6,20 +6,6 @@ export { WalletConfiguration } from './config';
 
 // Export types
 export * from './types';
-export type {
-  Provider,
-  RequestArguments,
-  TypedDataPayload,
-  MetaTransaction,
-  MetaTransactionNormalised,
-  FeeOption,
-  RelayerTransaction,
-  AccountsChangedEvent,
-  EIP6963ProviderDetail,
-  EIP6963ProviderInfo,
-  WalletModuleConfiguration,
-} from './types';
-export { ProviderEvent, RelayerTransactionStatus, PassportEvents } from './types';
 
 // Export errors
 export { WalletError, WalletErrorType } from './errors';
@@ -39,4 +25,3 @@ export { retryWithDelay } from './network/retry';
 
 // Export EIP-6963 provider announcement
 export { announceProvider, passportProviderInfo } from './provider/eip6963';
-

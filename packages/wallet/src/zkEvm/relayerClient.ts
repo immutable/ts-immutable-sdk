@@ -138,6 +138,7 @@ export class RelayerClient {
       jsonResponse = JSON.parse(responseText);
     } catch (parseError) {
       const preview = RelayerClient.getResponsePreview(responseText);
+      // eslint-disable-next-line max-len
       throw new Error(`Relayer JSON parse error: ${parseError instanceof Error ? parseError.message : 'Unknown error'}. Content: "${preview}"`);
     }
 

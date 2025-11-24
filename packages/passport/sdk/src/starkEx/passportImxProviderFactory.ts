@@ -1,11 +1,11 @@
 import { IMXClient } from '@imtbl/x-client';
 import { IMXProvider } from '@imtbl/x-provider';
 import { ImxApiClients } from '@imtbl/generated-clients';
-import { PassportError, PassportErrorType } from '../errors/passportError';
 import { AuthManager } from '@imtbl/auth';
+import { GuardianClient, MagicTEESigner, TypedEventEmitter } from '@imtbl/wallet';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportEventMap, User } from '../types';
 import { PassportImxProvider } from './passportImxProvider';
-import { GuardianClient, MagicTEESigner, TypedEventEmitter } from '@imtbl/wallet';
 
 export type PassportImxProviderFactoryInput = {
   authManager: AuthManager;

@@ -39,6 +39,7 @@ const transformTypedData = (typedData: string | object, chainId: bigint): TypedD
   if (!isValidTypedDataPayload(transformedTypedData)) {
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
+      // eslint-disable-next-line max-len
       `Invalid typed data argument. The following properties are required: ${REQUIRED_TYPED_DATA_PROPERTIES.join(', ')}`,
     );
   }

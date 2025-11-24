@@ -1,13 +1,14 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "declaration": true,
-    "declarationMap": true,
-    "moduleResolution": "bundler"
+    "outDir": "./dist",
+    "rootDirs": ["src"],
+    "customConditions": ["development"]
   },
-  "include": ["src/**/*"],
-  "exclude": ["**/*.test.ts", "**/*.test.tsx", "node_modules", "dist"]
+  "include": ["src", "src/types.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+  ]
 }
 

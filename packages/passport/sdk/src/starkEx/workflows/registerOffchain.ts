@@ -2,8 +2,8 @@ import axios from 'axios';
 import { ImxApiClients, imx } from '@imtbl/generated-clients';
 import { EthSigner, StarkSigner } from '@imtbl/x-client';
 import { AuthManager } from '@imtbl/auth';
-import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { retryWithDelay } from '@imtbl/wallet';
+import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { User } from '../../types';
 import registerPassportStarkEx from './registration';
 

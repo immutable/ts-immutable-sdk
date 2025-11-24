@@ -62,18 +62,18 @@ export interface AuthModuleConfiguration extends OidcConfiguration {
    * Authentication domain (e.g., 'https://auth.immutable.com')
    */
   authenticationDomain?: string;
-  
+
   /**
    * Passport domain for confirmation screens (e.g., 'https://passport.immutable.com')
    */
   passportDomain?: string;
-  
+
   /**
    * This flag indicates that Auth is being used in a cross-sdk bridge scenario
    * and not directly on the web.
    */
   crossSdkBridgeEnabled?: boolean;
-  
+
   /**
    * Options for customizing popup overlays
    */
@@ -126,4 +126,3 @@ export type DirectLoginOptions = {
   marketingConsentStatus?: MarketingConsentStatus;
   email?: string;
 };
-
