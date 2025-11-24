@@ -1,14 +1,14 @@
 module.exports = {
-  extends: [
-    '../../../.eslintrc',
-    'next/core-web-vitals',
-  ],
+  root: true, // Prevent ESLint from looking up and applying parent's ignorePatterns
+  // Only extend Next.js config to avoid plugin conflicts with root .eslintrc
+  extends: ['next/core-web-vitals'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,
   },
   rules: {
+    // Rules from root .eslintrc that are needed
     'import/prefer-default-export': ['off'],
     'no-console': 'off',
     'no-plusplus': ['off'],
