@@ -1,6 +1,8 @@
 import { Environment, ModuleConfiguration } from '@imtbl/config';
 import { Flow } from '@imtbl/metrics';
 import { User } from '@imtbl/auth';
+import { BigNumberish } from 'ethers';
+import { JsonRpcError } from './zkEvm/JsonRpcError';
 
 // Re-export auth types for convenience
 export type {
@@ -37,101 +39,132 @@ export type Provider = {
   isPassport: boolean;
 };
 
-export type RequestArguments = {
-  readonly method: string;
-  readonly params?: any[];
-};
-
-export type JsonRpcRequestPayload = {
-  id: number;
-  jsonrpc: '2.0';
+export interface RequestArguments {
   method: string;
-  params: any[];
+  params?: Array<any>;
+}
+
+export type JsonRpcRequestPayload = RequestArguments & {
+  jsonrpc?: string;
+  id?: string | number;
 };
 
-export type JsonRpcResponsePayload = {
-  id: number;
-  jsonrpc: '2.0';
-  result?: any;
-  error?: {
-    code: number;
-    message: string;
-    data?: any;
+export interface JsonRpcRequestCallback {
+  (
+    err: JsonRpcError | null,
+    result?: JsonRpcResponsePayload | (JsonRpcResponsePayload | null)[] | null
+  ): void;
+}
+
+export interface JsonRpcResponsePayload {
+  result?: Array<any> | null;
+  error?: JsonRpcError | null;
+  jsonrpc?: string;
+  id?: string | number;
+}
+
+// https://eips.ethereum.org/EIPS/eip-712
+export interface TypedDataPayload {
+  types: {
+    EIP712Domain: Array<{ name: string; type: string }>;
+    [key: string]: Array<{ name: string; type: string }>;
   };
-};
-
-export type JsonRpcRequestCallback = (error: Error | null, result?: JsonRpcResponsePayload) => void;
-
-export type TypedDataPayload = {
-  types: Record<string, Array<{ name: string; type: string }>>;
-  primaryType: string;
   domain: {
+    name?: string;
+    version?: string;
+    chainId?: number | string;
+    verifyingContract?: string;
+    salt?: string;
+  } | {
     name?: string;
     version?: string;
     chainId?: number;
     verifyingContract?: string;
+    salt?: string;
   };
+  primaryType: string;
   message: Record<string, any>;
-};
-
-export type MetaTransaction = {
-  to: string;
-  data: string;
-  value?: string;
-};
-
-export type MetaTransactionNormalised = {
-  to: string;
-  data: string;
-  value: string;
-};
-
-export enum ProviderEvent {
-  AccountsChanged = 'accountsChanged',
 }
 
-export type AccountsChangedEvent = {
-  accounts: string[];
-};
+export interface MetaTransaction {
+  to: string;
+  value?: BigNumberish | null;
+  data?: string | null;
+  nonce?: BigNumberish;
+  gasLimit?: BigNumberish;
+  delegateCall?: boolean;
+  revertOnError?: boolean;
+}
 
-export type FeeOption = {
+export interface MetaTransactionNormalised {
+  delegateCall: boolean;
+  revertOnError: boolean;
+  gasLimit: BigNumberish;
+  target: string;
+  value: BigNumberish;
+  data: string;
+}
+
+export enum ProviderEvent {
+  ACCOUNTS_CHANGED = 'accountsChanged',
+}
+
+export type AccountsChangedEvent = Array<string>;
+
+export interface ProviderEventMap extends Record<string, any> {
+  [ProviderEvent.ACCOUNTS_CHANGED]: [AccountsChangedEvent];
+}
+
+export enum RelayerTransactionStatus {
+  PENDING = 'PENDING',
+  SUBMITTED = 'SUBMITTED',
+  SUCCESSFUL = 'SUCCESSFUL',
+  REVERTED = 'REVERTED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+}
+
+export interface RelayerTransaction {
+  status: RelayerTransactionStatus;
+  chainId: string;
+  relayerId: string;
+  hash: string;
+  statusMessage?: string;
+}
+
+export interface FeeOption {
   tokenPrice: string;
   tokenSymbol: string;
   tokenDecimals: number;
   tokenAddress: string;
   recipientAddress: string;
-};
-
-export type RelayerTransaction = {
-  id: string;
-  chainId: number;
-  walletAddress: string;
-  status: RelayerTransactionStatus;
-  sponsoredTransactionHash?: string;
-  nonce?: number;
-  submittedAt?: Date;
-};
-
-export enum RelayerTransactionStatus {
-  PENDING = 'PENDING',
-  SUBMITTED = 'SUBMITTED',
-  CONFIRMED = 'CONFIRMED',
-  FAILED = 'FAILED',
 }
 
-export interface EIP6963ProviderInfo {
-  icon: string;
-  name: string;
-  rdns: string;
-  uuid: string;
-}
-
+/**
+ * Event detail from the `eip6963:announceProvider` event.
+ */
 export interface EIP6963ProviderDetail {
   info: EIP6963ProviderInfo;
   provider: Provider;
 }
 
-export type EIP6963AnnounceProviderEvent = CustomEvent<EIP6963ProviderDetail>;
+/**
+ * Metadata of the EIP-1193 Provider.
+ */
+export interface EIP6963ProviderInfo {
+  icon: `data:image/${string}`; // RFC-2397
+  name: string;
+  rdns: string;
+  uuid: string;
+}
+
+/**
+ * Event type to announce an EIP-1193 Provider.
+ */
+export interface EIP6963AnnounceProviderEvent
+  extends CustomEvent<EIP6963ProviderDetail> {
+  type: 'eip6963:announceProvider';
+}
 
 // Wallet configuration types
 export interface WalletOverrides {
