@@ -38,6 +38,7 @@
   "devDependencies": {
     "@imtbl/toolkit": "workspace:*",
     "@types/node": "^18.14.2",
+    "@types/uuid": "^8.3.4",
     "tsup": "^8.3.0",
     "typescript": "^5.6.2"
   }
