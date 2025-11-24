@@ -2303,6 +2303,12 @@ importers:
 
   packages/wallet:
     dependencies:
+      '@0xsequence/abi':
+        specifier: ^2.0.25
+        version: 2.2.13
+      '@0xsequence/core':
+        specifier: ^2.0.25
+        version: 2.2.13(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       '@imtbl/auth':
         specifier: workspace:*
         version: link:../auth

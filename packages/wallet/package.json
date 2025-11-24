@@ -22,6 +22,8 @@
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0"
   },
   "dependencies": {
+    "@0xsequence/abi": "^2.0.25",
+    "@0xsequence/core": "^2.0.25",
     "@imtbl/auth": "workspace:*",
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
