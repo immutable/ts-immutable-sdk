@@ -31,14 +31,15 @@ export interface PassportEventMap extends Record<string, any> {
 
 // zkEVM/Wallet specific types
 export type Provider = {
-  request: (args: RequestArguments) => Promise<any>;
-  on?: (eventName: string | symbol, listener: (...args: any[]) => void) => Provider;
-  removeListener?: (eventName: string | symbol, listener: (...args: any[]) => void) => Provider;
+  request: (request: RequestArguments) => Promise<any>;
+  on: (event: string, listener: (...args: any[]) => void) => void;
+  removeListener: (event: string, listener: (...args: any[]) => void) => void;
+  isPassport: boolean;
 };
 
 export type RequestArguments = {
   readonly method: string;
-  readonly params?: readonly any[] | object;
+  readonly params?: any[];
 };
 
 export type JsonRpcRequestPayload = {

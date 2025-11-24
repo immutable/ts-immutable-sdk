@@ -29,11 +29,11 @@ function ZkEvmWorkflow() {
   const onHandleEventsChanged = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       Object.values(ProviderEvent).forEach((eventName) => {
-        zkEvmProvider?.on(eventName, zkEvmEventHandler(eventName));
+        zkEvmProvider?.on?.(eventName, zkEvmEventHandler(eventName));
       });
     } else {
       Object.values(ProviderEvent).forEach((eventName) => {
-        zkEvmProvider?.removeListener(eventName, zkEvmEventHandler(eventName));
+        zkEvmProvider?.removeListener?.(eventName, zkEvmEventHandler(eventName));
       });
     }
   }, [zkEvmEventHandler, zkEvmProvider]);
