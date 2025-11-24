@@ -24,7 +24,7 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
     const populateParams = async () => {
       if (zkEvmProvider) {
         const chainIdHex = await zkEvmProvider.request({ method: 'eth_chainId' });
-        const chainId = parseInt(chainIdHex, 16).toString();
+        const chainId = parseInt(chainIdHex, 16);
         setEtherMailTypedPayload(getEtherMailTypedPayload(chainId, address));
       }
     };
