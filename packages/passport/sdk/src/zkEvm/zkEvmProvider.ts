@@ -416,6 +416,9 @@ export class ZkEvmProvider implements Provider {
         }
         return null;
       }
+      case 'web3_clientVersion': {
+        return 'ImmutablePassport/__SDK_VERSION__';
+      }
       default: {
         throw new JsonRpcError(
           ProviderErrorCode.UNSUPPORTED_METHOD,
