@@ -98,6 +98,7 @@ export function TransakIframe(props: TransakIframeProps) {
         transition: 'opacity 0.5s ease-out',
       }}
       onLoad={onLoad}
+      referrerPolicy="strict-origin-when-cross-origin"
       onError={() => onFailedToLoad?.()}
     />
   );

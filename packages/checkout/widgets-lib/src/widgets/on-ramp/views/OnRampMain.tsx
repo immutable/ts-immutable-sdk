@@ -329,6 +329,7 @@ export function OnRampMain({
             id={transakIframeId}
             src={widgetUrl}
             allow="camera;microphone;fullscreen;payment"
+            referrerPolicy="strict-origin-when-cross-origin"
             style={{
               height: '100%',
               width: '100%',
