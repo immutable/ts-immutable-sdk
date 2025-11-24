@@ -90,7 +90,13 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
   const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
 
   // Create wallet configuration for zkEVM provider
-  const walletConfig = new WalletConfiguration(passportModuleConfiguration as any);
+  const walletConfig = new WalletConfiguration({
+    baseConfig: passportModuleConfiguration.baseConfig,
+    overrides: passportModuleConfiguration.overrides,
+    jsonRpcReferrer: passportModuleConfiguration.jsonRpcReferrer,
+    forceScwDeployBeforeMessageSignature: passportModuleConfiguration.forceScwDeployBeforeMessageSignature,
+    crossSdkBridgeEnabled: passportModuleConfiguration.crossSdkBridgeEnabled,
+  });
   const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
 
   const immutableXClient = passportModuleConfiguration.overrides
@@ -98,7 +104,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     : new IMXClient({ baseConfig: passportModuleConfiguration.baseConfig });
 
   const guardianClient = new GuardianClient({
-    confirmationScreen: confirmationScreen as any, // Auth ConfirmationScreen compatible with wallet
+    confirmationScreen,
     config: walletConfig,
     authManager,
     guardianApi: multiRollupApiClients.guardianApi,
@@ -257,10 +263,17 @@ export class Passport {
       if (!user && useSilentLogin) {
         user = await this.authManager.forceUserRefresh();
       } else if (!user && !useCachedSession) {
+        // Convert Passport's DirectLoginOptions to Auth's DirectLoginOptions format
+        const authDirectLoginOptions = options?.directLoginOptions ? {
+          directLoginMethod: options.directLoginOptions.directLoginMethod,
+          email: options.directLoginOptions.email,
+          marketingConsentStatus: options.directLoginOptions.marketingConsentStatus,
+        } : undefined;
+
         if (options?.useRedirectFlow) {
-          await this.authManager.loginWithRedirect(options?.anonymousId, options?.directLoginOptions as any);
+          await this.authManager.loginWithRedirect(options?.anonymousId, authDirectLoginOptions);
         } else {
-          user = await this.authManager.login(options?.anonymousId, options?.directLoginOptions as any);
+          user = await this.authManager.login(options?.anonymousId, authDirectLoginOptions);
         }
       }
 

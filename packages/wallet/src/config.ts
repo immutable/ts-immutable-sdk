@@ -19,7 +19,7 @@ export class WalletConfiguration {
   readonly crossSdkBridgeEnabled: boolean;
 
   constructor(config: WalletModuleConfiguration) {
-    this.environment = (config.baseConfig as any).environment;
+    this.environment = config.baseConfig.environment;
     this.jsonRpcReferrer = config.jsonRpcReferrer;
     this.forceScwDeployBeforeMessageSignature = config.forceScwDeployBeforeMessageSignature || false;
     this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled || false;
@@ -30,7 +30,7 @@ export class WalletConfiguration {
       this.relayerUrl = config.overrides.relayerUrl;
       this.indexerMrBasePath = config.overrides.indexerMrBasePath;
     } else {
-      switch ((config.baseConfig as any).environment) {
+      switch (config.baseConfig.environment) {
         case Environment.PRODUCTION:
           this.passportDomain = 'https://passport.immutable.com';
           this.zkEvmRpcUrl = 'https://rpc.immutable.com';
@@ -44,7 +44,7 @@ export class WalletConfiguration {
           this.indexerMrBasePath = 'https://api.sandbox.immutable.com';
           break;
         default:
-          throw new Error(`Unsupported environment: ${(config.baseConfig as any).environment}`);
+          throw new Error(`Unsupported environment: ${config.baseConfig.environment}`);
       }
     }
   }

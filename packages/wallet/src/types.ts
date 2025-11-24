@@ -140,9 +140,7 @@ export interface WalletOverrides {
   indexerMrBasePath: string;
 }
 
-export interface WalletModuleConfiguration {
-  baseConfig: ModuleConfiguration<any>;
-  overrides?: WalletOverrides;
+export interface WalletModuleConfiguration extends ModuleConfiguration<WalletOverrides> {
   /**
    * Optional referrer URL to be sent with JSON-RPC requests.
    */
