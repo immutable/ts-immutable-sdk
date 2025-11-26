@@ -32,13 +32,8 @@ export interface PassportEventMap extends AuthEventMap {
   [WalletEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
 }
 
-// zkEVM/Wallet specific types
-export type Provider = {
-  request: (request: RequestArguments) => Promise<any>;
-  on: (event: string, listener: (...args: any[]) => void) => void;
-  removeListener: (event: string, listener: (...args: any[]) => void) => void;
-  isPassport: boolean;
-};
+// Re-export zkEVM Provider type for public API
+export type { Provider } from './zkEvm/types';
 
 export interface RequestArguments {
   method: string;
@@ -141,31 +136,12 @@ export interface FeeOption {
   recipientAddress: string;
 }
 
-/**
- * Event detail from the `eip6963:announceProvider` event.
- */
-export interface EIP6963ProviderDetail {
-  info: EIP6963ProviderInfo;
-  provider: Provider;
-}
-
-/**
- * Metadata of the EIP-1193 Provider.
- */
-export interface EIP6963ProviderInfo {
-  icon: `data:image/${string}`; // RFC-2397
-  name: string;
-  rdns: string;
-  uuid: string;
-}
-
-/**
- * Event type to announce an EIP-1193 Provider.
- */
-export interface EIP6963AnnounceProviderEvent
-  extends CustomEvent<EIP6963ProviderDetail> {
-  type: 'eip6963:announceProvider';
-}
+// Re-export EIP-6963 types from zkEvm for public API
+export type {
+  EIP6963ProviderDetail,
+  EIP6963ProviderInfo,
+  EIP6963AnnounceProviderEvent,
+} from './zkEvm/types';
 
 /**
  * Configuration for a single blockchain network

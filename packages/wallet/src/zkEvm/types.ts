@@ -92,8 +92,16 @@ export interface JsonRpcResponsePayload {
   id?: string | number;
 }
 
-// Re-export Provider from parent types to avoid duplication
-export type { Provider } from '../types';
+/**
+ * EIP-1193 Provider Interface
+ * Standard Ethereum provider interface
+ */
+export type Provider = {
+  request: (request: RequestArguments) => Promise<any>;
+  on: (event: string, listener: (...args: any[]) => void) => void;
+  removeListener: (event: string, listener: (...args: any[]) => void) => void;
+  isPassport: boolean;
+};
 
 export enum ProviderEvent {
   ACCOUNTS_CHANGED = 'accountsChanged',
