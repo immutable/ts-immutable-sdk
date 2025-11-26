@@ -76,7 +76,7 @@ export default class EmbeddedLoginPrompt {
   private getEmbeddedLoginIFrame = () => {
     const embeddedLoginPrompt = document.createElement('iframe');
     embeddedLoginPrompt.id = LOGIN_PROMPT_IFRAME_ID;
-    embeddedLoginPrompt.src = this.getHref(anonymousId);
+    embeddedLoginPrompt.src = this.getHref();
     embeddedLoginPrompt.style.height = '100vh';
     embeddedLoginPrompt.style.width = '100vw';
     embeddedLoginPrompt.style.maxHeight = `${LOGIN_PROMPT_WINDOW_HEIGHT}px`;
