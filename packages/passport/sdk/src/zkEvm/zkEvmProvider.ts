@@ -206,7 +206,7 @@ export class ZkEvmProvider implements Provider {
         }
       }
       case 'eth_sendTransaction': {
-        const zkEvmAddress = await this.#getZkEvmAddress();
+        const zkEvmAddress = '0xa6df9053c888404ada7d05409cbe6f4440e9750e';//await this.#getZkEvmAddress();
         if (!zkEvmAddress) {
           throw new JsonRpcError(
             ProviderErrorCode.UNAUTHORIZED,

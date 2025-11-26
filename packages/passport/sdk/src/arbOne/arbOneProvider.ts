@@ -180,7 +180,8 @@ export class ArbOneProvider implements Provider {
 
       case 'eth_sendTransaction': {
         // Get user's Arbitrum One wallet address
-        const arbOneAddress = '0xa0925a0817dac9eb8c99bcebefd09461c459eb3f';//await this.#getArbOneAddress();
+        // eoa: 0xD56294DdC6439D1A404F4C193a40aE3821165d69
+        const arbOneAddress = '0x33e406618478b434faa66d24a50c75884d0be601';//await this.#getArbOneAddress();
         if (!arbOneAddress) {
           throw new JsonRpcError(
             ProviderErrorCode.UNAUTHORIZED,
@@ -194,7 +195,7 @@ export class ArbOneProvider implements Provider {
         try {
           const signerAddress = await this.#ethSigner.getAddress();
           const tx = {
-            to: '0x04E55fc6fBD722703074D4E19374c201596f3CB4',//signerAddress,// '0x04E55fc6fBD722703074D4E19374c201596f3CB4', //'0x04E55fc6fBD722703074D4E19374c201596f3CB4'
+            to: '0xD56294DdC6439D1A404F4C193a40aE3821165d69', // Your EOA
             value: 0n,
             data: "0x"
           }

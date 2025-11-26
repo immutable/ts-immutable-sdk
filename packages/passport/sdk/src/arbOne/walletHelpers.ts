@@ -6,8 +6,11 @@ import {
   BigNumberish, Contract, getBytes,
   Interface, Signer, ZeroAddress,
   JsonRpcProvider, AbiCoder, concat,
+  SigningKey,
 } from 'ethers';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
+import { hashMessage } from 'ethers';
+import SequenceSigner from '../sequence/sequenceSigner';
 
 const SIGNATURE_WEIGHT = 1; // Weight of a single signature in the multi-sig
 
@@ -45,7 +48,9 @@ export const getNonce = async (
   const code = await rpcProvider.getCode(arbOneAddress);
   if (code === '0x') {
     // Wallet not deployed yet, nonce is 0
-    return encodeNonce(rawSpace, 0n);
+    // on sequence first transaction is to update image hash which nonce is 0
+    // so this needs to be 1
+    return encodeNonce(rawSpace, 1n);
   }
 
   // Wallet is deployed, get nonce from contract
@@ -105,10 +110,20 @@ export const signMetaTransactions = async (
   );
   
   // Sign with ETH_SIGN (adds Ethereum message prefix)
-  const signature = await sequenceSigner.signMessage(payloadHash);
-  
+  // const signature = await sequenceSigner.signMessage(payloadHash);
+  const privateKey = await (sequenceSigner as SequenceSigner).getPrivateKey();
+  const signingKey = new SigningKey(privateKey);
+  const ethSignDigest = hashMessage(payloadHash);
+  const signature = signingKey.sign(ethSignDigest);
+
+  console.log('[signMetaTransactions] signature', signature);
   // Parse signature to extract r, s, yParity
-  const sigBytes = Bytes.fromHex(signature as Hex.Hex);
+  // Safely convert signature to hex string before parsing bytes
+  const sigHex =
+    typeof signature === 'string'
+      ? signature
+      : (signature as any)?.serialized || (signature as any)?.compact || '';
+  const sigBytes = Bytes.fromHex(sigHex);
   const r = Bytes.toBigInt(sigBytes.slice(0, 32));
   const s = Bytes.toBigInt(sigBytes.slice(32, 64));
   const v = sigBytes[64]!;

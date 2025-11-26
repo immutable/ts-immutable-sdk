@@ -8,7 +8,7 @@ import { User } from '../types';
 import { Hex, Bytes } from 'ox'
 import jwtDecode from 'jwt-decode';
 import { IdTokenPayload } from '../types';
-
+import { SigningKey } from 'ethers';
 interface AuthKey {
   address: string;
   privateKey: CryptoKey;
@@ -213,7 +213,17 @@ export default class SequenceSigner extends AbstractSigner {
       return wallet.walletAddress;
     } else {
       const wallet = await this.getPrivateKeyWallet();
+      console.log('[SequenceSigner] wallet.walletAddress', wallet.walletAddress);
       return wallet.walletAddress;
+    }
+  }
+
+  async getPrivateKey(): Promise<string> {
+    if (this.useIdentityInstrument) {
+      return Promise.resolve('');
+    } else {
+      const wallet = await this.getPrivateKeyWallet();
+      return wallet.wallet.privateKey;
     }
   }
 

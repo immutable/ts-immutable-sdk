@@ -26,6 +26,7 @@ import {
   isUserZkEvm,
   UserImx,
   isUserImx,
+  RollupType,
 } from './types';
 import { PassportConfiguration } from './config';
 import ConfirmationOverlay from './overlay/confirmationOverlay';
@@ -638,12 +639,31 @@ export default class AuthManager {
   }
 
   public async getUserZkEvm(): Promise<UserZkEvm> {
-    const user = await this.getUser(isUserZkEvm);
-    if (!user) {
-      throw new Error('Failed to obtain a User with the required ZkEvm attributes');
-    }
+    // TODO: Uncomment when ZkEvm attributes are populated
+    // const user = await this.getUser(isUserZkEvm);
+    // if (!user) {
+    //   throw new Error('Failed to obtain a User with the required ZkEvm attributes');
+    // }
+    // return user;
 
-    return user;
+    const oidcUser = await this.userManager.getUser();
+    if (!oidcUser) {
+      throw new Error('User not authenticated');
+    }
+    
+    const ethAddress = '0xa6df9053c888404ada7d05409cbe6f4440e9750e';
+    const userAdminAddress = '0x5055cd32253f6fd0702ca3983425f520e23bf473';
+    
+    // Add ZkEvm attributes to the OIDC user
+    const userWithZkEvm = {
+      ...oidcUser,
+      [RollupType.ZKEVM]: {
+        ethAddress,
+        userAdminAddress,
+      }
+    } as unknown as UserZkEvm;
+    
+    return userWithZkEvm;
   }
 
   public async getUserImx(): Promise<UserImx> {

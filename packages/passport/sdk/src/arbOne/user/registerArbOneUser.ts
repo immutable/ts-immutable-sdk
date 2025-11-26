@@ -34,14 +34,14 @@ export async function registerArbOneUser({
   const detectNetworkPromise = rpcProvider.getNetwork();
   detectNetworkPromise.then(() => flow.addEvent('endDetectNetwork'));
 
-  const listChainsPromise = multiRollupApiClients.chainsApi.listChains();
-  listChainsPromise.then(() => flow.addEvent('endListChains'));
+  // const listChainsPromise = multiRollupApiClients.chainsApi.listChains();
+  // listChainsPromise.then(() => flow.addEvent('endListChains'));
 
-  const [ethereumAddress, ethereumSignature, network, chainListResponse] = await Promise.all([
+  const [ethereumAddress, ethereumSignature, network] = await Promise.all([
     getAddressPromise,
     signRawPromise,
     detectNetworkPromise,
-    listChainsPromise,
+    // listChainsPromise,
   ]);
 
   // const eipChainId = getEip155ChainId(Number(network.chainId));
