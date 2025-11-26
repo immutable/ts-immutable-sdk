@@ -65,15 +65,15 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
   }
   currentSessionTrackCall[clientId] = true;
 
-  const { sendTransaction, environment } = args;
+  const { sendTransaction, sessionActivityApiUrl } = args;
   if (!sendTransaction) {
     throw new Error('No sendTransaction function provided');
   }
   // Used to set up the request client
-  if (!environment) {
-    throw new Error('No environment provided');
+  if (!sessionActivityApiUrl) {
+    throw new Error('No session activity API URL provided');
   }
-  setupClient(environment);
+  setupClient(sessionActivityApiUrl);
 
   const from = args.walletAddress;
   if (!from) {

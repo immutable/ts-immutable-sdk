@@ -12,7 +12,6 @@ import {
   RequestArguments,
 } from './types';
 import { AuthManager, TypedEventEmitter } from '@imtbl/auth';
-import { Environment } from '@imtbl/config';
 import { WalletConfiguration } from '../config';
 import {
   PassportEventMap, AuthEvents, WalletEvents, User, UserZkEvm,
@@ -37,7 +36,7 @@ export type ZkEvmProviderInput = {
   guardianClient: GuardianClient;
   ethSigner: Signer;
   user: User | null;
-  environment: Environment;
+  sessionActivityApiUrl: string | null;
 };
 
 const isZkEvmUser = (user: User): user is UserZkEvm => 'zkEvm' in user;
@@ -47,7 +46,7 @@ export class ZkEvmProvider implements Provider {
 
   readonly #config: WalletConfiguration;
 
-  readonly #environment: Environment;
+  readonly #sessionActivityApiUrl: string | null;
 
   /**
    * intended to emit EIP-1193 events
@@ -79,19 +78,21 @@ export class ZkEvmProvider implements Provider {
     guardianClient,
     ethSigner,
     user,
-    environment,
+    sessionActivityApiUrl,
   }: ZkEvmProviderInput) {
     this.#authManager = authManager;
     this.#config = config;
     this.#guardianClient = guardianClient;
     this.#passportEventEmitter = passportEventEmitter;
-    this.#environment = environment;
+    this.#sessionActivityApiUrl = sessionActivityApiUrl;
     this.#ethSigner = ethSigner;
 
+    // Create JsonRpcProvider for reading from the chain
     this.#rpcProvider = new JsonRpcProvider(this.#config.zkEvmRpcUrl, undefined, {
       staticNetwork: true,
     });
 
+    // Create RelayerClient for transaction submission
     this.#relayerClient = new RelayerClient({
       config: this.#config,
       rpcProvider: this.#rpcProvider,
@@ -122,6 +123,11 @@ export class ZkEvmProvider implements Provider {
   };
 
   async #callSessionActivity(zkEvmAddress: string, clientId?: string) {
+    // Only emit session activity event for supported chains (mainnet, testnet, devnet)
+    if (!this.#sessionActivityApiUrl) {
+      return;
+    }
+
     // SessionActivity requests are processed in nonce space 1, where as all
     // other sendTransaction requests are processed in nonce space 0. This means
     // we can submit a session activity request per SCW in parallel without a SCW
@@ -139,7 +145,7 @@ export class ZkEvmProvider implements Provider {
       isBackgroundTransaction: true,
     });
     this.#passportEventEmitter.emit(WalletEvents.ACCOUNTS_REQUESTED, {
-      environment: this.#environment,
+      sessionActivityApiUrl: this.#sessionActivityApiUrl,
       sendTransaction: sendTransactionClosure,
       walletAddress: zkEvmAddress,
       passportClient: clientId || 'wallet',

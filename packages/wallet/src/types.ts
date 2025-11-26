@@ -1,4 +1,3 @@
-import { Environment } from '@imtbl/config';
 import { Flow } from '@imtbl/metrics';
 import {
   Auth, TypedEventEmitter, type AuthEventMap,
@@ -20,7 +19,7 @@ export enum WalletEvents {
 }
 
 export type AccountsRequestedEvent = {
-  environment: Environment;
+  sessionActivityApiUrl: string;
   sendTransaction: (params: Array<any>, flow: Flow) => Promise<string>;
   walletAddress: string;
   passportClient: string;

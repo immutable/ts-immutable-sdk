@@ -1,5 +1,4 @@
 import { AuthManager, IAuthConfiguration, TypedEventEmitter } from '@imtbl/auth';
-import { Environment } from '@imtbl/config';
 import {
   MultiRollupApiClients,
   MagicTeeApiClients,
@@ -149,15 +148,24 @@ export async function connectWallet(config: ConnectWalletOptions): Promise<ZkEvm
 
   const ethSigner = new MagicTEESigner(authManager, magicTeeApiClients);
 
-  // 9. Create PassportEventEmitter
+  // 9. Determine session activity API URL (only for mainnet, testnet, devnet)
+  let sessionActivityApiUrl: string | null = null;
+  if (initialChain.chainId === 13371) {
+    // Mainnet
+    sessionActivityApiUrl = 'https://api.immutable.com';
+  } else if (initialChain.chainId === 13473) {
+    // Testnet
+    sessionActivityApiUrl = 'https://api.sandbox.immutable.com';
+  } else if (initialChain.apiUrl) {
+    // Devnet - use the apiUrl from chain config
+    sessionActivityApiUrl = initialChain.apiUrl;
+  }
+  // For any other chain, sessionActivityApiUrl remains null (no session activity tracking)
+
+  // 10. Create PassportEventEmitter
   const passportEventEmitter = config.passportEventEmitter || new TypedEventEmitter<PassportEventMap>();
 
-  // 10. Determine environment from chain ID
-  const environment = initialChain.chainId === 13371
-    ? Environment.PRODUCTION
-    : Environment.SANDBOX;
-
-  // 11. Create ZkEvmProvider with multi-chain support
+  // 11. Create ZkEvmProvider
   const provider = new ZkEvmProvider({
     authManager,
     config: walletConfig,
@@ -166,7 +174,7 @@ export async function connectWallet(config: ConnectWalletOptions): Promise<ZkEvm
     guardianClient,
     ethSigner,
     user,
-    environment,
+    sessionActivityApiUrl,
   });
 
   // 12. Announce provider via EIP-6963

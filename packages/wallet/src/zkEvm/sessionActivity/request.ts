@@ -1,33 +1,16 @@
-import { Environment } from '@imtbl/config';
 import axios, { AxiosInstance } from 'axios';
 
-// For session activity checks, always use production
-// even for sandbox.
-
-const PROD_API = 'https://api.immutable.com';
-const SANDBOX_API = 'https://api.sandbox.immutable.com';
 const CHECK_PATH = '/v1/sdk/session-activity/check';
-
-const getBaseUrl = (environment?: Environment) => {
-  switch (environment) {
-    case Environment.SANDBOX:
-      return SANDBOX_API;
-    case Environment.PRODUCTION:
-      return PROD_API;
-    default:
-      throw new Error('Environment not supported');
-  }
-};
 
 let client: AxiosInstance | undefined;
 
-export const setupClient = (environment: Environment) => {
+export const setupClient = (sessionActivityApiUrl: string) => {
   if (client) {
     return;
   }
 
   client = axios.create({
-    baseURL: getBaseUrl(environment),
+    baseURL: sessionActivityApiUrl,
   });
 };
 
