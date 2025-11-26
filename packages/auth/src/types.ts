@@ -126,3 +126,35 @@ export type DirectLoginOptions = {
   marketingConsentStatus?: MarketingConsentStatus;
   email?: string;
 };
+
+/**
+ * Extended login options with caching and silent login support
+ */
+export type LoginOptions = {
+  /** If true, attempts to use cached session without user interaction */
+  useCachedSession?: boolean;
+  /** Optional anonymous ID for tracking */
+  anonymousId?: string;
+  /** If true, attempts silent authentication (force token refresh) */
+  useSilentLogin?: boolean;
+  /** If true, uses redirect flow instead of popup flow */
+  useRedirectFlow?: boolean;
+  /** Direct login options (social provider, email, etc.) */
+  directLoginOptions?: DirectLoginOptions;
+};
+
+/**
+ * Authentication events emitted by the Auth class
+ */
+export enum AuthEvents {
+  LOGGED_OUT = 'loggedOut',
+  LOGGED_IN = 'loggedIn',
+}
+
+/**
+ * Event map for typed event emitter
+ */
+export interface AuthEventMap extends Record<string, any> {
+  [AuthEvents.LOGGED_OUT]: [];
+  [AuthEvents.LOGGED_IN]: [User];
+}

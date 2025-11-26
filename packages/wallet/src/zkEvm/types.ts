@@ -92,12 +92,8 @@ export interface JsonRpcResponsePayload {
   id?: string | number;
 }
 
-export type Provider = {
-  request: (request: RequestArguments) => Promise<any>;
-  on: (event: string, listener: (...args: any[]) => void) => void;
-  removeListener: (event: string, listener: (...args: any[]) => void) => void;
-  isPassport: boolean;
-};
+// Re-export Provider from parent types to avoid duplication
+export type { Provider } from '../types';
 
 export enum ProviderEvent {
   ACCOUNTS_CHANGED = 'accountsChanged',

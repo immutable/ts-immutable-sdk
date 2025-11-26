@@ -11,11 +11,11 @@ import {
   ProviderEventMap,
   RequestArguments,
 } from './types';
-import { AuthManager } from '@imtbl/auth';
-import TypedEventEmitter from '../utils/typedEventEmitter';
+import { AuthManager, TypedEventEmitter } from '@imtbl/auth';
+import { Environment } from '@imtbl/config';
 import { WalletConfiguration } from '../config';
 import {
-  PassportEventMap, PassportEvents, User, UserZkEvm,
+  PassportEventMap, AuthEvents, WalletEvents, User, UserZkEvm,
 } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
@@ -37,6 +37,7 @@ export type ZkEvmProviderInput = {
   guardianClient: GuardianClient;
   ethSigner: Signer;
   user: User | null;
+  environment: Environment;
 };
 
 const isZkEvmUser = (user: User): user is UserZkEvm => 'zkEvm' in user;
@@ -45,6 +46,8 @@ export class ZkEvmProvider implements Provider {
   readonly #authManager: AuthManager;
 
   readonly #config: WalletConfiguration;
+
+  readonly #environment: Environment;
 
   /**
    * intended to emit EIP-1193 events
@@ -76,11 +79,13 @@ export class ZkEvmProvider implements Provider {
     guardianClient,
     ethSigner,
     user,
+    environment,
   }: ZkEvmProviderInput) {
     this.#authManager = authManager;
     this.#config = config;
     this.#guardianClient = guardianClient;
     this.#passportEventEmitter = passportEventEmitter;
+    this.#environment = environment;
     this.#ethSigner = ethSigner;
 
     this.#rpcProvider = new JsonRpcProvider(this.#config.zkEvmRpcUrl, undefined, {
@@ -100,14 +105,14 @@ export class ZkEvmProvider implements Provider {
       this.#callSessionActivity(user.zkEvm.ethAddress);
     }
 
-    passportEventEmitter.on(PassportEvents.LOGGED_IN, (loggedInUser: User) => {
+    passportEventEmitter.on(AuthEvents.LOGGED_IN, (loggedInUser: User) => {
       if (isZkEvmUser(loggedInUser)) {
         this.#callSessionActivity(loggedInUser.zkEvm.ethAddress);
       }
     });
-    passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.#handleLogout);
+    passportEventEmitter.on(AuthEvents.LOGGED_OUT, this.#handleLogout);
     passportEventEmitter.on(
-      PassportEvents.ACCOUNTS_REQUESTED,
+      WalletEvents.ACCOUNTS_REQUESTED,
       trackSessionActivity,
     );
   }
@@ -133,8 +138,8 @@ export class ZkEvmProvider implements Provider {
       nonceSpace,
       isBackgroundTransaction: true,
     });
-    this.#passportEventEmitter.emit(PassportEvents.ACCOUNTS_REQUESTED, {
-      environment: this.#config.environment,
+    this.#passportEventEmitter.emit(WalletEvents.ACCOUNTS_REQUESTED, {
+      environment: this.#environment,
       sendTransaction: sendTransactionClosure,
       walletAddress: zkEvmAddress,
       passportClient: clientId || 'wallet',

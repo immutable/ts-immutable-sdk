@@ -4,6 +4,7 @@ import {
   OidcConfiguration,
   PassportModuleConfiguration,
   PopupOverlayOptions,
+  PassportOverrides,
 } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 
@@ -56,7 +57,11 @@ export class PassportConfiguration {
 
   readonly forceScwDeployBeforeMessageSignature: boolean;
 
+  readonly jsonRpcReferrer?: string;
+
   readonly popupOverlayOptions: PopupOverlayOptions;
+
+  readonly overrides?: PassportOverrides;
 
   constructor({
     baseConfig,
@@ -73,14 +78,17 @@ export class PassportConfiguration {
     ]);
     this.oidcConfiguration = oidcConfiguration;
     this.baseConfig = baseConfig;
+    this.overrides = overrides;
     this.crossSdkBridgeEnabled = crossSdkBridgeEnabled || false;
     this.forceScwDeployBeforeMessageSignature = forceScwDeployBeforeMessageSignature || false;
+    this.jsonRpcReferrer = jsonRpcReferrer;
     this.popupOverlayOptions = popupOverlayOptions || {
       disableGenericPopupOverlay: false,
       disableBlockedPopupOverlay: false,
       disableHeadlessLoginPromptOverlay: false,
     };
     if (overrides) {
+      // Note: zkEvmChainId and zkEvmChainName are optional (for dev environments)
       validateConfiguration(
         overrides,
         [

@@ -5,48 +5,31 @@ import {
 import { IMXClient } from '@imtbl/x-client';
 import { Environment } from '@imtbl/config';
 
+import { setPassportClientId, track } from '@imtbl/metrics';
 import {
-  identify, setPassportClientId, track, trackError,
-  trackFlow,
-} from '@imtbl/metrics';
-import { isAxiosError } from 'axios';
-import {
-  AuthManager,
-  AuthConfiguration,
-  ConfirmationScreen,
-  EmbeddedLoginPrompt,
-  User,
+  Auth,
   UserProfile,
-  isUserImx,
-  isUserZkEvm,
-  DirectLoginOptions,
   DeviceTokenResponse,
 } from '@imtbl/auth';
+import type { DirectLoginOptions } from '@imtbl/auth';
 import {
+  connectWallet,
   ZkEvmProvider,
   WalletConfiguration,
-  Provider,
   GuardianClient,
   MagicTEESigner,
-  TypedEventEmitter,
-  announceProvider,
-  passportProviderInfo,
+  ChainConfig,
+  linkExternalWallet as walletLinkExternalWallet,
+  getLinkedAddresses as walletGetLinkedAddresses,
 } from '@imtbl/wallet';
+import type { LinkWalletParams, LinkedWallet } from '@imtbl/wallet';
 import {
-  PassportEvents,
-  PassportEventMap,
-
-  LinkedWallet,
-  LinkWalletParams,
   PassportModuleConfiguration,
   ConnectEvmArguments,
   LoginArguments,
 } from './types';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
-import logger from './utils/logger';
-import { isAPIError, PassportError, PassportErrorType } from './errors/passportError';
-import { withMetricsAsync } from './utils/metrics';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -66,48 +49,56 @@ const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfigura
 };
 
 export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
-  const config = new PassportConfiguration(passportModuleConfiguration);
+  const passportConfig = new PassportConfiguration(passportModuleConfiguration);
   // Create auth configuration for confirmation screen
-  const authConfig = new AuthConfiguration({
+  // Create Auth instance (public API)
+  const auth = new Auth({
     ...passportModuleConfiguration,
-    authenticationDomain: config.authenticationDomain,
+    authenticationDomain: passportConfig.authenticationDomain,
     crossSdkBridgeEnabled: passportModuleConfiguration.crossSdkBridgeEnabled,
     popupOverlayOptions: passportModuleConfiguration.popupOverlayOptions,
-    passportDomain: config.passportDomain,
+    passportDomain: passportConfig.passportDomain,
   });
 
-  const embeddedLoginPrompt = new EmbeddedLoginPrompt(authConfig);
-  const authManager = new AuthManager(authConfig, embeddedLoginPrompt);
-  const confirmationScreen = new ConfirmationScreen(authConfig);
-  const magicTeeApiClients = new MagicTeeApiClients({
-    basePath: config.magicTeeBasePath,
-    timeout: config.magicTeeTimeout,
-    magicPublishableApiKey: config.magicPublishableApiKey,
-    magicProviderId: config.magicProviderId,
-  });
-  const magicTEESigner = new MagicTEESigner(authManager, magicTeeApiClients);
-  const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
+  // Get AuthManager for internal IMX provider use
+  const authManager = auth.getAuthManager();
+  const authConfig = auth.getConfig();
 
-  // Create wallet configuration for zkEVM provider
+  // Create wallet configuration with concrete URLs (no environment)
+  // PassportConfiguration translates environment → URLs
   const walletConfig = new WalletConfiguration({
-    baseConfig: passportModuleConfiguration.baseConfig,
-    overrides: passportModuleConfiguration.overrides,
+    passportDomain: passportConfig.passportDomain,
+    zkEvmRpcUrl: passportConfig.zkEvmRpcUrl,
+    relayerUrl: passportConfig.relayerUrl,
+    indexerMrBasePath: passportConfig.multiRollupConfig.indexer.basePath || passportConfig.passportDomain,
     jsonRpcReferrer: passportModuleConfiguration.jsonRpcReferrer,
     forceScwDeployBeforeMessageSignature: passportModuleConfiguration.forceScwDeployBeforeMessageSignature,
     crossSdkBridgeEnabled: passportModuleConfiguration.crossSdkBridgeEnabled,
   });
-  const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
+
+  // Setup IMX-specific components
+  const multiRollupApiClients = new MultiRollupApiClients(passportConfig.multiRollupConfig);
 
   const immutableXClient = passportModuleConfiguration.overrides
     ? passportModuleConfiguration.overrides.immutableXClient
     : new IMXClient({ baseConfig: passportModuleConfiguration.baseConfig });
 
+  // Create Guardian client for IMX provider
   const guardianClient = new GuardianClient({
-    confirmationScreen,
     config: walletConfig,
     authManager,
     guardianApi: multiRollupApiClients.guardianApi,
+    authConfig,
   });
+
+  // Create Magic TEE signer for IMX provider
+  const magicTeeApiClients = new MagicTeeApiClients({
+    basePath: passportConfig.magicTeeBasePath,
+    timeout: passportConfig.magicTeeTimeout,
+    magicPublishableApiKey: passportConfig.magicPublishableApiKey,
+    magicProviderId: passportConfig.magicProviderId,
+  });
+  const magicTEESigner = new MagicTEESigner(authManager, magicTeeApiClients);
 
   const imxApiClients = buildImxApiClients(passportModuleConfiguration);
 
@@ -115,65 +106,54 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     authManager,
     immutableXClient,
     magicTEESigner,
-    passportEventEmitter,
+    passportEventEmitter: auth.eventEmitter,
     imxApiClients,
     guardianClient,
   });
 
   return {
-    config,
-    authManager,
-    authConfig,
-    walletConfig,
-    magicTEESigner,
-    confirmationScreen,
-    embeddedLoginPrompt,
-    immutableXClient,
-    multiRollupApiClients,
-    passportEventEmitter,
+    passportConfig,
+    auth,
     passportImxProviderFactory,
-    guardianClient,
+    environment: passportModuleConfiguration.baseConfig.environment,
+    // Keep walletConfig only for IMX GuardianClient
+    walletConfig,
   };
 };
 
 export class Passport {
-  private readonly authManager: AuthManager;
+  // ============================================================================
+  // DEPENDENCIES & CONFIGURATION
+  // ============================================================================
 
-  private readonly walletConfig: WalletConfiguration;
-
-  private readonly confirmationScreen: ConfirmationScreen;
-
-  private readonly embeddedLoginPrompt: EmbeddedLoginPrompt;
-
-  private readonly immutableXClient: IMXClient;
-
-  private readonly magicTEESigner: MagicTEESigner;
-
-  private readonly multiRollupApiClients: MultiRollupApiClients;
+  // Auth & Wallet (zkEVM uses these via public APIs)
+  private readonly auth: Auth;
 
   private readonly passportImxProviderFactory: PassportImxProviderFactory;
 
-  private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  private readonly multiRollupApiClients: MultiRollupApiClients;
 
-  private readonly guardianClient: GuardianClient;
+  private readonly environment: Environment;
+
+  private readonly passportConfig: PassportConfiguration;
 
   constructor(passportModuleConfiguration: PassportModuleConfiguration) {
     const privateVars = buildPrivateVars(passportModuleConfiguration);
 
-    this.walletConfig = privateVars.walletConfig;
-    this.authManager = privateVars.authManager;
-    this.magicTEESigner = privateVars.magicTEESigner;
-    this.confirmationScreen = privateVars.confirmationScreen;
-    this.embeddedLoginPrompt = privateVars.embeddedLoginPrompt;
-    this.immutableXClient = privateVars.immutableXClient;
-    this.multiRollupApiClients = privateVars.multiRollupApiClients;
-    this.passportEventEmitter = privateVars.passportEventEmitter;
+    this.auth = privateVars.auth;
     this.passportImxProviderFactory = privateVars.passportImxProviderFactory;
-    this.guardianClient = privateVars.guardianClient;
+    this.passportConfig = privateVars.passportConfig;
+    this.multiRollupApiClients = new MultiRollupApiClients(this.passportConfig.multiRollupConfig);
+    this.environment = privateVars.environment;
 
     setPassportClientId(passportModuleConfiguration.clientId);
     track('passport', 'initialise');
   }
+
+  // ============================================================================
+  // IMX-SPECIFIC METHODS
+  // Can use AuthManager directly for IMX-specific operations
+  // ============================================================================
 
   /**
    * Attempts to connect to IMX silently without user interaction.
@@ -181,7 +161,7 @@ export class Passport {
    * @deprecated The method `login` with an argument of `{ useCachedSession: true }` should be used in conjunction with `connectImx` instead
    */
   public async connectImxSilent(): Promise<IMXProvider | null> {
-    return withMetricsAsync(() => this.passportImxProviderFactory.getProviderSilent(), 'connectImxSilent', false);
+    return this.passportImxProviderFactory.getProviderSilent();
   }
 
   /**
@@ -189,47 +169,92 @@ export class Passport {
    * @returns {Promise<IMXProvider>} A promise that resolves to an IMX provider
    */
   public async connectImx(): Promise<IMXProvider> {
-    return withMetricsAsync(() => this.passportImxProviderFactory.getProvider(), 'connectImx', false);
+    return this.passportImxProviderFactory.getProvider();
   }
+
+  // ============================================================================
+  // ZKEVM-SPECIFIC METHODS
+  // Uses Auth + Wallet packages (not AuthManager directly)
+  // ============================================================================
 
   /**
    * Connects to EVM and optionally announces the provider.
+   * Uses: Auth + Wallet packages
    * @param {Object} options - Configuration options
    * @param {boolean} options.announceProvider - Whether to announce the provider via EIP-6963 for wallet discovery (defaults to true)
    * @returns {Promise<Provider>} The EVM provider instance
    */
   public async connectEvm(options: ConnectEvmArguments = { announceProvider: true }): Promise<ZkEvmProvider> {
-    return withMetricsAsync(async () => {
-      let user: User | null = null;
-      try {
-        user = await this.authManager.getUser();
-      } catch (error) {
-        // Initialise the zkEvmProvider without a user
-      }
+    // Access PassportOverrides from PassportConfiguration
+    const passportOverrides = this.passportConfig.overrides;
 
-      const provider = new ZkEvmProvider({
-        passportEventEmitter: this.passportEventEmitter,
-        authManager: this.authManager,
-        config: this.walletConfig,
-        multiRollupApiClients: this.multiRollupApiClients,
-        guardianClient: this.guardianClient,
-        ethSigner: this.magicTEESigner,
-        user,
-      });
+    // Build complete chain configuration
+    let chainConfig: ChainConfig;
 
-      if (options?.announceProvider) {
-        announceProvider({
-          info: passportProviderInfo,
-          provider: provider as unknown as Provider,
-        });
-      }
+    if (passportOverrides?.zkEvmChainId) {
+      // Dev environment with custom chain
+      chainConfig = {
+        chainId: passportOverrides.zkEvmChainId,
+        name: passportOverrides.zkEvmChainName || 'Dev Chain',
+        rpcUrl: this.passportConfig.zkEvmRpcUrl,
+        relayerUrl: this.passportConfig.relayerUrl,
+        apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || this.passportConfig.passportDomain,
+        passportDomain: this.passportConfig.passportDomain,
+        magicPublishableApiKey: this.passportConfig.magicPublishableApiKey,
+        magicProviderId: this.passportConfig.magicProviderId,
+        magicTeeBasePath: passportOverrides.magicTeeBasePath || this.passportConfig.magicTeeBasePath,
+      };
+    } else if (this.environment === Environment.PRODUCTION) {
+      // Production environment
+      chainConfig = {
+        chainId: 13371,
+        name: 'Immutable zkEVM',
+        rpcUrl: this.passportConfig.zkEvmRpcUrl,
+        relayerUrl: this.passportConfig.relayerUrl,
+        apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || this.passportConfig.passportDomain,
+        passportDomain: this.passportConfig.passportDomain,
+        magicPublishableApiKey: this.passportConfig.magicPublishableApiKey,
+        magicProviderId: this.passportConfig.magicProviderId,
+        magicTeeBasePath: this.passportConfig.magicTeeBasePath,
+      };
+    } else {
+      // Sandbox/testnet environment
+      chainConfig = {
+        chainId: 13473,
+        name: 'Immutable zkEVM Testnet',
+        rpcUrl: this.passportConfig.zkEvmRpcUrl,
+        relayerUrl: this.passportConfig.relayerUrl,
+        apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || this.passportConfig.passportDomain,
+        passportDomain: this.passportConfig.passportDomain,
+        magicPublishableApiKey: this.passportConfig.magicPublishableApiKey,
+        magicProviderId: this.passportConfig.magicProviderId,
+        magicTeeBasePath: this.passportConfig.magicTeeBasePath,
+      };
+    }
 
-      return provider;
-    }, 'connectEvm', false);
+    // Use connectWallet to create the provider (it will create WalletConfiguration internally)
+    const provider = await connectWallet({
+      auth: this.auth,
+      chains: [chainConfig],
+      crossSdkBridgeEnabled: this.passportConfig.crossSdkBridgeEnabled,
+      jsonRpcReferrer: this.passportConfig.jsonRpcReferrer,
+      forceScwDeployBeforeMessageSignature: this.passportConfig.forceScwDeployBeforeMessageSignature,
+      passportEventEmitter: this.auth.eventEmitter,
+      announceProvider: options?.announceProvider ?? true,
+    });
+
+    return provider;
   }
 
+  // ============================================================================
+  // SHARED METHODS (zkEVM + IMX)
+  // Uses Auth class (public API) instead of AuthManager directly
+  // Exception: forceUserRefresh for silent login (advanced operation)
+  // ============================================================================
+
   /**
-   * Logs in the user.
+   * Logs in the user (works for both zkEVM and IMX).
+   * Uses: Auth class
    * @param {Object} [options] - Login options
    * @param {boolean} [options.useCachedSession] - If true, attempts to use a cached session without user interaction.
    * @param {boolean} [options.useSilentLogin] - If true, attempts silent authentication without user interaction.
@@ -244,106 +269,101 @@ export class Passport {
    *                and useCachedSession is true
    */
   public async login(options?: LoginArguments): Promise<UserProfile | null> {
-    return withMetricsAsync(async () => {
-      const { useCachedSession = false, useSilentLogin } = options || {};
-      let user: User | null = null;
-      try {
-        user = await this.authManager.getUser();
-      } catch (error: any) {
-        if (error instanceof Error && !error.message.includes('Unknown or invalid refresh token')) {
-          trackError('passport', 'login', error);
-        }
-        if (useCachedSession) {
-          throw error;
-        }
-        logger.warn('Failed to retrieve a cached user session', error);
-      }
+    // Convert Passport's LoginArguments to Auth's LoginOptions
+    const authLoginOptions = options ? {
+      useCachedSession: options.useCachedSession,
+      anonymousId: options.anonymousId,
+      useSilentLogin: options.useSilentLogin,
+      useRedirectFlow: options.useRedirectFlow,
+      directLoginOptions: options.directLoginOptions ? {
+        directLoginMethod: options.directLoginOptions.directLoginMethod,
+        email: options.directLoginOptions.email,
+        marketingConsentStatus: options.directLoginOptions.marketingConsentStatus,
+      } : undefined,
+    } : undefined;
 
-      if (!user && useSilentLogin) {
-        user = await this.authManager.forceUserRefresh();
-      } else if (!user && !useCachedSession) {
-        // Convert Passport's DirectLoginOptions to Auth's DirectLoginOptions format
-        const authDirectLoginOptions = options?.directLoginOptions ? {
-          directLoginMethod: options.directLoginOptions.directLoginMethod,
-          email: options.directLoginOptions.email,
-          marketingConsentStatus: options.directLoginOptions.marketingConsentStatus,
-        } : undefined;
-
-        if (options?.useRedirectFlow) {
-          await this.authManager.loginWithRedirect(options?.anonymousId, authDirectLoginOptions);
-        } else {
-          user = await this.authManager.login(options?.anonymousId, authDirectLoginOptions);
-        }
-      }
-
-      if (user) {
-        identify({ passportId: user.profile.sub });
-        this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
-      }
-
-      return user ? user.profile : null;
-    }, 'login', false);
+    const user = await this.auth.loginWithOptions(authLoginOptions);
+    return user ? user.profile : null;
   }
 
   /**
    * Handles the login callback from the authentication service.
+   * Uses: Auth class
    * @returns {Promise<void>} A promise that resolves when the login callback is handled
    */
   public async loginCallback(): Promise<void> {
-    await withMetricsAsync(() => this.authManager.loginCallback(), 'loginCallback', false).then((user) => {
-      if (user) {
-        identify({ passportId: user.profile.sub });
-        this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
-      }
-    });
+    await this.auth.loginCallback();
+  }
+
+  /**
+   * Logs out the user (works for both zkEVM and IMX).
+   * Uses: Auth class
+   * @returns {Promise<void>} A promise that resolves when the user is logged out
+   */
+  public async logout(): Promise<void> {
+    await this.auth.logout();
+  }
+
+  /**
+   * Retrieves the current user's information.
+   * Uses: Auth class
+   * @returns {Promise<UserProfile | undefined>} A promise that resolves to the user profile if logged in, undefined otherwise
+   */
+  public async getUserInfo(): Promise<UserProfile | undefined> {
+    const user = await this.auth.getUser();
+    return user?.profile;
+  }
+
+  /**
+   * Retrieves the ID token.
+   * @returns {Promise<string | undefined>} A promise that resolves to the ID token if available, undefined otherwise
+   */
+  public async getIdToken(): Promise<string | undefined> {
+    const user = await this.auth.getUser();
+    return user?.idToken;
+  }
+
+  /**
+   * Retrieves the access token.
+   * @returns {Promise<string | undefined>} A promise that resolves to the access token if available, undefined otherwise
+   */
+  public async getAccessToken(): Promise<string | undefined> {
+    const user = await this.auth.getUser();
+    return user?.accessToken;
   }
 
   /**
    * Retrieves the PKCE authorization URL for the login flow.
+   * Uses: Auth class
    * @param {DirectLoginOptions} [directLoginOptions] - Optional direct login options
    * @param {string} [imPassportTraceId] - Optional trace ID
    * @returns {Promise<string>} A promise that resolves to the authorization URL
    */
   public async loginWithPKCEFlow(directLoginOptions?: DirectLoginOptions, imPassportTraceId?: string): Promise<string> {
-    return withMetricsAsync(async () => await this.authManager.getPKCEAuthorizationUrl(directLoginOptions, imPassportTraceId), 'loginWithPKCEFlow', false);
+    return this.auth.loginWithPKCEFlow(directLoginOptions, imPassportTraceId);
   }
 
   /**
-   * Handles the PKCE login callback.
-   * @param {string} authorizationCode - The authorization code from the OAuth provider
-   * @param {string} state - The state parameter for CSRF protection
-   * @returns {Promise<UserProfile>} A promise that resolves to the user profile
-   */
+     * Handles the PKCE login callback.
+     * Uses: Auth class
+     * @param {string} authorizationCode - The authorization code from the OAuth provider
+     * @param {string} state - The state parameter for CSRF protection
+     * @returns {Promise<UserProfile>} A promise that resolves to the user profile
+     */
   public async loginWithPKCEFlowCallback(authorizationCode: string, state: string): Promise<UserProfile> {
-    return withMetricsAsync(async () => {
-      const user = await this.authManager.loginWithPKCEFlowCallback(authorizationCode, state);
-      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
-      return user.profile;
-    }, 'loginWithPKCEFlowCallback', false);
+    const user = await this.auth.loginWithPKCEFlowCallback(authorizationCode, state);
+    return user.profile;
   }
 
   /**
-   * Stores the provided tokens and retrieves the user profile.
-   * @param {DeviceTokenResponse} tokenResponse - The token response from device flow
-   * @returns {Promise<UserProfile>} A promise that resolves to the user profile
-   */
+     * Stores the provided tokens and retrieves the user profile.
+     * Uses: Auth class
+     * @param {DeviceTokenResponse} tokenResponse - The token response from device flow
+     * @returns {Promise<UserProfile>} A promise that resolves to the user profile
+     */
   public async storeTokens(tokenResponse: DeviceTokenResponse): Promise<UserProfile> {
-    return withMetricsAsync(async () => {
-      const user = await this.authManager.storeTokens(tokenResponse);
-      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
-      return user.profile;
-    }, 'storeTokens', false);
-  }
-
-  /**
-   * Logs out the user.
-   * @returns {Promise<void>} A promise that resolves when the user is logged out
-   */
-  public async logout(): Promise<void> {
-    return withMetricsAsync(async () => {
-      await this.authManager.logout();
-      this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
-    }, 'logout', false);
+    const user = await this.auth.storeTokens(tokenResponse);
+    return user.profile;
   }
 
   /**
@@ -351,12 +371,8 @@ export class Passport {
    * @returns {Promise<string | undefined>} A promise that resolves to the logout URL, or undefined if not available
    */
   public async getLogoutUrl(): Promise<string | undefined> {
-    return withMetricsAsync(async () => {
-      await this.authManager.removeUser();
-      this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
-      const url = await this.authManager.getLogoutUrl();
-      return url || undefined;
-    }, 'getLogoutUrl', false);
+    const url = await this.auth.getLogoutUrl();
+    return url;
   }
 
   /**
@@ -365,40 +381,7 @@ export class Passport {
    * @returns {Promise<void>} A promise that resolves when the silent logout callback is handled
    */
   public async logoutSilentCallback(url: string): Promise<void> {
-    return withMetricsAsync(() => this.authManager.logoutSilentCallback(url), 'logoutSilentCallback', false);
-  }
-
-  /**
-   * Retrieves the current user's information.
-   * @returns {Promise<UserProfile | undefined>} A promise that resolves to the user profile if logged in, undefined otherwise
-   */
-  public async getUserInfo(): Promise<UserProfile | undefined> {
-    return withMetricsAsync(async () => {
-      const user = await this.authManager.getUser();
-      return user?.profile;
-    }, 'getUserInfo', false);
-  }
-
-  /**
-   * Retrieves the ID token.
-   * @returns {Promise<string | undefined>} A promise that resolves to the ID token if available, undefined otherwise
-   */
-  public async getIdToken(): Promise<string | undefined> {
-    return withMetricsAsync(async () => {
-      const user = await this.authManager.getUser();
-      return user?.idToken;
-    }, 'getIdToken', false, false);
-  }
-
-  /**
-   * Retrieves the access token.
-   * @returns {Promise<string | undefined>} A promise that resolves to the access token if available, undefined otherwise
-   */
-  public async getAccessToken(): Promise<string | undefined> {
-    return withMetricsAsync(async () => {
-      const user = await this.authManager.getUser();
-      return user?.accessToken;
-    }, 'getAccessToken', false, false);
+    return this.auth.logoutSilentCallback(url);
   }
 
   /**
@@ -406,19 +389,8 @@ export class Passport {
    * @returns {Promise<string[]>} A promise that resolves to an array of linked addresses
    */
   public async getLinkedAddresses(): Promise<string[]> {
-    return withMetricsAsync(async () => {
-      const user = await this.authManager.getUser();
-      if (!user?.profile.sub) {
-        return [];
-      }
-
-      const headers = {
-        Authorization: `Bearer ${user.accessToken}`,
-      };
-
-      const { data } = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
-      return data.linked_addresses;
-    }, 'getLinkedAddresses', false);
+    // Delegate to wallet package
+    return walletGetLinkedAddresses(this.auth, this.multiRollupApiClients);
   }
 
   /**
@@ -434,78 +406,7 @@ export class Passport {
    *  - Other generic errors (LINK_WALLET_GENERIC_ERROR)
    */
   public async linkExternalWallet(params: LinkWalletParams): Promise<LinkedWallet> {
-    const flowInit = trackFlow('passport', 'linkExternalWallet');
-
-    const user = await this.authManager.getUser();
-    if (!user) {
-      throw new PassportError('User is not logged in', PassportErrorType.NOT_LOGGED_IN_ERROR);
-    }
-
-    const isImxUser = isUserImx(user);
-    const isZkEvmUser = isUserZkEvm(user);
-
-    if (!isImxUser && !isZkEvmUser) {
-      throw new PassportError('User has not been registered', PassportErrorType.USER_NOT_REGISTERED_ERROR);
-    }
-
-    const headers = {
-      Authorization: `Bearer ${user.accessToken}`,
-    };
-
-    const linkWalletV2Request = {
-      type: params.type,
-      wallet_address: params.walletAddress,
-      signature: params.signature,
-      nonce: params.nonce,
-    };
-
-    try {
-      const linkWalletV2Result = await this.multiRollupApiClients
-        .passportProfileApi.linkWalletV2({ linkWalletV2Request }, { headers });
-      return { ...linkWalletV2Result.data };
-    } catch (error) {
-      if (error instanceof Error) {
-        trackError('passport', 'linkExternalWallet', error);
-      } else {
-        flowInit.addEvent('errored');
-      }
-
-      if (isAxiosError(error) && error.response) {
-        if (error.response.data && isAPIError(error.response.data)) {
-          const { code, message } = error.response.data;
-
-          switch (code) {
-            case 'ALREADY_LINKED':
-              throw new PassportError(message, PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
-            case 'MAX_WALLETS_LINKED':
-              throw new PassportError(message, PassportErrorType.LINK_WALLET_MAX_WALLETS_LINKED_ERROR);
-            case 'DUPLICATE_NONCE':
-              throw new PassportError(message, PassportErrorType.LINK_WALLET_DUPLICATE_NONCE_ERROR);
-            case 'VALIDATION_ERROR':
-              throw new PassportError(message, PassportErrorType.LINK_WALLET_VALIDATION_ERROR);
-            default:
-              throw new PassportError(message, PassportErrorType.LINK_WALLET_GENERIC_ERROR);
-          }
-        } else if (error.response.status) {
-          // Handle unexpected error with a generic error message
-          throw new PassportError(
-            `Link wallet request failed with status code ${error.response.status}`,
-            PassportErrorType.LINK_WALLET_GENERIC_ERROR,
-          );
-        }
-      }
-
-      let message: string = 'Link wallet request failed';
-      if (error instanceof Error) {
-        message += `: ${error.message}`;
-      }
-
-      throw new PassportError(
-        message,
-        PassportErrorType.LINK_WALLET_GENERIC_ERROR,
-      );
-    } finally {
-      flowInit.addEvent('End');
-    }
+    // Delegate to wallet package (tracking handled there)
+    return walletLinkExternalWallet(this.auth, this.multiRollupApiClients, params);
   }
 }

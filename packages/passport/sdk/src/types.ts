@@ -10,11 +10,9 @@ import { Flow } from '@imtbl/metrics';
  */
 export type DirectLoginMethod = string;
 
-export enum PassportEvents {
-  LOGGED_OUT = 'loggedOut',
-  LOGGED_IN = 'loggedIn',
-  ACCOUNTS_REQUESTED = 'accountsRequested',
-}
+// Re-export events from auth and wallet
+export { AuthEvents } from '@imtbl/auth';
+export { WalletEvents } from '@imtbl/wallet';
 
 export type AccountsRequestedEvent = {
   environment: Environment;
@@ -23,12 +21,6 @@ export type AccountsRequestedEvent = {
   passportClient: string;
   flow?: Flow;
 };
-
-export interface PassportEventMap extends Record<string, any> {
-  [PassportEvents.LOGGED_OUT]: [];
-  [PassportEvents.LOGGED_IN]: [User];
-  [PassportEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
-}
 
 export type UserProfile = {
   email?: string;
@@ -89,6 +81,24 @@ export interface PassportOverrides {
   orderBookMrBasePath: string;
   passportMrBasePath: string;
   imxApiClients?: ImxApiClients; // needs to be optional because ImxApiClients is not exposed publicly
+
+  /**
+   * Custom chain ID for dev environments (optional)
+   * If provided, overrides the default chainId based on environment
+   */
+  zkEvmChainId?: number;
+
+  /**
+   * Custom chain name for dev environments (optional)
+   * Used when zkEvmChainId is provided
+   */
+  zkEvmChainName?: string;
+
+  /**
+   * Magic TEE base path (optional, for dev/custom environments)
+   * Defaults to 'https://tee.express.magiclabs.com'
+   */
+  magicTeeBasePath?: string;
 }
 
 export interface PopupOverlayOptions {
@@ -162,21 +172,8 @@ export type PKCEData = {
   verifier: string;
 };
 
-export type LinkWalletParams = {
-  type: string;
-  walletAddress: string;
-  signature: string;
-  nonce: string;
-};
-
-export type LinkedWallet = {
-  address: string;
-  type: string;
-  created_at: string;
-  updated_at: string;
-  name?: string;
-  clientName: string;
-};
+// Re-export wallet linking types from wallet package
+export type { LinkWalletParams, LinkedWallet } from '@imtbl/wallet';
 
 export type ConnectEvmArguments = {
   announceProvider: boolean;

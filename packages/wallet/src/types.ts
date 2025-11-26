@@ -1,19 +1,21 @@
-import { Environment, ModuleConfiguration } from '@imtbl/config';
+import { Environment } from '@imtbl/config';
 import { Flow } from '@imtbl/metrics';
-import { User } from '@imtbl/auth';
+import {
+  Auth, TypedEventEmitter, type AuthEventMap,
+} from '@imtbl/auth';
 import { BigNumberish } from 'ethers';
 import { JsonRpcError } from './zkEvm/JsonRpcError';
 
 // Re-export auth types for convenience
 export type {
-  User, UserProfile, UserImx, UserZkEvm, DirectLoginMethod,
+  User, UserProfile, UserImx, UserZkEvm, DirectLoginMethod, AuthEventMap,
 } from '@imtbl/auth';
 export { isUserImx, isUserZkEvm } from '@imtbl/auth';
 export type { RollupType } from '@imtbl/auth';
+export { AuthEvents } from '@imtbl/auth';
 
-export enum PassportEvents {
-  LOGGED_OUT = 'loggedOut',
-  LOGGED_IN = 'loggedIn',
+// Wallet-specific event (in addition to AuthEvents)
+export enum WalletEvents {
   ACCOUNTS_REQUESTED = 'accountsRequested',
 }
 
@@ -25,10 +27,9 @@ export type AccountsRequestedEvent = {
   flow?: Flow;
 };
 
-export interface PassportEventMap extends Record<string, any> {
-  [PassportEvents.LOGGED_OUT]: [];
-  [PassportEvents.LOGGED_IN]: [User];
-  [PassportEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
+// PassportEventMap combines auth events and wallet-specific events
+export interface PassportEventMap extends AuthEventMap {
+  [WalletEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
 }
 
 // zkEVM/Wallet specific types
@@ -166,27 +167,95 @@ export interface EIP6963AnnounceProviderEvent
   type: 'eip6963:announceProvider';
 }
 
-// Wallet configuration types
-export interface WalletOverrides {
-  passportDomain: string;
-  zkEvmRpcUrl: string;
+/**
+ * Configuration for a single blockchain network
+ */
+export interface ChainConfig {
+  /** Chain ID (e.g., 13371 for mainnet, 13473 for testnet) */
+  chainId: number;
+
+  /** RPC URL for the chain */
+  rpcUrl: string;
+
+  /** Relayer URL for transaction submission */
   relayerUrl: string;
-  indexerMrBasePath: string;
+
+  /** API URL for Passport APIs (guardian, user registration) */
+  apiUrl: string;
+
+  /** Chain name (e.g., 'Immutable zkEVM') */
+  name: string;
+
+  /** Passport domain (optional, defaults based on apiUrl) */
+  passportDomain?: string;
+
+  /**
+   * Magic publishable API key (optional, for dev/custom environments)
+   * If not provided, will use default based on chainId
+   */
+  magicPublishableApiKey?: string;
+
+  /**
+   * Magic provider ID (optional, for dev/custom environments)
+   * If not provided, will use default based on chainId
+   */
+  magicProviderId?: string;
+
+  /**
+   * Magic TEE base path (optional, for dev/custom environments)
+   * Defaults to 'https://tee.express.magiclabs.com'
+   */
+  magicTeeBasePath?: string;
 }
 
-export interface WalletModuleConfiguration extends ModuleConfiguration<WalletOverrides> {
-  /**
-   * Optional referrer URL to be sent with JSON-RPC requests.
-   */
-  jsonRpcReferrer?: string;
+/**
+ * Popup overlay options for wallet UI
+ */
+export interface PopupOverlayOptions {
+  /** Disable the generic popup overlay */
+  disableGenericPopupOverlay?: boolean;
+
+  /** Disable the blocked popup overlay */
+  disableBlockedPopupOverlay?: boolean;
+}
+
+/**
+ * Options for connecting a wallet via connectWallet()
+ * High-level configuration that gets transformed into internal WalletConfiguration
+ */
+export interface ConnectWalletOptions {
+  /** Auth instance */
+  auth: Auth;
 
   /**
-   * If true, forces SCW deployment before allowing message signature.
+   * Chain configurations (supports multi-chain)
+   * Defaults to [IMMUTABLE_ZKEVM_TESTNET_CHAIN, IMMUTABLE_ZKEVM_MAINNET_CHAIN] if not provided
    */
+  chains?: ChainConfig[];
+
+  /**
+   * Initial chain ID (defaults to first chain in chains array)
+   * Use IMMUTABLE_ZKEVM_MAINNET_CHAIN_ID or IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID
+   */
+  initialChainId?: number;
+
+  /** Optional popup overlay options */
+  popupOverlayOptions?: PopupOverlayOptions;
+
+  /** Announce provider via EIP-6963 (default: true) */
+  announceProvider?: boolean;
+
+  /** Enable cross-SDK bridge mode (default: false) */
+  crossSdkBridgeEnabled?: boolean;
+
+  /** Optional referrer URL to be sent with JSON-RPC requests */
+  jsonRpcReferrer?: string;
+
+  /** If true, forces SCW deployment before allowing message signature */
   forceScwDeployBeforeMessageSignature?: boolean;
 
   /**
-   * This flag indicates that Wallet is being used in a cross-sdk bridge scenario.
+   * @internal - Only used by Passport for internal event communication
    */
-  crossSdkBridgeEnabled?: boolean;
+  passportEventEmitter?: TypedEventEmitter<PassportEventMap>;
 }

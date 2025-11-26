@@ -1,9 +1,34 @@
-import { Environment } from '@imtbl/config';
-import { WalletModuleConfiguration } from './types';
+/**
+ * Configuration for wallet operations
+ * Contains concrete URLs and settings - no environment abstraction
+ *
+ * Note: This is a low-level configuration class. For high-level usage,
+ * use Passport SDK which handles environment → URL translation.
+ */
+export interface WalletConfigurationParams {
+  /** Passport domain URL */
+  passportDomain: string;
+
+  /** zkEVM RPC URL */
+  zkEvmRpcUrl: string;
+
+  /** Relayer URL for transaction submission */
+  relayerUrl: string;
+
+  /** Indexer/API base path */
+  indexerMrBasePath: string;
+
+  /** Optional referrer URL for JSON-RPC requests */
+  jsonRpcReferrer?: string;
+
+  /** If true, forces SCW deployment before message signature */
+  forceScwDeployBeforeMessageSignature?: boolean;
+
+  /** Cross-SDK bridge mode flag */
+  crossSdkBridgeEnabled?: boolean;
+}
 
 export class WalletConfiguration {
-  readonly environment: Environment;
-
   readonly passportDomain: string;
 
   readonly zkEvmRpcUrl: string;
@@ -18,34 +43,13 @@ export class WalletConfiguration {
 
   readonly crossSdkBridgeEnabled: boolean;
 
-  constructor(config: WalletModuleConfiguration) {
-    this.environment = config.baseConfig.environment;
-    this.jsonRpcReferrer = config.jsonRpcReferrer;
-    this.forceScwDeployBeforeMessageSignature = config.forceScwDeployBeforeMessageSignature || false;
-    this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled || false;
-
-    if (config.overrides) {
-      this.passportDomain = config.overrides.passportDomain;
-      this.zkEvmRpcUrl = config.overrides.zkEvmRpcUrl;
-      this.relayerUrl = config.overrides.relayerUrl;
-      this.indexerMrBasePath = config.overrides.indexerMrBasePath;
-    } else {
-      switch (config.baseConfig.environment) {
-        case Environment.PRODUCTION:
-          this.passportDomain = 'https://passport.immutable.com';
-          this.zkEvmRpcUrl = 'https://rpc.immutable.com';
-          this.relayerUrl = 'https://api.immutable.com/relayer-mr';
-          this.indexerMrBasePath = 'https://api.immutable.com';
-          break;
-        case Environment.SANDBOX:
-          this.passportDomain = 'https://passport.sandbox.immutable.com';
-          this.zkEvmRpcUrl = 'https://rpc.testnet.immutable.com';
-          this.relayerUrl = 'https://api.sandbox.immutable.com/relayer-mr';
-          this.indexerMrBasePath = 'https://api.sandbox.immutable.com';
-          break;
-        default:
-          throw new Error(`Unsupported environment: ${config.baseConfig.environment}`);
-      }
-    }
+  constructor(params: WalletConfigurationParams) {
+    this.passportDomain = params.passportDomain;
+    this.zkEvmRpcUrl = params.zkEvmRpcUrl;
+    this.relayerUrl = params.relayerUrl;
+    this.indexerMrBasePath = params.indexerMrBasePath;
+    this.jsonRpcReferrer = params.jsonRpcReferrer;
+    this.forceScwDeployBeforeMessageSignature = params.forceScwDeployBeforeMessageSignature || false;
+    this.crossSdkBridgeEnabled = params.crossSdkBridgeEnabled || false;
   }
 }

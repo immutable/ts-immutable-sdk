@@ -28,9 +28,9 @@ import {
   isUserImx,
 } from './types';
 import { IAuthConfiguration } from './config';
-import ConfirmationOverlay from './overlay/confirmationOverlay';
+import LoginPopupOverlay from './overlay/loginPopupOverlay';
+import EmbeddedLoginPrompt from './login/embeddedLoginPrompt';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
-import { EmbeddedLoginPrompt } from './confirmation';
 
 const LOGIN_POPUP_CLOSED_POLLING_DURATION = 500;
 
@@ -94,7 +94,7 @@ const getAuthConfiguration = (config: IAuthConfiguration): UserManagerSettings =
   return baseConfiguration;
 };
 
-function base64URLEncode(str: ArrayBuffer) {
+function base64URLEncode(str: ArrayBuffer | Uint8Array) {
   return btoa(String.fromCharCode(...new Uint8Array(str)))
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
@@ -316,7 +316,7 @@ export default class AuthManager {
 
             // Popup was blocked; append the blocked popup overlay to allow the user to try again.
             let popupHasBeenOpened: boolean = false;
-            const overlay = new ConfirmationOverlay(this.config.popupOverlayOptions || {}, true);
+            const overlay = new LoginPopupOverlay(this.config.popupOverlayOptions || {}, true);
             overlay.append(
               async () => {
                 try {

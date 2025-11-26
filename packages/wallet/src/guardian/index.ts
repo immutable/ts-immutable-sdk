@@ -1,7 +1,8 @@
 import * as GeneratedClients from '@imtbl/generated-clients';
 import { BigNumberish, ZeroAddress } from 'ethers';
 import axios from 'axios';
-import { AuthManager, ConfirmationScreen } from '@imtbl/auth';
+import { AuthManager, IAuthConfiguration } from '@imtbl/auth';
+import ConfirmationScreen from '../confirmation/confirmation';
 import { retryWithDelay } from '../network/retry';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
@@ -10,10 +11,10 @@ import { getEip155ChainId } from '../zkEvm/walletHelpers';
 import { WalletError, WalletErrorType } from '../errors';
 
 export type GuardianClientParams = {
-  confirmationScreen: ConfirmationScreen;
   config: WalletConfiguration;
   authManager: AuthManager;
   guardianApi: GeneratedClients.mr.GuardianApi;
+  authConfig: IAuthConfiguration;
 };
 
 export type GuardianEvaluateImxTransactionParams = {
@@ -75,9 +76,9 @@ export default class GuardianClient {
   private readonly authManager: AuthManager;
 
   constructor({
-    confirmationScreen, config, authManager, guardianApi,
+    config, authManager, guardianApi, authConfig,
   }: GuardianClientParams) {
-    this.confirmationScreen = confirmationScreen;
+    this.confirmationScreen = new ConfirmationScreen(authConfig);
     this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled;
     this.guardianApi = guardianApi;
     this.authManager = authManager;

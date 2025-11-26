@@ -8,7 +8,7 @@ import {
   ConfirmationSendMessage,
 } from './types';
 import { openPopupCenter } from './popup';
-import { IAuthConfiguration } from '../config';
+import { IAuthConfiguration } from '@imtbl/auth';
 import ConfirmationOverlay from '../overlay/confirmationOverlay';
 
 const CONFIRMATION_WINDOW_TITLE = 'Confirm this transaction';

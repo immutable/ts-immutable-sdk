@@ -1,3 +1,6 @@
+// Export Auth class (public API)
+export { Auth } from './Auth';
+
 // Export AuthManager for use by other packages
 export { default as AuthManager } from './authManager';
 
@@ -12,6 +15,7 @@ export type {
   UserZkEvm,
   DirectLoginMethod,
   DirectLoginOptions,
+  LoginOptions,
   DeviceTokenResponse,
   OidcConfiguration,
   AuthModuleConfiguration,
@@ -19,15 +23,14 @@ export type {
   PassportMetadata,
   IdTokenPayload,
   PKCEData,
+  AuthEventMap,
 } from './types';
 export {
-  isUserZkEvm, isUserImx, RollupType, MarketingConsentStatus,
+  isUserZkEvm, isUserImx, RollupType, MarketingConsentStatus, AuthEvents,
 } from './types';
+
+// Export TypedEventEmitter
+export { default as TypedEventEmitter } from './utils/typedEventEmitter';
 
 // Export errors
 export { PassportError, PassportErrorType, withPassportError } from './errors';
-
-// Export confirmation and overlay classes
-export { default as ConfirmationScreen } from './confirmation/confirmation';
-export { default as EmbeddedLoginPrompt } from './confirmation/embeddedLoginPrompt';
-export { default as ConfirmationOverlay } from './overlay/confirmationOverlay';

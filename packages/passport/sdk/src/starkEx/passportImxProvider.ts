@@ -14,10 +14,12 @@ import {
   ImxApiClients,
 } from '@imtbl/generated-clients';
 import { TransactionResponse } from 'ethers';
-import { AuthManager } from '@imtbl/auth';
-import { GuardianClient, MagicTEESigner, TypedEventEmitter } from '@imtbl/wallet';
 import {
-  PassportEventMap, PassportEvents, UserImx, User, isUserImx,
+  AuthManager, AuthEventMap, AuthEvents, TypedEventEmitter,
+} from '@imtbl/auth';
+import { GuardianClient, MagicTEESigner } from '@imtbl/wallet';
+import {
+  UserImx, User, isUserImx,
 } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
@@ -30,7 +32,7 @@ import { withMetricsAsync } from '../utils/metrics';
 export interface PassportImxProviderOptions {
   authManager: AuthManager;
   immutableXClient: IMXClient;
-  passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  passportEventEmitter: TypedEventEmitter<AuthEventMap>;
   magicTEESigner: MagicTEESigner;
   imxApiClients: ImxApiClients;
   guardianClient: GuardianClient;
@@ -77,7 +79,7 @@ export class PassportImxProvider implements IMXProvider {
     this.guardianClient = guardianClient;
     this.#initialiseSigner();
 
-    passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.handleLogout);
+    passportEventEmitter.on(AuthEvents.LOGGED_OUT, this.handleLogout);
   }
 
   private handleLogout = (): void => {
