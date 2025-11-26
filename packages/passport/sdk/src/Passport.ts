@@ -5,7 +5,7 @@ import {
 import { IMXClient } from '@imtbl/x-client';
 import { Environment } from '@imtbl/config';
 
-import { setPassportClientId, track } from '@imtbl/metrics';
+import { setPassportClientId } from '@imtbl/metrics';
 import {
   Auth,
   UserProfile,
@@ -147,7 +147,6 @@ export class Passport {
     this.environment = privateVars.environment;
 
     setPassportClientId(passportModuleConfiguration.clientId);
-    track('passport', 'initialise');
   }
 
   // ============================================================================

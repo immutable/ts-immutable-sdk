@@ -20,14 +20,10 @@ export default class EmbeddedLoginPrompt {
     this.config = config;
   }
 
-  private getHref = (anonymousId?: string) => {
-    let href = `${this.config.authenticationDomain}/im-embedded-login-prompt`
+  private getHref = () => {
+    const href = `${this.config.authenticationDomain}/im-embedded-login-prompt`
     + `?client_id=${this.config.oidcConfiguration.clientId}`
     + `&rid=${getDetail(Detail.RUNTIME_ID)}`;
-
-    if (anonymousId) {
-      href += `&third_party_a_id=${anonymousId}`;
-    }
 
     return href;
   };
@@ -77,7 +73,7 @@ export default class EmbeddedLoginPrompt {
     document.head.appendChild(style);
   };
 
-  private getEmbeddedLoginIFrame = (anonymousId?: string) => {
+  private getEmbeddedLoginIFrame = () => {
     const embeddedLoginPrompt = document.createElement('iframe');
     embeddedLoginPrompt.id = LOGIN_PROMPT_IFRAME_ID;
     embeddedLoginPrompt.src = this.getHref(anonymousId);
@@ -96,9 +92,9 @@ export default class EmbeddedLoginPrompt {
     return embeddedLoginPrompt;
   };
 
-  public displayEmbeddedLoginPrompt(anonymousId?: string): Promise<EmbeddedLoginPromptResult> {
+  public displayEmbeddedLoginPrompt(): Promise<EmbeddedLoginPromptResult> {
     return new Promise((resolve, reject) => {
-      const embeddedLoginPrompt = this.getEmbeddedLoginIFrame(anonymousId);
+      const embeddedLoginPrompt = this.getEmbeddedLoginIFrame();
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
           origin !== this.config.authenticationDomain

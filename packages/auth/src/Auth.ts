@@ -5,7 +5,7 @@ import {
 } from './types';
 import EmbeddedLoginPrompt from './login/embeddedLoginPrompt';
 import TypedEventEmitter from './utils/typedEventEmitter';
-import { identify } from '@imtbl/metrics';
+import { identify, track } from '@imtbl/metrics';
 
 /**
  * Public-facing Auth class for authentication
@@ -45,28 +45,27 @@ export class Auth {
     const embeddedLoginPrompt = new EmbeddedLoginPrompt(this.config);
     this.authManager = new AuthManager(this.config, embeddedLoginPrompt);
     this.eventEmitter = new TypedEventEmitter<AuthEventMap>();
+    track('passport', 'initialise');
   }
 
   /**
    * Login with popup
    * Opens a popup window for authentication
-   * @param anonymousId - Optional anonymous ID for tracking
    * @param directLoginOptions - Optional direct login options
    * @returns Promise that resolves with the authenticated user
    */
-  async login(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<User> {
-    return this.authManager.login(anonymousId, directLoginOptions);
+  async login(directLoginOptions?: DirectLoginOptions): Promise<User> {
+    return this.authManager.login(directLoginOptions);
   }
 
   /**
    * Login with redirect
    * Redirects the page for authentication
-   * @param anonymousId - Optional anonymous ID for tracking
    * @param directLoginOptions - Optional direct login options
    * @returns Promise that resolves when redirect is initiated
    */
-  async loginWithRedirect(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<void> {
-    await this.authManager.loginWithRedirect(anonymousId, directLoginOptions);
+  async loginWithRedirect(directLoginOptions?: DirectLoginOptions): Promise<void> {
+    await this.authManager.loginWithRedirect(directLoginOptions);
   }
 
   /**
@@ -96,10 +95,10 @@ export class Auth {
 
     if (!user && !useCachedSession) {
       if (options?.useRedirectFlow) {
-        await this.authManager.loginWithRedirect(options?.anonymousId, options?.directLoginOptions);
+        await this.authManager.loginWithRedirect(options?.directLoginOptions);
         return null; // Redirect doesn't return user immediately
       }
-      user = await this.authManager.login(options?.anonymousId, options?.directLoginOptions);
+      user = await this.authManager.login(options?.directLoginOptions);
     }
 
     // Emit LOGGED_IN event and identify user if logged in

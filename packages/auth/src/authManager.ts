@@ -186,14 +186,13 @@ export default class AuthManager {
   };
 
   private buildExtraQueryParams(
-    anonymousId?: string,
     directLoginOptions?: DirectLoginOptions,
     imPassportTraceId?: string,
   ): Record<string, string> {
     const params: Record<string, string> = {
       ...(this.userManager.settings?.extraQueryParams ?? {}),
       rid: getDetail(Detail.RUNTIME_ID) || '',
-      third_party_a_id: anonymousId || '',
+      third_party_a_id: '',
     };
 
     if (directLoginOptions) {
@@ -221,10 +220,10 @@ export default class AuthManager {
     return params;
   }
 
-  public async loginWithRedirect(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<void> {
+  public async loginWithRedirect(directLoginOptions?: DirectLoginOptions): Promise<void> {
     await this.userManager.clearStaleState();
     return withPassportError<void>(async () => {
-      const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptions);
+      const extraQueryParams = this.buildExtraQueryParams(directLoginOptions);
 
       await this.userManager.signinRedirect({
         extraQueryParams,
@@ -234,13 +233,12 @@ export default class AuthManager {
 
   /**
    * login
-   * @param anonymousId Caller can pass an anonymousId if they want to associate their user's identity with immutable's internal instrumentation.
    * @param directLoginOptions If provided, contains login method and marketing consent options
    * @param directLoginOptions.directLoginMethod The login method to use (e.g., 'google', 'apple', 'email')
    * @param directLoginOptions.marketingConsentStatus Marketing consent status ('opted_in' or 'unsubscribed')
    * @param directLoginOptions.email Required when directLoginMethod is 'email'
    */
-  public async login(anonymousId?: string, directLoginOptions?: DirectLoginOptions): Promise<User> {
+  public async login(directLoginOptions?: DirectLoginOptions): Promise<User> {
     return withPassportError<User>(async () => {
       // If directLoginOptions are provided, then the consumer has rendered their own initial login screen.
       // If not, display the embedded login prompt and pass the returned direct login options and imPassportTraceId to the login popup.
@@ -252,14 +250,14 @@ export default class AuthManager {
         const {
           imPassportTraceId: embeddedLoginPromptImPassportTraceId,
           ...embeddedLoginPromptDirectLoginOptions
-        } = await this.embeddedLoginPrompt.displayEmbeddedLoginPrompt(anonymousId);
+        } = await this.embeddedLoginPrompt.displayEmbeddedLoginPrompt();
         directLoginOptionsToUse = embeddedLoginPromptDirectLoginOptions;
         imPassportTraceId = embeddedLoginPromptImPassportTraceId;
       }
 
       const popupWindowTarget = window.crypto.randomUUID();
       const signinPopup = async () => {
-        const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptionsToUse, imPassportTraceId);
+        const extraQueryParams = this.buildExtraQueryParams(directLoginOptionsToUse, imPassportTraceId);
 
         const userPromise = this.userManager.signinPopup({
           extraQueryParams,

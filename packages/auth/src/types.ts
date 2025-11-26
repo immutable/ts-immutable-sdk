@@ -133,8 +133,6 @@ export type DirectLoginOptions = {
 export type LoginOptions = {
   /** If true, attempts to use cached session without user interaction */
   useCachedSession?: boolean;
-  /** Optional anonymous ID for tracking */
-  anonymousId?: string;
   /** If true, attempts silent authentication (force token refresh) */
   useSilentLogin?: boolean;
   /** If true, uses redirect flow instead of popup flow */
