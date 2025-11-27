@@ -268,10 +268,9 @@ export class Passport {
    *                and useCachedSession is true
    */
   public async login(options?: LoginArguments): Promise<UserProfile | null> {
-    // Convert Passport's LoginArguments to Auth's LoginOptions
+    // Convert Passport's LoginArguments to Auth's LoginOptions (excludes anonymousId)
     const authLoginOptions = options ? {
       useCachedSession: options.useCachedSession,
-      anonymousId: options.anonymousId,
       useSilentLogin: options.useSilentLogin,
       useRedirectFlow: options.useRedirectFlow,
       directLoginOptions: options.directLoginOptions ? {
@@ -281,7 +280,7 @@ export class Passport {
       } : undefined,
     } : undefined;
 
-    const user = await this.auth.loginWithOptions(authLoginOptions);
+    const user = await this.auth.login(authLoginOptions);
     return user ? user.profile : null;
   }
 

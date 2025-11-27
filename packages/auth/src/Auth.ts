@@ -49,32 +49,12 @@ export class Auth {
   }
 
   /**
-   * Login with popup
-   * Opens a popup window for authentication
-   * @param directLoginOptions - Optional direct login options
-   * @returns Promise that resolves with the authenticated user
-   */
-  async login(directLoginOptions?: DirectLoginOptions): Promise<User> {
-    return this.authManager.login(directLoginOptions);
-  }
-
-  /**
-   * Login with redirect
-   * Redirects the page for authentication
-   * @param directLoginOptions - Optional direct login options
-   * @returns Promise that resolves when redirect is initiated
-   */
-  async loginWithRedirect(directLoginOptions?: DirectLoginOptions): Promise<void> {
-    await this.authManager.loginWithRedirect(directLoginOptions);
-  }
-
-  /**
-   * Enhanced login method with extended options
-   * Supports cached sessions, silent login, and redirect flow
+   * Login the user with extended options
+   * Supports cached sessions, silent login, redirect flow, and direct login
    * @param options - Extended login options
    * @returns Promise that resolves with the user or null
    */
-  async loginWithOptions(options?: LoginOptions): Promise<User | null> {
+  async login(options?: LoginOptions): Promise<User | null> {
     const { useCachedSession = false, useSilentLogin } = options || {};
     let user: User | null = null;
 
@@ -108,6 +88,16 @@ export class Auth {
     }
 
     return user;
+  }
+
+  /**
+   * Login with redirect
+   * Redirects the page for authentication
+   * @param directLoginOptions - Optional direct login options
+   * @returns Promise that resolves when redirect is initiated
+   */
+  async loginWithRedirect(directLoginOptions?: DirectLoginOptions): Promise<void> {
+    await this.authManager.loginWithRedirect(directLoginOptions);
   }
 
   /**
