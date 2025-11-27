@@ -5,11 +5,12 @@ import {
 import { IMXClient } from '@imtbl/x-client';
 import { Environment } from '@imtbl/config';
 
-import { setPassportClientId } from '@imtbl/metrics';
+import { setPassportClientId, trackError, trackFlow } from '@imtbl/metrics';
 import {
   Auth,
   UserProfile,
   DeviceTokenResponse,
+  isUserZkEvm,
 } from '@imtbl/auth';
 import type { DirectLoginOptions } from '@imtbl/auth';
 import {
@@ -19,17 +20,21 @@ import {
   GuardianClient,
   MagicTEESigner,
   ChainConfig,
-  linkExternalWallet as walletLinkExternalWallet,
-  getLinkedAddresses as walletGetLinkedAddresses,
+  ConfirmationScreen,
 } from '@imtbl/wallet';
 import type { LinkWalletParams, LinkedWallet } from '@imtbl/wallet';
+import { isAxiosError } from 'axios';
 import {
   PassportModuleConfiguration,
   ConnectEvmArguments,
   LoginArguments,
 } from './types';
+import { toUserImx } from './utils/imxUser';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
+import { withMetricsAsync } from './utils/metrics';
+import { PassportError, PassportErrorType } from './errors/passportError';
+import { ImxGuardianClient } from './starkEx/imxGuardianClient';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -63,6 +68,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
   // Get AuthManager for internal IMX provider use
   const authManager = auth.getAuthManager();
   const authConfig = auth.getConfig();
+  const confirmationScreen = new ConfirmationScreen(authConfig);
 
   // Create wallet configuration with concrete URLs (no environment)
   // PassportConfiguration translates environment → URLs
@@ -91,6 +97,13 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     authConfig,
   });
 
+  const imxGuardianClient = new ImxGuardianClient({
+    authManager,
+    guardianApi: multiRollupApiClients.guardianApi,
+    confirmationScreen,
+    crossSdkBridgeEnabled: passportModuleConfiguration.crossSdkBridgeEnabled || false,
+  });
+
   // Create Magic TEE signer for IMX provider
   const magicTeeApiClients = new MagicTeeApiClients({
     basePath: passportConfig.magicTeeBasePath,
@@ -109,6 +122,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     passportEventEmitter: auth.eventEmitter,
     imxApiClients,
     guardianClient,
+    imxGuardianClient,
   });
 
   return {
@@ -160,7 +174,11 @@ export class Passport {
    * @deprecated The method `login` with an argument of `{ useCachedSession: true }` should be used in conjunction with `connectImx` instead
    */
   public async connectImxSilent(): Promise<IMXProvider | null> {
-    return this.passportImxProviderFactory.getProviderSilent();
+    return withMetricsAsync(
+      () => this.passportImxProviderFactory.getProviderSilent(),
+      'connectImxSilent',
+      false,
+    );
   }
 
   /**
@@ -168,7 +186,11 @@ export class Passport {
    * @returns {Promise<IMXProvider>} A promise that resolves to an IMX provider
    */
   public async connectImx(): Promise<IMXProvider> {
-    return this.passportImxProviderFactory.getProvider();
+    return withMetricsAsync(
+      () => this.passportImxProviderFactory.getProvider(),
+      'connectImx',
+      false,
+    );
   }
 
   // ============================================================================
@@ -184,65 +206,67 @@ export class Passport {
    * @returns {Promise<Provider>} The EVM provider instance
    */
   public async connectEvm(options: ConnectEvmArguments = { announceProvider: true }): Promise<ZkEvmProvider> {
-    // Access PassportOverrides from PassportConfiguration
-    const passportOverrides = this.passportConfig.overrides;
+    return withMetricsAsync(async () => {
+      // Access PassportOverrides from PassportConfiguration
+      const passportOverrides = this.passportConfig.overrides;
 
-    // Build complete chain configuration
-    let chainConfig: ChainConfig;
+      // Build complete chain configuration
+      let chainConfig: ChainConfig;
 
-    if (passportOverrides?.zkEvmChainId) {
-      // Dev environment with custom chain
-      chainConfig = {
-        chainId: passportOverrides.zkEvmChainId,
-        name: passportOverrides.zkEvmChainName || 'Dev Chain',
-        rpcUrl: this.passportConfig.zkEvmRpcUrl,
-        relayerUrl: this.passportConfig.relayerUrl,
-        apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || this.passportConfig.passportDomain,
-        passportDomain: this.passportConfig.passportDomain,
-        magicPublishableApiKey: this.passportConfig.magicPublishableApiKey,
-        magicProviderId: this.passportConfig.magicProviderId,
-        magicTeeBasePath: passportOverrides.magicTeeBasePath || this.passportConfig.magicTeeBasePath,
-      };
-    } else if (this.environment === Environment.PRODUCTION) {
-      // Production environment
-      chainConfig = {
-        chainId: 13371,
-        name: 'Immutable zkEVM',
-        rpcUrl: this.passportConfig.zkEvmRpcUrl,
-        relayerUrl: this.passportConfig.relayerUrl,
-        apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || this.passportConfig.passportDomain,
-        passportDomain: this.passportConfig.passportDomain,
-        magicPublishableApiKey: this.passportConfig.magicPublishableApiKey,
-        magicProviderId: this.passportConfig.magicProviderId,
-        magicTeeBasePath: this.passportConfig.magicTeeBasePath,
-      };
-    } else {
-      // Sandbox/testnet environment
-      chainConfig = {
-        chainId: 13473,
-        name: 'Immutable zkEVM Testnet',
-        rpcUrl: this.passportConfig.zkEvmRpcUrl,
-        relayerUrl: this.passportConfig.relayerUrl,
-        apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || this.passportConfig.passportDomain,
-        passportDomain: this.passportConfig.passportDomain,
-        magicPublishableApiKey: this.passportConfig.magicPublishableApiKey,
-        magicProviderId: this.passportConfig.magicProviderId,
-        magicTeeBasePath: this.passportConfig.magicTeeBasePath,
-      };
-    }
+      if (passportOverrides?.zkEvmChainId) {
+        // Dev environment with custom chain
+        chainConfig = {
+          chainId: passportOverrides.zkEvmChainId,
+          name: passportOverrides.zkEvmChainName || 'Dev Chain',
+          rpcUrl: this.passportConfig.zkEvmRpcUrl,
+          relayerUrl: this.passportConfig.relayerUrl,
+          apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || this.passportConfig.passportDomain,
+          passportDomain: this.passportConfig.passportDomain,
+          magicPublishableApiKey: this.passportConfig.magicPublishableApiKey,
+          magicProviderId: this.passportConfig.magicProviderId,
+          magicTeeBasePath: passportOverrides.magicTeeBasePath || this.passportConfig.magicTeeBasePath,
+        };
+      } else if (this.environment === Environment.PRODUCTION) {
+        // Production environment
+        chainConfig = {
+          chainId: 13371,
+          name: 'Immutable zkEVM',
+          rpcUrl: this.passportConfig.zkEvmRpcUrl,
+          relayerUrl: this.passportConfig.relayerUrl,
+          apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || this.passportConfig.passportDomain,
+          passportDomain: this.passportConfig.passportDomain,
+          magicPublishableApiKey: this.passportConfig.magicPublishableApiKey,
+          magicProviderId: this.passportConfig.magicProviderId,
+          magicTeeBasePath: this.passportConfig.magicTeeBasePath,
+        };
+      } else {
+        // Sandbox/testnet environment
+        chainConfig = {
+          chainId: 13473,
+          name: 'Immutable zkEVM Testnet',
+          rpcUrl: this.passportConfig.zkEvmRpcUrl,
+          relayerUrl: this.passportConfig.relayerUrl,
+          apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || this.passportConfig.passportDomain,
+          passportDomain: this.passportConfig.passportDomain,
+          magicPublishableApiKey: this.passportConfig.magicPublishableApiKey,
+          magicProviderId: this.passportConfig.magicProviderId,
+          magicTeeBasePath: this.passportConfig.magicTeeBasePath,
+        };
+      }
 
-    // Use connectWallet to create the provider (it will create WalletConfiguration internally)
-    const provider = await connectWallet({
-      auth: this.auth,
-      chains: [chainConfig],
-      crossSdkBridgeEnabled: this.passportConfig.crossSdkBridgeEnabled,
-      jsonRpcReferrer: this.passportConfig.jsonRpcReferrer,
-      forceScwDeployBeforeMessageSignature: this.passportConfig.forceScwDeployBeforeMessageSignature,
-      passportEventEmitter: this.auth.eventEmitter,
-      announceProvider: options?.announceProvider ?? true,
-    });
+      // Use connectWallet to create the provider (it will create WalletConfiguration internally)
+      const provider = await connectWallet({
+        auth: this.auth,
+        chains: [chainConfig],
+        crossSdkBridgeEnabled: this.passportConfig.crossSdkBridgeEnabled,
+        jsonRpcReferrer: this.passportConfig.jsonRpcReferrer,
+        forceScwDeployBeforeMessageSignature: this.passportConfig.forceScwDeployBeforeMessageSignature,
+        passportEventEmitter: this.auth.eventEmitter,
+        announceProvider: options?.announceProvider ?? true,
+      });
 
-    return provider;
+      return provider;
+    }, 'connectEvm', false);
   }
 
   // ============================================================================
@@ -273,11 +297,7 @@ export class Passport {
       useCachedSession: options.useCachedSession,
       useSilentLogin: options.useSilentLogin,
       useRedirectFlow: options.useRedirectFlow,
-      directLoginOptions: options.directLoginOptions ? {
-        directLoginMethod: options.directLoginOptions.directLoginMethod,
-        email: options.directLoginOptions.email,
-        marketingConsentStatus: options.directLoginOptions.marketingConsentStatus,
-      } : undefined,
+      directLoginOptions: options.directLoginOptions,
     } : undefined;
 
     const user = await this.auth.login(authLoginOptions);
@@ -387,8 +407,16 @@ export class Passport {
    * @returns {Promise<string[]>} A promise that resolves to an array of linked addresses
    */
   public async getLinkedAddresses(): Promise<string[]> {
-    // Delegate to wallet package
-    return walletGetLinkedAddresses(this.auth, this.multiRollupApiClients);
+    return withMetricsAsync(async () => {
+      const user = await this.auth.getUser();
+      if (!user?.profile.sub) {
+        return [];
+      }
+
+      const headers = { Authorization: `Bearer ${user.accessToken}` };
+      const getUserInfoResult = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
+      return getUserInfoResult.data.linked_addresses;
+    }, 'getLinkedAddresses', false);
   }
 
   /**
@@ -404,7 +432,99 @@ export class Passport {
    *  - Other generic errors (LINK_WALLET_GENERIC_ERROR)
    */
   public async linkExternalWallet(params: LinkWalletParams): Promise<LinkedWallet> {
-    // Delegate to wallet package (tracking handled there)
-    return walletLinkExternalWallet(this.auth, this.multiRollupApiClients, params);
+    type ApiError = {
+      code: string;
+      message: string;
+    };
+
+    const isApiError = (error: unknown): error is ApiError => (
+      typeof error === 'object'
+      && error !== null
+      && 'code' in error
+      && 'message' in error
+    );
+
+    const flow = trackFlow('passport', 'linkExternalWallet', false);
+
+    try {
+      const user = await this.auth.getUser();
+      if (!user) {
+        throw new PassportError('User is not logged in', PassportErrorType.NOT_LOGGED_IN_ERROR);
+      }
+
+      const isRegisteredWithZkEvm = isUserZkEvm(user);
+      const isRegisteredWithIMX = (() => {
+        try {
+          toUserImx(user);
+          return true;
+        } catch (imxError) {
+          if (
+            imxError instanceof PassportError
+            && imxError.type === PassportErrorType.USER_NOT_REGISTERED_ERROR
+          ) {
+            return false;
+          }
+          throw imxError;
+        }
+      })();
+
+      if (!isRegisteredWithIMX && !isRegisteredWithZkEvm) {
+        throw new PassportError('User has not been registered', PassportErrorType.USER_NOT_REGISTERED_ERROR);
+      }
+
+      const headers = { Authorization: `Bearer ${user.accessToken}` };
+      const linkWalletV2Request = {
+        type: params.type,
+        wallet_address: params.walletAddress,
+        signature: params.signature,
+        nonce: params.nonce,
+      };
+
+      const linkWalletV2Result = await this.multiRollupApiClients
+        .passportProfileApi.linkWalletV2({ linkWalletV2Request }, { headers });
+      return { ...linkWalletV2Result.data };
+    } catch (error) {
+      if (error instanceof Error) {
+        trackError('passport', 'linkExternalWallet', error);
+      } else {
+        flow.addEvent('errored');
+      }
+
+      if (isAxiosError(error) && error.response) {
+        if (error.response.data && isApiError(error.response.data)) {
+          const { code, message } = error.response.data;
+
+          switch (code) {
+            case 'ALREADY_LINKED':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
+            case 'MAX_WALLETS_LINKED':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_MAX_WALLETS_LINKED_ERROR);
+            case 'DUPLICATE_NONCE':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_DUPLICATE_NONCE_ERROR);
+            case 'VALIDATION_ERROR':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_VALIDATION_ERROR);
+            default:
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_GENERIC_ERROR);
+          }
+        } else if (error.response.status) {
+          throw new PassportError(
+            `Link wallet request failed with status code ${error.response.status}`,
+            PassportErrorType.LINK_WALLET_GENERIC_ERROR,
+          );
+        }
+      }
+
+      let message: string = 'Link wallet request failed';
+      if (error instanceof Error) {
+        message += `: ${error.message}`;
+      }
+
+      throw new PassportError(
+        message,
+        PassportErrorType.LINK_WALLET_GENERIC_ERROR,
+      );
+    } finally {
+      flow.addEvent('End');
+    }
   }
 }

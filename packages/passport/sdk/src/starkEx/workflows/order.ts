@@ -4,7 +4,7 @@ import {
   UnsignedOrderRequest,
 } from '@imtbl/x-client';
 import { convertToSignableToken } from '@imtbl/toolkit';
-import { GuardianClient } from '@imtbl/wallet';
+import { ImxGuardianClient } from '../imxGuardianClient';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
 
@@ -13,7 +13,7 @@ type CancelOrderParams = {
   ordersApi: imx.OrdersApi;
   user: UserImx;
   starkSigner: StarkSigner;
-  guardianClient: GuardianClient;
+  guardianClient: ImxGuardianClient;
 };
 
 type CreateOrderParams = {
@@ -21,7 +21,7 @@ type CreateOrderParams = {
   ordersApi: imx.OrdersApi;
   user: UserImx;
   starkSigner: StarkSigner;
-  guardianClient: GuardianClient;
+  guardianClient: ImxGuardianClient;
 };
 
 const ERC721 = 'ERC721';
@@ -57,9 +57,7 @@ export async function createOrder({
       { headers },
     );
 
-    await guardianClient.evaluateImxTransaction({
-      payloadHash: getSignableOrderResponse.data.payload_hash,
-    });
+    await guardianClient.evaluateTransaction(getSignableOrderResponse.data.payload_hash);
 
     const { payload_hash: payloadHash } = getSignableOrderResponse.data;
 
@@ -115,9 +113,7 @@ export async function cancelOrder({
       getSignableCancelOrderRequest,
     }, { headers });
 
-    await guardianClient.evaluateImxTransaction({
-      payloadHash: getSignableCancelOrderResponse.data.payload_hash,
-    });
+    await guardianClient.evaluateTransaction(getSignableCancelOrderResponse.data.payload_hash);
 
     const { payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
 

@@ -15,12 +15,11 @@ import {
 } from '@imtbl/generated-clients';
 import { TransactionResponse } from 'ethers';
 import {
-  AuthManager, AuthEventMap, AuthEvents, TypedEventEmitter,
+  AuthManager, AuthEventMap, AuthEvents, TypedEventEmitter, User,
 } from '@imtbl/auth';
 import { GuardianClient, MagicTEESigner } from '@imtbl/wallet';
-import {
-  UserImx, User, isUserImx,
-} from '../types';
+import { toUserImx, UserImx } from '../utils/imxUser';
+import { ImxGuardianClient } from './imxGuardianClient';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
   batchNftTransfer, cancelOrder, createOrder, createTrade, exchangeTransfer, transfer,
@@ -36,6 +35,7 @@ export interface PassportImxProviderOptions {
   magicTEESigner: MagicTEESigner;
   imxApiClients: ImxApiClients;
   guardianClient: GuardianClient;
+  imxGuardianClient: ImxGuardianClient;
 }
 
 type RegisteredUserAndStarkSigner = {
@@ -54,6 +54,8 @@ export class PassportImxProvider implements IMXProvider {
 
   protected magicTEESigner: MagicTEESigner;
 
+  private readonly imxGuardianClient: ImxGuardianClient;
+
   /**
    * This property is set during initialisation and stores the signers in a promise.
    * This property is not meant to be accessed directly, but through the
@@ -71,12 +73,14 @@ export class PassportImxProvider implements IMXProvider {
     magicTEESigner,
     imxApiClients,
     guardianClient,
+    imxGuardianClient,
   }: PassportImxProviderOptions) {
     this.authManager = authManager;
     this.immutableXClient = immutableXClient;
     this.magicTEESigner = magicTEESigner;
     this.imxApiClients = imxApiClients;
     this.guardianClient = guardianClient;
+    this.imxGuardianClient = imxGuardianClient;
     this.#initialiseSigner();
 
     passportEventEmitter.on(AuthEvents.LOGGED_OUT, this.handleLogout);
@@ -144,15 +148,8 @@ export class PassportImxProvider implements IMXProvider {
       this.#getStarkSigner(),
     ]);
 
-    if (!isUserImx(user)) {
-      throw new PassportError(
-        'User has not been registered with StarkEx',
-        PassportErrorType.USER_NOT_REGISTERED_ERROR,
-      );
-    }
-
     return {
-      user,
+      user: toUserImx(user),
       starkSigner,
     };
   }
@@ -167,7 +164,7 @@ export class PassportImxProvider implements IMXProvider {
           user,
           starkSigner,
           transfersApi: this.immutableXClient.transfersApi,
-          guardianClient: this.guardianClient,
+          guardianClient: this.imxGuardianClient,
         });
       },
     )(), 'imxTransfer');
@@ -184,7 +181,7 @@ export class PassportImxProvider implements IMXProvider {
         return await registerOffchain(
           this.magicTEESigner,
           starkSigner,
-          user,
+          toUserImx(user),
           this.authManager,
           this.imxApiClients,
         );
@@ -196,8 +193,19 @@ export class PassportImxProvider implements IMXProvider {
   async isRegisteredOffchain(): Promise<boolean> {
     return withMetricsAsync(
       async () => {
-        const user = await this.#getAuthenticatedUser();
-        return !!user.imx;
+        try {
+          const user = await this.#getAuthenticatedUser();
+          const imxUser = toUserImx(user);
+          return !!imxUser.imx;
+        } catch (error) {
+          if (
+            error instanceof PassportError
+            && error.type === PassportErrorType.USER_NOT_REGISTERED_ERROR
+          ) {
+            return false;
+          }
+          throw error;
+        }
       },
       'imxIsRegisteredOffchain',
     );
@@ -220,7 +228,7 @@ export class PassportImxProvider implements IMXProvider {
           user,
           starkSigner,
           ordersApi: this.immutableXClient.ordersApi,
-          guardianClient: this.guardianClient,
+          guardianClient: this.imxGuardianClient,
         });
       },
     )(), 'imxCreateOrder');
@@ -238,7 +246,7 @@ export class PassportImxProvider implements IMXProvider {
           user,
           starkSigner,
           ordersApi: this.immutableXClient.ordersApi,
-          guardianClient: this.guardianClient,
+          guardianClient: this.imxGuardianClient,
         });
       },
     )(), 'imxCancelOrder');
@@ -254,7 +262,7 @@ export class PassportImxProvider implements IMXProvider {
           user,
           starkSigner,
           tradesApi: this.immutableXClient.tradesApi,
-          guardianClient: this.guardianClient,
+          guardianClient: this.imxGuardianClient,
         });
       },
     )(), 'imxCreateTrade');
@@ -274,7 +282,7 @@ export class PassportImxProvider implements IMXProvider {
 
         starkSigner,
         transfersApi: this.immutableXClient.transfersApi,
-        guardianClient: this.guardianClient,
+        guardianClient: this.imxGuardianClient,
       });
     })(), 'imxBatchNftTransfer');
   }
@@ -326,14 +334,8 @@ export class PassportImxProvider implements IMXProvider {
   async getAddress(): Promise<string> {
     return withMetricsAsync(async () => {
       const user = await this.#getAuthenticatedUser();
-      if (!isUserImx(user)) {
-        throw new PassportError(
-          'User has not been registered with StarkEx',
-          PassportErrorType.USER_NOT_REGISTERED_ERROR,
-        );
-      }
-
-      return Promise.resolve(user.imx.ethAddress);
+      const imxUser = toUserImx(user);
+      return Promise.resolve(imxUser.imx.ethAddress);
     }, 'imxGetAddress');
   }
 }

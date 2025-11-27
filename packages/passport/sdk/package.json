@@ -16,7 +16,8 @@
     "@imtbl/x-client": "workspace:*",
     "@imtbl/x-provider": "workspace:*",
     "axios": "^1.6.5",
-    "ethers": "^6.13.4"
+    "ethers": "^6.13.4",
+    "jwt-decode": "^3.1.2"
   },
   "devDependencies": {
     "@swc/core": "^1.3.36",

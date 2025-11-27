@@ -5,7 +5,7 @@ import { Flow, trackDuration } from '@imtbl/metrics';
 import { WalletError, WalletErrorType } from '../errors';
 import { AuthManager } from '@imtbl/auth';
 import { withMetricsAsync } from '../utils/metrics';
-import { isUserImx, isUserZkEvm, User } from '../types';
+import { isUserZkEvm, User } from '../types';
 
 const CHAIN_IDENTIFIER = 'ETH';
 
@@ -39,14 +39,6 @@ export default class MagicTEESigner extends AbstractSigner {
     const user = await this.getUserOrThrow();
     if (user.profile.sub !== userWallet.userIdentifier) {
       userWallet = await this.createWallet(user);
-    }
-
-    if (isUserImx(user) && user.imx.userAdminAddress.toLowerCase() !== userWallet.walletAddress.toLowerCase()) {
-      throw new WalletError(
-        'Wallet address mismatch.'
-          + `Rollup: IMX, TEE address: ${userWallet.walletAddress}, profile address: ${user.imx.userAdminAddress}`,
-        WalletErrorType.WALLET_CONNECTION_ERROR,
-      );
     }
 
     if (isUserZkEvm(user) && user.zkEvm.userAdminAddress.toLowerCase() !== userWallet.walletAddress.toLowerCase()) {

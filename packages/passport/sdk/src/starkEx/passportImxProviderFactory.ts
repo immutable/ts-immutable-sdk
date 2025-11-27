@@ -6,6 +6,7 @@ import { GuardianClient, MagicTEESigner } from '@imtbl/wallet';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { User } from '../types';
 import { PassportImxProvider } from './passportImxProvider';
+import { ImxGuardianClient } from './imxGuardianClient';
 
 export type PassportImxProviderFactoryInput = {
   authManager: AuthManager;
@@ -14,6 +15,7 @@ export type PassportImxProviderFactoryInput = {
   passportEventEmitter: TypedEventEmitter<AuthEventMap>;
   imxApiClients: ImxApiClients;
   guardianClient: GuardianClient;
+  imxGuardianClient: ImxGuardianClient;
 };
 
 export class PassportImxProviderFactory {
@@ -29,6 +31,8 @@ export class PassportImxProviderFactory {
 
   private readonly guardianClient: GuardianClient;
 
+  private readonly imxGuardianClient: ImxGuardianClient;
+
   constructor({
     authManager,
     immutableXClient,
@@ -36,6 +40,7 @@ export class PassportImxProviderFactory {
     passportEventEmitter,
     imxApiClients,
     guardianClient,
+    imxGuardianClient,
   }: PassportImxProviderFactoryInput) {
     this.authManager = authManager;
     this.immutableXClient = immutableXClient;
@@ -43,6 +48,7 @@ export class PassportImxProviderFactory {
     this.passportEventEmitter = passportEventEmitter;
     this.imxApiClients = imxApiClients;
     this.guardianClient = guardianClient;
+    this.imxGuardianClient = imxGuardianClient;
   }
 
   public async getProvider(): Promise<IMXProvider> {
@@ -74,6 +80,7 @@ export class PassportImxProviderFactory {
       magicTEESigner: this.magicTEESigner,
       imxApiClients: this.imxApiClients,
       guardianClient: this.guardianClient,
+      imxGuardianClient: this.imxGuardianClient,
     });
   }
 }

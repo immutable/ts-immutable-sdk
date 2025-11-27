@@ -12,7 +12,6 @@ export type UserProfile = {
 };
 
 export enum RollupType {
-  IMX = 'imx',
   ZKEVM = 'zkEvm',
 }
 
@@ -22,11 +21,6 @@ export type User = {
   refreshToken?: string;
   profile: UserProfile;
   expired?: boolean;
-  [RollupType.IMX]?: {
-    ethAddress: string;
-    starkAddress: string;
-    userAdminAddress: string;
-  };
   [RollupType.ZKEVM]?: {
     ethAddress: string;
     userAdminAddress: string;
@@ -34,11 +28,8 @@ export type User = {
 };
 
 export type PassportMetadata = {
-  imx_eth_address: string;
-  imx_stark_address: string;
-  imx_user_admin_address: string;
-  zkevm_eth_address: string;
-  zkevm_user_admin_address: string;
+  zkevm_eth_address?: string;
+  zkevm_user_admin_address?: string;
 };
 
 export interface OidcConfiguration {
@@ -82,11 +73,9 @@ export interface AuthModuleConfiguration extends OidcConfiguration {
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
-export type UserImx = WithRequired<User, RollupType.IMX>;
 export type UserZkEvm = WithRequired<User, RollupType.ZKEVM>;
 
 export const isUserZkEvm = (user: User): user is UserZkEvm => !!user[RollupType.ZKEVM];
-export const isUserImx = (user: User): user is UserImx => !!user[RollupType.IMX];
 
 export type DeviceTokenResponse = {
   access_token: string;
@@ -122,10 +111,11 @@ export enum MarketingConsentStatus {
 }
 
 export type DirectLoginOptions = {
-  directLoginMethod: DirectLoginMethod;
-  marketingConsentStatus?: MarketingConsentStatus;
-  email?: string;
-};
+  marketingConsentStatus: MarketingConsentStatus;
+} & (
+  | { directLoginMethod: 'email'; email: string }
+  | { directLoginMethod: Exclude<DirectLoginMethod, 'email'>; email?: never }
+);
 
 /**
  * Extended login options with caching and silent login support

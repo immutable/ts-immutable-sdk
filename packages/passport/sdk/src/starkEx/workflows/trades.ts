@@ -1,6 +1,6 @@
 import { imx } from '@imtbl/generated-clients';
 import { StarkSigner } from '@imtbl/x-client';
-import { GuardianClient } from '@imtbl/wallet';
+import { ImxGuardianClient } from '../imxGuardianClient';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
 
@@ -9,7 +9,7 @@ type CreateTradeParams = {
   tradesApi: imx.TradesApi;
   user: UserImx;
   starkSigner: StarkSigner;
-  guardianClient: GuardianClient,
+  guardianClient: ImxGuardianClient,
 };
 
 export async function createTrade({
@@ -35,9 +35,7 @@ export async function createTrade({
 
     }, { headers });
 
-    await guardianClient.evaluateImxTransaction({
-      payloadHash: getSignableTradeResponse.data.payload_hash,
-    });
+    await guardianClient.evaluateTransaction(getSignableTradeResponse.data.payload_hash);
 
     const { payload_hash: payloadHash } = getSignableTradeResponse.data;
     const starkSignature = await starkSigner.signMessage(payloadHash);

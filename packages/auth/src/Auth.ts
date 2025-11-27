@@ -5,7 +5,9 @@ import {
 } from './types';
 import EmbeddedLoginPrompt from './login/embeddedLoginPrompt';
 import TypedEventEmitter from './utils/typedEventEmitter';
-import { identify, track } from '@imtbl/metrics';
+import { withMetricsAsync } from './utils/metrics';
+import { identify, track, trackError } from '@imtbl/metrics';
+import logger from './utils/logger';
 
 /**
  * Public-facing Auth class for authentication
@@ -55,39 +57,42 @@ export class Auth {
    * @returns Promise that resolves with the user or null
    */
   async login(options?: LoginOptions): Promise<User | null> {
-    const { useCachedSession = false, useSilentLogin } = options || {};
-    let user: User | null = null;
+    return withMetricsAsync(async () => {
+      const { useCachedSession = false, useSilentLogin } = options || {};
+      let user: User | null = null;
 
-    // Try to get cached user
-    try {
-      user = await this.authManager.getUser();
-    } catch (error: any) {
-      if (useCachedSession) {
-        throw error;
+      // Try to get cached user
+      try {
+        user = await this.authManager.getUser();
+      } catch (error: any) {
+        if (error instanceof Error && !error.message.includes('Unknown or invalid refresh token')) {
+          trackError('passport', 'login', error);
+        }
+        if (useCachedSession) {
+          throw error;
+        }
+        logger.warn('Failed to retrieve a cached user session', error);
       }
-      // Silently ignore errors if not requiring cached session
-    }
 
-    // If no cached user, try silent login or regular login
-    if (!user && useSilentLogin) {
-      user = await this.authManager.forceUserRefresh();
-    }
-
-    if (!user && !useCachedSession) {
-      if (options?.useRedirectFlow) {
-        await this.authManager.loginWithRedirect(options?.directLoginOptions);
-        return null; // Redirect doesn't return user immediately
+      // If no cached user, try silent login or regular login
+      if (!user && useSilentLogin) {
+        user = await this.authManager.forceUserRefresh();
+      } else if (!user && !useCachedSession) {
+        if (options?.useRedirectFlow) {
+          await this.authManager.loginWithRedirect(options?.directLoginOptions);
+          return null; // Redirect doesn't return user immediately
+        }
+        user = await this.authManager.login(options?.directLoginOptions);
       }
-      user = await this.authManager.login(options?.directLoginOptions);
-    }
 
-    // Emit LOGGED_IN event and identify user if logged in
-    if (user) {
-      this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
-      identify({ passportId: user.profile.sub });
-    }
+      // Emit LOGGED_IN event and identify user if logged in
+      if (user) {
+        this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
+        identify({ passportId: user.profile.sub });
+      }
 
-    return user;
+      return user;
+    }, 'login');
   }
 
   /**
@@ -106,13 +111,15 @@ export class Auth {
    * @returns Promise that resolves with the authenticated user
    */
   async loginCallback(): Promise<User> {
-    const user = await this.authManager.loginCallback();
-    if (!user) {
-      throw new Error('Login callback failed - no user returned');
-    }
-    this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
-    identify({ passportId: user.profile.sub });
-    return user;
+    return withMetricsAsync(async () => {
+      const user = await this.authManager.loginCallback();
+      if (!user) {
+        throw new Error('Login callback failed - no user returned');
+      }
+      this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
+      identify({ passportId: user.profile.sub });
+      return user;
+    }, 'loginCallback');
   }
 
   /**
@@ -120,8 +127,10 @@ export class Auth {
    * @returns Promise that resolves when logout is complete
    */
   async logout(): Promise<void> {
-    await this.authManager.logout();
-    this.eventEmitter.emit(AuthEvents.LOGGED_OUT);
+    await withMetricsAsync(async () => {
+      await this.authManager.logout();
+      this.eventEmitter.emit(AuthEvents.LOGGED_OUT);
+    }, 'logout');
   }
 
   /**
@@ -129,7 +138,7 @@ export class Auth {
    * @returns Promise that resolves with the user or null if not authenticated
    */
   async getUser(): Promise<User | null> {
-    return this.authManager.getUser();
+    return withMetricsAsync(async () => this.authManager.getUser(), 'getUserInfo', false);
   }
 
   /**
@@ -137,8 +146,10 @@ export class Auth {
    * @returns Promise that resolves with the ID token or undefined
    */
   async getIdToken(): Promise<string | undefined> {
-    const user = await this.authManager.getUser();
-    return user?.idToken;
+    return withMetricsAsync(async () => {
+      const user = await this.authManager.getUser();
+      return user?.idToken;
+    }, 'getIdToken', false);
   }
 
   /**
@@ -146,8 +157,10 @@ export class Auth {
    * @returns Promise that resolves with the access token or undefined
    */
   async getAccessToken(): Promise<string | undefined> {
-    const user = await this.authManager.getUser();
-    return user?.accessToken;
+    return withMetricsAsync(async () => {
+      const user = await this.authManager.getUser();
+      return user?.accessToken;
+    }, 'getAccessToken', false, false);
   }
 
   /**
@@ -174,7 +187,10 @@ export class Auth {
    * @returns Promise that resolves with the authorization URL
    */
   async loginWithPKCEFlow(directLoginOptions?: DirectLoginOptions, imPassportTraceId?: string): Promise<string> {
-    return this.authManager.getPKCEAuthorizationUrl(directLoginOptions, imPassportTraceId);
+    return withMetricsAsync(
+      async () => this.authManager.getPKCEAuthorizationUrl(directLoginOptions, imPassportTraceId),
+      'loginWithPKCEFlow',
+    );
   }
 
   /**
@@ -184,10 +200,12 @@ export class Auth {
    * @returns Promise that resolves with the authenticated user
    */
   async loginWithPKCEFlowCallback(authorizationCode: string, state: string): Promise<User> {
-    const user = await this.authManager.loginWithPKCEFlowCallback(authorizationCode, state);
-    this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
-    identify({ passportId: user.profile.sub });
-    return user;
+    return withMetricsAsync(async () => {
+      const user = await this.authManager.loginWithPKCEFlowCallback(authorizationCode, state);
+      this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
+      identify({ passportId: user.profile.sub });
+      return user;
+    }, 'loginWithPKCEFlowCallback');
   }
 
   /**
@@ -196,10 +214,12 @@ export class Auth {
    * @returns Promise that resolves with the authenticated user
    */
   async storeTokens(tokenResponse: DeviceTokenResponse): Promise<User> {
-    const user = await this.authManager.storeTokens(tokenResponse);
-    this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
-    identify({ passportId: user.profile.sub });
-    return user;
+    return withMetricsAsync(async () => {
+      const user = await this.authManager.storeTokens(tokenResponse);
+      this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
+      identify({ passportId: user.profile.sub });
+      return user;
+    }, 'storeTokens');
   }
 
   /**
@@ -207,10 +227,12 @@ export class Auth {
    * @returns Promise that resolves with the logout URL or undefined if not available
    */
   async getLogoutUrl(): Promise<string | undefined> {
-    await this.authManager.removeUser();
-    this.eventEmitter.emit(AuthEvents.LOGGED_OUT);
-    const url = await this.authManager.getLogoutUrl();
-    return url || undefined;
+    return withMetricsAsync(async () => {
+      await this.authManager.removeUser();
+      this.eventEmitter.emit(AuthEvents.LOGGED_OUT);
+      const url = await this.authManager.getLogoutUrl();
+      return url || undefined;
+    }, 'getLogoutUrl');
   }
 
   /**
@@ -219,7 +241,7 @@ export class Auth {
    * @returns Promise that resolves when callback is handled
    */
   async logoutSilentCallback(url: string): Promise<void> {
-    return this.authManager.logoutSilentCallback(url);
+    return withMetricsAsync(() => this.authManager.logoutSilentCallback(url), 'logoutSilentCallback');
   }
 
   /**

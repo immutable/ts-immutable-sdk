@@ -7,9 +7,9 @@ import { JsonRpcError } from './zkEvm/JsonRpcError';
 
 // Re-export auth types for convenience
 export type {
-  User, UserProfile, UserImx, UserZkEvm, DirectLoginMethod, AuthEventMap,
+  User, UserProfile, UserZkEvm, DirectLoginMethod, AuthEventMap,
 } from '@imtbl/auth';
-export { isUserImx, isUserZkEvm } from '@imtbl/auth';
+export { isUserZkEvm } from '@imtbl/auth';
 export type { RollupType } from '@imtbl/auth';
 export { AuthEvents } from '@imtbl/auth';
 

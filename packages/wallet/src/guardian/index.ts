@@ -3,7 +3,6 @@ import { BigNumberish, ZeroAddress } from 'ethers';
 import axios from 'axios';
 import { AuthManager, IAuthConfiguration } from '@imtbl/auth';
 import ConfirmationScreen from '../confirmation/confirmation';
-import { retryWithDelay } from '../network/retry';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
 import { WalletConfiguration } from '../config';
@@ -15,10 +14,6 @@ export type GuardianClientParams = {
   authManager: AuthManager;
   guardianApi: GeneratedClients.mr.GuardianApi;
   authConfig: IAuthConfiguration;
-};
-
-export type GuardianEvaluateImxTransactionParams = {
-  payloadHash: string;
 };
 
 type GuardianEVMTxnEvaluationParams = {
@@ -118,59 +113,6 @@ export default class GuardianClient {
 
   public withDefaultConfirmationScreenTask<T>(task: () => Promise<T>): (() => Promise<T>) {
     return this.withConfirmationScreenTask()(task);
-  }
-
-  public async evaluateImxTransaction({ payloadHash }: GuardianEvaluateImxTransactionParams): Promise<void> {
-    try {
-      const finallyFn = () => {
-        this.confirmationScreen.closeWindow();
-      };
-      const user = await this.authManager.getUserImx();
-
-      const headers = { Authorization: `Bearer ${user.accessToken}` };
-      const transactionRes = await retryWithDelay(
-        async () => this.guardianApi.getTransactionByID({
-          transactionID: payloadHash,
-          chainType: 'starkex',
-        }, { headers }),
-        { finallyFn },
-      );
-
-      if (!transactionRes.data.id) {
-        throw new Error("Transaction doesn't exists");
-      }
-
-      const evaluateImxRes = await this.guardianApi.evaluateTransaction({
-        id: payloadHash,
-        transactionEvaluationRequest: {
-          chainType: 'starkex',
-        },
-      }, { headers });
-
-      const { confirmationRequired } = evaluateImxRes.data;
-      if (confirmationRequired) {
-        if (this.crossSdkBridgeEnabled) {
-          throw new Error(transactionRejectedCrossSdkBridgeError);
-        }
-
-        const confirmationResult = await this.confirmationScreen.requestConfirmation(
-          payloadHash,
-          user.imx.ethAddress,
-          GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex,
-        );
-
-        if (!confirmationResult.confirmed) {
-          throw new Error('Transaction rejected by user');
-        }
-      } else {
-        this.confirmationScreen.closeWindow();
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 403) {
-        throw new WalletError('Service unavailable', WalletErrorType.SERVICE_UNAVAILABLE_ERROR);
-      }
-      throw error;
-    }
   }
 
   private async evaluateEVMTransaction({

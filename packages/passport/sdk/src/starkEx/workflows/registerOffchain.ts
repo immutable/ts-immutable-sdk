@@ -1,19 +1,26 @@
 import axios from 'axios';
 import { ImxApiClients, imx } from '@imtbl/generated-clients';
 import { EthSigner, StarkSigner } from '@imtbl/x-client';
-import { AuthManager } from '@imtbl/auth';
+import { AuthManager, User } from '@imtbl/auth';
 import { retryWithDelay } from '@imtbl/wallet';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
-import { User } from '../../types';
+import { toUserImx } from '../../utils/imxUser';
 import registerPassportStarkEx from './registration';
 
 async function forceUserRefresh(authManager: AuthManager) {
   // User metadata is updated asynchronously. Poll userinfo endpoint until it is updated.
   await retryWithDelay<User | null>(async () => {
     const user = await authManager.forceUserRefresh(); // force refresh to get updated user info
-    if (user?.imx) return user;
+    if (!user) {
+      return Promise.reject(new Error('user wallet addresses not exist'));
+    }
 
-    return Promise.reject(new Error('user wallet addresses not exist'));
+    try {
+      toUserImx(user);
+      return user;
+    } catch {
+      return Promise.reject(new Error('user wallet addresses not exist'));
+    }
   });
 }
 

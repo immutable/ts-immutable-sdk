@@ -5,7 +5,7 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
 import { convertToSignableToken } from '@imtbl/toolkit';
-import { GuardianClient } from '@imtbl/wallet';
+import { ImxGuardianClient } from '../imxGuardianClient';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
 
@@ -16,7 +16,7 @@ type TransferRequest = {
   user: UserImx;
   starkSigner: StarkSigner;
   transfersApi: imx.TransfersApi;
-  guardianClient: GuardianClient;
+  guardianClient: ImxGuardianClient;
 };
 
 type BatchTransfersParams = {
@@ -24,7 +24,7 @@ type BatchTransfersParams = {
   user: UserImx;
   starkSigner: StarkSigner;
   transfersApi: imx.TransfersApi;
-  guardianClient: GuardianClient;
+  guardianClient: ImxGuardianClient;
 };
 
 export async function transfer({
@@ -54,9 +54,7 @@ export async function transfer({
       { headers },
     );
 
-    await guardianClient.evaluateImxTransaction({
-      payloadHash: signableResult.data.payload_hash,
-    });
+    await guardianClient.evaluateTransaction(signableResult.data.payload_hash);
 
     const signableResultData = signableResult.data;
     const { payload_hash: payloadHash } = signableResultData;
@@ -126,9 +124,9 @@ export async function batchNftTransfer({
       { headers },
     );
 
-    await guardianClient.evaluateImxTransaction({
-      payloadHash: signableResult.data.signable_responses[0]?.payload_hash,
-    });
+    await guardianClient.evaluateTransaction(
+      signableResult.data.signable_responses[0]?.payload_hash as string,
+    );
 
     const requests = await Promise.all(
       signableResult.data.signable_responses.map(async (resp) => {

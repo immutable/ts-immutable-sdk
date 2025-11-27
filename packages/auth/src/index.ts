@@ -11,7 +11,6 @@ export { AuthConfiguration, type IAuthConfiguration } from './config';
 export type {
   User,
   UserProfile,
-  UserImx,
   UserZkEvm,
   DirectLoginMethod,
   DirectLoginOptions,
@@ -26,7 +25,7 @@ export type {
   AuthEventMap,
 } from './types';
 export {
-  isUserZkEvm, isUserImx, RollupType, MarketingConsentStatus, AuthEvents,
+  isUserZkEvm, RollupType, MarketingConsentStatus, AuthEvents,
 } from './types';
 
 // Export TypedEventEmitter

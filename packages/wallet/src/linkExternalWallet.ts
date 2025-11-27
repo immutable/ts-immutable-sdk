@@ -1,4 +1,4 @@
-import { Auth, isUserImx, isUserZkEvm } from '@imtbl/auth';
+import { Auth, isUserZkEvm } from '@imtbl/auth';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { isAxiosError } from 'axios';
 import { trackFlow, trackError } from '@imtbl/metrics';
@@ -80,11 +80,9 @@ export async function linkExternalWallet(
       throw new WalletError('User is not logged in', WalletErrorType.NOT_LOGGED_IN_ERROR);
     }
 
-    const isImxUser = isUserImx(user);
     const isZkEvmUser = isUserZkEvm(user);
-
-    if (!isImxUser && !isZkEvmUser) {
-      throw new WalletError('User has not been registered', WalletErrorType.WALLET_CONNECTION_ERROR);
+    if (!isZkEvmUser) {
+      throw new WalletError('User has not been registered on Immutable zkEVM', WalletErrorType.WALLET_CONNECTION_ERROR);
     }
 
     const headers = {

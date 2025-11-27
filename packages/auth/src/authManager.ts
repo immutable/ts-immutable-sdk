@@ -24,8 +24,6 @@ import {
   OidcConfiguration,
   UserZkEvm,
   isUserZkEvm,
-  UserImx,
-  isUserImx,
 } from './types';
 import { IAuthConfiguration } from './config';
 import LoginPopupOverlay from './overlay/loginPopupOverlay';
@@ -148,17 +146,10 @@ export default class AuthManager {
         nickname: oidcUser.profile.nickname,
       },
     };
-    if (passport?.imx_eth_address) {
-      user.imx = {
-        ethAddress: passport.imx_eth_address,
-        starkAddress: passport.imx_stark_address,
-        userAdminAddress: passport.imx_user_admin_address,
-      };
-    }
-    if (passport?.zkevm_eth_address) {
+    if (passport?.zkevm_eth_address && passport?.zkevm_user_admin_address) {
       user.zkEvm = {
-        ethAddress: passport?.zkevm_eth_address,
-        userAdminAddress: passport?.zkevm_user_admin_address,
+        ethAddress: passport.zkevm_eth_address,
+        userAdminAddress: passport.zkevm_user_admin_address,
       };
     }
     return user;
@@ -645,15 +636,6 @@ export default class AuthManager {
     const user = await this.getUser(isUserZkEvm);
     if (!user) {
       throw new Error('Failed to obtain a User with the required ZkEvm attributes');
-    }
-
-    return user;
-  }
-
-  public async getUserImx(): Promise<UserImx> {
-    const user = await this.getUser(isUserImx);
-    if (!user) {
-      throw new Error('Failed to obtain a User with the required IMX attributes');
     }
 
     return user;
