@@ -220,6 +220,10 @@ export default class AuthManager {
     return params;
   }
 
+  public async getClientId(): Promise<string> {
+    return this.config.oidcConfiguration.clientId;
+  }
+
   public async loginWithRedirect(directLoginOptions?: DirectLoginOptions): Promise<void> {
     await this.userManager.clearStaleState();
     return withPassportError<void>(async () => {

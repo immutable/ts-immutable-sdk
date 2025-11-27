@@ -148,7 +148,7 @@ export class ZkEvmProvider implements Provider {
       sessionActivityApiUrl: this.#sessionActivityApiUrl,
       sendTransaction: sendTransactionClosure,
       walletAddress: zkEvmAddress,
-      passportClient: clientId || 'wallet',
+      passportClient: clientId || await this.#authManager.getClientId(),
     });
   }
 
