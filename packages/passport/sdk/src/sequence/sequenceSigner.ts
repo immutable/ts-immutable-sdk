@@ -42,7 +42,7 @@ export default class SequenceSigner extends AbstractSigner {
   private privateKeyWallet: PrivateKeyWallet | null = null;
   private createPrivateKeyWalletPromise: Promise<PrivateKeyWallet> | null = null;
 
-  private useIdentityInstrument: boolean = false;
+  useIdentityInstrument: boolean = true;
 
   constructor(authManager: AuthManager, config: PassportConfiguration) {
     super();
@@ -69,8 +69,10 @@ export default class SequenceSigner extends AbstractSigner {
     this.createWalletPromise = new Promise(async (resolve, reject) => {
       try {
         this.userWallet = null;
-        // Need a new ID token to call identity instrument, TODO: improve thi
+        // Need a new ID token to call identity instrument
+        // TODO: improve this
         await this.authManager.forceUserRefresh();
+
         const authenticatedUser = user || await this.getUserOrThrow();
         
         if (!authenticatedUser.idToken) {
@@ -229,6 +231,7 @@ export default class SequenceSigner extends AbstractSigner {
 
   async signMessage(message: string | Uint8Array): Promise<string> {
     if (this.useIdentityInstrument) {
+      console.log('[SequenceSigner] signMessage - Identity Instrument mode');
       // Identity Instrument mode
       const wallet = await this.getUserWallet();
       
@@ -236,6 +239,8 @@ export default class SequenceSigner extends AbstractSigner {
         wallet.identityInstrument,
         wallet.authKey
       );
+
+      console.log('[SequenceSigner] getting message bytes...');
       
       // Convert message to 32-byte hash digest
       // signMessage expects the message to be hashed with Ethereum prefix

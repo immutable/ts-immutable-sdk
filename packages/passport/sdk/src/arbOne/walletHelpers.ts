@@ -91,30 +91,36 @@ export const signMetaTransactions = async (
   const encodedNonceBigInt = BigInt(encodedNonce.toString());
   const space = encodedNonceBigInt >> 96n;
   const nonce = encodedNonceBigInt & ((1n << 96n) - 1n);
-  
+
   // Convert to Sequence call format
   const calls = metaTransactions.map(toSequenceCall);
-  
+
   // Create Sequence payload using SDK
   const payload = Payload.fromCall(nonce, space, calls);
-  
+
   // Encode payload using SDK (compact binary format)
   // Pass wallet address for self-call optimization
-  const encodedPayload = Payload.encode(payload, Address.from(walletAddress));
-  
+  const encodedPayload = Payload.encode(payload, Address.from(walletAddress))
   // Hash payload using SDK (EIP-712 typed data hash)
   const payloadHash = Payload.hash(
     Address.from(walletAddress),
     Number(chainId),
     payload
   );
-  
+  console.log('[signMetaTransactions] payloadHash', payloadHash);
   // Sign with ETH_SIGN (adds Ethereum message prefix)
   // const signature = await sequenceSigner.signMessage(payloadHash);
-  const privateKey = await (sequenceSigner as SequenceSigner).getPrivateKey();
-  const signingKey = new SigningKey(privateKey);
-  const ethSignDigest = hashMessage(payloadHash);
-  const signature = signingKey.sign(ethSignDigest);
+  let signature;
+  if ((sequenceSigner as SequenceSigner).useIdentityInstrument) {
+    signature = await (sequenceSigner as SequenceSigner).signMessage(payloadHash);
+    console.log('[signMetaTransactions] signature', signature);
+  } else {
+    const privateKey = await (sequenceSigner as SequenceSigner).getPrivateKey();
+    console.log('[signMetaTransactions] privateKey', privateKey);
+    const signingKey = new SigningKey(privateKey);
+    const ethSignDigest = hashMessage(payloadHash);
+    signature = signingKey.sign(ethSignDigest); // This returns a Signature object
+  }
 
   console.log('[signMetaTransactions] signature', signature);
   // Parse signature to extract r, s, yParity

@@ -143,7 +143,7 @@ export class PassportConfiguration {
           this.passportDomain = 'https://passport.sandbox.immutable.com';
           this.imxPublicApiDomain = 'https://api.sandbox.immutable.com';
           this.zkEvmRpcUrl = 'https://rpc.testnet.immutable.com';
-          this.relayerUrl = 'https://api.sandbox.immutable.com/relayer-mr';
+          this.relayerUrl = 'http://localhost:8070/relayer-mr';
           this.arbOneRpcUrl = 'https://sepolia-rollup.arbitrum.io/rpc';
           this.multiRollupConfig = multiRollupConfig.getSandbox();
           break;

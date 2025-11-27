@@ -78,7 +78,7 @@ export const multiRollupConfig = {
       basePath: 'https://api.sandbox.immutable.com',
     }),
     passport: createConfig({
-      basePath: 'https://api.sandbox.immutable.com',
+      basePath: 'http://localhost:8071',
     }),
   }),
 };
