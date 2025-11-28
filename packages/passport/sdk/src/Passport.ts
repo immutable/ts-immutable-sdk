@@ -65,8 +65,6 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     passportDomain: passportConfig.passportDomain,
   });
 
-  // Get AuthManager for internal IMX provider use
-  const authManager = auth.getAuthManager();
   const authConfig = auth.getConfig();
   const confirmationScreen = new ConfirmationScreen(authConfig);
 
@@ -92,13 +90,13 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
   // Create Guardian client for IMX provider
   const guardianClient = new GuardianClient({
     config: walletConfig,
-    authManager,
+    auth,
     guardianApi: multiRollupApiClients.guardianApi,
     authConfig,
   });
 
   const imxGuardianClient = new ImxGuardianClient({
-    authManager,
+    auth,
     guardianApi: multiRollupApiClients.guardianApi,
     confirmationScreen,
     crossSdkBridgeEnabled: passportModuleConfiguration.crossSdkBridgeEnabled || false,
@@ -111,12 +109,12 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     magicPublishableApiKey: passportConfig.magicPublishableApiKey,
     magicProviderId: passportConfig.magicProviderId,
   });
-  const magicTEESigner = new MagicTEESigner(authManager, magicTeeApiClients);
+  const magicTEESigner = new MagicTEESigner(auth, magicTeeApiClients);
 
   const imxApiClients = buildImxApiClients(passportModuleConfiguration);
 
   const passportImxProviderFactory = new PassportImxProviderFactory({
-    authManager,
+    auth,
     immutableXClient,
     magicTEESigner,
     passportEventEmitter: auth.eventEmitter,
@@ -165,7 +163,6 @@ export class Passport {
 
   // ============================================================================
   // IMX-SPECIFIC METHODS
-  // Can use AuthManager directly for IMX-specific operations
   // ============================================================================
 
   /**
@@ -195,7 +192,7 @@ export class Passport {
 
   // ============================================================================
   // ZKEVM-SPECIFIC METHODS
-  // Uses Auth + Wallet packages (not AuthManager directly)
+  // Uses Auth + Wallet packages
   // ============================================================================
 
   /**
@@ -262,6 +259,7 @@ export class Passport {
         jsonRpcReferrer: this.passportConfig.jsonRpcReferrer,
         forceScwDeployBeforeMessageSignature: this.passportConfig.forceScwDeployBeforeMessageSignature,
         passportEventEmitter: this.auth.eventEmitter,
+        feeTokenSymbol: 'IMX',
         announceProvider: options?.announceProvider ?? true,
       });
 
@@ -271,7 +269,7 @@ export class Passport {
 
   // ============================================================================
   // SHARED METHODS (zkEVM + IMX)
-  // Uses Auth class (public API) instead of AuthManager directly
+  // Uses Auth class (public API)
   // Exception: forceUserRefresh for silent login (advanced operation)
   // ============================================================================
 

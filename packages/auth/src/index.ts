@@ -1,9 +1,6 @@
 // Export Auth class (public API)
 export { Auth } from './Auth';
 
-// Export AuthManager for use by other packages
-export { default as AuthManager } from './authManager';
-
 // Export configuration
 export { AuthConfiguration, type IAuthConfiguration } from './config';
 

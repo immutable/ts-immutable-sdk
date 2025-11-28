@@ -26,6 +26,9 @@ export interface WalletConfigurationParams {
 
   /** Cross-SDK bridge mode flag */
   crossSdkBridgeEnabled?: boolean;
+
+  /** Preferred token symbol to use when paying relayer fees (defaults to 'IMX') */
+  feeTokenSymbol?: string;
 }
 
 export class WalletConfiguration {
@@ -43,6 +46,8 @@ export class WalletConfiguration {
 
   readonly crossSdkBridgeEnabled: boolean;
 
+  readonly feeTokenSymbol: string;
+
   constructor(params: WalletConfigurationParams) {
     this.passportDomain = params.passportDomain;
     this.zkEvmRpcUrl = params.zkEvmRpcUrl;
@@ -51,5 +56,6 @@ export class WalletConfiguration {
     this.jsonRpcReferrer = params.jsonRpcReferrer;
     this.forceScwDeployBeforeMessageSignature = params.forceScwDeployBeforeMessageSignature || false;
     this.crossSdkBridgeEnabled = params.crossSdkBridgeEnabled || false;
+    this.feeTokenSymbol = params.feeTokenSymbol || 'IMX';
   }
 }

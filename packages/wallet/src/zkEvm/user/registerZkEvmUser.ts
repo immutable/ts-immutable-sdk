@@ -3,11 +3,11 @@ import { signRaw } from '@imtbl/toolkit';
 import { Flow } from '@imtbl/metrics';
 import { Signer, JsonRpcProvider } from 'ethers';
 import { getEip155ChainId } from '../walletHelpers';
-import { AuthManager } from '@imtbl/auth';
+import { Auth } from '@imtbl/auth';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 
 export type RegisterZkEvmUserInput = {
-  authManager: AuthManager;
+  auth: Auth;
   ethSigner: Signer,
   multiRollupApiClients: MultiRollupApiClients,
   accessToken: string;
@@ -18,7 +18,7 @@ export type RegisterZkEvmUserInput = {
 const MESSAGE_TO_SIGN = 'Only sign this message from Immutable Passport';
 
 export async function registerZkEvmUser({
-  authManager,
+  auth,
   ethSigner,
   multiRollupApiClients,
   accessToken,
@@ -66,7 +66,7 @@ export async function registerZkEvmUser({
     });
     flow.addEvent('endCreateCounterfactualAddress');
 
-    authManager.forceUserRefreshInBackground();
+    auth.forceUserRefreshInBackground();
 
     return registrationResponse.data.counterfactual_address;
   } catch (error) {

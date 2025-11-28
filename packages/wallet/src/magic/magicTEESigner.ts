@@ -3,7 +3,7 @@ import { MagicTeeApiClients } from '@imtbl/generated-clients';
 import { isAxiosError } from 'axios';
 import { Flow, trackDuration } from '@imtbl/metrics';
 import { WalletError, WalletErrorType } from '../errors';
-import { AuthManager } from '@imtbl/auth';
+import { Auth } from '@imtbl/auth';
 import { withMetricsAsync } from '../utils/metrics';
 import { isUserZkEvm, User } from '../types';
 
@@ -15,7 +15,7 @@ interface UserWallet {
 }
 
 export default class MagicTEESigner extends AbstractSigner {
-  private readonly authManager: AuthManager;
+  private readonly auth: Auth;
 
   private readonly magicTeeApiClient: MagicTeeApiClients;
 
@@ -23,9 +23,9 @@ export default class MagicTEESigner extends AbstractSigner {
 
   private createWalletPromise: Promise<UserWallet> | null = null;
 
-  constructor(authManager: AuthManager, magicTeeApiClient: MagicTeeApiClients) {
+  constructor(auth: Auth, magicTeeApiClient: MagicTeeApiClients) {
     super();
-    this.authManager = authManager;
+    this.auth = auth;
     this.magicTeeApiClient = magicTeeApiClient;
   }
 
@@ -118,7 +118,7 @@ export default class MagicTEESigner extends AbstractSigner {
   }
 
   private async getUserOrThrow(): Promise<User> {
-    const user = await this.authManager.getUser();
+    const user = await this.auth.getUser();
     if (!user) {
       throw new WalletError(
         'User has been logged out',

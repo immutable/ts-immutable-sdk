@@ -11,7 +11,7 @@ import {
   ProviderEventMap,
   RequestArguments,
 } from './types';
-import { AuthManager, TypedEventEmitter } from '@imtbl/auth';
+import { Auth, TypedEventEmitter } from '@imtbl/auth';
 import { WalletConfiguration } from '../config';
 import {
   PassportEventMap, AuthEvents, WalletEvents, User, UserZkEvm,
@@ -29,7 +29,7 @@ import { sendDeployTransactionAndPersonalSign } from './sendDeployTransactionAnd
 import { signEjectionTransaction } from './signEjectionTransaction';
 
 export type ZkEvmProviderInput = {
-  authManager: AuthManager;
+  auth: Auth;
   config: WalletConfiguration;
   multiRollupApiClients: MultiRollupApiClients;
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
@@ -42,7 +42,7 @@ export type ZkEvmProviderInput = {
 const isZkEvmUser = (user: User): user is UserZkEvm => 'zkEvm' in user;
 
 export class ZkEvmProvider implements Provider {
-  readonly #authManager: AuthManager;
+  readonly #auth: Auth;
 
   readonly #config: WalletConfiguration;
 
@@ -71,7 +71,7 @@ export class ZkEvmProvider implements Provider {
   public readonly isPassport: boolean = true;
 
   constructor({
-    authManager,
+    auth,
     config,
     multiRollupApiClients,
     passportEventEmitter,
@@ -80,7 +80,7 @@ export class ZkEvmProvider implements Provider {
     user,
     sessionActivityApiUrl,
   }: ZkEvmProviderInput) {
-    this.#authManager = authManager;
+    this.#auth = auth;
     this.#config = config;
     this.#guardianClient = guardianClient;
     this.#passportEventEmitter = passportEventEmitter;
@@ -96,7 +96,7 @@ export class ZkEvmProvider implements Provider {
     this.#relayerClient = new RelayerClient({
       config: this.#config,
       rpcProvider: this.#rpcProvider,
-      authManager: this.#authManager,
+      auth: this.#auth,
     });
 
     this.#multiRollupApiClients = multiRollupApiClients;
@@ -148,14 +148,14 @@ export class ZkEvmProvider implements Provider {
       sessionActivityApiUrl: this.#sessionActivityApiUrl,
       sendTransaction: sendTransactionClosure,
       walletAddress: zkEvmAddress,
-      passportClient: clientId || await this.#authManager.getClientId(),
+      passportClient: clientId || await this.#auth.getClientId(),
     });
   }
 
   // Used to get the registered zkEvm address from the User session
   async #getZkEvmAddress() {
     try {
-      const user = await this.#authManager.getUser();
+      const user = await this.#auth.getUser();
       if (user && isZkEvmUser(user)) {
         return user.zkEvm.ethAddress;
       }
@@ -176,7 +176,7 @@ export class ZkEvmProvider implements Provider {
         const flow = trackFlow('passport', 'ethRequestAccounts');
 
         try {
-          const user = await this.#authManager.getUserOrLogin();
+          const user = await this.#auth.getUserOrLogin();
           flow.addEvent('endGetUserOrLogin');
 
           let userZkEvmEthAddress: string | undefined;
@@ -186,7 +186,7 @@ export class ZkEvmProvider implements Provider {
 
             userZkEvmEthAddress = await registerZkEvmUser({
               ethSigner: this.#ethSigner,
-              authManager: this.#authManager,
+              auth: this.#auth,
               multiRollupApiClients: this.#multiRollupApiClients,
               accessToken: user.accessToken,
               rpcProvider: this.#rpcProvider,

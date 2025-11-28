@@ -226,6 +226,9 @@ export interface ConnectWalletOptions {
   /** Optional referrer URL to be sent with JSON-RPC requests */
   jsonRpcReferrer?: string;
 
+  /** Preferred token symbol for relayer fees (default: 'IMX') */
+  feeTokenSymbol?: string;
+
   /** If true, forces SCW deployment before allowing message signature */
   forceScwDeployBeforeMessageSignature?: boolean;
 

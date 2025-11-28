@@ -1,4 +1,4 @@
-import { AuthManager, IAuthConfiguration, TypedEventEmitter } from '@imtbl/auth';
+import { IAuthConfiguration, TypedEventEmitter } from '@imtbl/auth';
 import {
   MultiRollupApiClients,
   MagicTeeApiClients,
@@ -106,8 +106,7 @@ export async function connectWallet(config: ConnectWalletOptions): Promise<ZkEvm
     passport: apiConfig,
   });
 
-  // 3. Extract AuthManager from Auth
-  const authManager: AuthManager = config.auth.getAuthManager();
+  // 3. Extract Auth configuration
   const authConfig: IAuthConfiguration = config.auth.getConfig();
 
   // 4. Get current user
@@ -122,6 +121,7 @@ export async function connectWallet(config: ConnectWalletOptions): Promise<ZkEvm
     jsonRpcReferrer: config.jsonRpcReferrer,
     forceScwDeployBeforeMessageSignature: config.forceScwDeployBeforeMessageSignature,
     crossSdkBridgeEnabled: config.crossSdkBridgeEnabled,
+    feeTokenSymbol: config.feeTokenSymbol,
   });
 
   // 6. Create GuardianClient
@@ -129,7 +129,7 @@ export async function connectWallet(config: ConnectWalletOptions): Promise<ZkEvm
 
   const guardianClient = new GuardianClient({
     config: walletConfig,
-    authManager,
+    auth: config.auth,
     guardianApi,
     authConfig,
   });
@@ -146,7 +146,7 @@ export async function connectWallet(config: ConnectWalletOptions): Promise<ZkEvm
     magicProviderId: magicConfig.magicProviderId,
   });
 
-  const ethSigner = new MagicTEESigner(authManager, magicTeeApiClients);
+  const ethSigner = new MagicTEESigner(config.auth, magicTeeApiClients);
 
   // 9. Determine session activity API URL (only for mainnet, testnet, devnet)
   let sessionActivityApiUrl: string | null = null;
@@ -167,7 +167,7 @@ export async function connectWallet(config: ConnectWalletOptions): Promise<ZkEvm
 
   // 11. Create ZkEvmProvider
   const provider = new ZkEvmProvider({
-    authManager,
+    auth: config.auth,
     config: walletConfig,
     multiRollupApiClients,
     passportEventEmitter,

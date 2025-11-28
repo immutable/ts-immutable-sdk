@@ -15,7 +15,7 @@ import {
 } from '@imtbl/generated-clients';
 import { TransactionResponse } from 'ethers';
 import {
-  AuthManager, AuthEventMap, AuthEvents, TypedEventEmitter, User,
+  Auth, AuthEventMap, AuthEvents, TypedEventEmitter, User,
 } from '@imtbl/auth';
 import { GuardianClient, MagicTEESigner } from '@imtbl/wallet';
 import { toUserImx, UserImx } from '../utils/imxUser';
@@ -29,7 +29,7 @@ import { getStarkSigner } from './getStarkSigner';
 import { withMetricsAsync } from '../utils/metrics';
 
 export interface PassportImxProviderOptions {
-  authManager: AuthManager;
+  auth: Auth;
   immutableXClient: IMXClient;
   passportEventEmitter: TypedEventEmitter<AuthEventMap>;
   magicTEESigner: MagicTEESigner;
@@ -44,7 +44,7 @@ type RegisteredUserAndStarkSigner = {
 };
 
 export class PassportImxProvider implements IMXProvider {
-  protected readonly authManager: AuthManager;
+  protected readonly auth: Auth;
 
   private readonly immutableXClient: IMXClient;
 
@@ -67,7 +67,7 @@ export class PassportImxProvider implements IMXProvider {
   private signerInitialisationError: unknown | undefined;
 
   constructor({
-    authManager,
+    auth,
     immutableXClient,
     passportEventEmitter,
     magicTEESigner,
@@ -75,7 +75,7 @@ export class PassportImxProvider implements IMXProvider {
     guardianClient,
     imxGuardianClient,
   }: PassportImxProviderOptions) {
-    this.authManager = authManager;
+    this.auth = auth;
     this.immutableXClient = immutableXClient;
     this.magicTEESigner = magicTEESigner;
     this.imxApiClients = imxApiClients;
@@ -116,7 +116,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async #getAuthenticatedUser(): Promise<User> {
-    const user = await this.authManager.getUser();
+    const user = await this.auth.getUser();
 
     if (!user || !this.starkSigner) {
       throw new PassportError(
@@ -182,7 +182,7 @@ export class PassportImxProvider implements IMXProvider {
           this.magicTEESigner,
           starkSigner,
           toUserImx(user),
-          this.authManager,
+          this.auth,
           this.imxApiClients,
         );
       },

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AuthManager } from '@imtbl/auth';
+import { Auth } from '@imtbl/auth';
 import { mr as MultiRollup } from '@imtbl/generated-clients';
 import { ConfirmationScreen, retryWithDelay } from '@imtbl/wallet';
 import { PassportError, PassportErrorType } from '../errors/passportError';
@@ -9,14 +9,14 @@ const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmatio
   + ' supported in this environment. Please contact Immutable support if you need to enable this feature.';
 
 type ImxGuardianClientParams = {
-  authManager: AuthManager;
+  auth: Auth;
   guardianApi: MultiRollup.GuardianApi;
   confirmationScreen: ConfirmationScreen;
   crossSdkBridgeEnabled?: boolean;
 };
 
 export class ImxGuardianClient {
-  private readonly authManager: AuthManager;
+  private readonly auth: Auth;
 
   private readonly guardianApi: MultiRollup.GuardianApi;
 
@@ -25,19 +25,19 @@ export class ImxGuardianClient {
   private readonly crossSdkBridgeEnabled: boolean;
 
   constructor({
-    authManager,
+    auth,
     guardianApi,
     confirmationScreen,
     crossSdkBridgeEnabled = false,
   }: ImxGuardianClientParams) {
-    this.authManager = authManager;
+    this.auth = auth;
     this.guardianApi = guardianApi;
     this.confirmationScreen = confirmationScreen;
     this.crossSdkBridgeEnabled = crossSdkBridgeEnabled;
   }
 
   public async evaluateTransaction(payloadHash: string): Promise<void> {
-    const user = await this.authManager.getUser();
+    const user = await this.auth.getUser();
     if (!user) {
       throw new PassportError('User has been logged out', PassportErrorType.NOT_LOGGED_IN_ERROR);
     }

@@ -1,5 +1,5 @@
 import { BytesLike, JsonRpcProvider } from 'ethers';
-import { AuthManager } from '@imtbl/auth';
+import { Auth } from '@imtbl/auth';
 import { WalletConfiguration } from '../config';
 import { FeeOption, RelayerTransaction, TypedDataPayload } from './types';
 import { getEip155ChainId } from './walletHelpers';
@@ -7,7 +7,7 @@ import { getEip155ChainId } from './walletHelpers';
 export type RelayerClientInput = {
   config: WalletConfiguration,
   rpcProvider: JsonRpcProvider,
-  authManager: AuthManager
+  auth: Auth
 };
 
 // JsonRpc base Types
@@ -94,12 +94,12 @@ export class RelayerClient {
 
   private readonly rpcProvider: JsonRpcProvider;
 
-  private readonly authManager: AuthManager;
+  private readonly auth: Auth;
 
-  constructor({ config, rpcProvider, authManager }: RelayerClientInput) {
+  constructor({ config, rpcProvider, auth }: RelayerClientInput) {
     this.config = config;
     this.rpcProvider = rpcProvider;
-    this.authManager = authManager;
+    this.auth = auth;
   }
 
   private static getResponsePreview(text: string): string {
@@ -115,7 +115,7 @@ export class RelayerClient {
       ...request,
     };
 
-    const user = await this.authManager.getUserZkEvm();
+    const user = await this.auth.getUserZkEvm();
 
     const response = await fetch(`${this.config.relayerUrl}/v1/transactions`, {
       method: 'POST',
@@ -147,6 +147,10 @@ export class RelayerClient {
     }
 
     return jsonResponse;
+  }
+
+  public getPreferredFeeTokenSymbol(): string {
+    return this.config.feeTokenSymbol;
   }
 
   public async ethSendTransaction(to: string, data: BytesLike): Promise<string> {

@@ -1,7 +1,7 @@
 import * as GeneratedClients from '@imtbl/generated-clients';
 import { BigNumberish, ZeroAddress } from 'ethers';
 import axios from 'axios';
-import { AuthManager, IAuthConfiguration } from '@imtbl/auth';
+import { Auth, IAuthConfiguration } from '@imtbl/auth';
 import ConfirmationScreen from '../confirmation/confirmation';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
@@ -11,7 +11,7 @@ import { WalletError, WalletErrorType } from '../errors';
 
 export type GuardianClientParams = {
   config: WalletConfiguration;
-  authManager: AuthManager;
+  auth: Auth;
   guardianApi: GeneratedClients.mr.GuardianApi;
   authConfig: IAuthConfiguration;
 };
@@ -68,15 +68,15 @@ export default class GuardianClient {
 
   private readonly crossSdkBridgeEnabled: boolean;
 
-  private readonly authManager: AuthManager;
+  private readonly auth: Auth;
 
   constructor({
-    config, authManager, guardianApi, authConfig,
+    config, auth, guardianApi, authConfig,
   }: GuardianClientParams) {
     this.confirmationScreen = new ConfirmationScreen(authConfig);
     this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled;
     this.guardianApi = guardianApi;
-    this.authManager = authManager;
+    this.auth = auth;
   }
 
   /**
@@ -120,7 +120,7 @@ export default class GuardianClient {
     nonce,
     metaTransactions,
   }: GuardianEVMTxnEvaluationParams): Promise<GeneratedClients.mr.TransactionEvaluationResponse> {
-    const user = await this.authManager.getUserZkEvm();
+    const user = await this.auth.getUserZkEvm();
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const guardianTransactions = transformGuardianTransactions(metaTransactions);
     try {
@@ -175,7 +175,7 @@ export default class GuardianClient {
     }
 
     if (confirmationRequired && !!transactionId) {
-      const user = await this.authManager.getUserZkEvm();
+      const user = await this.auth.getUserZkEvm();
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         transactionId,
         user.zkEvm.ethAddress,
@@ -200,7 +200,7 @@ export default class GuardianClient {
     { chainID, payload }: GuardianEIP712MessageEvaluationParams,
   ): Promise<GeneratedClients.mr.MessageEvaluationResponse> {
     try {
-      const user = await this.authManager.getUserZkEvm();
+      const user = await this.auth.getUserZkEvm();
       if (user === null) {
         throw new JsonRpcError(
           ProviderErrorCode.UNAUTHORIZED,
@@ -227,7 +227,7 @@ export default class GuardianClient {
       throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
     }
     if (confirmationRequired && !!messageId) {
-      const user = await this.authManager.getUserZkEvm();
+      const user = await this.auth.getUserZkEvm();
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
         user.zkEvm.ethAddress,
@@ -249,7 +249,7 @@ export default class GuardianClient {
     { chainID, payload }: GuardianERC191MessageEvaluationParams,
   ): Promise<GeneratedClients.mr.MessageEvaluationResponse> {
     try {
-      const user = await this.authManager.getUserZkEvm();
+      const user = await this.auth.getUserZkEvm();
       if (user === null) {
         throw new JsonRpcError(
           ProviderErrorCode.UNAUTHORIZED,
@@ -281,7 +281,7 @@ export default class GuardianClient {
       throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
     }
     if (confirmationRequired && !!messageId) {
-      const user = await this.authManager.getUserZkEvm();
+      const user = await this.auth.getUserZkEvm();
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
         user.zkEvm.ethAddress,

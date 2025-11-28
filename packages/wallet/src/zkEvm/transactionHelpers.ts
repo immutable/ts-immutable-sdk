@@ -59,14 +59,15 @@ const getFeeOption = async (
     throw new Error('Invalid fee options received from relayer');
   }
 
-  const imxFeeOption = feeOptions.find(
-    (feeOption) => feeOption.tokenSymbol === 'IMX',
+  const preferredFeeTokenSymbol = relayerClient.getPreferredFeeTokenSymbol();
+  const preferredFeeOption = feeOptions.find(
+    (feeOption) => feeOption.tokenSymbol === preferredFeeTokenSymbol,
   );
-  if (!imxFeeOption) {
-    throw new Error('Failed to retrieve fees for IMX token');
+  if (!preferredFeeOption) {
+    throw new Error(`Failed to retrieve fees for ${preferredFeeTokenSymbol} token`);
   }
 
-  return imxFeeOption;
+  return preferredFeeOption;
 };
 
 /**
