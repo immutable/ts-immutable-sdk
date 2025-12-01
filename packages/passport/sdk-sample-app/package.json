@@ -8,6 +8,7 @@
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
     "@imtbl/orderbook": "workspace:*",
+    "@imtbl/wallet": "workspace:*",
     "@imtbl/passport": "workspace:*",
     "@imtbl/x-client": "workspace:*",
     "@imtbl/x-provider": "workspace:*",

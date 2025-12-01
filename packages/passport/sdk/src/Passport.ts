@@ -488,6 +488,10 @@ export class Passport {
         flow.addEvent('errored');
       }
 
+      if (error instanceof PassportError) {
+        throw error;
+      }
+
       if (isAxiosError(error) && error.response) {
         if (error.response.data && isApiError(error.response.data)) {
           const { code, message } = error.response.data;
