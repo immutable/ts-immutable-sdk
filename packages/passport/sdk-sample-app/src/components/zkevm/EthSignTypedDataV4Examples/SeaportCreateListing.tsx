@@ -151,7 +151,8 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
       setIsBuildingTransaction(false);
     }
   }, [NFTContractAddress, buyAmount, buyType, orderbookClient,
-    tokenContractAddress, tokenId, walletAddress, sellTokenUnits, sellTokenType, submitTransaction, activeZkEvmProvider]);
+    tokenContractAddress, tokenId, walletAddress, sellTokenUnits, 
+    sellTokenType, submitTransaction, activeZkEvmProvider]);
 
   const handleSetSellTokenType = (e: React.ChangeEvent<HTMLSelectElement>) => {
     resetForm();
