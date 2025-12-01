@@ -43,7 +43,7 @@ function NFTTransfer({ disabled, handleExampleSubmitted }: RequestExampleProps) 
   const [assets, setAssets] = useState<BlockchainData.NFTWithBalance[]>([]);
   const [transfers, setTransfers] = useState<Partial<NFTCandidate>[]>([]);
   const [fromAddress, setFromAddress] = useState<string>('');
-  const { zkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider } = usePassportProvider();
   const { environment } = useImmutableProvider();
   const [choosedCollection, setChoosedCollection] = useState<GroupedAsset>({ assets: [] } as unknown as GroupedAsset);
   const { blockchainData } = useImmutableProvider();
@@ -95,8 +95,8 @@ function NFTTransfer({ disabled, handleExampleSubmitted }: RequestExampleProps) 
   const chainName = useMemo(() => chainNameMapping(environment), [environment]);
   useEffect(() => {
     const getAddress = async () => {
-      if (zkEvmProvider) {
-        const [walletAddress] = await zkEvmProvider.request({
+      if (activeZkEvmProvider) {
+        const [walletAddress] = await activeZkEvmProvider.request({
           method: 'eth_requestAccounts',
         });
         setFromAddress(walletAddress || '');
@@ -104,7 +104,7 @@ function NFTTransfer({ disabled, handleExampleSubmitted }: RequestExampleProps) 
     };
 
     getAddress().catch(console.log);
-  }, [zkEvmProvider, setFromAddress]);
+  }, [activeZkEvmProvider, setFromAddress]);
 
   useEffect(() => {
     const getAssets = async () => {

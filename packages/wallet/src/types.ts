@@ -199,8 +199,11 @@ export interface PopupOverlayOptions {
  * High-level configuration that gets transformed into internal WalletConfiguration
  */
 export interface ConnectWalletOptions {
-  /** Auth instance */
-  auth: Auth;
+  /**
+   * Auth instance. Optional – if omitted, a default Auth instance
+   * configured with Immutable hosted defaults will be created.
+   */
+  auth?: Auth;
 
   /**
    * Chain configurations (supports multi-chain)

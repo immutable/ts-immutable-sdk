@@ -13,7 +13,7 @@ import ZkEvmWorkflow from '@/components/zkevm/ZkEvmWorkflow';
 
 export default function Home() {
   const { isLoading } = useStatusProvider();
-  const { imxProvider, zkEvmProvider } = usePassportProvider();
+  const { imxProvider, zkEvmProvider, defaultWalletProvider } = usePassportProvider();
 
   return (
     <>
@@ -26,7 +26,7 @@ export default function Home() {
       <main>
         <Container>
           <Row className="my-3">
-            <Environment disabled={isLoading || !!imxProvider || !!zkEvmProvider} />
+            <Environment disabled={isLoading || !!imxProvider || !!zkEvmProvider || !!defaultWalletProvider} />
           </Row>
           <Row className="my-3">
             <PassportMethods />

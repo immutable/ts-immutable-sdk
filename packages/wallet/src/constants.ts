@@ -14,11 +14,11 @@ export const IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID = 13473;
  */
 export const MAGIC_CONFIG = {
   [IMMUTABLE_ZKEVM_MAINNET_CHAIN_ID]: {
-    magicPublishableApiKey: 'pk_live_D02F278E25B3E5F3',
-    magicProviderId: 'imtbl-immutable-zkEVM',
+    magicPublishableApiKey: 'pk_live_10F423798A540ED7',
+    magicProviderId: 'aa80b860-8869-4f13-9000-6a6ad3d20017',
   },
   [IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID]: {
-    magicPublishableApiKey: 'pk_live_620E2F8860D1D79E',
-    magicProviderId: 'imtbl-immutable-zkEVM-testnet',
+    magicPublishableApiKey: 'pk_live_10F423798A540ED7',
+    magicProviderId: 'aa80b860-8869-4f13-9000-6a6ad3d20017',
   },
 } as const;

@@ -1,4 +1,8 @@
-import { IAuthConfiguration, TypedEventEmitter } from '@imtbl/auth';
+import {
+  Auth,
+  IAuthConfiguration,
+  TypedEventEmitter,
+} from '@imtbl/auth';
 import {
   MultiRollupApiClients,
   MagicTeeApiClients,
@@ -12,7 +16,7 @@ import GuardianClient from './guardian';
 import MagicTEESigner from './magic/magicTEESigner';
 import { announceProvider, passportProviderInfo } from './provider/eip6963';
 import { DEFAULT_CHAINS } from './presets';
-import { MAGIC_CONFIG } from './constants';
+import { MAGIC_CONFIG, IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID } from './constants';
 
 /**
  * Type guard to check if chainId is a valid key for MAGIC_CONFIG
@@ -52,11 +56,79 @@ function getMagicConfigForChain(chain: ChainConfig): {
   );
 }
 
+const DEFAULT_PRODUCTION_CLIENT_ID = 'PtQRK4iRJ8GkXjiz6xfImMAYhPhW0cYk';
+const DEFAULT_SANDBOX_CLIENT_ID = 'mjtCL8mt06BtbxSkp2vbrYStKWnXVZfo';
+const DEFAULT_AUTH_SCOPE = 'openid profile email offline_access transact';
+const DEFAULT_AUTH_AUDIENCE = 'platform_api';
+const DEFAULT_REDIRECT_FALLBACK = 'https://auth.immutable.com/im-logged-in';
+const DEFAULT_AUTHENTICATION_DOMAIN = 'https://auth.immutable.com';
+const SANDBOX_DOMAIN_REGEX = /(sandbox|testnet)/i;
+
+function isSandboxChain(chain: ChainConfig): boolean {
+  if (chain.chainId === IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID) {
+    return true;
+  }
+
+  const domainCandidate = chain.apiUrl || chain.passportDomain || '';
+  return SANDBOX_DOMAIN_REGEX.test(domainCandidate);
+}
+
+function derivePassportDomain(chain: ChainConfig): string {
+  if (chain.passportDomain) {
+    return chain.passportDomain;
+  }
+
+  if (chain.apiUrl) {
+    try {
+      const apiUrl = new URL(chain.apiUrl);
+      const updatedHost = apiUrl.hostname.replace('api.', 'passport.');
+      return `${apiUrl.protocol}//${updatedHost}`;
+    } catch {
+      return chain.apiUrl.replace('api.', 'passport.');
+    }
+  }
+
+  return 'https://passport.immutable.com';
+}
+
+function deriveAuthenticationDomain(): string {
+  return DEFAULT_AUTHENTICATION_DOMAIN;
+}
+
+function deriveRedirectUri(): string {
+  return DEFAULT_REDIRECT_FALLBACK;
+}
+
+function getDefaultClientId(chain: ChainConfig): string {
+  return isSandboxChain(chain) ? DEFAULT_SANDBOX_CLIENT_ID : DEFAULT_PRODUCTION_CLIENT_ID;
+}
+
+function createDefaultAuth(initialChain: ChainConfig, options: ConnectWalletOptions): Auth {
+  const passportDomain = derivePassportDomain(initialChain);
+  const authenticationDomain = deriveAuthenticationDomain();
+  const redirectUri = deriveRedirectUri();
+
+  return new Auth({
+    clientId: getDefaultClientId(initialChain),
+    redirectUri,
+    popupRedirectUri: redirectUri,
+    logoutRedirectUri: redirectUri,
+    scope: DEFAULT_AUTH_SCOPE,
+    audience: DEFAULT_AUTH_AUDIENCE,
+    authenticationDomain,
+    passportDomain,
+    popupOverlayOptions: options.popupOverlayOptions,
+    crossSdkBridgeEnabled: options.crossSdkBridgeEnabled,
+  });
+}
+
 /**
  * Connect wallet with the provided configuration
  *
  * @param config - Wallet configuration
  * @returns EIP-1193 compliant provider with multi-chain support
+ *
+ * If no Auth instance is provided, a default Immutable-hosted client id will be used.
  *
  * @example
  * ```typescript
@@ -69,7 +141,7 @@ function getMagicConfigForChain(chain: ChainConfig): {
  *   passportDomain: 'https://passport.immutable.com',
  *   clientId: 'your-client-id',
  *   redirectUri: 'https://your-app.com/callback',
- *   scope: 'openid profile email transact',
+ *   scope: 'openid profile email offline_access transact',
  * });
  *
  * // Connect wallet (defaults to testnet + mainnet, starts on testnet)
@@ -82,7 +154,9 @@ function getMagicConfigForChain(chain: ChainConfig): {
  * });
  * ```
  */
-export async function connectWallet(config: ConnectWalletOptions): Promise<ZkEvmProvider> {
+export async function connectWallet(
+  config: ConnectWalletOptions = {},
+): Promise<ZkEvmProvider> {
   // Use default chains if not provided (testnet + mainnet)
   const chains = config.chains && config.chains.length > 0
     ? config.chains
@@ -106,11 +180,29 @@ export async function connectWallet(config: ConnectWalletOptions): Promise<ZkEvm
     passport: apiConfig,
   });
 
-  // 3. Extract Auth configuration
-  const authConfig: IAuthConfiguration = config.auth.getConfig();
+  // 3. Resolve Auth (use provided instance or create a default)
+  const auth = config.auth ?? createDefaultAuth(initialChain, config);
+  if (!config.auth && typeof window !== 'undefined') {
+    window.addEventListener('message', async (event) => {
+      if (event.data.code && event.data.state) {
+        // append to the current querystring making sure both cases of no existing and having existing params are handled
+        const currentQueryString = window.location.search;
+        const newQueryString = new URLSearchParams(currentQueryString);
+        newQueryString.set('code', event.data.code);
+        newQueryString.set('state', event.data.state);
+        window.history.replaceState(null, '', `?${newQueryString.toString()}`);
+        await auth.loginCallback();
+        // remove the code and state from the querystring
+        newQueryString.delete('code');
+        newQueryString.delete('state');
+        window.history.replaceState(null, '', `?${newQueryString.toString()}`);
+      }
+    });
+  }
 
-  // 4. Get current user
-  const user = await config.auth.getUser();
+  // 4. Extract Auth configuration and current user
+  const authConfig: IAuthConfiguration = auth.getConfig();
+  const user = await auth.getUser();
 
   // 5. Create wallet configuration with concrete URLs
   const walletConfig = new WalletConfiguration({
@@ -129,7 +221,7 @@ export async function connectWallet(config: ConnectWalletOptions): Promise<ZkEvm
 
   const guardianClient = new GuardianClient({
     config: walletConfig,
-    auth: config.auth,
+    auth,
     guardianApi,
     authConfig,
   });
@@ -146,7 +238,7 @@ export async function connectWallet(config: ConnectWalletOptions): Promise<ZkEvm
     magicProviderId: magicConfig.magicProviderId,
   });
 
-  const ethSigner = new MagicTEESigner(config.auth, magicTeeApiClients);
+  const ethSigner = new MagicTEESigner(auth, magicTeeApiClients);
 
   // 9. Determine session activity API URL (only for mainnet, testnet, devnet)
   let sessionActivityApiUrl: string | null = null;
@@ -167,7 +259,7 @@ export async function connectWallet(config: ConnectWalletOptions): Promise<ZkEvm
 
   // 11. Create ZkEvmProvider
   const provider = new ZkEvmProvider({
-    auth: config.auth,
+    auth,
     config: walletConfig,
     multiRollupApiClients,
     passportEventEmitter,

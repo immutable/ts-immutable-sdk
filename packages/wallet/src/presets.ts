@@ -2,6 +2,7 @@ import { ChainConfig } from './types';
 import {
   IMMUTABLE_ZKEVM_MAINNET_CHAIN_ID,
   IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID,
+  MAGIC_CONFIG,
 } from './constants';
 
 /**
@@ -14,8 +15,8 @@ export const IMMUTABLE_ZKEVM_MAINNET_CHAIN: ChainConfig = {
   relayerUrl: 'https://api.immutable.com/relayer-mr',
   apiUrl: 'https://api.immutable.com',
   passportDomain: 'https://passport.immutable.com',
-  magicPublishableApiKey: 'pk_live_D02F278E25B3E5F3',
-  magicProviderId: 'imtbl-immutable-zkEVM',
+  magicPublishableApiKey: MAGIC_CONFIG[IMMUTABLE_ZKEVM_MAINNET_CHAIN_ID].magicPublishableApiKey,
+  magicProviderId: MAGIC_CONFIG[IMMUTABLE_ZKEVM_MAINNET_CHAIN_ID].magicProviderId,
   magicTeeBasePath: 'https://tee.express.magiclabs.com',
 };
 
@@ -29,8 +30,8 @@ export const IMMUTABLE_ZKEVM_TESTNET_CHAIN: ChainConfig = {
   relayerUrl: 'https://api.sandbox.immutable.com/relayer-mr',
   apiUrl: 'https://api.sandbox.immutable.com',
   passportDomain: 'https://passport.sandbox.immutable.com',
-  magicPublishableApiKey: 'pk_live_620E2F8860D1D79E',
-  magicProviderId: 'imtbl-immutable-zkEVM-testnet',
+  magicPublishableApiKey: MAGIC_CONFIG[IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID].magicPublishableApiKey,
+  magicProviderId: MAGIC_CONFIG[IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID].magicProviderId,
   magicTeeBasePath: 'https://tee.express.magiclabs.com',
 };
 

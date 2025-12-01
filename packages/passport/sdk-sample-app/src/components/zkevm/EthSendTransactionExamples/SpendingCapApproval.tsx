@@ -37,7 +37,7 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
   const [params, setParams] = useState<any[]>([]);
   const amountRange = 'Amount should larger than 0';
 
-  const { zkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider } = usePassportProvider();
   useEffect(() => {
     setAmountConvertError('');
     const allowAmount = amount.trim() === '' ? '0' : amount;
@@ -64,8 +64,8 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
 
   useEffect(() => {
     const getAddress = async () => {
-      if (zkEvmProvider) {
-        const [walletAddress] = await zkEvmProvider.request({
+      if (activeZkEvmProvider) {
+        const [walletAddress] = await activeZkEvmProvider.request({
           method: 'eth_requestAccounts',
         });
         setFromAddress(walletAddress || '');
@@ -73,7 +73,7 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
     };
 
     getAddress().catch(console.log);
-  }, [zkEvmProvider, setFromAddress]);
+  }, [activeZkEvmProvider, setFromAddress]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

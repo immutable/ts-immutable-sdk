@@ -9,12 +9,12 @@ function SignEtherMail({ disabled, handleExampleSubmitted }: RequestExampleProps
   const [address, setAddress] = useState<string>('');
   const [params, setParams] = useState<any[]>([]);
 
-  const { zkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider } = usePassportProvider();
 
   useEffect(() => {
     const populateParams = async () => {
-      if (zkEvmProvider) {
-        const chainIdHex = await zkEvmProvider.request({ method: 'eth_chainId' });
+      if (activeZkEvmProvider) {
+        const chainIdHex = await activeZkEvmProvider.request({ method: 'eth_chainId' });
         const chainId = parseInt(chainIdHex, 16);
         const etherMailTypedPayload = getEtherMailTypedPayload(chainId, address);
 
@@ -26,12 +26,12 @@ function SignEtherMail({ disabled, handleExampleSubmitted }: RequestExampleProps
     };
 
     populateParams().catch(console.log);
-  }, [address, zkEvmProvider]);
+  }, [address, activeZkEvmProvider]);
 
   useEffect(() => {
     const getAddress = async () => {
-      if (zkEvmProvider) {
-        const [walletAddress] = await zkEvmProvider.request({
+      if (activeZkEvmProvider) {
+        const [walletAddress] = await activeZkEvmProvider.request({
           method: 'eth_requestAccounts',
         });
         setAddress(walletAddress || '');
@@ -39,7 +39,7 @@ function SignEtherMail({ disabled, handleExampleSubmitted }: RequestExampleProps
     };
 
     getAddress().catch(console.log);
-  }, [zkEvmProvider, setAddress]);
+  }, [activeZkEvmProvider, setAddress]);
 
   const handleSubmitSignPayload = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

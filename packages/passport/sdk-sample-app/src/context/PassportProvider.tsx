@@ -1,5 +1,5 @@
 import React, {
-  createContext, useCallback, useContext, useMemo, useState,
+  createContext, useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { IMXProvider } from '@imtbl/x-provider';
 import {
@@ -7,10 +7,15 @@ import {
 } from '@imtbl/passport';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
+import { EnvironmentNames } from '@/types';
 
 const PassportContext = createContext<{
   imxProvider: IMXProvider | undefined;
   zkEvmProvider: Provider | undefined;
+  defaultWalletProvider: Provider | undefined;
+  activeZkEvmProvider: Provider | undefined;
+  isSandboxEnvironment: boolean;
+  setDefaultWalletProvider: (provider?: Provider) => void;
   connectImx:() => void;
   connectZkEvm: () => void;
   logout: () => void;
@@ -30,6 +35,10 @@ const PassportContext = createContext<{
 }>({
       imxProvider: undefined,
       zkEvmProvider: undefined,
+      defaultWalletProvider: undefined,
+      activeZkEvmProvider: undefined,
+      setDefaultWalletProvider: () => undefined,
+      isSandboxEnvironment: false,
       connectImx: () => undefined,
       connectZkEvm: () => undefined,
       logout: () => undefined,
@@ -53,9 +62,10 @@ export function PassportProvider({
 }: { children: JSX.Element | JSX.Element[] }) {
   const [imxProvider, setImxProvider] = useState<IMXProvider | undefined>();
   const [zkEvmProvider, setZkEvmProvider] = useState<Provider | undefined>();
+  const [defaultWalletProvider, setDefaultWalletProvider] = useState<Provider | undefined>();
 
   const { addMessage, setIsLoading } = useStatusProvider();
-  const { passportClient } = useImmutableProvider();
+  const { passportClient, environment } = useImmutableProvider();
 
   const connectImx = useCallback(async () => {
     try {
@@ -141,6 +151,7 @@ export function PassportProvider({
       await passportClient.logout();
       setImxProvider(undefined);
       setZkEvmProvider(undefined);
+      setDefaultWalletProvider(undefined);
     } catch (err) {
       addMessage('Logout', err);
       console.error(err);
@@ -288,9 +299,22 @@ export function PassportProvider({
     }
   }, [addMessage, passportClient, setIsLoading]);
 
+  useEffect(() => {
+    if (environment !== EnvironmentNames.SANDBOX && defaultWalletProvider) {
+      setDefaultWalletProvider(undefined);
+    }
+  }, [environment, defaultWalletProvider]);
+
+  const isSandboxEnvironment = environment === EnvironmentNames.SANDBOX;
+
   const providerValues = useMemo(() => ({
     imxProvider,
     zkEvmProvider,
+    defaultWalletProvider,
+    activeZkEvmProvider: isSandboxEnvironment
+      ? (defaultWalletProvider || zkEvmProvider)
+      : zkEvmProvider,
+    setDefaultWalletProvider,
     connectImx,
     connectZkEvm,
     logout,
@@ -307,9 +331,12 @@ export function PassportProvider({
     getUserInfo,
     getLinkedAddresses,
     linkWallet,
+    isSandboxEnvironment,
   }), [
     imxProvider,
     zkEvmProvider,
+    defaultWalletProvider,
+    isSandboxEnvironment,
     connectImx,
     connectZkEvm,
     logout,
@@ -326,6 +353,7 @@ export function PassportProvider({
     getUserInfo,
     getLinkedAddresses,
     linkWallet,
+    setDefaultWalletProvider,
   ]);
 
   return (
@@ -339,6 +367,10 @@ export function usePassportProvider() {
   const {
     imxProvider,
     zkEvmProvider,
+    defaultWalletProvider,
+    activeZkEvmProvider,
+    isSandboxEnvironment,
+    setDefaultWalletProvider,
     connectImx,
     connectZkEvm,
     logout,
@@ -359,6 +391,10 @@ export function usePassportProvider() {
   return {
     imxProvider,
     zkEvmProvider,
+    defaultWalletProvider,
+    activeZkEvmProvider,
+    isSandboxEnvironment,
+    setDefaultWalletProvider,
     connectImx,
     connectZkEvm,
     logout,
