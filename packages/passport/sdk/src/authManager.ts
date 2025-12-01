@@ -32,8 +32,6 @@ import ConfirmationOverlay from './overlay/confirmationOverlay';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
 import { EmbeddedLoginPrompt } from './confirmation';
 
-const LOGIN_POPUP_CLOSED_POLLING_DURATION = 500;
-
 const formUrlEncodedHeader = {
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -259,7 +257,7 @@ export default class AuthManager {
       const signinPopup = async () => {
         const extraQueryParams = this.buildExtraQueryParams(anonymousId, directLoginOptionsToUse, imPassportTraceId);
 
-        const userPromise = this.userManager.signinPopup({
+        return this.userManager.signinPopup({
           extraQueryParams,
           popupWindowFeatures: {
             width: 410,
@@ -267,36 +265,6 @@ export default class AuthManager {
           },
           popupWindowTarget,
         });
-
-        // ID-3950: https://github.com/authts/oidc-client-ts/issues/2043
-        // The promise returned from `signinPopup` no longer rejects when the popup is closed.
-        // We can prevent this from impacting consumers by obtaining a reference to the popup and rejecting the promise
-        // that is returned by this method if the popup is closed by the user.
-
-        // Attempt to get a reference to the popup window
-        const popupRef = window.open('', popupWindowTarget);
-        if (popupRef) {
-          // Create a promise that rejects when popup is closed
-          const popupClosedPromise = new Promise<never>((_, reject) => {
-            const timer = setInterval(() => {
-              if (popupRef.closed) {
-                clearInterval(timer);
-                reject(new Error('Popup closed by user'));
-              }
-            }, LOGIN_POPUP_CLOSED_POLLING_DURATION);
-
-            // Clean up timer when the user promise resolves/rejects
-            userPromise.finally(() => {
-              clearInterval(timer);
-              popupRef.close();
-            });
-          });
-
-          // Race between user authentication and popup being closed
-          return Promise.race([userPromise, popupClosedPromise]);
-        }
-
-        return userPromise;
       };
 
       // This promise attempts to open the signin popup, and displays the blocked popup overlay if necessary.
@@ -360,33 +328,8 @@ export default class AuthManager {
     return user || this.login();
   }
 
-  private static shouldUseSigninPopupCallback(): boolean {
-    // ID-3950: https://github.com/authts/oidc-client-ts/issues/2043
-    // Detect when the login was initiated via a popup
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const stateParam = urlParams.get('state');
-      const localStorageKey = `oidc.${stateParam}`;
-
-      const localStorageValue = localStorage.getItem(localStorageKey);
-      const loginState = JSON.parse(localStorageValue || '{}');
-
-      return loginState?.request_type === 'si:p';
-    } catch (err) {
-      return false;
-    }
-  }
-
   public async loginCallback(): Promise<undefined | User> {
     return withPassportError<undefined | User>(async () => {
-      // ID-3950: https://github.com/authts/oidc-client-ts/issues/2043
-      // When using `signinPopup` to initiate a login, call the `signinPopupCallback` method and
-      // set the `keepOpen` flag to `true`, as the `login` method is now responsible for closing the popup.
-      // See the comment in the `login` method for more details.
-      if (AuthManager.shouldUseSigninPopupCallback()) {
-        await this.userManager.signinPopupCallback(undefined, true);
-        return undefined;
-      }
       const oidcUser = await this.userManager.signinCallback();
       if (!oidcUser) {
         return undefined;
