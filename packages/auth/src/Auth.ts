@@ -42,8 +42,6 @@ import { isAccessTokenExpiredOrExpiring } from './utils/token';
 import LoginPopupOverlay from './overlay/loginPopupOverlay';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
 
-const LOGIN_POPUP_CLOSED_POLLING_DURATION = 500;
-
 const formUrlEncodedHeader = {
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -472,7 +470,7 @@ export class Auth {
       const signinPopup = async () => {
         const extraQueryParams = this.buildExtraQueryParams(directLoginOptionsToUse, imPassportTraceId);
 
-        const userPromise = this.userManager.signinPopup({
+        return this.userManager.signinPopup({
           extraQueryParams,
           popupWindowFeatures: {
             width: 410,
@@ -480,27 +478,6 @@ export class Auth {
           },
           popupWindowTarget,
         });
-
-        const popupRef = window.open('', popupWindowTarget);
-        if (popupRef) {
-          const popupClosedPromise = new Promise<never>((_, reject) => {
-            const timer = setInterval(() => {
-              if (popupRef.closed) {
-                clearInterval(timer);
-                reject(new Error('Popup closed by user'));
-              }
-            }, LOGIN_POPUP_CLOSED_POLLING_DURATION);
-
-            userPromise.finally(() => {
-              clearInterval(timer);
-              popupRef.close();
-            });
-          });
-
-          return Promise.race([userPromise, popupClosedPromise]);
-        }
-
-        return userPromise;
       };
 
       return new Promise((resolve, reject) => {
@@ -586,25 +563,8 @@ export class Auth {
     });
   };
 
-  private static shouldUseSigninPopupCallback(): boolean {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const stateParam = urlParams.get('state');
-      const localStorageKey = `oidc.${stateParam}`;
-      const localStorageValue = localStorage.getItem(localStorageKey);
-      const loginState = JSON.parse(localStorageValue || '{}');
-      return loginState?.request_type === 'si:p';
-    } catch (err) {
-      return false;
-    }
-  }
-
   private async loginCallbackInternal(): Promise<User | undefined> {
     return withPassportError(async () => {
-      if (Auth.shouldUseSigninPopupCallback()) {
-        await this.userManager.signinPopupCallback(undefined, true);
-        return undefined;
-      }
       const oidcUser = await this.userManager.signinCallback();
       if (!oidcUser) {
         return undefined;
