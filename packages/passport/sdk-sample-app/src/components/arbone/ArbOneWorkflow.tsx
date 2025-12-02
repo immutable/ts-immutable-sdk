@@ -39,7 +39,7 @@ function ArbOneWorkflow() {
   }, [arbOneEventHandler, arbOneProvider]);
 
   return (
-    <CardStack title="ArbOne Workflow">
+    <CardStack title="Arbitrum Sepolia Workflow">
       <Stack direction="horizontal" style={{ flexWrap: 'wrap' }} gap={3}>
         {arbOneProvider && (
           <>
@@ -67,7 +67,7 @@ function ArbOneWorkflow() {
             disabled={isLoading}
             onClick={connectArbOne}
           >
-            Connect ArbOne
+            Connect Arbitrum Sepolia
           </WorkflowButton>
         )}
       </Stack>

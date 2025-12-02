@@ -127,6 +127,8 @@ describe('Passport', () => {
             orderBookMrBasePath: 'orderBookMrBasePath123',
             passportMrBasePath: 'passportMrBasePath123',
             immutableXClient,
+            sequenceIdentityInstrumentEndpoint: 'sequenceIdentityInstrumentEndpoint123',
+            sequenceProjectAccessKey: 'sequenceProjectAccessKey123',
           },
           ...oidcConfiguration,
         });

@@ -30,7 +30,6 @@ export type {
   User,
   UserImx,
   UserZkEvm,
-  UserArbOne,
 } from './types';
 export {
   MarketingConsentStatus,
@@ -39,5 +38,4 @@ export {
   EvmChain,
   isUserImx,
   isUserZkEvm,
-  isUserArbOne,
 } from './types';

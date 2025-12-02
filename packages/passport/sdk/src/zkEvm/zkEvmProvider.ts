@@ -68,6 +68,9 @@ export class ZkEvmProvider implements Provider {
 
   public readonly isPassport: boolean = true;
 
+  // TODO: for demo purposes only as we're using local database
+  userWalletAddress: string | undefined = undefined;
+
   constructor({
     authManager,
     config,
@@ -96,20 +99,20 @@ export class ZkEvmProvider implements Provider {
     this.#multiRollupApiClients = multiRollupApiClients;
     this.#providerEventEmitter = new TypedEventEmitter<ProviderEventMap>();
 
-    if (user && isZkEvmUser(user)) {
-      this.#callSessionActivity(user.zkEvm.ethAddress);
-    }
+    // if (user && isZkEvmUser(user)) {
+    //   this.#callSessionActivity(user.zkEvm.ethAddress);
+    // }
 
     passportEventEmitter.on(PassportEvents.LOGGED_IN, (loggedInUser: User) => {
-      if (isZkEvmUser(loggedInUser)) {
-        this.#callSessionActivity(loggedInUser.zkEvm.ethAddress);
-      }
+      // if (isZkEvmUser(loggedInUser)) {
+      //   this.#callSessionActivity(loggedInUser.zkEvm.ethAddress);
+      // }
     });
     passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.#handleLogout);
-    passportEventEmitter.on(
-      PassportEvents.ACCOUNTS_REQUESTED,
-      trackSessionActivity,
-    );
+    // passportEventEmitter.on(
+    //   PassportEvents.ACCOUNTS_REQUESTED,
+    //   trackSessionActivity,
+    // );
   }
 
   #handleLogout = () => {
@@ -181,6 +184,9 @@ export class ZkEvmProvider implements Provider {
               rpcProvider: this.#rpcProvider,
               flow,
             });
+
+            this.userWalletAddress = userZkEvmEthAddress;
+
             flow.addEvent('endUserRegistration');
           } else {
             userZkEvmEthAddress = user.zkEvm.ethAddress;
@@ -206,7 +212,7 @@ export class ZkEvmProvider implements Provider {
         }
       }
       case 'eth_sendTransaction': {
-        const zkEvmAddress = '0x775396532ac01f6013c0118a5a9d4568aaa92cfe';//await this.#getZkEvmAddress();
+        const zkEvmAddress = this.userWalletAddress;//await this.#getZkEvmAddress();
         if (!zkEvmAddress) {
           throw new JsonRpcError(
             ProviderErrorCode.UNAUTHORIZED,
@@ -218,10 +224,7 @@ export class ZkEvmProvider implements Provider {
 
         console.log(`request.params ${JSON.stringify(request.params)}`);
         try {
-          return await this.#guardianClient.withConfirmationScreen({
-            width: 480,
-            height: 720,
-          })(async () => await sendTransaction({
+          return await sendTransaction({
             params: request.params || [],
             ethSigner: this.#ethSigner,
             guardianClient: this.#guardianClient,
@@ -229,7 +232,19 @@ export class ZkEvmProvider implements Provider {
             relayerClient: this.#relayerClient,
             zkEvmAddress,
             flow,
-          }));
+          });
+          // return await this.#guardianClient.withConfirmationScreen({
+          //   width: 480,
+          //   height: 720,
+          // })(async () => await sendTransaction({
+          //   params: request.params || [],
+          //   ethSigner: this.#ethSigner,
+          //   guardianClient: this.#guardianClient,
+          //   rpcProvider: this.#rpcProvider,
+          //   relayerClient: this.#relayerClient,
+          //   zkEvmAddress,
+          //   flow,
+          // }));
         } catch (error) {
           if (error instanceof Error) {
             trackError('passport', 'eth_sendTransaction', error, { flowId: flow.details.flowId });

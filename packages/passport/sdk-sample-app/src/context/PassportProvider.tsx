@@ -96,7 +96,7 @@ export function PassportProvider({
   const connectArbOne = useCallback(async () => {
     if (!passportClient) return;
     setIsLoading(true);
-    const provider = await passportClient.connectEvm({ chain: EvmChain.ARBONE });
+    const provider = await passportClient.connectEvm({ chain: EvmChain.ARBITRUM_SEPOLIA });
     if (provider) {
       setArbOneProvider(provider);
       addMessage('ConnectArbOne', 'Connected');

@@ -3,6 +3,7 @@ import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
 import { FeeOption, RelayerTransaction, TypedDataPayload } from './types';
 import { getEip155ChainId } from './walletHelpers';
+import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 
 export type RelayerClientInput = {
   config: PassportConfiguration,
@@ -115,7 +116,13 @@ export class RelayerClient {
       ...request,
     };
 
-    const user = await this.authManager.getUserZkEvm();
+    const user = await this.authManager.getUser();
+    if (!user?.accessToken) {
+      throw new JsonRpcError(
+        ProviderErrorCode.UNAUTHORIZED,
+        'No access token found',
+      );
+    }
 
     const response = await fetch(`${this.config.relayerUrl}/v1/transactions`, {
       method: 'POST',

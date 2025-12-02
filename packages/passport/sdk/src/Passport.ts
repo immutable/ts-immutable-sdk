@@ -33,7 +33,6 @@ import {
 import { ConfirmationScreen, EmbeddedLoginPrompt } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
 import { Provider } from './zkEvm/types';
-import { ArbOneProvider } from './arbOne';
 import TypedEventEmitter from './utils/typedEventEmitter';
 import GuardianClient from './guardian';
 import logger from './utils/logger';
@@ -41,6 +40,7 @@ import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963
 import { isAPIError, PassportError, PassportErrorType } from './errors/passportError';
 import { withMetricsAsync } from './utils/metrics';
 import { EvmChain } from './types';
+import { SequenceProvider, SequenceSigner } from './sequence';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -71,8 +71,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     magicProviderId: config.magicProviderId,
   });
   const magicTEESigner = new MagicTEESigner(authManager, magicTeeApiClients);
-  // SequenceSigner will be loaded lazily to avoid SSR issues
-  let sequenceSigner: any = null;
+  const sequenceSigner = new SequenceSigner(authManager, config);
   
   const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
   const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
@@ -127,7 +126,7 @@ export class Passport {
 
   private readonly magicTEESigner: MagicTEESigner;
 
-  private sequenceSigner: any; // Lazy-loaded to avoid SSR issues
+  private sequenceSigner: SequenceSigner;
 
   private readonly multiRollupApiClients: MultiRollupApiClients;
 
@@ -143,7 +142,7 @@ export class Passport {
     this.config = privateVars.config;
     this.authManager = privateVars.authManager;
     this.magicTEESigner = privateVars.magicTEESigner;
-    this.sequenceSigner = privateVars.sequenceSigner; // Initially null
+    this.sequenceSigner = privateVars.sequenceSigner;
     this.confirmationScreen = privateVars.confirmationScreen;
     this.embeddedLoginPrompt = privateVars.embeddedLoginPrompt;
     this.immutableXClient = privateVars.immutableXClient;
@@ -174,18 +173,6 @@ export class Passport {
   }
 
   /**
-   * Lazy-loads SequenceSigner to avoid SSR issues with wallet-wdk
-   */
-  private async getSequenceSigner() {
-    if (!this.sequenceSigner) {
-      // Dynamic import to avoid loading wallet-wdk during SSR
-      const { default: SequenceSigner } = await import('./sequence/sequenceSigner');
-      this.sequenceSigner = new SequenceSigner(this.authManager, this.config);
-    }
-    return this.sequenceSigner;
-  }
-
-  /**
    * Connects to EVM and optionally announces the provider.
    * @param {Object} options - Configuration options
    * @param {boolean} options.announceProvider - Whether to announce the provider via EIP-6963 for wallet discovery (defaults to true)
@@ -205,16 +192,15 @@ export class Passport {
 
       let provider: Provider;
 
-      if (chain === EvmChain.ARBONE) {
-        // Lazy-load SequenceSigner for ArbOne
-        const sequenceSigner = await this.getSequenceSigner();
-        provider = new ArbOneProvider({
+      if (chain !== EvmChain.ZKEVM) {
+        provider = new SequenceProvider({
           passportEventEmitter: this.passportEventEmitter,
           authManager: this.authManager,
           config: this.config,
           multiRollupApiClients: this.multiRollupApiClients,
-          ethSigner: sequenceSigner,
+          ethSigner: this.sequenceSigner,
           user,
+          chain,
         });
       } else {
         provider = new ZkEvmProvider({

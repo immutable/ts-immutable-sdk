@@ -141,7 +141,7 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
           orderBookMrBasePath: 'https://api.dev.immutable.com',
           passportMrBasePath: 'http://localhost:8071',
           sequenceIdentityInstrumentEndpoint: 'https://next-identity.sequence-dev.app/',
-          arbOneRpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
+          sequenceProjectAccessKey: 'AQAAAAAAAAB5QznGqk9paa4EQjom09ERpJs',
         },
         ...sharedConfigurationValues,
       };

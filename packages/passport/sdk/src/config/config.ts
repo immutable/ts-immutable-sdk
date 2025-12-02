@@ -50,9 +50,9 @@ export class PassportConfiguration {
 
   readonly relayerUrl: string;
 
-  readonly arbOneRpcUrl: string;
+  readonly sequenceProjectAccessKey: string;
 
-  readonly sequenceIdentityInstrumentEndpoint?: string;
+  readonly sequenceIdentityInstrumentEndpoint: string;
 
   readonly multiRollupConfig: MultiRollupAPIConfiguration;
 
@@ -107,9 +107,9 @@ export class PassportConfiguration {
       this.magicPublishableApiKey = overrides.magicPublishableApiKey;
       this.magicProviderId = overrides.magicProviderId;
       this.zkEvmRpcUrl = overrides.zkEvmRpcUrl;
-      this.relayerUrl = 'http://localhost:8070/relayer-mr';//overrides.relayerUrl;
-      this.arbOneRpcUrl = 'https://sepolia-rollup.arbitrum.io/rpc';//overrides.arbOneRpcUrl || 'https://arb1.arbitrum.io/rpc';
+      this.relayerUrl = overrides.relayerUrl;
       this.sequenceIdentityInstrumentEndpoint = overrides.sequenceIdentityInstrumentEndpoint;
+      this.sequenceProjectAccessKey = overrides.sequenceProjectAccessKey;
       this.multiRollupConfig = {
         indexer: createConfig({
           basePath: overrides.indexerMrBasePath,
@@ -118,7 +118,7 @@ export class PassportConfiguration {
           basePath: overrides.orderBookMrBasePath,
         }),
         passport: createConfig({
-          basePath: 'http://localhost:8071',//overrides.passportMrBasePath,
+          basePath: overrides.passportMrBasePath,
         }),
       };
     } else {
@@ -131,7 +131,8 @@ export class PassportConfiguration {
           this.imxPublicApiDomain = 'https://api.immutable.com';
           this.zkEvmRpcUrl = 'https://rpc.immutable.com';
           this.relayerUrl = 'https://api.immutable.com/relayer-mr';
-          this.arbOneRpcUrl = 'https://arb1.arbitrum.io/rpc';
+          this.sequenceIdentityInstrumentEndpoint = 'https://next-identity.sequence.app/';
+          this.sequenceProjectAccessKey = 'AQAAAAAAAAB5QznGqk9paa4EQjom09ERpJs';
           this.multiRollupConfig = multiRollupConfig.getProduction();
           break;
         }
@@ -144,7 +145,8 @@ export class PassportConfiguration {
           this.imxPublicApiDomain = 'https://api.sandbox.immutable.com';
           this.zkEvmRpcUrl = 'https://rpc.testnet.immutable.com';
           this.relayerUrl = 'http://localhost:8070/relayer-mr';
-          this.arbOneRpcUrl = 'https://sepolia-rollup.arbitrum.io/rpc';
+          this.sequenceIdentityInstrumentEndpoint = 'https://next-identity.sequence-dev.app/';
+          this.sequenceProjectAccessKey = 'AQAAAAAAAAB5QznGqk9paa4EQjom09ERpJs';
           this.multiRollupConfig = multiRollupConfig.getSandbox();
           break;
         }

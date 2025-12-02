@@ -13,7 +13,6 @@ export const sendTransaction = async ({
   zkEvmAddress,
   flow,
   nonceSpace,
-  isBackgroundTransaction = false,
 }: EthSendTransactionParams): Promise<string> => {
   const transactionRequest = params[0];
 
@@ -26,7 +25,6 @@ export const sendTransaction = async ({
     zkEvmAddress,
     flow,
     nonceSpace,
-    isBackgroundTransaction,
   });
 
   const { hash } = await pollRelayerTransaction(relayerClient, relayerId, flow);
