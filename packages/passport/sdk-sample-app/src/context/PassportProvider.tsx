@@ -70,6 +70,10 @@ export function PassportProvider({
   const { addMessage, setIsLoading } = useStatusProvider();
   const { passportClient, environment } = useImmutableProvider();
   const isSandboxEnvironment = environment === EnvironmentNames.SANDBOX;
+  // `zkEvmProvider` is initialised using Passport package. 
+  // `defaultWalletProvider` is created by connectWallet(), which includes a default auth instance underneath.
+  // In sandbox environment, we allow testing the default wallet provider because the 
+  // conenectWallet works with testnet and sandbox env when no arguements are provided.
   const activeZkEvmProvider = isSandboxEnvironment
     ? (defaultWalletProvider || zkEvmProvider)
     : zkEvmProvider;
