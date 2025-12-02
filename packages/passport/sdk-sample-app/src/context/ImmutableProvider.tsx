@@ -186,7 +186,7 @@ const getOrderbookConfig = (environment: EnvironmentNames): ModuleConfiguration<
 };
 
 const ImmutableContext = createContext<{
-  passportClient: Passport | null,
+  passportClient: Passport,
   sdkClient: ImmutableX,
   orderbookClient: Orderbook,
   blockchainData: BlockchainData,
@@ -195,7 +195,7 @@ const ImmutableContext = createContext<{
 }>({
       sdkClient: new ImmutableX(getSdkConfig(EnvironmentNames.DEV)),
       orderbookClient: new Orderbook(getOrderbookConfig(EnvironmentNames.DEV)),
-      passportClient: null, // Initialize as null during SSR
+      passportClient: new Passport(getPassportConfig(EnvironmentNames.DEV)),
       environment: EnvironmentNames.DEV,
       blockchainData: new BlockchainData(getBlockchainDataConfig(EnvironmentNames.DEV)),
     });
@@ -213,8 +213,8 @@ export function ImmutableProvider({
   const [orderbookClient, setOrderbookClient] = useState<Orderbook>(
     useContext(ImmutableContext).orderbookClient,
   );
-  const [passportClient, setPassportClient] = useState<Passport | null>(
-    null, // Start as null for SSR
+  const [passportClient, setPassportClient] = useState<Passport>(
+    useContext(ImmutableContext).passportClient,
   );
 
   const [blockchainData, setBlockchainData] = useState<BlockchainData>(
@@ -222,18 +222,15 @@ export function ImmutableProvider({
   );
 
   useEffect(() => {
-    // Only initialize Passport on the client side
-    if (typeof window !== 'undefined') {
-      const passportInstance = new Passport(getPassportConfig(environment));
-      Object.defineProperty(window, 'passport', {
-        configurable: true,
-        value: passportInstance,
-      });
-      setSdkClient(new ImmutableX(getSdkConfig(environment)));
-      setOrderbookClient(new Orderbook(getOrderbookConfig(environment)));
-      setPassportClient(passportInstance);
-      setBlockchainData(new BlockchainData(getBlockchainDataConfig(environment)));
-    }
+    const passportInstance = new Passport(getPassportConfig(environment));
+    Object.defineProperty(window, 'passport', {
+      configurable: true,
+      value: passportInstance,
+    });
+    setSdkClient(new ImmutableX(getSdkConfig(environment)));
+    setOrderbookClient(new Orderbook(getOrderbookConfig(environment)));
+    setPassportClient(passportInstance);
+    setBlockchainData(new BlockchainData(getBlockchainDataConfig(environment)));
   }, [environment]);
 
   const providerValues = useMemo(() => ({

@@ -63,7 +63,6 @@ export function PassportProvider({
   const { passportClient } = useImmutableProvider();
 
   const connectImx = useCallback(async () => {
-    if (!passportClient) return;
     try {
       setIsLoading(true);
       const provider = await passportClient.connectImx();
@@ -81,7 +80,6 @@ export function PassportProvider({
   }, [passportClient, setIsLoading, addMessage]);
 
   const connectZkEvm = useCallback(async () => {
-    if (!passportClient) return;
     setIsLoading(true);
     const provider = await passportClient.connectEvm();
     if (provider) {
@@ -94,7 +92,6 @@ export function PassportProvider({
   }, [passportClient, setIsLoading, addMessage]);
 
   const connectArbOne = useCallback(async () => {
-    if (!passportClient) return;
     setIsLoading(true);
     const provider = await passportClient.connectEvm({ chain: EvmChain.ARBITRUM_SEPOLIA });
     if (provider) {
@@ -107,7 +104,6 @@ export function PassportProvider({
   }, [passportClient, setIsLoading, addMessage]);
 
   const getIdToken = useCallback(async () => {
-    if (!passportClient) return;
     setIsLoading(true);
     const idToken = await passportClient.getIdToken();
     addMessage('Get ID token', idToken);
@@ -117,7 +113,6 @@ export function PassportProvider({
   }, [passportClient, setIsLoading, addMessage]);
 
   const getAccessToken = useCallback(async () => {
-    if (!passportClient) return;
     setIsLoading(true);
     const accessToken = await passportClient.getAccessToken();
     addMessage('Get Access token', accessToken);
@@ -127,7 +122,6 @@ export function PassportProvider({
   }, [passportClient, setIsLoading, addMessage]);
 
   const getUserInfo = useCallback(async () => {
-    if (!passportClient) return;
     setIsLoading(true);
     const userInfo = await passportClient.getUserInfo();
     addMessage('Get User Info', userInfo);
@@ -137,7 +131,6 @@ export function PassportProvider({
   }, [passportClient, setIsLoading, addMessage]);
 
   const getLinkedAddresses = useCallback(async () => {
-    if (!passportClient) return;
     setIsLoading(true);
     const linkedAddresses = await passportClient.getLinkedAddresses();
     addMessage('Get Linked Addresses', linkedAddresses);
@@ -147,7 +140,6 @@ export function PassportProvider({
   }, [passportClient, setIsLoading, addMessage]);
 
   const linkWallet = useCallback(async (params: LinkWalletParams) => {
-    if (!passportClient) return;
     setIsLoading(true);
     let linkedWallet;
     try {
@@ -161,7 +153,6 @@ export function PassportProvider({
   }, [passportClient, setIsLoading, addMessage]);
 
   const logout = useCallback(async () => {
-    if (!passportClient) return;
     try {
       setIsLoading(true);
       await passportClient.logout();
@@ -177,7 +168,6 @@ export function PassportProvider({
   }, [addMessage, passportClient, setIsLoading]);
 
   const popupRedirect = useCallback(async () => {
-    if (!passportClient) return;
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login();
@@ -191,7 +181,6 @@ export function PassportProvider({
   }, [addMessage, passportClient, setIsLoading]);
 
   const login = useCallback(async () => {
-    if (!passportClient) return;
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({ useRedirectFlow: true });
@@ -206,7 +195,6 @@ export function PassportProvider({
 
   // Popup redirect methods (provider-specific)
   const popupRedirectGoogle = useCallback(async () => {
-    if (!passportClient) return;
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({
@@ -225,7 +213,6 @@ export function PassportProvider({
   }, [addMessage, passportClient, setIsLoading]);
 
   const popupRedirectApple = useCallback(async () => {
-    if (!passportClient) return;
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({
@@ -244,7 +231,6 @@ export function PassportProvider({
   }, [addMessage, passportClient, setIsLoading]);
 
   const popupRedirectFacebook = useCallback(async () => {
-    if (!passportClient) return;
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({
@@ -264,7 +250,6 @@ export function PassportProvider({
 
   // Login (redirect) methods
   const loginGoogle = useCallback(async () => {
-    if (!passportClient) return;
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({
@@ -284,7 +269,6 @@ export function PassportProvider({
   }, [addMessage, passportClient, setIsLoading]);
 
   const loginApple = useCallback(async () => {
-    if (!passportClient) return;
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({
@@ -304,7 +288,6 @@ export function PassportProvider({
   }, [addMessage, passportClient, setIsLoading]);
 
   const loginFacebook = useCallback(async () => {
-    if (!passportClient) return;
     try {
       setIsLoading(true);
       const userProfile = await passportClient.login({
