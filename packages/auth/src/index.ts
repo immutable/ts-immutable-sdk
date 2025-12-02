@@ -29,4 +29,6 @@ export {
 export { default as TypedEventEmitter } from './utils/typedEventEmitter';
 
 // Export errors
-export { PassportError, PassportErrorType, withPassportError } from './errors';
+export {
+  PassportError, PassportErrorType, withPassportError, isAPIError,
+} from './errors';
