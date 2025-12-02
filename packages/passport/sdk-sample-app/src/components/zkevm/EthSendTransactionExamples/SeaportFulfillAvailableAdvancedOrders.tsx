@@ -13,7 +13,7 @@ import { PreparedTransactionRequest } from 'ethers';
 
 function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const { orderbookClient } = useImmutableProvider();
-  const { activeZkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider, activeZkEvmAccount } = usePassportProvider();
 
   const [listingIds, setListingIds] = useState<string>('');
   const [walletAddress, setWalletAddress] = useState<string>('');
@@ -29,17 +29,8 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
   );
 
   useEffect(() => {
-    const getAddress = async () => {
-      if (activeZkEvmProvider) {
-        const [address] = await activeZkEvmProvider.request({
-          method: 'eth_requestAccounts',
-        });
-        setWalletAddress(address || '');
-      }
-    };
-
-    getAddress().catch(console.log);
-  }, [activeZkEvmProvider, setWalletAddress]);
+    setWalletAddress(activeZkEvmAccount || '');
+  }, [activeZkEvmAccount]);
 
   useEffect(() => {
     setTransactionError('');

@@ -12,7 +12,7 @@ import { getCreateERC721ListingPayload } from './SeaportCreateListingExample';
 
 function SeaportCreateERC721ListingDefault({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const { orderbookClient } = useImmutableProvider();
-  const { activeZkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider, activeZkEvmAccount } = usePassportProvider();
 
   const [params, setParams] = useState<any>();
 
@@ -24,19 +24,20 @@ function SeaportCreateERC721ListingDefault({ disabled, handleExampleSubmitted }:
   );
 
   useEffect(() => {
-    const getAddress = async () => {
-      if (activeZkEvmProvider) {
-        const [address] = await activeZkEvmProvider.request({
-          method: 'eth_requestAccounts',
-        });
+    const populate = async () => {
+      if (activeZkEvmProvider && activeZkEvmAccount) {
         const chainIdHex = await activeZkEvmProvider.request({ method: 'eth_chainId' });
         const chainId = parseInt(chainIdHex, 16);
-        const data = getCreateERC721ListingPayload({ seaportContractAddress, walletAddress: address, chainId });
-        setParams([address, data]);
+        const data = getCreateERC721ListingPayload({
+          seaportContractAddress,
+          walletAddress: activeZkEvmAccount,
+          chainId,
+        });
+        setParams([activeZkEvmAccount, data]);
       }
     };
-    getAddress().catch(console.log);
-  }, [activeZkEvmProvider, seaportContractAddress]);
+    populate().catch(console.log);
+  }, [activeZkEvmProvider, activeZkEvmAccount, seaportContractAddress]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -32,7 +32,7 @@ function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps
   const [useTransferFrom, setUseTransferFrom] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>('0');
   const [contractAddress, setContractAddress] = useState<string>(getErc20DefaultContractAddress(environment));
-  const { activeZkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider, activeZkEvmAccount } = usePassportProvider();
   const [params, setParams] = useState<any[]>([]);
   const [amountConvertError, setAmountConvertError] = useState<string>('');
   const amountRange = 'Amount should larger than 0 with maximum 18 digits in decimal';
@@ -80,17 +80,8 @@ function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps
   }, [fromAddress, toAddress, contractAddress, amount, erc20Transfer, useTransferFrom]);
 
   useEffect(() => {
-    const getAddress = async () => {
-      if (activeZkEvmProvider) {
-        const [walletAddress] = await activeZkEvmProvider.request({
-          method: 'eth_requestAccounts',
-        });
-        setFromAddress(walletAddress || '');
-      }
-    };
-
-    getAddress().catch(console.log);
-  }, [activeZkEvmProvider, setFromAddress]);
+    setFromAddress(activeZkEvmAccount || '');
+  }, [activeZkEvmAccount]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

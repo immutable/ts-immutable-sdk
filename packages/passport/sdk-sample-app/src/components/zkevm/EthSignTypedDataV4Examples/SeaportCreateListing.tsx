@@ -19,7 +19,7 @@ type TokenType = 'NATIVE' | 'ERC20';
 
 function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const { orderbookClient } = useImmutableProvider();
-  const { activeZkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider, activeZkEvmAccount } = usePassportProvider();
 
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [isBuldingTransaction, setIsBuildingTransaction] = useState<boolean>(false);
@@ -46,17 +46,8 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
   );
 
   useEffect(() => {
-    const getAddress = async () => {
-      if (activeZkEvmProvider) {
-        const [address] = await activeZkEvmProvider.request({
-          method: 'eth_requestAccounts',
-        });
-        setWalletAddress(address || '');
-      }
-    };
-
-    getAddress().catch(console.log);
-  }, [activeZkEvmProvider, setWalletAddress]);
+    setWalletAddress(activeZkEvmAccount || '');
+  }, [activeZkEvmAccount]);
 
   useEffect(() => {
     setSignMessageError('');

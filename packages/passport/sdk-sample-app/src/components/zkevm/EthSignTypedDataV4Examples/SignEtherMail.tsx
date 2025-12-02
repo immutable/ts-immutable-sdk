@@ -9,7 +9,7 @@ function SignEtherMail({ disabled, handleExampleSubmitted }: RequestExampleProps
   const [address, setAddress] = useState<string>('');
   const [params, setParams] = useState<any[]>([]);
 
-  const { activeZkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider, activeZkEvmAccount } = usePassportProvider();
 
   useEffect(() => {
     const populateParams = async () => {
@@ -29,17 +29,8 @@ function SignEtherMail({ disabled, handleExampleSubmitted }: RequestExampleProps
   }, [address, activeZkEvmProvider]);
 
   useEffect(() => {
-    const getAddress = async () => {
-      if (activeZkEvmProvider) {
-        const [walletAddress] = await activeZkEvmProvider.request({
-          method: 'eth_requestAccounts',
-        });
-        setAddress(walletAddress || '');
-      }
-    };
-
-    getAddress().catch(console.log);
-  }, [activeZkEvmProvider, setAddress]);
+    setAddress(activeZkEvmAccount || '');
+  }, [activeZkEvmAccount]);
 
   const handleSubmitSignPayload = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

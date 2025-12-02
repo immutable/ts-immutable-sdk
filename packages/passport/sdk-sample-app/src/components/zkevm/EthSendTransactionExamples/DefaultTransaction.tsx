@@ -17,7 +17,7 @@ function ShowGenericConfirmationScreen({ disabled, handleExampleSubmitted }: Req
   const [toAddress, setToAddress] = useState<string>(defaultAddress);
   const [toAddressError, setToAddressError] = useState<string>('');
   const [data, setData] = useState<string>('1234567890');
-  const { activeZkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider, activeZkEvmAccount } = usePassportProvider();
   const [params, setParams] = useState<any[]>([]);
   const [dataError, setDataError] = useState<string>('');
   const emptyDataError = 'Data should not be empty and should be at least 10 characters';
@@ -57,17 +57,8 @@ function ShowGenericConfirmationScreen({ disabled, handleExampleSubmitted }: Req
   });
 
   useEffect(() => {
-    const getAddress = async () => {
-      if (activeZkEvmProvider) {
-        const [walletAddress] = await activeZkEvmProvider.request({
-          method: 'eth_requestAccounts',
-        });
-        setFromAddress(walletAddress || '');
-      }
-    };
-
-    getAddress();
-  }, [activeZkEvmProvider, setFromAddress]);
+    setFromAddress(activeZkEvmAccount || '');
+  }, [activeZkEvmAccount]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

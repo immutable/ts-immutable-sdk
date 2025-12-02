@@ -14,6 +14,7 @@ const PassportContext = createContext<{
   zkEvmProvider: Provider | undefined;
   defaultWalletProvider: Provider | undefined;
   activeZkEvmProvider: Provider | undefined;
+  activeZkEvmAccount: string;
   isSandboxEnvironment: boolean;
   setDefaultWalletProvider: (provider?: Provider) => void;
   connectImx:() => void;
@@ -37,6 +38,7 @@ const PassportContext = createContext<{
       zkEvmProvider: undefined,
       defaultWalletProvider: undefined,
       activeZkEvmProvider: undefined,
+      activeZkEvmAccount: '',
       setDefaultWalletProvider: () => undefined,
       isSandboxEnvironment: false,
       connectImx: () => undefined,
@@ -63,9 +65,14 @@ export function PassportProvider({
   const [imxProvider, setImxProvider] = useState<IMXProvider | undefined>();
   const [zkEvmProvider, setZkEvmProvider] = useState<Provider | undefined>();
   const [defaultWalletProvider, setDefaultWalletProvider] = useState<Provider | undefined>();
+  const [activeZkEvmAccount, setActiveZkEvmAccount] = useState<string>('');
 
   const { addMessage, setIsLoading } = useStatusProvider();
   const { passportClient, environment } = useImmutableProvider();
+  const isSandboxEnvironment = environment === EnvironmentNames.SANDBOX;
+  const activeZkEvmProvider = isSandboxEnvironment
+    ? (defaultWalletProvider || zkEvmProvider)
+    : zkEvmProvider;
 
   const connectImx = useCallback(async () => {
     try {
@@ -305,15 +312,55 @@ export function PassportProvider({
     }
   }, [environment, defaultWalletProvider]);
 
-  const isSandboxEnvironment = environment === EnvironmentNames.SANDBOX;
+  useEffect(() => {
+    if (!activeZkEvmProvider) {
+      setActiveZkEvmAccount('');
+      return;
+    }
+
+    let unsubscribed = false;
+
+    const syncAccounts = async () => {
+      try {
+        const accounts = await activeZkEvmProvider.request({
+          method: 'eth_accounts',
+        });
+
+        if (!unsubscribed) {
+          setActiveZkEvmAccount(accounts?.[0] ?? '');
+        }
+      } catch (error) {
+        console.error('Failed to get accounts', error);
+      }
+    };
+
+    syncAccounts();
+
+    const handleAccountsChanged = (accounts: string[]) => {
+      if (!unsubscribed) {
+        setActiveZkEvmAccount(accounts?.[0] ?? '');
+      }
+    };
+
+    const providerWithEvents = activeZkEvmProvider as unknown as {
+      on?: (event: string, listener: (...args: any[]) => void) => void;
+      removeListener?: (event: string, listener: (...args: any[]) => void) => void;
+    };
+
+    providerWithEvents.on?.('accountsChanged', handleAccountsChanged);
+
+    return () => {
+      unsubscribed = true;
+      providerWithEvents.removeListener?.('accountsChanged', handleAccountsChanged);
+    };
+  }, [activeZkEvmProvider]);
 
   const providerValues = useMemo(() => ({
     imxProvider,
     zkEvmProvider,
     defaultWalletProvider,
-    activeZkEvmProvider: isSandboxEnvironment
-      ? (defaultWalletProvider || zkEvmProvider)
-      : zkEvmProvider,
+    activeZkEvmProvider,
+    activeZkEvmAccount,
     setDefaultWalletProvider,
     connectImx,
     connectZkEvm,
@@ -336,6 +383,8 @@ export function PassportProvider({
     imxProvider,
     zkEvmProvider,
     defaultWalletProvider,
+    activeZkEvmProvider,
+    activeZkEvmAccount,
     isSandboxEnvironment,
     connectImx,
     connectZkEvm,
@@ -369,6 +418,7 @@ export function usePassportProvider() {
     zkEvmProvider,
     defaultWalletProvider,
     activeZkEvmProvider,
+    activeZkEvmAccount,
     isSandboxEnvironment,
     setDefaultWalletProvider,
     connectImx,
@@ -393,6 +443,7 @@ export function usePassportProvider() {
     zkEvmProvider,
     defaultWalletProvider,
     activeZkEvmProvider,
+    activeZkEvmAccount,
     isSandboxEnvironment,
     setDefaultWalletProvider,
     connectImx,
