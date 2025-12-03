@@ -204,8 +204,7 @@ export class Auth {
 
       // Emit LOGGED_IN event and identify user if logged in
       if (user) {
-        this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
-        identify({ passportId: user.profile.sub });
+        this.handleSuccessfulLogin(user);
       }
 
       return user;
@@ -231,8 +230,7 @@ export class Auth {
     return withMetricsAsync(async () => {
       const user = await this.loginCallbackInternal();
       if (user) {
-        this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
-        identify({ passportId: user.profile.sub });
+        this.handleSuccessfulLogin(user);
       }
       return user;
     }, 'loginCallback');
@@ -273,7 +271,9 @@ export class Auth {
       return user;
     }
 
-    return this.loginWithPopup();
+    const loggedInUser = await this.loginWithPopup();
+    this.handleSuccessfulLogin(loggedInUser);
+    return loggedInUser;
   }
 
   /**
@@ -352,8 +352,7 @@ export class Auth {
   async loginWithPKCEFlowCallback(authorizationCode: string, state: string): Promise<User> {
     return withMetricsAsync(async () => {
       const user = await this.loginWithPKCEFlowCallbackInternal(authorizationCode, state);
-      this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
-      identify({ passportId: user.profile.sub });
+      this.handleSuccessfulLogin(user);
       return user;
     }, 'loginWithPKCEFlowCallback');
   }
@@ -366,8 +365,7 @@ export class Auth {
   async storeTokens(tokenResponse: DeviceTokenResponse): Promise<User> {
     return withMetricsAsync(async () => {
       const user = await this.storeTokensInternal(tokenResponse);
-      this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
-      identify({ passportId: user.profile.sub });
+      this.handleSuccessfulLogin(user);
       return user;
     }, 'storeTokens');
   }
@@ -411,6 +409,11 @@ export class Auth {
     return this.config.oidcConfiguration.clientId;
   }
 
+  private handleSuccessfulLogin(user: User): void {
+    this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
+    identify({ passportId: user.profile.sub });
+  }
+
   private buildExtraQueryParams(
     directLoginOptions?: DirectLoginOptions,
     imPassportTraceId?: string,
@@ -418,7 +421,6 @@ export class Auth {
     const params: Record<string, string> = {
       ...(this.userManager.settings?.extraQueryParams ?? {}),
       rid: getDetail(Detail.RUNTIME_ID) || '',
-      third_party_a_id: '',
     };
 
     if (directLoginOptions) {
