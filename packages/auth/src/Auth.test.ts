@@ -51,9 +51,10 @@ describe('withMetricsAsync', () => {
     };
     trackFlowMock.mockReturnValue(flow);
 
+    const nonError = { message: 'failure' };
     await expect(withMetricsAsync(async () => {
-      throw new Error('failure');
-    }, 'login')).rejects.toThrow('failure');
+      throw nonError as unknown as Error;
+    }, 'login')).rejects.toBe(nonError);
 
     expect(flow.addEvent).toHaveBeenCalledWith('errored');
   });
