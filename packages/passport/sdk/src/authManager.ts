@@ -129,8 +129,11 @@ export default class AuthManager {
 
   private static mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
     let passport: PassportMetadata | undefined;
+    let username: string | undefined;
     if (oidcUser.id_token) {
-      passport = jwt_decode<IdTokenPayload>(oidcUser.id_token)?.passport;
+      const idTokenPayload = jwt_decode<IdTokenPayload>(oidcUser.id_token);
+      passport = idTokenPayload?.passport;
+      username = idTokenPayload?.username;
     }
 
     const user: User = {
@@ -142,6 +145,7 @@ export default class AuthManager {
         sub: oidcUser.profile.sub,
         email: oidcUser.profile.email,
         nickname: oidcUser.profile.nickname,
+        username,
       },
     };
     if (passport?.imx_eth_address) {
@@ -176,6 +180,7 @@ export default class AuthManager {
         iat: idTokenPayload.iat,
         email: idTokenPayload.email,
         nickname: idTokenPayload.nickname,
+        username: idTokenPayload.username,
         passport: idTokenPayload.passport,
       },
     });
