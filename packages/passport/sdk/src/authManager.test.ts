@@ -53,7 +53,6 @@ const commonOidcUser: OidcUser = {
     sub: mockUser.profile.sub,
     email: mockUser.profile.email,
     nickname: mockUser.profile.nickname,
-    username: mockUser.profile.username,
   },
 } as OidcUser;
 
