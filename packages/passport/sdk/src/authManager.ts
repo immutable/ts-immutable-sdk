@@ -182,14 +182,13 @@ export default class AuthManager {
         iat: idTokenPayload.iat,
         email: idTokenPayload.email,
         nickname: idTokenPayload.nickname,
-
         passport: idTokenPayload.passport,
       },
     });
 
     const username = idTokenPayload.username;
     if (username) {
-      oidcUser.username = username;
+      oidcUser.profile.username = username;
     }
     return oidcUser
   };
