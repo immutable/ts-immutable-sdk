@@ -133,7 +133,9 @@ export default class AuthManager {
     if (oidcUser.id_token) {
       const idTokenPayload = jwt_decode<IdTokenPayload>(oidcUser.id_token);
       passport = idTokenPayload?.passport;
-      username = idTokenPayload?.username;
+      if (idTokenPayload?.username){
+        username = idTokenPayload?.username;
+      }
     }
 
     const user: User = {
@@ -145,7 +147,7 @@ export default class AuthManager {
         sub: oidcUser.profile.sub,
         email: oidcUser.profile.email,
         nickname: oidcUser.profile.nickname,
-        username,
+        username: username,
       },
     };
     if (passport?.imx_eth_address) {
@@ -167,7 +169,7 @@ export default class AuthManager {
   private static mapDeviceTokenResponseToOidcUser = (tokenResponse: DeviceTokenResponse): OidcUser => {
     const idTokenPayload: IdTokenPayload = jwt_decode(tokenResponse.id_token);
 
-    return new OidcUser({
+    const oidcUser = new OidcUser({
       id_token: tokenResponse.id_token,
       access_token: tokenResponse.access_token,
       refresh_token: tokenResponse.refresh_token,
@@ -180,10 +182,16 @@ export default class AuthManager {
         iat: idTokenPayload.iat,
         email: idTokenPayload.email,
         nickname: idTokenPayload.nickname,
-        username: idTokenPayload.username,
+
         passport: idTokenPayload.passport,
       },
     });
+
+    const username = idTokenPayload.username;
+    if (username) {
+      oidcUser.username = username;
+    }
+    return oidcUser
   };
 
   private buildExtraQueryParams(

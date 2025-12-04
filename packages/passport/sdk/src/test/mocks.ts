@@ -30,6 +30,7 @@ export const mockUser: User = {
     sub: 'email|123',
     email: 'test@immutable.com',
     nickname: 'test',
+    username: 'username'
   },
   expired: false,
 };

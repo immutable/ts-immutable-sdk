@@ -53,6 +53,7 @@ const commonOidcUser: OidcUser = {
     sub: mockUser.profile.sub,
     email: mockUser.profile.email,
     nickname: mockUser.profile.nickname,
+    username: mockUser.profile.username,
   },
 } as OidcUser;
 
@@ -296,6 +297,28 @@ describe('AuthManager', () => {
           zkEvm: {
             ethAddress: zkEvmProfileData.zkevm_eth_address,
             userAdminAddress: zkEvmProfileData.zkevm_user_admin_address,
+          },
+        });
+      });
+    });
+
+    describe('when the token contains a username', () => {
+      it('should extract username from the top level of the id token', async () => {
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+        (jwt_decode as jest.Mock).mockReturnValue({
+          username: 'username123',
+          email: mockUser.profile.email,
+          nickname: mockUser.profile.nickname,
+          sub: mockUser.profile.sub,
+        });
+
+        const result = await authManager.login();
+
+        expect(result).toEqual({
+          ...mockUser,
+          profile: {
+            ...mockUser.profile,
+            username: 'username123',
           },
         });
       });
