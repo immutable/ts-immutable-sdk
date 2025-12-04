@@ -129,8 +129,13 @@ export default class AuthManager {
 
   private static mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
     let passport: PassportMetadata | undefined;
+    let username: string | undefined;
     if (oidcUser.id_token) {
-      passport = jwt_decode<IdTokenPayload>(oidcUser.id_token)?.passport;
+      const idTokenPayload = jwt_decode<IdTokenPayload>(oidcUser.id_token);
+      passport = idTokenPayload?.passport;
+      if (idTokenPayload?.username) {
+        username = idTokenPayload?.username;
+      }
     }
 
     const user: User = {
@@ -142,6 +147,7 @@ export default class AuthManager {
         sub: oidcUser.profile.sub,
         email: oidcUser.profile.email,
         nickname: oidcUser.profile.nickname,
+        username,
       },
     };
     if (passport?.imx_eth_address) {
@@ -163,7 +169,7 @@ export default class AuthManager {
   private static mapDeviceTokenResponseToOidcUser = (tokenResponse: DeviceTokenResponse): OidcUser => {
     const idTokenPayload: IdTokenPayload = jwt_decode(tokenResponse.id_token);
 
-    return new OidcUser({
+    const oidcUser = new OidcUser({
       id_token: tokenResponse.id_token,
       access_token: tokenResponse.access_token,
       refresh_token: tokenResponse.refresh_token,
@@ -179,6 +185,12 @@ export default class AuthManager {
         passport: idTokenPayload.passport,
       },
     });
+
+    const { username } = idTokenPayload;
+    if (username) {
+      oidcUser.profile.username = username;
+    }
+    return oidcUser;
   };
 
   private buildExtraQueryParams(

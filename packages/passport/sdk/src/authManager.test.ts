@@ -301,6 +301,28 @@ describe('AuthManager', () => {
       });
     });
 
+    describe('when the token contains a username', () => {
+      it('should extract username from the top level of the id token', async () => {
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+        (jwt_decode as jest.Mock).mockReturnValue({
+          username: 'username123',
+          email: mockUser.profile.email,
+          nickname: mockUser.profile.nickname,
+          sub: mockUser.profile.sub,
+        });
+
+        const result = await authManager.login();
+
+        expect(result).toEqual({
+          ...mockUser,
+          profile: {
+            ...mockUser.profile,
+            username: 'username123',
+          },
+        });
+      });
+    });
+
     it('should throw the error if user is failed to login', async () => {
       mockSigninPopup.mockImplementation(() => {
         throw new Error(mockErrorMsg);
