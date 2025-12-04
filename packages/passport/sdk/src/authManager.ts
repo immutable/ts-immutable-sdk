@@ -133,7 +133,7 @@ export default class AuthManager {
     if (oidcUser.id_token) {
       const idTokenPayload = jwt_decode<IdTokenPayload>(oidcUser.id_token);
       passport = idTokenPayload?.passport;
-      if (idTokenPayload?.username){
+      if (idTokenPayload?.username) {
         username = idTokenPayload?.username;
       }
     }
@@ -147,7 +147,7 @@ export default class AuthManager {
         sub: oidcUser.profile.sub,
         email: oidcUser.profile.email,
         nickname: oidcUser.profile.nickname,
-        username: username,
+        username,
       },
     };
     if (passport?.imx_eth_address) {
@@ -186,11 +186,11 @@ export default class AuthManager {
       },
     });
 
-    const username = idTokenPayload.username;
+    const { username } = idTokenPayload;
     if (username) {
       oidcUser.profile.username = username;
     }
-    return oidcUser
+    return oidcUser;
   };
 
   private buildExtraQueryParams(
