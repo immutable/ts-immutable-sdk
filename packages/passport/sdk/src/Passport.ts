@@ -326,8 +326,10 @@ export class Passport {
    * @returns {Promise<UserProfile | undefined>} A promise that resolves to the user profile if logged in, undefined otherwise
    */
   public async getUserInfo(): Promise<UserProfile | undefined> {
-    const user = await this.auth.getUser();
-    return user?.profile;
+    return withMetricsAsync(async () => {
+      const user = await this.auth.getUser();
+      return user?.profile;
+    }, 'getUserInfo', false);
   }
 
   /**

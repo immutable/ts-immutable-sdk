@@ -1,6 +1,7 @@
 import { Auth } from './Auth';
 import { AuthEvents, User } from './types';
 import { withMetricsAsync } from './utils/metrics';
+import jwt_decode from 'jwt-decode';
 
 const trackFlowMock = jest.fn();
 const trackErrorMock = jest.fn();
@@ -17,12 +18,15 @@ jest.mock('@imtbl/metrics', () => ({
   getDetail: (...args: any[]) => getDetailMock(...args),
 }));
 
+jest.mock('jwt-decode', () => jest.fn());
+
 beforeEach(() => {
   trackFlowMock.mockReset();
   trackErrorMock.mockReset();
   identifyMock.mockReset();
   trackMock.mockReset();
   getDetailMock.mockReset();
+  (jwt_decode as jest.Mock).mockReset();
 });
 
 describe('withMetricsAsync', () => {
@@ -128,6 +132,55 @@ describe('Auth', () => {
 
       expect(params.third_party_a_id).toBeUndefined();
       expect(params.rid).toEqual('runtime-id-value');
+    });
+  });
+
+  describe('username extraction', () => {
+    it('extracts username from id token when present', () => {
+      const mockOidcUser = {
+        id_token: 'token',
+        access_token: 'access',
+        refresh_token: 'refresh',
+        expired: false,
+        profile: { sub: 'user-123', email: 'test@example.com', nickname: 'tester' },
+      };
+
+      (jwt_decode as jest.Mock).mockReturnValue({
+        username: 'username123',
+        passport: undefined,
+      });
+
+      const result = (Auth as any).mapOidcUserToDomainModel(mockOidcUser);
+
+      expect(jwt_decode).toHaveBeenCalledWith('token');
+      expect(result.profile.username).toEqual('username123');
+    });
+
+    it('maps username when creating OIDC user from device tokens', () => {
+      const tokenResponse = {
+        id_token: 'token',
+        access_token: 'access',
+        refresh_token: 'refresh',
+        token_type: 'Bearer',
+        expires_in: 3600,
+      };
+
+      (jwt_decode as jest.Mock).mockReturnValue({
+        sub: 'user-123',
+        iss: 'issuer',
+        aud: 'audience',
+        exp: 1,
+        iat: 0,
+        email: 'test@example.com',
+        nickname: 'tester',
+        username: 'username123',
+        passport: undefined,
+      });
+
+      const oidcUser = (Auth as any).mapDeviceTokenResponseToOidcUser(tokenResponse);
+
+      expect(jwt_decode).toHaveBeenCalledWith('token');
+      expect(oidcUser.profile.username).toEqual('username123');
     });
   });
 });

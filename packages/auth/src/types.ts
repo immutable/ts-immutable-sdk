@@ -9,6 +9,7 @@ export type UserProfile = {
   email?: string;
   nickname?: string;
   sub: string;
+  username?: string;
 };
 
 export enum RollupType {
@@ -91,6 +92,7 @@ export type TokenPayload = {
 
 export type IdTokenPayload = {
   passport?: PassportMetadata;
+  username?: string;
   email: string;
   nickname: string;
   aud: string;

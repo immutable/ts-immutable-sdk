@@ -252,7 +252,7 @@ export class Auth {
    * @returns Promise that resolves with the user or null if not authenticated
    */
   async getUser(): Promise<User | null> {
-    return withMetricsAsync(async () => this.getUserInternal(), 'getUserInfo', false);
+    return this.getUserInternal();
   }
 
   /**
@@ -521,8 +521,13 @@ export class Auth {
 
   private static mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
     let passport: PassportMetadata | undefined;
+    let username: string | undefined;
     if (oidcUser.id_token) {
-      passport = jwt_decode<IdTokenPayload>(oidcUser.id_token)?.passport;
+      const idTokenPayload = jwt_decode<IdTokenPayload>(oidcUser.id_token);
+      passport = idTokenPayload?.passport;
+      if (idTokenPayload?.username) {
+        username = idTokenPayload?.username;
+      }
     }
 
     const user: User = {
@@ -534,6 +539,7 @@ export class Auth {
         sub: oidcUser.profile.sub,
         email: oidcUser.profile.email,
         nickname: oidcUser.profile.nickname,
+        username,
       },
     };
     if (passport?.zkevm_eth_address && passport?.zkevm_user_admin_address) {
@@ -561,6 +567,7 @@ export class Auth {
         email: idTokenPayload.email,
         nickname: idTokenPayload.nickname,
         passport: idTokenPayload.passport,
+        ...(idTokenPayload.username ? { username: idTokenPayload.username } : {}),
       },
     });
   };
