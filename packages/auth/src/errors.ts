@@ -27,7 +27,12 @@ export enum PassportErrorType {
 }
 
 export function isAPIError(error: any): error is imx.APIError {
-  return 'code' in error && 'message' in error;
+  return (
+    typeof error === 'object'
+    && error !== null
+    && 'code' in error
+    && 'message' in error
+  );
 }
 
 export class PassportError extends Error {
