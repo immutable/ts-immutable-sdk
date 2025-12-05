@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from 'ethers';
+import { Provider as OxProvider, RpcTransport } from 'ox';
 import {
   Provider,
   ProviderEvent,
@@ -22,7 +22,6 @@ import { registerUser } from './user';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { SequenceSigner } from './index';
 import { getChainConfig } from './chainConfig';
-import { Provider as OxProvider, RpcTransport } from 'ox';
 
 export type SequenceProviderInput = {
   authManager: AuthManager;
@@ -195,7 +194,6 @@ export class SequenceProvider implements Provider {
             flow,
             authManager: this.#authManager,
             chain: this.#chain,
-            multiRollupApiClients: this.#multiRollupApiClients,
           });
         } catch (error) {
           if (error instanceof Error) {

@@ -15,7 +15,6 @@ export const sendTransaction = async ({
   flow,
   authManager,
   chain,
-  multiRollupApiClients,
 }: EthSendTransactionParams): Promise<string> => {
   const transactionRequest = params[0];
 
@@ -27,10 +26,8 @@ export const sendTransaction = async ({
     walletAddress,
     flow,
     authManager,
-    multiRollupApiClients,
   });
 
   const txHash = await relayerClient.postToRelayer(chain, to, data, flow);
   return txHash;
 };
-
