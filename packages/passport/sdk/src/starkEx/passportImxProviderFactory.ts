@@ -1,59 +1,63 @@
 import { IMXClient } from '@imtbl/x-client';
 import { IMXProvider } from '@imtbl/x-provider';
 import { ImxApiClients } from '@imtbl/generated-clients';
+import { Auth, AuthEventMap, TypedEventEmitter } from '@imtbl/auth';
+import { GuardianClient, MagicTEESigner } from '@imtbl/wallet';
 import { PassportError, PassportErrorType } from '../errors/passportError';
-import AuthManager from '../authManager';
-import { PassportEventMap, User } from '../types';
+import { User } from '../types';
 import { PassportImxProvider } from './passportImxProvider';
-import GuardianClient from '../guardian';
-import MagicTEESigner from '../magic/magicTEESigner';
-import TypedEventEmitter from '../utils/typedEventEmitter';
+import { ImxGuardianClient } from './imxGuardianClient';
 
 export type PassportImxProviderFactoryInput = {
-  authManager: AuthManager;
+  auth: Auth;
   immutableXClient: IMXClient;
   magicTEESigner: MagicTEESigner;
-  passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  passportEventEmitter: TypedEventEmitter<AuthEventMap>;
   imxApiClients: ImxApiClients;
   guardianClient: GuardianClient;
+  imxGuardianClient: ImxGuardianClient;
 };
 
 export class PassportImxProviderFactory {
-  private readonly authManager: AuthManager;
+  private readonly auth: Auth;
 
   private readonly immutableXClient: IMXClient;
 
   private readonly magicTEESigner: MagicTEESigner;
 
-  private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  private readonly passportEventEmitter: TypedEventEmitter<AuthEventMap>;
 
   public readonly imxApiClients: ImxApiClients;
 
   private readonly guardianClient: GuardianClient;
 
+  private readonly imxGuardianClient: ImxGuardianClient;
+
   constructor({
-    authManager,
+    auth,
     immutableXClient,
     magicTEESigner,
     passportEventEmitter,
     imxApiClients,
     guardianClient,
+    imxGuardianClient,
   }: PassportImxProviderFactoryInput) {
-    this.authManager = authManager;
+    this.auth = auth;
     this.immutableXClient = immutableXClient;
     this.magicTEESigner = magicTEESigner;
     this.passportEventEmitter = passportEventEmitter;
     this.imxApiClients = imxApiClients;
     this.guardianClient = guardianClient;
+    this.imxGuardianClient = imxGuardianClient;
   }
 
   public async getProvider(): Promise<IMXProvider> {
-    const user = await this.authManager.getUserOrLogin();
+    const user = await this.auth.getUserOrLogin();
     return this.createProviderInstance(user);
   }
 
   public async getProviderSilent(): Promise<IMXProvider | null> {
-    const user = await this.authManager.getUser();
+    const user = await this.auth.getUser();
     if (!user) {
       return null;
     }
@@ -70,12 +74,13 @@ export class PassportImxProviderFactory {
     }
 
     return new PassportImxProvider({
-      authManager: this.authManager,
+      auth: this.auth,
       immutableXClient: this.immutableXClient,
       passportEventEmitter: this.passportEventEmitter,
       magicTEESigner: this.magicTEESigner,
       imxApiClients: this.imxApiClients,
       guardianClient: this.guardianClient,
+      imxGuardianClient: this.imxGuardianClient,
     });
   }
 }

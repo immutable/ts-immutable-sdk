@@ -25,7 +25,7 @@ function ValidateSignature({ disabled, handleSignatureValidation }: ValidateSign
   const [signatureValidationMessage, setSignatureValidationMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { zkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider } = usePassportProvider();
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ function ValidateSignature({ disabled, handleSignatureValidation }: ValidateSign
     setIsLoading(true);
 
     try {
-      if (!zkEvmProvider) {
+      if (!activeZkEvmProvider) {
         setIsValidSignature(false);
         setSignatureValidationMessage('zkEvmProvider cannot be null');
         return;
@@ -46,7 +46,7 @@ function ValidateSignature({ disabled, handleSignatureValidation }: ValidateSign
         address,
         payload,
         signature,
-        zkEvmProvider,
+        activeZkEvmProvider,
       );
 
       setIsValidSignature(isValid);
@@ -57,7 +57,7 @@ function ValidateSignature({ disabled, handleSignatureValidation }: ValidateSign
     } finally {
       setIsLoading(false);
     }
-  }, [address, payload, signature, zkEvmProvider, handleSignatureValidation]);
+  }, [address, payload, signature, activeZkEvmProvider, handleSignatureValidation]);
 
   return (
     <Accordion.Item eventKey="0">

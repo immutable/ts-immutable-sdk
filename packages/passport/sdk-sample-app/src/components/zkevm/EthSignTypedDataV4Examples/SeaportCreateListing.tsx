@@ -19,7 +19,7 @@ type TokenType = 'NATIVE' | 'ERC20';
 
 function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const { orderbookClient } = useImmutableProvider();
-  const { zkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider, activeZkEvmAccount } = usePassportProvider();
 
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [isBuldingTransaction, setIsBuildingTransaction] = useState<boolean>(false);
@@ -46,17 +46,8 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
   );
 
   useEffect(() => {
-    const getAddress = async () => {
-      if (zkEvmProvider) {
-        const [address] = await zkEvmProvider.request({
-          method: 'eth_requestAccounts',
-        });
-        setWalletAddress(address || '');
-      }
-    };
-
-    getAddress().catch(console.log);
-  }, [zkEvmProvider, setWalletAddress]);
+    setWalletAddress(activeZkEvmAccount || '');
+  }, [activeZkEvmAccount]);
 
   useEffect(() => {
     setSignMessageError('');
@@ -107,6 +98,9 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
       });
 
       if (submitTransaction) {
+        if (!activeZkEvmProvider) {
+          throw new Error('No zkEVM provider available to submit approval transactions');
+        }
         const approvalActions = preparedListing.actions.filter((action) => (
           action.type === ActionType.TRANSACTION && action.purpose === TransactionPurpose.APPROVAL
         )) as TransactionAction[];
@@ -116,13 +110,13 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
           const unsignedTx = await approvalAction.buildTransaction();
 
           // eslint-disable-next-line no-await-in-loop
-          const transactionHash = await zkEvmProvider!.request({
+          const transactionHash = await activeZkEvmProvider.request({
             method: 'eth_sendTransaction',
             params: [unsignedTx],
           });
 
           // eslint-disable-next-line no-await-in-loop
-          await new BrowserProvider(zkEvmProvider!).waitForTransaction(transactionHash);
+          await new BrowserProvider(activeZkEvmProvider).waitForTransaction(transactionHash);
         }
 
         setOrderComponents(preparedListing.orderComponents);
@@ -148,7 +142,8 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
       setIsBuildingTransaction(false);
     }
   }, [NFTContractAddress, buyAmount, buyType, orderbookClient,
-    tokenContractAddress, tokenId, walletAddress, sellTokenUnits, sellTokenType, submitTransaction, zkEvmProvider]);
+    tokenContractAddress, tokenId, walletAddress, sellTokenUnits, 
+    sellTokenType, submitTransaction, activeZkEvmProvider]);
 
   const handleSetSellTokenType = (e: React.ChangeEvent<HTMLSelectElement>) => {
     resetForm();

@@ -1,19 +1,26 @@
 import axios from 'axios';
 import { ImxApiClients, imx } from '@imtbl/generated-clients';
 import { EthSigner, StarkSigner } from '@imtbl/x-client';
-import AuthManager from '../../authManager';
+import { Auth, User } from '@imtbl/auth';
+import { retryWithDelay } from '@imtbl/wallet';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
-import { retryWithDelay } from '../../network/retry';
-import { User } from '../../types';
+import { toUserImx } from '../../utils/imxUser';
 import registerPassportStarkEx from './registration';
 
-async function forceUserRefresh(authManager: AuthManager) {
+async function forceUserRefresh(auth: Auth) {
   // User metadata is updated asynchronously. Poll userinfo endpoint until it is updated.
   await retryWithDelay<User | null>(async () => {
-    const user = await authManager.forceUserRefresh(); // force refresh to get updated user info
-    if (user?.imx) return user;
+    const user = await auth.forceUserRefresh(); // force refresh to get updated user info
+    if (!user) {
+      return Promise.reject(new Error('user wallet addresses not exist'));
+    }
 
-    return Promise.reject(new Error('user wallet addresses not exist'));
+    try {
+      toUserImx(user);
+      return user;
+    } catch {
+      return Promise.reject(new Error('user wallet addresses not exist'));
+    }
   });
 }
 
@@ -21,7 +28,7 @@ export default async function registerOffchain(
   userAdminKeySigner: EthSigner,
   starkSigner: StarkSigner,
   unregisteredUser: User,
-  authManager: AuthManager,
+  auth: Auth,
   imxApiClients: ImxApiClients,
 ) {
   return withPassportError<imx.RegisterUserResponse>(async () => {
@@ -34,13 +41,13 @@ export default async function registerOffchain(
         },
         unregisteredUser.accessToken,
       );
-      await forceUserRefresh(authManager);
+      await forceUserRefresh(auth);
 
       return response;
     } catch (err: any) {
       if (axios.isAxiosError(err) && err.response?.status === 409) {
         // The user already registered, but the user token is not updated yet.
-        await forceUserRefresh(authManager);
+        await forceUserRefresh(auth);
         return { tx_hash: '' };
       }
 

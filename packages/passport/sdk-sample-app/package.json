@@ -8,6 +8,7 @@
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
     "@imtbl/orderbook": "workspace:*",
+    "@imtbl/wallet": "workspace:*",
     "@imtbl/passport": "workspace:*",
     "@imtbl/x-client": "workspace:*",
     "@imtbl/x-provider": "workspace:*",
@@ -41,7 +42,7 @@
     "build": "next build",
     "dev": "next dev",
     "dev-with-sdk": "concurrently 'pnpm dev' 'pnpm run -w dev'",
-    "lint": "eslint ./src --ext .ts --max-warnings=0",
+    "lint": "eslint 'src/**/*.{ts,tsx}' --max-warnings=0",
     "start": "next start"
   }
 }

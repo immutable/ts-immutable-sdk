@@ -10,11 +10,9 @@ import { Flow } from '@imtbl/metrics';
  */
 export type DirectLoginMethod = string;
 
-export enum PassportEvents {
-  LOGGED_OUT = 'loggedOut',
-  LOGGED_IN = 'loggedIn',
-  ACCOUNTS_REQUESTED = 'accountsRequested',
-}
+// Re-export events from auth and wallet
+export { AuthEvents } from '@imtbl/auth';
+export { WalletEvents } from '@imtbl/wallet';
 
 export type AccountsRequestedEvent = {
   environment: Environment;
@@ -24,48 +22,14 @@ export type AccountsRequestedEvent = {
   flow?: Flow;
 };
 
-export interface PassportEventMap extends Record<string, any> {
-  [PassportEvents.LOGGED_OUT]: [];
-  [PassportEvents.LOGGED_IN]: [User];
-  [PassportEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
-}
-
-export type UserProfile = {
-  email?: string;
-  nickname?: string;
-  sub: string;
-  username?: string;
-};
-
-export enum RollupType {
-  IMX = 'imx',
-  ZKEVM = 'zkEvm',
-}
-
-export type User = {
-  idToken?: string;
-  accessToken: string;
-  refreshToken?: string;
-  profile: UserProfile;
-  expired?: boolean;
-  [RollupType.IMX]?: {
-    ethAddress: string;
-    starkAddress: string;
-    userAdminAddress: string;
-  };
-  [RollupType.ZKEVM]?: {
-    ethAddress: string;
-    userAdminAddress: string;
-  };
-};
-
-export type PassportMetadata = {
-  imx_eth_address: string;
-  imx_stark_address: string;
-  imx_user_admin_address: string;
-  zkevm_eth_address: string;
-  zkevm_user_admin_address: string;
-};
+export type {
+  User,
+  UserProfile,
+  DeviceTokenResponse,
+  IdTokenPayload,
+} from '@imtbl/auth';
+export { isUserZkEvm } from '@imtbl/auth';
+export type { UserImx } from './utils/imxUser';
 
 export interface OidcConfiguration {
   clientId: string;
@@ -90,6 +54,24 @@ export interface PassportOverrides {
   orderBookMrBasePath: string;
   passportMrBasePath: string;
   imxApiClients?: ImxApiClients; // needs to be optional because ImxApiClients is not exposed publicly
+
+  /**
+   * Custom chain ID for dev environments (optional)
+   * If provided, overrides the default chainId based on environment
+   */
+  zkEvmChainId?: number;
+
+  /**
+   * Custom chain name for dev environments (optional)
+   * Used when zkEvmChainId is provided
+   */
+  zkEvmChainName?: string;
+
+  /**
+   * Magic TEE base path (optional, for dev/custom environments)
+   * Defaults to 'https://tee.express.magiclabs.com'
+   */
+  magicTeeBasePath?: string;
 }
 
 export interface PopupOverlayOptions {
@@ -127,36 +109,8 @@ export interface PassportModuleConfiguration
   forceScwDeployBeforeMessageSignature?: boolean;
 }
 
-type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
-
-export type UserImx = WithRequired<User, RollupType.IMX>;
-export type UserZkEvm = WithRequired<User, RollupType.ZKEVM>;
-
-export const isUserZkEvm = (user: User): user is UserZkEvm => !!user[RollupType.ZKEVM];
-export const isUserImx = (user: User): user is UserImx => !!user[RollupType.IMX];
-
-export type DeviceTokenResponse = {
-  access_token: string;
-  refresh_token?: string;
-  id_token: string;
-  token_type: string;
-  expires_in: number;
-};
-
 export type TokenPayload = {
   exp?: number;
-};
-
-export type IdTokenPayload = {
-  passport?: PassportMetadata;
-  email: string;
-  nickname: string;
-  username?: string;
-  aud: string;
-  sub: string;
-  exp: number;
-  iss: string;
-  iat: number;
 };
 
 export type PKCEData = {
@@ -164,25 +118,15 @@ export type PKCEData = {
   verifier: string;
 };
 
-export type LinkWalletParams = {
-  type: string;
-  walletAddress: string;
-  signature: string;
-  nonce: string;
-};
-
-export type LinkedWallet = {
-  address: string;
-  type: string;
-  created_at: string;
-  updated_at: string;
-  name?: string;
-  clientName: string;
-};
+// Re-export wallet linking types from wallet package
+export type { LinkWalletParams, LinkedWallet } from '@imtbl/wallet';
 
 export type ConnectEvmArguments = {
   announceProvider: boolean;
 };
+
+// Export ZkEvmProvider for return type
+export type { ZkEvmProvider } from '@imtbl/wallet';
 
 export type LoginArguments = {
   useCachedSession?: boolean;
