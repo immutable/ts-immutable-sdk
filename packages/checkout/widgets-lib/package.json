@@ -41,7 +41,7 @@
     "react-dom": "^18.2.0",
     "react-i18next": "^13.5.0",
     "ts-deepmerge": "^7.0.2",
-    "uuid": "^8.3.2"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@0xsquid/squid-types": "^0.1.108",
@@ -58,7 +58,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^29.4.3",
+    "@types/jest": "^29.5.12",
     "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^18.14.2",
     "@types/react": "^18.3.5",

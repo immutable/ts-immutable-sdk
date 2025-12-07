@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# prevent heap limit allocation errors
-export NODE_OPTIONS="--max-old-space-size=4096"
+# prevent heap limit allocation errors - increased to 8GB
+export NODE_OPTIONS="--max-old-space-size=8192"
 
 pnpm lint-staged

@@ -18,19 +18,19 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [etherMailTypedPayload, setEtherMailTypedPayload] = useState<TypedDataPayload | undefined>();
 
-  const { zkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider } = usePassportProvider();
 
   useEffect(() => {
     const populateParams = async () => {
-      if (zkEvmProvider) {
-        const chainIdHex = await zkEvmProvider.request({ method: 'eth_chainId' });
-        const chainId = parseInt(chainIdHex, 16).toString();
+      if (activeZkEvmProvider) {
+        const chainIdHex = await activeZkEvmProvider.request({ method: 'eth_chainId' });
+        const chainId = parseInt(chainIdHex, 16);
         setEtherMailTypedPayload(getEtherMailTypedPayload(chainId, address));
       }
     };
 
     populateParams().catch(console.log);
-  }, [zkEvmProvider, address]);
+  }, [activeZkEvmProvider, address]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -41,7 +41,7 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
     setIsLoading(true);
 
     try {
-      if (!zkEvmProvider) {
+      if (!activeZkEvmProvider) {
         setIsValidSignature(false);
         setSignatureValidationMessage('zkEvmProvider cannot be null');
         return;
@@ -57,7 +57,7 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
         address,
         JSON.stringify(etherMailTypedPayload),
         signature,
-        zkEvmProvider,
+        activeZkEvmProvider,
       );
 
       setIsValidSignature(isValid);
@@ -68,7 +68,7 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [address, etherMailTypedPayload, signature, zkEvmProvider]);
+  }, [address, etherMailTypedPayload, signature, activeZkEvmProvider]);
 
   return (
     <Accordion.Item eventKey="2">

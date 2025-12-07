@@ -46,7 +46,7 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
   const [params, setParams] = useState<any[]>([]);
 
   const [isUnSafe, setIsUnSafe] = useState<boolean>(false);
-  const { zkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider, activeZkEvmAccount } = usePassportProvider();
 
   const handleSetApproveType = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     setChoosedApproveType(e.target.value as ApproveType);
@@ -77,17 +77,8 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
   }, [fromAddress, erc721ContractAddress, toAddress, tokenId, choosedApproveType, nftApproveContract, isUnSafe]);
 
   useEffect(() => {
-    const getAddress = async () => {
-      if (zkEvmProvider) {
-        const [walletAddress] = await zkEvmProvider.request({
-          method: 'eth_requestAccounts',
-        });
-        setFromAddress(walletAddress || '');
-      }
-    };
-
-    getAddress().catch(console.log);
-  }, [zkEvmProvider, setFromAddress]);
+    setFromAddress(activeZkEvmAccount || '');
+  }, [activeZkEvmAccount]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

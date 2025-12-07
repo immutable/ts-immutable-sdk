@@ -157,7 +157,7 @@ function Request({ showModal, setShowModal }: ModalProps) {
   const [isInvalid, setInvalid] = useState<boolean | undefined>(undefined);
 
   const { addMessage } = useStatusProvider();
-  const { zkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider } = usePassportProvider();
 
   const resetForm = () => {
     setParams([]);
@@ -173,7 +173,13 @@ function Request({ showModal, setShowModal }: ModalProps) {
     setInvalid(false);
     setLoadingRequest(true);
     try {
-      const result = await zkEvmProvider?.request(request);
+      if (!activeZkEvmProvider) {
+        addMessage('Request', 'No zkEVM provider connected. Connect via Passport or connectWallet first.');
+        setLoadingRequest(false);
+        setInvalid(true);
+        return;
+      }
+      const result = await activeZkEvmProvider.request(request);
       setLoadingRequest(false);
       addMessage(request.method, result);
       if (onSuccess) {
@@ -187,7 +193,7 @@ function Request({ showModal, setShowModal }: ModalProps) {
   };
 
   const handleExampleSubmitted = async (request: RequestArguments, onSuccess?: (result?: any) => Promise<void>) => {
-    if (request.params) {
+    if (request.params && Array.isArray(request.params)) {
       const newParams = params;
       request.params.forEach((param, i) => {
         try {

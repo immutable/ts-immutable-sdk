@@ -6,7 +6,7 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import CardStack from '@/components/CardStack';
 
 function Status() {
-  const { imxProvider, zkEvmProvider } = usePassportProvider();
+  const { imxProvider, activeZkEvmProvider } = usePassportProvider();
 
   return (
     <CardStack title="Status">
@@ -31,7 +31,7 @@ function Status() {
           </Col>
           <Col>
             {
-                zkEvmProvider
+                activeZkEvmProvider
                   ? (
                     <Stack direction="horizontal" gap={1}>
                       <div className="led green-led" />

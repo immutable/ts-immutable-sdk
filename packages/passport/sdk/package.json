@@ -7,15 +7,14 @@
   "dependencies": {
     "@0xsequence/abi": "^2.0.25",
     "@0xsequence/core": "^2.0.25",
+    "@imtbl/auth": "workspace:*",
+    "@imtbl/wallet": "workspace:*",
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
     "@imtbl/metrics": "workspace:*",
     "@imtbl/toolkit": "workspace:*",
     "@imtbl/x-client": "workspace:*",
     "@imtbl/x-provider": "workspace:*",
-    "@magic-ext/oidc": "12.0.5",
-    "@magic-sdk/provider": "^29.0.5",
-    "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
     "ethers": "^6.13.4",
     "events": "^3.3.0",
@@ -23,13 +22,13 @@
     "localforage": "^1.10.0",
     "magic-sdk": "^29.0.5",
     "oidc-client-ts": "3.4.1",
-    "uuid": "^8.3.2"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@swc/core": "^1.3.36",
     "@swc/jest": "^0.2.37",
     "@types/axios": "^0.14.0",
-    "@types/jest": "^29.4.3",
+    "@types/jest": "^29.5.12",
     "@types/jwt-encode": "^1.0.1",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
@@ -44,8 +43,9 @@
     "msw": "^1.2.2",
     "prettier": "^2.8.7",
     "ts-node": "^10.9.1",
-    "tsup": "8.3.0",
-    "typescript": "^5.6.2"
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.2",
+    "@jest/test-sequencer": "^29.7.0"
   },
   "engines": {
     "node": ">=20.11.0"

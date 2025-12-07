@@ -1,603 +1,372 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { IMXClient } from '@imtbl/x-client';
-import { ImxApiClients, imxApiConfig, MultiRollupApiClients } from '@imtbl/generated-clients';
-import { trackError, trackFlow } from '@imtbl/metrics';
-import AuthManager from './authManager';
-import MagicTEESigner from './magic/magicTEESigner';
 import { Passport } from './Passport';
-import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
-import { OidcConfiguration, UserProfile } from './types';
-import {
-  mockApiError,
-  mockLinkedAddresses,
-  mockLinkedWallet,
-  mockPassportBadRequest,
-  mockUser,
-  mockUserImx,
-  mockUserZkEvm,
-} from './test/mocks';
-import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
-import { ZkEvmProvider } from './zkEvm';
 import { PassportError, PassportErrorType } from './errors/passportError';
 
-jest.mock('./authManager');
-jest.mock('./magic/magicTEESigner');
-jest.mock('./starkEx');
-jest.mock('./confirmation');
-jest.mock('./zkEvm');
-jest.mock('./zkEvm/provider/eip6963');
-jest.mock('@imtbl/generated-clients');
-jest.mock('@imtbl/metrics');
+jest.mock('axios', () => ({
+  isAxiosError: (error: any) => Boolean(error?.isAxiosError),
+}));
 
-const oidcConfiguration: OidcConfiguration = {
-  clientId: '11111',
-  redirectUri: 'https://test.com',
-  popupRedirectUri: 'https://test.com',
-  logoutRedirectUri: 'https://test.com',
-};
+const mockAuthInstances: any[] = [];
 
-describe('Passport', () => {
-  afterEach(jest.resetAllMocks);
-
-  let passport: Passport;
-  let authLoginMock: jest.Mock;
-  let loginCallbackMock: jest.Mock;
-  let logoutMock: jest.Mock;
-  let removeUserMock: jest.Mock;
-  let getUserMock: jest.Mock;
-  let requestRefreshTokenMock: jest.Mock;
-  let getProviderMock: jest.Mock;
-  let getProviderSilentMock: jest.Mock;
-  let getLinkedAddressesMock: jest.Mock;
-  let linkExternalWalletMock: jest.Mock;
-  let forceUserRefreshMock: jest.Mock;
-
-  beforeEach(() => {
-    authLoginMock = jest.fn().mockReturnValue(mockUser);
-    loginCallbackMock = jest.fn();
-    logoutMock = jest.fn();
-    removeUserMock = jest.fn();
-    getUserMock = jest.fn();
-    requestRefreshTokenMock = jest.fn();
-    getProviderMock = jest.fn();
-    getProviderSilentMock = jest.fn();
-    getLinkedAddressesMock = jest.fn();
-    linkExternalWalletMock = jest.fn();
-    forceUserRefreshMock = jest.fn();
-    (AuthManager as unknown as jest.Mock).mockReturnValue({
-      login: authLoginMock,
-      loginWithRedirect: authLoginMock,
-      loginCallback: loginCallbackMock,
-      logout: logoutMock,
-      removeUser: removeUserMock,
-      getUser: getUserMock,
-      requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
-      forceUserRefresh: forceUserRefreshMock,
-    });
-    (MagicTEESigner as unknown as jest.Mock).mockReturnValue({
-      getAddress: jest.fn().mockResolvedValue('0x123'),
-      signMessage: jest.fn().mockResolvedValue('signature'),
-    });
-    (PassportImxProviderFactory as jest.Mock).mockReturnValue({
-      getProvider: getProviderMock,
-      getProviderSilent: getProviderSilentMock,
-    });
-    (MultiRollupApiClients as jest.Mock).mockReturnValue({
-      passportProfileApi: {
-        getUserInfo: getLinkedAddressesMock,
-        linkWalletV2: linkExternalWalletMock,
-      },
-    });
-    (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
-      addEvent: jest.fn(),
-      details: {
-        flowId: '123',
-      },
-    }));
-    passport = new Passport({
-      baseConfig: new ImmutableConfiguration({
-        environment: Environment.SANDBOX,
-      }),
-      ...oidcConfiguration,
-    });
+jest.mock('@imtbl/auth', () => {
+  const actual = jest.requireActual('@imtbl/auth');
+  const authFactory = jest.fn().mockImplementation(() => {
+    const instance = {
+      login: jest.fn(),
+      loginCallback: jest.fn(),
+      logout: jest.fn(),
+      getUser: jest.fn(),
+      storeTokens: jest.fn(),
+      getLogoutUrl: jest.fn(),
+      logoutSilentCallback: jest.fn(),
+      loginWithPKCEFlow: jest.fn(),
+      loginWithPKCEFlowCallback: jest.fn(),
+      eventEmitter: { emit: jest.fn(), on: jest.fn() },
+      getConfig: jest.fn().mockReturnValue({}),
+      forceUserRefresh: jest.fn(),
+      forceUserRefreshInBackground: jest.fn(),
+    };
+    mockAuthInstances.push(instance);
+    return instance;
   });
 
-  describe('constructor', () => {
-    describe('when modules have been overridden', () => {
-      it('sets the private property to the overridden value', () => {
-        const baseConfig = new ImmutableConfiguration({
-          environment: Environment.SANDBOX,
-        });
-        const immutableXClient = new IMXClient({
-          baseConfig,
-        });
-        const imxApiClients = new ImxApiClients(imxApiConfig.getSandbox());
-        const passportInstance = new Passport({
-          baseConfig,
-          overrides: {
-            authenticationDomain: 'authenticationDomain123',
-            imxPublicApiDomain: 'guardianDomain123',
-            magicProviderId: 'providerId123',
-            magicPublishableApiKey: 'publishableKey123',
-            passportDomain: 'customDomain123',
-            relayerUrl: 'relayerUrl123',
-            zkEvmRpcUrl: 'zkEvmRpcUrl123',
-            imxApiClients,
-            indexerMrBasePath: 'indexerMrBasePath123',
-            orderBookMrBasePath: 'orderBookMrBasePath123',
-            passportMrBasePath: 'passportMrBasePath123',
-            immutableXClient,
-          },
-          ...oidcConfiguration,
-        });
-        // @ts-ignore
-        expect(passportInstance.immutableXClient).toEqual(immutableXClient);
-      });
-    });
+  return {
+    ...actual,
+    Auth: authFactory,
+    isUserZkEvm: jest.fn().mockReturnValue(true),
+  };
+});
+
+jest.mock('@imtbl/wallet', () => {
+  const connectWalletMock = jest.fn();
+
+  return {
+    connectWallet: connectWalletMock,
+    ZkEvmProvider: jest.fn(),
+    GuardianClient: jest.fn(),
+    MagicTEESigner: jest.fn(),
+    WalletConfiguration: jest.fn(),
+    ConfirmationScreen: jest.fn(),
+    __mocked: {
+      connectWalletMock,
+    },
+  };
+});
+
+const multiRollupInstances: any[] = [];
+
+jest.mock('@imtbl/generated-clients', () => {
+  const actual = jest.requireActual('@imtbl/generated-clients');
+  const multiRollupApiClientsFactory = jest.fn().mockImplementation(() => {
+    const instance = {
+      passportProfileApi: {
+        getUserInfo: jest.fn().mockResolvedValue({ data: { linked_addresses: [] } }),
+        linkWalletV2: jest.fn(),
+      },
+      guardianApi: {},
+    };
+    multiRollupInstances.push(instance);
+    return instance;
+  });
+
+  return {
+    ...actual,
+    MultiRollupApiClients: multiRollupApiClientsFactory,
+    MagicTeeApiClients: jest.fn(),
+    createConfig: jest.fn((config) => config),
+    imxApiConfig: {
+      getSandbox: jest.fn(() => ({ basePath: 'sandbox' })),
+      getProduction: jest.fn(() => ({ basePath: 'production' })),
+    },
+  };
+});
+
+jest.mock('@imtbl/metrics', () => {
+  const actual = jest.requireActual('@imtbl/metrics');
+  const trackErrorMock = jest.fn();
+  const trackFlowMock = jest.fn(() => ({
+    addEvent: jest.fn(),
+    details: { flowId: 'flow-id' },
+  }));
+
+  return {
+    ...actual,
+    trackError: trackErrorMock,
+    trackFlow: trackFlowMock,
+    setPassportClientId: jest.fn(),
+    __mocked: {
+      trackErrorMock,
+      trackFlowMock,
+    },
+  };
+});
+
+jest.mock('./starkEx', () => {
+  const factoryMock = {
+    getProvider: jest.fn(),
+    getProviderSilent: jest.fn(),
+  };
+  const passportImxProviderFactory = jest.fn().mockImplementation(() => factoryMock);
+  return {
+    PassportImxProviderFactory: passportImxProviderFactory,
+  };
+});
+
+jest.mock('./starkEx/imxGuardianClient', () => ({
+  ImxGuardianClient: jest.fn().mockImplementation(() => ({
+    evaluateTransaction: jest.fn(),
+  })),
+}));
+
+jest.mock('./utils/imxUser', () => ({
+  toUserImx: jest.fn().mockReturnValue({}),
+}));
+
+const { PassportImxProviderFactory: passportImxProviderFactoryMock } = jest.requireMock('./starkEx');
+const { __mocked: metricsMocks } = jest.requireMock('@imtbl/metrics');
+const { __mocked: walletMocks } = jest.requireMock('@imtbl/wallet');
+const { trackErrorMock } = metricsMocks;
+const { connectWalletMock } = walletMocks;
+
+describe('Passport', () => {
+  const baseConfiguration = new ImmutableConfiguration({
+    environment: Environment.SANDBOX,
+  });
+
+  const oidcConfiguration = {
+    clientId: 'client',
+    redirectUri: 'https://example.com/redirect',
+    popupRedirectUri: 'https://example.com/popup',
+    logoutRedirectUri: 'https://example.com/logout',
+    scope: 'openid profile',
+  };
+
+  const createPassport = () => new Passport({
+    baseConfig: baseConfiguration,
+    ...oidcConfiguration,
+  });
+
+  const getLatestAuthInstance = () => mockAuthInstances[mockAuthInstances.length - 1];
+  const getLatestMultiRollupInstance = () => multiRollupInstances[multiRollupInstances.length - 1];
+  const getFactoryInstance = () => (passportImxProviderFactoryMock as jest.Mock).mock.results.slice(-1)[0]?.value;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockAuthInstances.length = 0;
+    multiRollupInstances.length = 0;
   });
 
   describe('connectImx', () => {
-    it('should execute connect without error', async () => {
-      const passportImxProvider = {} as PassportImxProvider;
-      getProviderMock.mockResolvedValue(passportImxProvider);
+    it('returns provider from factory', async () => {
+      const passport = createPassport();
+      const factory = getFactoryInstance();
+      const provider = { kind: 'imx' };
+      factory.getProvider.mockResolvedValue(provider);
 
       const result = await passport.connectImx();
 
-      expect(result).toBe(passportImxProvider);
-      expect(getProviderMock).toHaveBeenCalled();
+      expect(result).toBe(provider);
+      expect(factory.getProvider).toHaveBeenCalledTimes(1);
     });
 
-    it('should call track error function if an error occurs', async () => {
-      const error = new Error('Error');
-      getProviderMock.mockRejectedValue(error);
+    it('tracks error when factory throws', async () => {
+      const passport = createPassport();
+      const factory = getFactoryInstance();
+      const error = new Error('boom');
+      factory.getProvider.mockRejectedValue(error);
 
-      try {
-        await passport.connectImx();
-      } catch (e) {
-        expect(trackError).toHaveBeenCalledWith(
-          'passport',
-          'connectImx',
-          e,
-          { flowId: '123' },
-        );
-      }
+      await expect(passport.connectImx()).rejects.toThrow(error);
+      expect(trackErrorMock).toHaveBeenCalledWith('passport', 'connectImx', error, { flowId: 'flow-id' });
     });
   });
 
   describe('connectImxSilent', () => {
-    describe('when getPassportImxProvider returns null', () => {
-      it('returns null', async () => {
-        getProviderSilentMock.mockResolvedValue(null);
+    it('returns null when factory resolves null', async () => {
+      const passport = createPassport();
+      const factory = getFactoryInstance();
+      factory.getProviderSilent.mockResolvedValue(null);
 
-        const result = await passport.connectImxSilent();
+      const result = await passport.connectImxSilent();
 
-        expect(result).toBe(null);
-        expect(getProviderSilentMock).toHaveBeenCalled();
-      });
-    });
-    describe('when getPassportImxProvider returns a provider', () => {
-      it('should return the provider', async () => {
-        const passportImxProvider = {} as PassportImxProvider;
-        getProviderSilentMock.mockResolvedValue(passportImxProvider);
-
-        const result = await passport.connectImxSilent();
-
-        expect(result).toBe(passportImxProvider);
-        expect(getProviderSilentMock).toHaveBeenCalled();
-      });
-    });
-
-    it('should call track error function if an error occurs', async () => {
-      const error = new Error('Unknown or invalid refresh token.');
-      getProviderSilentMock.mockRejectedValue(error);
-
-      try {
-        await passport.connectImxSilent();
-      } catch (e) {
-        expect(trackError).toHaveBeenCalledWith(
-          'passport',
-          'connectImxSilent',
-          e,
-          { flowId: '123' },
-        );
-      }
+      expect(result).toBeNull();
+      expect(factory.getProviderSilent).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('connectEvm', () => {
-    it('should execute connectEvm without error and return the provider', async () => {
-      // #doc connect-evm
-      const passportProvider = await passport.connectEvm();
-      // #enddoc connect-evm
+    it('returns provider from connectWallet', async () => {
+      const provider = { kind: 'zkEvm' };
+      connectWalletMock.mockResolvedValue(provider);
+      const passport = createPassport();
 
-      expect(passportProvider).toBeInstanceOf(ZkEvmProvider);
-      expect(ZkEvmProvider).toHaveBeenCalled();
+      const result = await passport.connectEvm();
+
+      expect(result).toBe(provider);
+      expect(connectWalletMock).toHaveBeenCalledWith(expect.objectContaining({
+        announceProvider: true,
+      }));
     });
 
-    it('should announce the provider by default', async () => {
-      passportProviderInfo.uuid = 'mock123';
-      const provider = await passport.connectEvm();
+    it('passes announceProvider option through', async () => {
+      connectWalletMock.mockResolvedValue({ kind: 'zkEvm' });
+      const passport = createPassport();
 
-      expect(announceProvider).toHaveBeenCalledWith({
-        info: passportProviderInfo,
-        provider,
-      });
-    });
+      await passport.connectEvm({ announceProvider: false });
 
-    it('should not announce the provider if called with options announceProvider false', async () => {
-      const passportInstance = new Passport({
-        baseConfig: new ImmutableConfiguration({
-          environment: Environment.SANDBOX,
-        }),
-        ...oidcConfiguration,
-      });
-
-      await passportInstance.connectEvm({ announceProvider: false });
-
-      expect(announceProvider).not.toHaveBeenCalled();
-    });
-
-    it('should call track error function if an error occurs', async () => {
-      (ZkEvmProvider as jest.Mock).mockImplementation(() => {
-        throw new Error('Error');
-      });
-
-      try {
-        await passport.connectEvm();
-      } catch (e) {
-        expect(trackError).toHaveBeenCalledWith(
-          'passport',
-          'connectEvm',
-          e,
-          { flowId: '123' },
-        );
-      }
+      expect(connectWalletMock).toHaveBeenCalledWith(expect.objectContaining({
+        announceProvider: false,
+      }));
     });
   });
 
-  describe('loginCallback', () => {
-    it('should execute login callback', async () => {
+  describe('login flow', () => {
+    it('returns user profile from auth login', async () => {
+      const passport = createPassport();
+      const auth = getLatestAuthInstance();
+      const user = { profile: { sub: 'user-1' } };
+      auth.login.mockResolvedValue(user);
+
+      const result = await passport.login();
+
+      expect(result).toEqual(user.profile);
+      expect(auth.login).toHaveBeenCalledWith(undefined);
+    });
+
+    it('forwards login options to auth', async () => {
+      const passport = createPassport();
+      const auth = getLatestAuthInstance();
+      auth.login.mockResolvedValue(null);
+
+      await passport.login({
+        useCachedSession: true,
+        useSilentLogin: true,
+        useRedirectFlow: true,
+      });
+
+      expect(auth.login).toHaveBeenCalledWith({
+        useCachedSession: true,
+        useSilentLogin: true,
+        useRedirectFlow: true,
+        directLoginOptions: undefined,
+      });
+    });
+
+    it('calls loginCallback and logout on auth', async () => {
+      const passport = createPassport();
+      const auth = getLatestAuthInstance();
+
       await passport.loginCallback();
+      await passport.logout();
 
-      expect(loginCallbackMock).toBeCalledTimes(1);
-    });
-
-    it('should call track error function if an error occurs', async () => {
-      const error = new Error('error');
-      loginCallbackMock.mockRejectedValue(error);
-
-      try {
-        await passport.loginCallback();
-      } catch (e) {
-        expect(trackError).toHaveBeenCalledWith(
-          'passport',
-          'loginCallback',
-          e,
-          { flowId: '123' },
-        );
-      }
+      expect(auth.loginCallback).toHaveBeenCalledTimes(1);
+      expect(auth.logout).toHaveBeenCalledTimes(1);
     });
   });
 
-  describe('logout', () => {
-    describe('when the logout mode is silent', () => {
-      it('should execute logout without error', async () => {
-        await passport.logout();
+  describe('token helpers', () => {
+    it('getUserInfo returns profile from auth user', async () => {
+      const passport = createPassport();
+      const auth = getLatestAuthInstance();
+      const user = { profile: { sub: 'test', nickname: 'nick' } };
+      auth.getUser.mockResolvedValue(user);
 
-        expect(logoutMock).toBeCalledTimes(1);
-      });
+      const profile = await passport.getUserInfo();
+
+      expect(profile).toEqual(user.profile);
     });
 
-    it('should call track error function if an error occurs', async () => {
-      const error = new Error('error');
-      logoutMock.mockRejectedValue(error);
+    it('getIdToken and getAccessToken return from auth user', async () => {
+      const passport = createPassport();
+      const auth = getLatestAuthInstance();
+      const user = { idToken: 'id', accessToken: 'access', profile: { sub: 'sub' } };
+      auth.getUser.mockResolvedValue(user);
 
-      try {
-        await passport.logout();
-      } catch (e) {
-        expect(trackError).toHaveBeenCalledWith(
-          'passport',
-          'logout',
-          e,
-          { flowId: '123' },
-        );
-      }
-    });
-  });
-
-  describe('getUserInfo', () => {
-    it('should execute getUser', async () => {
-      getUserMock.mockReturnValue(mockUser);
-
-      const result = await passport.getUserInfo();
-
-      expect(result).toEqual(mockUser.profile);
-    });
-
-    it('should return undefined if there is no user', async () => {
-      getUserMock.mockReturnValue(null);
-
-      const result = await passport.getUserInfo();
-
-      expect(result).toEqual(undefined);
-    });
-
-    it('should call track error function if an error occurs', async () => {
-      const error = new Error('Unknown or invalid refresh token.');
-      getUserMock.mockRejectedValue(error);
-
-      try {
-        await passport.getUserInfo();
-      } catch (e) {
-        expect(trackError).toHaveBeenCalledWith(
-          'passport',
-          'getUserInfo',
-          e,
-          { flowId: '123' },
-        );
-      }
-    });
-  });
-
-  describe('getIdToken', () => {
-    it('should execute getIdToken', async () => {
-      getUserMock.mockReturnValue(mockUser);
-
-      const result = await passport.getIdToken();
-
-      expect(result).toEqual(mockUser.idToken);
-    });
-
-    it('should return undefined if there is no user', async () => {
-      getUserMock.mockReturnValue(null);
-
-      const result = await passport.getIdToken();
-
-      expect(result).toEqual(undefined);
-    });
-
-    it('should call track error function if an error occurs', async () => {
-      const error = new Error('Unknown or invalid refresh token.');
-      getUserMock.mockRejectedValue(error);
-
-      try {
-        await passport.getIdToken();
-      } catch (e) {
-        expect(trackError).toHaveBeenCalledWith(
-          'passport',
-          'getIdToken',
-          e,
-          { flowId: '123' },
-        );
-      }
-    });
-  });
-
-  describe('getAccessToken', () => {
-    it('should execute getAccessToken', async () => {
-      getUserMock.mockReturnValue(mockUser);
-
-      const result = await passport.getAccessToken();
-
-      expect(result).toEqual(mockUser.accessToken);
-    });
-
-    it('should return undefined if there is no user', async () => {
-      getUserMock.mockReturnValue(null);
-
-      const result = await passport.getAccessToken();
-
-      expect(result).toEqual(undefined);
-    });
-
-    it('should call track error function if an error occurs', async () => {
-      const error = new Error('Unknown or invalid refresh token.');
-      getUserMock.mockRejectedValue(error);
-
-      try {
-        await passport.getAccessToken();
-      } catch (e) {
-        expect(trackError).toHaveBeenCalledWith(
-          'passport',
-          'getAccessToken',
-          e,
-          { flowId: '123' },
-        );
-      }
+      await expect(passport.getIdToken()).resolves.toEqual('id');
+      await expect(passport.getAccessToken()).resolves.toEqual('access');
     });
   });
 
   describe('getLinkedAddresses', () => {
-    it('should execute getLinkedAddresses', async () => {
-      getUserMock.mockReturnValue(mockUser);
-      getLinkedAddressesMock.mockReturnValue(mockLinkedAddresses);
-
-      const result = await passport.getLinkedAddresses();
-
-      expect(result).toEqual(mockLinkedAddresses.data.linked_addresses);
-    });
-
-    it('should return empty array if there is no linked addresses', async () => {
-      getUserMock.mockReturnValue(mockUser);
-      getLinkedAddressesMock.mockReturnValue({
-        data: {
-          sub: 'sub',
-          linked_addresses: [],
-        },
+    it('returns linked addresses when user exists', async () => {
+      const passport = createPassport();
+      const auth = getLatestAuthInstance();
+      const multiRollup = getLatestMultiRollupInstance();
+      auth.getUser.mockResolvedValue({ profile: { sub: 'user' }, accessToken: 'token' });
+      multiRollup.passportProfileApi.getUserInfo.mockResolvedValue({
+        data: { linked_addresses: ['addr-1'] },
       });
 
-      const result = await passport.getLinkedAddresses();
+      const addresses = await passport.getLinkedAddresses();
 
-      expect(result).toHaveLength(0);
+      expect(multiRollup.passportProfileApi.getUserInfo).toHaveBeenCalled();
+      expect(addresses).toEqual(['addr-1']);
     });
 
-    it('should call track error function if an error occurs', async () => {
-      const error = new Error('Unknown or invalid refresh token.');
-      getUserMock.mockRejectedValue(error);
+    it('returns empty array when no user', async () => {
+      const passport = createPassport();
+      const auth = getLatestAuthInstance();
+      auth.getUser.mockResolvedValue(null);
 
-      try {
-        await passport.getLinkedAddresses();
-      } catch (e) {
-        expect(trackError).toHaveBeenCalledWith(
-          'passport',
-          'getLinkedAddresses',
-          e,
-          { flowId: '123' },
-        );
-      }
-    });
-  });
+      const addresses = await passport.getLinkedAddresses();
 
-  describe('login', () => {
-    it('should login silently if there is a user', async () => {
-      getUserMock.mockReturnValue(mockUserImx);
-      // #doc auth-users-without-wallet
-      const user: UserProfile | null = await passport.login();
-      // #enddoc auth-users-without-wallet
-
-      expect(getUserMock).toBeCalledTimes(1);
-      expect(authLoginMock).toBeCalledTimes(0);
-      expect(user).toEqual(mockUser.profile);
-    });
-
-    it('should login if login silently returns error', async () => {
-      getUserMock.mockRejectedValue(new Error('Unknown or invalid refresh token.'));
-      authLoginMock.mockReturnValue(mockUserImx);
-      const user = await passport.login();
-
-      expect(getUserMock).toBeCalledTimes(1);
-      expect(authLoginMock).toBeCalledTimes(1);
-      expect(user).toEqual(mockUser.profile);
-    });
-
-    it('should login and get a user', async () => {
-      getUserMock.mockReturnValue(null);
-      authLoginMock.mockReturnValue(mockUserImx);
-      const user = await passport.login();
-
-      expect(getUserMock).toBeCalledTimes(1);
-      expect(authLoginMock).toBeCalledTimes(1);
-      expect(user).toEqual(mockUserImx.profile);
-    });
-
-    it('should only login silently if useCachedSession is true', async () => {
-      getUserMock.mockReturnValue(mockUserImx);
-      const user = await passport.login({ useCachedSession: true });
-
-      expect(getUserMock).toBeCalledTimes(1);
-      expect(authLoginMock).toBeCalledTimes(0);
-      expect(user).toEqual(mockUser.profile);
-    });
-
-    it('should throw error if useCachedSession is true and getUser returns error', async () => {
-      const error = new Error('Unknown or invalid refresh token.');
-      getUserMock.mockRejectedValue(error);
-      authLoginMock.mockReturnValue(mockUserImx);
-
-      await expect(passport.login({ useCachedSession: true })).rejects.toThrow(error);
-      expect(getUserMock).toBeCalledTimes(1);
-      expect(authLoginMock).toBeCalledTimes(0);
-    });
-
-    it('should call track error function if an error occurs', async () => {
-      const error = new Error('Unknown or invalid refresh token.');
-      getUserMock.mockRejectedValue(error);
-      authLoginMock.mockReturnValue(mockUserImx);
-
-      try {
-        await passport.login({ useCachedSession: true });
-      } catch (e) {
-        expect(trackError).toHaveBeenCalledWith(
-          'passport',
-          'login',
-          e,
-          { flowId: '123' },
-        );
-      }
-    });
-
-    it('should try to login silently if silent is true', async () => {
-      getUserMock.mockReturnValue(null);
-
-      await passport.login({ useSilentLogin: true });
-
-      expect(forceUserRefreshMock).toBeCalledTimes(1);
-      expect(authLoginMock).toBeCalledTimes(0);
-    });
-
-    it('should call loginWithRedirect', async () => {
-      getUserMock.mockReturnValue(null);
-      await passport.login({ useRedirectFlow: true });
-
-      expect(getUserMock).toBeCalledTimes(1);
-      expect(authLoginMock).toBeCalledTimes(1);
+      expect(addresses).toEqual([]);
     });
   });
 
   describe('linkExternalWallet', () => {
     const linkWalletParams = {
       type: 'MetaMask',
-      walletAddress: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
-      signature: 'signature123',
-      nonce: 'nonce123',
+      walletAddress: '0xabc',
+      signature: 'sig',
+      nonce: 'nonce',
     };
 
-    it('should link external wallet when user is logged in', async () => {
-      getUserMock.mockReturnValue(mockUserZkEvm);
-      linkExternalWalletMock.mockReturnValue(mockLinkedWallet);
-
-      const result = await passport.linkExternalWallet(linkWalletParams);
-
-      expect(result).toEqual(mockLinkedWallet.data);
-    });
-
-    it('should throw error if user is not logged in', async () => {
-      getUserMock.mockReturnValue(null);
+    it('throws when user not logged in', async () => {
+      const passport = createPassport();
+      const auth = getLatestAuthInstance();
+      auth.getUser.mockResolvedValue(null);
 
       await expect(passport.linkExternalWallet(linkWalletParams)).rejects.toThrow(
         new PassportError('User is not logged in', PassportErrorType.NOT_LOGGED_IN_ERROR),
       );
     });
 
-    it('should handle generic errors from the linkWalletV2 API call', async () => {
-      getUserMock.mockReturnValue(mockUserImx);
-      linkExternalWalletMock.mockReturnValue(mockApiError);
+    it('returns linked wallet response', async () => {
+      const passport = createPassport();
+      const auth = getLatestAuthInstance();
+      const multiRollup = getLatestMultiRollupInstance();
+      const linkedWallet = { wallet_address: '0xabc' };
+      auth.getUser.mockResolvedValue({
+        profile: { sub: 'user' },
+        accessToken: 'token',
+      });
+      multiRollup.passportProfileApi.linkWalletV2.mockResolvedValue({
+        data: linkedWallet,
+      });
 
-      try {
-        await passport.linkExternalWallet(linkWalletParams);
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(PassportError);
-        expect(error.type).toEqual(PassportErrorType.LINK_WALLET_GENERIC_ERROR);
-        expect(error.message).toEqual(`Link wallet request failed with status code ${mockApiError.response.status}`);
-      }
+      const result = await passport.linkExternalWallet(linkWalletParams);
+
+      expect(result).toEqual(linkedWallet);
+      expect(multiRollup.passportProfileApi.linkWalletV2).toHaveBeenCalled();
     });
 
-    it('should handle 400 bad requests from the linkWalletV2 API call', async () => {
-      getUserMock.mockReturnValue(mockUserImx);
-      linkExternalWalletMock.mockReturnValue(mockPassportBadRequest);
+    it('maps API error codes to PassportError', async () => {
+      const passport = createPassport();
+      const auth = getLatestAuthInstance();
+      const multiRollup = getLatestMultiRollupInstance();
+      auth.getUser.mockResolvedValue({
+        profile: { sub: 'user' },
+        accessToken: 'token',
+      });
+      const error = new Error('axios error') as Error & { isAxiosError?: boolean; response?: any };
+      error.isAxiosError = true;
+      error.response = { data: { code: 'ALREADY_LINKED', message: 'oops' } };
+      multiRollup.passportProfileApi.linkWalletV2.mockRejectedValue(error);
 
-      try {
-        await passport.linkExternalWallet(linkWalletParams);
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(PassportError);
-        expect(error.type).toEqual(PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
-        expect(error.message).toEqual('Already linked');
-      }
-    });
-
-    it('should call track error function if an error occurs', async () => {
-      getUserMock.mockReturnValue(mockUserImx);
-      linkExternalWalletMock.mockReturnValue(mockPassportBadRequest);
-
-      try {
-        await passport.linkExternalWallet(linkWalletParams);
-      } catch (error) {
-        expect(trackError).toHaveBeenCalledWith(
-          'passport',
-          'linkExternalWallet',
-          error,
-        );
-      }
+      await expect(passport.linkExternalWallet(linkWalletParams)).rejects.toThrow(
+        new PassportError('oops', PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR),
+      );
+      expect(trackErrorMock).toHaveBeenCalledWith('passport', 'linkExternalWallet', error);
     });
   });
 });

@@ -1,9 +1,11 @@
 import React, {
   ChangeEvent,
   useCallback,
+  useEffect,
   useState,
 } from 'react';
 import { Stack } from 'react-bootstrap';
+import { connectWallet } from '@imtbl/wallet';
 import { usePassportProvider } from '@/context/PassportProvider';
 import Request from '@/components/zkevm/Request';
 import CardStack from '@/components/CardStack';
@@ -11,16 +13,61 @@ import { useStatusProvider } from '@/context/StatusProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { FormControl, Toggle } from '@biom3/react';
 import { ProviderEvent } from '@imtbl/passport';
+import { useImmutableProvider } from '@/context/ImmutableProvider';
+import { EnvironmentNames } from '@/types';
 
 function ZkEvmWorkflow() {
   const [showRequest, setShowRequest] = useState<boolean>(false);
 
-  const { isLoading, addMessage } = useStatusProvider();
-  const { connectZkEvm, zkEvmProvider } = usePassportProvider();
+  const { isLoading, addMessage, setIsLoading } = useStatusProvider();
+  const {
+    connectZkEvm,
+    zkEvmProvider,
+    defaultWalletProvider,
+    activeZkEvmProvider,
+    setDefaultWalletProvider,
+  } = usePassportProvider();
+  const { environment } = useImmutableProvider();
+  const isSandboxEnvironment = environment === EnvironmentNames.SANDBOX;
+  const [isClientReady, setIsClientReady] = useState(false);
+  const canUseDefaultConnect = isClientReady && isSandboxEnvironment;
+
+  useEffect(() => {
+    setIsClientReady(true);
+  }, []);
 
   const handleRequest = () => {
     setShowRequest(true);
   };
+
+  const handleConnectDefault = useCallback(async () => {
+    if (!canUseDefaultConnect) {
+      addMessage('connectWallet (default auth)', 'Default auth connect is only available in Sandbox.');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const provider = await connectWallet();
+      if (provider) {
+        setDefaultWalletProvider(provider);
+        addMessage(
+          'connectWallet (default auth)',
+          'Connected using built-in Immutable configuration',
+        );
+      } else {
+        addMessage('connectWallet (default auth)', 'No provider returned');
+      }
+    } catch (error) {
+      addMessage('connectWallet (default auth)', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [addMessage, canUseDefaultConnect, setDefaultWalletProvider, setIsLoading]);
+
+  const handleClearDefault = useCallback(() => {
+    setDefaultWalletProvider(undefined);
+    addMessage('connectWallet (default auth)', 'Provider cleared');
+  }, [addMessage, setDefaultWalletProvider]);
 
   const zkEvmEventHandler = useCallback((eventName: string) => (args: any[]) => {
     addMessage(`Provider Event: ${eventName}`, args);
@@ -29,19 +76,19 @@ function ZkEvmWorkflow() {
   const onHandleEventsChanged = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       Object.values(ProviderEvent).forEach((eventName) => {
-        zkEvmProvider?.on(eventName, zkEvmEventHandler(eventName));
+        activeZkEvmProvider?.on?.(eventName, zkEvmEventHandler(eventName));
       });
     } else {
       Object.values(ProviderEvent).forEach((eventName) => {
-        zkEvmProvider?.removeListener(eventName, zkEvmEventHandler(eventName));
+        activeZkEvmProvider?.removeListener?.(eventName, zkEvmEventHandler(eventName));
       });
     }
-  }, [zkEvmEventHandler, zkEvmProvider]);
+  }, [activeZkEvmProvider, zkEvmEventHandler]);
 
   return (
     <CardStack title="ZkEvm Workflow">
       <Stack direction="horizontal" style={{ flexWrap: 'wrap' }} gap={3}>
-        {zkEvmProvider && (
+        {activeZkEvmProvider && (
           <>
             <WorkflowButton
               disabled={isLoading}
@@ -60,15 +107,39 @@ function ZkEvmWorkflow() {
               <Toggle onChange={onHandleEventsChanged} />
               <FormControl.Label>Log out events</FormControl.Label>
             </FormControl>
+            {defaultWalletProvider && canUseDefaultConnect && (
+              <WorkflowButton
+                variant="secondary"
+                disabled={isLoading}
+                onClick={handleClearDefault}
+              >
+                Clear Default Wallet
+              </WorkflowButton>
+            )}
           </>
         )}
-        {!zkEvmProvider && (
-          <WorkflowButton
-            disabled={isLoading}
-            onClick={connectZkEvm}
-          >
-            Connect ZkEvm
-          </WorkflowButton>
+        {!activeZkEvmProvider && (
+          <>
+            {canUseDefaultConnect && (
+              <WorkflowButton
+                disabled={isLoading}
+                onClick={handleConnectDefault}
+              >
+                Connect with Defaults
+              </WorkflowButton>
+            )}
+            <WorkflowButton
+              disabled={isLoading}
+              onClick={connectZkEvm}
+            >
+              Connect ZkEvm
+            </WorkflowButton>
+            {!isSandboxEnvironment && (
+              <p className="text-muted mb-0">
+                Default auth connect is only available in the Sandbox environment.
+              </p>
+            )}
+          </>
         )}
       </Stack>
     </CardStack>

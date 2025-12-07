@@ -13,6 +13,18 @@ export default defineConfig((options) => {
       target: 'es2022',
       platform: 'browser',
       bundle: true,
+      esbuildPlugins: [
+        nodeModulesPolyfillPlugin({
+          globals: {
+            Buffer: true,
+            process: true,
+          },
+          modules: ['crypto', 'buffer', 'process'],
+        }),
+        replace({
+          '__SDK_VERSION__': pkg.version === '0.0.0' ? '2.0.0' : pkg.version
+        }),
+      ],
     }
   }
   

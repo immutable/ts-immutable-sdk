@@ -37,7 +37,7 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
   const [params, setParams] = useState<any[]>([]);
   const amountRange = 'Amount should larger than 0';
 
-  const { zkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider, activeZkEvmAccount } = usePassportProvider();
   useEffect(() => {
     setAmountConvertError('');
     const allowAmount = amount.trim() === '' ? '0' : amount;
@@ -63,17 +63,8 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
   }, [fromAddress, erc20ContractAddress, spender, amount, iface]);
 
   useEffect(() => {
-    const getAddress = async () => {
-      if (zkEvmProvider) {
-        const [walletAddress] = await zkEvmProvider.request({
-          method: 'eth_requestAccounts',
-        });
-        setFromAddress(walletAddress || '');
-      }
-    };
-
-    getAddress().catch(console.log);
-  }, [zkEvmProvider, setFromAddress]);
+    setFromAddress(activeZkEvmAccount || '');
+  }, [activeZkEvmAccount]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

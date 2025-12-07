@@ -13,7 +13,7 @@ import { PreparedTransactionRequest } from 'ethers';
 
 function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const { orderbookClient } = useImmutableProvider();
-  const { zkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider, activeZkEvmAccount } = usePassportProvider();
 
   const [listingIds, setListingIds] = useState<string>('');
   const [walletAddress, setWalletAddress] = useState<string>('');
@@ -29,17 +29,8 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
   );
 
   useEffect(() => {
-    const getAddress = async () => {
-      if (zkEvmProvider) {
-        const [address] = await zkEvmProvider.request({
-          method: 'eth_requestAccounts',
-        });
-        setWalletAddress(address || '');
-      }
-    };
-
-    getAddress().catch(console.log);
-  }, [zkEvmProvider, setWalletAddress]);
+    setWalletAddress(activeZkEvmAccount || '');
+  }, [activeZkEvmAccount]);
 
   useEffect(() => {
     setTransactionError('');
@@ -79,8 +70,11 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
       )) as TransactionAction | undefined;
 
       if (verifyAction) {
+        if (!activeZkEvmProvider) {
+          throw new Error('No zkEVM provider available to submit approval transaction');
+        }
         const approvalTransaction = await verifyAction.buildTransaction();
-        await zkEvmProvider?.request({
+        await activeZkEvmProvider.request({
           method: 'eth_sendTransaction',
           params: [approvalTransaction],
         });
@@ -101,7 +95,7 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
     } finally {
       setIsBuildingTransaction(false);
     }
-  }, [listingIds, orderbookClient, walletAddress, zkEvmProvider]);
+  }, [listingIds, orderbookClient, walletAddress, activeZkEvmProvider]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

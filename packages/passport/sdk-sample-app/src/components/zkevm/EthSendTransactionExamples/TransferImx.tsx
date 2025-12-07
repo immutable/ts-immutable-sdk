@@ -10,7 +10,7 @@ function TransferImx({ disabled, handleExampleSubmitted }: RequestExampleProps) 
   const [fromAddress, setFromAddress] = useState<string>('');
   const [toAddress, setToAddress] = useState<string>('');
   const [amount, setAmount] = useState<string>('0');
-  const { zkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider, activeZkEvmAccount } = usePassportProvider();
   const [params, setParams] = useState<any[]>([]);
   const [amountConvertError, setAmountConvertError] = useState<string>('');
   const imxTokenDecimal = 18;
@@ -40,17 +40,8 @@ function TransferImx({ disabled, handleExampleSubmitted }: RequestExampleProps) 
   }, [fromAddress, toAddress, amount]);
 
   useEffect(() => {
-    const getAddress = async () => {
-      if (zkEvmProvider) {
-        const [walletAddress] = await zkEvmProvider.request({
-          method: 'eth_requestAccounts',
-        });
-        setFromAddress(walletAddress || '');
-      }
-    };
-
-    getAddress().catch(console.log);
-  }, [zkEvmProvider, setFromAddress]);
+    setFromAddress(activeZkEvmAccount || '');
+  }, [activeZkEvmAccount]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
