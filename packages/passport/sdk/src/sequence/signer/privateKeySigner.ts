@@ -8,14 +8,12 @@ import {
   Payload,
   Signature as SequenceSignature,
 } from '@0xsequence/wallet-primitives';
-import { createWalletConfig } from './signerHelpers';
 import { ISigner } from './ISigner';
 import { Address } from 'ox';
 
 interface PrivateKeyWallet {
   userIdentifier: string;
   signerAddress: string;
-  walletConfig: Config.Config;
   signer: Signers.Pk.Pk;
 }
 
@@ -62,15 +60,14 @@ export class PrivateKeySigner implements ISigner {
         const authenticatedUser = user || await this.getUserOrThrow();
         
         const privateKeyHash = keccak256(toUtf8Bytes(`${authenticatedUser.profile.sub}-sequence-arb-one`)) as `0x${string}`;
+        console.log(`privateKeyHash = ${privateKeyHash}`);
         let signer = new Signers.Pk.Pk(privateKeyHash);
 
         const signerAddress = signer.address;
-        const walletConfig = createWalletConfig(signerAddress);
 
         this.privateKeyWallet = {
           userIdentifier: authenticatedUser.profile.sub,
           signerAddress,
-          walletConfig,
           signer,
         };
 
@@ -87,13 +84,12 @@ export class PrivateKeySigner implements ISigner {
   }
 
   async getAddress(): Promise<string> {
+    console.log('getAddress');
     const wallet = await this.getWalletInstance();
+    const privateKey = keccak256(toUtf8Bytes(`${wallet.userIdentifier}-sequence-arb-one`));
+    console.log(`sequence privateKey = ${privateKey}`);
+    console.log(`sequence wallet.signerAddress = ${wallet.signerAddress}`);
     return wallet.signerAddress;
-  }
-
-  async getWalletConfig(): Promise<Config.Config> {
-    const wallet = await this.getWalletInstance();
-    return wallet.walletConfig;
   }
 
   async signPayload(walletAddress: Address.Address, chainId: number, payload: Payload.Parented): Promise<SequenceSignature.SignatureOfSignerLeaf> {
@@ -101,7 +97,7 @@ export class PrivateKeySigner implements ISigner {
     return pkWallet.signer.sign(walletAddress, chainId, payload);
   }
 
-  async signMessage(message: string): Promise<string> {
+  async signMessage(message: string | Uint8Array): Promise<string> {
     const pkWallet = await this.getWalletInstance();
     
     const privateKeyHash = keccak256(toUtf8Bytes(`${pkWallet.userIdentifier}-sequence-arb-one`)) as `0x${string}`;

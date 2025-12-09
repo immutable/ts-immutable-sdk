@@ -1,23 +1,63 @@
 import { Flow } from '@imtbl/metrics';
 import { TransactionRequest } from 'ethers';
 import { Address, Bytes, Hex, AbiFunction, Provider } from 'ox';
-import { getEip155ChainId, isWalletDeployed } from './walletHelpers';
+import { getEip155ChainId, getNonce, isWalletDeployed } from './walletHelpers';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import SequenceSigner from './sequenceSigner';
 import { Payload, Config, Signature, Constants, Context } from '@0xsequence/wallet-primitives';
-import { Envelope, Wallet } from '@0xsequence/wallet-core';
+import { Envelope, State, Wallet } from '@0xsequence/wallet-core';
 import { SequenceRelayerClient } from './sequenceRelayerClient';
 import AuthManager from '../authManager';
-import { createStateProvider, saveWalletConfig, SEQUENCE_CONTEXT } from './signer/signerHelpers';
+import { createStateProvider, createWalletConfig, saveWalletConfig, SEQUENCE_CONTEXT } from './signer/signerHelpers';
+import GuardianClient from '../guardian';
+import { MetaTransaction } from '../zkEvm/types';
 
 export type TransactionParams = {
   sequenceSigner: SequenceSigner;
   rpcProvider: Provider.Provider;
+  guardianClient: GuardianClient;
   relayerClient: SequenceRelayerClient;
   walletAddress: string;
   flow: Flow;
   authManager: AuthManager;
   nonceSpace?: bigint;
+  isBackgroundTransaction?: boolean;
+};
+
+const buildMetaTransactions = async (
+  transactionRequest: TransactionRequest,
+  rpcProvider: Provider.Provider,
+  relayerClient: SequenceRelayerClient,
+  zkevmAddress: string,
+  nonceSpace?: bigint,
+): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
+  if (!transactionRequest.to) {
+    throw new JsonRpcError(
+      RpcErrorCode.INVALID_PARAMS,
+      'eth_sendTransaction requires a "to" field',
+    );
+  }
+
+  const metaTransaction: MetaTransaction = {
+    to: transactionRequest.to.toString(),
+    data: transactionRequest.data,
+    nonce: BigInt(0), // NOTE: We don't need a valid nonce to estimate the fee
+    value: transactionRequest.value,
+    revertOnError: true,
+  };
+
+  // Estimate the fee and get the nonce from the smart wallet
+  const nonce = await getNonce(rpcProvider, zkevmAddress, nonceSpace);
+
+  // Build the meta transactions array with a valid nonce and fee transaction
+  const metaTransactions: [MetaTransaction, ...MetaTransaction[]] = [
+    {
+      ...metaTransaction,
+      nonce,
+    },
+  ];
+
+  return metaTransactions;
 };
 
 /**
@@ -32,6 +72,7 @@ const deployBootstrapAndExecute = async (
   wallet: Wallet,
   chainId: string,
   flow: Flow,
+  stateProvider: State.Provider,
   authManager: AuthManager,
 ): Promise<{ to: Address.Address; signedTransaction: Hex.Hex; }> => {  
   flow.addEvent('startDeployBootstrapAndExecute');
@@ -44,7 +85,7 @@ const deployBootstrapAndExecute = async (
     );
   }
 
-  const userTransction = await buildUserTransactionCall(walletAddress, transactionRequest, wallet, rpcProvider, sequenceSigner, chainId, flow);
+  const userSignature = await signUserTransaction(walletAddress, transactionRequest, wallet, rpcProvider, sequenceSigner, chainId, flow);
 
   const response = await fetch('http://localhost:8073/relayer-mr/v1/build-guest-module-calldata', {
     method: 'POST',
@@ -53,10 +94,11 @@ const deployBootstrapAndExecute = async (
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      wallet_address: walletAddress,
-      user_eoa: await sequenceSigner.getAddress(),
       chain_id: getEip155ChainId(Number(chainId)),
-      user_execute_data: userTransction.data,
+      to: transactionRequest.to,
+      value: Hex.fromNumber(BigInt(transactionRequest.value ?? 0)),
+      data: transactionRequest.data ?? '0x',
+      user_ecdsa_signature: userSignature,
     }),
   });
 
@@ -75,7 +117,7 @@ const createWallet = async (
   authManager: AuthManager,
   walletAddress: Address.Address,
   sequenceSigner: SequenceSigner,
-): Promise<Wallet> => {
+): Promise<{ wallet: Wallet; stateProvider: State.Provider; }> => {
   const user = await authManager.getUser();
   if (!user?.accessToken) {
     throw new JsonRpcError(
@@ -85,8 +127,11 @@ const createWallet = async (
   }
   const deploymentSalt = await fetchDeploymentSalt(user.accessToken);
 
-  const walletConfig = await sequenceSigner.getWalletConfig();
+  const signerAddress = await sequenceSigner.getAddress();
+  const walletConfig = createWalletConfig(Address.from(signerAddress));
   const realImageHash = Bytes.toHex(Config.hashConfiguration(walletConfig));
+  console.log(`realImageHash = ${realImageHash}`);
+
   const stateProvider = createStateProvider(walletAddress, deploymentSalt, realImageHash);
   const wallet = new Wallet(walletAddress, { 
     stateProvider: stateProvider,
@@ -94,17 +139,19 @@ const createWallet = async (
   });
   await saveWalletConfig(walletConfig, stateProvider);
 
-  return wallet;
+  return { wallet: wallet, stateProvider: stateProvider };
 };
 
 export const prepareAndSignTransaction = async ({
   transactionRequest,
   sequenceSigner,
   rpcProvider,
+  guardianClient,
   relayerClient,
   walletAddress,
   flow,
   authManager,
+  isBackgroundTransaction,
 }: TransactionParams & { transactionRequest: TransactionRequest }): Promise<{ to: Address.Address; data: Hex.Hex; }> => {
   if (!transactionRequest.to) {
     throw new JsonRpcError(
@@ -115,7 +162,7 @@ export const prepareAndSignTransaction = async ({
 
   const chainId = await rpcProvider.request({ method: 'eth_chainId' });
 
-  const wallet = await createWallet(authManager, Address.from(walletAddress), sequenceSigner);
+  const {wallet, stateProvider} = await createWallet(authManager, Address.from(walletAddress), sequenceSigner);
   
   const deployed = await isWalletDeployed(rpcProvider, walletAddress);
   if (!deployed) {
@@ -127,6 +174,7 @@ export const prepareAndSignTransaction = async ({
       wallet,
       Number(chainId).toString(),
       flow,
+      stateProvider,
       authManager,
     );
     flow.addEvent('endPrepareDeployBootstrapExecuteTransaction');
@@ -145,9 +193,11 @@ export const prepareAndSignTransaction = async ({
     behaviorOnError: "revert",
   };
 
+
   const envelope = await wallet.prepareTransaction(rpcProvider as any, [tx]);
 
   const signature = await sequenceSigner.signPayload(Address.from(walletAddress), Number(chainId), envelope.payload);
+
   const signedEnvelope = Envelope.toSigned(envelope, [
     {
       address: Address.from(await sequenceSigner.getAddress()),
@@ -163,7 +213,7 @@ export const prepareAndSignTransaction = async ({
 /**
  * Build and sign user transaction call (nonce 1)
  */
-const buildUserTransactionCall = async (
+const signUserTransaction = async (
   walletAddress: string,
   transactionRequest: TransactionRequest,
   wallet: Wallet,
@@ -171,8 +221,8 @@ const buildUserTransactionCall = async (
   sequenceSigner: SequenceSigner,
   chainId: string,
   flow: Flow,
-): Promise<Payload.Call> => {
-  flow.addEvent('startBuildUserTransactionCall');
+): Promise<Hex.Hex> => {
+  flow.addEvent('startSignUserTransaction');
 
   const userTx: Payload.Call = {
     to: transactionRequest.to as `0x${string}`,
@@ -195,51 +245,19 @@ const buildUserTransactionCall = async (
     },
   };
 
-  // Sign user transaction
-  const userSignature = await sequenceSigner.signPayload(Address.from(walletAddress), Number(chainId), userEnvelope.payload);
+  // Encode payload to bytes and sign with EIP-191 prefix
+  const payloadDigest = Payload.hash(Address.from(walletAddress), Number(chainId), userEnvelope.payload);
+  const userSignatureHex = await sequenceSigner.signMessage(payloadDigest) as `0x${string}`;
 
-  const signerAddress = await sequenceSigner.getAddress();
-  const signedUserEnvelope = Envelope.toSigned(userEnvelope, [
-    {
-      address: Address.from(signerAddress),
-      signature: userSignature,
-    },
-  ]);
-  
-  // Encode signature
-  const status = await wallet.getStatus(rpcProvider as any);
-  const userRawSig = Envelope.encodeSignature(signedUserEnvelope);
-  const userEncodedSig = Bytes.toHex(
-    Signature.encodeSignature({
-      ...userRawSig,
-      suffix: status.pendingUpdates.map(({ signature }: any) => signature),
-    })
-  );
+  flow.addEvent('endSignUserTransaction');
 
-  flow.addEvent('endBuildUserTransactionCall');
-
-  const userTransactionCall: Payload.Call = {
-    to: Address.from(walletAddress),
-    value: 0n,
-    data: AbiFunction.encodeData(Constants.EXECUTE, [
-      Bytes.toHex(Payload.encode(signedUserEnvelope.payload)),
-      userEncodedSig,
-    ]),
-    gasLimit: 0n,
-    delegateCall: false,
-    onlyFallback: false,
-    behaviorOnError: 'revert',
-  };
-
-  flow.addEvent('endBuildUserTransactionCall');
-
-  return userTransactionCall;
+  return userSignatureHex;
 };
 
 async function fetchDeploymentSalt(
   accessToken: string
 ): Promise<string> {
-  const apiUrl = 'http://localhost:8071/v2/passport/counterfactual-salt';
+  const apiUrl = 'http://localhost:8072/v2/passport/counterfactual-salt';
   
   const response = await fetch(apiUrl, {
     method: 'GET',

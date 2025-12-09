@@ -12,8 +12,8 @@ import { PrivateKeySigner } from './signer/privateKeySigner';
 import { Address } from 'ox';
 
 export default class SequenceSigner implements ISigner {
-  private readonly identityInstrumentSigner: ISigner;
-  private readonly privateKeySigner: ISigner;
+  private readonly identityInstrumentSigner: IdentityInstrumentSigner;
+  private readonly privateKeySigner: PrivateKeySigner;
   private readonly useIdentityInstrument: boolean;
 
   constructor(authManager: AuthManager, config: PassportConfiguration) {
@@ -28,19 +28,13 @@ export default class SequenceSigner implements ISigner {
       : this.privateKeySigner.getAddress();
   }
 
-  async getWalletConfig(): Promise<Config.Config> {
-    return this.useIdentityInstrument
-      ? this.identityInstrumentSigner.getWalletConfig()
-      : this.privateKeySigner.getWalletConfig();
-  }
-
   async signPayload(walletAddress: Address.Address, chainId: number, payload: Payload.Parented): Promise<SequenceSignature.SignatureOfSignerLeaf> {
     return this.useIdentityInstrument
       ? this.identityInstrumentSigner.signPayload(walletAddress, chainId, payload)
       : this.privateKeySigner.signPayload(walletAddress, chainId, payload);
   }
 
-  async signMessage(message: string): Promise<string> {
+  async signMessage(message: string | Uint8Array): Promise<string> {
     return this.useIdentityInstrument
       ? this.identityInstrumentSigner.signMessage(message)
       : this.privateKeySigner.signMessage(message);

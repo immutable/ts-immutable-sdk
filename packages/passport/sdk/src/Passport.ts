@@ -198,6 +198,7 @@ export class Passport {
           authManager: this.authManager,
           config: this.config,
           multiRollupApiClients: this.multiRollupApiClients,
+          guardianClient: this.guardianClient,
           ethSigner: this.sequenceSigner,
           user,
           chain,

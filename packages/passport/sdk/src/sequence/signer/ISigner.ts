@@ -3,8 +3,7 @@ import { Address } from 'ox';
 
 export interface ISigner {
   getAddress(): Promise<string>;
-  getWalletConfig(): Promise<Config.Config>;
   signPayload(walletAddress: Address.Address, chainId: number, payload: Payload.Parented): Promise<SequenceSignature.SignatureOfSignerLeaf>;
-  signMessage(message: string): Promise<string>;
+  signMessage(message: string | Uint8Array): Promise<string>;
 }
 

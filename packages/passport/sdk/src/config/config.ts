@@ -144,7 +144,7 @@ export class PassportConfiguration {
           this.passportDomain = 'https://passport.sandbox.immutable.com';
           this.imxPublicApiDomain = 'https://api.sandbox.immutable.com';
           this.zkEvmRpcUrl = 'https://rpc.testnet.immutable.com';
-          this.relayerUrl = 'http://localhost:8070/relayer-mr';
+          this.relayerUrl = 'http://localhost:8073/relayer-mr';
           this.sequenceIdentityInstrumentEndpoint = 'https://next-identity.sequence-dev.app/';
           this.sequenceProjectAccessKey = 'AQAAAAAAAAB5QznGqk9paa4EQjom09ERpJs';
           this.multiRollupConfig = multiRollupConfig.getSandbox();

@@ -9,11 +9,9 @@ import { Hex, Address } from 'ox';
 import jwtDecode from 'jwt-decode';
 import { IdTokenPayload } from '../../types';
 import {
-  Config,
   Payload,
   Signature as SequenceSignature,
 } from '@0xsequence/wallet-primitives';
-import {  createWalletConfig } from './signerHelpers';
 import { ISigner } from './ISigner';
 
 interface AuthKey {
@@ -25,10 +23,9 @@ interface AuthKey {
 
 interface UserWallet {
   userIdentifier: string;
-  walletAddress: string;
+  signerAddress: string;
   authKey: AuthKey;
   identityInstrument: IdentityInstrument;
-  walletConfig: Config.Config
 }
 
 export class IdentityInstrumentSigner implements ISigner {
@@ -119,14 +116,11 @@ export class IdentityInstrumentSigner implements ISigner {
         const signerAddress = result.signer.address;
         authKey.identitySigner = signerAddress;
 
-        const walletConfig = createWalletConfig(Address.from(signerAddress));
-
         this.userWallet = {
           userIdentifier: authenticatedUser.profile.sub,
-          walletAddress: signerAddress,
+          signerAddress: signerAddress,
           authKey,
           identityInstrument,
-          walletConfig,
         };
 
         return resolve(this.userWallet!);
@@ -144,12 +138,7 @@ export class IdentityInstrumentSigner implements ISigner {
 
   async getAddress(): Promise<string> {
     const wallet = await this.getUserWallet();
-    return wallet.walletAddress;
-  }
-
-  async getWalletConfig(): Promise<Config.Config> {
-    const wallet = await this.getUserWallet();
-    return wallet.walletConfig;
+    return wallet.signerAddress;
   }
 
   async signPayload(walletAddress: Address.Address, chainId: number, payload: Payload.Parented): Promise<SequenceSignature.SignatureOfSignerLeaf> {
@@ -163,7 +152,7 @@ export class IdentityInstrumentSigner implements ISigner {
     return signer.sign(walletAddress, chainId, payload);
   }
 
-  async signMessage(message: string): Promise<string> {
+  async signMessage(message: string | Uint8Array): Promise<string> {
     const wallet = await this.getUserWallet();
     
     const signer = new Identity.IdentitySigner(
@@ -171,8 +160,7 @@ export class IdentityInstrumentSigner implements ISigner {
       wallet.authKey
     );
 
-    const messageBytes = toUtf8Bytes(message);
-    const digest = hashMessage(messageBytes);
+    const digest = hashMessage(message);
     
     const signature = await signer.signDigest(getBytes(digest));
     

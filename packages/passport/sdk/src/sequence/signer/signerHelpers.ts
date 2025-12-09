@@ -9,17 +9,34 @@ export const SEQUENCE_CONTEXT: Context.Context = {
   creationCode: "0x6054600f3d396034805130553df3fe63906111273d3560e01c14602b57363d3d373d3d3d3d369030545af43d82803e156027573d90f35b3d90fd5b30543d5260203df3",
 };
 
+const immutableSignerContractAddress = '0x8bea3E180bEab544c9295a0C0b8eC1628614A2b3';
+
 const stateProviderUrl = "https://keymachine.sequence.app";
 
-export const createWalletConfig = (signerAddress: Address.Address): Config.Config => ({
-  threshold: 1n,
-  checkpoint: 0n,
-  topology: {
-    type: "signer",
-    address: signerAddress,
-    weight: 1n,
-  },
-});
+export const createWalletConfig = (signerAddress: Address.Address): Config.Config => {
+  const signers = [Address.from(immutableSignerContractAddress), signerAddress];
+
+  if (signers[0].toLowerCase() > signers[1].toLowerCase()) {
+    [signers[0], signers[1]] = [signers[1], signers[0]];
+  }
+
+  return {
+    threshold: 2n,
+    checkpoint: 0n,
+    topology: [
+      {
+        type: "signer",
+        address: signers[0],
+        weight: 1n,
+      },
+      {
+        type: "signer", 
+        address: signers[1],
+        weight: 1n,
+      },
+    ],
+  };
+};
 
 export const createStateProvider = (walletAddress: Address.Address, deploymentSalt: string, realImageHash: Hex.Hex): State.Provider => {
   const baseStateProvider = new State.Sequence.Provider(stateProviderUrl);

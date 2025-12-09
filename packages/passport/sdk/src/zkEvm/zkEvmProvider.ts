@@ -162,6 +162,9 @@ export class ZkEvmProvider implements Provider {
 
     switch (request.method) {
       case 'eth_requestAccounts': {
+        const signerAddress = await this.#ethSigner.getAddress();
+        console.log(`zkevm signerAddress = ${signerAddress}`);
+
         const zkEvmAddress = await this.#getZkEvmAddress();
         if (zkEvmAddress) return [zkEvmAddress];
 
@@ -224,19 +227,7 @@ export class ZkEvmProvider implements Provider {
 
         console.log(`request.params ${JSON.stringify(request.params)}`);
         try {
-          return await sendTransaction({
-            params: request.params || [],
-            ethSigner: this.#ethSigner,
-            guardianClient: this.#guardianClient,
-            rpcProvider: this.#rpcProvider,
-            relayerClient: this.#relayerClient,
-            zkEvmAddress,
-            flow,
-          });
-          // return await this.#guardianClient.withConfirmationScreen({
-          //   width: 480,
-          //   height: 720,
-          // })(async () => await sendTransaction({
+          // return await sendTransaction({
           //   params: request.params || [],
           //   ethSigner: this.#ethSigner,
           //   guardianClient: this.#guardianClient,
@@ -244,7 +235,19 @@ export class ZkEvmProvider implements Provider {
           //   relayerClient: this.#relayerClient,
           //   zkEvmAddress,
           //   flow,
-          // }));
+          // });
+          return await this.#guardianClient.withConfirmationScreen({
+            width: 480,
+            height: 720,
+          })(async () => await sendTransaction({
+            params: request.params || [],
+            ethSigner: this.#ethSigner,
+            guardianClient: this.#guardianClient,
+            rpcProvider: this.#rpcProvider,
+            relayerClient: this.#relayerClient,
+            zkEvmAddress,
+            flow,
+          }));
         } catch (error) {
           if (error instanceof Error) {
             trackError('passport', 'eth_sendTransaction', error, { flowId: flow.details.flowId });

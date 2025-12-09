@@ -22,12 +22,14 @@ import { registerUser } from './user';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { SequenceSigner } from './index';
 import { getChainConfig } from './chainConfig';
+import GuardianClient from '../guardian';
 
 export type SequenceProviderInput = {
   authManager: AuthManager;
   config: PassportConfiguration;
   multiRollupApiClients: MultiRollupApiClients;
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  guardianClient: GuardianClient;
   ethSigner: SequenceSigner;
   user: User | null;
   chain: Exclude<EvmChain, EvmChain.ZKEVM>;
@@ -52,6 +54,8 @@ export class SequenceProvider implements Provider {
 
   readonly #passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
+  readonly #guardianClient: GuardianClient;
+
   readonly #rpcProvider: OxProvider.Provider;
 
   readonly #multiRollupApiClients: MultiRollupApiClients;
@@ -72,12 +76,14 @@ export class SequenceProvider implements Provider {
     config,
     multiRollupApiClients,
     passportEventEmitter,
+    guardianClient,
     ethSigner,
     user,
     chain,
   }: SequenceProviderInput) {
     this.#authManager = authManager;
     this.#config = config;
+    this.#guardianClient = guardianClient;
     this.#passportEventEmitter = passportEventEmitter;
     this.#ethSigner = ethSigner;
     this.#chain = chain;
@@ -115,6 +121,9 @@ export class SequenceProvider implements Provider {
   async #performRequest(request: RequestArguments): Promise<any> {
     switch (request.method) {
       case 'eth_requestAccounts': {
+        const signerAddress = await this.#ethSigner.getAddress();
+        console.log(`sequence signerAddress = ${signerAddress}`);
+
         const walletAddress = await this.#getWalletAddress();
         if (walletAddress) return [walletAddress];
 
@@ -190,11 +199,26 @@ export class SequenceProvider implements Provider {
             sequenceSigner: this.#ethSigner,
             rpcProvider: this.#rpcProvider,
             relayerClient: this.#relayerClient,
+            guardianClient: this.#guardianClient,
             walletAddress,
             flow,
             authManager: this.#authManager,
             chain: this.#chain,
           });
+          // return await this.#guardianClient.withConfirmationScreen({
+          //   width: 480,
+          //   height: 720,
+          // })(async () => await sendTransaction({
+          //   params: request.params || [],
+          //   sequenceSigner: this.#ethSigner,
+          //   rpcProvider: this.#rpcProvider,
+          //   relayerClient: this.#relayerClient,
+          //   guardianClient: this.#guardianClient,
+          //   walletAddress,
+          //   flow,
+          //   authManager: this.#authManager,
+          //   chain: this.#chain,
+          // }));
         } catch (error) {
           if (error instanceof Error) {
             trackError('passport', `ethSendTransaction_${this.#chain}`, error, { flowId: flow.details.flowId });

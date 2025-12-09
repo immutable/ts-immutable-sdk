@@ -197,15 +197,15 @@ export const prepareAndSignTransaction = async ({
 
   // Parallelize the validation and signing of the transaction
   // without waiting for the validation to complete
-  // const validateTransaction = async () => {
-  //   await guardianClient.validateEVMTransaction({
-  //     chainId: getEip155ChainId(Number(chainId)),
-  //     nonce: convertBigNumberishToString(nonce),
-  //     metaTransactions,
-  //     isBackgroundTransaction,
-  //   });
-  //   flow.addEvent('endValidateEVMTransaction');
-  // };
+  const validateTransaction = async () => {
+    await guardianClient.validateEVMTransaction({
+      chainId: getEip155ChainId(Number(chainId)),
+      nonce: convertBigNumberishToString(nonce),
+      metaTransactions,
+      isBackgroundTransaction,
+    });
+    flow.addEvent('endValidateEVMTransaction');
+  };
 
   // NOTE: We sign again because we now are adding the fee transaction, so the
   // whole payload is different and needs a new signature.
