@@ -13,6 +13,7 @@
     "@imtbl/wallet": "workspace:*",
     "@imtbl/x-client": "workspace:*",
     "@imtbl/x-provider": "workspace:*",
+    "ethers": "^6.13.4",
     "localforage": "^1.10.0",
     "oidc-client-ts": "3.4.1",
     "viem": "^2.7.13"
