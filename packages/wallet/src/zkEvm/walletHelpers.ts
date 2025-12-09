@@ -1,5 +1,3 @@
-import { walletContracts } from '@0xsequence/abi';
-import { v1 as sequenceCoreV1 } from '@0xsequence/core';
 import {
   BigNumberish, Contract, getBytes, hashMessage,
   Interface, keccak256, Signer, solidityPacked, ZeroAddress,
@@ -7,6 +5,11 @@ import {
   isError,
 } from 'ethers';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
+import {
+  decodeSequenceSignatureV1,
+  encodeSequenceSignatureV1,
+  walletContracts,
+} from './sequenceCompat';
 
 const SIGNATURE_WEIGHT = 1; // Weight of a single signature in the multi-sig
 const TRANSACTION_SIGNATURE_THRESHOLD = 1; // Total required weight in the multi-sig for a transaction
@@ -132,7 +135,7 @@ export const signMetaTransactions = async (
   const signedDigest = `${ethsigNoType}${ETH_SIGN_FLAG}`;
 
   // Add metadata
-  const encodedSignature = sequenceCoreV1.signature.encodeSignature({
+  const encodedSignature = encodeSequenceSignatureV1({
     version: 1,
     threshold: TRANSACTION_SIGNATURE_THRESHOLD,
     signers: [
@@ -156,7 +159,7 @@ export const signMetaTransactions = async (
 
 const decodeRelayerSignature = (relayerSignature: string) => {
   const signatureWithThreshold = `0x0000${relayerSignature}`;
-  return sequenceCoreV1.signature.decodeSignature(signatureWithThreshold);
+  return decodeSequenceSignatureV1(signatureWithThreshold);
 };
 
 export const packSignatures = (
@@ -190,7 +193,7 @@ export const packSignatures = (
     return 1;
   });
 
-  return sequenceCoreV1.signature.encodeSignature({
+  return encodeSequenceSignatureV1({
     version: 1,
     threshold: PACKED_SIGNATURE_THRESHOLD,
     signers: sortedSigners,

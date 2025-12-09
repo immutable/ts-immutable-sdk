@@ -1,5 +1,5 @@
-import jwt_decode from 'jwt-decode';
-import type { User, IdTokenPayload } from '@imtbl/auth';
+import type { IdTokenPayload, User } from '@imtbl/auth';
+import { decodeJwtPayload } from '@imtbl/auth';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 
 type ImxMetadata = {
@@ -28,7 +28,7 @@ export const toUserImx = (user: User): UserImx => {
     );
   }
 
-  const payload = jwt_decode<PassportPayload>(user.idToken);
+  const payload = decodeJwtPayload<PassportPayload>(user.idToken);
   const metadata = payload.passport;
 
   if (

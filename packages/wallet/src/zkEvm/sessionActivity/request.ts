@@ -1,17 +1,13 @@
-import axios, { AxiosInstance } from 'axios';
-
 const CHECK_PATH = '/v1/sdk/session-activity/check';
 
-let client: AxiosInstance | undefined;
+let baseUrl: string | undefined;
 
 export const setupClient = (sessionActivityApiUrl: string) => {
-  if (client) {
+  if (baseUrl) {
     return;
   }
 
-  client = axios.create({
-    baseURL: sessionActivityApiUrl,
-  });
+  baseUrl = sessionActivityApiUrl;
 };
 
 type CheckParams = {
@@ -26,20 +22,30 @@ export type CheckResponse = {
   delay?: number;
 };
 
+const buildQueryUrl = (queries: CheckParams): string => {
+  const url = new URL(CHECK_PATH, baseUrl);
+  Object.entries(queries).forEach(([key, value]) => {
+    if (value === undefined || value === null) {
+      return;
+    }
+    url.searchParams.append(key, String(value));
+  });
+  return url.toString();
+};
+
 export async function get(queries: CheckParams) {
-  if (!client) {
+  if (!baseUrl) {
     throw new Error('Client not initialised');
   }
-  // pass queries as query string
-  return client!
-    .get<CheckResponse>(CHECK_PATH, {
-    params: queries,
-  })
-    .then((res) => res.data)
-    .catch((error) => {
-      if (error.response.status === 404) {
-        return undefined;
-      }
-      throw error;
-    });
+
+  const response = await fetch(buildQueryUrl(queries));
+  if (response.status === 404) {
+    return undefined;
+  }
+
+  if (!response.ok) {
+    throw new Error(`Session activity request failed with status ${response.status}`);
+  }
+
+  return response.json() as Promise<CheckResponse>;
 }

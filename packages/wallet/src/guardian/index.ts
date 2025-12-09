@@ -1,6 +1,5 @@
 import * as GeneratedClients from '@imtbl/generated-clients';
 import { BigNumberish, ZeroAddress } from 'ethers';
-import axios from 'axios';
 import { Auth, IAuthConfiguration } from '@imtbl/auth';
 import ConfirmationScreen from '../confirmation/confirmation';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcError';
@@ -8,6 +7,7 @@ import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
 import { WalletConfiguration } from '../config';
 import { getEip155ChainId } from '../zkEvm/walletHelpers';
 import { WalletError, WalletErrorType } from '../errors';
+import { isAxiosError } from '../utils/http';
 
 export type GuardianClientParams = {
   config: WalletConfiguration;
@@ -142,7 +142,7 @@ export default class GuardianClient {
 
       return response.data;
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 403) {
+      if (isAxiosError(error) && error.response?.status === 403) {
         throw new WalletError('Service unavailable', WalletErrorType.SERVICE_UNAVAILABLE_ERROR);
       }
 
