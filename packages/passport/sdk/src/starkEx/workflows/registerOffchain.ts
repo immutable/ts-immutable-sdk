@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { ImxApiClients, imx } from '@imtbl/generated-clients';
 import { EthSigner, StarkSigner } from '@imtbl/x-client';
 import { Auth, User } from '@imtbl/auth';
@@ -6,6 +5,7 @@ import { retryWithDelay } from '@imtbl/wallet';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { toUserImx } from '../../utils/imxUser';
 import registerPassportStarkEx from './registration';
+import { getHttpStatus } from '../../utils/httpError';
 
 async function forceUserRefresh(auth: Auth) {
   // User metadata is updated asynchronously. Poll userinfo endpoint until it is updated.
@@ -44,8 +44,8 @@ export default async function registerOffchain(
       await forceUserRefresh(auth);
 
       return response;
-    } catch (err: any) {
-      if (axios.isAxiosError(err) && err.response?.status === 409) {
+    } catch (err: unknown) {
+      if (getHttpStatus(err) === 409) {
         // The user already registered, but the user token is not updated yet.
         await forceUserRefresh(auth);
         return { tx_hash: '' };

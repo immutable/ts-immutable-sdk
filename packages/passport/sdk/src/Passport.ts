@@ -23,7 +23,6 @@ import {
   ConfirmationScreen,
 } from '@imtbl/wallet';
 import type { LinkWalletParams, LinkedWallet } from '@imtbl/wallet';
-import { isAxiosError } from 'axios';
 import {
   PassportModuleConfiguration,
   ConnectEvmArguments,
@@ -35,6 +34,7 @@ import { PassportConfiguration } from './config';
 import { withMetricsAsync } from './utils/metrics';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { ImxGuardianClient } from './starkEx/imxGuardianClient';
+import { getHttpErrorResponse } from './utils/httpError';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -494,9 +494,10 @@ export class Passport {
         throw error;
       }
 
-      if (isAxiosError(error) && error.response) {
-        if (error.response.data && isApiError(error.response.data)) {
-          const { code, message } = error.response.data;
+      const httpResponse = getHttpErrorResponse(error);
+      if (httpResponse) {
+        if (httpResponse.data && isApiError(httpResponse.data)) {
+          const { code, message } = httpResponse.data;
 
           switch (code) {
             case 'ALREADY_LINKED':
@@ -510,9 +511,9 @@ export class Passport {
             default:
               throw new PassportError(message, PassportErrorType.LINK_WALLET_GENERIC_ERROR);
           }
-        } else if (error.response.status) {
+        } else if (httpResponse.status) {
           throw new PassportError(
-            `Link wallet request failed with status code ${error.response.status}`,
+            `Link wallet request failed with status code ${httpResponse.status}`,
             PassportErrorType.LINK_WALLET_GENERIC_ERROR,
           );
         }

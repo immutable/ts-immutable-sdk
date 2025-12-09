@@ -1,8 +1,8 @@
 import { Auth, isUserZkEvm } from '@imtbl/auth';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { isAxiosError } from 'axios';
 import { trackFlow, trackError } from '@imtbl/metrics';
 import { WalletError, WalletErrorType } from './errors';
+import { isAxiosError } from './utils/http';
 
 export type LinkWalletParams = {
   type: string;

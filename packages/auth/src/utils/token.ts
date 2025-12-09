@@ -1,13 +1,13 @@
-import jwt_decode from 'jwt-decode';
 import {
   User as OidcUser,
 } from 'oidc-client-ts';
 import { IdTokenPayload, TokenPayload } from '../types';
+import { decodeJwtPayload } from './jwt';
 
 function isTokenExpiredOrExpiring(token: string): boolean {
   try {
     // try to decode the token as access token payload or id token payload
-    const decodedToken = jwt_decode<TokenPayload | IdTokenPayload>(token);
+    const decodedToken = decodeJwtPayload<TokenPayload | IdTokenPayload>(token);
     const now = Math.floor(Date.now() / 1000);
 
     // Tokens without expiration claims are invalid (security vulnerability)

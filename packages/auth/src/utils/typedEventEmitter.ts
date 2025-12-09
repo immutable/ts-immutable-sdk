@@ -1,26 +1,45 @@
-import { EventEmitter } from 'events';
+type StringEventKey<T> = Extract<keyof T, string>;
+
+type AnyListener = (...args: any[]) => void;
 
 export default class TypedEventEmitter<TEvents extends Record<string, any>> {
-  private emitter = new EventEmitter();
+  private listeners = new Map<StringEventKey<TEvents>, Set<AnyListener>>();
 
-  emit<TEventName extends keyof TEvents & string>(
+  emit<TEventName extends StringEventKey<TEvents>>(
     eventName: TEventName,
     ...eventArg: TEvents[TEventName]
   ) {
-    this.emitter.emit(eventName, ...(eventArg as []));
+    const handlers = this.listeners.get(eventName);
+    if (!handlers || handlers.size === 0) {
+      return;
+    }
+
+    // Copy handlers to avoid issues if listeners mutate during emit
+    [...handlers].forEach((handler) => {
+      handler(...eventArg);
+    });
   }
 
-  on<TEventName extends keyof TEvents & string>(
+  on<TEventName extends StringEventKey<TEvents>>(
     eventName: TEventName,
     handler: (...eventArg: TEvents[TEventName]) => void,
   ) {
-    this.emitter.on(eventName, handler as any);
+    const handlers = this.listeners.get(eventName) ?? new Set<AnyListener>();
+    handlers.add(handler as AnyListener);
+    this.listeners.set(eventName, handlers);
   }
 
-  removeListener<TEventName extends keyof TEvents & string>(
+  removeListener<TEventName extends StringEventKey<TEvents>>(
     eventName: TEventName,
     handler: (...eventArg: TEvents[TEventName]) => void,
   ) {
-    this.emitter.removeListener(eventName, handler as any);
+    const handlers = this.listeners.get(eventName);
+    if (!handlers) {
+      return;
+    }
+    handlers.delete(handler as AnyListener);
+    if (handlers.size === 0) {
+      this.listeners.delete(eventName);
+    }
   }
 }

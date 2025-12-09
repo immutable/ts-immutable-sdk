@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
-import jwt_decode from 'jwt-decode';
 import { TokenPayload, PKCEData } from '../types';
+import { decodeJwtPayload } from '../utils/jwt';
 
 const KEY_PKCE_STATE = 'pkce_state';
 const KEY_PKCE_VERIFIER = 'pkce_verifier';
@@ -9,7 +9,7 @@ const validCredentialsMinTtlSec = 3600; // 1 hour
 export default class DeviceCredentialsManager {
   private isTokenValid(jwt: string): boolean {
     try {
-      const tokenPayload: TokenPayload = jwt_decode(jwt);
+      const tokenPayload: TokenPayload = decodeJwtPayload(jwt);
       const expiresAt = tokenPayload.exp ?? 0;
       const now = (Date.now() / 1000) + validCredentialsMinTtlSec;
       return expiresAt > now;

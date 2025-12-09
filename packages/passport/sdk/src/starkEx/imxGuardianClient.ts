@@ -1,9 +1,9 @@
-import axios from 'axios';
 import { Auth } from '@imtbl/auth';
 import { mr as MultiRollup } from '@imtbl/generated-clients';
 import { ConfirmationScreen, retryWithDelay } from '@imtbl/wallet';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { toUserImx } from '../utils/imxUser';
+import { getHttpStatus } from '../utils/httpError';
 
 const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmation but this functionality is not'
   + ' supported in this environment. Please contact Immutable support if you need to enable this feature.';
@@ -97,7 +97,7 @@ export class ImxGuardianClient {
         this.confirmationScreen.closeWindow();
       }
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 403) {
+      if (getHttpStatus(error) === 403) {
         throw new PassportError('Service unavailable', PassportErrorType.SERVICE_UNAVAILABLE_ERROR);
       }
       throw error;
