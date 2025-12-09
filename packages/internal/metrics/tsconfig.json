@@ -6,5 +6,5 @@
     "customConditions": ["development"]
   },
   "include": ["src"],
-  "exclude": ["dist", "jest.config.js", "node_modules"]
+  "exclude": ["dist", "jest.config.js", "node_modules", "src/**/*.test.ts"]
 }

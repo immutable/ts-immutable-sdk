@@ -1,13 +1,19 @@
 type StringEventKey<T> = Extract<keyof T, string>;
 
 type AnyListener = (...args: any[]) => void;
+type EventArgs<TEvents, TEventName extends keyof TEvents> =
+  TEvents[TEventName] extends readonly [...infer A]
+    ? [...A]
+    : TEvents[TEventName] extends readonly any[]
+      ? [...TEvents[TEventName]]
+      : [TEvents[TEventName]];
 
 export default class TypedEventEmitter<TEvents extends Record<string, any>> {
   private listeners = new Map<StringEventKey<TEvents>, Set<AnyListener>>();
 
   emit<TEventName extends StringEventKey<TEvents>>(
     eventName: TEventName,
-    ...eventArg: TEvents[TEventName]
+    ...eventArg: EventArgs<TEvents, TEventName>
   ) {
     const handlers = this.listeners.get(eventName);
     if (!handlers || handlers.size === 0) {
@@ -22,7 +28,7 @@ export default class TypedEventEmitter<TEvents extends Record<string, any>> {
 
   on<TEventName extends StringEventKey<TEvents>>(
     eventName: TEventName,
-    handler: (...eventArg: TEvents[TEventName]) => void,
+    handler: (...eventArg: EventArgs<TEvents, TEventName>) => void,
   ) {
     const handlers = this.listeners.get(eventName) ?? new Set<AnyListener>();
     handlers.add(handler as AnyListener);
@@ -31,7 +37,7 @@ export default class TypedEventEmitter<TEvents extends Record<string, any>> {
 
   removeListener<TEventName extends StringEventKey<TEvents>>(
     eventName: TEventName,
-    handler: (...eventArg: TEvents[TEventName]) => void,
+    handler: (...eventArg: EventArgs<TEvents, TEventName>) => void,
   ) {
     const handlers = this.listeners.get(eventName);
     if (!handlers) {
