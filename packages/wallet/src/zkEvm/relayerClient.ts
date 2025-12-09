@@ -1,4 +1,4 @@
-import { BytesLike, JsonRpcProvider } from 'ethers';
+import { PublicClient, Hex } from 'viem';
 import { Auth } from '@imtbl/auth';
 import { WalletConfiguration } from '../config';
 import { FeeOption, RelayerTransaction, TypedDataPayload } from './types';
@@ -6,7 +6,7 @@ import { getEip155ChainId } from './walletHelpers';
 
 export type RelayerClientInput = {
   config: WalletConfiguration,
-  rpcProvider: JsonRpcProvider,
+  rpcProvider: PublicClient,
   auth: Auth
 };
 
@@ -21,7 +21,7 @@ type EthSendTransactionRequest = {
   method: 'eth_sendTransaction';
   params: {
     to: string;
-    data: BytesLike;
+    data: Hex;
     chainId: string;
   }[];
 };
@@ -45,7 +45,7 @@ type ImGetFeeOptionsRequest = {
   method: 'im_getFeeOptions';
   params: {
     userAddress: string;
-    data: BytesLike;
+    data: Hex;
     chainId: string;
   }[];
 };
@@ -92,7 +92,7 @@ export type RelayerTransactionRequest =
 export class RelayerClient {
   private readonly config: WalletConfiguration;
 
-  private readonly rpcProvider: JsonRpcProvider;
+  private readonly rpcProvider: PublicClient;
 
   private readonly auth: Auth;
 
@@ -153,14 +153,14 @@ export class RelayerClient {
     return this.config.feeTokenSymbol;
   }
 
-  public async ethSendTransaction(to: string, data: BytesLike): Promise<string> {
-    const { chainId } = await this.rpcProvider.getNetwork();
+  public async ethSendTransaction(to: string, data: Hex): Promise<string> {
+    const chainId = await this.rpcProvider.getChainId();
     const payload: EthSendTransactionRequest = {
       method: 'eth_sendTransaction',
       params: [{
         to,
         data,
-        chainId: getEip155ChainId(Number(chainId)),
+        chainId: getEip155ChainId(chainId),
       }],
     };
     const { result } = await this.postToRelayer<EthSendTransactionResponse>(payload);
@@ -176,14 +176,14 @@ export class RelayerClient {
     return result;
   }
 
-  public async imGetFeeOptions(userAddress: string, data: BytesLike): Promise<FeeOption[] | undefined> {
-    const { chainId } = await this.rpcProvider.getNetwork();
+  public async imGetFeeOptions(userAddress: string, data: Hex): Promise<FeeOption[] | undefined> {
+    const chainId = await this.rpcProvider.getChainId();
     const payload: ImGetFeeOptionsRequest = {
       method: 'im_getFeeOptions',
       params: [{
         userAddress,
         data,
-        chainId: getEip155ChainId(Number(chainId)),
+        chainId: getEip155ChainId(chainId),
       }],
     };
     const { result } = await this.postToRelayer<ImGetFeeOptionsResponse>(payload);
@@ -191,13 +191,13 @@ export class RelayerClient {
   }
 
   public async imSignTypedData(address: string, eip712Payload: TypedDataPayload): Promise<string> {
-    const { chainId } = await this.rpcProvider.getNetwork();
+    const chainId = await this.rpcProvider.getChainId();
     const payload: ImSignTypedDataRequest = {
       method: 'im_signTypedData',
       params: [{
         address,
         eip712Payload,
-        chainId: getEip155ChainId(Number(chainId)),
+        chainId: getEip155ChainId(chainId),
       }],
     };
     const { result } = await this.postToRelayer<ImSignTypedDataResponse>(payload);
@@ -205,13 +205,13 @@ export class RelayerClient {
   }
 
   public async imSign(address: string, message: string): Promise<string> {
-    const { chainId } = await this.rpcProvider.getNetwork();
+    const chainId = await this.rpcProvider.getChainId();
     const payload: ImSignRequest = {
       method: 'im_sign',
       params: [{
         address,
         message,
-        chainId: getEip155ChainId(Number(chainId)),
+        chainId: getEip155ChainId(chainId),
       }],
     };
     const { result } = await this.postToRelayer<ImSignResponse>(payload);

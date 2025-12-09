@@ -1,9 +1,18 @@
 import {
-  BigNumberish, Contract, getBytes, hashMessage,
-  Interface, keccak256, Signer, solidityPacked, ZeroAddress,
-  TypedDataEncoder, JsonRpcProvider, AbiCoder,
-  isError,
-} from 'ethers';
+  encodeAbiParameters,
+  encodeFunctionData,
+  encodePacked,
+  getContract,
+  hashMessage,
+  keccak256,
+  toBytes,
+  zeroAddress,
+  type Address,
+  type PublicClient,
+  type TypedDataDomain,
+  hashTypedData,
+  BaseError,
+} from 'viem';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
 import {
   decodeSequenceSignatureV1,
@@ -11,62 +20,105 @@ import {
   walletContracts,
 } from './sequenceCompat';
 
+export interface Signer {
+  getAddress(): Promise<string>;
+  signMessage(message: string | Uint8Array): Promise<string>;
+}
+
 const SIGNATURE_WEIGHT = 1; // Weight of a single signature in the multi-sig
 const TRANSACTION_SIGNATURE_THRESHOLD = 1; // Total required weight in the multi-sig for a transaction
 const PACKED_SIGNATURE_THRESHOLD = 2; // Total required weight in the multi-sig for data signing
 
 const ETH_SIGN_FLAG = '02';
 const ETH_SIGN_PREFIX = '\x19\x01';
-const META_TRANSACTIONS_TYPE = `tuple(
-  bool delegateCall,
-  bool revertOnError,
-  uint256 gasLimit,
-  address target,
-  uint256 value,
-  bytes data
-)[]`;
 
 export const getNormalisedTransactions = (txs: MetaTransaction[]): MetaTransactionNormalised[] => txs.map((t) => ({
   delegateCall: t.delegateCall === true,
   revertOnError: t.revertOnError === true,
   gasLimit: t.gasLimit ?? BigInt(0),
-  target: t.to ?? ZeroAddress,
+  target: t.to ?? zeroAddress,
   value: t.value ?? BigInt(0),
   data: t.data ?? '0x',
 }));
 
 export const digestOfTransactionsAndNonce = (
-  nonce: BigNumberish,
+  nonce: bigint | number | string,
   normalisedTransactions: MetaTransactionNormalised[],
 ): string => {
-  const packMetaTransactionsNonceData = AbiCoder.defaultAbiCoder().encode(
-    ['uint256', META_TRANSACTIONS_TYPE],
-    [nonce, normalisedTransactions],
+  const nonceBigInt = BigInt(nonce);
+  const txs = normalisedTransactions.map((tx) => ({
+    delegateCall: tx.delegateCall,
+    revertOnError: tx.revertOnError,
+    gasLimit: BigInt(tx.gasLimit),
+    target: tx.target as Address,
+    value: BigInt(tx.value),
+    data: tx.data as `0x${string}`,
+  }));
+
+  const packMetaTransactionsNonceData = encodeAbiParameters(
+    [
+      { type: 'uint256' },
+      {
+        type: 'tuple[]',
+        components: [
+          { type: 'bool', name: 'delegateCall' },
+          { type: 'bool', name: 'revertOnError' },
+          { type: 'uint256', name: 'gasLimit' },
+          { type: 'address', name: 'target' },
+          { type: 'uint256', name: 'value' },
+          { type: 'bytes', name: 'data' },
+        ],
+      },
+    ],
+    [nonceBigInt, txs],
   );
   return keccak256(packMetaTransactionsNonceData);
 };
 
 export const encodedTransactions = (
   normalisedTransactions: MetaTransactionNormalised[],
-): string => AbiCoder.defaultAbiCoder().encode(
-  [META_TRANSACTIONS_TYPE],
-  [normalisedTransactions],
-);
+): string => {
+  const txs = normalisedTransactions.map((tx) => ({
+    delegateCall: tx.delegateCall,
+    revertOnError: tx.revertOnError,
+    gasLimit: BigInt(tx.gasLimit),
+    target: tx.target as Address,
+    value: BigInt(tx.value),
+    data: tx.data as `0x${string}`,
+  }));
+
+  return encodeAbiParameters(
+    [
+      {
+        type: 'tuple[]',
+        components: [
+          { type: 'bool', name: 'delegateCall' },
+          { type: 'bool', name: 'revertOnError' },
+          { type: 'uint256', name: 'gasLimit' },
+          { type: 'address', name: 'target' },
+          { type: 'uint256', name: 'value' },
+          { type: 'bytes', name: 'data' },
+        ],
+      },
+    ],
+    [txs],
+  );
+};
 
 /**
  * This helper function is used to coerce the type <BigNumber | undefined> to BigNumber for the
  * getNonce function above.
- * @param {BigNumber} nonceSpace - An unsigned 256 bit value that can be used to encode a nonce into a distinct space.
- * @returns {BigNumber} The passed in nonceSpace or instead initialises the nonce to 0.
+ * @param {bigint} nonceSpace - An unsigned 256 bit value that can be used to encode a nonce into a distinct space.
+ * @returns {bigint} The passed in nonceSpace or instead initialises the nonce to 0.
  */
 export const coerceNonceSpace = (nonceSpace?: bigint): bigint => nonceSpace || 0n;
 
 /**
  * This helper function is used to encode the nonce into a 256 bit value where the space is encoded into
  * the first 160 bits, and the nonce the remaining 96 bits.
- * @param {BigNumber} nonceSpace - An unsigned 256 bit value that can be used to encode a nonce into a distinct space.
- * @param nonce {BigNumber} nonce - Sequential number starting at 0, and incrementing in single steps e.g. 0,1,2,...
- * @returns {BigNumber} The encoded value where the space is left shifted 96 bits, and the nonce is in the first 96 bits.
+ * @param {bigint} nonceSpace - An unsigned 256 bit value that can be used to encode a nonce into a distinct space.
+ * @param nonce {bigint} nonce - Sequential number starting at 0, and incrementing in single steps e.g. 0,1,2,...
+ * @returns {bigint} The encoded value where the space is left shifted 96 bits, and the nonce is in the first 96 bits.
  */
 export const encodeNonce = (nonceSpace: bigint, nonce: bigint): bigint => {
   const shiftedSpace = BigInt(nonceSpace) * (2n ** 96n);
@@ -80,24 +132,27 @@ export const encodeNonce = (nonceSpace: bigint, nonce: bigint): bigint => {
  * contract wallet if required.
  */
 export const getNonce = async (
-  rpcProvider: JsonRpcProvider,
+  publicClient: PublicClient,
   smartContractWalletAddress: string,
   nonceSpace?: bigint,
 ): Promise<bigint> => {
   try {
-    const contract = new Contract(
-      smartContractWalletAddress,
-      walletContracts.mainModule.abi,
-      rpcProvider,
-    );
+    const contract = getContract({
+      address: smartContractWalletAddress as Address,
+      abi: walletContracts.mainModule.abi,
+      client: publicClient,
+    });
     const space: bigint = coerceNonceSpace(nonceSpace); // Default nonce space is 0
-    const result = await contract.readNonce(space);
+    // @ts-ignore
+    const result = await contract.read.readNonce([space]);
     if (typeof result === 'bigint') {
       return encodeNonce(space, result);
     }
     throw new Error('Unexpected result from contract.nonce() call.');
   } catch (error) {
-    if (isError(error, 'BAD_DATA')) {
+    // Check for BAD_DATA or similar error from viem/RPC
+    // In viem, errors usually come as BaseError or RpcError
+    if (error instanceof BaseError || (error as any).code === 'BAD_DATA') {
       // The most likely reason for a BAD_DATA error is that the smart contract wallet
       // has not been deployed yet, so we should default to a nonce of 0.
       return BigInt(0);
@@ -108,15 +163,15 @@ export const getNonce = async (
 };
 
 export const encodeMessageSubDigest = (chainId: bigint, walletAddress: string, digest: string): string => (
-  solidityPacked(
+  encodePacked(
     ['string', 'uint256', 'address', 'bytes32'],
-    [ETH_SIGN_PREFIX, chainId, walletAddress, digest],
+    [ETH_SIGN_PREFIX, chainId, walletAddress as Address, digest as `0x${string}`],
   )
 );
 
 export const signMetaTransactions = async (
   metaTransactions: MetaTransaction[],
-  nonce: BigNumberish,
+  nonce: bigint | number | string,
   chainId: bigint,
   walletAddress: string,
   signer: Signer,
@@ -127,10 +182,10 @@ export const signMetaTransactions = async (
   const digest = digestOfTransactionsAndNonce(nonce, normalisedMetaTransactions);
   const completePayload = encodeMessageSubDigest(chainId, walletAddress, digest);
 
-  const hash = keccak256(completePayload);
+  const hash = keccak256(completePayload as `0x${string}`);
 
   // Sign the digest
-  const hashArray = getBytes(hash);
+  const hashArray = toBytes(hash);
   const ethsigNoType = await signer.signMessage(hashArray);
   const signedDigest = `${ethsigNoType}${ETH_SIGN_FLAG}`;
 
@@ -149,12 +204,22 @@ export const signMetaTransactions = async (
   });
 
   // Encode the transaction;
-  const walletInterface = new Interface(walletContracts.mainModule.abi);
-  return walletInterface.encodeFunctionData(walletInterface.getFunction('execute') ?? '', [
-    normalisedMetaTransactions,
-    nonce,
-    encodedSignature,
-  ]);
+  return encodeFunctionData({
+    abi: walletContracts.mainModule.abi,
+    functionName: 'execute',
+    args: [
+      normalisedMetaTransactions.map((tx) => ({
+        delegateCall: tx.delegateCall,
+        revertOnError: tx.revertOnError,
+        gasLimit: BigInt(tx.gasLimit),
+        target: tx.target as Address,
+        value: BigInt(tx.value),
+        data: tx.data as `0x${string}`,
+      })),
+      BigInt(nonce),
+      encodedSignature as `0x${string}`,
+    ],
+  });
 };
 
 const decodeRelayerSignature = (relayerSignature: string) => {
@@ -207,19 +272,25 @@ export const signAndPackTypedData = async (
   walletAddress: string,
   signer: Signer,
 ): Promise<string> => {
-  // Ethers auto-generates the EIP712Domain type in the TypedDataEncoder, and so it needs to be removed
+  // Hash the EIP712 payload and generate the complete payload
+  // hashTypedData in viem expects specific types
   const types = { ...typedData.types };
   // @ts-ignore
   delete types.EIP712Domain;
 
-  // Hash the EIP712 payload and generate the complete payload
-  const typedDataHash = TypedDataEncoder.hash(typedData.domain, types, typedData.message);
+  const typedDataHash = hashTypedData({
+    domain: typedData.domain as TypedDataDomain,
+    types,
+    primaryType: typedData.primaryType,
+    message: typedData.message,
+  });
+
   const messageSubDigest = encodeMessageSubDigest(chainId, walletAddress, typedDataHash);
-  const hash = keccak256(messageSubDigest);
+  const hash = keccak256(messageSubDigest as `0x${string}`);
 
   // Sign the sub digest
   // https://github.com/immutable/wallet-contracts/blob/7824b5f24b2e0eb2dc465ecb5cd71f3984556b73/src/contracts/modules/commons/ModuleAuth.sol#L155
-  const hashArray = getBytes(hash);
+  const hashArray = toBytes(hash);
   const eoaSignature = await signer.signMessage(hashArray);
   const eoaAddress = await signer.getAddress();
 
@@ -237,8 +308,8 @@ export const signERC191Message = async (
 
   // Generate subDigest
   const subDigest = encodeMessageSubDigest(chainId, walletAddress, digest);
-  const subDigestHash = keccak256(subDigest);
-  const subDigestHashArray = getBytes(subDigestHash);
+  const subDigestHash = keccak256(subDigest as `0x${string}`);
+  const subDigestHashArray = toBytes(subDigestHash);
 
   return signer.signMessage(subDigestHashArray);
 };

@@ -2,7 +2,7 @@ import { Flow } from '@imtbl/metrics';
 import {
   Auth, TypedEventEmitter, type AuthEventMap,
 } from '@imtbl/auth';
-import { BigNumberish } from 'ethers';
+import { BigNumberish } from './zkEvm/types';
 import { JsonRpcError } from './zkEvm/JsonRpcError';
 
 // Re-export auth types for convenience

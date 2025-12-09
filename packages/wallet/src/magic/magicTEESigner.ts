@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise */
-import { AbstractSigner, Signer } from 'ethers';
 import { MagicTeeApiClients } from '@imtbl/generated-clients';
 import { Flow, trackDuration } from '@imtbl/metrics';
+import { toHex } from 'viem';
 import { WalletError, WalletErrorType } from '../errors';
 import { Auth } from '@imtbl/auth';
 import { withMetricsAsync } from '../utils/metrics';
@@ -14,11 +14,6 @@ interface UserWallet {
   userIdentifier: string;
   walletAddress: string;
 }
-
-const toHex = (bytes: Uint8Array): string => bytes.reduce(
-  (acc, byte) => `${acc}${byte.toString(16).padStart(2, '0')}`,
-  '',
-);
 
 const encodeUtf8 = (value: string): Uint8Array => {
   if (typeof TextEncoder !== 'undefined') {
@@ -58,7 +53,7 @@ const toBase64 = (value: string): string => {
   return output;
 };
 
-export default class MagicTEESigner extends AbstractSigner {
+export default class MagicTEESigner {
   private readonly auth: Auth;
 
   private readonly magicTeeApiClient: MagicTeeApiClients;
@@ -68,7 +63,6 @@ export default class MagicTEESigner extends AbstractSigner {
   private createWalletPromise: Promise<UserWallet> | null = null;
 
   constructor(auth: Auth, magicTeeApiClient: MagicTeeApiClients) {
-    super();
     this.auth = auth;
     this.magicTeeApiClient = magicTeeApiClient;
   }
@@ -234,20 +228,5 @@ export default class MagicTEESigner extends AbstractSigner {
         throw new Error(errorMessage);
       }
     }, 'magicSignMessage');
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  connect(): Signer {
-    throw new Error('Method not implemented.');
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  signTransaction(): Promise<string> {
-    throw new Error('Method not implemented.');
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  signTypedData(): Promise<string> {
-    throw new Error('Method not implemented.');
   }
 }

@@ -1,8 +1,8 @@
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
 import { Flow } from '@imtbl/metrics';
-import { Signer, JsonRpcProvider } from 'ethers';
-import { getEip155ChainId } from '../walletHelpers';
+import { PublicClient } from 'viem';
+import { getEip155ChainId, Signer } from '../walletHelpers';
 import { Auth } from '@imtbl/auth';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 
@@ -11,7 +11,7 @@ export type RegisterZkEvmUserInput = {
   ethSigner: Signer,
   multiRollupApiClients: MultiRollupApiClients,
   accessToken: string;
-  rpcProvider: JsonRpcProvider;
+  rpcProvider: PublicClient;
   flow: Flow;
 };
 
@@ -32,25 +32,25 @@ export async function registerZkEvmUser({
   const signRawPromise = signRaw(MESSAGE_TO_SIGN, ethSigner);
   signRawPromise.then(() => flow.addEvent('endSignRaw'));
 
-  const detectNetworkPromise = rpcProvider.getNetwork();
+  const detectNetworkPromise = rpcProvider.getChainId();
   detectNetworkPromise.then(() => flow.addEvent('endDetectNetwork'));
 
   const listChainsPromise = multiRollupApiClients.chainsApi.listChains();
   listChainsPromise.then(() => flow.addEvent('endListChains'));
 
-  const [ethereumAddress, ethereumSignature, network, chainListResponse] = await Promise.all([
+  const [ethereumAddress, ethereumSignature, chainId, chainListResponse] = await Promise.all([
     getAddressPromise,
     signRawPromise,
     detectNetworkPromise,
     listChainsPromise,
   ]);
 
-  const eipChainId = getEip155ChainId(Number(network.chainId));
+  const eipChainId = getEip155ChainId(Number(chainId));
   const chainName = chainListResponse.data?.result?.find((chain) => chain.id === eipChainId)?.name;
   if (!chainName) {
     throw new JsonRpcError(
       RpcErrorCode.INTERNAL_ERROR,
-      `Chain name does not exist on for chain id ${network.chainId}`,
+      `Chain name does not exist on for chain id ${chainId}`,
     );
   }
 

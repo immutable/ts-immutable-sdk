@@ -1,11 +1,11 @@
-import { getBytes, stripZerosLeft, toUtf8String } from 'ethers';
+import { trim, hexToString as viemHexToString } from 'viem';
 
 export const hexToString = (hex: string) => {
   if (!hex) return hex;
 
   try {
-    const stripped = stripZerosLeft(getBytes(hex));
-    return toUtf8String(stripped);
+    const trimmed = trim(hex as `0x${string}`);
+    return viemHexToString(trimmed);
   } catch (e) {
     return hex;
   }

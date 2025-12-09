@@ -1,6 +1,10 @@
 import BN from 'bn.js';
 import * as encUtils from 'enc-utils';
-import { Signer } from 'ethers';
+
+export interface Signer {
+  getAddress(): Promise<string>;
+  signMessage(message: string | Uint8Array): Promise<string>;
+}
 
 type SignatureOptions = {
   r: BN;

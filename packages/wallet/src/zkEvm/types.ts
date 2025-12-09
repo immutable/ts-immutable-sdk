@@ -1,5 +1,6 @@
-import { BigNumberish } from 'ethers';
 import { JsonRpcError } from './JsonRpcError';
+
+export type BigNumberish = string | number | bigint;
 
 export enum RelayerTransactionStatus {
   PENDING = 'PENDING',

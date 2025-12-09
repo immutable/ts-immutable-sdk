@@ -13,7 +13,6 @@ import {
   imx,
   ImxApiClients,
 } from '@imtbl/generated-clients';
-import { TransactionResponse } from 'ethers';
 import {
   Auth, AuthEventMap, AuthEvents, TypedEventEmitter, User,
 } from '@imtbl/auth';
@@ -303,7 +302,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
-  deposit(deposit: TokenAmount): Promise<TransactionResponse> {
+  deposit(deposit: TokenAmount): Promise<any> {
     throw new PassportError(
       'Operation not supported',
       PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
@@ -324,7 +323,7 @@ export class PassportImxProvider implements IMXProvider {
     starkPublicKey: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     token: AnyToken,
-  ): Promise<TransactionResponse> {
+  ): Promise<any> {
     throw new PassportError(
       'Operation not supported',
       PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,

@@ -1,14 +1,12 @@
 import { Flow } from '@imtbl/metrics';
-import {
-  Signer, TransactionRequest, JsonRpcProvider,
-  BigNumberish,
-} from 'ethers';
+import { PublicClient, Hex } from 'viem';
 import {
   getEip155ChainId,
   signMetaTransactions,
   encodedTransactions,
   getNormalisedTransactions,
   getNonce,
+  Signer,
 } from './walletHelpers';
 import { RelayerClient } from './relayerClient';
 import GuardianClient, { convertBigNumberishToString } from '../guardian';
@@ -16,6 +14,7 @@ import {
   FeeOption,
   MetaTransaction,
   RelayerTransactionStatus,
+  BigNumberish,
 } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
@@ -23,9 +22,26 @@ import { retryWithDelay } from '../network/retry';
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
 
+export interface TransactionRequest {
+  to?: string;
+  from?: string;
+  nonce?: BigNumberish;
+  gasLimit?: BigNumberish;
+  gasPrice?: BigNumberish;
+  data?: string;
+  value?: BigNumberish;
+  chainId?: BigNumberish;
+  type?: number;
+  accessList?: any;
+  maxPriorityFeePerGas?: BigNumberish;
+  maxFeePerGas?: BigNumberish;
+  customData?: Record<string, any>;
+  ccipReadEnabled?: boolean;
+}
+
 export type TransactionParams = {
   ethSigner: Signer;
-  rpcProvider: JsonRpcProvider;
+  rpcProvider: PublicClient;
   guardianClient: GuardianClient;
   relayerClient: RelayerClient;
   zkEvmAddress: string;
@@ -45,6 +61,8 @@ const getFeeOption = async (
   metaTransaction: MetaTransaction,
   walletAddress: string,
   relayerClient: RelayerClient,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _flow?: Flow,
 ): Promise<FeeOption> => {
   const normalisedMetaTransaction = getNormalisedTransactions([
     metaTransaction,
@@ -52,7 +70,7 @@ const getFeeOption = async (
   const transactions = encodedTransactions(normalisedMetaTransaction);
   const feeOptions = await relayerClient.imGetFeeOptions(
     walletAddress,
-    transactions,
+    transactions as Hex,
   );
 
   if (!feeOptions || !Array.isArray(feeOptions)) {
@@ -76,7 +94,7 @@ const getFeeOption = async (
  */
 const buildMetaTransactions = async (
   transactionRequest: TransactionRequest,
-  rpcProvider: JsonRpcProvider,
+  rpcProvider: PublicClient,
   relayerClient: RelayerClient,
   zkevmAddress: string,
   nonceSpace?: bigint,
@@ -178,7 +196,7 @@ export const prepareAndSignTransaction = async ({
   nonceSpace,
   isBackgroundTransaction,
 }: TransactionParams & { transactionRequest: TransactionRequest }) => {
-  const { chainId } = await rpcProvider.getNetwork();
+  const chainId = await rpcProvider.getChainId();
   const chainIdBigNumber = BigInt(chainId);
   flow.addEvent('endDetectNetwork');
 
@@ -227,7 +245,7 @@ export const prepareAndSignTransaction = async ({
     signTransaction(),
   ]);
 
-  const relayerId = await relayerClient.ethSendTransaction(zkEvmAddress, signedTransactions);
+  const relayerId = await relayerClient.ethSendTransaction(zkEvmAddress, signedTransactions as Hex);
   flow.addEvent('endRelayerSendTransaction');
 
   return { signedTransactions, relayerId, nonce };
@@ -260,7 +278,7 @@ const buildMetaTransactionForEjection = async (
   const metaTransaction: MetaTransaction = {
     to: transactionRequest.to.toString(),
     data: transactionRequest.data,
-    nonce: transactionRequest.nonce ?? undefined,
+    nonce: transactionRequest.nonce,
     value: transactionRequest.value,
     revertOnError: true,
   };

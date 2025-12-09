@@ -3,8 +3,11 @@ import {
   Flow, identify, trackError, trackFlow,
 } from '@imtbl/metrics';
 import {
-  JsonRpcProvider, Signer, toBeHex,
-} from 'ethers';
+  createPublicClient,
+  http,
+  toHex,
+  type PublicClient,
+} from 'viem';
 import {
   Provider,
   ProviderEvent,
@@ -24,7 +27,7 @@ import GuardianClient from '../guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
 import { personalSign } from './personalSign';
 import { trackSessionActivity } from './sessionActivity/sessionActivity';
-import { getNonce } from './walletHelpers';
+import { getNonce, Signer } from './walletHelpers';
 import { sendDeployTransactionAndPersonalSign } from './sendDeployTransactionAndPersonalSign';
 import { signEjectionTransaction } from './signEjectionTransaction';
 
@@ -60,7 +63,7 @@ export class ZkEvmProvider implements Provider {
 
   readonly #guardianClient: GuardianClient;
 
-  readonly #rpcProvider: JsonRpcProvider; // Used for read
+  readonly #rpcProvider: PublicClient; // Used for read
 
   readonly #multiRollupApiClients: MultiRollupApiClients;
 
@@ -87,9 +90,9 @@ export class ZkEvmProvider implements Provider {
     this.#sessionActivityApiUrl = sessionActivityApiUrl;
     this.#ethSigner = ethSigner;
 
-    // Create JsonRpcProvider for reading from the chain
-    this.#rpcProvider = new JsonRpcProvider(this.#config.zkEvmRpcUrl, undefined, {
-      staticNetwork: true,
+    // Create PublicClient for reading from the chain
+    this.#rpcProvider = createPublicClient({
+      transport: http(this.#config.zkEvmRpcUrl),
     });
 
     // Create RelayerClient for transaction submission
@@ -347,40 +350,43 @@ export class ZkEvmProvider implements Provider {
         }
       }
       case 'eth_chainId': {
-        // Call detect network to fetch the chainId so to take advantage of
-        // the caching layer provided by StaticJsonRpcProvider.
-        // In case Passport is changed from StaticJsonRpcProvider to a
-        // JsonRpcProvider, this function will still work as expected given
-        // that detectNetwork call _uncachedDetectNetwork which will force
-        // the provider to re-fetch the chainId from remote.
-        const { chainId } = await this.#rpcProvider.getNetwork();
-        return toBeHex(chainId);
+        const chainId = await this.#rpcProvider.getChainId();
+        return toHex(chainId);
       }
       // Pass through methods
       case 'eth_getBalance':
       case 'eth_getCode':
       case 'eth_getTransactionCount': {
         const [address, blockNumber] = request.params || [];
-        return this.#rpcProvider.send(request.method, [
-          address,
-          blockNumber || 'latest',
-        ]);
+        return this.#rpcProvider.request({
+          method: request.method,
+          params: [
+            address,
+            blockNumber || 'latest',
+          ],
+        });
       }
       case 'eth_getStorageAt': {
         const [address, storageSlot, blockNumber] = request.params || [];
-        return this.#rpcProvider.send(request.method, [
-          address,
-          storageSlot,
-          blockNumber || 'latest',
-        ]);
+        return this.#rpcProvider.request({
+          method: request.method,
+          params: [
+            address,
+            storageSlot,
+            blockNumber || 'latest',
+          ],
+        });
       }
       case 'eth_call':
       case 'eth_estimateGas': {
         const [transaction, blockNumber] = request.params || [];
-        return this.#rpcProvider.send(request.method, [
-          transaction,
-          blockNumber || 'latest',
-        ]);
+        return this.#rpcProvider.request({
+          method: request.method,
+          params: [
+            transaction,
+            blockNumber || 'latest',
+          ],
+        });
       }
       case 'eth_gasPrice':
       case 'eth_blockNumber':
@@ -388,7 +394,10 @@ export class ZkEvmProvider implements Provider {
       case 'eth_getBlockByNumber':
       case 'eth_getTransactionByHash':
       case 'eth_getTransactionReceipt': {
-        return this.#rpcProvider.send(request.method, request.params || []);
+        return this.#rpcProvider.request({
+          method: request.method,
+          params: request.params || [] as any,
+        });
       }
       case 'im_signEjectionTransaction': {
         const zkEvmAddress = await this.#getZkEvmAddress();

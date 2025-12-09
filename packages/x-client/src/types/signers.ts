@@ -1,6 +1,10 @@
-import { Signer as EthSigner } from 'ethers';
-
-export type { EthSigner };
+/**
+ * An abstraction of an Ethereum account, which can be used to sign messages and transactions
+ */
+export interface EthSigner {
+  getAddress(): Promise<string>;
+  signMessage(message: string | Uint8Array): Promise<string>;
+}
 
 /**
  * An abstraction of a Stark account, which can be used to sign messages and transactions on StarkEx to execute state changing operations

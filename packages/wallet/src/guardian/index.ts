@@ -1,9 +1,9 @@
 import * as GeneratedClients from '@imtbl/generated-clients';
-import { BigNumberish, ZeroAddress } from 'ethers';
+import { zeroAddress } from 'viem';
 import { Auth, IAuthConfiguration } from '@imtbl/auth';
 import ConfirmationScreen from '../confirmation/confirmation';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcError';
-import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
+import { MetaTransaction, TypedDataPayload, BigNumberish } from '../zkEvm/types';
 import { WalletConfiguration } from '../config';
 import { getEip155ChainId } from '../zkEvm/walletHelpers';
 import { WalletError, WalletErrorType } from '../errors';
@@ -48,7 +48,7 @@ const transformGuardianTransactions = (
       delegateCall: t.delegateCall === true,
       revertOnError: t.revertOnError === true,
       gasLimit: t.gasLimit ? convertBigNumberishToString(t.gasLimit) : '0',
-      target: t.to ?? ZeroAddress,
+      target: t.to ?? zeroAddress,
       value: t.value ? convertBigNumberishToString(t.value) : '0',
       data: t.data ? t.data.toString() : '0x',
     }));
