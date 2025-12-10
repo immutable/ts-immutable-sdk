@@ -7,8 +7,6 @@ import {
   UserManagerSettings,
   WebStorageStateStore,
 } from 'oidc-client-ts';
-import axios from 'axios';
-import jwt_decode from 'jwt-decode';
 import localForage from 'localforage';
 import {
   Detail,
@@ -35,6 +33,7 @@ import {
 import EmbeddedLoginPrompt from './login/embeddedLoginPrompt';
 import TypedEventEmitter from './utils/typedEventEmitter';
 import { withMetricsAsync } from './utils/metrics';
+import { decodeJwtPayload } from './utils/jwt';
 import DeviceCredentialsManager from './storage/device_credentials_manager';
 import { PassportError, PassportErrorType, withPassportError } from './errors';
 import logger from './utils/logger';
@@ -43,11 +42,37 @@ import LoginPopupOverlay from './overlay/loginPopupOverlay';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
 
 const LOGIN_POPUP_CLOSED_POLLING_DURATION = 500;
+const formUrlEncodedHeaders = {
+  'Content-Type': 'application/x-www-form-urlencoded',
+};
 
-const formUrlEncodedHeader = {
-  headers: {
-    'Content-Type': 'application/x-www-form-urlencoded',
-  },
+const parseJsonSafely = (text: string): unknown => {
+  if (!text) {
+    return undefined;
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    return undefined;
+  }
+};
+
+const extractTokenErrorMessage = (
+  payload: unknown,
+  fallbackText: string,
+  status: number,
+): string => {
+  if (payload && typeof payload === 'object') {
+    const data = payload as Record<string, unknown>;
+    const description = data.error_description ?? data.message ?? data.error;
+    if (typeof description === 'string' && description.trim().length > 0) {
+      return description;
+    }
+  }
+  if (fallbackText.trim().length > 0) {
+    return fallbackText;
+  }
+  return `Token request failed with status ${status}`;
 };
 
 const logoutEndpoint = '/v2/logout';
@@ -554,7 +579,7 @@ export class Auth {
     let passport: PassportMetadata | undefined;
     let username: string | undefined;
     if (oidcUser.id_token) {
-      const idTokenPayload = jwt_decode<IdTokenPayload>(oidcUser.id_token);
+      const idTokenPayload = decodeJwtPayload<IdTokenPayload>(oidcUser.id_token);
       passport = idTokenPayload?.passport;
       if (idTokenPayload?.username) {
         username = idTokenPayload?.username;
@@ -583,7 +608,7 @@ export class Auth {
   };
 
   private static mapDeviceTokenResponseToOidcUser = (tokenResponse: DeviceTokenResponse): OidcUser => {
-    const idTokenPayload: IdTokenPayload = jwt_decode(tokenResponse.id_token);
+    const idTokenPayload: IdTokenPayload = decodeJwtPayload(tokenResponse.id_token);
     return new OidcUser({
       id_token: tokenResponse.id_token,
       access_token: tokenResponse.access_token,
@@ -681,18 +706,39 @@ export class Auth {
   }
 
   private async getPKCEToken(authorizationCode: string, codeVerifier: string): Promise<DeviceTokenResponse> {
-    const response = await axios.post<DeviceTokenResponse>(
+    const response = await fetch(
       `${this.config.authenticationDomain}/oauth/token`,
       {
-        client_id: this.config.oidcConfiguration.clientId,
-        grant_type: 'authorization_code',
-        code_verifier: codeVerifier,
-        code: authorizationCode,
-        redirect_uri: this.config.oidcConfiguration.redirectUri,
+        method: 'POST',
+        headers: formUrlEncodedHeaders,
+        body: new URLSearchParams({
+          client_id: this.config.oidcConfiguration.clientId,
+          grant_type: 'authorization_code',
+          code_verifier: codeVerifier,
+          code: authorizationCode,
+          redirect_uri: this.config.oidcConfiguration.redirectUri,
+        }),
       },
-      formUrlEncodedHeader,
     );
-    return response.data;
+
+    const responseText = await response.text();
+    const parsedBody = parseJsonSafely(responseText);
+
+    if (!response.ok) {
+      throw new Error(
+        extractTokenErrorMessage(
+          parsedBody,
+          responseText,
+          response.status,
+        ),
+      );
+    }
+
+    if (!parsedBody || typeof parsedBody !== 'object') {
+      throw new Error('Token endpoint returned an invalid response');
+    }
+
+    return parsedBody as DeviceTokenResponse;
   }
 
   private async storeTokensInternal(tokenResponse: DeviceTokenResponse): Promise<User> {

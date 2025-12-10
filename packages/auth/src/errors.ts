@@ -1,4 +1,3 @@
-import { isAxiosError } from 'axios';
 import { imx } from '@imtbl/generated-clients';
 
 export enum PassportErrorType {
@@ -35,6 +34,31 @@ export function isAPIError(error: any): error is imx.APIError {
   );
 }
 
+type AxiosLikeError = {
+  response?: {
+    data?: unknown;
+  };
+};
+
+const extractApiError = (error: unknown): imx.APIError | undefined => {
+  if (isAPIError(error)) {
+    return error;
+  }
+
+  if (
+    typeof error === 'object'
+    && error !== null
+    && 'response' in error
+  ) {
+    const { response } = error as AxiosLikeError;
+    if (response?.data && isAPIError(response.data)) {
+      return response.data;
+    }
+  }
+
+  return undefined;
+};
+
 export class PassportError extends Error {
   public type: PassportErrorType;
 
@@ -57,8 +81,9 @@ export const withPassportError = async <T>(
       throw new PassportError(error.message, error.type);
     }
 
-    if (isAxiosError(error) && error.response?.data && isAPIError(error.response.data)) {
-      errorMessage = error.response.data.message;
+    const apiError = extractApiError(error);
+    if (apiError) {
+      errorMessage = apiError.message;
     } else {
       errorMessage = (error as Error).message;
     }

@@ -2,10 +2,6 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { Passport } from './Passport';
 import { PassportError, PassportErrorType } from './errors/passportError';
 
-jest.mock('axios', () => ({
-  isAxiosError: (error: any) => Boolean(error?.isAxiosError),
-}));
-
 const mockAuthInstances: any[] = [];
 
 jest.mock('@imtbl/auth', () => {
@@ -358,8 +354,7 @@ describe('Passport', () => {
         profile: { sub: 'user' },
         accessToken: 'token',
       });
-      const error = new Error('axios error') as Error & { isAxiosError?: boolean; response?: any };
-      error.isAxiosError = true;
+      const error = new Error('http error') as Error & { response?: any };
       error.response = { data: { code: 'ALREADY_LINKED', message: 'oops' } };
       multiRollup.passportProfileApi.linkWalletV2.mockRejectedValue(error);
 

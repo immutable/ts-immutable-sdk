@@ -32,3 +32,5 @@ export { default as TypedEventEmitter } from './utils/typedEventEmitter';
 export {
   PassportError, PassportErrorType, withPassportError, isAPIError,
 } from './errors';
+
+export { decodeJwtPayload } from './utils/jwt';

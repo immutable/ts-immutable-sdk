@@ -9,12 +9,10 @@
     "@imtbl/generated-clients": "workspace:*",
     "@imtbl/toolkit": "workspace:*",
     "@imtbl/x-client": "workspace:*",
-    "@magic-ext/oidc": "12.0.5",
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
     "enc-utils": "^3.0.0",
     "ethers": "^6.13.4",
-    "magic-sdk": "^29.0.5",
     "oidc-client-ts": "3.4.1"
   },
   "devDependencies": {

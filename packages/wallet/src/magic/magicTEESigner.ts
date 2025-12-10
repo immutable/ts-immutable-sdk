@@ -1,11 +1,12 @@
+/* eslint-disable no-bitwise */
 import { AbstractSigner, Signer } from 'ethers';
 import { MagicTeeApiClients } from '@imtbl/generated-clients';
-import { isAxiosError } from 'axios';
 import { Flow, trackDuration } from '@imtbl/metrics';
 import { WalletError, WalletErrorType } from '../errors';
 import { Auth } from '@imtbl/auth';
 import { withMetricsAsync } from '../utils/metrics';
 import { isUserZkEvm, User } from '../types';
+import { isAxiosError } from '../utils/http';
 
 const CHAIN_IDENTIFIER = 'ETH';
 
@@ -13,6 +14,49 @@ interface UserWallet {
   userIdentifier: string;
   walletAddress: string;
 }
+
+const toHex = (bytes: Uint8Array): string => bytes.reduce(
+  (acc, byte) => `${acc}${byte.toString(16).padStart(2, '0')}`,
+  '',
+);
+
+const encodeUtf8 = (value: string): Uint8Array => {
+  if (typeof TextEncoder !== 'undefined') {
+    return new TextEncoder().encode(value);
+  }
+
+  const utf8 = unescape(encodeURIComponent(value));
+  const bytes = new Uint8Array(utf8.length);
+  for (let i = 0; i < utf8.length; i += 1) {
+    bytes[i] = utf8.charCodeAt(i);
+  }
+  return bytes;
+};
+
+const toBase64 = (value: string): string => {
+  const bytes = encodeUtf8(value);
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  let output = '';
+
+  for (let i = 0; i < bytes.length; i += 3) {
+    const byte1 = bytes[i];
+    const byte2 = bytes[i + 1];
+    const byte3 = bytes[i + 2];
+
+    const triplet = (byte1 << 16) | ((byte2 ?? 0) << 8) | (byte3 ?? 0);
+
+    const enc1 = (triplet >> 18) & 0x3f;
+    const enc2 = (triplet >> 12) & 0x3f;
+    const enc3 = (triplet >> 6) & 0x3f;
+    const enc4 = triplet & 0x3f;
+
+    output += alphabet[enc1] + alphabet[enc2];
+    output += Number.isFinite(byte2) ? alphabet[enc3] : '=';
+    output += Number.isFinite(byte3) ? alphabet[enc4] : '=';
+  }
+
+  return output;
+};
 
 export default class MagicTEESigner extends AbstractSigner {
   private readonly auth: Auth;
@@ -150,19 +194,22 @@ export default class MagicTEESigner extends AbstractSigner {
     // as this is a prerequisite for signing messages.
     await this.getUserWallet();
 
-    const messageToSign = message instanceof Uint8Array ? `0x${Buffer.from(message).toString('hex')}` : message;
+    const messageToSign = message instanceof Uint8Array ? `0x${toHex(message)}` : message;
     const user = await this.getUserOrThrow();
     const headers = await MagicTEESigner.getHeaders(user);
 
     return withMetricsAsync(async (flow: Flow) => {
       try {
         const startTime = performance.now();
-        const response = await this.magicTeeApiClient.signOperationsApi.signMessageV1WalletSignMessagePost({
-          signMessageRequest: {
-            message_base64: Buffer.from(messageToSign, 'utf-8').toString('base64'),
+        const response = await this.magicTeeApiClient.signOperationsApi.signMessageV1WalletSignMessagePost(
+          {
+            signMessageRequest: {
+              message_base64: toBase64(messageToSign),
+            },
+            xMagicChain: CHAIN_IDENTIFIER,
           },
-          xMagicChain: CHAIN_IDENTIFIER,
-        }, { headers });
+          { headers },
+        );
 
         trackDuration(
           'passport',

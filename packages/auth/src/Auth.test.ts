@@ -1,7 +1,7 @@
 import { Auth } from './Auth';
 import { AuthEvents, User } from './types';
 import { withMetricsAsync } from './utils/metrics';
-import jwt_decode from 'jwt-decode';
+import { decodeJwtPayload } from './utils/jwt';
 
 const trackFlowMock = jest.fn();
 const trackErrorMock = jest.fn();
@@ -18,7 +18,9 @@ jest.mock('@imtbl/metrics', () => ({
   getDetail: (...args: any[]) => getDetailMock(...args),
 }));
 
-jest.mock('jwt-decode', () => jest.fn());
+jest.mock('./utils/jwt', () => ({
+  decodeJwtPayload: jest.fn(),
+}));
 
 beforeEach(() => {
   trackFlowMock.mockReset();
@@ -26,7 +28,7 @@ beforeEach(() => {
   identifyMock.mockReset();
   trackMock.mockReset();
   getDetailMock.mockReset();
-  (jwt_decode as jest.Mock).mockReset();
+  (decodeJwtPayload as jest.Mock).mockReset();
 });
 
 describe('withMetricsAsync', () => {
@@ -145,14 +147,14 @@ describe('Auth', () => {
         profile: { sub: 'user-123', email: 'test@example.com', nickname: 'tester' },
       };
 
-      (jwt_decode as jest.Mock).mockReturnValue({
+      (decodeJwtPayload as jest.Mock).mockReturnValue({
         username: 'username123',
         passport: undefined,
       });
 
       const result = (Auth as any).mapOidcUserToDomainModel(mockOidcUser);
 
-      expect(jwt_decode).toHaveBeenCalledWith('token');
+      expect(decodeJwtPayload).toHaveBeenCalledWith('token');
       expect(result.profile.username).toEqual('username123');
     });
 
@@ -165,7 +167,7 @@ describe('Auth', () => {
         expires_in: 3600,
       };
 
-      (jwt_decode as jest.Mock).mockReturnValue({
+      (decodeJwtPayload as jest.Mock).mockReturnValue({
         sub: 'user-123',
         iss: 'issuer',
         aud: 'audience',
@@ -179,7 +181,7 @@ describe('Auth', () => {
 
       const oidcUser = (Auth as any).mapDeviceTokenResponseToOidcUser(tokenResponse);
 
-      expect(jwt_decode).toHaveBeenCalledWith('token');
+      expect(decodeJwtPayload).toHaveBeenCalledWith('token');
       expect(oidcUser.profile.username).toEqual('username123');
     });
   });
