@@ -1,10 +1,10 @@
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { signRaw } from '@imtbl/toolkit';
 import { Flow } from '@imtbl/metrics';
 import { PublicClient } from 'viem';
 import { getEip155ChainId, Signer } from '../walletHelpers';
 import { Auth } from '@imtbl/auth';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
+import { signRaw } from '../../utils/crypto';
 
 export type RegisterZkEvmUserInput = {
   auth: Auth;

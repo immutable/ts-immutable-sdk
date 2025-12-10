@@ -14,6 +14,9 @@ import { getStarkPublicKeyFromImx } from './getStarkPublicKeyFromImx';
 export interface Signer {
   getAddress(): Promise<string>;
   signMessage(message: string | Uint8Array): Promise<string>;
+  provider?: {
+    getNetwork: () => Promise<{ chainId: number }>;
+  };
 }
 
 const { curves, ec } = elliptic;

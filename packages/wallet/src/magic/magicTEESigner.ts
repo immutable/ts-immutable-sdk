@@ -188,7 +188,7 @@ export default class MagicTEESigner {
     // as this is a prerequisite for signing messages.
     await this.getUserWallet();
 
-    const messageToSign = message instanceof Uint8Array ? `0x${toHex(message)}` : message;
+    const messageToSign = typeof message === 'string' ? message : toHex(message);
     const user = await this.getUserOrThrow();
     const headers = await MagicTEESigner.getHeaders(user);
 

@@ -1,9 +1,10 @@
 import { imx } from '@imtbl/generated-clients';
 import {
   Contracts,
-  EthSigner,
+  // EthSigner,
   // StarkSigner,
 } from '@imtbl/x-client';
+import { Signer as EthSigner } from 'ethers';
 import { signRaw } from '@imtbl/toolkit';
 import { isAxiosError } from 'axios';
 import { Signers } from './types';

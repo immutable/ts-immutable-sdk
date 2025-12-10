@@ -37,7 +37,6 @@
     "@imtbl/auth": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
     "@imtbl/metrics": "workspace:*",
-    "@imtbl/toolkit": "workspace:*",
     "viem": "^2.7.13"
   },
   "devDependencies": {

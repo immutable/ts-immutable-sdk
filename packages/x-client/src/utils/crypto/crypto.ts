@@ -3,8 +3,8 @@ import BN from 'bn.js';
 // @ts-ignore
 import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
-import { Signer, solidityPackedKeccak256 } from 'ethers';
-import { StarkSigner } from '../../types';
+import { solidityPackedKeccak256 } from 'ethers';
+import { StarkSigner, EthSigner } from '../../types';
 import { starkEcOrder } from '../stark/starkCurve';
 
 type SignatureOptions = {
@@ -25,11 +25,11 @@ function serializeEthSignature(sig: SignatureOptions): string {
 }
 
 function importRecoveryParam(v: string): number | undefined {
-  // eslint-disable-next-line no-nested-ternary
+  const isValidBigNumber = new BN(v, 16).cmp(new BN(27)) !== -1
+    ? new BN(v, 16).sub(new BN(27)).toNumber()
+    : new BN(v, 16).toNumber();
   return v.trim()
-    ? new BN(v, 16).cmp(new BN(27)) !== -1
-      ? new BN(v, 16).sub(new BN(27)).toNumber()
-      : new BN(v, 16).toNumber()
+    ? isValidBigNumber
     : undefined;
 }
 
@@ -46,7 +46,7 @@ function deserializeSignature(sig: string, size = 64): SignatureOptions {
 
 export async function signRaw(
   payload: string,
-  signer: Signer,
+  signer: EthSigner,
 ): Promise<string> {
   const signature = deserializeSignature(await signer.signMessage(payload));
   return serializeEthSignature(signature);
@@ -58,7 +58,7 @@ type IMXAuthorisationHeaders = {
 };
 
 export async function generateIMXAuthorisationHeaders(
-  ethSigner: Signer,
+  ethSigner: EthSigner,
 ): Promise<IMXAuthorisationHeaders> {
   const timestamp = Math.floor(Date.now() / 1000).toString();
   const signature = await signRaw(timestamp, ethSigner);
@@ -71,7 +71,7 @@ export async function generateIMXAuthorisationHeaders(
 
 export async function signMessage(
   message: string,
-  signer: Signer,
+  signer: EthSigner,
 ): Promise<{ message: string; ethAddress: string; ethSignature: string }> {
   const ethAddress = await signer.getAddress();
   const ethSignature = await signRaw(message, signer);

@@ -3,9 +3,9 @@ import {
   Contracts,
   ERC20Amount,
   EthConfiguration,
-  EthSigner,
+  // EthSigner,
 } from '@imtbl/x-client';
-import { parseUnits, TransactionResponse } from 'ethers';
+import { parseUnits, TransactionResponse, Signer as EthSigner } from 'ethers';
 import { validateChain } from '../helpers';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';

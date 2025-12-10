@@ -1,5 +1,4 @@
 /* eslint-disable max-len */
-// eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
 import { Wallet } from 'ethers';
 import * as encUtils from 'enc-utils';
@@ -19,7 +18,8 @@ describe('Key generation', () => {
     const signer = new Wallet(
       '5c7b4b5cad9a3fc7b1ba235a49cd74e615488a18b0d6a531739fd1062935104d',
     );
-    const starkKey = await generateLegacyStarkPrivateKey(signer);
+    const starkKey = await generateLegacyStarkPrivateKey(signer as unknown as any);
+    // @ts-ignore
     expect(starkKey).toEqual(
       '0556413893a023efd75f62cd4eca825f2be7e918b5188f1db06cbec12d7d1b88',
     );
@@ -120,7 +120,7 @@ describe('Key generation', () => {
         );
 
         const signer = new Wallet(test.privateKey);
-        const starkKey = await generateLegacyStarkPrivateKey(signer);
+        const starkKey = await generateLegacyStarkPrivateKey(signer as unknown as any);
         const starkPublicKey = await createStarkSigner(starkKey).getAddress();
         const starkPublicKeyBN = new BN(
           encUtils.removeHexPrefix(starkPublicKey),

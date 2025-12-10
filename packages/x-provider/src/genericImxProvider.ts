@@ -1,7 +1,7 @@
 import { imx } from '@imtbl/generated-clients';
 import {
   AnyToken,
-  EthSigner,
+  // EthSigner,
   UnsignedOrderRequest,
   UnsignedExchangeTransferRequest,
   GetSignableCancelOrderRequest,
@@ -12,7 +12,7 @@ import {
   TokenAmount,
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
-import { TransactionResponse } from 'ethers';
+import { TransactionResponse, Signer as EthSigner } from 'ethers';
 import { ProviderConfiguration } from './config';
 import { IMXProvider } from './imxProvider';
 import { Signers } from './signable-actions/types';

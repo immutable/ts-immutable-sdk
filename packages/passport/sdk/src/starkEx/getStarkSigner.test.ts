@@ -19,6 +19,7 @@ describe('getStarkSigner', () => {
     (generateLegacyStarkPrivateKey as jest.Mock).mockReturnValue(privKey);
     (createStarkSigner as jest.Mock).mockReturnValue(starkSigner);
 
+    // @ts-ignore
     const result = await getStarkSigner(wallet);
 
     expect(generateLegacyStarkPrivateKey).toHaveBeenCalledWith(wallet);
@@ -32,6 +33,7 @@ describe('getStarkSigner', () => {
       throw new Error(errorMessage);
     });
     await expect(async () => {
+      // @ts-ignore
       await getStarkSigner(wallet);
     }).rejects.toThrow(
       new PassportError(

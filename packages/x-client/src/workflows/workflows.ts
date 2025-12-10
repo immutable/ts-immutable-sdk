@@ -1,5 +1,4 @@
 import axios, { AxiosResponse } from 'axios';
-import { Signer } from 'ethers';
 import {
   CollectionsApi,
   ExchangesApi,
@@ -67,7 +66,14 @@ export class Workflows {
     this.projectsApi = projectsApi;
   }
 
-  private async validateChain(signer: Signer) {
+  private async validateChain(signer: EthSigner) {
+    // @ts-ignore
+    if (typeof signer.provider?.getNetwork !== 'function') {
+      // If the signer doesn't have a provider with getNetwork, we can't validate the chain.
+      // This is expected for some custom signers.
+      return;
+    }
+    // @ts-ignore
     const chainID = (await signer.provider?.getNetwork())?.chainId;
 
     if (!this.isChainValid(Number(chainID))) {
@@ -84,7 +90,7 @@ export class Workflows {
     return axios.get('/starkex-contract-version', options);
   }
 
-  public async mint(signer: Signer, request: UnsignedMintRequest) {
+  public async mint(signer: EthSigner, request: UnsignedMintRequest) {
     await this.validateChain(signer);
 
     return mintingWorkflow(signer, request, this.mintsApi);
@@ -97,7 +103,8 @@ export class Workflows {
     await this.validateChain(walletConnection.ethSigner);
 
     return exchangeTransfersWorkflow({
-      ...walletConnection,
+      ethSigner: walletConnection.ethSigner,
+      starkSigner: walletConnection.starkSigner,
       request,
       exchangesApi: this.exchangesApi,
     });

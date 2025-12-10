@@ -2,10 +2,10 @@ import { imx } from '@imtbl/generated-clients';
 import {
   Contracts,
   ERC721Token,
-  EthSigner,
+  // EthSigner,
   ImmutableXConfiguration,
 } from '@imtbl/x-client';
-import { TransactionResponse } from 'ethers';
+import { TransactionResponse, Signer as EthSigner } from 'ethers';
 import { validateChain } from '../helpers';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
