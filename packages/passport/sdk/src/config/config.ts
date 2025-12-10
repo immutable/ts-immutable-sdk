@@ -54,6 +54,8 @@ export class PassportConfiguration {
 
   readonly sequenceIdentityInstrumentEndpoint: string;
 
+  readonly sequenceGuardEndpoint: string;
+
   readonly multiRollupConfig: MultiRollupAPIConfiguration;
 
   readonly crossSdkBridgeEnabled: boolean;
@@ -110,6 +112,7 @@ export class PassportConfiguration {
       this.relayerUrl = overrides.relayerUrl;
       this.sequenceIdentityInstrumentEndpoint = overrides.sequenceIdentityInstrumentEndpoint;
       this.sequenceProjectAccessKey = overrides.sequenceProjectAccessKey;
+      this.sequenceGuardEndpoint = overrides.sequenceGuardEndpoint;
       this.multiRollupConfig = {
         indexer: createConfig({
           basePath: overrides.indexerMrBasePath,
@@ -133,6 +136,7 @@ export class PassportConfiguration {
           this.relayerUrl = 'https://api.immutable.com/relayer-mr';
           this.sequenceIdentityInstrumentEndpoint = 'https://next-identity.sequence.app/';
           this.sequenceProjectAccessKey = 'AQAAAAAAAAB5QznGqk9paa4EQjom09ERpJs';
+          this.sequenceGuardEndpoint = 'https://guard.sequence.app';
           this.multiRollupConfig = multiRollupConfig.getProduction();
           break;
         }
@@ -147,6 +151,7 @@ export class PassportConfiguration {
           this.relayerUrl = 'http://localhost:8073/relayer-mr';
           this.sequenceIdentityInstrumentEndpoint = 'https://next-identity.sequence-dev.app/';
           this.sequenceProjectAccessKey = 'AQAAAAAAAAB5QznGqk9paa4EQjom09ERpJs';
+          this.sequenceGuardEndpoint = 'https://guard.sequence.app';
           this.multiRollupConfig = multiRollupConfig.getSandbox();
           break;
         }

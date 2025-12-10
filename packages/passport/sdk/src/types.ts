@@ -98,6 +98,7 @@ export interface PassportOverrides {
   relayerUrl: string;
   sequenceIdentityInstrumentEndpoint: string;
   sequenceProjectAccessKey: string;
+  sequenceGuardEndpoint: string;
   indexerMrBasePath: string;
   orderBookMrBasePath: string;
   passportMrBasePath: string;

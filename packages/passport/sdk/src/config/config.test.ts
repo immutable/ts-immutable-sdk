@@ -32,7 +32,8 @@ describe('Config', () => {
     orderBookMrBasePath: 'orderBookMrBasePath123',
     passportMrBasePath: 'passportMrBasePath123',
     sequenceIdentityInstrumentEndpoint: 'sequenceIdentityInstrumentEndpoint123',
-    sequenceProjectAccessKey: 'sequenceProjectAccessKey123'
+    sequenceProjectAccessKey: 'sequenceProjectAccessKey123',
+    sequenceGuardEndpoint: 'sequenceGuardEndpoint123'
   };
 
   const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };

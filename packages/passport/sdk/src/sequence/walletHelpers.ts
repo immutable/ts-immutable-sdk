@@ -1,11 +1,7 @@
-import { walletContracts } from '@0xsequence/abi';
-import { Payload, Signature } from '@0xsequence/wallet-primitives';
-import { Bytes, Address, Abi, AbiFunction, Hex, Provider } from 'ox';
+import { Address, Abi, AbiFunction, Provider } from 'ox';
 import { BigNumberish } from 'ethers';
-import SequenceSigner from './sequenceSigner';
 
 const READ_NONCE = Abi.from(['function readNonce(uint256 _space) external view returns (uint256)'])[0]
-const SIGNATURE_WEIGHT = 1;
 
 export const isWalletDeployed = async (
   rpcProvider: Provider.Provider,
@@ -27,6 +23,11 @@ export const getNonce = async (
   nonceSpace?: bigint,
 ): Promise<bigint> => {
   const rawSpace = nonceSpace ? (nonceSpace >> 96n) : 0n;
+
+  const deployed = await isWalletDeployed(rpcProvider, walletAddress);
+  if (!deployed) {
+    return encodeNonce(rawSpace, 0n);
+  }
   
   const callData = AbiFunction.encodeData(READ_NONCE, [rawSpace]);
   
@@ -42,6 +43,7 @@ export const getNonce = async (
   });
   
   const nonce = AbiFunction.decodeResult(READ_NONCE, result);
+
   return encodeNonce(rawSpace, nonce);
 };
 

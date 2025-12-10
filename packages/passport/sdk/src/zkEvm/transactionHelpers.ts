@@ -221,8 +221,8 @@ export const prepareAndSignTransaction = async ({
     return signed;
   };
 
-  const [signedTransactions] = await Promise.all([
-    // validateTransaction(),
+  const [, signedTransactions] = await Promise.all([
+    validateTransaction(),
     signTransaction(),
   ]);
 

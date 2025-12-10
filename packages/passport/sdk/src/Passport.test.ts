@@ -129,6 +129,7 @@ describe('Passport', () => {
             immutableXClient,
             sequenceIdentityInstrumentEndpoint: 'sequenceIdentityInstrumentEndpoint123',
             sequenceProjectAccessKey: 'sequenceProjectAccessKey123',
+            sequenceGuardEndpoint: 'sequenceGuardEndpoint123',
           },
           ...oidcConfiguration,
         });
