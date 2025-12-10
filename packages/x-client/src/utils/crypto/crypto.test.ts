@@ -1,5 +1,4 @@
 import { getDefaultProvider, Wallet } from 'ethers';
-// @ts-ignore
 import { signMessage, signRaw, signRegisterEthAddress } from './crypto';
 import { generateLegacyStarkPrivateKey } from '../stark/starkCurve';
 import { createStarkSigner } from '../stark/starkSigner';
@@ -42,7 +41,7 @@ describe('signMessage()', () => {
 describe('signRegisterEthAddress()', () => {
   test('Correctly signs message', async () => {
     const signer = new Wallet('5c7b4b5cad9a3fc7b1ba235a49cd74e615488a18b0d6a531739fd1062935104d');
-    const starkKey = await generateLegacyStarkPrivateKey(signer as unknown as any);
+    const starkKey = await generateLegacyStarkPrivateKey(signer);
     const starkSigner = createStarkSigner(starkKey);
     const starkPublicKey = await createStarkSigner(starkKey).getAddress();
     const ethSignature = await signRegisterEthAddress(starkSigner, await signer.getAddress(), starkPublicKey);

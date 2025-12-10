@@ -2,10 +2,10 @@ import { imx } from '@imtbl/generated-clients';
 import {
   Contracts,
   ETHAmount,
-  // EthSigner,
+  EthSigner,
   ImmutableXConfiguration,
 } from '@imtbl/x-client';
-import { parseUnits, TransactionResponse, Signer as EthSigner } from 'ethers';
+import { parseUnits, TransactionResponse } from 'ethers';
 import { validateChain } from '../helpers';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';

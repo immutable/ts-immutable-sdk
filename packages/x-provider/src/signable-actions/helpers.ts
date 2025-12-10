@@ -1,5 +1,4 @@
-import { ImmutableXConfiguration } from '@imtbl/x-client';
-import { Signer as EthSigner } from 'ethers';
+import { EthSigner, ImmutableXConfiguration } from '@imtbl/x-client';
 
 function isChainValid(chainID: number, config: ImmutableXConfiguration) {
   return chainID === config.ethConfiguration.chainID;

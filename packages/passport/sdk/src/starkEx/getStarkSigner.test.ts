@@ -19,7 +19,7 @@ describe('getStarkSigner', () => {
     (generateLegacyStarkPrivateKey as jest.Mock).mockReturnValue(privKey);
     (createStarkSigner as jest.Mock).mockReturnValue(starkSigner);
 
-    // @ts-ignore
+    // @ts-ignore - wallet is used as a mock for MagicTEESigner
     const result = await getStarkSigner(wallet);
 
     expect(generateLegacyStarkPrivateKey).toHaveBeenCalledWith(wallet);
@@ -33,7 +33,7 @@ describe('getStarkSigner', () => {
       throw new Error(errorMessage);
     });
     await expect(async () => {
-      // @ts-ignore
+      // @ts-ignore - wallet is used as a mock for MagicTEESigner
       await getStarkSigner(wallet);
     }).rejects.toThrow(
       new PassportError(

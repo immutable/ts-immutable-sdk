@@ -1,7 +1,7 @@
 import { ImxApiClients, imx } from '@imtbl/generated-clients';
 import { EthSigner, StarkSigner } from '@imtbl/x-client';
 import { Auth, User } from '@imtbl/auth';
-import { retryWithDelay } from '@imtbl/wallet';
+import { retryWithDelay, MagicTEESigner } from '@imtbl/wallet';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { toUserImx } from '../../utils/imxUser';
 import registerPassportStarkEx from './registration';
@@ -25,7 +25,8 @@ async function forceUserRefresh(auth: Auth) {
 }
 
 export default async function registerOffchain(
-  userAdminKeySigner: EthSigner,
+  // MagicTEESigner implements getAddress and signMessage which is all that's needed
+  userAdminKeySigner: MagicTEESigner,
   starkSigner: StarkSigner,
   unregisteredUser: User,
   auth: Auth,
@@ -35,7 +36,8 @@ export default async function registerOffchain(
     try {
       const response = await registerPassportStarkEx(
         {
-          ethSigner: userAdminKeySigner,
+          // Cast to EthSigner - MagicTEESigner implements the required methods
+          ethSigner: userAdminKeySigner as unknown as EthSigner,
           starkSigner,
           imxApiClients,
         },
