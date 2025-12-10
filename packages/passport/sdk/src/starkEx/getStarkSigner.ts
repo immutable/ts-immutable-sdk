@@ -1,15 +1,12 @@
-import { MagicTEESigner } from '@imtbl/wallet';
 import {
   createStarkSigner,
   generateLegacyStarkPrivateKey,
   StarkSigner,
+  LegacySigner,
 } from '@imtbl/x-client';
 import { withPassportError, PassportErrorType } from '../errors/passportError';
 
-export const getStarkSigner = async (signer: MagicTEESigner) => withPassportError<StarkSigner>(async () => {
-  // MagicTEESigner implements the minimal Signer interface (getAddress, signMessage)
-  // that generateLegacyStarkPrivateKey actually uses
-  // @ts-ignore - MagicTEESigner matches the Signer interface expected by generateLegacyStarkPrivateKey
+export const getStarkSigner = async (signer: LegacySigner) => withPassportError<StarkSigner>(async () => {
   const privateKey = await generateLegacyStarkPrivateKey(signer);
   return createStarkSigner(privateKey);
 }, PassportErrorType.WALLET_CONNECTION_ERROR);
