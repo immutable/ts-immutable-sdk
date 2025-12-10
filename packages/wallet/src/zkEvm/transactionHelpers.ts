@@ -1,8 +1,5 @@
 import { Flow } from '@imtbl/metrics';
-import {
-  Signer, TransactionRequest, JsonRpcProvider,
-  BigNumberish,
-} from 'ethers';
+import type { PublicClient, Hex } from 'viem';
 import {
   getEip155ChainId,
   signMetaTransactions,
@@ -19,13 +16,25 @@ import {
 } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
+import type { WalletSigner } from '../types';
 
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
 
+/**
+ * Transaction request type compatible with eth_sendTransaction
+ */
+export interface TransactionRequest {
+  to?: string;
+  data?: Hex | string | null;
+  value?: bigint;
+  nonce?: bigint;
+  chainId?: bigint | number;
+}
+
 export type TransactionParams = {
-  ethSigner: Signer;
-  rpcProvider: JsonRpcProvider;
+  ethSigner: WalletSigner;
+  rpcProvider: PublicClient;
   guardianClient: GuardianClient;
   relayerClient: RelayerClient;
   zkEvmAddress: string;
@@ -76,7 +85,7 @@ const getFeeOption = async (
  */
 const buildMetaTransactions = async (
   transactionRequest: TransactionRequest,
-  rpcProvider: JsonRpcProvider,
+  rpcProvider: PublicClient,
   relayerClient: RelayerClient,
   zkevmAddress: string,
   nonceSpace?: bigint,
@@ -90,7 +99,7 @@ const buildMetaTransactions = async (
 
   const metaTransaction: MetaTransaction = {
     to: transactionRequest.to.toString(),
-    data: transactionRequest.data,
+    data: transactionRequest.data as string | null | undefined,
     nonce: BigInt(0), // NOTE: We don't need a valid nonce to estimate the fee
     value: transactionRequest.value,
     revertOnError: true,
@@ -178,7 +187,7 @@ export const prepareAndSignTransaction = async ({
   nonceSpace,
   isBackgroundTransaction,
 }: TransactionParams & { transactionRequest: TransactionRequest }) => {
-  const { chainId } = await rpcProvider.getNetwork();
+  const chainId = await rpcProvider.getChainId();
   const chainIdBigNumber = BigInt(chainId);
   flow.addEvent('endDetectNetwork');
 
@@ -259,7 +268,7 @@ const buildMetaTransactionForEjection = async (
 
   const metaTransaction: MetaTransaction = {
     to: transactionRequest.to.toString(),
-    data: transactionRequest.data,
+    data: transactionRequest.data as string | null | undefined,
     nonce: transactionRequest.nonce ?? undefined,
     value: transactionRequest.value,
     revertOnError: true,
@@ -281,7 +290,7 @@ export const prepareAndSignEjectionTransaction = async ({
 
   const signedTransaction = await signMetaTransactions(
     metaTransaction,
-    transactionRequest.nonce as BigNumberish,
+    transactionRequest.nonce as bigint,
     BigInt(transactionRequest.chainId ?? 0),
     zkEvmAddress,
     ethSigner,

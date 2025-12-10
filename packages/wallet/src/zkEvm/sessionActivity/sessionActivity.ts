@@ -1,5 +1,5 @@
 import { trackFlow, utils as metricsUtils, trackError } from '@imtbl/metrics';
-import { Interface } from 'ethers';
+import { encodeFunctionData, parseAbi } from 'viem';
 import { CheckResponse, get, setupClient } from './request';
 import { errorBoundary } from './errorBoundary';
 import { AccountsRequestedEvent } from '../../types';
@@ -102,8 +102,12 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
   }
 
   if (details && details.contractAddress && details.functionName) {
-    const contractInterface = () => new Interface([`function ${details!.functionName}()`]);
-    const data = contractInterface().encodeFunctionData(details.functionName);
+    // Use viem's encodeFunctionData
+    const abi = parseAbi([`function ${details.functionName}()`]);
+    const data = encodeFunctionData({
+      abi,
+      functionName: details.functionName,
+    });
     const to = details.contractAddress;
 
     // If transaction payload, send transaction

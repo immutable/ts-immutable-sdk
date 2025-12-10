@@ -1,14 +1,15 @@
 import { Flow } from '@imtbl/metrics';
-import { Signer, JsonRpcProvider } from 'ethers';
+import type { PublicClient } from 'viem';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { hexToString } from '../utils/string';
 import GuardianClient from '../guardian';
 import { RelayerClient } from './relayerClient';
 import { packSignatures, signERC191Message } from './walletHelpers';
+import type { WalletSigner } from '../types';
 
 interface PersonalSignParams {
-  ethSigner: Signer;
-  rpcProvider: JsonRpcProvider;
+  ethSigner: WalletSigner;
+  rpcProvider: PublicClient;
   params: any[];
   zkEvmAddress: string;
   guardianClient: GuardianClient;
@@ -38,7 +39,7 @@ export const personalSign = async ({
 
   // Convert message into a string if it's a hex
   const payload = hexToString(message);
-  const { chainId } = await rpcProvider.getNetwork();
+  const chainId = await rpcProvider.getChainId();
   flow.addEvent('endDetectNetwork');
   const chainIdBigNumber = BigInt(chainId);
 
@@ -46,7 +47,7 @@ export const personalSign = async ({
   const eoaSignaturePromise = signERC191Message(chainIdBigNumber, payload, ethSigner, fromAddress);
   eoaSignaturePromise.then(() => flow.addEvent('endEOASignature'));
 
-  await guardianClient.evaluateERC191Message({ chainID: chainId, payload });
+  await guardianClient.evaluateERC191Message({ chainID: chainIdBigNumber, payload });
   flow.addEvent('endEvaluateERC191Message');
 
   const [eoaSignature, relayerSignature] = await Promise.all([

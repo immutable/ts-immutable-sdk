@@ -1,14 +1,15 @@
 import { Flow } from '@imtbl/metrics';
-import { Signer, JsonRpcProvider } from 'ethers';
+import type { PublicClient } from 'viem';
 import GuardianClient from '../guardian';
 import { signAndPackTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { RelayerClient } from './relayerClient';
+import type { WalletSigner } from '../types';
 
 export type SignTypedDataV4Params = {
-  ethSigner: Signer;
-  rpcProvider: JsonRpcProvider;
+  ethSigner: WalletSigner;
+  rpcProvider: PublicClient;
   relayerClient: RelayerClient;
   method: string;
   params: Array<any>;
@@ -80,8 +81,8 @@ export const signTypedDataV4 = async ({
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `${method} requires an address and a typed data JSON`);
   }
 
-  const { chainId } = await rpcProvider.getNetwork();
-  const typedData = transformTypedData(typedDataParam, chainId);
+  const chainId = await rpcProvider.getChainId();
+  const typedData = transformTypedData(typedDataParam, BigInt(chainId));
   flow.addEvent('endDetectNetwork');
 
   await guardianClient.evaluateEIP712Message({ chainID: String(chainId), payload: typedData });
