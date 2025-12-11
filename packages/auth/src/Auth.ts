@@ -515,10 +515,14 @@ export class Auth {
         // This complements oidc-client-ts native detection which only checks once at start
         const popupRef = window.open('', popupWindowTarget);
         if (popupRef) {
+          // Flag to track if authentication completed (success or failure)
+          let authenticationCompleted = false;
+
           // Create a promise that rejects when popup is closed
           const popupClosedPromise = new Promise<never>((_, reject) => {
             const timer = setInterval(() => {
-              if (popupRef.closed) {
+              // Only reject if popup closed AND authentication hasn't completed yet
+              if (popupRef.closed && !authenticationCompleted) {
                 clearInterval(timer);
                 reject(new Error('Popup closed by user'));
               }
@@ -526,8 +530,12 @@ export class Auth {
 
             // Clean up timer when the user promise resolves/rejects
             userPromise.finally(() => {
+              authenticationCompleted = true;
               clearInterval(timer);
-              popupRef.close();
+              // Close popup if still open (e.g., auth completed but popup didn't auto-close)
+              if (!popupRef.closed) {
+                popupRef.close();
+              }
             });
           });
 
