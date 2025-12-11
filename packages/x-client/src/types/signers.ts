@@ -2,6 +2,12 @@ import { Signer as EthSigner } from 'ethers';
 
 export type { EthSigner };
 
+// Lightweight signer for message-only flows (no tx/provider required)
+export type MessageSigner = {
+  getAddress(): Promise<string>;
+  signMessage(message: string | Uint8Array): Promise<string>;
+};
+
 /**
  * An abstraction of a Stark account, which can be used to sign messages and transactions on StarkEx to execute state changing operations
  */

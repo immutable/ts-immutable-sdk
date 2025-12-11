@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { keccak256, Signer, toUtf8Bytes } from 'ethers';
+import { keccak256, toUtf8Bytes } from 'ethers';
 import {
   MintRequest,
   MintsApi,
   MintsApiMintTokensRequest,
   MintTokensResponse,
 } from '../types/api';
-import { UnsignedMintRequest } from '../types';
+import { EthSigner, UnsignedMintRequest } from '../types';
 import { signRaw } from '../utils';
 
 export async function mintingWorkflow(
-  signer: Signer,
+  signer: EthSigner,
   request: UnsignedMintRequest,
   mintsApi: MintsApi,
 ): Promise<MintTokensResponse> {
