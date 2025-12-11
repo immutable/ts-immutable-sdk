@@ -5,7 +5,7 @@
     "@imtbl/sdk": "latest",
     "@tanstack/react-query": "^5.37.1",
     "@web3modal/wagmi": "^4.1.11",
-    "next": "14.2.3",
+    "next": "14.2.34",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "viem": "2.x",
