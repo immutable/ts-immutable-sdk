@@ -48,16 +48,21 @@ const transformTypedData = (typedData: string | object, chainId: bigint): TypedD
   const providedChainId = transformedTypedData.domain?.chainId;
 
   if (providedChainId) {
-    // domain.chainId (if defined) can be a number, string, or hex value, but the relayer & guardian only accept a number.
+    // domain.chainId (if defined) can be a number, string, or hex value.
+    // Normalize to a number for consistent EIP-712 hashing.
+    let normalizedChainId: number;
     if (typeof providedChainId === 'string') {
       if (providedChainId.startsWith('0x')) {
-        transformedTypedData.domain.chainId = parseInt(providedChainId, 16).toString();
+        normalizedChainId = parseInt(providedChainId, 16);
       } else {
-        transformedTypedData.domain.chainId = parseInt(providedChainId, 10).toString();
+        normalizedChainId = parseInt(providedChainId, 10);
       }
+    } else {
+      normalizedChainId = Number(providedChainId);
     }
+    transformedTypedData.domain.chainId = normalizedChainId;
 
-    if (BigInt(transformedTypedData.domain.chainId ?? 0) !== chainId) {
+    if (BigInt(normalizedChainId) !== chainId) {
       throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid chainId, expected ${chainId}`);
     }
   }
