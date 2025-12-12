@@ -139,6 +139,7 @@ export type LoginArguments = {
 export enum MarketingConsentStatus {
   OptedIn = 'opted_in',
   Unsubscribed = 'unsubscribed',
+  Subscribed = 'subscribed',
 }
 
 export type DirectLoginOptions = {
