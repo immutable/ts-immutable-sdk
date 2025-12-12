@@ -1,10 +1,11 @@
 /* eslint-disable no-bitwise */
 import {
   getAddress,
-  getBytes,
-  hexlify,
-  solidityPacked,
-} from 'ethers';
+  toBytes,
+  toHex,
+  encodePacked,
+  type Hex,
+} from 'viem';
 
 // Minimal ABI surface used by walletHelpers for nonce reads and execute encoding.
 export const walletContracts = {
@@ -23,7 +24,7 @@ export const walletContracts = {
         type: 'function',
         name: 'readNonce',
         constant: true,
-        inputs: [{ type: 'uint256' }],
+        inputs: [{ type: 'uint256', name: '_space' }],
         outputs: [{ type: 'uint256' }],
         payable: false,
         stateMutability: 'view',
@@ -42,16 +43,17 @@ export const walletContracts = {
               { type: 'uint256', name: 'value' },
               { type: 'bytes', name: 'data' },
             ],
+            name: '_txs',
             type: 'tuple[]',
           },
-          { type: 'uint256' },
-          { type: 'bytes' },
+          { type: 'uint256', name: '_nonce' },
+          { type: 'bytes', name: '_signature' },
         ],
         outputs: [],
         payable: false,
         stateMutability: 'nonpayable',
       },
-    ],
+    ] as const,
   },
 };
 
@@ -76,7 +78,7 @@ export type SequenceSignature = {
 };
 
 export const decodeSequenceSignatureV1 = (signature: string): SequenceSignature => {
-  const bytes = getBytes(signature);
+  const bytes = toBytes(signature as Hex);
   const threshold = (bytes[0] << 8) | bytes[1];
   const signers: SequenceSigner[] = [];
 
@@ -88,25 +90,25 @@ export const decodeSequenceSignatureV1 = (signature: string): SequenceSignature 
       signers.push({
         unrecovered: true,
         weight,
-        signature: hexlify(bytes.slice(i, i + 66)),
+        signature: toHex(bytes.slice(i, i + 66)),
         isDynamic: false,
       });
       i += 66;
     } else if (type === SignaturePartType.Address) {
       signers.push({
         weight,
-        address: getAddress(hexlify(bytes.slice(i, i + 20))),
+        address: getAddress(toHex(bytes.slice(i, i + 20))),
       });
       i += 20;
     } else if (type === SignaturePartType.DynamicSignature) {
-      const address = getAddress(hexlify(bytes.slice(i, i + 20)));
+      const address = getAddress(toHex(bytes.slice(i, i + 20)));
       i += 20;
       const size = (bytes[i] << 8) | bytes[i + 1];
       i += 2;
       signers.push({
         unrecovered: true,
         weight,
-        signature: hexlify(bytes.slice(i, i + size)),
+        signature: toHex(bytes.slice(i, i + size)),
         address,
         isDynamic: true,
       });
@@ -128,9 +130,9 @@ export const encodeSequenceSignatureV1 = (input: SequenceSignature): string => {
   const encodedSigners = signers.map((signer) => {
     const weight = Number(signer.weight);
     if (signer.address && signer.signature === undefined) {
-      return solidityPacked(
+      return encodePacked(
         ['uint8', 'uint8', 'address'],
-        [SignaturePartType.Address, weight, signer.address],
+        [SignaturePartType.Address, weight, signer.address as `0x${string}`],
       );
     }
 
@@ -139,25 +141,25 @@ export const encodeSequenceSignatureV1 = (input: SequenceSignature): string => {
     }
 
     if (signer.isDynamic) {
-      const signatureBytes = getBytes(signer.signature);
-      const address = signer.address ? getAddress(signer.address) : undefined;
+      const signatureBytes = toBytes(signer.signature as Hex);
+      const address = signer.address ? getAddress(signer.address as `0x${string}`) : undefined;
       if (!address) {
         throw new Error('Dynamic signature part must include an address');
       }
-      return solidityPacked(
+      return encodePacked(
         ['uint8', 'uint8', 'address', 'uint16', 'bytes'],
-        [SignaturePartType.DynamicSignature, weight, address, signatureBytes.length, signatureBytes],
+        [SignaturePartType.DynamicSignature, weight, address, signatureBytes.length, toHex(signatureBytes)],
       );
     }
 
-    return solidityPacked(
+    return encodePacked(
       ['uint8', 'uint8', 'bytes'],
-      [SignaturePartType.EOASignature, weight, signer.signature],
+      [SignaturePartType.EOASignature, weight, signer.signature as Hex],
     );
   });
 
-  return solidityPacked(
-    ['uint16', ...new Array(encodedSigners.length).fill('bytes')],
-    [threshold, ...encodedSigners],
+  return encodePacked(
+    ['uint16', ...new Array(encodedSigners.length).fill('bytes')] as ['uint16', ...('bytes')[]],
+    [threshold, ...encodedSigners] as [number, ...Hex[]],
   );
 };

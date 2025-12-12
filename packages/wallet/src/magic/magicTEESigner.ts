@@ -1,11 +1,10 @@
 /* eslint-disable no-bitwise */
-import { AbstractSigner, Signer } from 'ethers';
 import { MagicTeeApiClients } from '@imtbl/generated-clients';
 import { Flow, trackDuration } from '@imtbl/metrics';
 import { WalletError, WalletErrorType } from '../errors';
 import { Auth } from '@imtbl/auth';
 import { withMetricsAsync } from '../utils/metrics';
-import { isUserZkEvm, User } from '../types';
+import { isUserZkEvm, User, WalletSigner } from '../types';
 import { isAxiosError } from '../utils/http';
 
 const CHAIN_IDENTIFIER = 'ETH';
@@ -58,7 +57,11 @@ const toBase64 = (value: string): string => {
   return output;
 };
 
-export default class MagicTEESigner extends AbstractSigner {
+/**
+ * MagicTEESigner implements the WalletSigner interface for Magic TEE-based signing.
+ * This signer delegates cryptographic operations to the Magic TEE service.
+ */
+export default class MagicTEESigner implements WalletSigner {
   private readonly auth: Auth;
 
   private readonly magicTeeApiClient: MagicTeeApiClients;
@@ -68,7 +71,6 @@ export default class MagicTEESigner extends AbstractSigner {
   private createWalletPromise: Promise<UserWallet> | null = null;
 
   constructor(auth: Auth, magicTeeApiClient: MagicTeeApiClients) {
-    super();
     this.auth = auth;
     this.magicTeeApiClient = magicTeeApiClient;
   }
@@ -184,19 +186,19 @@ export default class MagicTEESigner extends AbstractSigner {
     };
   }
 
-  public async getAddress(): Promise<string> {
+  public async getAddress(): Promise<`0x${string}`> {
     const userWallet = await this.getUserWallet();
-    return userWallet.walletAddress;
+    return userWallet.walletAddress as `0x${string}`;
   }
 
-  public async signMessage(message: string | Uint8Array): Promise<string> {
+  public async signMessage(message: string | Uint8Array): Promise<`0x${string}`> {
     // Call getUserWallet to ensure that the createWallet endpoint has been called at least once,
     // as this is a prerequisite for signing messages.
     await this.getUserWallet();
 
     const messageToSign = message instanceof Uint8Array ? `0x${toHex(message)}` : message;
     const user = await this.getUserOrThrow();
-    const headers = await MagicTEESigner.getHeaders(user);
+    const headers = MagicTEESigner.getHeaders(user);
 
     return withMetricsAsync(async (flow: Flow) => {
       try {
@@ -217,7 +219,7 @@ export default class MagicTEESigner extends AbstractSigner {
           Math.round(performance.now() - startTime),
         );
 
-        return response.data.signature;
+        return response.data.signature as `0x${string}`;
       } catch (error) {
         let errorMessage: string = 'MagicTEE: Failed to sign message using EOA';
 
@@ -234,20 +236,5 @@ export default class MagicTEESigner extends AbstractSigner {
         throw new Error(errorMessage);
       }
     }, 'magicSignMessage');
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  connect(): Signer {
-    throw new Error('Method not implemented.');
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  signTransaction(): Promise<string> {
-    throw new Error('Method not implemented.');
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  signTypedData(): Promise<string> {
-    throw new Error('Method not implemented.');
   }
 }

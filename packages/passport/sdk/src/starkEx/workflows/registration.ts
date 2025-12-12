@@ -1,9 +1,11 @@
 import { signRaw } from '@imtbl/toolkit';
-import { WalletConnection } from '@imtbl/x-client';
+import { MessageSigner, StarkSigner } from '@imtbl/x-client';
 import { ImxApiClients, imx } from '@imtbl/generated-clients';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 
-export type RegisterPassportParams = WalletConnection & {
+export type RegisterPassportParams = {
+  ethSigner: MessageSigner;
+  starkSigner: StarkSigner;
   imxApiClients: ImxApiClients;
 };
 

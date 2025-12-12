@@ -1,8 +1,8 @@
-import { TransactionRequest } from 'ethers';
 import {
   prepareAndSignEjectionTransaction,
   EjectionTransactionParams,
   EjectionTransactionResponse,
+  TransactionRequest,
 } from './transactionHelpers';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 

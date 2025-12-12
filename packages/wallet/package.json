@@ -37,8 +37,7 @@
     "@imtbl/auth": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
     "@imtbl/metrics": "workspace:*",
-    "@imtbl/toolkit": "workspace:*",
-    "ethers": "^6.13.4"
+    "viem": "~2.18.0"
   },
   "devDependencies": {
     "@swc/core": "^1.3.36",
