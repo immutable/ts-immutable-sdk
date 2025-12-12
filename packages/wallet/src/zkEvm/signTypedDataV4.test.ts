@@ -1,5 +1,6 @@
-import { transformTypedData } from './signTypedDataV4';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
+
+const { transformTypedData } = require('./signTypedDataV4');
 
 describe('transformTypedData', () => {
   const validTypedData = {

@@ -22,7 +22,7 @@ const isValidTypedDataPayload = (typedData: object): typedData is TypedDataPaylo
   REQUIRED_TYPED_DATA_PROPERTIES.every((key) => key in typedData)
 );
 
-const transformTypedData = (typedData: string | object, chainId: bigint): TypedDataPayload => {
+export const transformTypedData = (typedData: string | object, chainId: bigint): TypedDataPayload => {
   let transformedTypedData: object | TypedDataPayload;
 
   if (typeof typedData === 'string') {
