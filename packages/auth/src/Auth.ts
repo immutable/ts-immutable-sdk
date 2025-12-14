@@ -42,6 +42,9 @@ import LoginPopupOverlay from './overlay/loginPopupOverlay';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
 
 const LOGIN_POPUP_CLOSED_POLLING_DURATION = 500;
+// Timeout for authentication to complete after reaching callback URL
+// If userPromise doesn't settle within this time after callback navigation, reject to prevent timer leak
+const CALLBACK_COMPLETION_TIMEOUT = 30000; // 30 seconds
 const formUrlEncodedHeaders = {
   'Content-Type': 'application/x-www-form-urlencoded',
 };
@@ -521,6 +524,8 @@ export class Auth {
             let settled = false;
             // Track if popup has navigated to callback URL (indicates auth in progress)
             let hasNavigatedToCallback = false;
+            // Track when popup reached callback to detect timeout
+            let callbackStartTime: number | null = null;
 
             // Helper to check if popup is on callback URL
             const isOnCallbackUrl = (): boolean => {
@@ -540,16 +545,26 @@ export class Auth {
               // Check if popup navigated to callback URL
               if (!hasNavigatedToCallback && isOnCallbackUrl()) {
                 hasNavigatedToCallback = true;
+                callbackStartTime = Date.now();
               }
 
-              // Only reject if:
-              // 1. Not yet settled
-              // 2. Popup is closed
-              // 3. Popup never reached callback URL (user closed it manually)
-              if (!settled && popupRef.closed && !hasNavigatedToCallback) {
+              // Check if authentication timed out after reaching callback
+              const callbackTimedOut = hasNavigatedToCallback
+                && callbackStartTime
+                && (Date.now() - callbackStartTime > CALLBACK_COMPLETION_TIMEOUT);
+
+              // Reject if:
+              // 1. Not yet settled AND popup is closed AND
+              //    (a) Popup never reached callback URL (user closed it manually) OR
+              //    (b) Popup reached callback but timed out (prevents timer leak)
+              if (!settled && popupRef.closed && (!hasNavigatedToCallback || callbackTimedOut)) {
                 settled = true;
                 clearInterval(timer);
-                reject(new Error('Popup closed by user'));
+                reject(new Error(
+                  callbackTimedOut
+                    ? 'Authentication timed out after reaching callback'
+                    : 'Popup closed by user',
+                ));
               }
             }, LOGIN_POPUP_CLOSED_POLLING_DURATION);
 

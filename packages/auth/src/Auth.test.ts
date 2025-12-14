@@ -398,5 +398,45 @@ describe('Auth', () => {
       setIntervalSpy.mockRestore();
       clearIntervalSpy.mockRestore();
     });
+
+    it('rejects with timeout error when popup reaches callback but userPromise never settles', async () => {
+      // Simulate userPromise that never resolves (network issue, OIDC bug, etc)
+      mockUserManager.signinPopup.mockImplementation(() => new Promise(() => {
+        // Promise that never settles
+      }));
+
+      // Mock popup that navigates to callback URL
+      Object.defineProperty(mockPopupWindow, 'location', {
+        get: jest.fn(() => ({
+          pathname: '/login/callback',
+        })),
+        configurable: true,
+      });
+
+      const auth = Object.create(Auth.prototype) as Auth;
+      (auth as any).userManager = mockUserManager;
+      (auth as any).config = {
+        popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
+      };
+      getDetailMock.mockReturnValue('runtime-id-value');
+
+      // Pass directLoginOptions to skip embeddedLoginPrompt
+      const loginPromise = (auth as any).loginWithPopup({
+        directLoginMethod: 'google',
+        marketingConsentStatus: 'opted_in',
+      });
+
+      // Advance time to detect callback navigation (first polling cycle)
+      jest.advanceTimersByTime(500);
+
+      // Close popup after it reached callback
+      mockPopupWindow.closed = true;
+
+      // Advance time past the 30 second timeout
+      jest.advanceTimersByTime(31000);
+
+      // Should reject with timeout error
+      await expect(loginPromise).rejects.toThrow('Authentication timed out after reaching callback');
+    });
   });
 });
