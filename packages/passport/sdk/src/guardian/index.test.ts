@@ -44,8 +44,21 @@ describe('Guardian', () => {
       authManager: {
         getUserImx: getUserImxMock,
         getUserZkEvm: getUserZkEvmMock,
+        getUser: jest.fn().mockResolvedValue(mockUserZkEvm),
       } as unknown as AuthManager,
       guardianApi: guardianApi as GeneratedClients.mr.GuardianApi,
+      multiRollupApiClients: {
+        chainsApi: {
+          listChains: jest.fn().mockResolvedValue({
+            data: {
+              result: [
+                { id: 'eip155:13473', name: 'imtbl-zkevm-testnet' },
+                { id: 'eip155:421614', name: 'arbitrum-sepolia' },
+              ],
+            },
+          }),
+        },
+      } as any,
     });
   };
 

@@ -10,12 +10,15 @@
     "ethers": "^6.13.4"
   },
   "devDependencies": {
+    "esbuild": "^0.23.1",
     "eslint": "^8.40.0",
+    "html-inline": "^1.2.0",
     "parcel": "^2.8.3"
   },
   "scripts": {
-    "build": "parcel build --no-cache --no-scope-hoist",
-    "build:local": "parcel build --no-cache --no-scope-hoist && pnpm updateSdkVersion",
+    "build": "node build.js",
+    "build:parcel": "parcel build --no-cache --no-scope-hoist",
+    "build:local": "node build.js && pnpm updateSdkVersion",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "start": "parcel",
     "updateSdkVersion": "./scripts/updateSdkVersion.sh"

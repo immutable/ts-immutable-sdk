@@ -9,8 +9,9 @@ import { Wallet } from '@0xsequence/wallet-core';
 import { SequenceRelayerClient } from './sequenceRelayerClient';
 import AuthManager from '../authManager';
 import { createStateProvider, createWalletConfig, saveWalletConfig, SEQUENCE_CONTEXT } from './signer/signerHelpers';
-import GuardianClient from '../guardian';
+import GuardianClient, { convertBigNumberishToString } from '../guardian';
 import { MetaTransaction } from '../zkEvm/types';
+import { signTypedDataV4 } from '../zkEvm/signTypedDataV4';
 
 export type TransactionParams = {
   sequenceSigner: SequenceSigner;
@@ -114,27 +115,40 @@ export const prepareAndSignTransaction = async ({
   );
   flow.addEvent('endBuildMetaTransactions');
 
-  console.log(`end build meta transaction`);
-
   const { nonce } = metaTransaction;
   if (typeof nonce === 'undefined') {
     throw new Error('Failed to retrieve nonce from the smart wallet');
   }
 
-  console.log(`nonce = ${nonce}`);
+  const validateTransaction = async () => {
+    await guardianClient.validateEVMTransaction({
+      chainId: getEip155ChainId(Number(chainId)),
+      nonce: convertBigNumberishToString(nonce),
+      metaTransactions: [metaTransaction],
+      isBackgroundTransaction,
+    });
+    flow.addEvent('endValidateEVMTransaction');
+  };
 
-  const signature = await signMetaTransaction(
-    walletAddress,
-    metaTransaction,
-    authManager,
-    rpcProvider,
-    sequenceSigner,
-    chainId,
-    flow,
-    nonce,
-  );
+  const signTransaction = async () => {
+    const signed = await signMetaTransaction(
+      walletAddress,
+      metaTransaction,
+      authManager,
+      rpcProvider,
+      sequenceSigner,
+      chainId,
+      flow,
+      nonce,
+    );
+    flow.addEvent('endSignMetaTransaction');
+    return signed;
+  }
 
-  console.log(`end sign meta transaction`);
+  const [_, signature] = await Promise.all([
+    validateTransaction(),
+    signTransaction(),
+  ]);
 
   const response = await fetch('http://localhost:8073/relayer-mr/v1/build-guest-module-calldata', {
     method: 'POST',
@@ -158,6 +172,8 @@ export const prepareAndSignTransaction = async ({
   const result = await response.json();
 
   flow.addEvent('endBuildGuestModuleMulticall');
+
+  console.log(`response ${JSON.stringify(result)}`);
 
   return { to: result.to, data: result.data };
 };

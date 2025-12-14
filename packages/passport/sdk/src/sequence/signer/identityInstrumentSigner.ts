@@ -6,7 +6,7 @@ import AuthManager from '../../authManager';
 import { PassportConfiguration } from '../../config';
 import { User } from '../../types';
 import { Hex, Address } from 'ox';
-import jwtDecode from 'jwt-decode';
+import jwt_decode from 'jwt-decode';
 import { IdTokenPayload } from '../../types';
 import {
   Payload,
@@ -82,7 +82,7 @@ export class IdentityInstrumentSigner implements ISigner {
         }
 
         const idToken = authenticatedUser.idToken;
-        const decoded = jwtDecode<IdTokenPayload>(idToken);
+        const decoded = jwt_decode<IdTokenPayload>(idToken);
         const issuer = decoded.iss;
         const audience = decoded.aud;
 

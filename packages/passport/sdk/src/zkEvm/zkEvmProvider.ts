@@ -162,10 +162,12 @@ export class ZkEvmProvider implements Provider {
 
     switch (request.method) {
       case 'eth_requestAccounts': {
+        console.log(`zkevm eth_requestAccounts`);
         const signerAddress = await this.#ethSigner.getAddress();
         console.log(`zkevm signerAddress = ${signerAddress}`);
 
         const zkEvmAddress = await this.#getZkEvmAddress();
+        this.userWalletAddress = zkEvmAddress;
         if (zkEvmAddress) return [zkEvmAddress];
 
         const flow = trackFlow('passport', 'ethRequestAccounts');
@@ -193,6 +195,8 @@ export class ZkEvmProvider implements Provider {
             flow.addEvent('endUserRegistration');
           } else {
             userZkEvmEthAddress = user.zkEvm.ethAddress;
+
+            this.userWalletAddress = userZkEvmEthAddress;
           }
 
           this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [
@@ -215,6 +219,7 @@ export class ZkEvmProvider implements Provider {
         }
       }
       case 'eth_sendTransaction': {
+        console.log(`zkevm eth_sendTransaction`);
         const zkEvmAddress = this.userWalletAddress;//await this.#getZkEvmAddress();
         if (!zkEvmAddress) {
           throw new JsonRpcError(

@@ -25,7 +25,19 @@ export default defineConfig((options) => {
       target: 'es2022',
       minify: true,
       bundle: true,
-      noExternal: ['@uniswap/swap-router-contracts'],
+      noExternal: [
+        '@uniswap/swap-router-contracts',
+        '@0xsequence/abi',
+        '@0xsequence/core',
+        '@0xsequence/identity-instrument',
+        '@0xsequence/relayer',
+        '@0xsequence/wallet-core',
+        '@0xsequence/wallet-primitives',
+        '@0xsequence/wallet-wdk',
+        '@0xsequence/guard',
+        'ox',
+        'jwt-decode'
+      ],
       treeshake: true,
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({

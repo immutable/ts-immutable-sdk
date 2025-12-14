@@ -9,12 +9,14 @@ import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
 import { PassportConfiguration } from '../config';
 import { getEip155ChainId } from '../zkEvm/walletHelpers';
 import { PassportError, PassportErrorType } from '../errors/passportError';
+import { RollupType } from '../types';
 
 export type GuardianClientParams = {
   confirmationScreen: ConfirmationScreen;
   config: PassportConfiguration;
   authManager: AuthManager;
   guardianApi: GeneratedClients.mr.GuardianApi;
+  multiRollupApiClients: GeneratedClients.MultiRollupApiClients;
 };
 
 export type GuardianEvaluateImxTransactionParams = {
@@ -40,6 +42,8 @@ type GuardianERC191MessageEvaluationParams = {
 
 const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmation but this functionality is not'
   + ' supported in this environment. Please contact Immutable support if you need to enable this feature.';
+
+const IMTBL_ZKEVM_CHAIN_PREFIX = 'imtbl-zkevm';
 
 export const convertBigNumberishToString = (
   value: BigNumberish,
@@ -75,13 +79,81 @@ export default class GuardianClient {
 
   private readonly authManager: AuthManager;
 
+  private readonly multiRollupApiClients: GeneratedClients.MultiRollupApiClients;
+
+  private chainIdToKeyCache: Map<string, string> = new Map();
+
   constructor({
-    confirmationScreen, config, authManager, guardianApi,
+    confirmationScreen, config, authManager, guardianApi, multiRollupApiClients,
   }: GuardianClientParams) {
     this.confirmationScreen = confirmationScreen;
     this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled;
     this.guardianApi = guardianApi;
     this.authManager = authManager;
+    this.multiRollupApiClients = multiRollupApiClients;
+  }
+
+  /**
+   * Get chain key from EIP-155 chainId by querying listChains API
+   * Converts API format (dashes) to User object format (underscores)
+   */
+  private async getChainKeyFromId(chainId: string): Promise<string> {
+    // Check cache first
+    if (this.chainIdToKeyCache.has(chainId)) {
+      return this.chainIdToKeyCache.get(chainId)!;
+    }
+
+    try {
+      const chainListResponse = await this.multiRollupApiClients.chainsApi.listChains();
+      const chain = chainListResponse.data?.result?.find((c) => c.id === chainId);
+      
+      if (!chain?.name) {
+        // Fallback to zkEvm if chain not found
+        return RollupType.ZKEVM;
+      }
+
+      // Convert API format (arbitrum-sepolia, imtbl-zkevm-testnet) to User key format (arbitrum_sepolia, zkEvm)
+      let chainKey: string;
+      if (chain.name.startsWith(IMTBL_ZKEVM_CHAIN_PREFIX)) {
+        chainKey = RollupType.ZKEVM;
+      } else {
+        // Replace dashes with underscores for other chains
+        chainKey = chain.name.replace(/-/g, '_');
+      }
+
+      this.chainIdToKeyCache.set(chainId, chainKey);
+      return chainKey;
+    } catch (error) {
+      // Fallback to zkEvm on error
+      return RollupType.ZKEVM;
+    }
+  }
+
+  /**
+   * Get user and extract eth address for the given EIP-155 chainId
+   */
+  private async getUserForChain(chainId: string): Promise<{ user: any; ethAddress: string }> {
+    const user = await this.authManager.getUser();
+    if (!user) {
+      throw new JsonRpcError(
+        ProviderErrorCode.UNAUTHORIZED,
+        'User not logged in',
+      );
+    }
+
+    const chainKey = await this.getChainKeyFromId(chainId);
+    // const ethAddress = (user as any)[chainKey]?.ethAddress;
+    // TODO remove, this is for local testing
+    const ethAddress = '0x3fadd1f6f02408c0fad35e362e3d5c65e722b67a';
+
+    if (!ethAddress) {
+      throw new JsonRpcError(
+        ProviderErrorCode.UNAUTHORIZED,
+        `User not registered for chain ${chainId}`,
+      );
+    }
+
+    return { user, ethAddress };
   }
 
   /**
@@ -178,7 +250,7 @@ export default class GuardianClient {
     nonce,
     metaTransactions,
   }: GuardianEVMTxnEvaluationParams): Promise<GeneratedClients.mr.TransactionEvaluationResponse> {
-    const user = await this.authManager.getUserZkEvm();
+    const { user, ethAddress } = await this.getUserForChain(chainId);
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const guardianTransactions = transformGuardianTransactions(metaTransactions);
     try {
@@ -190,7 +262,7 @@ export default class GuardianClient {
             chainId,
             transactionData: {
               nonce,
-              userAddress: user.zkEvm.ethAddress,
+              userAddress: ethAddress,
               metaTransactions: guardianTransactions,
             },
           },
@@ -225,6 +297,11 @@ export default class GuardianClient {
     });
 
     const { confirmationRequired, transactionId } = transactionEvaluationResponse;
+
+    console.log(`confirmationRequired ${confirmationRequired}`);
+    console.log(`transactionId ${transactionId}`);
+    console.log(`crossSdkBridgeEnabled ${this.crossSdkBridgeEnabled}`);
+
     if (confirmationRequired && this.crossSdkBridgeEnabled) {
       throw new JsonRpcError(
         RpcErrorCode.TRANSACTION_REJECTED,
@@ -233,13 +310,15 @@ export default class GuardianClient {
     }
 
     if (confirmationRequired && !!transactionId) {
-      const user = await this.authManager.getUserZkEvm();
+      const { ethAddress } = await this.getUserForChain(chainId);
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         transactionId,
-        user.zkEvm.ethAddress,
+        ethAddress,
         GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Evm,
         chainId,
       );
+
+      console.log(`confirmationResult: ${JSON.stringify(confirmationResult)}`);
 
       if (!confirmationResult.confirmed) {
         throw new JsonRpcError(
@@ -258,13 +337,7 @@ export default class GuardianClient {
     { chainID, payload }: GuardianEIP712MessageEvaluationParams,
   ): Promise<GeneratedClients.mr.MessageEvaluationResponse> {
     try {
-      const user = await this.authManager.getUserZkEvm();
-      if (user === null) {
-        throw new JsonRpcError(
-          ProviderErrorCode.UNAUTHORIZED,
-          'User not logged in. Please log in first.',
-        );
-      }
+      const { user } = await this.getUserForChain(chainID);
       const messageEvalResponse = await this.guardianApi.evaluateMessage(
         { messageEvaluationRequest: { chainID, payload } },
         { headers: { Authorization: `Bearer ${user.accessToken}` } },
@@ -285,10 +358,10 @@ export default class GuardianClient {
       throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
     }
     if (confirmationRequired && !!messageId) {
-      const user = await this.authManager.getUserZkEvm();
+      const { ethAddress } = await this.getUserForChain(chainID);
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
-        user.zkEvm.ethAddress,
+        ethAddress,
         'eip712',
       );
 
@@ -307,17 +380,12 @@ export default class GuardianClient {
     { chainID, payload }: GuardianERC191MessageEvaluationParams,
   ): Promise<GeneratedClients.mr.MessageEvaluationResponse> {
     try {
-      const user = await this.authManager.getUserZkEvm();
-      if (user === null) {
-        throw new JsonRpcError(
-          ProviderErrorCode.UNAUTHORIZED,
-          'User not logged in. Please log in first.',
-        );
-      }
+      const eip155ChainId = getEip155ChainId(Number(chainID));
+      const { user } = await this.getUserForChain(eip155ChainId);
       const messageEvalResponse = await this.guardianApi.evaluateErc191Message(
         {
           eRC191MessageEvaluationRequest: {
-            chainID: getEip155ChainId(Number(chainID)),
+            chainID: eip155ChainId,
             payload,
           },
         },
@@ -339,10 +407,11 @@ export default class GuardianClient {
       throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
     }
     if (confirmationRequired && !!messageId) {
-      const user = await this.authManager.getUserZkEvm();
+      const eip155ChainId = getEip155ChainId(Number(chainID));
+      const { ethAddress } = await this.getUserForChain(eip155ChainId);
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
-        user.zkEvm.ethAddress,
+        ethAddress,
         'erc191',
       );
 

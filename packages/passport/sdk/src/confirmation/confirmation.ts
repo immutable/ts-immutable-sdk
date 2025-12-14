@@ -63,6 +63,7 @@ export default class ConfirmationScreen {
     chainType: GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum,
     chainId?: string,
   ): Promise<ConfirmationResult> {
+    console.log(`request confirmation for transactionId: ${transactionId}, etherAddress: ${etherAddress}, chainType: ${chainType}, chainId: ${chainId}`);
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
@@ -228,6 +229,7 @@ export default class ConfirmationScreen {
   }
 
   showConfirmationScreen(href: string, messageHandler: MessageHandler, resolve: Function) {
+    console.log(`show confirmation screen for href: ${href}`);
     // If popup blocked, the confirmation window will not exist
     if (this.confirmationWindow) {
       this.confirmationWindow.location.href = href;
@@ -235,6 +237,7 @@ export default class ConfirmationScreen {
 
     // This indicates the user closed the overlay so the transaction should be rejected
     if (!this.overlay) {
+      console.log('overlay is not defined');
       this.overlayClosed = false;
       resolve({ confirmed: false });
       return;
@@ -243,6 +246,7 @@ export default class ConfirmationScreen {
     // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
     const timerCallback = () => {
       if (this.confirmationWindow?.closed || this.overlayClosed) {
+        console.log('confirmation window closed or overlay closed');
         clearInterval(this.timer);
         window.removeEventListener('message', messageHandler);
         resolve({ confirmed: false });

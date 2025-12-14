@@ -1,4 +1,16 @@
 /* eslint-disable no-console */
+
+// Catch any errors during module initialization
+window.addEventListener('error', (event) => {
+  console.error('Global error caught:', event.error || event.message);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('Unhandled promise rejection:', event.reason);
+});
+
+console.log('game-bridge loading...');
+
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/x-provider';
@@ -14,12 +26,29 @@ import * as ethers from 'ethers';
 // eslint-disable-next-line import/no-duplicates
 import { BrowserProvider, getAddress } from 'ethers';
 
+console.log('game-bridge imports loaded');
+
 // This patches a bundler issue where @0xsequence/core expects
-// `ethers.getAddress` to exist on the `ethers` namespace, but Parcel
-// fails to attach it in a global build. This ensures the function is
+// `ethers.getAddress` to exist on the `ethers` namespace, but some bundlers
+// fail to attach it in a global build. This ensures the function is
 // available before any Passport code executes.
-if (typeof ethers === 'object' && !ethers.getAddress) {
-  (ethers as any).getAddress = getAddress;
+try {
+  if (typeof ethers === 'object' && !ethers.getAddress) {
+    try {
+      Object.defineProperty(ethers, 'getAddress', {
+        value: getAddress,
+        writable: true,
+        configurable: true
+      });
+      console.log('ethers.getAddress patched successfully');
+    } catch (e) {
+      // If we can't define the property, create a new object with the patched value
+      (window as any).ethers = { ...ethers, getAddress };
+      console.log('ethers.getAddress patched via window.ethers');
+    }
+  }
+} catch (error) {
+  console.error('Error during ethers patching:', error);
 }
 
 /* eslint-disable no-undef */
@@ -176,7 +205,7 @@ const getProvider = (): provider.IMXProvider => {
   return providerInstance;
 };
 
-const setZkEvmProvider = (zkEvmProvider: passport.Provider | null | undefined): boolean => {
+const setEvmProvider = (zkEvmProvider: passport.Provider | null | undefined): boolean => {
   if (zkEvmProvider !== null && zkEvmProvider !== undefined) {
     zkEvmProviderInstance = zkEvmProvider;
     console.log('zkEvm provider set');
@@ -186,7 +215,7 @@ const setZkEvmProvider = (zkEvmProvider: passport.Provider | null | undefined): 
   return false;
 };
 
-const getZkEvmProvider = (): passport.Provider => {
+const getEvmProvider = (): passport.Provider => {
   if (zkEvmProviderInstance == null) {
     throw new Error('No zkEvm provider');
   }
@@ -263,10 +292,13 @@ window.callFunction = async (jsonData: string) => {
                   },
                 }),
                 zkEvmRpcUrl: 'https://rpc.dev.immutable.com',
-                relayerUrl: 'https://api.dev.immutable.com/relayer-mr',
+                relayerUrl: 'http://localhost:8073/relayer-mr',
                 indexerMrBasePath: 'https://api.dev.immutable.com',
                 orderBookMrBasePath: 'https://api.dev.immutable.com',
-                passportMrBasePath: 'https://api.dev.immutable.com',
+                passportMrBasePath: 'http://localhost:8072',
+                sequenceIdentityInstrumentEndpoint: 'https://next-identity.sequence-dev.app/',
+                sequenceProjectAccessKey: 'AQAAAAAAAAB5QznGqk9paa4EQjom09ERpJs',
+                sequenceGuardEndpoint: 'https://guard.sequence.app',
               },
             };
           } else {
@@ -606,8 +638,11 @@ window.callFunction = async (jsonData: string) => {
         break;
       }
       case PASSPORT_FUNCTIONS.zkEvm.connectEvm: {
-        const zkEvmProvider = await getPassportClient().connectEvm();
-        const providerSet = setZkEvmProvider(zkEvmProvider);
+        const request = JSON.parse(data);
+        console.log(`Connecting to EVM chain: ${request.chain}`);
+
+        const zkEvmProvider = await getPassportClient().connectEvm({chain: request.chain});
+        const providerSet = setEvmProvider(zkEvmProvider);
 
         if (!providerSet) {
           throw new Error('Failed to connect to EVM');
@@ -626,7 +661,7 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.zkEvm.sendTransaction: {
         const transaction = JSON.parse(data);
-        const transactionHash = await getZkEvmProvider().request({
+        const transactionHash = await getEvmProvider().request({
           method: 'eth_sendTransaction',
           params: [transaction],
         });
@@ -652,7 +687,7 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.zkEvm.sendTransactionWithConfirmation: {
         const transaction = JSON.parse(data);
-        const zkEvmProvider = getZkEvmProvider();
+        const zkEvmProvider = getEvmProvider();
         const browserProvider = new BrowserProvider(zkEvmProvider);
         const signer = await browserProvider.getSigner();
 
@@ -676,10 +711,10 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.zkEvm.signTypedDataV4: {
         const payload = JSON.parse(data);
-        const [address] = await getZkEvmProvider().request({
+        const [address] = await getEvmProvider().request({
           method: 'eth_requestAccounts',
         });
-        const signature = await getZkEvmProvider().request({
+        const signature = await getEvmProvider().request({
           method: 'eth_signTypedData_v4',
           params: [address, payload],
         });
@@ -703,7 +738,7 @@ window.callFunction = async (jsonData: string) => {
         break;
       }
       case PASSPORT_FUNCTIONS.zkEvm.requestAccounts: {
-        const result = await getZkEvmProvider().request({
+        const result = await getEvmProvider().request({
           method: 'eth_requestAccounts',
         });
         const success = result !== null && result !== undefined;
@@ -724,7 +759,7 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.zkEvm.getBalance: {
         const request = JSON.parse(data);
-        const result = await getZkEvmProvider().request({
+        const result = await getEvmProvider().request({
           method: 'eth_getBalance',
           params: [request.address, request.blockNumberOrTag],
         });
@@ -746,7 +781,7 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.zkEvm.getTransactionReceipt: {
         const request = JSON.parse(data);
-        const response = await getZkEvmProvider().request({
+        const response = await getEvmProvider().request({
           method: 'eth_getTransactionReceipt',
           params: [request.txHash],
         });

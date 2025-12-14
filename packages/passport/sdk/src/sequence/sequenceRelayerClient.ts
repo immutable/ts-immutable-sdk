@@ -47,13 +47,16 @@ export class SequenceRelayerClient {
     const chainConfig = getChainConfig(chain);
 
     const relayer = this.getRelayer(chain, chainConfig);
+    console.log(`postToRelayer relayer ${JSON.stringify(relayer)}`);
     const { opHash } = await relayer.relay(to, data, chainConfig.chainId);
+    console.log(`postToRelayer opHash ${opHash}`);
 
     const wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
     let transactionHash: string;
     while (true) {
       const status = await relayer.status(opHash, chainConfig.chainId);
+      console.log(`postToRelayer status ${JSON.stringify(status)}`);
       if (status.status === "confirmed") {
         transactionHash = `${status.transactionHash}`;
         flow.addEvent('endSubmitToRelayer');

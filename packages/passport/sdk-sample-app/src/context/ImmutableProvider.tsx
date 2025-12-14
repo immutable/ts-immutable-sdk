@@ -142,6 +142,7 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
           passportMrBasePath: 'http://localhost:8072',
           sequenceIdentityInstrumentEndpoint: 'https://next-identity.sequence-dev.app/',
           sequenceProjectAccessKey: 'AQAAAAAAAAB5QznGqk9paa4EQjom09ERpJs',
+          sequenceGuardEndpoint: 'https://guard.sequence.app',
         },
         ...sharedConfigurationValues,
       };

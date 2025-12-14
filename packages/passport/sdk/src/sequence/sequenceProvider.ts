@@ -121,10 +121,13 @@ export class SequenceProvider implements Provider {
   async #performRequest(request: RequestArguments): Promise<any> {
     switch (request.method) {
       case 'eth_requestAccounts': {
+        console.log(`sequence eth_requestAccounts`);
         const signerAddress = await this.#ethSigner.getAddress();
         console.log(`sequence signerAddress = ${signerAddress}`);
 
         const walletAddress = await this.#getWalletAddress();
+        console.log(`eth_requestAccounts 1 walletAddress = ${walletAddress}`);
+        this.userWalletAddress = walletAddress;
         if (walletAddress) return [walletAddress];
 
         const flow = trackFlow('passport', `ethRequestAccounts_${this.#chain}`);
@@ -151,10 +154,14 @@ export class SequenceProvider implements Provider {
             });
 
             this.userWalletAddress = userEthAddress;
+            console.log(`eth_requestAccounts 2 walletAddress = ${this.userWalletAddress}`);
             
             flow.addEvent('endUserRegistration');
           } else {
             userEthAddress = user[this.#chain].ethAddress;
+
+            this.userWalletAddress = userEthAddress;
+            console.log(`eth_requestAccounts 3 walletAddress = ${this.userWalletAddress}`);
           }
 
           if (userEthAddress) {
@@ -181,7 +188,8 @@ export class SequenceProvider implements Provider {
       }
 
       case 'eth_sendTransaction': {
-        const walletAddress = this.userWalletAddress;
+        console.log(`sequence eth_sendTransaction ${this.userWalletAddress}`);
+        const walletAddress = '0x3fadd1f6f02408c0fad35e362e3d5c65e722b67a';//this.userWalletAddress;
         // const walletAddress = await this.#getWalletAddress();
 
         if (!walletAddress) {
@@ -194,21 +202,8 @@ export class SequenceProvider implements Provider {
         const flow = trackFlow('passport', `ethSendTransaction_${this.#chain}`);
 
         try {
-          return await sendTransaction({
-            params: request.params || [],
-            sequenceSigner: this.#ethSigner,
-            rpcProvider: this.#rpcProvider,
-            relayerClient: this.#relayerClient,
-            guardianClient: this.#guardianClient,
-            walletAddress,
-            flow,
-            authManager: this.#authManager,
-            chain: this.#chain,
-          });
-          // return await this.#guardianClient.withConfirmationScreen({
-          //   width: 480,
-          //   height: 720,
-          // })(async () => await sendTransaction({
+          // console.log(`sequence NO GUARDIAN`)
+          // return await sendTransaction({
           //   params: request.params || [],
           //   sequenceSigner: this.#ethSigner,
           //   rpcProvider: this.#rpcProvider,
@@ -218,7 +213,21 @@ export class SequenceProvider implements Provider {
           //   flow,
           //   authManager: this.#authManager,
           //   chain: this.#chain,
-          // }));
+          // });
+          return await this.#guardianClient.withConfirmationScreen({
+            width: 480,
+            height: 720,
+          })(async () => await sendTransaction({
+            params: request.params || [],
+            sequenceSigner: this.#ethSigner,
+            rpcProvider: this.#rpcProvider,
+            relayerClient: this.#relayerClient,
+            guardianClient: this.#guardianClient,
+            walletAddress,
+            flow,
+            authManager: this.#authManager,
+            chain: this.#chain,
+          }));
         } catch (error) {
           if (error instanceof Error) {
             trackError('passport', `ethSendTransaction_${this.#chain}`, error, { flowId: flow.details.flowId });
