@@ -340,6 +340,10 @@ describe('Auth', () => {
       // Complete authentication
       jest.advanceTimersByTime(150);
 
+      // Wait for promise resolution (microtasks) to complete
+      await Promise.resolve();
+      await Promise.resolve();
+
       // Now close the popup AFTER auth completed
       mockPopupWindow.closed = true;
 

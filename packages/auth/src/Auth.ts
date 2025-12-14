@@ -515,32 +515,68 @@ export class Auth {
         // This complements oidc-client-ts native detection which only checks once at start
         const popupRef = window.open('', popupWindowTarget);
         if (popupRef) {
-          // Flag to track if authentication completed (success or failure)
-          let authenticationCompleted = false;
+          // Return a single promise that manages both success and popup closure detection
+          return new Promise<OidcUser>((resolve, reject) => {
+            // Flag to track if we've already resolved/rejected
+            let settled = false;
+            // Track if popup has navigated to callback URL (indicates auth in progress)
+            let hasNavigatedToCallback = false;
 
-          // Create a promise that rejects when popup is closed
-          const popupClosedPromise = new Promise<never>((_, reject) => {
+            // Helper to check if popup is on callback URL
+            const isOnCallbackUrl = (): boolean => {
+              try {
+                // Check if popup URL contains the callback path
+                // This will work when popup is on same origin (our callback URL)
+                return popupRef.location?.pathname?.includes('/callback') || false;
+              } catch (e) {
+                // CORS error means popup is on different origin (auth provider)
+                // This is expected during authentication flow
+                return false;
+              }
+            };
+
+            // Start polling for popup closure
             const timer = setInterval(() => {
-              // Only reject if popup closed AND authentication hasn't completed yet
-              if (popupRef.closed && !authenticationCompleted) {
+              // Check if popup navigated to callback URL
+              if (!hasNavigatedToCallback && isOnCallbackUrl()) {
+                hasNavigatedToCallback = true;
+              }
+
+              // Only reject if:
+              // 1. Not yet settled
+              // 2. Popup is closed
+              // 3. Popup never reached callback URL (user closed it manually)
+              if (!settled && popupRef.closed && !hasNavigatedToCallback) {
+                settled = true;
                 clearInterval(timer);
                 reject(new Error('Popup closed by user'));
               }
             }, LOGIN_POPUP_CLOSED_POLLING_DURATION);
 
-            // Clean up timer when the user promise resolves/rejects
-            userPromise.finally(() => {
-              authenticationCompleted = true;
-              clearInterval(timer);
-              // Close popup if still open (e.g., auth completed but popup didn't auto-close)
-              if (!popupRef.closed) {
-                popupRef.close();
-              }
-            });
+            // Handle userPromise resolution
+            userPromise.then(
+              (user) => {
+                if (!settled) {
+                  settled = true;
+                  clearInterval(timer);
+                  if (!popupRef.closed) {
+                    popupRef.close();
+                  }
+                  resolve(user);
+                }
+              },
+              (error) => {
+                if (!settled) {
+                  settled = true;
+                  clearInterval(timer);
+                  if (!popupRef.closed) {
+                    popupRef.close();
+                  }
+                  reject(error);
+                }
+              },
+            );
           });
-
-          // Race between user authentication and popup being closed
-          return Promise.race([userPromise, popupClosedPromise]);
         }
 
         return userPromise;
