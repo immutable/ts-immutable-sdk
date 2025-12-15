@@ -283,7 +283,7 @@ export class Passport {
    * @param {boolean} [options.useRedirectFlow] - If true, uses redirect flow instead of popup flow
    * @param {DirectLoginOptions} [options.directLoginOptions] - If provided, contains login method and marketing consent options
    * @param {string} [options.directLoginOptions.directLoginMethod] - The login method to use (e.g., 'google', 'apple', 'email')
-   * @param {MarketingConsentStatus} [options.directLoginOptions.marketingConsentStatus] - Marketing consent status ('opted_in' or 'unsubscribed')
+   * @param {MarketingConsentStatus} [options.directLoginOptions.marketingConsentStatus] - Marketing consent status ('opted_in' | 'unsubscribed' | 'subscribed')
    * @param {string} [options.directLoginOptions.email] - Required when directLoginMethod is 'email'
    * @returns {Promise<UserProfile | null>} A promise that resolves to the user profile if logged in, null otherwise
    * @throws {Error} If retrieving the cached user session fails (except for "Unknown or invalid refresh token" errors)
