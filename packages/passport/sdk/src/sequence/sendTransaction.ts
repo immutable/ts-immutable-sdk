@@ -9,7 +9,7 @@ type EthSendTransactionParams = TransactionParams & {
 export const sendTransaction = async ({
   params,
   sequenceSigner,
-  rpcProvider,
+  oxRpcProvider,
   relayerClient,
   guardianClient,
   walletAddress,
@@ -22,7 +22,7 @@ export const sendTransaction = async ({
   const { to, data } = await prepareAndSignTransaction({
     transactionRequest,
     sequenceSigner,
-    rpcProvider,
+    oxRpcProvider,
     relayerClient,
     guardianClient,
     walletAddress,

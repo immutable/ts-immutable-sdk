@@ -23,6 +23,7 @@ import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { SequenceSigner } from './index';
 import { getChainConfig } from './chainConfig';
 import GuardianClient from '../guardian';
+import { JsonRpcProvider } from 'ethers';
 
 export type SequenceProviderInput = {
   authManager: AuthManager;
@@ -56,7 +57,9 @@ export class SequenceProvider implements Provider {
 
   readonly #guardianClient: GuardianClient;
 
-  readonly #rpcProvider: OxProvider.Provider;
+  readonly #rpcProvider: JsonRpcProvider;
+
+  readonly #oxRpcProvider: OxProvider.Provider;
 
   readonly #multiRollupApiClients: MultiRollupApiClients;
 
@@ -89,10 +92,10 @@ export class SequenceProvider implements Provider {
     this.#chain = chain;
 
     const chainConfig = getChainConfig(chain);
-    // this.#rpcProvider = new JsonRpcProvider(chainConfig.rpcUrl, undefined, {
-    //   staticNetwork: true,
-    // });
-    this.#rpcProvider = OxProvider.from(RpcTransport.fromHttp(chainConfig.nodeUrl));
+    this.#rpcProvider = new JsonRpcProvider(chainConfig.rpcUrl, undefined, {
+      staticNetwork: true,
+    });
+    this.#oxRpcProvider = OxProvider.from(RpcTransport.fromHttp(chainConfig.nodeUrl));
 
     this.#relayerClient = new SequenceRelayerClient({ config: this.#config });
 
@@ -190,6 +193,7 @@ export class SequenceProvider implements Provider {
       case 'eth_sendTransaction': {
         console.log(`sequence eth_sendTransaction ${this.userWalletAddress}`);
         const walletAddress = '0x3fadd1f6f02408c0fad35e362e3d5c65e722b67a';//this.userWalletAddress;
+        // const walletAddress = this.userWalletAddress;
         // const walletAddress = await this.#getWalletAddress();
 
         if (!walletAddress) {
@@ -206,7 +210,7 @@ export class SequenceProvider implements Provider {
           // return await sendTransaction({
           //   params: request.params || [],
           //   sequenceSigner: this.#ethSigner,
-          //   rpcProvider: this.#rpcProvider,
+          //   oxRpcProvider: this.#oxRpcProvider,
           //   relayerClient: this.#relayerClient,
           //   guardianClient: this.#guardianClient,
           //   walletAddress,
@@ -220,7 +224,7 @@ export class SequenceProvider implements Provider {
           })(async () => await sendTransaction({
             params: request.params || [],
             sequenceSigner: this.#ethSigner,
-            rpcProvider: this.#rpcProvider,
+            oxRpcProvider: this.#oxRpcProvider,
             relayerClient: this.#relayerClient,
             guardianClient: this.#guardianClient,
             walletAddress,
@@ -240,12 +244,40 @@ export class SequenceProvider implements Provider {
         }
       }
 
+      // Pass through methods
       case 'eth_getBalance':
+      case 'eth_getCode':
+      case 'eth_getTransactionCount': {
         const [address, blockNumber] = request.params || [];
-        return this.#rpcProvider.request({
-          method: request.method,
-          params: [address, blockNumber || 'latest'],
-        });
+        return this.#rpcProvider.send(request.method, [
+          address,
+          blockNumber || 'latest',
+        ]);
+      }
+      case 'eth_getStorageAt': {
+        const [address, storageSlot, blockNumber] = request.params || [];
+        return this.#rpcProvider.send(request.method, [
+          address,
+          storageSlot,
+          blockNumber || 'latest',
+        ]);
+      }
+      case 'eth_call':
+      case 'eth_estimateGas': {
+        const [transaction, blockNumber] = request.params || [];
+        return this.#rpcProvider.send(request.method, [
+          transaction,
+          blockNumber || 'latest',
+        ]);
+      }
+      case 'eth_gasPrice':
+      case 'eth_blockNumber':
+      case 'eth_getBlockByHash':
+      case 'eth_getBlockByNumber':
+      case 'eth_getTransactionByHash':
+      case 'eth_getTransactionReceipt': {
+        return this.#rpcProvider.send(request.method, request.params || []);
+      }
 
       default: {
         throw new JsonRpcError(

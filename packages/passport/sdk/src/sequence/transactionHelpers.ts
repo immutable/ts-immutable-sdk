@@ -11,11 +11,10 @@ import AuthManager from '../authManager';
 import { createStateProvider, createWalletConfig, saveWalletConfig, SEQUENCE_CONTEXT } from './signer/signerHelpers';
 import GuardianClient, { convertBigNumberishToString } from '../guardian';
 import { MetaTransaction } from '../zkEvm/types';
-import { signTypedDataV4 } from '../zkEvm/signTypedDataV4';
 
 export type TransactionParams = {
   sequenceSigner: SequenceSigner;
-  rpcProvider: Provider.Provider;
+  oxRpcProvider: Provider.Provider;
   guardianClient: GuardianClient;
   relayerClient: SequenceRelayerClient;
   walletAddress: string;
@@ -88,7 +87,7 @@ const createWallet = async (
 export const prepareAndSignTransaction = async ({
   transactionRequest,
   sequenceSigner,
-  rpcProvider,
+  oxRpcProvider,
   guardianClient,
   relayerClient,
   walletAddress,
@@ -105,11 +104,11 @@ export const prepareAndSignTransaction = async ({
     );
   }
 
-  const chainId = await rpcProvider.request({ method: 'eth_chainId' });
+  const chainId = await oxRpcProvider.request({ method: 'eth_chainId' });
 
   const metaTransaction = await buildMetaTransaction(
     transactionRequest,
-    rpcProvider,
+    oxRpcProvider,
     walletAddress,
     nonceSpace,
   );
@@ -135,7 +134,7 @@ export const prepareAndSignTransaction = async ({
       walletAddress,
       metaTransaction,
       authManager,
-      rpcProvider,
+      oxRpcProvider,
       sequenceSigner,
       chainId,
       flow,

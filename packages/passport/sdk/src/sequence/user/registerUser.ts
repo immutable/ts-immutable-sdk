@@ -4,13 +4,13 @@ import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { getEip155ChainId } from '../walletHelpers';
 import { JsonRpcError, RpcErrorCode } from '../../zkEvm/JsonRpcError';
 import SequenceSigner from '../sequenceSigner';
-import { Provider } from 'ox';
+import { JsonRpcProvider } from 'ethers';
 
 export type RegisterUserInput = {
   authManager: AuthManager;
   multiRollupApiClients: MultiRollupApiClients;
   accessToken: string;
-  rpcProvider: Provider.Provider;
+  rpcProvider: JsonRpcProvider;
   ethSigner: SequenceSigner;
   flow: Flow;
 };
@@ -42,25 +42,25 @@ export async function registerUser({
   });
   signMessagePromise.then(() => flow.addEvent('endSignRaw'));
 
-  const detectNetworkPromise = rpcProvider.request({ method: 'eth_chainId' });
+  const detectNetworkPromise = rpcProvider.getNetwork();
   detectNetworkPromise.then(() => flow.addEvent('endDetectNetwork'));
 
   const listChainsPromise = multiRollupApiClients.chainsApi.listChains();
   listChainsPromise.then(() => flow.addEvent('endListChains'));
 
-  const [ethereumAddress, ethereumSignature, chainId, chainListResponse] = await Promise.all([
+  const [ethereumAddress, ethereumSignature, network, chainListResponse] = await Promise.all([
     getAddressPromise,
     signMessagePromise,
     detectNetworkPromise,
     listChainsPromise,
   ]);
 
-  const eipChainId = getEip155ChainId(Number(chainId));
+  const eipChainId = getEip155ChainId(Number(network.chainId));
   const chainName = chainListResponse.data?.result?.find((chain) => chain.id === eipChainId)?.name;
   if (!chainName) {
     throw new JsonRpcError(
       RpcErrorCode.INTERNAL_ERROR,
-      `Chain name does not exist on for chain id ${chainId}`,
+      `Chain name does not exist on for chain id ${network.chainId}`,
     );
   }
 
