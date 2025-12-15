@@ -247,6 +247,9 @@ describe('Auth', () => {
       (auth as any).userManager = mockUserManager;
       (auth as any).config = {
         popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
+        oidcConfiguration: {
+          redirectUri: 'http://localhost:3000/redirect',
+        },
       };
       getDetailMock.mockReturnValue('runtime-id-value');
 
@@ -284,6 +287,9 @@ describe('Auth', () => {
       (auth as any).userManager = mockUserManager;
       (auth as any).config = {
         popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
+        oidcConfiguration: {
+          redirectUri: 'http://localhost:3000/redirect',
+        },
       };
       getDetailMock.mockReturnValue('runtime-id-value');
 
@@ -328,6 +334,9 @@ describe('Auth', () => {
       (auth as any).userManager = mockUserManager;
       (auth as any).config = {
         popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
+        oidcConfiguration: {
+          redirectUri: 'http://localhost:3000/redirect',
+        },
       };
       getDetailMock.mockReturnValue('runtime-id-value');
 
@@ -374,6 +383,9 @@ describe('Auth', () => {
       (auth as any).userManager = mockUserManager;
       (auth as any).config = {
         popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
+        oidcConfiguration: {
+          redirectUri: 'http://localhost:3000/redirect',
+        },
       };
       getDetailMock.mockReturnValue('runtime-id-value');
 
@@ -405,10 +417,12 @@ describe('Auth', () => {
         // Promise that never settles
       }));
 
-      // Mock popup that navigates to callback URL
+      // Mock popup that navigates to callback URL (matches default test config)
       Object.defineProperty(mockPopupWindow, 'location', {
         get: jest.fn(() => ({
-          pathname: '/login/callback',
+          href: 'http://localhost:3000/redirect',
+          origin: 'http://localhost:3000',
+          pathname: '/redirect',
         })),
         configurable: true,
       });
@@ -417,6 +431,9 @@ describe('Auth', () => {
       (auth as any).userManager = mockUserManager;
       (auth as any).config = {
         popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
+        oidcConfiguration: {
+          redirectUri: 'http://localhost:3000/redirect',
+        },
       };
       getDetailMock.mockReturnValue('runtime-id-value');
 

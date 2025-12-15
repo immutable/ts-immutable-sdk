@@ -518,6 +518,10 @@ export class Auth {
         // This complements oidc-client-ts native detection which only checks once at start
         const popupRef = window.open('', popupWindowTarget);
         if (popupRef) {
+          // Get the configured popup redirect URI to detect when auth completes
+          const popupRedirectUri = this.config.oidcConfiguration.popupRedirectUri
+            || this.config.oidcConfiguration.redirectUri;
+
           // Return a single promise that manages both success and popup closure detection
           return new Promise<OidcUser>((resolve, reject) => {
             // Flag to track if we've already resolved/rejected
@@ -530,9 +534,17 @@ export class Auth {
             // Helper to check if popup is on callback URL
             const isOnCallbackUrl = (): boolean => {
               try {
-                // Check if popup URL contains the callback path
+                // Check if popup URL matches the configured redirect URI
                 // This will work when popup is on same origin (our callback URL)
-                return popupRef.location?.pathname?.includes('/callback') || false;
+                const popupUrl = popupRef.location?.href;
+                if (!popupUrl) return false;
+
+                // Compare origins and pathnames to avoid false positives
+                const callbackUrl = new URL(popupRedirectUri);
+                const currentUrl = new URL(popupUrl);
+
+                return currentUrl.origin === callbackUrl.origin
+                  && currentUrl.pathname === callbackUrl.pathname;
               } catch (e) {
                 // CORS error means popup is on different origin (auth provider)
                 // This is expected during authentication flow
