@@ -41,10 +41,6 @@ import { isAccessTokenExpiredOrExpiring } from './utils/token';
 import LoginPopupOverlay from './overlay/loginPopupOverlay';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
 
-const LOGIN_POPUP_CLOSED_POLLING_DURATION = 500;
-// Timeout for authentication to complete after reaching callback URL
-// If userPromise doesn't settle within this time after callback navigation, reject to prevent timer leak
-const CALLBACK_COMPLETION_TIMEOUT = 30000; // 30 seconds
 const formUrlEncodedHeaders = {
   'Content-Type': 'application/x-www-form-urlencoded',
 };
@@ -502,7 +498,7 @@ export class Auth {
       const signinPopup = async () => {
         const extraQueryParams = this.buildExtraQueryParams(directLoginOptionsToUse, imPassportTraceId);
 
-        const userPromise = this.userManager.signinPopup({
+        return this.userManager.signinPopup({
           extraQueryParams,
           popupWindowFeatures: {
             width: 410,
@@ -512,101 +508,6 @@ export class Auth {
           // Enable oidc-client-ts native popup close detection (works for initial screen)
           popupAbortOnClose: true,
         });
-
-        // Additional polling workaround to detect popup closure during navigation
-        // (e.g., when user navigates to third-party login, passwordless, or captcha screens)
-        // This complements oidc-client-ts native detection which only checks once at start
-        const popupRef = window.open('', popupWindowTarget);
-        if (popupRef) {
-          // Get the configured popup redirect URI to detect when auth completes
-          const popupRedirectUri = this.config.oidcConfiguration.popupRedirectUri
-            || this.config.oidcConfiguration.redirectUri;
-
-          // Return a single promise that manages both success and popup closure detection
-          return new Promise<OidcUser>((resolve, reject) => {
-            // Flag to track if we've already resolved/rejected
-            let settled = false;
-            // Track if popup has navigated to callback URL (indicates auth in progress)
-            let hasNavigatedToCallback = false;
-            // Track when popup reached callback to detect timeout
-            let callbackStartTime: number | null = null;
-
-            // Helper to check if popup is on callback URL
-            const isOnCallbackUrl = (): boolean => {
-              try {
-                // Check if popup URL matches the configured redirect URI
-                // This will work when popup is on same origin (our callback URL)
-                const popupUrl = popupRef.location?.href;
-                if (!popupUrl) return false;
-
-                // Compare origins and pathnames to avoid false positives
-                const callbackUrl = new URL(popupRedirectUri);
-                const currentUrl = new URL(popupUrl);
-
-                return currentUrl.origin === callbackUrl.origin
-                  && currentUrl.pathname === callbackUrl.pathname;
-              } catch (e) {
-                // CORS error means popup is on different origin (auth provider)
-                // This is expected during authentication flow
-                return false;
-              }
-            };
-
-            // Start polling for popup closure
-            const timer = setInterval(() => {
-              // Check if popup navigated to callback URL
-              if (!hasNavigatedToCallback && isOnCallbackUrl()) {
-                hasNavigatedToCallback = true;
-                callbackStartTime = Date.now();
-              }
-
-              // Check if authentication timed out after reaching callback
-              const callbackTimedOut = hasNavigatedToCallback
-                && callbackStartTime
-                && (Date.now() - callbackStartTime > CALLBACK_COMPLETION_TIMEOUT);
-
-              // Reject if:
-              // 1. Not yet settled AND popup is closed AND
-              //    (a) Popup never reached callback URL (user closed it manually) OR
-              //    (b) Popup reached callback but timed out (prevents timer leak)
-              if (!settled && popupRef.closed && (!hasNavigatedToCallback || callbackTimedOut)) {
-                settled = true;
-                clearInterval(timer);
-                reject(new Error(
-                  callbackTimedOut
-                    ? 'Authentication timed out after reaching callback'
-                    : 'Popup closed by user',
-                ));
-              }
-            }, LOGIN_POPUP_CLOSED_POLLING_DURATION);
-
-            // Handle userPromise resolution
-            userPromise.then(
-              (user) => {
-                if (!settled) {
-                  settled = true;
-                  clearInterval(timer);
-                  if (!popupRef.closed) {
-                    popupRef.close();
-                  }
-                  resolve(user);
-                }
-              },
-              (error) => {
-                if (!settled) {
-                  settled = true;
-                  clearInterval(timer);
-                  if (!popupRef.closed) {
-                    popupRef.close();
-                  }
-                  reject(error);
-                }
-              },
-            );
-          });
-        }
-
-        return userPromise;
       };
 
       return new Promise((resolve, reject) => {

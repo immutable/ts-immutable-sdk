@@ -186,21 +186,11 @@ describe('Auth', () => {
     });
   });
 
-  describe('loginWithPopup - popup closure detection', () => {
+  describe('loginWithPopup', () => {
     let mockUserManager: any;
-    let mockPopupWindow: any;
-    let originalWindowOpen: any;
     let originalCryptoRandomUUID: any;
 
     beforeEach(() => {
-      // Mock window.open to return a controllable popup reference
-      originalWindowOpen = window.open;
-      mockPopupWindow = {
-        closed: false,
-        close: jest.fn(),
-      };
-      window.open = jest.fn().mockReturnValue(mockPopupWindow);
-
       // Mock crypto.randomUUID
       originalCryptoRandomUUID = window.crypto.randomUUID;
       window.crypto.randomUUID = jest.fn().mockReturnValue('test-popup-id');
@@ -212,158 +202,13 @@ describe('Auth', () => {
           extraQueryParams: {},
         },
       };
-
-      jest.useFakeTimers();
     });
 
     afterEach(() => {
-      window.open = originalWindowOpen;
       window.crypto.randomUUID = originalCryptoRandomUUID;
-      jest.useRealTimers();
     });
 
-    it('resolves successfully when authentication completes before popup closes', async () => {
-      const mockOidcUser = {
-        id_token: 'token',
-        access_token: 'access',
-        refresh_token: 'refresh',
-        expired: false,
-        profile: { sub: 'user-123', email: 'test@example.com', nickname: 'tester' },
-      };
-
-      (decodeJwtPayload as jest.Mock).mockReturnValue({
-        username: 'username123',
-        passport: undefined,
-      });
-
-      // Simulate successful authentication that resolves quickly
-      mockUserManager.signinPopup.mockImplementation(() => new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(mockOidcUser);
-        }, 100);
-      }));
-
-      const auth = Object.create(Auth.prototype) as Auth;
-      (auth as any).userManager = mockUserManager;
-      (auth as any).config = {
-        popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
-        oidcConfiguration: {
-          redirectUri: 'http://localhost:3000/redirect',
-        },
-      };
-      getDetailMock.mockReturnValue('runtime-id-value');
-
-      // Pass directLoginOptions to skip embeddedLoginPrompt
-      const loginPromise = (auth as any).loginWithPopup({
-        directLoginMethod: 'google',
-        marketingConsentStatus: 'opted_in',
-      });
-
-      // Fast-forward time to complete authentication
-      jest.advanceTimersByTime(150);
-
-      const user = await loginPromise;
-
-      expect(user).toBeDefined();
-      expect(user.profile.sub).toBe('user-123');
-      expect(mockPopupWindow.close).toHaveBeenCalled();
-    });
-
-    it('rejects with error when popup is closed manually before authentication completes', async () => {
-      // Simulate authentication that takes a long time
-      mockUserManager.signinPopup.mockImplementation(() => new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            id_token: 'token',
-            access_token: 'access',
-            refresh_token: 'refresh',
-            expired: false,
-            profile: { sub: 'user-123', email: 'test@example.com', nickname: 'tester' },
-          });
-        }, 5000); // Takes 5 seconds
-      }));
-
-      const auth = Object.create(Auth.prototype) as Auth;
-      (auth as any).userManager = mockUserManager;
-      (auth as any).config = {
-        popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
-        oidcConfiguration: {
-          redirectUri: 'http://localhost:3000/redirect',
-        },
-      };
-      getDetailMock.mockReturnValue('runtime-id-value');
-
-      // Pass directLoginOptions to skip embeddedLoginPrompt
-      const loginPromise = (auth as any).loginWithPopup({
-        directLoginMethod: 'google',
-        marketingConsentStatus: 'opted_in',
-      });
-
-      // Simulate user closing popup after 1 second
-      jest.advanceTimersByTime(1000);
-      mockPopupWindow.closed = true;
-
-      // Advance time to trigger the polling check
-      jest.advanceTimersByTime(500);
-
-      await expect(loginPromise).rejects.toThrow('Popup closed by user');
-    });
-
-    it('does not reject when popup closes after authentication completes successfully', async () => {
-      const mockOidcUser = {
-        id_token: 'token',
-        access_token: 'access',
-        refresh_token: 'refresh',
-        expired: false,
-        profile: { sub: 'user-123', email: 'test@example.com', nickname: 'tester' },
-      };
-
-      (decodeJwtPayload as jest.Mock).mockReturnValue({
-        username: 'username123',
-        passport: undefined,
-      });
-
-      // Simulate successful authentication
-      mockUserManager.signinPopup.mockImplementation(() => new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(mockOidcUser);
-        }, 100);
-      }));
-
-      const auth = Object.create(Auth.prototype) as Auth;
-      (auth as any).userManager = mockUserManager;
-      (auth as any).config = {
-        popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
-        oidcConfiguration: {
-          redirectUri: 'http://localhost:3000/redirect',
-        },
-      };
-      getDetailMock.mockReturnValue('runtime-id-value');
-
-      // Pass directLoginOptions to skip embeddedLoginPrompt
-      const loginPromise = (auth as any).loginWithPopup({
-        directLoginMethod: 'google',
-        marketingConsentStatus: 'opted_in',
-      });
-
-      // Complete authentication
-      jest.advanceTimersByTime(150);
-
-      // Wait for promise microtasks to complete before closing popup
-      await Promise.resolve();
-
-      // Now close the popup AFTER auth completed
-      mockPopupWindow.closed = true;
-
-      // Advance polling interval - should NOT reject
-      jest.advanceTimersByTime(600);
-
-      const user = await loginPromise;
-      expect(user).toBeDefined();
-      expect(user.profile.sub).toBe('user-123');
-    });
-
-    it('stops polling after authentication completes', async () => {
+    it('successfully completes authentication and returns user', async () => {
       const mockOidcUser = {
         id_token: 'token',
         access_token: 'access',
@@ -383,77 +228,72 @@ describe('Auth', () => {
       (auth as any).userManager = mockUserManager;
       (auth as any).config = {
         popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
-        oidcConfiguration: {
-          redirectUri: 'http://localhost:3000/redirect',
-        },
       };
       getDetailMock.mockReturnValue('runtime-id-value');
 
-      const setIntervalSpy = jest.spyOn(global, 'setInterval');
-      const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
-
-      // Pass directLoginOptions to skip embeddedLoginPrompt
-      const loginPromise = (auth as any).loginWithPopup({
+      const user = await (auth as any).loginWithPopup({
         directLoginMethod: 'google',
         marketingConsentStatus: 'opted_in',
       });
 
-      // Let authentication complete
-      await Promise.resolve();
-      jest.runAllTimers();
-
-      await loginPromise;
-
-      // Verify that clearInterval was called (timer stopped)
-      expect(clearIntervalSpy).toHaveBeenCalled();
-
-      setIntervalSpy.mockRestore();
-      clearIntervalSpy.mockRestore();
+      expect(user).toBeDefined();
+      expect(user.profile.sub).toBe('user-123');
+      expect(user.profile.email).toBe('test@example.com');
     });
 
-    it('rejects with timeout error when popup reaches callback but userPromise never settles', async () => {
-      // Simulate userPromise that never resolves (network issue, OIDC bug, etc)
-      mockUserManager.signinPopup.mockImplementation(() => new Promise(() => {
-        // Promise that never settles
-      }));
+    it('calls signinPopup with correct configuration', async () => {
+      const mockOidcUser = {
+        id_token: 'token',
+        access_token: 'access',
+        refresh_token: 'refresh',
+        expired: false,
+        profile: { sub: 'user-123', email: 'test@example.com', nickname: 'tester' },
+      };
 
-      // Mock popup that navigates to callback URL (matches default test config)
-      Object.defineProperty(mockPopupWindow, 'location', {
-        get: jest.fn(() => ({
-          href: 'http://localhost:3000/redirect',
-          origin: 'http://localhost:3000',
-          pathname: '/redirect',
-        })),
-        configurable: true,
+      (decodeJwtPayload as jest.Mock).mockReturnValue({
+        username: 'username123',
+        passport: undefined,
       });
+
+      mockUserManager.signinPopup.mockResolvedValue(mockOidcUser);
 
       const auth = Object.create(Auth.prototype) as Auth;
       (auth as any).userManager = mockUserManager;
       (auth as any).config = {
         popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
-        oidcConfiguration: {
-          redirectUri: 'http://localhost:3000/redirect',
-        },
       };
       getDetailMock.mockReturnValue('runtime-id-value');
 
-      // Pass directLoginOptions to skip embeddedLoginPrompt
-      const loginPromise = (auth as any).loginWithPopup({
+      await (auth as any).loginWithPopup({
         directLoginMethod: 'google',
         marketingConsentStatus: 'opted_in',
       });
 
-      // Advance time to detect callback navigation (first polling cycle)
-      jest.advanceTimersByTime(500);
+      expect(mockUserManager.signinPopup).toHaveBeenCalledWith(
+        expect.objectContaining({
+          popupWindowTarget: 'test-popup-id',
+          popupWindowFeatures: { width: 410, height: 450 },
+          popupAbortOnClose: true,
+          extraQueryParams: expect.any(Object),
+        }),
+      );
+    });
 
-      // Close popup after it reached callback
-      mockPopupWindow.closed = true;
+    it('rejects when signinPopup rejects', async () => {
+      const error = new Error('Authentication failed');
+      mockUserManager.signinPopup.mockRejectedValue(error);
 
-      // Advance time past the 30 second timeout
-      jest.advanceTimersByTime(31000);
+      const auth = Object.create(Auth.prototype) as Auth;
+      (auth as any).userManager = mockUserManager;
+      (auth as any).config = {
+        popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
+      };
+      getDetailMock.mockReturnValue('runtime-id-value');
 
-      // Should reject with timeout error
-      await expect(loginPromise).rejects.toThrow('Authentication timed out after reaching callback');
+      await expect((auth as any).loginWithPopup({
+        directLoginMethod: 'google',
+        marketingConsentStatus: 'opted_in',
+      })).rejects.toThrow('Authentication failed');
     });
   });
 });
