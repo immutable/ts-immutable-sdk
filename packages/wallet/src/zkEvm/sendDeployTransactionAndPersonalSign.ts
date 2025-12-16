@@ -14,7 +14,7 @@ export const sendDeployTransactionAndPersonalSign = async ({
   zkEvmAddress,
   flow,
 }: EthSendDeployTransactionParams): Promise<string> => {
-  const deployTransaction = { to: zkEvmAddress, value: 0 };
+  const deployTransaction = { to: zkEvmAddress, value: 0n };
 
   const { relayerId } = await prepareAndSignTransaction({
     transactionRequest: deployTransaction,

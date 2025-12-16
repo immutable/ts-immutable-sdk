@@ -1,5 +1,5 @@
 import { ImxApiClients, imx } from '@imtbl/generated-clients';
-import { EthSigner, StarkSigner } from '@imtbl/x-client';
+import { MessageSigner, StarkSigner } from '@imtbl/x-client';
 import { Auth, User } from '@imtbl/auth';
 import { retryWithDelay } from '@imtbl/wallet';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
@@ -25,7 +25,7 @@ async function forceUserRefresh(auth: Auth) {
 }
 
 export default async function registerOffchain(
-  userAdminKeySigner: EthSigner,
+  userAdminKeySigner: MessageSigner,
   starkSigner: StarkSigner,
   unregisteredUser: User,
   auth: Auth,

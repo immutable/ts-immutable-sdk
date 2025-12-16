@@ -1,14 +1,15 @@
 import { Flow } from '@imtbl/metrics';
-import { Signer, JsonRpcProvider } from 'ethers';
+import type { PublicClient } from 'viem';
 import GuardianClient from '../guardian';
 import { signAndPackTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { RelayerClient } from './relayerClient';
+import type { WalletSigner } from '../types';
 
 export type SignTypedDataV4Params = {
-  ethSigner: Signer;
-  rpcProvider: JsonRpcProvider;
+  ethSigner: WalletSigner;
+  rpcProvider: PublicClient;
   relayerClient: RelayerClient;
   method: string;
   params: Array<any>;
@@ -21,7 +22,7 @@ const isValidTypedDataPayload = (typedData: object): typedData is TypedDataPaylo
   REQUIRED_TYPED_DATA_PROPERTIES.every((key) => key in typedData)
 );
 
-const transformTypedData = (typedData: string | object, chainId: bigint): TypedDataPayload => {
+export const transformTypedData = (typedData: string | object, chainId: bigint): TypedDataPayload => {
   let transformedTypedData: object | TypedDataPayload;
 
   if (typeof typedData === 'string') {
@@ -47,16 +48,21 @@ const transformTypedData = (typedData: string | object, chainId: bigint): TypedD
   const providedChainId = transformedTypedData.domain?.chainId;
 
   if (providedChainId) {
-    // domain.chainId (if defined) can be a number, string, or hex value, but the relayer & guardian only accept a number.
+    // domain.chainId (if defined) can be a number, string, or hex value.
+    // Normalize to a number for consistent EIP-712 hashing.
+    let normalizedChainId: number;
     if (typeof providedChainId === 'string') {
       if (providedChainId.startsWith('0x')) {
-        transformedTypedData.domain.chainId = parseInt(providedChainId, 16).toString();
+        normalizedChainId = parseInt(providedChainId, 16);
       } else {
-        transformedTypedData.domain.chainId = parseInt(providedChainId, 10).toString();
+        normalizedChainId = parseInt(providedChainId, 10);
       }
+    } else {
+      normalizedChainId = Number(providedChainId);
     }
+    transformedTypedData.domain.chainId = normalizedChainId;
 
-    if (BigInt(transformedTypedData.domain.chainId ?? 0) !== chainId) {
+    if (BigInt(normalizedChainId) !== chainId) {
       throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid chainId, expected ${chainId}`);
     }
   }
@@ -80,8 +86,8 @@ export const signTypedDataV4 = async ({
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `${method} requires an address and a typed data JSON`);
   }
 
-  const { chainId } = await rpcProvider.getNetwork();
-  const typedData = transformTypedData(typedDataParam, chainId);
+  const chainId = await rpcProvider.getChainId();
+  const typedData = transformTypedData(typedDataParam, BigInt(chainId));
   flow.addEvent('endDetectNetwork');
 
   await guardianClient.evaluateEIP712Message({ chainID: String(chainId), payload: typedData });

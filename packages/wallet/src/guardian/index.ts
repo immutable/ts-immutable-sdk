@@ -1,5 +1,5 @@
 import * as GeneratedClients from '@imtbl/generated-clients';
-import { BigNumberish, ZeroAddress } from 'ethers';
+import { zeroAddress } from 'viem';
 import { Auth, IAuthConfiguration } from '@imtbl/auth';
 import ConfirmationScreen from '../confirmation/confirmation';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcError';
@@ -37,7 +37,7 @@ const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmatio
   + ' supported in this environment. Please contact Immutable support if you need to enable this feature.';
 
 export const convertBigNumberishToString = (
-  value: BigNumberish,
+  value: bigint,
 ): string => BigInt(value).toString();
 
 const transformGuardianTransactions = (
@@ -48,7 +48,7 @@ const transformGuardianTransactions = (
       delegateCall: t.delegateCall === true,
       revertOnError: t.revertOnError === true,
       gasLimit: t.gasLimit ? convertBigNumberishToString(t.gasLimit) : '0',
-      target: t.to ?? ZeroAddress,
+      target: t.to ?? zeroAddress,
       value: t.value ? convertBigNumberishToString(t.value) : '0',
       data: t.data ? t.data.toString() : '0x',
     }));

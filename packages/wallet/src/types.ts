@@ -2,8 +2,18 @@ import { Flow } from '@imtbl/metrics';
 import {
   Auth, TypedEventEmitter, type AuthEventMap,
 } from '@imtbl/auth';
-import { BigNumberish } from 'ethers';
 import { JsonRpcError } from './zkEvm/JsonRpcError';
+
+/**
+ * A viem-compatible signer interface for wallet operations.
+ * This replaces ethers' AbstractSigner/Signer.
+ */
+export interface WalletSigner {
+  /** Get the wallet address */
+  getAddress(): Promise<`0x${string}`>;
+  /** Sign a message (EIP-191 personal_sign) */
+  signMessage(message: string | Uint8Array): Promise<`0x${string}`>;
+}
 
 // Re-export auth types for convenience
 export type {
@@ -83,10 +93,10 @@ export interface TypedDataPayload {
 
 export interface MetaTransaction {
   to: string;
-  value?: BigNumberish | null;
+  value?: bigint | null;
   data?: string | null;
-  nonce?: BigNumberish;
-  gasLimit?: BigNumberish;
+  nonce?: bigint;
+  gasLimit?: bigint;
   delegateCall?: boolean;
   revertOnError?: boolean;
 }
@@ -94,9 +104,9 @@ export interface MetaTransaction {
 export interface MetaTransactionNormalised {
   delegateCall: boolean;
   revertOnError: boolean;
-  gasLimit: BigNumberish;
+  gasLimit: bigint;
   target: string;
-  value: BigNumberish;
+  value: bigint;
   data: string;
 }
 

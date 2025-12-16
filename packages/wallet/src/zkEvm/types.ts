@@ -1,4 +1,3 @@
-import { BigNumberish } from 'ethers';
 import { JsonRpcError } from './JsonRpcError';
 
 export enum RelayerTransactionStatus {
@@ -28,10 +27,10 @@ export interface FeeOption {
 
 export interface MetaTransaction {
   to: string;
-  value?: BigNumberish | null;
+  value?: bigint | null;
   data?: string | null;
-  nonce?: BigNumberish;
-  gasLimit?: BigNumberish;
+  nonce?: bigint;
+  gasLimit?: bigint;
   delegateCall?: boolean;
   revertOnError?: boolean;
 }
@@ -39,9 +38,9 @@ export interface MetaTransaction {
 export interface MetaTransactionNormalised {
   delegateCall: boolean;
   revertOnError: boolean;
-  gasLimit: BigNumberish;
+  gasLimit: bigint;
   target: string;
-  value: BigNumberish;
+  value: bigint;
   data: string;
 }
 
