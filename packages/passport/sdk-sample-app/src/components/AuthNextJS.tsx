@@ -74,13 +74,16 @@ export default function AuthNextJS() {
   }, [session, environment, addMessage]);
 
   return (
-    <CardStack title="Auth NextJS">
+    <CardStack title="Auth NextJS SSR">
+      <Body size="xSmall" sx={{ marginBottom: "base.spacing.x2", color: "base.color.text.body.secondary" }}>
+        ⚠️ This section is only testable when running the sample app locally with: pnpm run dev-with-sdk
+      </Body>
       <Stack direction="horizontal" style={{ flexWrap: "wrap" }} gap={3}>
         <WorkflowButton disabled={isLoading || isAuthenticated} onClick={handleSignIn}>
-          Login (NextAuth)
+          Login
         </WorkflowButton>
         <WorkflowButton disabled={isLoading || !isAuthenticated} onClick={handleSignOut}>
-          Logout (NextAuth)
+          Logout
         </WorkflowButton>
         <WorkflowButton disabled={isLoading || !isAuthenticated} onClick={handleGetUserInfo}>
           Get User Info

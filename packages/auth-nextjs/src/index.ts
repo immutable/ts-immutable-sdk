@@ -1,8 +1,13 @@
 // Main entry point for @imtbl/auth-nextjs
 
-import NextAuth, { type NextAuthOptions } from 'next-auth';
+import NextAuthDefault, { type NextAuthOptions } from 'next-auth';
 import { createAuthOptions } from './config';
 import type { ImmutableAuthConfig } from './types';
+
+// Handle ESM/CJS interop - in some bundler configurations, the default export
+// may be nested under a 'default' property
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const NextAuth = ((NextAuthDefault as any).default || NextAuthDefault) as typeof NextAuthDefault;
 
 /**
  * NextAuth options that can be overridden.

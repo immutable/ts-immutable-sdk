@@ -3,25 +3,23 @@ import '@/styles/globals.css';
 import React from 'react';
 import type { AppProps } from 'next/app';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { SessionProvider } from 'next-auth/react';
+import type { Session } from 'next-auth';
 import { ImmutableProvider } from '@/context/ImmutableProvider';
 import { StatusProvider } from '@/context/StatusProvider';
 import { PassportProvider } from '@/context/PassportProvider';
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps }: AppProps<{ session?: Session }>) {
   return (
-    <SessionProvider session={pageProps.session}>
-      <StatusProvider>
-        <ImmutableProvider>
-          <PassportProvider>
-            <BiomeCombinedProviders>
-              {/* @ts-ignore */}
-              <Component {...pageProps} />
-            </BiomeCombinedProviders>
-          </PassportProvider>
-        </ImmutableProvider>
-      </StatusProvider>
-    </SessionProvider>
+    <StatusProvider>
+      <ImmutableProvider session={pageProps.session}>
+        <PassportProvider>
+          <BiomeCombinedProviders>
+            {/* @ts-ignore */}
+            <Component {...pageProps} />
+          </BiomeCombinedProviders>
+        </PassportProvider>
+      </ImmutableProvider>
+    </StatusProvider>
   );
 }
 

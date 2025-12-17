@@ -132,6 +132,19 @@ export default DashboardPage;
 export const getServerSideProps = withPageAuthRequired(config);
 ```
 
+## Configuration Options
+
+The `ImmutableAuthConfig` object accepts the following properties:
+
+| Property               | Type     | Required | Default                                          | Description                    |
+| ---------------------- | -------- | -------- | ------------------------------------------------ | ------------------------------ |
+| `clientId`             | `string` | Yes      | -                                                | Immutable OAuth client ID      |
+| `redirectUri`          | `string` | Yes      | -                                                | OAuth callback redirect URI    |
+| `logoutRedirectUri`    | `string` | No       | -                                                | Where to redirect after logout |
+| `audience`             | `string` | No       | `"platform_api"`                                 | OAuth audience                 |
+| `scope`                | `string` | No       | `"openid profile email offline_access transact"` | OAuth scopes                   |
+| `authenticationDomain` | `string` | No       | `"https://auth.immutable.com"`                   | Authentication domain          |
+
 ## Environment Variables
 
 ```bash
@@ -157,24 +170,87 @@ openssl rand -base64 32
 | Export                              | Description                                 |
 | ----------------------------------- | ------------------------------------------- |
 | `ImmutableAuth(config, overrides?)` | Creates NextAuth handler (use in API route) |
-| `ImmutableAuthConfig`               | Configuration type                          |
-| `ImmutableAuthOverrides`            | NextAuth options override type              |
+| `refreshAccessToken(token)`         | Utility to refresh an expired access token  |
+| `isTokenExpired(token)`             | Utility to check if a token is expired      |
+
+**Types:**
+
+| Type                          | Description                               |
+| ----------------------------- | ----------------------------------------- |
+| `ImmutableAuthConfig`         | Configuration options                     |
+| `ImmutableAuthOverrides`      | NextAuth options override type            |
+| `ImmutableUser`               | User profile type                         |
+| `ImmutableTokenData`          | Token data passed to credentials provider |
+| `ZkEvmInfo`                   | zkEVM wallet information type             |
+| `WithPageAuthRequiredOptions` | Options for page protection               |
 
 ### Client Exports (`@imtbl/auth-nextjs/client`)
 
-| Export                  | Description                                                              |
-| ----------------------- | ------------------------------------------------------------------------ |
-| `ImmutableAuthProvider` | React context provider                                                   |
-| `useImmutableAuth()`    | Hook returning `{ user, session, signIn, signOut, getAccessToken, ... }` |
-| `useAccessToken()`      | Hook returning `getAccessToken` function                                 |
-| `CallbackPage`          | Pre-built callback page component for OAuth redirects                    |
+| Export                  | Description                                             |
+| ----------------------- | ------------------------------------------------------- |
+| `ImmutableAuthProvider` | React context provider (wraps NextAuth SessionProvider) |
+| `useImmutableAuth()`    | Hook for authentication state and methods (see below)   |
+| `useAccessToken()`      | Hook returning `getAccessToken` function                |
+| `CallbackPage`          | Pre-built callback page component for OAuth redirects   |
+
+**`useImmutableAuth()` Return Value:**
+
+| Property          | Type                    | Description                                      |
+| ----------------- | ----------------------- | ------------------------------------------------ |
+| `user`            | `ImmutableUser \| null` | Current user profile (null if not authenticated) |
+| `session`         | `Session \| null`       | Full NextAuth session with tokens                |
+| `isLoading`       | `boolean`               | Whether authentication state is loading          |
+| `isAuthenticated` | `boolean`               | Whether user is authenticated                    |
+| `signIn`          | `() => Promise<void>`   | Sign in with Immutable (opens popup)             |
+| `signOut`         | `() => Promise<void>`   | Sign out from both NextAuth and Immutable        |
+| `getAccessToken`  | `() => Promise<string>` | Get a valid access token (refreshes if needed)   |
+| `auth`            | `Auth \| null`          | The underlying Auth instance (for advanced use)  |
+
+**Types:**
+
+| Type                         | Description                      |
+| ---------------------------- | -------------------------------- |
+| `ImmutableAuthProviderProps` | Props for the provider component |
+| `UseImmutableAuthReturn`     | Return type of useImmutableAuth  |
+| `CallbackPageProps`          | Props for CallbackPage component |
+| `ImmutableAuthConfig`        | Re-exported configuration type   |
+| `ImmutableUser`              | Re-exported user type            |
 
 ### Server Exports (`@imtbl/auth-nextjs/server`)
 
-| Export                                   | Description              |
-| ---------------------------------------- | ------------------------ |
-| `getImmutableSession(req, res, config)`  | Get session server-side  |
-| `withPageAuthRequired(config, options?)` | HOC for protecting pages |
+| Export                                   | Description                              |
+| ---------------------------------------- | ---------------------------------------- |
+| `getImmutableSession(req, res, config)`  | Get session server-side                  |
+| `withPageAuthRequired(config, options?)` | HOC for protecting pages with auth check |
+
+**`withPageAuthRequired` Options:**
+
+| Option               | Type                    | Default      | Description                                          |
+| -------------------- | ----------------------- | ------------ | ---------------------------------------------------- |
+| `loginUrl`           | `string`                | `"/login"`   | URL to redirect to when not authenticated            |
+| `returnTo`           | `string \| false`       | current page | URL to redirect to after login (`false` to disable)  |
+| `getServerSideProps` | `(ctx, session) => ...` | -            | Custom getServerSideProps that runs after auth check |
+
+**Example with custom getServerSideProps:**
+
+```typescript
+export const getServerSideProps = withPageAuthRequired(config, {
+  loginUrl: "/auth/signin",
+  async getServerSideProps(ctx, session) {
+    // session is guaranteed to exist here
+    const data = await fetchData(session.accessToken);
+    return { props: { data } };
+  },
+});
+```
+
+**Types:**
+
+| Type                              | Description                               |
+| --------------------------------- | ----------------------------------------- |
+| `WithPageAuthRequiredOptions`     | Basic options for page protection         |
+| `WithPageAuthRequiredFullOptions` | Full options including getServerSideProps |
+| `WithPageAuthRequiredProps`       | Props added to protected pages (session)  |
 
 ## How It Works
 

@@ -44,7 +44,8 @@ function ImmutableAuthInner({
   children: React.ReactNode;
   config: ImmutableAuthConfig;
 }) {
-  const authRef = useRef<Auth | null>(null);
+  // Use state instead of ref so changes trigger re-renders and update context consumers
+  const [auth, setAuth] = useState<Auth | null>(null);
   const prevConfigRef = useRef<string | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const { data: session, update: updateSession } = useSession();
@@ -56,30 +57,29 @@ function ImmutableAuthInner({
     // Create a config key to detect changes (clientId + authDomain uniquely identify the environment)
     const configKey = `${config.clientId}:${config.authenticationDomain || DEFAULT_AUTH_DOMAIN}`;
 
-    // If config changed, recreate Auth instance
-    if (prevConfigRef.current !== null && prevConfigRef.current !== configKey) {
-      authRef.current = null;
-      setIsAuthReady(false);
+    // Only recreate if config actually changed
+    if (prevConfigRef.current === configKey) {
+      return;
     }
     prevConfigRef.current = configKey;
 
-    if (!authRef.current) {
-      authRef.current = new Auth({
-        clientId: config.clientId,
-        redirectUri: config.redirectUri,
-        logoutRedirectUri: config.logoutRedirectUri,
-        audience: config.audience || 'platform_api',
-        scope: config.scope || 'openid profile email offline_access transact',
-        authenticationDomain: config.authenticationDomain || DEFAULT_AUTH_DOMAIN,
-      });
-      setIsAuthReady(true);
-    }
+    // Create new Auth instance with current config
+    const newAuth = new Auth({
+      clientId: config.clientId,
+      redirectUri: config.redirectUri,
+      logoutRedirectUri: config.logoutRedirectUri,
+      audience: config.audience || 'platform_api',
+      scope: config.scope || 'openid profile email offline_access transact',
+      authenticationDomain: config.authenticationDomain || DEFAULT_AUTH_DOMAIN,
+    });
+
+    setAuth(newAuth);
+    setIsAuthReady(true);
   }, [config]);
 
   // Hydrate Auth instance from NextAuth session if localStorage is cleared
   // This handles the case where a valid session exists but Auth has no local state
   useEffect(() => {
-    const auth = authRef.current;
     if (!auth || !isAuthReady) return;
     if (!session?.accessToken || !session?.idToken) return;
 
@@ -119,11 +119,10 @@ function ImmutableAuthInner({
     };
 
     hydrateAuth();
-  }, [isAuthReady, session]);
+  }, [auth, isAuthReady, session]);
 
   // Listen for Auth events to sync tokens back to NextAuth
   useEffect(() => {
-    const auth = authRef.current;
     if (!auth || !isAuthReady) return undefined;
 
     const handleLoggedIn = async (authUser: User) => {
@@ -144,11 +143,11 @@ function ImmutableAuthInner({
     return () => {
       auth.eventEmitter.removeListener('loggedIn', handleLoggedIn);
     };
-  }, [isAuthReady, session, updateSession]);
+  }, [auth, isAuthReady, session, updateSession]);
 
   const contextValue = useMemo(
-    () => ({ auth: authRef.current, config }),
-    [isAuthReady, config],
+    () => ({ auth, config }),
+    [auth, config],
   );
 
   return (

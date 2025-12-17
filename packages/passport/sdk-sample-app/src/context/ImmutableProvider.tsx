@@ -11,6 +11,7 @@ import { Orderbook, OrderbookOverrides } from '@imtbl/orderbook';
 import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
 import { ImmutableAuthProvider } from '@imtbl/auth-nextjs/client';
+import type { Session } from 'next-auth';
 import {
   AUDIENCE,
   POPUP_REDIRECT_URI,
@@ -202,7 +203,8 @@ const ImmutableContext = createContext<{
 
 export function ImmutableProvider({
   children,
-}: { children: JSX.Element | JSX.Element[] }) {
+  session,
+}: { children: JSX.Element | JSX.Element[]; session?: Session }) {
   const [environment, setEnvironment] = useLocalStorage(
     'IMX_PASSPORT_SAMPLE_ENVIRONMENT',
     useContext(ImmutableContext).environment,
@@ -247,7 +249,7 @@ export function ImmutableProvider({
 
   return (
     <ImmutableContext.Provider value={providerValues}>
-      <ImmutableAuthProvider config={authConfig}>
+      <ImmutableAuthProvider config={authConfig} session={session ?? null}>
         {children}
       </ImmutableAuthProvider>
     </ImmutableContext.Provider>
