@@ -57,7 +57,7 @@
     "lint": "eslint ./src --ext .ts,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.tsx --max-warnings=0 --fix",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve",
-    "test": "jest"
+    "test": "jest --passWithNoTests"
   },
   "dependencies": {
     "@imtbl/auth": "workspace:*"

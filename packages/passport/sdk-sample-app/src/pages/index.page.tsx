@@ -29,7 +29,9 @@ export default function Home() {
       <main>
         <Container>
           <Row className="my-3">
-            <Environment disabled={isLoading || !!imxProvider || !!zkEvmProvider || !!defaultWalletProvider || isAuthNextJSAuthenticated} />
+            <Environment disabled={
+              isLoading || !!imxProvider || !!zkEvmProvider || !!defaultWalletProvider || isAuthNextJSAuthenticated
+            } />
           </Row>
           <Row className="my-3">
             <AuthNextJS />
