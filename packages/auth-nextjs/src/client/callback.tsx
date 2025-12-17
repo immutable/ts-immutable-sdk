@@ -80,11 +80,33 @@ export function CallbackPage({
       }
     };
 
-    // Only run when we have the code parameter
-    if (router.isReady && router.query.code) {
+    const handleOAuthError = () => {
+      // OAuth providers return error and error_description when authentication fails
+      // (e.g., user cancels, consent denied, invalid request)
+      const errorCode = router.query.error as string;
+      const errorDescription = router.query.error_description as string;
+
+      const errorMessage = errorDescription || errorCode || 'Authentication failed';
+      setError(errorMessage);
+    };
+
+    if (!router.isReady) {
+      return;
+    }
+
+    // Handle OAuth error responses (user cancelled, consent denied, etc.)
+    if (router.query.error) {
+      handleOAuthError();
+      return;
+    }
+
+    // Handle successful OAuth callback with authorization code
+    if (router.query.code) {
       handleCallback();
     }
-  }, [router.isReady, router.query.code, router, config, redirectTo]);
+  }, [
+    router.isReady, router.query.code, router.query.error, router.query.error_description, router, config, redirectTo,
+  ]);
 
   if (error) {
     if (errorComponent) {
