@@ -68,7 +68,7 @@ importers:
         version: 17.1.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2))(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint@8.57.0)
       eslint-plugin-react-refresh:
         specifier: latest
-        version: 0.4.24(eslint@8.57.0)
+        version: 0.4.25(eslint@8.57.0)
       http-server:
         specifier: ^14.1.1
         version: 14.1.1
@@ -135,7 +135,7 @@ importers:
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@imtbl/sdk':
         specifier: latest
-        version: 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
         version: 14.2.25(@babel/core@7.26.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -344,7 +344,7 @@ importers:
     dependencies:
       '@imtbl/contracts':
         specifier: latest
-        version: 2.2.17(bufferutil@4.0.8)(eslint@9.16.0(jiti@1.21.0))(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
+        version: 2.2.18(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../sdk
@@ -771,7 +771,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -829,7 +829,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -1039,6 +1039,52 @@ importers:
       tsup:
         specifier: ^8.3.0
         version: 8.3.0(@swc/core@1.9.3(@swc/helpers@0.5.13))(jiti@1.21.0)(postcss@8.4.49)(typescript@5.6.2)(yaml@2.5.0)
+      typescript:
+        specifier: ^5.6.2
+        version: 5.6.2
+
+  packages/auth-nextjs:
+    dependencies:
+      '@imtbl/auth':
+        specifier: workspace:*
+        version: link:../auth
+    devDependencies:
+      '@swc/core':
+        specifier: ^1.3.36
+        version: 1.15.3(@swc/helpers@0.5.13)
+      '@swc/jest':
+        specifier: ^0.2.37
+        version: 0.2.37(@swc/core@1.15.3(@swc/helpers@0.5.13))
+      '@types/jest':
+        specifier: ^29.5.12
+        version: 29.5.14
+      '@types/node':
+        specifier: ^18.14.2
+        version: 18.15.13
+      '@types/react':
+        specifier: ^18.3.5
+        version: 18.3.12
+      jest:
+        specifier: ^29.4.3
+        version: 29.7.0(@types/node@18.15.13)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))
+      jest-environment-jsdom:
+        specifier: ^29.4.3
+        version: 29.6.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      next:
+        specifier: 14.2.25
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next-auth:
+        specifier: ^4.24.0
+        version: 4.24.13(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      ts-node:
+        specifier: ^10.9.1
+        version: 10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2)
+      tsup:
+        specifier: ^8.3.0
+        version: 8.3.0(@swc/core@1.15.3(@swc/helpers@0.5.13))(jiti@1.21.0)(postcss@8.4.49)(typescript@5.6.2)(yaml@2.5.0)
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -2209,6 +2255,9 @@ importers:
       '@biom3/react':
         specifier: ^0.29.4
         version: 0.29.11(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@imtbl/auth-nextjs':
+        specifier: workspace:*
+        version: link:../../auth-nextjs
       '@imtbl/blockchain-data':
         specifier: workspace:*
         version: link:../../blockchain-data/sdk
@@ -2257,6 +2306,9 @@ importers:
       next:
         specifier: 14.2.25
         version: 14.2.25(@babel/core@7.26.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next-auth:
+        specifier: ^4.24.0
+        version: 4.24.13(next@14.2.25(@babel/core@7.26.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -2745,19 +2797,6 @@ importers:
         version: 5.6.2
 
 packages:
-
-  '@0xsequence/abi@2.3.38':
-    resolution: {integrity: sha512-KdR0JkjA9qnkZg5G/gFJT6xg5Ngzargf9blDGjniVqLhK3i/PuVMKV23CVmNi8Yg4QKB1DcwwB4hXKx6rXmJgQ==}
-
-  '@0xsequence/core@2.3.38':
-    resolution: {integrity: sha512-H87zfeIX9YjlsDgxj2xJ2sIPU4bonRN5iHnOerWeVpHAfsUgVT6CwRSEvd2Ek3Yw1sI+s7kG9b4XxmJuh6Dp6Q==}
-    peerDependencies:
-      ethers: '>=6'
-
-  '@0xsequence/utils@2.3.38':
-    resolution: {integrity: sha512-XCe17omFbLjQnDW7HNhNzTqcpeeiXeSCc5ttFjOYex+GO8v9imPt3qbcn4N2v4dlylfkSfpdh4DcnKlcAPAtFw==}
-    peerDependencies:
-      ethers: '>=6'
 
   '@0xsquid/sdk@2.8.25':
     resolution: {integrity: sha512-fSMKVdKIX8G3qFpoTf3WfcyjhGdc9hE0uSu1bs1gsh4+iG19ILguDdrY8g87dUknt9PCKBb6TIt1QeYEgbXjdA==}
@@ -4431,71 +4470,77 @@ packages:
     resolution: {integrity: sha512-c7hNEllBlenFTHBky65mhq8WD2kbN9Q6gk0bTk8lSBvc554jpXSkST1iePudpt7+A/AQvuHs9EMqjHDXMY1lrA==}
     engines: {node: '>=18.18'}
 
-  '@imtbl/blockchain-data@2.11.0':
-    resolution: {integrity: sha512-UmgjEWN3pad+lZCVTx+BV5rFx9VMVM7WDSiVyYMqES3C+WgJeel/7dJKNjGpW9kq0BwPy6tSVRMKb+kokGL/dw==}
+  '@imtbl/auth@2.12.3':
+    resolution: {integrity: sha512-zUPwoYoiqyIyq4XKaJkvMMrKDhnPw0ND3AJUNN/ZZ2NMIKrDYpaIvCD2JmisO6HXiXrlb9HcocI+Bc+bfPnYhQ==}
 
-  '@imtbl/bridge-sdk@2.11.0':
-    resolution: {integrity: sha512-xZ6KoAlRY8Im7alyfKcqqcvIGxR+BiJ0S9tV4q6BXNSq0VKRoLt+4asJdzwQvfpFag1j2gZFP2jIz7zytShRVA==}
+  '@imtbl/blockchain-data@2.12.3':
+    resolution: {integrity: sha512-IwhH2oQe6eOb+WCOmrN5axuUH5cW13dzqaRudNwtZK8fG2qgSnbhEarozLUvkqTgnA4YWZ/q1GMfpDNV8gqxww==}
+
+  '@imtbl/bridge-sdk@2.12.3':
+    resolution: {integrity: sha512-q8kZC0a14IhKRGkYd8a2H9YEMThS3irkHq1c/o3zOnzGLfk+wMGUaUzEzDYWgWWFzoskZfUMo9SUI5MX3MzLCA==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/checkout-sdk@2.11.0':
-    resolution: {integrity: sha512-qOVzOW2fdys9sl2zMKYtrfvyzVvp+Q3R1uVUeN2NQ+yscDp4mvpVgWEr1s4FhYZ75gYG/+18mrKnvxLik+t2xA==}
+  '@imtbl/checkout-sdk@2.12.3':
+    resolution: {integrity: sha512-zjiL7bBkTcTX140XFuzVd5is4tGR3EW8f4v5ltCcIJYtp5QGK3ZBAK+O28kiLHzBug6ZB/dE1aIn2AsVp7zNog==}
 
-  '@imtbl/config@2.11.0':
-    resolution: {integrity: sha512-huORWo89gUYCXQPvKKl/cB440MrFhW2pU7nOELxHat/8hm3JirazemMmF5wyuaLJ+F0HjeWakqlOOnfM51ajiQ==}
+  '@imtbl/config@2.12.3':
+    resolution: {integrity: sha512-3bTdJrprnNFAuhB6vOsv2/1/wCoh+qzHc+j9NiSMLsE0RVr+8ZkLWHnvcEAxdlmTIS8FhA8i/C/k8VX8eGRWDg==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/contracts@2.2.17':
-    resolution: {integrity: sha512-JakmzqU019vo4T52nPQIgXmGM5tlzPO5QRiMKU9xJQVMKPaICTc3UPIFEBfHr/Jq4cj720Dj8YaJ3SgowwO+bg==}
+  '@imtbl/contracts@2.2.18':
+    resolution: {integrity: sha512-wxjfE32t9jzEs4PswKwZDMlBO6wqCfSpVxseyFADFVG+Y2oFBrf1lK4eA0e81BbrXTGAbR+snSnSjPS305JoIQ==}
 
   '@imtbl/contracts@2.2.6':
     resolution: {integrity: sha512-2cfE3Tojfp4GnxwVKSwoZY1CWd+/drCIbCKawyH9Nh2zASXd7VC71lo27aD5RnCweXHkZVhPzjqwQf/xrtnmIQ==}
 
-  '@imtbl/dex-sdk@2.11.0':
-    resolution: {integrity: sha512-FSXplji/Thqd4DNgFad3T/AKszt0Ua5D+/hGjUzj+OaWIabTH9maeXtZThkJAV38Mm22mYz0xNgNCsszuhseNw==}
+  '@imtbl/dex-sdk@2.12.3':
+    resolution: {integrity: sha512-oFKqNAPNCfs4g9Yb3fmPSLVgvUevF9Mf7NmL2ubWcHM2EDu01cAVuUcuwklDxtbyHoD1aRzgFcWpoQQ9uml5rQ==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/generated-clients@2.11.0':
-    resolution: {integrity: sha512-tYzqEnH2XIE5GYf1iMMJGPhdp9cQctLymy3Gav9aRCHQzXnLwSLQGEk0/M0JJ/3QTMoocawY6rV/Cs+vSTMsCw==}
+  '@imtbl/generated-clients@2.12.3':
+    resolution: {integrity: sha512-4YaMQYbCEX7XyYB7EOq9+qENFOz83JUF74D5yU9rInQYmdYAqoxRCF0W8tD5XSz7biLz+OMKjhP2a02J8/2xDw==}
     engines: {node: '>=20.11.0'}
 
   '@imtbl/image-resizer-utils@0.0.3':
     resolution: {integrity: sha512-/EOJKMJF4gD/Dv0qNhpUTpp2AgWeQ7XgYK9Xjl+xP2WWgaarNv1SHe1aeqSb8aZT5W7wSXdUGzn6TIxNsuCWGw==}
 
-  '@imtbl/metrics@2.11.0':
-    resolution: {integrity: sha512-e7ZFsYScv0P5Wy50PvC0L5GlGxnDLec5DvyHHd93RJGzkDs3spYkkGCXjoybbb6agTgtoL1IyKawcGe5K8HNLQ==}
+  '@imtbl/metrics@2.12.3':
+    resolution: {integrity: sha512-omHwaRfHMuBTkn8D9kDokF1xkWzgcA5VMzQcAtlKUvZAaKXgKJ6v6oA0d0idlPjSNJxnR6qz8k5gZQpI1jS4Mw==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/minting-backend@2.11.0':
-    resolution: {integrity: sha512-SouAioAynwpXjgzBOOT1SfK+T6JpNaUw+ouIuNdpnR+fOE7DOsL9N+WxbmhFP6BLPrEOgE34ZtI+QNBX614iPA==}
+  '@imtbl/minting-backend@2.12.3':
+    resolution: {integrity: sha512-6RdzYxtJ/FQI6nb/Osany/8XZG3EkPv0nF8gH78lstp35FDsojMr0ynMd+lQBKfXK8N+1SCHdaDFuUOqiK70Ig==}
 
-  '@imtbl/orderbook@2.11.0':
-    resolution: {integrity: sha512-Mq1NXB/hs+In4hOrdGJmBM44rtSrYDejM4ixRaMbzRrSxehKpmsMI6W4fmv/3ZyJx2m8bvhAvZrS//jLL61UtQ==}
+  '@imtbl/orderbook@2.12.3':
+    resolution: {integrity: sha512-xc533eYWzbavagw1dr47TA0P0YTNHE/fSvGTKAWP+L3i8UZk7ptb67NsldeqQ5bOB5A4MByxGO9jUZ3DT/eKrg==}
 
-  '@imtbl/passport@2.11.0':
-    resolution: {integrity: sha512-hcBJmgoN2yjrczbRc+sZ6oCyqFmyBsIZRjR7QywhZIRwunGsGpzjO+kwmWzUOHCNl7zEShmEsfFOtpxlRBOckA==}
+  '@imtbl/passport@2.12.3':
+    resolution: {integrity: sha512-9f0IUalTd7csGZyFwE/Rxmt0pjnsSs6CktnuGhEVG+pVv86OMWJhrXSH00P1l+veHkLrO/TCJ+92LzcKxxUFJQ==}
     engines: {node: '>=20.11.0'}
 
   '@imtbl/react-analytics@0.3.4-alpha':
     resolution: {integrity: sha512-4VWvfm8RZtpLub7+x2D2wNQ507nIVBCSAPA7B5lxdb0cKrHEujM6Y/HScMImHZHvgjUFQT1jiD9b2BL/DS43Pg==}
 
-  '@imtbl/sdk@2.11.0':
-    resolution: {integrity: sha512-JyRj1bgVbQY7LzgROEvJba0a6DQRKgOP+Fou2lOjWJrxMdz7rYmEohhHS3eWaMnDvi+zRg8Ffbwy1bxlp9RLVQ==}
+  '@imtbl/sdk@2.12.3':
+    resolution: {integrity: sha512-ou3jCehJjVDqEob0HOhLrwnLhL/FwdmjBO6F37wBLgXXj1ThOraXpofV29f2qrlHPL1EjWEYED+j+gKL2m00sg==}
     engines: {node: '>=20.0.0'}
 
-  '@imtbl/toolkit@2.11.0':
-    resolution: {integrity: sha512-yL+V8wqHiAcQ4Q/TOE5euLMlRh/5rnhER5oFRtZss1lzTsmTqfygB/lg+8yyQ5i0pNNtt9bc/26uyXYl37JlhA==}
+  '@imtbl/toolkit@2.12.3':
+    resolution: {integrity: sha512-Orz0I8ajdLd1xhbwAxuj7+9VNjD+yUUaeVy35EJY3Yfm/08v6x/5BahLa0PKLMvSOniGs5QI9notA9lpX9naHQ==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/webhook@2.11.0':
-    resolution: {integrity: sha512-xmeraQ6STLaCceEd4IFPE0htPrTb8oGVXPrk8zTRhuPzMRp/S4zfbOtnqpiLIU/Q+TzH7lrC7C1Fk3KxVe2OBw==}
+  '@imtbl/wallet@2.12.3':
+    resolution: {integrity: sha512-mHfqmywGNHXaEYoQjLGD/2ZuJz42/bCem+ocjkOeanbfpRmtLZDFiz+tdkte6MpnHWCz/8QKfg1DLy4KrdqZJg==}
 
-  '@imtbl/x-client@2.11.0':
-    resolution: {integrity: sha512-jW+W4uG0Z/XqJpNnDMJhlpp+JRMYz0rnsCpZxGKYUG55YwcHjXxMpkPuQSWWrwu7CNOrcFSYETZ2Mb+BKrR7gQ==}
+  '@imtbl/webhook@2.12.3':
+    resolution: {integrity: sha512-k9+x1IZTN6oyNOmbJ+O824PtAb5vmB0sMWLXzGRwK/n8qYXpBbSpsk1NgP7vHJYbmqVydzyiNgn00zM3qmyY5w==}
+
+  '@imtbl/x-client@2.12.3':
+    resolution: {integrity: sha512-Ihje4DtgU/wxeDu7Cei0MeaB2aC9ZYVf8KSutMFvimF7Pqhlv/PqHfiYGdWe2B4a58nm2A0c1TOcuC8Ml7DcJg==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/x-provider@2.11.0':
-    resolution: {integrity: sha512-2le+7s1WO2e6/scYQaV/XROucvWmJjvLRHuVCBbpfMaMZgp9HcF4DerHn8/wFcMzyi1AxHpQ8dG+UwzknYKPaA==}
+  '@imtbl/x-provider@2.12.3':
+    resolution: {integrity: sha512-/A5Ka8DFPAnkChHfxIyDSxFKAyTmdZhk0RXZpSxe2hs5Dd+3t6OfleJJL5HWaOdOf6F/Gzlqm22l3uWU5lDhpA==}
     engines: {node: '>=20.11.0'}
 
   '@ioredis/commands@1.2.0':
@@ -4741,6 +4786,12 @@ packages:
   '@lezer/lr@1.4.5':
     resolution: {integrity: sha512-/YTRKP5yPPSo1xImYQk7AZZMAgap0kegzqCSYHjAL9x1AZ0ZQW+IpcEzMKagCsbTsLnVeWkxYrCNeXG8xEPrjg==}
 
+  '@limitbreak/creator-token-standards@5.0.0':
+    resolution: {integrity: sha512-BhrD3SMCq8YrGbJildBbu4BpHia7uby60XpGYVyFnb4xEvFey7bRbnOeVQ2mrTx07y02KvTWS5gESIPj5O4Mtg==}
+
+  '@limitbreak/permit-c@1.0.0':
+    resolution: {integrity: sha512-7BooxTklXlCPzfdccfKL7Tt2Cm4MntOHR51dHqjKePn7AynMKsUtaKH75ZXHzWRPZSmyixFNzQ7tIJDdPxF2MA==}
+
   '@lit-labs/ssr-dom-shim@1.2.0':
     resolution: {integrity: sha512-yWJKmpGE6lUURKAaIltoPIE/wrbY3TEkqQt+X0m+7fQNnAv0keydnYvbiJFP1PnMhizmIWRWOG5KLhYyc/xl+g==}
 
@@ -4784,24 +4835,6 @@ packages:
   '@lukeed/uuid@2.0.1':
     resolution: {integrity: sha512-qC72D4+CDdjGqJvkFMMEAtancHUQ7/d/tAiHf64z8MopFDmcrtbcJuerDtFceuAfQJ2pDSfCKCtbqoGBNnwg0w==}
     engines: {node: '>=8'}
-
-  '@magic-ext/oidc@12.0.5':
-    resolution: {integrity: sha512-EAmmRRZn/c5jmxHZ1H3IHtEqUKHYrsRtH9O+WuMFOZMv0llef/9MBa4DiRZkpnB0EPKb2hwsY7us8qk/LaFRNA==}
-    deprecated: 'Deprecation Notice: The OIDC extension will be deprecated soon. Please migrate to API Wallet, which offers improved performance and faster response times. Learn more: https://docs.magic.link/api-wallets/introduction'
-
-  '@magic-sdk/commons@25.4.2':
-    resolution: {integrity: sha512-R3wJ1NWa+uDH9+Cc6kLjPDCSkelG3VM9pnuHR0zpE52XxiYaL0IplSG8DsjCqt2FeurTgqlUHGUEFrDHIdXEFQ==}
-    peerDependencies:
-      '@magic-sdk/provider': '>=18.6.0'
-      '@magic-sdk/types': '>=15.8.0'
-
-  '@magic-sdk/provider@29.5.0':
-    resolution: {integrity: sha512-OAd813MLFfJDdRk/puRYqoGpBukGbTAlnR0n7f5AHG1NH9vQd/VSo3g6FunAPgoMfnLtJjFH9PdmD+Sh+f1yWA==}
-    peerDependencies:
-      localforage: ^1.7.4
-
-  '@magic-sdk/types@24.22.0':
-    resolution: {integrity: sha512-FLa9ChjsHcuRNF+dcXIFK4wPb1hJMjGtW+dz1gY5Oyhv37UB7xmOaIlR6YAe4jAxQvO+Hz2Q2Htk4JGI7WRluA==}
 
   '@metamask/detect-provider@2.0.0':
     resolution: {integrity: sha512-sFpN+TX13E9fdBDh9lvQeZdJn4qYoRb/6QF2oZZK/Pn559IhCFacPMU1rMuqyXoFQF3JSJfii2l98B87QDPeCQ==}
@@ -5397,6 +5430,9 @@ packages:
   '@openzeppelin/contracts@3.4.2':
     resolution: {integrity: sha512-z0zMCjyhhp4y7XKAcDAi3Vgms4T2PstwBdahiO0+9NaGICQKjynK3wduSRplTgk4LXmoO1yfDGO5RbjKYxtuxA==}
 
+  '@openzeppelin/contracts@4.8.3':
+    resolution: {integrity: sha512-bQHV8R9Me8IaJoJ2vPG4rXcL7seB7YVuskr4f+f5RyOStSZetwzkWtoqDMl5erkBJy0lDRUnIR2WIkPiC0GJlg==}
+
   '@openzeppelin/contracts@4.9.6':
     resolution: {integrity: sha512-xSmezSupL+y9VkHZJGDoCBpmnB2ogM13ccaYDWqJTfS3dbuHkgjuwDFUmaFauBCboQMGB/S5UqUl2y54X99BmA==}
 
@@ -5457,6 +5493,9 @@ packages:
     resolution: {integrity: sha512-rVKiZSTgao4SBWyqWvStxDhKmwbKEN/E8+H3CJzIP4FcsL7MQtWH2HT86bmoefkyRe1yO+m2/mG7j3TfADh/Fg==}
     cpu: [x64]
     os: [win32]
+
+  '@panva/hkdf@1.2.1':
+    resolution: {integrity: sha512-6oclG6Y3PiDFcoyk8srjLfVKyMfVCKJ27JwNPViuXziFpmdz+MZnZN/aKY0JGXgYuO/VghU0jcOAZgWXZ1Dmrw==}
 
   '@parcel/bundler-default@2.16.3':
     resolution: {integrity: sha512-zCW2KzMfcEXqpVSU+MbLFMV3mHIzm/7UK1kT8mceuj4UwUScw7Lmjmulc2Ev4hcnwnaAFyaVkyFE5JXA4GKsLQ==}
@@ -8851,9 +8890,6 @@ packages:
   caniuse-lite@1.0.30001660:
     resolution: {integrity: sha512-GacvNTTuATm26qC74pt+ad1fW15mlQ/zuTzzY1ZoIzECTP8HURDfF43kNxPgf7H1jmelCBQTTbBNxdSXOA7Bqg==}
 
-  caniuse-lite@1.0.30001703:
-    resolution: {integrity: sha512-kRlAGTRWgPsOj7oARC9m1okJEXdL/8fekFVcxA8Hl7GH4r/sN4OJn/i6Flde373T50KS7Y37oFbMwlE8+F42kQ==}
-
   caniuse-lite@1.0.30001760:
     resolution: {integrity: sha512-7AAMPcueWELt1p3mi13HR/LHH0TJLT11cnwDJEs3xA4+CK/PLKeO9Kl1oru24htkyUKtkGCvAx4ohB0Ttry8Dw==}
 
@@ -10058,6 +10094,9 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
+  erc721a@4.2.3:
+    resolution: {integrity: sha512-0deF0hOOK1XI1Vxv3NKDh2E9sgzRlENuOoexjXRJIRfYCsLlqi9ejl2RF6Wcd9HfH0ldqC03wleQ2WDjxoOUvA==}
+
   err-code@2.0.3:
     resolution: {integrity: sha512-2bmlRpNKBxT/CRmPOlyISQpNj+qSeYvcym/uT0Jx2bMOlKLtSy1ZmLuVxSEKKyor/N5yhvp/ZiG1oE3DEYMSFA==}
 
@@ -10342,8 +10381,8 @@ packages:
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
 
-  eslint-plugin-react-refresh@0.4.24:
-    resolution: {integrity: sha512-nLHIW7TEq3aLrEYWpVaJ1dRgFR+wLDPN8e8FpYAql/bMV2oBEfC37K0gLEGgv9fy66juNShSMV8OkTqzltcG/w==}
+  eslint-plugin-react-refresh@0.4.25:
+    resolution: {integrity: sha512-dRUD2LOdEqI4zXHqbQ442blQAzdSuShAaiSq5Vtyy6LT08YUf0oOjBDo4VPx0dCPgiPWh1WB4dtbLOd0kOlDPQ==}
     peerDependencies:
       eslint: '>=8.40'
 
@@ -12406,12 +12445,12 @@ packages:
   joi@17.13.3:
     resolution: {integrity: sha512-otDA4ldcIx+ZXsKHWmp0YizCweVRZG96J10b0FevjfuncLO1oX59THoAmHkNubYJ+9gWsYsp5k8v4ib6oDv1fA==}
 
+  jose@4.15.9:
+    resolution: {integrity: sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==}
+
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
-
-  js-base64@3.7.8:
-    resolution: {integrity: sha512-hNngCeKxIUQiEUN3GPJOkz4wF/YvdUdbNL9hsBcMQTkKzboD7T/q3OYOuuPZLUE6dBxSGpwhk5mwuDud7JVAow==}
 
   js-cookie@3.0.1:
     resolution: {integrity: sha512-+0rgsUXZu4ncpPxRL+lNEptWMOWl9etvPHc/koSRp6MPwpRYAhmk0dUG00J4bxVV3r9uUzfo24wW0knS07SKSw==}
@@ -12543,9 +12582,6 @@ packages:
   jsx-ast-utils@3.3.5:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
-
-  jwt-decode@3.1.2:
-    resolution: {integrity: sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==}
 
   jwt-decode@4.0.0:
     resolution: {integrity: sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==}
@@ -12888,6 +12924,10 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
+  lru-cache@6.0.0:
+    resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
+    engines: {node: '>=10'}
+
   lru-cache@7.18.3:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
     engines: {node: '>=12'}
@@ -12904,9 +12944,6 @@ packages:
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
     hasBin: true
-
-  magic-sdk@29.4.2:
-    resolution: {integrity: sha512-m5DFM+FUxAwDkmG8cuGKp9aIcJfIrI7TUoL5oL2ywumVAPAfBdJys0Udda7nZMJMN0mtHAhYPhqoOSqDU9HvgA==}
 
   magic-string@0.25.9:
     resolution: {integrity: sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==}
@@ -13225,9 +13262,6 @@ packages:
     engines: {node: '>= 14.0.0'}
     hasBin: true
 
-  moment@2.30.1:
-    resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
-
   motion-dom@11.18.1:
     resolution: {integrity: sha512-g76KvA001z+atjfxczdRtw/RXOM3OMSdd1f4DL77qCTF/+avrRJiawSG4yDibEQ215sr9kpinSlX2pCTJ9zbhw==}
 
@@ -13319,9 +13353,24 @@ packages:
   new-date@1.0.3:
     resolution: {integrity: sha512-0fsVvQPbo2I18DT2zVHpezmeeNYV2JaJSrseiHLc17GNOxJzUdx5mvSigPu8LtIfZSij5i1wXnXFspEs2CD6hA==}
 
+  next-auth@4.24.13:
+    resolution: {integrity: sha512-sgObCfcfL7BzIK76SS5TnQtc3yo2Oifp/yIpfv6fMfeBOiBJkDWF3A2y9+yqnmJ4JKc2C+nMjSjmgDeTwgN1rQ==}
+    peerDependencies:
+      '@auth/core': 0.34.3
+      next: ^12.2.5 || ^13 || ^14 || ^15 || ^16
+      nodemailer: ^7.0.7
+      react: ^17.0.2 || ^18 || ^19
+      react-dom: ^17.0.2 || ^18 || ^19
+    peerDependenciesMeta:
+      '@auth/core':
+        optional: true
+      nodemailer:
+        optional: true
+
   next@14.2.25:
     resolution: {integrity: sha512-N5M7xMc4wSb4IkPvEV5X2BRRXUmhVHNyaXwEM86+voXthSZz8ZiRyQW4p9mwAoAPIm6OzuVZtn7idgEJeAJN3Q==}
     engines: {node: '>=18.17.0'}
+    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -13520,6 +13569,9 @@ packages:
       '@swc/core':
         optional: true
 
+  oauth@0.9.15:
+    resolution: {integrity: sha512-a5ERWK1kh38ExDEfoO6qUHJb32rd7aYmPHuyCu3Fta/cnICvYmgd2uhuKXvPD+PXB+gCEYYEaQdIRAjCOwAKNA==}
+
   ob1@0.80.12:
     resolution: {integrity: sha512-VMArClVT6LkhUGpnuEoBuyjG9rzUyEzg4PDkav6wK1cLhOK02gPCYFxoiB4mqVnrMhDpIzJcrGNAMVi9P+hXrw==}
     engines: {node: '>=18'}
@@ -13537,6 +13589,10 @@ packages:
   object-copy@0.1.0:
     resolution: {integrity: sha512-79LYn6VAb63zgtmAteVOWo9Vdj71ZVBy3Pbse+VqxDpEP83XuujMrGqHIwAXJ5I/aM0zU7dIyIAhifVTPrNItQ==}
     engines: {node: '>=0.10.0'}
+
+  object-hash@2.2.0:
+    resolution: {integrity: sha512-gScRMn0bS5fH+IuwyIFgnh9zBdo4DV+6GhygmWM9HyNJSgS0hScp1f5vjtm7oIIOiT9trXrShAkLFSc2IqKNgw==}
+    engines: {node: '>= 6'}
 
   object-hash@3.0.0:
     resolution: {integrity: sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw==}
@@ -13601,6 +13657,10 @@ packages:
     resolution: {integrity: sha512-jNdst/U28Iasukx/L5MP6b274Vr7ftQs6qAhPBCvz6Wt5rPCA+Q/tUmCzfCHHWweWw5szeMy2Gfrm1rITwUKrw==}
     engines: {node: '>=18'}
 
+  oidc-token-hash@5.2.0:
+    resolution: {integrity: sha512-6gj2m8cJZ+iSW8bm0FXdGF0YhIQbKrfP4yWTNzxc31U6MOjfEmB1rHvlYvxI1B7t7BCi1F2vYTT6YhtQRG4hxw==}
+    engines: {node: ^10.13.0 || >=12.0.0}
+
   on-exit-leak-free@0.2.0:
     resolution: {integrity: sha512-dqaz3u44QbRXQooZLTUKU41ZrzYrcvLISVgbrzbyCMxpmSLJvZ3ZamIJIZ29P6OhZIkNIQKosdeM6t1LYbA9hg==}
 
@@ -13650,6 +13710,9 @@ packages:
   opener@1.5.2:
     resolution: {integrity: sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==}
     hasBin: true
+
+  openid-client@5.7.1:
+    resolution: {integrity: sha512-jDBPgSVfTnkIh71Hg9pRvtJc6wTwqjRkN88+gCFtYWrlP4Yx2Dsrow8uPi3qLr/aeymPF3o2+dS+wOpglK04ew==}
 
   optionator@0.8.3:
     resolution: {integrity: sha512-+IW9pACdk3XWmmTXG8m3upGUJst5XRGzxMRjXzAuJ1XnIFNvfhjjIuYkDvysnPQ7qzqVzLt78BCruntqRhWQbA==}
@@ -14527,6 +14590,11 @@ packages:
   postgres-range@1.1.4:
     resolution: {integrity: sha512-i/hbxIE9803Alj/6ytL7UHQxRvZkI9O4Sy+J3HGc4F4oo/2eQAjTSNJ0bfxyse3bH0nuVesCk+3IRLaMtG3H6w==}
 
+  preact-render-to-string@5.2.6:
+    resolution: {integrity: sha512-JyhErpYOvBV1hEPwIxc/fHWXPfnEGdRKxc8gFdAZ7XV4tlzyzG847XAyEZqoDnynP88akM4eaHcSOzNcLWFguw==}
+    peerDependencies:
+      preact: '>=10'
+
   preact@10.23.1:
     resolution: {integrity: sha512-O5UdRsNh4vdZaTieWe3XOgSpdMAmkIYBCT3VhQDlKrzyCm8lUYsk0fmVEvoQQifoOjFRTaHZO69ylrzTW2BH+A==}
 
@@ -14565,6 +14633,9 @@ packages:
   pretty-format@29.7.0:
     resolution: {integrity: sha512-Pdlw/oPxN+aXdmM9R00JVC9WVFoCLTKJvDVLgmJ+qAffBMxsV85l/Lu7sNx4zSzPyoL2euImuEwHhOXdEgNFZQ==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
+
+  pretty-format@3.8.0:
+    resolution: {integrity: sha512-WuxUnVtlWL1OfZFQFuqvnvs6MiAGk9UNsBostyBOB0Is9wb5uRESevA6rnl/rkksXaGX3GzZhPup5d6Vp1nFew==}
 
   prisma@5.20.0:
     resolution: {integrity: sha512-6obb3ucKgAnsGS9x9gLOe8qa51XxvJ3vLQtmyf52CTey1Qcez3A6W6ROH5HIz5Q5bW+0VpmZb8WBohieMFGpig==}
@@ -14670,6 +14741,7 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qr-code-styling@1.6.0-rc.1:
@@ -15317,15 +15389,30 @@ packages:
   seaport-core@0.0.1:
     resolution: {integrity: sha512-fgdSIC0ru8xK+fdDfF4bgTFH8ssr6EwbPejC2g/JsWzxy+FvG7JfaX57yn/eIv6hoscgZL87Rm+kANncgwLH3A==}
 
+  seaport-core@1.6.5:
+    resolution: {integrity: sha512-jpGOpaKpH1B49oOYqAYAAVXN8eGlI/NjE6fYHPYlQaDVx325NS5dpiDDgGLtQZNgQ3EbqrfhfB5KyIbg7owyFg==}
+
   seaport-core@https://codeload.github.com/immutable/seaport-core/tar.gz/0633350ec34f21fcede657ff812f11cf7d19144e:
     resolution: {tarball: https://codeload.github.com/immutable/seaport-core/tar.gz/0633350ec34f21fcede657ff812f11cf7d19144e}
     version: 1.5.0
+
+  seaport-core@https://codeload.github.com/immutable/seaport-core/tar.gz/f9b2e50267862570d0df3ed7e3e32d1ff2cd9813:
+    resolution: {tarball: https://codeload.github.com/immutable/seaport-core/tar.gz/f9b2e50267862570d0df3ed7e3e32d1ff2cd9813}
+    version: 1.6.6
 
   seaport-sol@1.6.0:
     resolution: {integrity: sha512-a1FBK1jIeEQXZ9CmQvtmfG0w7CE8nIad89btGg7qrrrtF4j1S0Ilmzpe2Hderap05Uvf3EWS9P/aghDQCNAwkA==}
 
   seaport-types@0.0.1:
     resolution: {integrity: sha512-m7MLa7sq3YPwojxXiVvoX1PM9iNVtQIn7AdEtBnKTwgxPfGRWUlbs/oMgetpjT/ZYTmv3X5/BghOcstWYvKqRA==}
+
+  seaport-types@1.6.3:
+    resolution: {integrity: sha512-Rm9dTTEUKmXqMgc5TiRtfX/sFOX6SjKkT9l/spTdRknplYh5tmJ0fMJzbE60pCzV1/Izq0cCua6uvWszo6zOAQ==}
+
+  seaport@https://codeload.github.com/immutable/seaport/tar.gz/8345d291c69b7777a77bd81996ce46b28183586c:
+    resolution: {tarball: https://codeload.github.com/immutable/seaport/tar.gz/8345d291c69b7777a77bd81996ce46b28183586c}
+    version: 1.6.0
+    engines: {node: '>=18.15.0'}
 
   seaport@https://codeload.github.com/immutable/seaport/tar.gz/ae061dc008105dd8d05937df9ad9a676f878cbf9:
     resolution: {tarball: https://codeload.github.com/immutable/seaport/tar.gz/ae061dc008105dd8d05937df9ad9a676f878cbf9}
@@ -17387,19 +17474,6 @@ packages:
         optional: true
 
 snapshots:
-
-  '@0xsequence/abi@2.3.38': {}
-
-  '@0xsequence/core@2.3.38(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
-    dependencies:
-      '@0xsequence/abi': 2.3.38
-      '@0xsequence/utils': 2.3.38(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))
-      ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-
-  '@0xsequence/utils@2.3.38(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
-    dependencies:
-      ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      js-base64: 3.7.8
 
   '@0xsquid/sdk@2.8.25(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
@@ -20293,17 +20367,26 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.1': {}
 
-  '@imtbl/blockchain-data@2.11.0':
+  '@imtbl/auth@2.12.3':
     dependencies:
-      '@imtbl/config': 2.11.0
-      '@imtbl/generated-clients': 2.11.0
+      '@imtbl/generated-clients': 2.12.3
+      '@imtbl/metrics': 2.12.3
+      localforage: 1.10.0
+      oidc-client-ts: 3.4.1
+    transitivePeerDependencies:
+      - debug
+
+  '@imtbl/blockchain-data@2.12.3':
+    dependencies:
+      '@imtbl/config': 2.12.3
+      '@imtbl/generated-clients': 2.12.3
       axios: 1.7.7
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/bridge-sdk@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/bridge-sdk@2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/config': 2.11.0
+      '@imtbl/config': 2.12.3
       '@jest/globals': 29.7.0
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -20313,21 +20396,21 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@imtbl/checkout-sdk@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/checkout-sdk@2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/blockchain-data': 2.11.0
-      '@imtbl/bridge-sdk': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/config': 2.11.0
-      '@imtbl/dex-sdk': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/generated-clients': 2.11.0
-      '@imtbl/metrics': 2.11.0
-      '@imtbl/orderbook': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/passport': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/blockchain-data': 2.12.3
+      '@imtbl/bridge-sdk': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/config': 2.12.3
+      '@imtbl/dex-sdk': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/generated-clients': 2.12.3
+      '@imtbl/metrics': 2.12.3
+      '@imtbl/orderbook': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/passport': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       semver: 7.7.1
-      uuid: 8.3.2
+      uuid: 9.0.1
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -20335,29 +20418,27 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@imtbl/config@2.11.0':
+  '@imtbl/config@2.12.3':
     dependencies:
-      '@imtbl/metrics': 2.11.0
-    transitivePeerDependencies:
-      - debug
+      '@imtbl/metrics': 2.12.3
 
-  '@imtbl/contracts@2.2.17(bufferutil@4.0.8)(eslint@9.16.0(jiti@1.21.0))(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/contracts@2.2.18(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@axelar-network/axelar-gmp-sdk-solidity': 5.10.0
+      '@limitbreak/creator-token-standards': 5.0.0
       '@openzeppelin/contracts': 4.9.6
       '@openzeppelin/contracts-upgradeable': 4.9.6
-      '@rari-capital/solmate': 6.4.0
-      eslint-plugin-mocha: 10.5.0(eslint@9.16.0(jiti@1.21.0))
-      moment: 2.30.1
       openzeppelin-contracts-5.0.2: '@openzeppelin/contracts@5.0.2'
       openzeppelin-contracts-upgradeable-4.9.3: '@openzeppelin/contracts-upgradeable@4.9.6'
       seaport: https://codeload.github.com/immutable/seaport/tar.gz/ae061dc008105dd8d05937df9ad9a676f878cbf9(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
+      seaport-16: seaport@https://codeload.github.com/immutable/seaport/tar.gz/8345d291c69b7777a77bd81996ce46b28183586c(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
+      seaport-core-16: seaport-core@https://codeload.github.com/immutable/seaport-core/tar.gz/f9b2e50267862570d0df3ed7e3e32d1ff2cd9813
+      seaport-types-16: seaport-types@1.6.3
       solidity-bits: 0.4.0
       solidity-bytes-utils: 0.8.2
     transitivePeerDependencies:
       - bufferutil
       - c-kzg
-      - eslint
       - supports-color
       - ts-node
       - typescript
@@ -20384,20 +20465,19 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@imtbl/dex-sdk@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/dex-sdk@2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/config': 2.11.0
+      '@imtbl/config': 2.12.3
       '@uniswap/sdk-core': 3.2.3
       '@uniswap/swap-router-contracts': 1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
       '@uniswap/v3-sdk': 3.10.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
-      - debug
       - hardhat
       - utf-8-validate
 
-  '@imtbl/generated-clients@2.11.0':
+  '@imtbl/generated-clients@2.12.3':
     dependencies:
       axios: 1.7.7
     transitivePeerDependencies:
@@ -20407,22 +20487,19 @@ snapshots:
     dependencies:
       buffer: 6.0.3
 
-  '@imtbl/metrics@2.11.0':
+  '@imtbl/metrics@2.12.3':
     dependencies:
-      axios: 1.7.7
       global-const: 0.1.2
       lru-memorise: 0.3.0
-    transitivePeerDependencies:
-      - debug
 
-  '@imtbl/minting-backend@2.11.0':
+  '@imtbl/minting-backend@2.12.3':
     dependencies:
-      '@imtbl/blockchain-data': 2.11.0
-      '@imtbl/config': 2.11.0
-      '@imtbl/generated-clients': 2.11.0
-      '@imtbl/metrics': 2.11.0
-      '@imtbl/webhook': 2.11.0
-      uuid: 8.3.2
+      '@imtbl/blockchain-data': 2.12.3
+      '@imtbl/config': 2.12.3
+      '@imtbl/generated-clients': 2.12.3
+      '@imtbl/metrics': 2.12.3
+      '@imtbl/webhook': 2.12.3
+      uuid: 9.0.1
     optionalDependencies:
       pg: 8.11.5
       prisma: 5.20.0
@@ -20430,10 +20507,10 @@ snapshots:
       - debug
       - pg-native
 
-  '@imtbl/orderbook@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/orderbook@2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/config': 2.11.0
-      '@imtbl/metrics': 2.11.0
+      '@imtbl/config': 2.12.3
+      '@imtbl/metrics': 2.12.3
       '@opensea/seaport-js': 4.0.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -20444,27 +20521,19 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/passport@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/passport@2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@0xsequence/abi': 2.3.38
-      '@0xsequence/core': 2.3.38(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))
-      '@imtbl/config': 2.11.0
-      '@imtbl/generated-clients': 2.11.0
-      '@imtbl/metrics': 2.11.0
-      '@imtbl/toolkit': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-client': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-provider': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@magic-ext/oidc': 12.0.5
-      '@magic-sdk/provider': 29.5.0(localforage@1.10.0)
-      '@metamask/detect-provider': 2.0.0
-      axios: 1.7.7
+      '@imtbl/auth': 2.12.3
+      '@imtbl/config': 2.12.3
+      '@imtbl/generated-clients': 2.12.3
+      '@imtbl/metrics': 2.12.3
+      '@imtbl/toolkit': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/wallet': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-client': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-provider': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      events: 3.3.0
-      jwt-decode: 3.1.2
       localforage: 1.10.0
-      magic-sdk: 29.4.2
       oidc-client-ts: 3.4.1
-      uuid: 8.3.2
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -20478,17 +20547,19 @@ snapshots:
       - encoding
       - supports-color
 
-  '@imtbl/sdk@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/sdk@2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/blockchain-data': 2.11.0
-      '@imtbl/checkout-sdk': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/config': 2.11.0
-      '@imtbl/minting-backend': 2.11.0
-      '@imtbl/orderbook': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/passport': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/webhook': 2.11.0
-      '@imtbl/x-client': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-provider': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/auth': 2.12.3
+      '@imtbl/blockchain-data': 2.12.3
+      '@imtbl/checkout-sdk': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/config': 2.12.3
+      '@imtbl/minting-backend': 2.12.3
+      '@imtbl/orderbook': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/passport': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/wallet': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/webhook': 2.12.3
+      '@imtbl/x-client': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-provider': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -20497,35 +20568,45 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@imtbl/toolkit@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/toolkit@2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/x-client': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@magic-ext/oidc': 12.0.5
+      '@imtbl/x-client': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       bn.js: 5.2.1
       enc-utils: 3.0.0
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      magic-sdk: 29.4.2
       oidc-client-ts: 3.4.1
     transitivePeerDependencies:
       - bufferutil
       - debug
       - utf-8-validate
 
-  '@imtbl/webhook@2.11.0':
+  '@imtbl/wallet@2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/config': 2.11.0
-      '@imtbl/generated-clients': 2.11.0
+      '@imtbl/auth': 2.12.3
+      '@imtbl/generated-clients': 2.12.3
+      '@imtbl/metrics': 2.12.3
+      '@imtbl/toolkit': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - utf-8-validate
+
+  '@imtbl/webhook@2.12.3':
+    dependencies:
+      '@imtbl/config': 2.12.3
+      '@imtbl/generated-clients': 2.12.3
       sns-validator: 0.3.5
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/x-client@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/x-client@2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@ethereumjs/wallet': 2.0.4
-      '@imtbl/config': 2.11.0
-      '@imtbl/generated-clients': 2.11.0
+      '@imtbl/config': 2.12.3
+      '@imtbl/generated-clients': 2.12.3
       axios: 1.7.7
       bn.js: 5.2.1
       elliptic: 6.6.1
@@ -20537,18 +20618,16 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/x-provider@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/x-provider@2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/config': 2.11.0
-      '@imtbl/generated-clients': 2.11.0
-      '@imtbl/toolkit': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-client': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@magic-ext/oidc': 12.0.5
+      '@imtbl/config': 2.12.3
+      '@imtbl/generated-clients': 2.12.3
+      '@imtbl/toolkit': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-client': 2.12.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       enc-utils: 3.0.0
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      magic-sdk: 29.4.2
       oidc-client-ts: 3.4.1
     transitivePeerDependencies:
       - bufferutil
@@ -21313,6 +21392,16 @@ snapshots:
     dependencies:
       '@lezer/common': 1.4.0
 
+  '@limitbreak/creator-token-standards@5.0.0':
+    dependencies:
+      '@limitbreak/permit-c': 1.0.0
+      '@openzeppelin/contracts': 4.8.3
+      erc721a: 4.2.3
+
+  '@limitbreak/permit-c@1.0.0':
+    dependencies:
+      '@openzeppelin/contracts': 4.8.3
+
   '@lit-labs/ssr-dom-shim@1.2.0': {}
 
   '@lit/reactive-element@1.6.3':
@@ -21342,21 +21431,6 @@ snapshots:
   '@lukeed/uuid@2.0.1':
     dependencies:
       '@lukeed/csprng': 1.1.0
-
-  '@magic-ext/oidc@12.0.5': {}
-
-  '@magic-sdk/commons@25.4.2(@magic-sdk/provider@29.5.0(localforage@1.10.0))(@magic-sdk/types@24.22.0)':
-    dependencies:
-      '@magic-sdk/provider': 29.5.0(localforage@1.10.0)
-      '@magic-sdk/types': 24.22.0
-
-  '@magic-sdk/provider@29.5.0(localforage@1.10.0)':
-    dependencies:
-      '@magic-sdk/types': 24.22.0
-      eventemitter3: 4.0.7
-      localforage: 1.10.0
-
-  '@magic-sdk/types@24.22.0': {}
 
   '@metamask/detect-provider@2.0.0': {}
 
@@ -21513,8 +21587,8 @@ snapshots:
     dependencies:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.1.0
-      '@noble/hashes': 1.5.0
-      '@scure/base': 1.1.7
+      '@noble/hashes': 1.8.0
+      '@scure/base': 1.2.6
       '@types/debug': 4.1.8
       debug: 4.3.7(supports-color@8.1.1)
       pony-cause: 2.1.11
@@ -21527,8 +21601,8 @@ snapshots:
     dependencies:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.1.0
-      '@noble/hashes': 1.5.0
-      '@scure/base': 1.1.7
+      '@noble/hashes': 1.8.0
+      '@scure/base': 1.2.6
       '@types/debug': 4.1.8
       debug: 4.3.7(supports-color@8.1.1)
       pony-cause: 2.1.11
@@ -22118,6 +22192,8 @@ snapshots:
 
   '@openzeppelin/contracts@3.4.2': {}
 
+  '@openzeppelin/contracts@4.8.3': {}
+
   '@openzeppelin/contracts@4.9.6': {}
 
   '@openzeppelin/contracts@5.0.2': {}
@@ -22156,6 +22232,8 @@ snapshots:
 
   '@oxc-resolver/binding-win32-x64-msvc@1.11.0':
     optional: true
+
+  '@panva/hkdf@1.2.1': {}
 
   '@parcel/bundler-default@2.16.3(@parcel/core@2.16.3(@swc/helpers@0.5.13))':
     dependencies:
@@ -24584,6 +24662,13 @@ snapshots:
       '@swc/counter': 0.1.3
       jsonc-parser: 3.3.1
 
+  '@swc/jest@0.2.37(@swc/core@1.15.3(@swc/helpers@0.5.13))':
+    dependencies:
+      '@jest/create-cache-key-function': 29.7.0
+      '@swc/core': 1.15.3(@swc/helpers@0.5.13)
+      '@swc/counter': 0.1.3
+      jsonc-parser: 3.3.1
+
   '@swc/jest@0.2.37(@swc/core@1.9.3(@swc/helpers@0.5.13))':
     dependencies:
       '@jest/create-cache-key-function': 29.7.0
@@ -26796,7 +26881,7 @@ snapshots:
 
   browserslist@4.24.4:
     dependencies:
-      caniuse-lite: 1.0.30001703
+      caniuse-lite: 1.0.30001760
       electron-to-chromium: 1.5.113
       node-releases: 2.0.19
       update-browserslist-db: 1.1.3(browserslist@4.24.4)
@@ -26950,13 +27035,11 @@ snapshots:
   caniuse-api@3.0.0:
     dependencies:
       browserslist: 4.24.4
-      caniuse-lite: 1.0.30001703
+      caniuse-lite: 1.0.30001760
       lodash.memoize: 4.1.2
       lodash.uniq: 4.5.0
 
   caniuse-lite@1.0.30001660: {}
-
-  caniuse-lite@1.0.30001703: {}
 
   caniuse-lite@1.0.30001760: {}
 
@@ -28289,6 +28372,8 @@ snapshots:
 
   envinfo@7.14.0: {}
 
+  erc721a@4.2.3: {}
+
   err-code@2.0.3: {}
 
   error-ex@1.3.2:
@@ -28997,7 +29082,7 @@ snapshots:
     dependencies:
       eslint: 8.57.0
 
-  eslint-plugin-react-refresh@0.4.24(eslint@8.57.0):
+  eslint-plugin-react-refresh@0.4.25(eslint@8.57.0):
     dependencies:
       eslint: 8.57.0
 
@@ -32932,9 +33017,9 @@ snapshots:
       '@sideway/formula': 3.0.1
       '@sideway/pinpoint': 2.0.0
 
-  joycon@3.1.1: {}
+  jose@4.15.9: {}
 
-  js-base64@3.7.8: {}
+  joycon@3.1.1: {}
 
   js-cookie@3.0.1: {}
 
@@ -33112,8 +33197,6 @@ snapshots:
       array.prototype.flat: 1.3.2
       object.assign: 4.1.5
       object.values: 1.2.0
-
-  jwt-decode@3.1.2: {}
 
   jwt-decode@4.0.0: {}
 
@@ -33471,6 +33554,10 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
+  lru-cache@6.0.0:
+    dependencies:
+      yallist: 4.0.0
+
   lru-cache@7.18.3: {}
 
   lru-memorise@0.3.0:
@@ -33482,13 +33569,6 @@ snapshots:
   lunr@2.3.9: {}
 
   lz-string@1.5.0: {}
-
-  magic-sdk@29.4.2:
-    dependencies:
-      '@magic-sdk/commons': 25.4.2(@magic-sdk/provider@29.5.0(localforage@1.10.0))(@magic-sdk/types@24.22.0)
-      '@magic-sdk/provider': 29.5.0(localforage@1.10.0)
-      '@magic-sdk/types': 24.22.0
-      localforage: 1.10.0
 
   magic-string@0.25.9:
     dependencies:
@@ -33952,8 +34032,6 @@ snapshots:
       yargs-parser: 20.2.9
       yargs-unparser: 2.0.0
 
-  moment@2.30.1: {}
-
   motion-dom@11.18.1:
     dependencies:
       motion-utils: 11.18.1
@@ -34075,17 +34153,47 @@ snapshots:
     dependencies:
       '@segment/isodate': 1.0.3
 
-  next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next-auth@4.24.13(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      '@babel/runtime': 7.25.0
+      '@panva/hkdf': 1.2.1
+      cookie: 0.7.2
+      jose: 4.15.9
+      next: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      oauth: 0.9.15
+      openid-client: 5.7.1
+      preact: 10.23.1
+      preact-render-to-string: 5.2.6(preact@10.23.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      uuid: 8.3.2
+
+  next-auth@4.24.13(next@14.2.25(@babel/core@7.26.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      '@babel/runtime': 7.25.0
+      '@panva/hkdf': 1.2.1
+      cookie: 0.7.2
+      jose: 4.15.9
+      next: 14.2.25(@babel/core@7.26.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      oauth: 0.9.15
+      openid-client: 5.7.1
+      preact: 10.23.1
+      preact-render-to-string: 5.2.6(preact@10.23.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      uuid: 8.3.2
+
+  next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 14.2.25
       '@swc/helpers': 0.5.5
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001703
+      caniuse-lite: 1.0.30001760
       graceful-fs: 4.2.11
       postcss: 8.4.31
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      styled-jsx: 5.1.1(@babel/core@7.26.10)(react@18.3.1)
+      styled-jsx: 5.1.1(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react@18.3.1)
     optionalDependencies:
       '@next/swc-darwin-arm64': 14.2.25
       '@next/swc-darwin-x64': 14.2.25
@@ -34106,7 +34214,7 @@ snapshots:
       '@next/env': 14.2.25
       '@swc/helpers': 0.5.5
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001703
+      caniuse-lite: 1.0.30001760
       graceful-fs: 4.2.11
       postcss: 8.4.31
       react: 18.3.1
@@ -34380,6 +34488,8 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
+  oauth@0.9.15: {}
+
   ob1@0.80.12:
     dependencies:
       flow-enums-runtime: 0.0.6
@@ -34399,6 +34509,8 @@ snapshots:
       copy-descriptor: 0.1.1
       define-property: 0.2.5
       kind-of: 3.2.2
+
+  object-hash@2.2.0: {}
 
   object-hash@3.0.0: {}
 
@@ -34475,6 +34587,8 @@ snapshots:
     dependencies:
       jwt-decode: 4.0.0
 
+  oidc-token-hash@5.2.0: {}
+
   on-exit-leak-free@0.2.0: {}
 
   on-exit-leak-free@2.1.2: {}
@@ -34524,6 +34638,13 @@ snapshots:
       is-wsl: 2.2.0
 
   opener@1.5.2: {}
+
+  openid-client@5.7.1:
+    dependencies:
+      jose: 4.15.9
+      lru-cache: 6.0.0
+      object-hash: 2.2.0
+      oidc-token-hash: 5.2.0
 
   optionator@0.8.3:
     dependencies:
@@ -35456,6 +35577,11 @@ snapshots:
 
   postgres-range@1.1.4: {}
 
+  preact-render-to-string@5.2.6(preact@10.23.1):
+    dependencies:
+      preact: 10.23.1
+      pretty-format: 3.8.0
+
   preact@10.23.1: {}
 
   prelude-ls@1.1.2: {}
@@ -35496,6 +35622,8 @@ snapshots:
       '@jest/schemas': 29.6.3
       ansi-styles: 5.2.0
       react-is: 18.2.0
+
+  pretty-format@3.8.0: {}
 
   prisma@5.20.0:
     dependencies:
@@ -36656,9 +36784,17 @@ snapshots:
     dependencies:
       seaport-types: 0.0.1
 
+  seaport-core@1.6.5:
+    dependencies:
+      seaport-types: 1.6.3
+
   seaport-core@https://codeload.github.com/immutable/seaport-core/tar.gz/0633350ec34f21fcede657ff812f11cf7d19144e:
     dependencies:
       seaport-types: 0.0.1
+
+  seaport-core@https://codeload.github.com/immutable/seaport-core/tar.gz/f9b2e50267862570d0df3ed7e3e32d1ff2cd9813:
+    dependencies:
+      seaport-types: 1.6.3
 
   seaport-sol@1.6.0:
     dependencies:
@@ -36666,6 +36802,28 @@ snapshots:
       seaport-types: 0.0.1
 
   seaport-types@0.0.1: {}
+
+  seaport-types@1.6.3: {}
+
+  seaport@https://codeload.github.com/immutable/seaport/tar.gz/8345d291c69b7777a77bd81996ce46b28183586c(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10):
+    dependencies:
+      '@nomicfoundation/hardhat-network-helpers': 1.0.11(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@openzeppelin/contracts': 4.9.6
+      ethers: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ethers-eip712: 0.2.0(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+      hardhat: 2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@22.7.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
+      merkletreejs: 0.3.11
+      seaport-core: 1.6.5
+      seaport-sol: 1.6.0
+      seaport-types: 1.6.3
+      solady: 0.0.84
+    transitivePeerDependencies:
+      - bufferutil
+      - c-kzg
+      - supports-color
+      - ts-node
+      - typescript
+      - utf-8-validate
 
   seaport@https://codeload.github.com/immutable/seaport/tar.gz/ae061dc008105dd8d05937df9ad9a676f878cbf9(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10):
     dependencies:
@@ -37418,12 +37576,13 @@ snapshots:
     dependencies:
       webpack: 5.88.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(esbuild@0.23.1)
 
-  styled-jsx@5.1.1(@babel/core@7.26.10)(react@18.3.1):
+  styled-jsx@5.1.1(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react@18.3.1):
     dependencies:
       client-only: 0.0.1
       react: 18.3.1
     optionalDependencies:
       '@babel/core': 7.26.10
+      babel-plugin-macros: 3.1.0
 
   styled-jsx@5.1.1(@babel/core@7.26.9)(react@18.3.1):
     dependencies:

@@ -10,6 +10,7 @@ import { useStatusProvider } from '@/context/StatusProvider';
 import { BASE_PATH } from '@/config';
 import PassportMethods from '@/components/PassportMethods';
 import ZkEvmWorkflow from '@/components/zkevm/ZkEvmWorkflow';
+import AuthNextJS from '@/components/AuthNextJS';
 
 export default function Home() {
   const { isLoading } = useStatusProvider();
@@ -27,6 +28,9 @@ export default function Home() {
         <Container>
           <Row className="my-3">
             <Environment disabled={isLoading || !!imxProvider || !!zkEvmProvider || !!defaultWalletProvider} />
+          </Row>
+          <Row className="my-3">
+            <AuthNextJS />
           </Row>
           <Row className="my-3">
             <PassportMethods />

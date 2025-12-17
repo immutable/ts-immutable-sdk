@@ -15,7 +15,9 @@ const nextConfig = {
   typescript: {
     tsconfigPath: './tsconfig.build.json',
   },
-  output: 'export',
+  // Static export disables API routes.
+  // Set ENABLE_API_ROUTES=true to enable API routes (required for auth-nextjs)
+  ...(process.env.ENABLE_API_ROUTES !== 'true' && { output: 'export' }),
   reactStrictMode: true,
 };
 

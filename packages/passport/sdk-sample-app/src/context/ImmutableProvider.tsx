@@ -10,6 +10,7 @@ import {
 import { Orderbook, OrderbookOverrides } from '@imtbl/orderbook';
 import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
+import { ImmutableAuthProvider } from '@imtbl/auth-nextjs/client';
 import {
   AUDIENCE,
   POPUP_REDIRECT_URI,
@@ -23,6 +24,7 @@ import { EnvironmentNames } from '@/types';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { ImxApiClients, createConfig } from '@imtbl/generated-clients';
 import { BlockchainData, BlockchainDataModuleConfiguration } from '@imtbl/blockchain-data';
+import { getAuthConfig } from '@/lib/auth-nextjs';
 
 const getSdkConfig = (environment: EnvironmentNames): ImxModuleConfiguration => {
   switch (environment) {
@@ -240,9 +242,14 @@ export function ImmutableProvider({
     setEnvironment,
   }), [sdkClient, orderbookClient, passportClient, blockchainData, environment, setEnvironment]);
 
+  // Get auth-nextjs config based on current environment
+  const authConfig = useMemo(() => getAuthConfig(environment), [environment]);
+
   return (
     <ImmutableContext.Provider value={providerValues}>
-      {children}
+      <ImmutableAuthProvider config={authConfig}>
+        {children}
+      </ImmutableAuthProvider>
     </ImmutableContext.Provider>
   );
 }
