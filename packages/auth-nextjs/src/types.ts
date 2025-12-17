@@ -170,7 +170,7 @@ export interface UseImmutableAuthReturn {
 export interface WithPageAuthRequiredOptions {
   /**
    * URL to redirect to when not authenticated
-   * @default "/login"
+   * @default "/"
    */
   loginUrl?: string;
   /**

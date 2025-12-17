@@ -123,11 +123,6 @@ export function createAuthOptions(config: ImmutableAuthConfig): NextAuthOptions 
       },
     },
 
-    pages: {
-      signIn: '/login',
-      error: '/login',
-    },
-
     session: {
       strategy: 'jwt',
       // Session max age in seconds (30 days default)
