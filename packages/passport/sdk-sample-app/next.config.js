@@ -17,11 +17,12 @@ const nextConfig = {
   typescript: {
     tsconfigPath: './tsconfig.build.json',
   },
-  // Only include .api.ts/.api.tsx extensions when API routes are enabled
+  // Use .page.* extensions for regular pages and .api.* for API routes
+  // When API routes are disabled, only .page.* files are included (excludes .api.* files)
   // This allows static export to work by excluding API route files
   pageExtensions: enableApiRoutes
-    ? ['tsx', 'ts', 'jsx', 'js', 'api.tsx', 'api.ts']
-    : ['tsx', 'ts', 'jsx', 'js'],
+    ? ['page.tsx', 'page.ts', 'page.jsx', 'page.js', 'api.tsx', 'api.ts']
+    : ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
   // Static export when API routes are disabled
   ...(!enableApiRoutes && { output: 'export' }),
   reactStrictMode: true,

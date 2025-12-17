@@ -1,5 +1,6 @@
 import type { ImmutableAuthConfig } from "@imtbl/auth-nextjs";
 import { EnvironmentNames } from "@/types";
+import { BASE_PATH } from "@/config";
 
 // Client IDs for each environment (same as ImmutableProvider)
 const CLIENT_IDS: Record<EnvironmentNames, string> = {
@@ -21,7 +22,7 @@ export function getAuthConfig(environment: EnvironmentNames): ImmutableAuthConfi
 
   return {
     clientId: CLIENT_IDS[environment],
-    redirectUri: `${baseUrl}/callback`,
+    redirectUri: `${baseUrl}${BASE_PATH}/callback`,
     audience: "platform_api",
     scope: "openid profile email offline_access transact",
     authenticationDomain: AUTH_DOMAINS[environment],
