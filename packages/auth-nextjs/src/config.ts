@@ -92,6 +92,8 @@ export function createAuthOptions(config: ImmutableAuthConfig): NextAuthOptions 
           }
 
           // Validate required fields exist to prevent TypeError on malformed requests
+          // accessTokenExpires must be a valid number to ensure isTokenExpired() works correctly
+          // (NaN comparisons always return false, which would prevent token refresh)
           if (
             !tokenData.accessToken
             || typeof tokenData.accessToken !== 'string'
@@ -99,6 +101,8 @@ export function createAuthOptions(config: ImmutableAuthConfig): NextAuthOptions 
             || typeof tokenData.profile !== 'object'
             || !tokenData.profile.sub
             || typeof tokenData.profile.sub !== 'string'
+            || typeof tokenData.accessTokenExpires !== 'number'
+            || Number.isNaN(tokenData.accessTokenExpires)
           ) {
             // eslint-disable-next-line no-console
             console.error('[auth-nextjs] Invalid token data structure - missing required fields');
