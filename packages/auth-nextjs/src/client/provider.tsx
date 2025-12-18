@@ -64,8 +64,16 @@ function ImmutableAuthInner({
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Create a config key to detect changes (clientId + authDomain uniquely identify the environment)
-    const configKey = `${config.clientId}:${config.authenticationDomain || DEFAULT_AUTH_DOMAIN}`;
+    // Create a config key to detect changes - include all properties used in Auth constructor
+    // to ensure the Auth instance is recreated when any config property changes
+    const configKey = [
+      config.clientId,
+      config.redirectUri,
+      config.logoutRedirectUri || '',
+      config.audience || DEFAULT_AUDIENCE,
+      config.scope || DEFAULT_SCOPE,
+      config.authenticationDomain || DEFAULT_AUTH_DOMAIN,
+    ].join(':');
 
     // Only recreate if config actually changed
     if (prevConfigRef.current === configKey) {

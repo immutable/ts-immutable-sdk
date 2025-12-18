@@ -36,11 +36,23 @@ export async function refreshAccessToken(
       }),
     });
 
-    const data = await response.json();
-
+    // Check response.ok before parsing JSON to avoid confusing errors
+    // when server returns non-JSON responses (e.g., HTML error pages)
     if (!response.ok) {
-      throw new Error(data.error_description || data.error || 'Token refresh failed');
+      let errorMessage = `Token refresh failed with status ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.error_description || errorData.error) {
+          errorMessage = errorData.error_description || errorData.error;
+        }
+      } catch {
+        // Response is not JSON (e.g., HTML error page from proxy/load balancer)
+        // Use the status-based error message
+      }
+      throw new Error(errorMessage);
     }
+
+    const data = await response.json();
 
     // Validate that access_token exists in the response
     if (!data.access_token || typeof data.access_token !== 'string') {
