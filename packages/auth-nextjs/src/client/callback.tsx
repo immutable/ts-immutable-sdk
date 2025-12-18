@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { signIn } from 'next-auth/react';
 import { Auth } from '@imtbl/auth';
@@ -56,6 +56,9 @@ export function CallbackPage({
 }: CallbackPageProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  // Track whether callback has been processed to prevent double invocation
+  // (React 18 StrictMode runs effects twice, and OAuth codes are single-use)
+  const callbackProcessedRef = useRef(false);
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -140,7 +143,9 @@ export function CallbackPage({
     }
 
     // Handle successful OAuth callback with authorization code
-    if (router.query.code) {
+    // Guard against double invocation (React 18 StrictMode runs effects twice)
+    if (router.query.code && !callbackProcessedRef.current) {
+      callbackProcessedRef.current = true;
       handleCallback();
     }
   }, [

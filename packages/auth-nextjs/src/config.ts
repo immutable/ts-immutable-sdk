@@ -91,6 +91,20 @@ export function createAuthOptions(config: ImmutableAuthConfig): NextAuthOptions 
             return null;
           }
 
+          // Validate required fields exist to prevent TypeError on malformed requests
+          if (
+            !tokenData.accessToken
+            || typeof tokenData.accessToken !== 'string'
+            || !tokenData.profile
+            || typeof tokenData.profile !== 'object'
+            || !tokenData.profile.sub
+            || typeof tokenData.profile.sub !== 'string'
+          ) {
+            // eslint-disable-next-line no-console
+            console.error('[auth-nextjs] Invalid token data structure - missing required fields');
+            return null;
+          }
+
           // Validate tokens server-side via userinfo endpoint.
           // This is the standard OAuth 2.0 way - the auth server validates the token.
           const userInfo = await validateTokens(tokenData.accessToken, authDomain);

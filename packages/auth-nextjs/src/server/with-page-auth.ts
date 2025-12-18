@@ -117,7 +117,7 @@ export function withPageAuthRequired<
   options: WithPageAuthRequiredFullOptions<P> = {},
 ): GetServerSideProps<WithPageAuthRequiredProps & P> {
   const {
-    loginUrl = '/',
+    loginUrl = '/login',
     returnTo,
     getServerSideProps: customGetServerSideProps,
   } = options;
