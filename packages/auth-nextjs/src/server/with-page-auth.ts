@@ -133,7 +133,9 @@ export function withPageAuthRequired<
 
       if (returnTo !== false) {
         const returnPath = returnTo || ctx.resolvedUrl;
-        destination = `${loginUrl}?returnTo=${encodeURIComponent(returnPath)}`;
+        // Use '&' if loginUrl already has a query string, otherwise use '?'
+        const separator = loginUrl.includes('?') ? '&' : '?';
+        destination = `${loginUrl}${separator}returnTo=${encodeURIComponent(returnPath)}`;
       }
 
       return {
