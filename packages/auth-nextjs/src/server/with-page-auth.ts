@@ -156,9 +156,11 @@ export function withPageAuthRequired<
       }
 
       // Merge props with session
+      // Note: result.props can be P | Promise<P>, so we must await it
+      const userProps = await result.props;
       return {
         props: {
-          ...result.props,
+          ...userProps,
           session,
         } as WithPageAuthRequiredProps & P,
       };
