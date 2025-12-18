@@ -13,10 +13,11 @@ export default function Callback() {
 
   useEffect(() => {
     // Read environment from localStorage (same key as ImmutableProvider uses)
+    // Default to DEV to match ImmutableProvider's default context environment
     const storedEnv = localStorage.getItem("IMX_PASSPORT_SAMPLE_ENVIRONMENT");
     const environment = storedEnv 
       ? (JSON.parse(storedEnv) as EnvironmentNames)
-      : EnvironmentNames.SANDBOX;
+      : EnvironmentNames.DEV;
     
     setConfig(getAuthConfig(environment));
   }, []);
