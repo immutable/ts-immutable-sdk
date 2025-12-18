@@ -21,6 +21,7 @@ import type {
   ImmutableUser,
   ImmutableTokenData,
 } from '../types';
+import { getTokenExpiry } from '../utils/token';
 
 const DEFAULT_AUTH_DOMAIN = 'https://auth.immutable.com';
 
@@ -103,7 +104,7 @@ function ImmutableAuthInner({
         // Calculate expires_in from accessTokenExpires
         const expiresIn = accessTokenExpires
           ? Math.max(0, Math.floor((accessTokenExpires - Date.now()) / 1000))
-          : 3600; // Default 1 hour
+          : 900; // Default 15 minutes
 
         // Hydrate Auth with tokens from NextAuth session
         const tokenResponse: DeviceTokenResponse = {
@@ -137,7 +138,7 @@ function ImmutableAuthInner({
           accessToken: authUser.accessToken,
           refreshToken: authUser.refreshToken,
           idToken: authUser.idToken,
-          accessTokenExpires: Date.now() + 3600 * 1000, // 1 hour
+          accessTokenExpires: getTokenExpiry(authUser.accessToken),
           zkEvm: authUser.zkEvm,
         });
       }
@@ -265,7 +266,7 @@ export function useImmutableAuth(): UseImmutableAuthReturn {
       accessToken: authUser.accessToken,
       refreshToken: authUser.refreshToken,
       idToken: authUser.idToken,
-      accessTokenExpires: Date.now() + 3600 * 1000, // 1 hour
+      accessTokenExpires: getTokenExpiry(authUser.accessToken),
       profile: {
         sub: authUser.profile.sub,
         email: authUser.profile.email,

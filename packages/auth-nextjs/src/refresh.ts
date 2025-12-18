@@ -40,7 +40,7 @@ export async function refreshAccessToken(
     }
 
     // Calculate expiry (access_token typically expires in 1 hour)
-    const expiresIn = data.expires_in || 3600;
+    const expiresIn = data.expires_in || 900;
     const accessTokenExpires = Date.now() + expiresIn * 1000;
 
     return {

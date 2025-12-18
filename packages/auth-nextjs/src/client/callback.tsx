@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { signIn } from 'next-auth/react';
 import { Auth } from '@imtbl/auth';
 import type { ImmutableAuthConfig, ImmutableTokenData } from '../types';
+import { getTokenExpiry } from '../utils/token';
 
 export interface CallbackPageProps {
   /**
@@ -80,7 +81,7 @@ export function CallbackPage({
               accessToken: authUser.accessToken,
               refreshToken: authUser.refreshToken,
               idToken: authUser.idToken,
-              accessTokenExpires: Date.now() + 3600 * 1000, // 1 hour
+              accessTokenExpires: getTokenExpiry(authUser.accessToken),
               profile: {
                 sub: authUser.profile.sub,
                 email: authUser.profile.email,
