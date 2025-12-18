@@ -80,42 +80,44 @@ export function CallbackPage({
         if (window.opener) {
           // Close the popup - the parent window will receive the tokens via Auth events
           window.close();
-        } else {
+        } else if (authUser) {
           // Not in a popup - create NextAuth session before redirecting
           // This ensures SSR/session-based auth is authenticated
-          if (authUser) {
-            const tokenData: ImmutableTokenData = {
-              accessToken: authUser.accessToken,
-              refreshToken: authUser.refreshToken,
-              idToken: authUser.idToken,
-              accessTokenExpires: getTokenExpiry(authUser.accessToken),
-              profile: {
-                sub: authUser.profile.sub,
-                email: authUser.profile.email,
-                nickname: authUser.profile.nickname,
-              },
-              zkEvm: authUser.zkEvm,
-            };
+          const tokenData: ImmutableTokenData = {
+            accessToken: authUser.accessToken,
+            refreshToken: authUser.refreshToken,
+            idToken: authUser.idToken,
+            accessTokenExpires: getTokenExpiry(authUser.accessToken),
+            profile: {
+              sub: authUser.profile.sub,
+              email: authUser.profile.email,
+              nickname: authUser.profile.nickname,
+            },
+            zkEvm: authUser.zkEvm,
+          };
 
-            // Sign in to NextAuth with the tokens
-            // Note: signIn uses the basePath from SessionProvider context,
-            // so ensure CallbackPage is rendered within ImmutableAuthProvider
-            const result = await signIn(IMMUTABLE_PROVIDER_ID, {
-              tokens: JSON.stringify(tokenData),
-              redirect: false,
-            });
+          // Sign in to NextAuth with the tokens
+          // Note: signIn uses the basePath from SessionProvider context,
+          // so ensure CallbackPage is rendered within ImmutableAuthProvider
+          const result = await signIn(IMMUTABLE_PROVIDER_ID, {
+            tokens: JSON.stringify(tokenData),
+            redirect: false,
+          });
 
-            // signIn with redirect: false returns a result object instead of throwing
-            if (result?.error) {
-              throw new Error(`NextAuth sign-in failed: ${result.error}`);
-            }
-            if (!result?.ok) {
-              throw new Error('NextAuth sign-in failed: unknown error');
-            }
+          // signIn with redirect: false returns a result object instead of throwing
+          if (result?.error) {
+            throw new Error(`NextAuth sign-in failed: ${result.error}`);
+          }
+          if (!result?.ok) {
+            throw new Error('NextAuth sign-in failed: unknown error');
           }
 
-          // Redirect to specified page
+          // Only redirect after successful session creation
           router.replace(redirectTo);
+        } else {
+          // authUser is undefined - loginCallback failed silently
+          // This can happen if the OIDC signinCallback returns null
+          throw new Error('Authentication failed: no user data received from login callback');
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Authentication failed');
