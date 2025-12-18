@@ -276,10 +276,18 @@ export function useImmutableAuth(): UseImmutableAuthReturn {
     };
 
     // Sign in to NextAuth with the tokens
-    await signIn('immutable', {
+    const result = await signIn('immutable', {
       tokens: JSON.stringify(tokenData),
       redirect: false,
     });
+
+    // signIn with redirect: false returns a result object instead of throwing
+    if (result?.error) {
+      throw new Error(`NextAuth sign-in failed: ${result.error}`);
+    }
+    if (!result?.ok) {
+      throw new Error('NextAuth sign-in failed: unknown error');
+    }
   }, [auth]);
 
   // Sign out from both NextAuth and Immutable

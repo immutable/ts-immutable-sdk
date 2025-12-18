@@ -93,10 +93,18 @@ export function CallbackPage({
             // Sign in to NextAuth with the tokens
             // Note: signIn uses the basePath from SessionProvider context,
             // so ensure CallbackPage is rendered within ImmutableAuthProvider
-            await signIn('immutable', {
+            const result = await signIn('immutable', {
               tokens: JSON.stringify(tokenData),
               redirect: false,
             });
+
+            // signIn with redirect: false returns a result object instead of throwing
+            if (result?.error) {
+              throw new Error(`NextAuth sign-in failed: ${result.error}`);
+            }
+            if (!result?.ok) {
+              throw new Error('NextAuth sign-in failed: unknown error');
+            }
           }
 
           // Redirect to specified page
