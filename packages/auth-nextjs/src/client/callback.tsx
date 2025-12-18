@@ -78,6 +78,11 @@ export function CallbackPage({
 
         // Check if we're in a popup window
         if (window.opener) {
+          // Validate authUser before closing - if loginCallback failed silently,
+          // we need to show an error instead of closing the popup
+          if (!authUser) {
+            throw new Error('Authentication failed: no user data received from login callback');
+          }
           // Close the popup - the parent window will receive the tokens via Auth events
           window.close();
         } else if (authUser) {
