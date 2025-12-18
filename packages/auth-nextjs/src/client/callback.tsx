@@ -6,6 +6,12 @@ import { signIn } from 'next-auth/react';
 import { Auth } from '@imtbl/auth';
 import type { ImmutableAuthConfig, ImmutableTokenData } from '../types';
 import { getTokenExpiry } from '../utils/token';
+import {
+  DEFAULT_AUTH_DOMAIN,
+  DEFAULT_AUDIENCE,
+  DEFAULT_SCOPE,
+  IMMUTABLE_PROVIDER_ID,
+} from '../constants';
 
 export interface CallbackPageProps {
   /**
@@ -25,8 +31,6 @@ export interface CallbackPageProps {
    */
   errorComponent?: (error: string) => React.ReactElement | null;
 }
-
-const DEFAULT_AUTH_DOMAIN = 'https://auth.immutable.com';
 
 /**
  * Callback page component for handling OAuth redirects.
@@ -61,8 +65,8 @@ export function CallbackPage({
           clientId: config.clientId,
           redirectUri: config.redirectUri,
           logoutRedirectUri: config.logoutRedirectUri,
-          audience: config.audience || 'platform_api',
-          scope: config.scope || 'openid profile email offline_access transact',
+          audience: config.audience || DEFAULT_AUDIENCE,
+          scope: config.scope || DEFAULT_SCOPE,
           authenticationDomain: config.authenticationDomain || DEFAULT_AUTH_DOMAIN,
         });
 
@@ -93,7 +97,7 @@ export function CallbackPage({
             // Sign in to NextAuth with the tokens
             // Note: signIn uses the basePath from SessionProvider context,
             // so ensure CallbackPage is rendered within ImmutableAuthProvider
-            const result = await signIn('immutable', {
+            const result = await signIn(IMMUTABLE_PROVIDER_ID, {
               tokens: JSON.stringify(tokenData),
               redirect: false,
             });

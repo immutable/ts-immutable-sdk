@@ -22,8 +22,14 @@ import type {
   ImmutableTokenData,
 } from '../types';
 import { getTokenExpiry } from '../utils/token';
-
-const DEFAULT_AUTH_DOMAIN = 'https://auth.immutable.com';
+import {
+  DEFAULT_AUTH_DOMAIN,
+  DEFAULT_AUDIENCE,
+  DEFAULT_SCOPE,
+  DEFAULT_NEXTAUTH_BASE_PATH,
+  DEFAULT_TOKEN_EXPIRY_SECONDS,
+  IMMUTABLE_PROVIDER_ID,
+} from '../constants';
 
 /**
  * Internal context for Immutable auth state
@@ -35,8 +41,6 @@ interface ImmutableAuthContextValue {
 }
 
 const ImmutableAuthContext = createContext<ImmutableAuthContextValue | null>(null);
-
-const DEFAULT_BASE_PATH = '/api/auth';
 
 /**
  * Internal provider that manages Auth instance
@@ -74,8 +78,8 @@ function ImmutableAuthInner({
       clientId: config.clientId,
       redirectUri: config.redirectUri,
       logoutRedirectUri: config.logoutRedirectUri,
-      audience: config.audience || 'platform_api',
-      scope: config.scope || 'openid profile email offline_access transact',
+      audience: config.audience || DEFAULT_AUDIENCE,
+      scope: config.scope || DEFAULT_SCOPE,
       authenticationDomain: config.authenticationDomain || DEFAULT_AUTH_DOMAIN,
     });
 
@@ -104,7 +108,7 @@ function ImmutableAuthInner({
         // Calculate expires_in from accessTokenExpires
         const expiresIn = accessTokenExpires
           ? Math.max(0, Math.floor((accessTokenExpires - Date.now()) / 1000))
-          : 900; // Default 15 minutes
+          : DEFAULT_TOKEN_EXPIRY_SECONDS;
 
         // Hydrate Auth with tokens from NextAuth session
         const tokenResponse: DeviceTokenResponse = {
@@ -191,7 +195,7 @@ export function ImmutableAuthProvider({
   children,
   config,
   session,
-  basePath = DEFAULT_BASE_PATH,
+  basePath = DEFAULT_NEXTAUTH_BASE_PATH,
 }: ImmutableAuthProviderProps) {
   return (
     <SessionProvider session={session as Session | null | undefined} basePath={basePath}>
@@ -276,7 +280,7 @@ export function useImmutableAuth(): UseImmutableAuthReturn {
     };
 
     // Sign in to NextAuth with the tokens
-    const result = await signIn('immutable', {
+    const result = await signIn(IMMUTABLE_PROVIDER_ID, {
       tokens: JSON.stringify(tokenData),
       redirect: false,
     });

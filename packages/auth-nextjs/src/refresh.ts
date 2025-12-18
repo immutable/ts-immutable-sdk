@@ -1,7 +1,10 @@
 import type { JWT } from 'next-auth/jwt';
 import type { ImmutableAuthConfig } from './types';
-
-const DEFAULT_AUTH_DOMAIN = 'https://auth.immutable.com';
+import {
+  DEFAULT_AUTH_DOMAIN,
+  DEFAULT_TOKEN_EXPIRY_SECONDS,
+  TOKEN_EXPIRY_BUFFER_SECONDS,
+} from './constants';
 
 /**
  * Refresh the access token using the refresh token
@@ -40,7 +43,7 @@ export async function refreshAccessToken(
     }
 
     // Calculate expiry (access_token typically expires in 1 hour)
-    const expiresIn = data.expires_in || 900;
+    const expiresIn = data.expires_in || DEFAULT_TOKEN_EXPIRY_SECONDS;
     const accessTokenExpires = Date.now() + expiresIn * 1000;
 
     return {
@@ -67,7 +70,7 @@ export async function refreshAccessToken(
  */
 export function isTokenExpired(
   accessTokenExpires: number,
-  bufferSeconds: number = 60,
+  bufferSeconds: number = TOKEN_EXPIRY_BUFFER_SECONDS,
 ): boolean {
   return Date.now() >= accessTokenExpires - bufferSeconds * 1000;
 }

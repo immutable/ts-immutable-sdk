@@ -2,11 +2,14 @@ import type { NextAuthOptions } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import type { ImmutableAuthConfig, ImmutableTokenData, UserInfoResponse } from './types';
 import { refreshAccessToken, isTokenExpired } from './refresh';
+import {
+  DEFAULT_AUTH_DOMAIN,
+  IMMUTABLE_PROVIDER_ID,
+  DEFAULT_SESSION_MAX_AGE_SECONDS,
+} from './constants';
 
 // Handle ESM/CJS interop - CredentialsProvider may be default export or the module itself
 const CredentialsProvider = (Credentials as unknown as { default?: typeof Credentials }).default || Credentials;
-
-const DEFAULT_AUTH_DOMAIN = 'https://auth.immutable.com';
 
 /**
  * Validate tokens by calling the userinfo endpoint.
@@ -69,7 +72,7 @@ export function createAuthOptions(config: ImmutableAuthConfig): NextAuthOptions 
   return {
     providers: [
       CredentialsProvider({
-        id: 'immutable',
+        id: IMMUTABLE_PROVIDER_ID,
         name: 'Immutable',
         credentials: {
           tokens: { label: 'Tokens', type: 'text' },
@@ -188,7 +191,7 @@ export function createAuthOptions(config: ImmutableAuthConfig): NextAuthOptions 
     session: {
       strategy: 'jwt',
       // Session max age in seconds (30 days default)
-      maxAge: 30 * 24 * 60 * 60,
+      maxAge: DEFAULT_SESSION_MAX_AGE_SECONDS,
     },
 
     // Use NEXTAUTH_SECRET from environment
