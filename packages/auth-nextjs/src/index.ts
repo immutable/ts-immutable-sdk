@@ -21,6 +21,12 @@ export type ImmutableAuthOverrides = Omit<NextAuthOptions, 'providers'>;
  * @param config - Immutable auth configuration
  * @param overrides - Optional NextAuth options to override defaults
  *
+ * @remarks
+ * Callback composition: The `jwt` and `session` callbacks are composed rather than
+ * replaced. Internal callbacks run first (handling token storage and refresh), then
+ * your custom callbacks receive the result. Other callbacks (`signIn`, `redirect`)
+ * are replaced entirely if provided.
+ *
  * @example Basic usage
  * ```typescript
  * // pages/api/auth/[...nextauth].ts
@@ -42,6 +48,23 @@ export type ImmutableAuthOverrides = Omit<NextAuthOptions, 'providers'>;
  *   }
  * );
  * ```
+ *
+ * @example With custom jwt callback (composed with internal callback)
+ * ```typescript
+ * export default ImmutableAuth(
+ *   { clientId: "...", redirectUri: "..." },
+ *   {
+ *     callbacks: {
+ *       // Your jwt callback receives the token after internal processing
+ *       async jwt({ token }) {
+ *         // Add custom claims
+ *         token.customClaim = "value";
+ *         return token;
+ *       },
+ *     },
+ *   }
+ * );
+ * ```
  */
 export function ImmutableAuth(
   config: ImmutableAuthConfig,
@@ -49,18 +72,60 @@ export function ImmutableAuth(
 ) {
   const authOptions = createAuthOptions(config);
 
-  // Merge overrides with generated options
-  const mergedOptions: NextAuthOptions = overrides
-    ? {
-      ...authOptions,
-      ...overrides,
-      // Deep merge callbacks if both exist
-      callbacks: {
-        ...authOptions.callbacks,
-        ...overrides.callbacks,
-      },
+  // If no overrides, use auth options as-is
+  if (!overrides) {
+    return NextAuth(authOptions);
+  }
+
+  // Compose callbacks to ensure internal callbacks always run first
+  // User callbacks receive the result and can modify it further
+  const composedCallbacks: NextAuthOptions['callbacks'] = {
+    ...authOptions.callbacks,
+  };
+
+  if (overrides.callbacks) {
+    // Compose jwt callback - internal callback runs first, then user callback
+    if (overrides.callbacks.jwt) {
+      const internalJwt = authOptions.callbacks?.jwt;
+      const userJwt = overrides.callbacks.jwt;
+      composedCallbacks.jwt = async (params) => {
+        // Run internal jwt callback first to handle token storage and refresh
+        const token = internalJwt ? await internalJwt(params) : params.token;
+        // Then run user's jwt callback with the result
+        return userJwt({ ...params, token });
+      };
     }
-    : authOptions;
+
+    // Compose session callback - internal callback runs first, then user callback
+    if (overrides.callbacks.session) {
+      const internalSession = authOptions.callbacks?.session;
+      const userSession = overrides.callbacks.session;
+      composedCallbacks.session = async (params) => {
+        // Run internal session callback first to expose token data
+        const session = internalSession
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ? await internalSession(params as any)
+          : params.session;
+        // Then run user's session callback with the result
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return userSession({ ...params, session } as any);
+      };
+    }
+
+    // For other callbacks (signIn, redirect), just use overrides if provided
+    if (overrides.callbacks.signIn) {
+      composedCallbacks.signIn = overrides.callbacks.signIn;
+    }
+    if (overrides.callbacks.redirect) {
+      composedCallbacks.redirect = overrides.callbacks.redirect;
+    }
+  }
+
+  const mergedOptions: NextAuthOptions = {
+    ...authOptions,
+    ...overrides,
+    callbacks: composedCallbacks,
+  };
 
   return NextAuth(mergedOptions);
 }

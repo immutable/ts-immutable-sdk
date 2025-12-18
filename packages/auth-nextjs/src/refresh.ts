@@ -42,6 +42,11 @@ export async function refreshAccessToken(
       throw new Error(data.error_description || data.error || 'Token refresh failed');
     }
 
+    // Validate that access_token exists in the response
+    if (!data.access_token || typeof data.access_token !== 'string') {
+      throw new Error('Invalid token response: missing access_token');
+    }
+
     // Calculate expiry (access_token typically expires in 1 hour)
     const expiresIn = data.expires_in || DEFAULT_TOKEN_EXPIRY_SECONDS;
     const accessTokenExpires = Date.now() + expiresIn * 1000;
