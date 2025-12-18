@@ -111,6 +111,27 @@ export interface ImmutableTokenData {
 }
 
 /**
+ * Response from the userinfo endpoint
+ * Used for server-side token validation
+ */
+export interface UserInfoResponse {
+  /** Subject - unique user identifier */
+  sub: string;
+  /** User's email address */
+  email?: string;
+  /** User's nickname/username */
+  nickname?: string;
+  /** User's full name */
+  name?: string;
+  /** User's profile picture URL */
+  picture?: string;
+  /** When the user profile was last updated */
+  updated_at?: string;
+  /** Whether the email has been verified */
+  email_verified?: boolean;
+}
+
+/**
  * Props for ImmutableAuthProvider
  */
 export interface ImmutableAuthProviderProps {
@@ -124,6 +145,12 @@ export interface ImmutableAuthProviderProps {
    * Can be Session from getServerSession or any compatible session object
    */
   session?: Session | DefaultSession | null;
+  /**
+   * Custom base path for NextAuth API routes
+   * Use this when you have multiple auth endpoints (e.g., per environment)
+   * @default "/api/auth"
+   */
+  basePath?: string;
 }
 
 /**

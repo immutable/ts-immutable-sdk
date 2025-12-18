@@ -1,10 +1,47 @@
 import type { NextAuthOptions } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import type { ImmutableAuthConfig, ImmutableTokenData } from './types';
+import type { ImmutableAuthConfig, ImmutableTokenData, UserInfoResponse } from './types';
 import { refreshAccessToken, isTokenExpired } from './refresh';
 
 // Handle ESM/CJS interop - CredentialsProvider may be default export or the module itself
 const CredentialsProvider = (Credentials as unknown as { default?: typeof Credentials }).default || Credentials;
+
+const DEFAULT_AUTH_DOMAIN = 'https://auth.immutable.com';
+
+/**
+ * Validate tokens by calling the userinfo endpoint.
+ * This is the standard OAuth 2.0 way to validate access tokens server-side.
+ * The auth server validates signature, issuer, audience, and expiry.
+ *
+ * @param accessToken - The access token to validate
+ * @param authDomain - The authentication domain
+ * @returns The user info if valid, null otherwise
+ */
+async function validateTokens(
+  accessToken: string,
+  authDomain: string,
+): Promise<UserInfoResponse | null> {
+  try {
+    const response = await fetch(`${authDomain}/userinfo`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      // eslint-disable-next-line no-console
+      console.error('[auth-nextjs] Token validation failed:', response.status, response.statusText);
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('[auth-nextjs] Token validation error:', error);
+    return null;
+  }
+}
 
 /**
  * Create NextAuth options configured for Immutable authentication
@@ -27,6 +64,8 @@ const CredentialsProvider = (Credentials as unknown as { default?: typeof Creden
  * ```
  */
 export function createAuthOptions(config: ImmutableAuthConfig): NextAuthOptions {
+  const authDomain = config.authenticationDomain || DEFAULT_AUTH_DOMAIN;
+
   return {
     providers: [
       CredentialsProvider({
@@ -40,26 +79,49 @@ export function createAuthOptions(config: ImmutableAuthConfig): NextAuthOptions 
             return null;
           }
 
+          let tokenData: ImmutableTokenData;
           try {
-            const tokenData: ImmutableTokenData = JSON.parse(credentials.tokens);
-
-            // Return user object with all token data
-            return {
-              id: tokenData.profile.sub,
-              sub: tokenData.profile.sub,
-              email: tokenData.profile.email,
-              nickname: tokenData.profile.nickname,
-              accessToken: tokenData.accessToken,
-              refreshToken: tokenData.refreshToken,
-              idToken: tokenData.idToken,
-              accessTokenExpires: tokenData.accessTokenExpires,
-              zkEvm: tokenData.zkEvm,
-            };
+            tokenData = JSON.parse(credentials.tokens);
           } catch (error) {
             // eslint-disable-next-line no-console
             console.error('[auth-nextjs] Failed to parse token data:', error);
             return null;
           }
+
+          // Validate tokens server-side via userinfo endpoint.
+          // This is the standard OAuth 2.0 way - the auth server validates the token.
+          const userInfo = await validateTokens(tokenData.accessToken, authDomain);
+          if (!userInfo) {
+            // eslint-disable-next-line no-console
+            console.error('[auth-nextjs] Token validation failed - rejecting authentication');
+            return null;
+          }
+
+          // Verify the user ID (sub) from userinfo matches the client-provided profile.
+          // This prevents spoofing a different user ID with a valid token.
+          if (userInfo.sub !== tokenData.profile.sub) {
+            // eslint-disable-next-line no-console
+            console.error(
+              '[auth-nextjs] User ID mismatch - userinfo sub:',
+              userInfo.sub,
+              'provided sub:',
+              tokenData.profile.sub,
+            );
+            return null;
+          }
+
+          // Return user object with validated data
+          return {
+            id: userInfo.sub,
+            sub: userInfo.sub,
+            email: userInfo.email ?? tokenData.profile.email,
+            nickname: userInfo.nickname ?? tokenData.profile.nickname,
+            accessToken: tokenData.accessToken,
+            refreshToken: tokenData.refreshToken,
+            idToken: tokenData.idToken,
+            accessTokenExpires: tokenData.accessTokenExpires,
+            zkEvm: tokenData.zkEvm,
+          };
         },
       }),
     ],

@@ -247,9 +247,21 @@ export function ImmutableProvider({
   // Get auth-nextjs config based on current environment
   const authConfig = useMemo(() => getAuthConfig(environment), [environment]);
 
+  // Get the NextAuth base path for the current environment
+  const authBasePath = useMemo(() => {
+    switch (environment) {
+      case EnvironmentNames.DEV:
+        return '/api/auth/dev';
+      case EnvironmentNames.PRODUCTION:
+        return '/api/auth/prod';
+      default:
+        return '/api/auth/sandbox';
+    }
+  }, [environment]);
+
   return (
     <ImmutableContext.Provider value={providerValues}>
-      <ImmutableAuthProvider config={authConfig} session={session ?? null}>
+      <ImmutableAuthProvider config={authConfig} session={session ?? null} basePath={authBasePath}>
         {children}
       </ImmutableAuthProvider>
     </ImmutableContext.Provider>

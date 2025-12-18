@@ -52,6 +52,7 @@
   ],
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
+    "dev": "pnpm transpile && tsup --config tsup.config.ts --watch --no-clean",
     "transpile": "tsup --config tsup.config.ts",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
     "lint": "eslint ./src --ext .ts,.tsx --max-warnings=0",
@@ -88,4 +89,3 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "type": "module"
 }
-

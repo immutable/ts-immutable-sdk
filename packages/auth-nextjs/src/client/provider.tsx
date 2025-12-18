@@ -30,9 +30,12 @@ const DEFAULT_AUTH_DOMAIN = 'https://auth.immutable.com';
 interface ImmutableAuthContextValue {
   auth: Auth | null;
   config: ImmutableAuthConfig;
+  basePath: string;
 }
 
 const ImmutableAuthContext = createContext<ImmutableAuthContextValue | null>(null);
+
+const DEFAULT_BASE_PATH = '/api/auth';
 
 /**
  * Internal provider that manages Auth instance
@@ -40,9 +43,11 @@ const ImmutableAuthContext = createContext<ImmutableAuthContextValue | null>(nul
 function ImmutableAuthInner({
   children,
   config,
+  basePath,
 }: {
   children: React.ReactNode;
   config: ImmutableAuthConfig;
+  basePath: string;
 }) {
   // Use state instead of ref so changes trigger re-renders and update context consumers
   const [auth, setAuth] = useState<Auth | null>(null);
@@ -146,8 +151,8 @@ function ImmutableAuthInner({
   }, [auth, isAuthReady, session, updateSession]);
 
   const contextValue = useMemo(
-    () => ({ auth, config }),
-    [auth, config],
+    () => ({ auth, config, basePath }),
+    [auth, config, basePath],
   );
 
   return (
@@ -185,10 +190,11 @@ export function ImmutableAuthProvider({
   children,
   config,
   session,
+  basePath = DEFAULT_BASE_PATH,
 }: ImmutableAuthProviderProps) {
   return (
-    <SessionProvider session={session as Session | null | undefined}>
-      <ImmutableAuthInner config={config}>{children}</ImmutableAuthInner>
+    <SessionProvider session={session as Session | null | undefined} basePath={basePath}>
+      <ImmutableAuthInner config={config} basePath={basePath}>{children}</ImmutableAuthInner>
     </SessionProvider>
   );
 }
