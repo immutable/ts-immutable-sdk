@@ -46,9 +46,6 @@
     "*.{js,jsx,ts,tsx}": "eslint"
   },
   "packageManager": "pnpm@9.12.0",
-  "pnpm": {
-    "neverBuiltDependencies": ["seaport", "seaport-core"]
-  },
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
