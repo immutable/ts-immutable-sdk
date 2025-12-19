@@ -6,7 +6,6 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/auth": "workspace:*",
-    "@imtbl/auth-nextjs": "workspace:*",
     "@imtbl/blockchain-data": "workspace:*",
     "@imtbl/checkout-sdk": "workspace:*",
     "@imtbl/config": "workspace:*",

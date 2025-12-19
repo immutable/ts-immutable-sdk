@@ -128,8 +128,6 @@ function ImmutableAuthInner({
         };
 
         await auth.storeTokens(tokenResponse);
-        // eslint-disable-next-line no-console
-        console.log('[auth-nextjs] Hydrated Auth instance from session');
       } catch (error) {
         // eslint-disable-next-line no-console
         console.warn('[auth-nextjs] Failed to hydrate Auth instance:', error);
