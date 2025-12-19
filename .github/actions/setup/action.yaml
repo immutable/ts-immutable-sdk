@@ -17,10 +17,6 @@ runs:
         registry-url: https://registry.npmjs.org/
         cache: "pnpm"
 
-    - name: Clear yarn cache (workaround for git-hosted packages)
-      shell: bash
-      run: rm -rf ~/.cache/yarn || true
-
     - name: install dependencies
       shell: bash
       run: pnpm install --frozen-lockfile
