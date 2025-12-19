@@ -99,6 +99,10 @@ function ImmutableAuthInner({
   // This handles the case where a valid session exists but Auth has no local state
   useEffect(() => {
     if (!auth || !isAuthReady) return;
+    // Don't hydrate if session has an error (e.g., RefreshTokenError)
+    // When server-side token refresh fails, the session contains both stale tokens
+    // AND an error flag - we must not store these stale tokens in the Auth instance
+    if (session?.error) return;
     if (!session?.accessToken || !session?.idToken) return;
 
     const hydrateAuth = async () => {
