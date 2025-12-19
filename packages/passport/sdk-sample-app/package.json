@@ -4,6 +4,7 @@
   "dependencies": {
     "@biom3/design-tokens": "^0.4.5",
     "@biom3/react": "^0.29.4",
+    "@imtbl/auth-nextjs": "workspace:*",
     "@imtbl/blockchain-data": "workspace:*",
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
@@ -20,6 +21,7 @@
     "ethers": "^6.13.4",
     "motion": "^11.17.0",
     "next": "14.2.25",
+    "next-auth": "^4.24.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",
     "react-dom": "^18.2.0"
@@ -41,7 +43,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "dev-with-sdk": "concurrently 'pnpm dev' 'pnpm run -w dev'",
+    "dev-with-sdk": "concurrently 'ENABLE_API_ROUTES=true pnpm dev' 'pnpm run -w dev'",
     "lint": "eslint 'src/**/*.{ts,tsx}' --max-warnings=0",
     "start": "next start"
   }

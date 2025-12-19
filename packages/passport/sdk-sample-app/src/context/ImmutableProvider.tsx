@@ -10,6 +10,8 @@ import {
 import { Orderbook, OrderbookOverrides } from '@imtbl/orderbook';
 import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
+import { ImmutableAuthProvider } from '@imtbl/auth-nextjs/client';
+import type { Session } from 'next-auth';
 import {
   AUDIENCE,
   POPUP_REDIRECT_URI,
@@ -23,6 +25,7 @@ import { EnvironmentNames } from '@/types';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { ImxApiClients, createConfig } from '@imtbl/generated-clients';
 import { BlockchainData, BlockchainDataModuleConfiguration } from '@imtbl/blockchain-data';
+import { getAuthConfig } from '@/lib/auth-nextjs';
 
 const getSdkConfig = (environment: EnvironmentNames): ImxModuleConfiguration => {
   switch (environment) {
@@ -200,7 +203,8 @@ const ImmutableContext = createContext<{
 
 export function ImmutableProvider({
   children,
-}: { children: JSX.Element | JSX.Element[] }) {
+  session,
+}: { children: JSX.Element | JSX.Element[]; session?: Session }) {
   const [environment, setEnvironment] = useLocalStorage(
     'IMX_PASSPORT_SAMPLE_ENVIRONMENT',
     useContext(ImmutableContext).environment,
@@ -240,9 +244,26 @@ export function ImmutableProvider({
     setEnvironment,
   }), [sdkClient, orderbookClient, passportClient, blockchainData, environment, setEnvironment]);
 
+  // Get auth-nextjs config based on current environment
+  const authConfig = useMemo(() => getAuthConfig(environment), [environment]);
+
+  // Get the NextAuth base path for the current environment
+  const authBasePath = useMemo(() => {
+    switch (environment) {
+      case EnvironmentNames.DEV:
+        return '/api/auth/dev';
+      case EnvironmentNames.PRODUCTION:
+        return '/api/auth/prod';
+      default:
+        return '/api/auth/sandbox';
+    }
+  }, [environment]);
+
   return (
     <ImmutableContext.Provider value={providerValues}>
-      {children}
+      <ImmutableAuthProvider config={authConfig} session={session ?? null} basePath={authBasePath}>
+        {children}
+      </ImmutableAuthProvider>
     </ImmutableContext.Provider>
   );
 }

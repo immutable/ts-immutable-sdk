@@ -7,13 +7,16 @@ import Message from '@/components/Message';
 import Environment from '@/components/Environment';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
+import { useImmutableAuth } from '@imtbl/auth-nextjs/client';
 import { BASE_PATH } from '@/config';
 import PassportMethods from '@/components/PassportMethods';
 import ZkEvmWorkflow from '@/components/zkevm/ZkEvmWorkflow';
+import AuthNextJS from '@/components/AuthNextJS';
 
 export default function Home() {
   const { isLoading } = useStatusProvider();
   const { imxProvider, zkEvmProvider, defaultWalletProvider } = usePassportProvider();
+  const { isAuthenticated: isAuthNextJSAuthenticated } = useImmutableAuth();
 
   return (
     <>
@@ -26,7 +29,12 @@ export default function Home() {
       <main>
         <Container>
           <Row className="my-3">
-            <Environment disabled={isLoading || !!imxProvider || !!zkEvmProvider || !!defaultWalletProvider} />
+            <Environment disabled={
+              isLoading || !!imxProvider || !!zkEvmProvider || !!defaultWalletProvider || isAuthNextJSAuthenticated
+            } />
+          </Row>
+          <Row className="my-3">
+            <AuthNextJS />
           </Row>
           <Row className="my-3">
             <PassportMethods />

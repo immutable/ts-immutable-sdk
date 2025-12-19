@@ -1,6 +1,7 @@
 packages:
   - "sdk"
   - "packages/auth"
+  - "packages/auth-nextjs"
   - "packages/wallet"
   - "packages/config"
   - "packages/x-client"
