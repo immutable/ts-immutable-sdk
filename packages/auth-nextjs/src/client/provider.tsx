@@ -335,7 +335,13 @@ export function useImmutableAuth(): UseImmutableAuthReturn {
       }
     }
 
-    // Fall back to session token
+    // Fall back to session token, but check for errors first
+    // When server-side token refresh fails, the session contains both an error flag
+    // and the original stale token. We must not return the stale token in this case.
+    if (session?.error) {
+      throw new Error(`Token refresh failed: ${session.error}`);
+    }
+
     if (session?.accessToken) {
       return session.accessToken;
     }
