@@ -175,8 +175,9 @@ export interface UseImmutableAuthReturn {
   isAuthenticated: boolean;
   /**
    * Sign in with Immutable (opens popup)
+   * @param options - Optional login options (cached session, silent login, redirect flow, direct login)
    */
-  signIn: () => Promise<void>;
+  signIn: (options?: import('@imtbl/auth').LoginOptions) => Promise<void>;
   /**
    * Sign out from both NextAuth and Immutable
    */

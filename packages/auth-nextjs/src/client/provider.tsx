@@ -13,7 +13,9 @@ import {
   SessionProvider, useSession, signIn, signOut,
 } from 'next-auth/react';
 import type { Session } from 'next-auth';
-import { Auth, type User, type DeviceTokenResponse } from '@imtbl/auth';
+import {
+  Auth, type User, type DeviceTokenResponse, type LoginOptions,
+} from '@imtbl/auth';
 import type {
   ImmutableAuthConfig,
   ImmutableAuthProviderProps,
@@ -264,13 +266,13 @@ export function useImmutableAuth(): UseImmutableAuthReturn {
     : null;
 
   // Sign in with Immutable popup
-  const handleSignIn = useCallback(async () => {
+  const handleSignIn = useCallback(async (options?: LoginOptions) => {
     if (!auth) {
       throw new Error('Auth not initialized');
     }
 
-    // Open popup login
-    const authUser = await auth.login();
+    // Open popup login with optional login options
+    const authUser = await auth.login(options);
     if (!authUser) {
       throw new Error('Login failed');
     }

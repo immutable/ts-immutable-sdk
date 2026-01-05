@@ -139,5 +139,9 @@ export type {
   WithPageAuthRequiredOptions,
 } from './types';
 
+// Re-export login-related types from @imtbl/auth for convenience
+export type { LoginOptions, DirectLoginOptions } from '@imtbl/auth';
+export { MarketingConsentStatus } from '@imtbl/auth';
+
 // Token refresh utilities (for advanced use)
 export { refreshAccessToken, isTokenExpired } from './refresh';
