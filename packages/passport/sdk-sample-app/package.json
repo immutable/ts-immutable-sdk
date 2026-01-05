@@ -21,7 +21,7 @@
     "ethers": "^6.13.4",
     "motion": "^11.17.0",
     "next": "14.2.25",
-    "next-auth": "^4.24.0",
+    "next-auth": "^5.0.0-beta.30",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",
     "react-dom": "^18.2.0"

@@ -1,7 +1,7 @@
 {
   "name": "@imtbl/auth-nextjs",
   "version": "0.0.0",
-  "description": "Next.js authentication integration for Immutable SDK using NextAuth",
+  "description": "Next.js App Router authentication integration for Immutable SDK using Auth.js v5",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
@@ -65,7 +65,7 @@
   },
   "peerDependencies": {
     "next": "14.2.25",
-    "next-auth": "^4.24.0",
+    "next-auth": "^5.0.0-beta.30",
     "react": "^18.2.0"
   },
   "devDependencies": {
@@ -77,7 +77,7 @@
     "jest": "^29.4.3",
     "jest-environment-jsdom": "^29.4.3",
     "next": "14.2.25",
-    "next-auth": "^4.24.0",
+    "next-auth": "^5.0.0-beta.30",
     "react": "^18.2.0",
     "ts-node": "^10.9.1",
     "tsup": "^8.3.0",

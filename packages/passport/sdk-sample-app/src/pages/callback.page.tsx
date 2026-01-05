@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { CallbackPage } from "@imtbl/auth-nextjs/client";
 import { getAuthConfig } from "@/lib/auth-nextjs";
@@ -15,9 +17,15 @@ export default function Callback() {
     // Read environment from localStorage (same key as ImmutableProvider uses)
     // Default to DEV to match ImmutableProvider's default context environment
     const storedEnv = localStorage.getItem("IMX_PASSPORT_SAMPLE_ENVIRONMENT");
-    const environment = storedEnv 
-      ? (JSON.parse(storedEnv) as EnvironmentNames)
-      : EnvironmentNames.DEV;
+    let environment = EnvironmentNames.DEV;
+    
+    if (storedEnv) {
+      try {
+        environment = JSON.parse(storedEnv) as EnvironmentNames;
+      } catch {
+        // If localStorage value is corrupted, fall back to DEV
+      }
+    }
     
     setConfig(getAuthConfig(environment));
   }, []);
@@ -43,4 +51,3 @@ export default function Callback() {
     />
   );
 }
-

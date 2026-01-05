@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { Auth } from '@imtbl/auth';
 import type { ImmutableAuthConfig, ImmutableTokenData } from '../types';
@@ -33,18 +33,23 @@ export interface CallbackPageProps {
 }
 
 /**
- * Callback page component for handling OAuth redirects.
+ * Callback page component for handling OAuth redirects (App Router version).
  *
  * Use this in your callback page to process authentication responses.
  *
  * @example
  * ```tsx
- * // pages/callback.tsx
+ * // app/callback/page.tsx
+ * "use client";
  * import { CallbackPage } from "@imtbl/auth-nextjs/client";
- * import { immutableConfig } from "@/lib/auth-nextjs";
+ *
+ * const config = {
+ *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+ *   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
+ * };
  *
  * export default function Callback() {
- *   return <CallbackPage config={immutableConfig} />;
+ *   return <CallbackPage config={config} />;
  * }
  * ```
  */
@@ -55,6 +60,7 @@ export function CallbackPage({
   errorComponent,
 }: CallbackPageProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   // Track whether callback has been processed to prevent double invocation
   // (React 18 StrictMode runs effects twice, and OAuth codes are single-use)
@@ -132,32 +138,26 @@ export function CallbackPage({
     const handleOAuthError = () => {
       // OAuth providers return error and error_description when authentication fails
       // (e.g., user cancels, consent denied, invalid request)
-      const errorCode = router.query.error as string;
-      const errorDescription = router.query.error_description as string;
+      const errorCode = searchParams.get('error');
+      const errorDescription = searchParams.get('error_description');
 
       const errorMessage = errorDescription || errorCode || 'Authentication failed';
       setError(errorMessage);
     };
 
-    if (!router.isReady) {
-      return;
-    }
-
     // Handle OAuth error responses (user cancelled, consent denied, etc.)
-    if (router.query.error) {
+    if (searchParams.get('error')) {
       handleOAuthError();
       return;
     }
 
     // Handle successful OAuth callback with authorization code
     // Guard against double invocation (React 18 StrictMode runs effects twice)
-    if (router.query.code && !callbackProcessedRef.current) {
+    if (searchParams.get('code') && !callbackProcessedRef.current) {
       callbackProcessedRef.current = true;
       handleCallback();
     }
-  }, [
-    router.isReady, router.query.code, router.query.error, router.query.error_description, router, config, redirectTo,
-  ]);
+  }, [searchParams, router, config, redirectTo]);
 
   if (error) {
     if (errorComponent) {
@@ -170,6 +170,7 @@ export function CallbackPage({
         <p>{error}</p>
         <button
           onClick={() => router.push('/')}
+          type="button"
           style={{
             padding: '0.5rem 1rem',
             marginTop: '1rem',

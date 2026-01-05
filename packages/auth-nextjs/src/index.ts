@@ -1,25 +1,34 @@
-// Main entry point for @imtbl/auth-nextjs
+// Main entry point for @imtbl/auth-nextjs (Auth.js v5 / App Router)
 
-import NextAuthDefault, { type NextAuthOptions } from 'next-auth';
-import { createAuthOptions } from './config';
+import NextAuthImport from 'next-auth';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - Type exists in next-auth v5 but TS resolver may use stale types
+import type { NextAuthConfig } from 'next-auth';
+import { createAuthConfig } from './config';
 import type { ImmutableAuthConfig } from './types';
 
 // Handle ESM/CJS interop - in some bundler configurations, the default export
 // may be nested under a 'default' property
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const NextAuth = ((NextAuthDefault as any).default || NextAuthDefault) as typeof NextAuthDefault;
+const NextAuth = ((NextAuthImport as any).default || NextAuthImport) as typeof NextAuthImport;
 
 /**
- * NextAuth options that can be overridden.
+ * Auth.js v5 config options that can be overridden.
  * Excludes 'providers' as that's managed internally.
  */
-export type ImmutableAuthOverrides = Omit<NextAuthOptions, 'providers'>;
+export type ImmutableAuthOverrides = Omit<NextAuthConfig, 'providers'>;
 
 /**
- * Create a NextAuth handler with Immutable authentication
+ * Return type of createImmutableAuth - the NextAuth instance with handlers
+ */
+export type ImmutableAuthResult = ReturnType<typeof NextAuth>;
+
+/**
+ * Create an Auth.js v5 instance with Immutable authentication
  *
  * @param config - Immutable auth configuration
- * @param overrides - Optional NextAuth options to override defaults
+ * @param overrides - Optional Auth.js options to override defaults
+ * @returns NextAuth instance with { handlers, auth, signIn, signOut }
  *
  * @remarks
  * Callback composition: The `jwt` and `session` callbacks are composed rather than
@@ -27,20 +36,24 @@ export type ImmutableAuthOverrides = Omit<NextAuthOptions, 'providers'>;
  * your custom callbacks receive the result. Other callbacks (`signIn`, `redirect`)
  * are replaced entirely if provided.
  *
- * @example Basic usage
+ * @example Basic usage (App Router)
  * ```typescript
- * // pages/api/auth/[...nextauth].ts
- * import { ImmutableAuth } from "@imtbl/auth-nextjs";
+ * // lib/auth.ts
+ * import { createImmutableAuth } from "@imtbl/auth-nextjs";
  *
- * export default ImmutableAuth({
+ * export const { handlers, auth, signIn, signOut } = createImmutableAuth({
  *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
  *   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
  * });
+ *
+ * // app/api/auth/[...nextauth]/route.ts
+ * import { handlers } from "@/lib/auth";
+ * export const { GET, POST } = handlers;
  * ```
  *
- * @example With NextAuth overrides
+ * @example With Auth.js overrides
  * ```typescript
- * export default ImmutableAuth(
+ * export const { handlers, auth } = createImmutableAuth(
  *   { clientId: "...", redirectUri: "..." },
  *   {
  *     pages: { signIn: "/custom-login", error: "/auth-error" },
@@ -51,7 +64,7 @@ export type ImmutableAuthOverrides = Omit<NextAuthOptions, 'providers'>;
  *
  * @example With custom jwt callback (composed with internal callback)
  * ```typescript
- * export default ImmutableAuth(
+ * export const { handlers, auth } = createImmutableAuth(
  *   { clientId: "...", redirectUri: "..." },
  *   {
  *     callbacks: {
@@ -66,29 +79,30 @@ export type ImmutableAuthOverrides = Omit<NextAuthOptions, 'providers'>;
  * );
  * ```
  */
-export function ImmutableAuth(
+export function createImmutableAuth(
   config: ImmutableAuthConfig,
   overrides?: ImmutableAuthOverrides,
-) {
-  const authOptions = createAuthOptions(config);
+): ImmutableAuthResult {
+  const authConfig = createAuthConfig(config);
 
-  // If no overrides, use auth options as-is
+  // If no overrides, use auth config as-is
   if (!overrides) {
-    return NextAuth(authOptions);
+    return NextAuth(authConfig);
   }
 
   // Compose callbacks to ensure internal callbacks always run first
   // User callbacks receive the result and can modify it further
-  const composedCallbacks: NextAuthOptions['callbacks'] = {
-    ...authOptions.callbacks,
+  const composedCallbacks: NextAuthConfig['callbacks'] = {
+    ...authConfig.callbacks,
   };
 
   if (overrides.callbacks) {
     // Compose jwt callback - internal callback runs first, then user callback
     if (overrides.callbacks.jwt) {
-      const internalJwt = authOptions.callbacks?.jwt;
+      const internalJwt = authConfig.callbacks?.jwt;
       const userJwt = overrides.callbacks.jwt;
-      composedCallbacks.jwt = async (params) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      composedCallbacks.jwt = async (params: any) => {
         // Run internal jwt callback first to handle token storage and refresh
         const token = internalJwt ? await internalJwt(params) : params.token;
         // Then run user's jwt callback with the result
@@ -98,17 +112,15 @@ export function ImmutableAuth(
 
     // Compose session callback - internal callback runs first, then user callback
     if (overrides.callbacks.session) {
-      const internalSession = authOptions.callbacks?.session;
+      const internalSession = authConfig.callbacks?.session;
       const userSession = overrides.callbacks.session;
-      composedCallbacks.session = async (params) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      composedCallbacks.session = async (params: any) => {
         // Run internal session callback first to expose token data
-        const session = internalSession
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ? await internalSession(params as any)
-          : params.session;
-        // Then run user's session callback with the result
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return userSession({ ...params, session } as any);
+        const session = internalSession ? await internalSession(params) : params.session;
+        // Then run user's session callback with the result
+        return userSession({ ...params, session });
       };
     }
 
@@ -121,14 +133,20 @@ export function ImmutableAuth(
     }
   }
 
-  const mergedOptions: NextAuthOptions = {
-    ...authOptions,
+  const mergedConfig: NextAuthConfig = {
+    ...authConfig,
     ...overrides,
     callbacks: composedCallbacks,
   };
 
-  return NextAuth(mergedOptions);
+  return NextAuth(mergedConfig);
 }
+
+// Legacy alias for backwards compatibility during migration
+export const ImmutableAuth = createImmutableAuth;
+
+// Export config creator for advanced use cases
+export { createAuthConfig } from './config';
 
 // Types
 export type {
@@ -136,7 +154,6 @@ export type {
   ImmutableTokenData,
   ImmutableUser,
   ZkEvmInfo,
-  WithPageAuthRequiredOptions,
 } from './types';
 
 // Re-export login-related types from @imtbl/auth for convenience

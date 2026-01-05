@@ -12,6 +12,7 @@ import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
 import { ImmutableAuthProvider } from '@imtbl/auth-nextjs/client';
 import type { Session } from 'next-auth';
+// Note: Session type is augmented in @imtbl/auth-nextjs/types
 import {
   AUDIENCE,
   POPUP_REDIRECT_URI,

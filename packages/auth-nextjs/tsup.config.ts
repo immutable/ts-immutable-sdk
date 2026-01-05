@@ -7,7 +7,7 @@ const baseConfig: Options = {
   target: "es2022",
   platform: "node",
   dts: false,
-  external: ["react", "next", "next-auth", "next/navigation", "next/headers"],
+  external: ["react", "next", "next-auth", "next/navigation", "next/headers", "next/server"],
 };
 
 export default defineConfig([

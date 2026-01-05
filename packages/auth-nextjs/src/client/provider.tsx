@@ -180,13 +180,14 @@ function ImmutableAuthInner({
 }
 
 /**
- * Provider component for Immutable authentication with NextAuth
+ * Provider component for Immutable authentication with Auth.js v5
  *
  * Wraps your app to provide authentication state via useImmutableAuth hook.
  *
- * @example
+ * @example App Router (recommended)
  * ```tsx
- * // pages/_app.tsx
+ * // app/providers.tsx
+ * "use client";
  * import { ImmutableAuthProvider } from "@imtbl/auth-nextjs/client";
  *
  * const config = {
@@ -194,11 +195,24 @@ function ImmutableAuthInner({
  *   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
  * };
  *
- * export default function App({ Component, pageProps }: AppProps) {
+ * export function Providers({ children }: { children: React.ReactNode }) {
  *   return (
- *     <ImmutableAuthProvider config={config} session={pageProps.session}>
- *       <Component {...pageProps} />
+ *     <ImmutableAuthProvider config={config}>
+ *       {children}
  *     </ImmutableAuthProvider>
+ *   );
+ * }
+ *
+ * // app/layout.tsx
+ * import { Providers } from "./providers";
+ *
+ * export default function RootLayout({ children }: { children: React.ReactNode }) {
+ *   return (
+ *     <html>
+ *       <body>
+ *         <Providers>{children}</Providers>
+ *       </body>
+ *     </html>
  *   );
  * }
  * ```

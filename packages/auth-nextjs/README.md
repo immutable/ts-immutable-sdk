@@ -1,38 +1,58 @@
 # @imtbl/auth-nextjs
 
-Next.js authentication integration for Immutable SDK using NextAuth.js.
+Next.js App Router authentication integration for Immutable SDK using Auth.js v5.
 
-This package bridges `@imtbl/auth` popup-based authentication with NextAuth.js session management, providing:
+This package bridges `@imtbl/auth` popup-based authentication with Auth.js session management, providing:
 
 - Server-side session storage in encrypted JWT cookies
 - Automatic token refresh on both server and client
-- Full SSR support with `getServerSession`
+- Full SSR support with `auth()` function
 - React hooks for easy client-side authentication
+- Middleware support for protecting routes
+
+## Requirements
+
+- Next.js 14+ with App Router
+- Auth.js v5 (next-auth@5.x)
+- React 18+
 
 ## Installation
 
 ```bash
-pnpm add @imtbl/auth-nextjs next-auth
+pnpm add @imtbl/auth-nextjs next-auth@beta
 ```
 
 ## Quick Start
 
-### 1. Set Up Auth API Route
+### 1. Create Auth Configuration
 
 ```typescript
-// pages/api/auth/[...nextauth].ts
-import { ImmutableAuth } from "@imtbl/auth-nextjs";
+// lib/auth.ts
+import { createImmutableAuth } from "@imtbl/auth-nextjs";
 
-export default ImmutableAuth({
+const config = {
   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
-});
+};
+
+export const { handlers, auth, signIn, signOut } = createImmutableAuth(config);
 ```
 
-### 2. Create Callback Page
+### 2. Set Up Auth API Route
 
 ```typescript
-// pages/callback.tsx
+// app/api/auth/[...nextauth]/route.ts
+import { handlers } from "@/lib/auth";
+
+export const { GET, POST } = handlers;
+```
+
+### 3. Create Callback Page
+
+```typescript
+// app/callback/page.tsx
+"use client";
+
 import { CallbackPage } from "@imtbl/auth-nextjs/client";
 
 const config = {
@@ -45,10 +65,12 @@ export default function Callback() {
 }
 ```
 
-### 3. Add Provider to App
+### 4. Add Provider to Layout
 
 ```typescript
-// pages/_app.tsx
+// app/providers.tsx
+"use client";
+
 import { ImmutableAuthProvider } from "@imtbl/auth-nextjs/client";
 
 const config = {
@@ -56,21 +78,39 @@ const config = {
   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
 };
 
-export default function App({ Component, pageProps }: AppProps) {
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ImmutableAuthProvider config={config} session={pageProps.session}>
-      <Component {...pageProps} />
-    </ImmutableAuthProvider>
+    <ImmutableAuthProvider config={config}>{children}</ImmutableAuthProvider>
+  );
+}
+
+// app/layout.tsx
+import { Providers } from "./providers";
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
   );
 }
 ```
 
-### 4. Use in Components
+### 5. Use in Components
 
 ```typescript
+// app/components/LoginButton.tsx
+"use client";
+
 import { useImmutableAuth } from "@imtbl/auth-nextjs/client";
 
-function LoginButton() {
+export function LoginButton() {
   const { user, isLoading, signIn, signOut } = useImmutableAuth();
 
   if (isLoading) return <div>Loading...</div>;
@@ -84,52 +124,42 @@ function LoginButton() {
     );
   }
 
-  return <button onClick={signIn}>Login with Immutable</button>;
+  return <button onClick={() => signIn()}>Login with Immutable</button>;
 }
 ```
 
-### 5. Access Session Server-Side (SSR)
+### 6. Access Session in Server Components
 
 ```typescript
-// pages/profile.tsx
-import { getImmutableSession } from "@imtbl/auth-nextjs/server";
-import type { GetServerSideProps } from "next";
+// app/profile/page.tsx
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-const config = {
-  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
-  redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
-};
+export default async function ProfilePage() {
+  const session = await auth();
 
-export default function ProfilePage({ user }) {
-  if (!user) return <p>Not logged in</p>;
-  return <h1>Welcome, {user.email}</h1>;
+  if (!session) {
+    redirect("/login");
+  }
+
+  return <h1>Welcome, {session.user.email}</h1>;
 }
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const session = await getImmutableSession(ctx.req, ctx.res, config);
-  return { props: { user: session?.user ?? null } };
-};
 ```
 
-### 6. Protect Pages (Optional)
+### 7. Protect Routes with Middleware (Optional)
 
 ```typescript
-// pages/dashboard.tsx
-import { withPageAuthRequired } from "@imtbl/auth-nextjs/server";
+// middleware.ts
+import { createAuthMiddleware } from "@imtbl/auth-nextjs/server";
+import { auth } from "@/lib/auth";
 
-const config = {
-  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
-  redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
+export default createAuthMiddleware(auth, {
+  loginUrl: "/login",
+});
+
+export const config = {
+  matcher: ["/dashboard/:path*", "/profile/:path*"],
 };
-
-function DashboardPage() {
-  return <h1>Dashboard (protected)</h1>;
-}
-
-export default DashboardPage;
-
-// Redirects to /login if not authenticated
-export const getServerSideProps = withPageAuthRequired(config);
 ```
 
 ## Configuration Options
@@ -152,9 +182,8 @@ The `ImmutableAuthConfig` object accepts the following properties:
 NEXT_PUBLIC_IMMUTABLE_CLIENT_ID=your-client-id
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
-# Required by NextAuth for cookie encryption
-NEXTAUTH_SECRET=generate-with-openssl-rand-base64-32
-NEXTAUTH_URL=http://localhost:3000
+# Required by Auth.js for cookie encryption
+AUTH_SECRET=generate-with-openssl-rand-base64-32
 ```
 
 Generate a secret:
@@ -167,98 +196,82 @@ openssl rand -base64 32
 
 ### Main Exports (`@imtbl/auth-nextjs`)
 
-| Export                              | Description                                 |
-| ----------------------------------- | ------------------------------------------- |
-| `ImmutableAuth(config, overrides?)` | Creates NextAuth handler (use in API route) |
-| `refreshAccessToken(token)`         | Utility to refresh an expired access token  |
-| `isTokenExpired(token)`             | Utility to check if a token is expired      |
+| Export                                  | Description                                                         |
+| --------------------------------------- | ------------------------------------------------------------------- |
+| `createImmutableAuth(config, options?)` | Creates Auth.js instance with `{ handlers, auth, signIn, signOut }` |
+| `createAuthConfig(config)`              | Creates Auth.js config (for advanced use)                           |
+| `refreshAccessToken(token, config)`     | Utility to refresh an expired access token                          |
+| `isTokenExpired(expires, buffer?)`      | Utility to check if a token is expired                              |
 
 **Types:**
 
-| Type                          | Description                               |
-| ----------------------------- | ----------------------------------------- |
-| `ImmutableAuthConfig`         | Configuration options                     |
-| `ImmutableAuthOverrides`      | NextAuth options override type            |
-| `ImmutableUser`               | User profile type                         |
-| `ImmutableTokenData`          | Token data passed to credentials provider |
-| `ZkEvmInfo`                   | zkEVM wallet information type             |
-| `WithPageAuthRequiredOptions` | Options for page protection               |
+| Type                     | Description                               |
+| ------------------------ | ----------------------------------------- |
+| `ImmutableAuthConfig`    | Configuration options                     |
+| `ImmutableAuthOverrides` | Auth.js options override type             |
+| `ImmutableAuthResult`    | Return type of createImmutableAuth        |
+| `ImmutableUser`          | User profile type                         |
+| `ImmutableTokenData`     | Token data passed to credentials provider |
+| `ZkEvmInfo`              | zkEVM wallet information type             |
 
 ### Client Exports (`@imtbl/auth-nextjs/client`)
 
-| Export                  | Description                                             |
-| ----------------------- | ------------------------------------------------------- |
-| `ImmutableAuthProvider` | React context provider (wraps NextAuth SessionProvider) |
-| `useImmutableAuth()`    | Hook for authentication state and methods (see below)   |
-| `useAccessToken()`      | Hook returning `getAccessToken` function                |
-| `CallbackPage`          | Pre-built callback page component for OAuth redirects   |
+| Export                  | Description                                            |
+| ----------------------- | ------------------------------------------------------ |
+| `ImmutableAuthProvider` | React context provider (wraps Auth.js SessionProvider) |
+| `useImmutableAuth()`    | Hook for authentication state and methods (see below)  |
+| `useAccessToken()`      | Hook returning `getAccessToken` function               |
+| `CallbackPage`          | Pre-built callback page component for OAuth redirects  |
 
 **`useImmutableAuth()` Return Value:**
 
 | Property          | Type                    | Description                                      |
 | ----------------- | ----------------------- | ------------------------------------------------ |
 | `user`            | `ImmutableUser \| null` | Current user profile (null if not authenticated) |
-| `session`         | `Session \| null`       | Full NextAuth session with tokens                |
+| `session`         | `Session \| null`       | Full Auth.js session with tokens                 |
 | `isLoading`       | `boolean`               | Whether authentication state is loading          |
 | `isAuthenticated` | `boolean`               | Whether user is authenticated                    |
-| `signIn`          | `() => Promise<void>`   | Sign in with Immutable (opens popup)             |
-| `signOut`         | `() => Promise<void>`   | Sign out from both NextAuth and Immutable        |
+| `signIn`          | `(options?) => Promise` | Sign in with Immutable (opens popup)             |
+| `signOut`         | `() => Promise<void>`   | Sign out from both Auth.js and Immutable         |
 | `getAccessToken`  | `() => Promise<string>` | Get a valid access token (refreshes if needed)   |
 | `auth`            | `Auth \| null`          | The underlying Auth instance (for advanced use)  |
 
-**Types:**
-
-| Type                         | Description                      |
-| ---------------------------- | -------------------------------- |
-| `ImmutableAuthProviderProps` | Props for the provider component |
-| `UseImmutableAuthReturn`     | Return type of useImmutableAuth  |
-| `CallbackPageProps`          | Props for CallbackPage component |
-| `ImmutableAuthConfig`        | Re-exported configuration type   |
-| `ImmutableUser`              | Re-exported user type            |
-
 ### Server Exports (`@imtbl/auth-nextjs/server`)
 
-| Export                                   | Description                              |
-| ---------------------------------------- | ---------------------------------------- |
-| `getImmutableSession(req, res, config)`  | Get session server-side                  |
-| `withPageAuthRequired(config, options?)` | HOC for protecting pages with auth check |
+| Export                              | Description                                      |
+| ----------------------------------- | ------------------------------------------------ |
+| `createImmutableAuth`               | Re-exported for convenience                      |
+| `createAuthMiddleware(auth, opts?)` | Create middleware for protecting routes          |
+| `withAuth(auth, handler)`           | HOC for protecting Server Actions/Route Handlers |
 
-**`withPageAuthRequired` Options:**
+**`createAuthMiddleware` Options:**
 
-| Option               | Type                    | Default      | Description                                          |
-| -------------------- | ----------------------- | ------------ | ---------------------------------------------------- |
-| `loginUrl`           | `string`                | `"/login"`   | URL to redirect to when not authenticated            |
-| `returnTo`           | `string \| false`       | current page | URL to redirect to after login (`false` to disable)  |
-| `getServerSideProps` | `(ctx, session) => ...` | -            | Custom getServerSideProps that runs after auth check |
-
-**Example with custom getServerSideProps:**
-
-```typescript
-export const getServerSideProps = withPageAuthRequired(config, {
-  loginUrl: "/auth/signin",
-  async getServerSideProps(ctx, session) {
-    // session is guaranteed to exist here
-    const data = await fetchData(session.accessToken);
-    return { props: { data } };
-  },
-});
-```
-
-**Types:**
-
-| Type                              | Description                               |
-| --------------------------------- | ----------------------------------------- |
-| `WithPageAuthRequiredOptions`     | Basic options for page protection         |
-| `WithPageAuthRequiredFullOptions` | Full options including getServerSideProps |
-| `WithPageAuthRequiredProps`       | Props added to protected pages (session)  |
+| Option           | Type                   | Default    | Description                            |
+| ---------------- | ---------------------- | ---------- | -------------------------------------- |
+| `loginUrl`       | `string`               | `"/login"` | URL to redirect when not authenticated |
+| `protectedPaths` | `(string \| RegExp)[]` | -          | Paths that require authentication      |
+| `publicPaths`    | `(string \| RegExp)[]` | -          | Paths to exclude from protection       |
 
 ## How It Works
 
 1. **Login**: User clicks login → `@imtbl/auth` opens popup → tokens returned
-2. **Session Creation**: Tokens passed to NextAuth's credentials provider → stored in encrypted JWT cookie
-3. **Token Refresh**: NextAuth JWT callback automatically refreshes expired tokens using refresh_token
-4. **SSR**: `getServerSession()` reads and decrypts cookie, providing full session with tokens
+2. **Session Creation**: Tokens passed to Auth.js credentials provider → stored in encrypted JWT cookie
+3. **Token Refresh**: Auth.js JWT callback automatically refreshes expired tokens using refresh_token
+4. **SSR**: `auth()` reads and decrypts cookie, providing full session with tokens
 5. **Auto-hydration**: If localStorage is cleared but session cookie exists, the Auth instance is automatically hydrated from session tokens
+
+## Migration from v4 (Pages Router)
+
+If you're migrating from the Pages Router version:
+
+| v4 (Pages Router)                       | v5 (App Router)                               |
+| --------------------------------------- | --------------------------------------------- |
+| `ImmutableAuth(config)`                 | `createImmutableAuth(config)`                 |
+| `getImmutableSession(req, res, config)` | `auth()` (from createImmutableAuth)           |
+| `withPageAuthRequired(config)`          | `createAuthMiddleware(auth)` or layout checks |
+| `pages/api/auth/[...nextauth].ts`       | `app/api/auth/[...nextauth]/route.ts`         |
+| `pages/_app.tsx` with provider          | `app/layout.tsx` with provider                |
+| `NEXTAUTH_SECRET`                       | `AUTH_SECRET`                                 |
 
 ## License
 

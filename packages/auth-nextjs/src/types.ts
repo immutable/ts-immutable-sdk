@@ -1,8 +1,8 @@
-import type { DefaultSession, DefaultUser, Session } from 'next-auth';
-import type { DefaultJWT } from 'next-auth/jwt';
+import type { DefaultSession, Session } from 'next-auth';
+import type { JWT } from 'next-auth/jwt';
 
 /**
- * Configuration for ImmutableAuthProvider and createAuthOptions
+ * Configuration for ImmutableAuthProvider and createImmutableAuth
  */
 export interface ImmutableAuthConfig {
   /**
@@ -54,12 +54,12 @@ export interface ImmutableUser {
 }
 
 /**
- * NextAuth module augmentation to add Immutable-specific fields
+ * Auth.js v5 module augmentation to add Immutable-specific fields
  */
 declare module 'next-auth' {
   // eslint-disable-next-line @typescript-eslint/no-shadow
   interface Session extends DefaultSession {
-    user: ImmutableUser;
+    user: ImmutableUser & DefaultSession['user'];
     accessToken: string;
     refreshToken?: string;
     idToken?: string;
@@ -68,9 +68,10 @@ declare module 'next-auth' {
     error?: string;
   }
 
-  interface User extends DefaultUser {
+  interface User {
+    id: string;
     sub: string;
-    email?: string;
+    email?: string | null;
     nickname?: string;
     accessToken: string;
     refreshToken?: string;
@@ -81,21 +82,22 @@ declare module 'next-auth' {
 }
 
 declare module 'next-auth/jwt' {
-  interface JWT extends DefaultJWT {
-    sub: string;
-    email?: string;
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  interface JWT {
+    sub?: string;
+    email?: string | null;
     nickname?: string;
-    accessToken: string;
+    accessToken?: string;
     refreshToken?: string;
     idToken?: string;
-    accessTokenExpires: number;
+    accessTokenExpires?: number;
     zkEvm?: ZkEvmInfo;
     error?: string;
   }
 }
 
 /**
- * Token data passed from client to NextAuth credentials provider
+ * Token data passed from client to Auth.js credentials provider
  */
 export interface ImmutableTokenData {
   accessToken: string;
@@ -142,11 +144,11 @@ export interface ImmutableAuthProviderProps {
   config: ImmutableAuthConfig;
   /**
    * Initial session from server (for SSR hydration)
-   * Can be Session from getServerSession or any compatible session object
+   * Can be Session from auth() or any compatible session object
    */
   session?: Session | DefaultSession | null;
   /**
-   * Custom base path for NextAuth API routes
+   * Custom base path for Auth.js API routes
    * Use this when you have multiple auth endpoints (e.g., per environment)
    * @default "/api/auth"
    */
@@ -162,7 +164,7 @@ export interface UseImmutableAuthReturn {
    */
   user: ImmutableUser | null;
   /**
-   * Full NextAuth session with tokens
+   * Full Auth.js session with tokens
    */
   session: Session | null;
   /**
@@ -179,7 +181,7 @@ export interface UseImmutableAuthReturn {
    */
   signIn: (options?: import('@imtbl/auth').LoginOptions) => Promise<void>;
   /**
-   * Sign out from both NextAuth and Immutable
+   * Sign out from both Auth.js and Immutable
    */
   signOut: () => Promise<void>;
   /**
@@ -192,18 +194,5 @@ export interface UseImmutableAuthReturn {
   auth: import('@imtbl/auth').Auth | null;
 }
 
-/**
- * Options for withPageAuthRequired
- */
-export interface WithPageAuthRequiredOptions {
-  /**
-   * URL to redirect to when not authenticated
-   * @default "/login"
-   */
-  loginUrl?: string;
-  /**
-   * URL to redirect to after login
-   * @default current page
-   */
-  returnTo?: string | false;
-}
+// Re-export JWT type for use in refresh.ts
+export type { JWT };

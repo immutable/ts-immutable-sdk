@@ -1,5 +1,8 @@
-import type { NextAuthOptions } from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
+// NextAuthConfig type from next-auth v5
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - Type exists in next-auth v5 but TS resolver may use stale types
+import type { NextAuthConfig } from 'next-auth';
+import CredentialsImport from 'next-auth/providers/credentials';
 import type { ImmutableAuthConfig, ImmutableTokenData, UserInfoResponse } from './types';
 import { refreshAccessToken, isTokenExpired } from './refresh';
 import {
@@ -8,8 +11,10 @@ import {
   DEFAULT_SESSION_MAX_AGE_SECONDS,
 } from './constants';
 
-// Handle ESM/CJS interop - CredentialsProvider may be default export or the module itself
-const CredentialsProvider = (Credentials as unknown as { default?: typeof Credentials }).default || Credentials;
+// Handle ESM/CJS interop - in some bundler configurations, the default export
+// may be nested under a 'default' property
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Credentials = ((CredentialsImport as any).default || CredentialsImport) as typeof CredentialsImport;
 
 /**
  * Validate tokens by calling the userinfo endpoint.
@@ -47,38 +52,35 @@ async function validateTokens(
 }
 
 /**
- * Create NextAuth options configured for Immutable authentication
+ * Create Auth.js v5 configuration for Immutable authentication
  *
  * @example
  * ```typescript
  * // lib/auth.ts
- * import { createAuthOptions } from "@imtbl/auth-nextjs";
+ * import NextAuth from "next-auth";
+ * import { createAuthConfig } from "@imtbl/auth-nextjs";
  *
- * export const authOptions = createAuthOptions({
+ * const config = {
  *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
  *   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
- * });
+ * };
  *
- * // pages/api/auth/[...nextauth].ts
- * import NextAuth from "next-auth";
- * import { authOptions } from "@/lib/auth";
- *
- * export default NextAuth(authOptions);
+ * export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig(config));
  * ```
  */
-export function createAuthOptions(config: ImmutableAuthConfig): NextAuthOptions {
+export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
   const authDomain = config.authenticationDomain || DEFAULT_AUTH_DOMAIN;
 
   return {
     providers: [
-      CredentialsProvider({
+      Credentials({
         id: IMMUTABLE_PROVIDER_ID,
         name: 'Immutable',
         credentials: {
           tokens: { label: 'Tokens', type: 'text' },
         },
         async authorize(credentials) {
-          if (!credentials?.tokens) {
+          if (!credentials?.tokens || typeof credentials.tokens !== 'string') {
             return null;
           }
 
@@ -148,9 +150,10 @@ export function createAuthOptions(config: ImmutableAuthConfig): NextAuthOptions 
     ],
 
     callbacks: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       async jwt({
         token, user, trigger, session: sessionUpdate,
-      }) {
+      }: any) {
         // Initial sign in - store all token data
         if (user) {
           return {
@@ -168,18 +171,19 @@ export function createAuthOptions(config: ImmutableAuthConfig): NextAuthOptions 
 
         // Handle session update (for client-side token sync)
         if (trigger === 'update' && sessionUpdate) {
+          const update = sessionUpdate as Record<string, unknown>;
           return {
             ...token,
-            ...(sessionUpdate.accessToken && { accessToken: sessionUpdate.accessToken }),
-            ...(sessionUpdate.refreshToken && { refreshToken: sessionUpdate.refreshToken }),
-            ...(sessionUpdate.idToken && { idToken: sessionUpdate.idToken }),
-            ...(sessionUpdate.accessTokenExpires && { accessTokenExpires: sessionUpdate.accessTokenExpires }),
-            ...(sessionUpdate.zkEvm && { zkEvm: sessionUpdate.zkEvm }),
+            ...(update.accessToken ? { accessToken: update.accessToken } : {}),
+            ...(update.refreshToken ? { refreshToken: update.refreshToken } : {}),
+            ...(update.idToken ? { idToken: update.idToken } : {}),
+            ...(update.accessTokenExpires ? { accessTokenExpires: update.accessTokenExpires } : {}),
+            ...(update.zkEvm ? { zkEvm: update.zkEvm } : {}),
           };
         }
 
         // Return token if not expired
-        if (!isTokenExpired(token.accessTokenExpires)) {
+        if (!isTokenExpired(token.accessTokenExpires as number)) {
           return token;
         }
 
@@ -187,21 +191,23 @@ export function createAuthOptions(config: ImmutableAuthConfig): NextAuthOptions 
         return refreshAccessToken(token, config);
       },
 
-      async session({ session, token }) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      async session({ session, token }: any) {
         // Expose token data to the session
         return {
           ...session,
           user: {
-            sub: token.sub,
-            email: token.email,
-            nickname: token.nickname,
+            ...session.user,
+            sub: token.sub as string,
+            email: token.email as string | undefined,
+            nickname: token.nickname as string | undefined,
           },
-          accessToken: token.accessToken,
-          refreshToken: token.refreshToken,
-          idToken: token.idToken,
-          accessTokenExpires: token.accessTokenExpires,
+          accessToken: token.accessToken as string,
+          refreshToken: token.refreshToken as string | undefined,
+          idToken: token.idToken as string | undefined,
+          accessTokenExpires: token.accessTokenExpires as number,
           zkEvm: token.zkEvm,
-          ...(token.error && { error: token.error }),
+          ...(token.error && { error: token.error as string }),
         };
       },
     },
@@ -211,8 +217,8 @@ export function createAuthOptions(config: ImmutableAuthConfig): NextAuthOptions 
       // Session max age in seconds (30 days default)
       maxAge: DEFAULT_SESSION_MAX_AGE_SECONDS,
     },
-
-    // Use NEXTAUTH_SECRET from environment
-    secret: process.env.NEXTAUTH_SECRET,
   };
 }
+
+// Keep backwards compatibility alias
+export const createAuthOptions = createAuthConfig;

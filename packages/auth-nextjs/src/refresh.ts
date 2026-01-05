@@ -8,7 +8,7 @@ import {
 
 /**
  * Refresh the access token using the refresh token
- * Called by NextAuth JWT callback when token is expired
+ * Called by Auth.js JWT callback when token is expired
  */
 export async function refreshAccessToken(
   token: JWT,
