@@ -162,3 +162,11 @@ export { MarketingConsentStatus } from '@imtbl/auth';
 
 // Token refresh utilities (for advanced use)
 export { refreshAccessToken, isTokenExpired } from './refresh';
+
+// Default constants (useful for configuration reference)
+export {
+  DEFAULT_AUTH_DOMAIN,
+  DEFAULT_AUDIENCE,
+  DEFAULT_SCOPE,
+  DEFAULT_NEXTAUTH_BASE_PATH,
+} from './constants';

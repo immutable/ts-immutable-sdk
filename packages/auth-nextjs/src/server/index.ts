@@ -117,9 +117,30 @@ export function createAuthMiddleware(
 /**
  * Higher-order function to protect a Server Action or Route Handler.
  *
+ * The returned function forwards all arguments from Next.js to your handler,
+ * allowing access to the request, context, form data, or any other arguments.
+ *
  * @param auth - The auth function from createImmutableAuth
- * @param handler - The handler function to protect
+ * @param handler - The handler function to protect. Receives session as first arg,
+ *                  followed by any arguments passed by Next.js (request, context, etc.)
  * @returns A protected handler that checks authentication before executing
+ *
+ * @example Protecting a Route Handler with request access:
+ * ```typescript
+ * // app/api/protected/route.ts
+ * import { withAuth } from "@imtbl/auth-nextjs/server";
+ * import { auth } from "@/lib/auth";
+ *
+ * export const POST = withAuth(auth, async (session, request: Request) => {
+ *   const body = await request.json();
+ *   return Response.json({ user: session.user, data: body });
+ * });
+ *
+ * export const GET = withAuth(auth, async (session, request: Request, context) => {
+ *   const { params } = context;
+ *   return Response.json({ user: session.user, params: await params });
+ * });
+ * ```
  *
  * @example Protecting a Server Action:
  * ```typescript
@@ -128,38 +149,24 @@ export function createAuthMiddleware(
  * import { withAuth } from "@imtbl/auth-nextjs/server";
  * import { auth } from "@/lib/auth";
  *
- * export const protectedAction = withAuth(auth, async (session) => {
- *   // session is guaranteed to exist here
+ * export const protectedAction = withAuth(auth, async (session, formData: FormData) => {
  *   const userId = session.user.sub;
+ *   const name = formData.get("name");
  *   // ... your action logic
  * });
  * ```
- *
- * @example Protecting a Route Handler:
- * ```typescript
- * // app/api/protected/route.ts
- * import { withAuth } from "@imtbl/auth-nextjs/server";
- * import { auth } from "@/lib/auth";
- *
- * export const GET = withAuth(auth, async (session) => {
- *   return Response.json({ user: session.user });
- * });
- * ```
  */
-export function withAuth<T>(
+export function withAuth<TArgs extends unknown[], TReturn>(
   auth: AuthFunction,
-  handler: (session: Session) => Promise<T>,
-): () => Promise<T> {
-  return async () => {
+  handler: (session: Session, ...args: TArgs) => Promise<TReturn>,
+): (...args: TArgs) => Promise<TReturn> {
+  return async (...args: TArgs) => {
     const session = await auth();
 
     if (!session) {
       throw new Error('Unauthorized: No active session');
     }
 
-    return handler(session);
+    return handler(session, ...args);
   };
 }
-
-// Re-export useful types
-export type { AuthMiddlewareOptions, AuthFunction };
