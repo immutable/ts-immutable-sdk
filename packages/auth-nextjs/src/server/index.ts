@@ -105,8 +105,12 @@ export function createAuthMiddleware(
 
     if (!session) {
       // Build redirect URL with returnTo parameter
+      // Include search params to preserve query string (e.g., ?tab=settings)
       const url = new URL(loginUrl, request.url);
-      url.searchParams.set('returnTo', pathname);
+      const returnTo = request.nextUrl.search
+        ? `${pathname}${request.nextUrl.search}`
+        : pathname;
+      url.searchParams.set('returnTo', returnTo);
       return NextResponse.redirect(url);
     }
 
