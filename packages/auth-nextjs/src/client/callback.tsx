@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { Auth } from '@imtbl/auth';
-import type { ImmutableAuthConfig, ImmutableTokenData } from '../types';
+import type { ImmutableAuthConfig, ImmutableTokenData, ImmutableUser } from '../types';
 import { getTokenExpiry } from '../utils/token';
 import {
   DEFAULT_AUTH_DOMAIN,
@@ -19,9 +19,25 @@ export interface CallbackPageProps {
    */
   config: ImmutableAuthConfig;
   /**
-   * URL to redirect to after successful authentication (when not in popup)
+   * URL to redirect to after successful authentication (when not in popup).
+   * Can be a string or a function that receives the authenticated user.
+   * If a function returns void/undefined, defaults to "/".
+   * @default "/"
+   *
+   * @example Static redirect
+   * ```tsx
+   * <CallbackPage config={config} redirectTo="/dashboard" />
+   * ```
+   *
+   * @example Dynamic redirect based on user
+   * ```tsx
+   * <CallbackPage
+   *   config={config}
+   *   redirectTo={(user) => user.email?.endsWith('@admin.com') ? '/admin' : '/dashboard'}
+   * />
+   * ```
    */
-  redirectTo?: string;
+  redirectTo?: string | ((user: ImmutableUser) => string | void);
   /**
    * Custom loading component
    */
@@ -30,6 +46,19 @@ export interface CallbackPageProps {
    * Custom error component
    */
   errorComponent?: (error: string) => React.ReactElement | null;
+  /**
+   * Callback fired after successful authentication.
+   * Receives the authenticated user as a parameter.
+   * Called before redirect (non-popup) or before window.close (popup).
+   * If this callback returns a Promise, it will be awaited before proceeding.
+   */
+  onSuccess?: (user: ImmutableUser) => void | Promise<void>;
+  /**
+   * Callback fired when authentication fails.
+   * Receives the error message as a parameter.
+   * Called before the error UI is displayed.
+   */
+  onError?: (error: string) => void;
 }
 
 /**
@@ -58,6 +87,8 @@ export function CallbackPage({
   redirectTo = '/',
   loadingComponent = null,
   errorComponent,
+  onSuccess,
+  onError,
 }: CallbackPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -88,6 +119,16 @@ export function CallbackPage({
           // we need to show an error instead of closing the popup
           if (!authUser) {
             throw new Error('Authentication failed: no user data received from login callback');
+          }
+          // Create user object for callbacks
+          const user: ImmutableUser = {
+            sub: authUser.profile.sub,
+            email: authUser.profile.email,
+            nickname: authUser.profile.nickname,
+          };
+          // Call onSuccess callback before closing popup
+          if (onSuccess) {
+            await onSuccess(user);
           }
           // Close the popup - the parent window will receive the tokens via Auth events
           window.close();
@@ -123,15 +164,36 @@ export function CallbackPage({
             throw new Error('NextAuth sign-in failed: unknown error');
           }
 
+          // Create user object for callbacks and dynamic redirect
+          const user: ImmutableUser = {
+            sub: authUser.profile.sub,
+            email: authUser.profile.email,
+            nickname: authUser.profile.nickname,
+          };
+
+          // Call onSuccess callback before redirect
+          if (onSuccess) {
+            await onSuccess(user);
+          }
+
+          // Resolve redirect path (can be string or function)
+          const resolvedRedirectTo = typeof redirectTo === 'function'
+            ? redirectTo(user) || '/'
+            : redirectTo;
+
           // Only redirect after successful session creation
-          router.replace(redirectTo);
+          router.replace(resolvedRedirectTo);
         } else {
           // authUser is undefined - loginCallback failed silently
           // This can happen if the OIDC signinCallback returns null
           throw new Error('Authentication failed: no user data received from login callback');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Authentication failed');
+        const errorMessage = err instanceof Error ? err.message : 'Authentication failed';
+        if (onError) {
+          onError(errorMessage);
+        }
+        setError(errorMessage);
       }
     };
 
@@ -142,6 +204,9 @@ export function CallbackPage({
       const errorDescription = searchParams.get('error_description');
 
       const errorMessage = errorDescription || errorCode || 'Authentication failed';
+      if (onError) {
+        onError(errorMessage);
+      }
       setError(errorMessage);
     };
 
@@ -157,7 +222,7 @@ export function CallbackPage({
       callbackProcessedRef.current = true;
       handleCallback();
     }
-  }, [searchParams, router, config, redirectTo]);
+  }, [searchParams, router, config, redirectTo, onSuccess, onError]);
 
   if (error) {
     if (errorComponent) {

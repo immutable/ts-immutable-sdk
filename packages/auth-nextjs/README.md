@@ -61,9 +61,11 @@ const config = {
 };
 
 export default function Callback() {
-  return <CallbackPage config={config} />;
+  return <CallbackPage config={config} redirectTo="/dashboard" />;
 }
 ```
+
+See [CallbackPage Props](#callbackpage-props) for all available options.
 
 ### 4. Add Provider to Layout
 
@@ -222,6 +224,69 @@ openssl rand -base64 32
 | `useImmutableAuth()`    | Hook for authentication state and methods (see below)  |
 | `useAccessToken()`      | Hook returning `getAccessToken` function               |
 | `CallbackPage`          | Pre-built callback page component for OAuth redirects  |
+
+#### CallbackPage Props
+
+| Prop               | Type                                                  | Default | Description                                                        |
+| ------------------ | ----------------------------------------------------- | ------- | ------------------------------------------------------------------ |
+| `config`           | `ImmutableAuthConfig`                                 | -       | Required. Immutable auth configuration                             |
+| `redirectTo`       | `string \| ((user: ImmutableUser) => string \| void)` | `"/"`   | Where to redirect after successful auth (supports dynamic routing) |
+| `loadingComponent` | `React.ReactElement \| null`                          | `null`  | Custom loading UI while processing authentication                  |
+| `errorComponent`   | `(error: string) => React.ReactElement \| null`       | -       | Custom error UI component                                          |
+| `onSuccess`        | `(user: ImmutableUser) => void \| Promise<void>`      | -       | Callback fired after successful authentication                     |
+| `onError`          | `(error: string) => void`                             | -       | Callback fired when authentication fails                           |
+
+**Example with all props:**
+
+```tsx
+// app/callback/page.tsx
+"use client";
+
+import { CallbackPage } from "@imtbl/auth-nextjs/client";
+import { Spinner } from "@/components/ui/spinner";
+
+const config = {
+  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+  redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
+};
+
+export default function Callback() {
+  return (
+    <CallbackPage
+      config={config}
+      // Dynamic redirect based on user
+      redirectTo={(user) => {
+        if (user.email?.endsWith("@admin.com")) return "/admin";
+        return "/dashboard";
+      }}
+      // Custom loading UI
+      loadingComponent={
+        <div className="flex items-center justify-center min-h-screen">
+          <Spinner />
+          <span>Completing authentication...</span>
+        </div>
+      }
+      // Custom error UI
+      errorComponent={(error) => (
+        <div className="text-center p-8">
+          <h2 className="text-red-500">Authentication Error</h2>
+          <p>{error}</p>
+          <a href="/">Return Home</a>
+        </div>
+      )}
+      // Success callback for analytics
+      onSuccess={async (user) => {
+        await analytics.track("login_success", { userId: user.sub });
+      }}
+      // Error callback for logging
+      onError={(error) => {
+        console.error("Auth failed:", error);
+        Sentry.captureMessage(error);
+      }}
+    />
+  );
+}
+```
 
 **`useImmutableAuth()` Return Value:**
 
