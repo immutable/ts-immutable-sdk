@@ -64,7 +64,7 @@ function ImmutableAuthInner({
 
   // Initialize/reinitialize Auth instance when config changes (e.g., environment switch)
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return undefined;
 
     // Create a config key to detect changes - include all properties used in Auth constructor
     // to ensure the Auth instance is recreated when any config property changes
@@ -80,7 +80,7 @@ function ImmutableAuthInner({
 
     // Only recreate if config actually changed
     if (prevConfigRef.current === configKey) {
-      return;
+      return undefined;
     }
     prevConfigRef.current = configKey;
 
@@ -97,6 +97,18 @@ function ImmutableAuthInner({
 
     setAuth(newAuth);
     setIsAuthReady(true);
+
+    // Cleanup function: When config changes or component unmounts,
+    // clear the previous Auth instance reference to prevent memory leaks.
+    // The Auth class holds a UserManager from oidc-client-ts which may register
+    // window event listeners (storage, message). By setting auth to null and
+    // resetting the config ref, we allow garbage collection and prevent multiple
+    // Auth instances from competing for the same localStorage keys.
+    return () => {
+      setAuth(null);
+      setIsAuthReady(false);
+      prevConfigRef.current = null;
+    };
   }, [config]);
 
   // Hydrate Auth instance from NextAuth session if localStorage is cleared

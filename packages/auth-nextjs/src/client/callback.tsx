@@ -210,21 +210,36 @@ export function CallbackPage({
       setError(errorMessage);
     };
 
+    // Guard against double invocation (React 18 StrictMode runs effects twice)
+    if (callbackProcessedRef.current) {
+      return;
+    }
+
+    const hasError = searchParams.get('error');
+    const hasCode = searchParams.get('code');
+
     // Handle OAuth error responses (user cancelled, consent denied, etc.)
-    // Guard against double invocation (React 18 StrictMode runs effects twice,
-    // and onError may not be memoized by consumers)
-    if (searchParams.get('error') && !callbackProcessedRef.current) {
+    if (hasError) {
       callbackProcessedRef.current = true;
       handleOAuthError();
       return;
     }
 
     // Handle successful OAuth callback with authorization code
-    // Guard against double invocation (React 18 StrictMode runs effects twice)
-    if (searchParams.get('code') && !callbackProcessedRef.current) {
+    if (hasCode) {
       callbackProcessedRef.current = true;
       handleCallback();
+      return;
     }
+
+    // No OAuth parameters present - user navigated directly to callback page,
+    // bookmarked it, or OAuth redirect lost its parameters
+    callbackProcessedRef.current = true;
+    const errorMessage = 'Invalid callback: missing OAuth parameters. Please try logging in again.';
+    if (onError) {
+      onError(errorMessage);
+    }
+    setError(errorMessage);
   }, [searchParams, router, config, redirectTo, onSuccess, onError]);
 
   if (error) {
