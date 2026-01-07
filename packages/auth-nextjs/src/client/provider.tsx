@@ -71,6 +71,7 @@ function ImmutableAuthInner({
     const configKey = [
       config.clientId,
       config.redirectUri,
+      config.popupRedirectUri || '',
       config.logoutRedirectUri || '',
       config.audience || DEFAULT_AUDIENCE,
       config.scope || DEFAULT_SCOPE,
@@ -87,6 +88,7 @@ function ImmutableAuthInner({
     const newAuth = new Auth({
       clientId: config.clientId,
       redirectUri: config.redirectUri,
+      popupRedirectUri: config.popupRedirectUri,
       logoutRedirectUri: config.logoutRedirectUri,
       audience: config.audience || DEFAULT_AUDIENCE,
       scope: config.scope || DEFAULT_SCOPE,

@@ -11,9 +11,15 @@ export interface ImmutableAuthConfig {
   clientId: string;
 
   /**
-   * OAuth callback redirect URI
+   * OAuth callback redirect URI (used for redirect flow)
    */
   redirectUri: string;
+
+  /**
+   * OAuth callback redirect URI for popup flow
+   * If not provided, falls back to redirectUri
+   */
+  popupRedirectUri?: string;
 
   /**
    * Where to redirect after logout

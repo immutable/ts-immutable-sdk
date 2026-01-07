@@ -124,12 +124,16 @@ export function createImmutableAuth(
       };
     }
 
-    // For other callbacks (signIn, redirect), just use overrides if provided
+    // For other callbacks (signIn, redirect, authorized), just use overrides if provided
+    // These don't need composition as there's no internal implementation
     if (overrides.callbacks.signIn) {
       composedCallbacks.signIn = overrides.callbacks.signIn;
     }
     if (overrides.callbacks.redirect) {
       composedCallbacks.redirect = overrides.callbacks.redirect;
+    }
+    if (overrides.callbacks.authorized) {
+      composedCallbacks.authorized = overrides.callbacks.authorized;
     }
   }
 

@@ -168,14 +168,15 @@ export const config = {
 
 The `ImmutableAuthConfig` object accepts the following properties:
 
-| Property               | Type     | Required | Default                                          | Description                    |
-| ---------------------- | -------- | -------- | ------------------------------------------------ | ------------------------------ |
-| `clientId`             | `string` | Yes      | -                                                | Immutable OAuth client ID      |
-| `redirectUri`          | `string` | Yes      | -                                                | OAuth callback redirect URI    |
-| `logoutRedirectUri`    | `string` | No       | -                                                | Where to redirect after logout |
-| `audience`             | `string` | No       | `"platform_api"`                                 | OAuth audience                 |
-| `scope`                | `string` | No       | `"openid profile email offline_access transact"` | OAuth scopes                   |
-| `authenticationDomain` | `string` | No       | `"https://auth.immutable.com"`                   | Authentication domain          |
+| Property               | Type     | Required | Default                                          | Description                                     |
+| ---------------------- | -------- | -------- | ------------------------------------------------ | ----------------------------------------------- |
+| `clientId`             | `string` | Yes      | -                                                | Immutable OAuth client ID                       |
+| `redirectUri`          | `string` | Yes      | -                                                | OAuth callback redirect URI (for redirect flow) |
+| `popupRedirectUri`     | `string` | No       | `redirectUri`                                    | OAuth callback redirect URI for popup flow      |
+| `logoutRedirectUri`    | `string` | No       | -                                                | Where to redirect after logout                  |
+| `audience`             | `string` | No       | `"platform_api"`                                 | OAuth audience                                  |
+| `scope`                | `string` | No       | `"openid profile email offline_access transact"` | OAuth scopes                                    |
+| `authenticationDomain` | `string` | No       | `"https://auth.immutable.com"`                   | Authentication domain                           |
 
 ## Environment Variables
 
