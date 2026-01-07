@@ -211,7 +211,10 @@ export function CallbackPage({
     };
 
     // Handle OAuth error responses (user cancelled, consent denied, etc.)
-    if (searchParams.get('error')) {
+    // Guard against double invocation (React 18 StrictMode runs effects twice,
+    // and onError may not be memoized by consumers)
+    if (searchParams.get('error') && !callbackProcessedRef.current) {
+      callbackProcessedRef.current = true;
       handleOAuthError();
       return;
     }
