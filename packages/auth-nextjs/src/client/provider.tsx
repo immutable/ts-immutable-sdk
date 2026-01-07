@@ -59,6 +59,9 @@ function ImmutableAuthInner({
   // Use state instead of ref so changes trigger re-renders and update context consumers
   const [auth, setAuth] = useState<Auth | null>(null);
   const prevConfigRef = useRef<string | null>(null);
+  // Track auth instance in a ref to check if it's still valid synchronously
+  // This is needed for React 18 Strict Mode compatibility
+  const authInstanceRef = useRef<Auth | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const { data: session, update: updateSession } = useSession();
 
@@ -78,8 +81,13 @@ function ImmutableAuthInner({
       config.authenticationDomain || DEFAULT_AUTH_DOMAIN,
     ].join(':');
 
-    // Only recreate if config actually changed
-    if (prevConfigRef.current === configKey) {
+    // Only skip recreation if BOTH:
+    // 1. Config hasn't changed (same configKey)
+    // 2. Auth instance still exists (wasn't nullified by cleanup)
+    // This handles React 18 Strict Mode where effects run twice:
+    // setup → cleanup → setup. After cleanup, authInstanceRef is null,
+    // so we correctly recreate Auth on the second setup.
+    if (prevConfigRef.current === configKey && authInstanceRef.current !== null) {
       return undefined;
     }
     prevConfigRef.current = configKey;
@@ -95,6 +103,7 @@ function ImmutableAuthInner({
       authenticationDomain: config.authenticationDomain || DEFAULT_AUTH_DOMAIN,
     });
 
+    authInstanceRef.current = newAuth;
     setAuth(newAuth);
     setIsAuthReady(true);
 
@@ -103,13 +112,8 @@ function ImmutableAuthInner({
     // The Auth class holds a UserManager from oidc-client-ts which may register
     // window event listeners (storage, message). By setting auth to null,
     // we allow garbage collection.
-    // NOTE: We intentionally do NOT reset prevConfigRef here. React runs cleanup
-    // before the new effect when dependencies change, so resetting the ref would
-    // defeat the optimization that prevents Auth recreation when only the config
-    // reference changes but values stay the same. The ref persists to enable this
-    // comparison; it will be reset naturally when the component fully unmounts
-    // and remounts (since refs are tied to component instances).
     return () => {
+      authInstanceRef.current = null;
       setAuth(null);
       setIsAuthReady(false);
     };
