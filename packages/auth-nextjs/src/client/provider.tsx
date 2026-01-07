@@ -99,15 +99,19 @@ function ImmutableAuthInner({
     setIsAuthReady(true);
 
     // Cleanup function: When config changes or component unmounts,
-    // clear the previous Auth instance reference to prevent memory leaks.
+    // clear the Auth instance to prevent memory leaks.
     // The Auth class holds a UserManager from oidc-client-ts which may register
-    // window event listeners (storage, message). By setting auth to null and
-    // resetting the config ref, we allow garbage collection and prevent multiple
-    // Auth instances from competing for the same localStorage keys.
+    // window event listeners (storage, message). By setting auth to null,
+    // we allow garbage collection.
+    // NOTE: We intentionally do NOT reset prevConfigRef here. React runs cleanup
+    // before the new effect when dependencies change, so resetting the ref would
+    // defeat the optimization that prevents Auth recreation when only the config
+    // reference changes but values stay the same. The ref persists to enable this
+    // comparison; it will be reset naturally when the component fully unmounts
+    // and remounts (since refs are tied to component instances).
     return () => {
       setAuth(null);
       setIsAuthReady(false);
-      prevConfigRef.current = null;
     };
   }, [config]);
 
