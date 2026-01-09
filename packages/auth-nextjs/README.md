@@ -368,7 +368,7 @@ export default function Callback() {
 
 ## Handling Token Refresh Errors
 
-When a refresh token expires or becomes invalid (e.g., after 30 days of inactivity, or revoked from another session), the session will contain an `error` property. You should handle this gracefully:
+When a refresh token expires or becomes invalid (e.g., after 365 days of inactivity, or revoked from another session), the session will contain an `error` property. You should handle this gracefully:
 
 ### Server Components
 

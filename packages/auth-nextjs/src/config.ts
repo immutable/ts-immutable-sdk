@@ -219,7 +219,7 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
 
     session: {
       strategy: 'jwt',
-      // Session max age in seconds (30 days default)
+      // Session max age in seconds (365 days default)
       maxAge: DEFAULT_SESSION_MAX_AGE_SECONDS,
     },
   };
