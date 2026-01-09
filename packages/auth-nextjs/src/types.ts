@@ -185,9 +185,13 @@ export interface UseImmutableAuthReturn {
    */
   session: Session | null;
   /**
-   * Whether authentication state is loading
+   * Whether authentication state is loading (initial session fetch)
    */
   isLoading: boolean;
+  /**
+   * Whether a login flow is in progress (popup open, waiting for OAuth callback)
+   */
+  isLoggingIn: boolean;
   /**
    * Whether user is authenticated
    */

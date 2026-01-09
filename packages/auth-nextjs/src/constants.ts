@@ -48,4 +48,4 @@ export const TOKEN_EXPIRY_BUFFER_SECONDS = 60;
  * Default session max age in seconds (30 days)
  * This is how long the NextAuth session cookie will be valid
  */
-export const DEFAULT_SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
+export const DEFAULT_SESSION_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;

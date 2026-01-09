@@ -295,9 +295,9 @@ export function ImmutableAuthProvider({
  * @example
  * ```tsx
  * function MyComponent() {
- *   const { user, isLoading, signIn, signOut } = useImmutableAuth();
+ *   const { user, isLoading, isLoggingIn, signIn, signOut } = useImmutableAuth();
  *
- *   if (isLoading) return <div>Loading...</div>;
+ *   if (isLoading) return <div>Loading session...</div>;
  *
  *   if (user) {
  *     return (
@@ -308,13 +308,18 @@ export function ImmutableAuthProvider({
  *     );
  *   }
  *
- *   return <button onClick={signIn}>Login</button>;
+ *   return (
+ *     <button onClick={signIn} disabled={isLoggingIn}>
+ *       {isLoggingIn ? 'Logging in...' : 'Login'}
+ *     </button>
+ *   );
  * }
  * ```
  */
 export function useImmutableAuth(): UseImmutableAuthReturn {
   const context = useContext(ImmutableAuthContext);
   const { data: sessionData, status } = useSession();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   if (!context) {
     throw new Error('useImmutableAuth must be used within ImmutableAuthProvider');
@@ -342,38 +347,43 @@ export function useImmutableAuth(): UseImmutableAuthReturn {
       throw new Error('Auth not initialized');
     }
 
-    // Open popup login with optional login options
-    const authUser = await auth.login(options);
-    if (!authUser) {
-      throw new Error('Login failed');
-    }
+    setIsLoggingIn(true);
+    try {
+      // Open popup login with optional login options
+      const authUser = await auth.login(options);
+      if (!authUser) {
+        throw new Error('Login failed');
+      }
 
-    // Build token data for NextAuth
-    const tokenData: ImmutableTokenData = {
-      accessToken: authUser.accessToken,
-      refreshToken: authUser.refreshToken,
-      idToken: authUser.idToken,
-      accessTokenExpires: getTokenExpiry(authUser.accessToken),
-      profile: {
-        sub: authUser.profile.sub,
-        email: authUser.profile.email,
-        nickname: authUser.profile.nickname,
-      },
-      zkEvm: authUser.zkEvm,
-    };
+      // Build token data for NextAuth
+      const tokenData: ImmutableTokenData = {
+        accessToken: authUser.accessToken,
+        refreshToken: authUser.refreshToken,
+        idToken: authUser.idToken,
+        accessTokenExpires: getTokenExpiry(authUser.accessToken),
+        profile: {
+          sub: authUser.profile.sub,
+          email: authUser.profile.email,
+          nickname: authUser.profile.nickname,
+        },
+        zkEvm: authUser.zkEvm,
+      };
 
-    // Sign in to NextAuth with the tokens
-    const result = await signIn(IMMUTABLE_PROVIDER_ID, {
-      tokens: JSON.stringify(tokenData),
-      redirect: false,
-    });
+      // Sign in to NextAuth with the tokens
+      const result = await signIn(IMMUTABLE_PROVIDER_ID, {
+        tokens: JSON.stringify(tokenData),
+        redirect: false,
+      });
 
-    // signIn with redirect: false returns a result object instead of throwing
-    if (result?.error) {
-      throw new Error(`NextAuth sign-in failed: ${result.error}`);
-    }
-    if (!result?.ok) {
-      throw new Error('NextAuth sign-in failed: unknown error');
+      // signIn with redirect: false returns a result object instead of throwing
+      if (result?.error) {
+        throw new Error(`NextAuth sign-in failed: ${result.error}`);
+      }
+      if (!result?.ok) {
+        throw new Error('NextAuth sign-in failed: unknown error');
+      }
+    } finally {
+      setIsLoggingIn(false);
     }
   }, [auth]);
 
@@ -428,6 +438,7 @@ export function useImmutableAuth(): UseImmutableAuthReturn {
     user,
     session,
     isLoading,
+    isLoggingIn,
     isAuthenticated,
     signIn: handleSignIn,
     signOut: handleSignOut,

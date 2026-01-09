@@ -59,7 +59,7 @@ export async function refreshAccessToken(
       throw new Error('Invalid token response: missing access_token');
     }
 
-    // Calculate expiry (access_token typically expires in 1 hour)
+    // Calculate expiry
     const expiresIn = data.expires_in || DEFAULT_TOKEN_EXPIRY_SECONDS;
     const accessTokenExpires = Date.now() + expiresIn * 1000;
 
