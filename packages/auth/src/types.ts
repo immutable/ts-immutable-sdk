@@ -140,6 +140,12 @@ export type LoginOptions = {
 export enum AuthEvents {
   LOGGED_OUT = 'loggedOut',
   LOGGED_IN = 'loggedIn',
+  /**
+   * Emitted when tokens are refreshed via signinSilent().
+   * This is critical for refresh token rotation - when client-side refresh happens,
+   * the new tokens must be synced to server-side session to prevent race conditions.
+   */
+  TOKEN_REFRESHED = 'tokenRefreshed',
 }
 
 /**
@@ -148,4 +154,5 @@ export enum AuthEvents {
 export interface AuthEventMap extends Record<string, any> {
   [AuthEvents.LOGGED_OUT]: [];
   [AuthEvents.LOGGED_IN]: [User];
+  [AuthEvents.TOKEN_REFRESHED]: [User];
 }

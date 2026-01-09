@@ -765,7 +765,12 @@ export class Auth {
         try {
           const newOidcUser = await this.userManager.signinSilent();
           if (newOidcUser) {
-            resolve(Auth.mapOidcUserToDomainModel(newOidcUser));
+            const user = Auth.mapOidcUserToDomainModel(newOidcUser);
+            // Emit TOKEN_REFRESHED event so consumers (e.g., auth-nextjs) can sync
+            // the new tokens to their session. This is critical for refresh token
+            // rotation - without this, the server-side session may have stale tokens.
+            this.eventEmitter.emit(AuthEvents.TOKEN_REFRESHED, user);
+            resolve(user);
             return;
           }
           resolve(null);

@@ -186,6 +186,62 @@ describe('Auth', () => {
     });
   });
 
+  describe('refreshTokenAndUpdatePromise', () => {
+    it('emits TOKEN_REFRESHED event when signinSilent succeeds', async () => {
+      const mockOidcUser = {
+        id_token: 'new-id',
+        access_token: 'new-access',
+        refresh_token: 'new-refresh',
+        expired: false,
+        profile: { sub: 'user-123', email: 'test@example.com', nickname: 'tester' },
+      };
+
+      (decodeJwtPayload as jest.Mock).mockReturnValue({
+        username: undefined,
+        passport: undefined,
+      });
+
+      const auth = Object.create(Auth.prototype) as Auth;
+      const mockEventEmitter = { emit: jest.fn() };
+      const mockUserManager = {
+        signinSilent: jest.fn().mockResolvedValue(mockOidcUser),
+      };
+
+      (auth as any).eventEmitter = mockEventEmitter;
+      (auth as any).userManager = mockUserManager;
+      (auth as any).refreshingPromise = null;
+
+      const user = await (auth as any).refreshTokenAndUpdatePromise();
+
+      expect(user).toBeDefined();
+      expect(user.accessToken).toBe('new-access');
+      expect(mockEventEmitter.emit).toHaveBeenCalledWith(
+        AuthEvents.TOKEN_REFRESHED,
+        expect.objectContaining({
+          accessToken: 'new-access',
+          refreshToken: 'new-refresh',
+        }),
+      );
+    });
+
+    it('does not emit TOKEN_REFRESHED event when signinSilent returns null', async () => {
+      const auth = Object.create(Auth.prototype) as Auth;
+      const mockEventEmitter = { emit: jest.fn() };
+      const mockUserManager = {
+        signinSilent: jest.fn().mockResolvedValue(null),
+      };
+
+      (auth as any).eventEmitter = mockEventEmitter;
+      (auth as any).userManager = mockUserManager;
+      (auth as any).refreshingPromise = null;
+
+      const user = await (auth as any).refreshTokenAndUpdatePromise();
+
+      expect(user).toBeNull();
+      expect(mockEventEmitter.emit).not.toHaveBeenCalled();
+    });
+  });
+
   describe('loginWithPopup', () => {
     let mockUserManager: any;
     let originalCryptoRandomUUID: any;

@@ -14,7 +14,7 @@ import {
 } from 'next-auth/react';
 import type { Session } from 'next-auth';
 import {
-  Auth, type User, type DeviceTokenResponse, type LoginOptions,
+  Auth, AuthEvents, type User, type DeviceTokenResponse, type LoginOptions,
 } from '@imtbl/auth';
 import type {
   ImmutableAuthConfig,
@@ -200,10 +200,27 @@ function ImmutableAuthInner({
       }
     };
 
-    auth.eventEmitter.on('loggedIn', handleLoggedIn);
+    // Handle client-side token refresh - critical for refresh token rotation.
+    // When Auth refreshes tokens via signinSilent(), we must sync the new tokens
+    // (especially the new refresh token) to the NextAuth session. Without this,
+    // the server-side JWT callback may use a stale refresh token that Auth0 has
+    // already invalidated, causing "Unknown or invalid refresh token" errors.
+    const handleTokenRefreshed = async (authUser: User) => {
+      await updateSession({
+        accessToken: authUser.accessToken,
+        refreshToken: authUser.refreshToken,
+        idToken: authUser.idToken,
+        accessTokenExpires: getTokenExpiry(authUser.accessToken),
+        zkEvm: authUser.zkEvm,
+      });
+    };
+
+    auth.eventEmitter.on(AuthEvents.LOGGED_IN, handleLoggedIn);
+    auth.eventEmitter.on(AuthEvents.TOKEN_REFRESHED, handleTokenRefreshed);
 
     return () => {
-      auth.eventEmitter.removeListener('loggedIn', handleLoggedIn);
+      auth.eventEmitter.removeListener(AuthEvents.LOGGED_IN, handleLoggedIn);
+      auth.eventEmitter.removeListener(AuthEvents.TOKEN_REFRESHED, handleTokenRefreshed);
     };
   }, [auth, isAuthReady, session, updateSession]);
 
