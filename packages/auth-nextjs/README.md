@@ -168,15 +168,23 @@ export const config = {
 
 The `ImmutableAuthConfig` object accepts the following properties:
 
-| Property               | Type     | Required | Default                                          | Description                                     |
-| ---------------------- | -------- | -------- | ------------------------------------------------ | ----------------------------------------------- |
-| `clientId`             | `string` | Yes      | -                                                | Immutable OAuth client ID                       |
-| `redirectUri`          | `string` | Yes      | -                                                | OAuth callback redirect URI (for redirect flow) |
-| `popupRedirectUri`     | `string` | No       | `redirectUri`                                    | OAuth callback redirect URI for popup flow      |
-| `logoutRedirectUri`    | `string` | No       | -                                                | Where to redirect after logout                  |
-| `audience`             | `string` | No       | `"platform_api"`                                 | OAuth audience                                  |
-| `scope`                | `string` | No       | `"openid profile email offline_access transact"` | OAuth scopes                                    |
-| `authenticationDomain` | `string` | No       | `"https://auth.immutable.com"`                   | Authentication domain                           |
+| Property               | Type     | Required | Default                                          | Description                                                    |
+| ---------------------- | -------- | -------- | ------------------------------------------------ | -------------------------------------------------------------- |
+| `clientId`             | `string` | Yes      | -                                                | Immutable OAuth client ID                                      |
+| `redirectUri`          | `string` | Yes      | -                                                | OAuth callback redirect URI (for redirect flow)                |
+| `popupRedirectUri`     | `string` | No       | `redirectUri`                                    | OAuth callback redirect URI for popup flow                     |
+| `logoutRedirectUri`    | `string` | No       | -                                                | Where to redirect after logout                                 |
+| `audience`             | `string` | No       | `"platform_api"`                                 | OAuth audience                                                 |
+| `scope`                | `string` | No       | `"openid profile email offline_access transact"` | OAuth scopes                                                   |
+| `authenticationDomain` | `string` | No       | `"https://auth.immutable.com"`                   | Authentication domain                                          |
+| `passportDomain`       | `string` | No       | `"https://passport.immutable.com"`               | Passport domain for transaction confirmations (see note below) |
+
+> **Important:** The `passportDomain` must match your target environment for transaction signing to work correctly:
+>
+> - **Production:** `https://passport.immutable.com` (default)
+> - **Sandbox:** `https://passport.sandbox.immutable.com`
+>
+> If you're using the sandbox environment, you must explicitly set `passportDomain` to the sandbox URL.
 
 ## Environment Variables
 
@@ -194,6 +202,38 @@ Generate a secret:
 ```bash
 openssl rand -base64 32
 ```
+
+## Sandbox vs Production Configuration
+
+When developing or testing, you'll typically use the **Sandbox** environment. Make sure to configure `passportDomain` correctly:
+
+```typescript
+// lib/auth.ts
+
+// For SANDBOX environment
+const sandboxConfig = {
+  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+  redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
+  passportDomain: "https://passport.sandbox.immutable.com", // Required for sandbox!
+};
+
+// For PRODUCTION environment
+const productionConfig = {
+  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+  redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
+  // passportDomain defaults to 'https://passport.immutable.com'
+};
+
+// Use environment variable to switch between configs
+const config =
+  process.env.NEXT_PUBLIC_IMMUTABLE_ENV === "production"
+    ? productionConfig
+    : sandboxConfig;
+
+export const { handlers, auth, signIn, signOut } = createImmutableAuth(config);
+```
+
+> **Note:** The `passportDomain` is used for transaction confirmation popups. If not set correctly for your environment, transaction signing will not work as expected.
 
 ## API Reference
 

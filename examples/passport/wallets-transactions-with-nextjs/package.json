@@ -2,7 +2,7 @@
   "name": "@examples/wallets-transactions-with-nextjs",
   "version": "0.1.0",
   "dependencies": {
-    "@imtbl/sdk": "workspace:*",
+    "@imtbl/sdk": "file:.yalc/@imtbl/sdk",
     "ethers": "^6.13.4",
     "next": "14.2.25",
     "react": "^18.2.0",

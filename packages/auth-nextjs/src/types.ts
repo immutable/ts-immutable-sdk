@@ -40,6 +40,17 @@ export interface ImmutableAuthConfig {
    * Authentication domain (default: "https://auth.immutable.com")
    */
   authenticationDomain?: string;
+
+  /**
+   * Passport domain for transaction confirmation popups.
+   * Must be set correctly for the target environment:
+   * - Production: "https://passport.immutable.com"
+   * - Sandbox: "https://passport.sandbox.immutable.com"
+   *
+   * If not provided, defaults to production ("https://passport.immutable.com").
+   * This is important for transaction signing flows to work correctly.
+   */
+  passportDomain?: string;
 }
 
 /**

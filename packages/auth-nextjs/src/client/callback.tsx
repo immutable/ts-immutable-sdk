@@ -108,6 +108,7 @@ export function CallbackPage({
           audience: config.audience || DEFAULT_AUDIENCE,
           scope: config.scope || DEFAULT_SCOPE,
           authenticationDomain: config.authenticationDomain || DEFAULT_AUTH_DOMAIN,
+          passportDomain: config.passportDomain,
         });
 
         // Process the callback - this extracts tokens from the URL and returns the user

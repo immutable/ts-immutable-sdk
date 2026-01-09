@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "dependencies": {
     "@biom3/react": "^0.27.12",
-    "@imtbl/sdk": "workspace:*",
+    "@imtbl/sdk": "file:.yalc/@imtbl/sdk",
     "@tanstack/react-query": "^5.51.11",
     "ethers": "^6.13.4",
     "next": "14.2.25",

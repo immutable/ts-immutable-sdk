@@ -79,6 +79,7 @@ function ImmutableAuthInner({
       config.audience || DEFAULT_AUDIENCE,
       config.scope || DEFAULT_SCOPE,
       config.authenticationDomain || DEFAULT_AUTH_DOMAIN,
+      config.passportDomain || '',
     ].join(':');
 
     // Only skip recreation if BOTH:
@@ -101,6 +102,7 @@ function ImmutableAuthInner({
       audience: config.audience || DEFAULT_AUDIENCE,
       scope: config.scope || DEFAULT_SCOPE,
       authenticationDomain: config.authenticationDomain || DEFAULT_AUTH_DOMAIN,
+      passportDomain: config.passportDomain,
     });
 
     authInstanceRef.current = newAuth;
