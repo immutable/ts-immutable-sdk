@@ -324,7 +324,85 @@ export default function Callback() {
 2. **Session Creation**: Tokens passed to Auth.js credentials provider → stored in encrypted JWT cookie
 3. **Token Refresh**: Auth.js JWT callback automatically refreshes expired tokens using refresh_token
 4. **SSR**: `auth()` reads and decrypts cookie, providing full session with tokens
-5. **Auto-hydration**: If localStorage is cleared but session cookie exists, the Auth instance is automatically hydrated from session tokens
+5. **Auto-sync**: Tokens are automatically synced between server (NextAuth session) and client (Auth instance) to handle refresh token rotation
+
+## Handling Token Refresh Errors
+
+When a refresh token expires or becomes invalid (e.g., after 30 days of inactivity, or revoked from another session), the session will contain an `error` property. You should handle this gracefully:
+
+### Server Components
+
+```typescript
+// app/profile/page.tsx
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+
+export default async function ProfilePage() {
+  const session = await auth();
+
+  // Handle refresh token failure - prompt user to re-login
+  if (session?.error === "RefreshTokenError") {
+    redirect("/login?error=session_expired");
+  }
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  return <h1>Welcome, {session.user.email}</h1>;
+}
+```
+
+### Client Components
+
+```typescript
+"use client";
+
+import { useImmutableAuth } from "@imtbl/auth-nextjs/client";
+
+export function ProtectedContent() {
+  const { session, user, signIn, isLoading } = useImmutableAuth();
+
+  if (isLoading) return <div>Loading...</div>;
+
+  // Handle refresh token failure
+  if (session?.error) {
+    return (
+      <div>
+        <p>Your session has expired. Please log in again.</p>
+        <button onClick={() => signIn()}>Log In</button>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <button onClick={() => signIn()}>Log In</button>;
+  }
+
+  return <div>Welcome, {user.email}</div>;
+}
+```
+
+### Using getAccessToken
+
+The `getAccessToken()` function will throw an error if the token cannot be refreshed:
+
+```typescript
+const { getAccessToken } = useImmutableAuth();
+
+async function fetchData() {
+  try {
+    const token = await getAccessToken();
+    const response = await fetch("/api/data", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.json();
+  } catch (error) {
+    // Token refresh failed - redirect to login or show error
+    console.error("Failed to get access token:", error);
+  }
+}
+```
 
 ## Migration from v4 (Pages Router)
 

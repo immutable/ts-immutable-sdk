@@ -119,17 +119,20 @@ function ImmutableAuthInner({
     };
   }, [config]);
 
-  // Hydrate Auth instance from NextAuth session if localStorage is cleared
-  // This handles the case where a valid session exists but Auth has no local state
+  // Sync tokens from NextAuth session to Auth instance
+  // This handles two cases:
+  // 1. Initial hydration when Auth has no local state (e.g., localStorage cleared)
+  // 2. Token refresh sync when server-side refresh happened and tokens are newer
+  //    (critical for refresh token rotation - the old refresh token is invalidated)
   useEffect(() => {
     if (!auth || !isAuthReady) return;
-    // Don't hydrate if session has an error (e.g., RefreshTokenError)
+    // Don't sync if session has an error (e.g., RefreshTokenError)
     // When server-side token refresh fails, the session contains both stale tokens
     // AND an error flag - we must not store these stale tokens in the Auth instance
     if (session?.error) return;
     if (!session?.accessToken || !session?.idToken) return;
 
-    const hydrateAuth = async () => {
+    const syncTokensToAuth = async () => {
       try {
         // Re-check tokens inside async function for TypeScript narrowing
         const {
@@ -137,16 +140,29 @@ function ImmutableAuthInner({
         } = session;
         if (!accessToken || !idToken) return;
 
-        // Check if Auth already has user data
+        // Check if Auth already has user data with same or newer tokens
         const existingUser = await auth.getUser();
-        if (existingUser) return; // Already hydrated
+        if (existingUser) {
+          // Compare tokens - only update if session has different tokens
+          // This handles the case where server-side refresh happened:
+          // - Server refreshed tokens → new refresh token returned
+          // - Old refresh token is invalidated (refresh token rotation)
+          // - Client Auth still has old refresh token → sync the new one
+          const sessionHasNewerTokens = existingUser.accessToken !== accessToken
+            || existingUser.refreshToken !== refreshToken;
+
+          if (!sessionHasNewerTokens) {
+            return; // Tokens are the same, no need to sync
+          }
+          // Tokens are different - session has updated tokens from server-side refresh
+        }
 
         // Calculate expires_in from accessTokenExpires
         const expiresIn = accessTokenExpires
           ? Math.max(0, Math.floor((accessTokenExpires - Date.now()) / 1000))
           : DEFAULT_TOKEN_EXPIRY_SECONDS;
 
-        // Hydrate Auth with tokens from NextAuth session
+        // Store tokens from NextAuth session into Auth instance
         const tokenResponse: DeviceTokenResponse = {
           access_token: accessToken,
           refresh_token: refreshToken,
@@ -158,11 +174,11 @@ function ImmutableAuthInner({
         await auth.storeTokens(tokenResponse);
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.warn('[auth-nextjs] Failed to hydrate Auth instance:', error);
+        console.warn('[auth-nextjs] Failed to sync tokens to Auth instance:', error);
       }
     };
 
-    hydrateAuth();
+    syncTokensToAuth();
   }, [auth, isAuthReady, session]);
 
   // Listen for Auth events to sync tokens back to NextAuth
