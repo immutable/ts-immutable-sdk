@@ -170,6 +170,9 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
         }
 
         // Handle session update (for client-side token sync)
+        // When client-side Auth refreshes tokens via TOKEN_REFRESHED event and syncs them here,
+        // we must clear any stale error (e.g., from a previous server-side refresh failure).
+        // This matches refreshAccessToken's behavior of setting error: undefined on success.
         if (trigger === 'update' && sessionUpdate) {
           const update = sessionUpdate as Record<string, unknown>;
           return {
@@ -179,6 +182,8 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
             ...(update.idToken ? { idToken: update.idToken } : {}),
             ...(update.accessTokenExpires ? { accessTokenExpires: update.accessTokenExpires } : {}),
             ...(update.zkEvm ? { zkEvm: update.zkEvm } : {}),
+            // Clear any stale error when valid tokens are synced from client-side
+            error: undefined,
           };
         }
 
