@@ -443,20 +443,3 @@ async function fetchData() {
   }
 }
 ```
-
-## Migration from v4 (Pages Router)
-
-If you're migrating from the Pages Router version:
-
-| v4 (Pages Router)                       | v5 (App Router)                               |
-| --------------------------------------- | --------------------------------------------- |
-| `ImmutableAuth(config)`                 | `createImmutableAuth(config)`                 |
-| `getImmutableSession(req, res, config)` | `auth()` (from createImmutableAuth)           |
-| `withPageAuthRequired(config)`          | `createAuthMiddleware(auth)` or layout checks |
-| `pages/api/auth/[...nextauth].ts`       | `app/api/auth/[...nextauth]/route.ts`         |
-| `pages/_app.tsx` with provider          | `app/layout.tsx` with provider                |
-| `NEXTAUTH_SECRET`                       | `AUTH_SECRET`                                 |
-
-## License
-
-Apache-2.0
