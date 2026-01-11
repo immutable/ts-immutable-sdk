@@ -7,22 +7,29 @@ import {
 } from './constants';
 
 /**
- * Refresh the access token using the refresh token
- * Called by Auth.js JWT callback when token is expired
+ * Map of pending refresh promises keyed by refresh token.
+ * Used to deduplicate concurrent refresh requests and prevent race conditions
+ * caused by OAuth refresh token rotation.
+ *
+ * When multiple concurrent requests detect an expired token, they all attempt
+ * to refresh simultaneously. Due to refresh token rotation, only the first
+ * request succeeds - the rest would fail with "Unknown or invalid refresh token"
+ * because the original refresh token was invalidated.
+ *
+ * This map ensures only ONE actual refresh request is made per refresh token.
+ * All concurrent requests wait for and share the same result.
  */
-export async function refreshAccessToken(
+const pendingRefreshes = new Map<string, Promise<JWT>>();
+
+/**
+ * Internal function that performs the actual token refresh HTTP request.
+ * This is called by refreshAccessToken after deduplication checks.
+ */
+async function doRefreshAccessToken(
   token: JWT,
   config: ImmutableAuthConfig,
+  authDomain: string,
 ): Promise<JWT> {
-  const authDomain = config.authenticationDomain || DEFAULT_AUTH_DOMAIN;
-
-  if (!token.refreshToken) {
-    return {
-      ...token,
-      error: 'NoRefreshToken',
-    };
-  }
-
   try {
     const response = await fetch(`${authDomain}/oauth/token`, {
       method: 'POST',
@@ -32,7 +39,7 @@ export async function refreshAccessToken(
       body: new URLSearchParams({
         grant_type: 'refresh_token',
         client_id: config.clientId,
-        refresh_token: token.refreshToken,
+        refresh_token: token.refreshToken!,
       }),
     });
 
@@ -78,6 +85,63 @@ export async function refreshAccessToken(
       ...token,
       error: 'RefreshTokenError',
     };
+  }
+}
+
+/**
+ * Refresh the access token using the refresh token.
+ * Called by Auth.js JWT callback when token is expired.
+ *
+ * This function implements deduplication to handle concurrent refresh requests.
+ * When multiple requests detect an expired token simultaneously, only ONE actual
+ * refresh request is made to the OAuth server. All concurrent requests wait for
+ * and share the same result.
+ *
+ * This prevents "Unknown or invalid refresh token" errors caused by OAuth
+ * refresh token rotation, where using the same refresh token twice fails
+ * because it was invalidated after the first use.
+ */
+export async function refreshAccessToken(
+  token: JWT,
+  config: ImmutableAuthConfig,
+): Promise<JWT> {
+  const authDomain = config.authenticationDomain || DEFAULT_AUTH_DOMAIN;
+
+  if (!token.refreshToken) {
+    return {
+      ...token,
+      error: 'NoRefreshToken',
+    };
+  }
+
+  const { refreshToken } = token;
+
+  // Check if a refresh is already in progress for this refresh token
+  const existingRefresh = pendingRefreshes.get(refreshToken);
+  if (existingRefresh) {
+    // Wait for the existing refresh to complete and use its result
+    // The result will have updated tokens that we merge with our token's other fields
+    const result = await existingRefresh;
+    return {
+      ...token,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      idToken: result.idToken,
+      accessTokenExpires: result.accessTokenExpires,
+      error: result.error,
+    };
+  }
+
+  // Start a new refresh and store the promise
+  const refreshPromise = doRefreshAccessToken(token, config, authDomain);
+  pendingRefreshes.set(refreshToken, refreshPromise);
+
+  try {
+    const result = await refreshPromise;
+    return result;
+  } finally {
+    // Clean up the pending refresh after completion (success or failure)
+    pendingRefreshes.delete(refreshToken);
   }
 }
 
