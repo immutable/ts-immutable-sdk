@@ -137,10 +137,22 @@ export function createImmutableAuth(
     }
   }
 
+  // Merge session config to preserve critical settings like strategy: 'jwt'
+  // User can override maxAge, updateAge, etc. but strategy is always preserved
+  const mergedSession = overrides.session
+    ? {
+      ...authConfig.session,
+      ...overrides.session,
+      // Always enforce JWT strategy - this is required for token storage/refresh
+      strategy: 'jwt' as const,
+    }
+    : authConfig.session;
+
   const mergedConfig: NextAuthConfig = {
     ...authConfig,
     ...overrides,
     callbacks: composedCallbacks,
+    session: mergedSession,
   };
 
   return NextAuth(mergedConfig);
