@@ -2,6 +2,7 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import type { Session } from 'next-auth';
+import { matchPathPrefix } from '../utils/pathMatch';
 
 // Re-export createImmutableAuth for convenience
 export { createImmutableAuth, createAuthConfig } from '../index';
@@ -78,7 +79,7 @@ export function createAuthMiddleware(
     if (publicPaths) {
       const isPublic = publicPaths.some((pattern) => {
         if (typeof pattern === 'string') {
-          return pathname === pattern || pathname.startsWith(pattern);
+          return matchPathPrefix(pathname, pattern);
         }
         return pattern.test(pathname);
       });
@@ -91,7 +92,7 @@ export function createAuthMiddleware(
     if (protectedPaths) {
       const isProtected = protectedPaths.some((pattern) => {
         if (typeof pattern === 'string') {
-          return pathname === pattern || pathname.startsWith(pattern);
+          return matchPathPrefix(pathname, pattern);
         }
         return pattern.test(pathname);
       });
