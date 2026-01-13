@@ -10,6 +10,7 @@ import { PassportConfiguration } from '../config';
 import { getEip155ChainId } from '../zkEvm/walletHelpers';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { RollupType } from '../types';
+import { getEvmChainFromChainId } from '../sequence/chainConfig';
 
 export type GuardianClientParams = {
   confirmationScreen: ConfirmationScreen;
@@ -117,8 +118,7 @@ export default class GuardianClient {
       if (chain.name.startsWith(IMTBL_ZKEVM_CHAIN_PREFIX)) {
         chainKey = RollupType.ZKEVM;
       } else {
-        // Replace dashes with underscores for other chains
-        chainKey = chain.name.replace(/-/g, '_');
+        chainKey = getEvmChainFromChainId(chainId);
       }
 
       this.chainIdToKeyCache.set(chainId, chainKey);
@@ -142,9 +142,9 @@ export default class GuardianClient {
     }
 
     const chainKey = await this.getChainKeyFromId(chainId);
-    // const ethAddress = (user as any)[chainKey]?.ethAddress;
+    const ethAddress = (user as any)[chainKey]?.ethAddress;
     // TODO remove, this is for local testing
-    const ethAddress = '0x3fadd1f6f02408c0fad35e362e3d5c65e722b67a';
+    // const ethAddress = '0x3fadd1f6f02408c0fad35e362e3d5c65e722b67a';
 
     if (!ethAddress) {
       throw new JsonRpcError(
@@ -311,14 +311,15 @@ export default class GuardianClient {
 
     if (confirmationRequired && !!transactionId) {
       const { ethAddress } = await this.getUserForChain(chainId);
+      const chainType = getEvmChainFromChainId(chainId);
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         transactionId,
         ethAddress,
-        GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Evm,
+        chainType as GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum,
         chainId,
       );
 
-      console.log(`confirmationResult: ${JSON.stringify(confirmationResult)}`);
+      console.log(`confirmationResult 2: ${JSON.stringify(confirmationResult)}`);
 
       if (!confirmationResult.confirmed) {
         throw new JsonRpcError(

@@ -42,31 +42,32 @@ export async function registerUser({
   });
   signMessagePromise.then(() => flow.addEvent('endSignRaw'));
 
-  const detectNetworkPromise = rpcProvider.getNetwork();
-  detectNetworkPromise.then(() => flow.addEvent('endDetectNetwork'));
+  // const detectNetworkPromise = rpcProvider.getNetwork();
+  // detectNetworkPromise.then(() => flow.addEvent('endDetectNetwork'));
 
-  const listChainsPromise = multiRollupApiClients.chainsApi.listChains();
-  listChainsPromise.then(() => flow.addEvent('endListChains'));
+  // const listChainsPromise = multiRollupApiClients.chainsApi.listChains();
+  // listChainsPromise.then(() => flow.addEvent('endListChains'));
 
-  const [ethereumAddress, ethereumSignature, network, chainListResponse] = await Promise.all([
+  const [ethereumAddress, ethereumSignature/* , network, chainListResponse */] = await Promise.all([
     getAddressPromise,
     signMessagePromise,
-    detectNetworkPromise,
-    listChainsPromise,
+    // detectNetworkPromise,
+    // listChainsPromise,
   ]);
 
-  const eipChainId = getEip155ChainId(Number(network.chainId));
-  const chainName = chainListResponse.data?.result?.find((chain) => chain.id === eipChainId)?.name;
-  if (!chainName) {
-    throw new JsonRpcError(
-      RpcErrorCode.INTERNAL_ERROR,
-      `Chain name does not exist on for chain id ${network.chainId}`,
-    );
-  }
+  // const eipChainId = getEip155ChainId(Number(network.chainId));
+  // const chainName = chainListResponse.data?.result?.find((chain) => chain.id === eipChainId)?.name;
+  // if (!chainName) {
+  //   throw new JsonRpcError(
+  //     RpcErrorCode.INTERNAL_ERROR,
+  //     `Chain name does not exist on for chain id ${network.chainId}`,
+  //   );
+  // }
 
   try {
+    console.log(`sequence registerUser createCounterfactualAddressV2`);
     const registrationResponse = await multiRollupApiClients.passportApi.createCounterfactualAddressV2({
-      chainName: chainName,
+      chainName: "arbitrum-sepolia",
       createCounterfactualAddressRequest: {
         ethereum_address: ethereumAddress,
         ethereum_signature: ethereumSignature,
@@ -80,6 +81,8 @@ export async function registerUser({
 
     return registrationResponse.data.counterfactual_address;
   } catch (error) {
+    console.log(`sequence registerUser error: ${error}`, (error as Error)?.stack);
+
     flow.addEvent('errorRegisteringUser');
     throw error;
   }

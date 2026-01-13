@@ -68,6 +68,7 @@ const createWallet = async (
     );
   }
   const deploymentSalt = await fetchDeploymentSalt(user.accessToken);
+  console.log(`deployment salt = ${deploymentSalt}`);
 
   const signerAddress = await sequenceSigner.getAddress();
   const walletConfig = createWalletConfig(Address.from(signerAddress));
@@ -144,7 +145,7 @@ export const prepareAndSignTransaction = async ({
     return signed;
   }
 
-  const [_, signature] = await Promise.all([
+  const [  _,  signature] = await Promise.all([
     validateTransaction(),
     signTransaction(),
   ]);
@@ -226,7 +227,7 @@ const signMetaTransaction = async (
 async function fetchDeploymentSalt(
   accessToken: string
 ): Promise<string> {
-  const apiUrl = 'http://localhost:8072/v2/passport/counterfactual-salt';
+  const apiUrl = 'http://localhost:8072/passport-mr/v1/counterfactual-salt';
   
   const response = await fetch(apiUrl, {
     method: 'GET',

@@ -1,9 +1,11 @@
 import { prepareAndSignTransaction, TransactionParams } from './transactionHelpers';
 import { EvmChain } from '../types';
+import { Environment } from '@imtbl/config';
 
 type EthSendTransactionParams = TransactionParams & {
   params: Array<any>;
   chain: EvmChain;
+  environment: Environment;
 };
 
 export const sendTransaction = async ({
@@ -16,6 +18,7 @@ export const sendTransaction = async ({
   flow,
   authManager,
   chain,
+  environment,
 }: EthSendTransactionParams): Promise<string> => {
   const transactionRequest = params[0];
 
@@ -30,6 +33,6 @@ export const sendTransaction = async ({
     authManager,
   });
 
-  const txHash = await relayerClient.postToRelayer(chain, to, data, flow);
+  const txHash = await relayerClient.postToRelayer(chain, environment, to, data, flow);
   return txHash;
 };

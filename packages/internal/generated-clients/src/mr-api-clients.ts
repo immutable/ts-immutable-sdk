@@ -42,6 +42,7 @@ export class MultiRollupApiClients {
     this.ordersApi = new OrdersApi(config.orderBook);
     this.passportApi = new PassportApi(config.passport);
     this.passportProfileApi = new PassportProfileApi(config.passport);
+    // this.guardianApi = new GuardianApi(config.passport);
     this.guardianApi = new GuardianApi(createConfig({
       basePath: 'http://localhost:8074',
     }));

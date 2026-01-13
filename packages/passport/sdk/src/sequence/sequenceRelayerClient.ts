@@ -5,6 +5,7 @@ import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { EvmChain } from '../types';
 import { getChainConfig, ChainConfig } from './chainConfig';
 import { Flow } from '@imtbl/metrics';
+import { Environment } from '@imtbl/config';
 
 export type RelayerClientInput = {
   config: PassportConfiguration,
@@ -38,13 +39,14 @@ export class SequenceRelayerClient {
 
   async postToRelayer(
     chain: EvmChain,
+    environment: Environment,
     to: Address.Address,
     data: Hex.Hex,
     flow: Flow,
   ): Promise<string> {
     flow.addEvent('startSubmitToRelayer');
     
-    const chainConfig = getChainConfig(chain);
+    const chainConfig = getChainConfig(chain, environment);
 
     const relayer = this.getRelayer(chain, chainConfig);
     console.log(`postToRelayer relayer ${JSON.stringify(relayer)}`);

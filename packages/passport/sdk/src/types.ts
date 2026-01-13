@@ -195,7 +195,6 @@ export type LinkedWallet = {
 export enum EvmChain {
   ZKEVM = 'zkevm',
   ARBITRUM_ONE = 'arbitrum_one',
-  ARBITRUM_SEPOLIA = 'arbitrum_sepolia',
 }
 
 export type ConnectEvmArguments = {

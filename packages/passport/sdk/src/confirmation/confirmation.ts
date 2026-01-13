@@ -63,7 +63,6 @@ export default class ConfirmationScreen {
     chainType: GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum,
     chainId?: string,
   ): Promise<ConfirmationResult> {
-    console.log(`request confirmation for transactionId: ${transactionId}, etherAddress: ${etherAddress}, chainType: ${chainType}, chainId: ${chainId}`);
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
@@ -106,7 +105,7 @@ export default class ConfirmationScreen {
       if (chainType === GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex) {
         href = this.getHref('transaction', { transactionId, etherAddress, chainType });
       } else {
-        href = this.getHref('zkevm/transaction', {
+        href = this.getHref(`${chainType.replace('_', '-')}/transaction`, {
           transactionID: transactionId, etherAddress, chainType, chainID: chainId,
         });
       }

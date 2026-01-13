@@ -70,7 +70,7 @@ export class IdentityInstrumentSigner implements ISigner {
     this.createWalletPromise = new Promise(async (resolve, reject) => {
       try {
         this.userWallet = null;
-        await this.authManager.forceUserRefresh();
+        await this.authManager.forceUserRefresh(); // TODO shouldn't have to refresh all the time
 
         const authenticatedUser = user || await this.getUserOrThrow();
         
