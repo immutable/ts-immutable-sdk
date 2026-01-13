@@ -4,7 +4,7 @@
 import type { NextAuthConfig } from 'next-auth';
 import CredentialsImport from 'next-auth/providers/credentials';
 import type { ImmutableAuthConfig, ImmutableTokenData, UserInfoResponse } from './types';
-import { refreshAccessToken, isTokenExpired } from './refresh';
+import { isTokenExpired } from './refresh';
 import {
   DEFAULT_AUTH_DOMAIN,
   IMMUTABLE_PROVIDER_ID,
@@ -170,9 +170,9 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
         }
 
         // Handle session update (for client-side token sync)
-        // When client-side Auth refreshes tokens via TOKEN_REFRESHED event and syncs them here,
-        // we must clear any stale error (e.g., from a previous server-side refresh failure).
-        // This matches refreshAccessToken's behavior of setting error: undefined on success.
+        // When client-side Auth refreshes tokens via TOKEN_REFRESHED event,
+        // it calls updateSession() which triggers this callback with the new tokens.
+        // We clear any stale error (e.g., TokenExpired) on successful update.
         if (trigger === 'update' && sessionUpdate) {
           const update = sessionUpdate as Record<string, unknown>;
           return {
@@ -192,8 +192,22 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
           return token;
         }
 
-        // Token expired - refresh it
-        return refreshAccessToken(token, config);
+        // Token expired - DON'T refresh server-side!
+        // Server-side refresh causes race conditions with 403 errors when multiple
+        // concurrent SSR requests detect expired tokens. The pendingRefreshes Map
+        // mutex doesn't work across serverless isolates/processes.
+        //
+        // Instead, mark the token as expired and let the client handle refresh:
+        // 1. SSR completes with session.error = "TokenExpired"
+        // 2. Client hydrates, calls getAccessToken() for data fetches
+        // 3. getAccessToken() calls auth.getAccessToken() which auto-refreshes
+        //    with proper mutex protection (refreshingPromise in @imtbl/auth)
+        // 4. TOKEN_REFRESHED event fires → updateSession() syncs fresh tokens
+        // 5. NextAuth receives update trigger → clears error, stores fresh tokens
+        return {
+          ...token,
+          error: 'TokenExpired',
+        };
       },
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -176,8 +176,8 @@ export type {
 export type { LoginOptions, DirectLoginOptions } from '@imtbl/auth';
 export { MarketingConsentStatus } from '@imtbl/auth';
 
-// Token refresh utilities (for advanced use)
-export { refreshAccessToken, isTokenExpired } from './refresh';
+// Token expiry check utility
+export { isTokenExpired } from './refresh';
 
 // Default constants (useful for configuration reference)
 export {
