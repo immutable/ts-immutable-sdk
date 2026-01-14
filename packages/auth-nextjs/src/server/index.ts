@@ -104,9 +104,8 @@ export function createAuthMiddleware(
     // Check authentication
     const session = await auth();
 
+    // No session at all - user is not authenticated, redirect to login
     if (!session) {
-      // Build redirect URL with returnTo parameter
-      // Include search params to preserve query string (e.g., ?tab=settings)
       const url = new URL(loginUrl, request.url);
       const returnTo = request.nextUrl.search
         ? `${pathname}${request.nextUrl.search}`
@@ -114,6 +113,23 @@ export function createAuthMiddleware(
       url.searchParams.set('returnTo', returnTo);
       return NextResponse.redirect(url);
     }
+
+    // Session exists but has error - distinguish between error types:
+    // - "TokenExpired": Access token expired but user may have valid refresh token.
+    //   Let the page load - client-side Auth will refresh tokens silently.
+    // - Other errors (e.g., "RefreshTokenError"): Refresh token is invalid/expired.
+    //   User must re-authenticate, redirect to login.
+    if (session.error && session.error !== 'TokenExpired') {
+      const url = new URL(loginUrl, request.url);
+      const returnTo = request.nextUrl.search
+        ? `${pathname}${request.nextUrl.search}`
+        : pathname;
+      url.searchParams.set('returnTo', returnTo);
+      url.searchParams.set('error', session.error);
+      return NextResponse.redirect(url);
+    }
+
+    // Session valid OR TokenExpired (client will refresh) - allow access
 
     return NextResponse.next();
   };
@@ -172,6 +188,18 @@ export function withAuth<TArgs extends unknown[], TReturn>(
       throw new Error('Unauthorized: No active session');
     }
 
+    // Check for session error - distinguish between error types:
+    // - "TokenExpired": Access token expired. Server can't make authenticated API calls,
+    //   but handler may not need to. If handler needs tokens, it should check session.error.
+    //   Throwing here would break SSR for pages that could work with stale data + client refresh.
+    // - Other errors (e.g., "RefreshTokenError"): Refresh token is invalid/expired.
+    //   User must re-authenticate, throw to signal unauthorized.
+    if (session.error && session.error !== 'TokenExpired') {
+      throw new Error(`Unauthorized: ${session.error}`);
+    }
+
+    // Pass session to handler - handler can check session.error === 'TokenExpired'
+    // if it needs to make authenticated API calls and handle accordingly
     return handler(session, ...args);
   };
 }
