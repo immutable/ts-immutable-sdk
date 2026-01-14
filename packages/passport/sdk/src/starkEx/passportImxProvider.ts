@@ -181,7 +181,7 @@ export class PassportImxProvider implements IMXProvider {
         return await registerOffchain(
           this.magicTEESigner,
           starkSigner,
-          toUserImx(user),
+          user,
           this.auth,
           this.imxApiClients,
         );
