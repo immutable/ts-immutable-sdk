@@ -405,3 +405,127 @@ export function useAccessToken(): () => Promise<string> {
   const { getAccessToken } = useImmutableAuth();
   return getAccessToken;
 }
+
+/**
+ * Result from useHydratedData hook
+ */
+export interface UseHydratedDataResult<T> {
+  data: T | null;
+  isLoading: boolean;
+  error: Error | null;
+  refetch: () => Promise<void>;
+}
+
+/**
+ * Props for useHydratedData hook - matches AuthPropsWithData from server
+ */
+export interface HydratedDataProps<T> {
+  session: Session | null;
+  ssr: boolean;
+  data: T | null;
+  fetchError?: string;
+  authError?: string;
+}
+
+/**
+ * Hook for hydrating server-fetched data with automatic client-side fallback.
+ *
+ * This is the recommended pattern for components that receive data from `getAuthenticatedData`:
+ * - When `ssr: true` and `data` exists: Uses pre-fetched server data immediately (no loading state)
+ * - When `ssr: false`: Refreshes token client-side and fetches data
+ * - When `fetchError` exists: Retries fetch client-side
+ *
+ * @param props - Props from getAuthenticatedData (session, ssr, data, fetchError)
+ * @param fetcher - Async function that receives access token and returns data (for client-side fallback)
+ * @returns Object with data, isLoading, error, and refetch function
+ *
+ * @example
+ * ```tsx
+ * // app/dashboard/page.tsx (Server Component)
+ * import { getAuthenticatedData } from "@imtbl/auth-nextjs/server";
+ *
+ * export default async function DashboardPage() {
+ *   const props = await getAuthenticatedData(auth, fetchDashboardData);
+ *   if (props.authError) redirect("/login");
+ *   return <Dashboard {...props} />;
+ * }
+ *
+ * // app/dashboard/Dashboard.tsx (Client Component)
+ * "use client";
+ * import { useHydratedData } from "@imtbl/auth-nextjs/client";
+ *
+ * export default function Dashboard(props: AuthPropsWithData<DashboardData>) {
+ *   const { data, isLoading, error } = useHydratedData(props, fetchDashboardData);
+ *
+ *   if (isLoading) return <Skeleton />;
+ *   if (error) return <Error message={error.message} />;
+ *   return <DashboardContent data={data} />;
+ * }
+ * ```
+ */
+export function useHydratedData<T>(
+  props: HydratedDataProps<T>,
+  fetcher: (accessToken: string) => Promise<T>,
+): UseHydratedDataResult<T> {
+  const { getAccessToken } = useImmutableAuth();
+  const {
+    session,
+    ssr,
+    data: serverData,
+    fetchError,
+  } = props;
+
+  // Determine if we need to fetch client-side:
+  // 1. SSR was skipped (token expired) - need to refresh token and fetch
+  // 2. Server fetch failed - retry on client
+  // 3. No server data - need to fetch
+  const needsClientFetch = !ssr || Boolean(fetchError) || serverData === null;
+
+  // Initialize state with server data if available
+  const [data, setData] = useState<T | null>(serverData);
+  const [isLoading, setIsLoading] = useState(needsClientFetch);
+  const [error, setError] = useState<Error | null>(
+    fetchError ? new Error(fetchError) : null,
+  );
+
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      let token: string;
+
+      if (ssr && session?.accessToken) {
+        // SSR mode with valid session: use session token
+        token = session.accessToken;
+      } else {
+        // CSR mode: get/refresh token client-side
+        token = await getAccessToken();
+      }
+
+      const result = await fetcher(token);
+      setData(result);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error(String(err)));
+    } finally {
+      setIsLoading(false);
+    }
+  }, [session, ssr, fetcher, getAccessToken]);
+
+  // Only fetch on mount if we need client-side data
+  // Using empty deps intentionally - we only want to run once on mount.
+  // The needsClientFetch check inside handles the condition.
+  useEffect(() => {
+    if (needsClientFetch) {
+      fetchData();
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  return {
+    data,
+    isLoading,
+    error,
+    refetch: fetchData,
+  };
+}
