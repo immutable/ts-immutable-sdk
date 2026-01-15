@@ -496,7 +496,7 @@ export function useHydratedData<T>(
   props: HydratedDataProps<T>,
   fetcher: (accessToken: string) => Promise<T>,
 ): UseHydratedDataResult<T> {
-  const { getAccessToken } = useImmutableAuth();
+  const { getAccessToken, auth } = useImmutableAuth();
   const {
     session,
     ssr,
@@ -516,6 +516,9 @@ export function useHydratedData<T>(
   const [error, setError] = useState<Error | null>(
     fetchError ? new Error(fetchError) : null,
   );
+
+  // Track if we've already started fetching to prevent duplicate calls
+  const hasFetchedRef = useRef(false);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -541,15 +544,27 @@ export function useHydratedData<T>(
     }
   }, [session, ssr, fetcher, getAccessToken]);
 
-  // Only fetch on mount if we need client-side data
-  // Using empty deps intentionally - we only want to run once on mount.
-  // The needsClientFetch check inside handles the condition.
+  // Fetch client-side data when needed
+  // When ssr is false (token expired server-side), we must wait for the Auth instance
+  // to be initialized before fetching. Auth is created in a parent component's effect
+  // which runs AFTER this (child) effect due to React's bottom-up effect execution.
+  // Without waiting for auth, getAccessToken() would find auth === null, fall through
+  // to check the session (which has an error because token is expired), and throw
+  // "Session expired" instead of properly refreshing the token via Auth.
   useEffect(() => {
-    if (needsClientFetch) {
-      fetchData();
-    }
-    // eslint-disable-next-line
-  }, []);
+    // Already fetched, don't fetch again
+    if (hasFetchedRef.current) return;
+
+    // Don't need client fetch
+    if (!needsClientFetch) return;
+
+    // When ssr is false, we need Auth to refresh the expired token.
+    // Wait for it to initialize before attempting to fetch.
+    if (!ssr && !auth) return;
+
+    hasFetchedRef.current = true;
+    fetchData();
+  }, [needsClientFetch, ssr, auth, fetchData]);
 
   return {
     data,
