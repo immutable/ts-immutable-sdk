@@ -160,12 +160,16 @@ export enum AuthEvents {
 }
 
 /**
- * Error reason for USER_REMOVED event
+ * Error reason for USER_REMOVED event.
+ * Note: Network/timeout errors do NOT emit USER_REMOVED (user stays logged in),
+ * so 'network_error' is not a valid reason.
  */
 export type UserRemovedReason =
+  // OAuth permanent errors (invalid_grant, login_required, etc.)
   | 'refresh_token_invalid'
+  // Unknown non-OAuth errors
   | 'refresh_failed'
-  | 'network_error'
+  // Fallback for truly unknown error types
   | 'unknown';
 
 /**

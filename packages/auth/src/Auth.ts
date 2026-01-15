@@ -780,14 +780,14 @@ export class Auth {
           // Default to REMOVING user - safer to log out on unknown errors
           // Only keep user logged in for explicitly known transient errors
           let removeUser = true;
-          let removeReason: 'refresh_token_invalid' | 'refresh_failed' | 'network_error' | 'unknown' = 'unknown';
+          let removeReason: 'refresh_token_invalid' | 'refresh_failed' | 'unknown' = 'unknown';
 
           if (err instanceof ErrorTimeout) {
             // Timeout is transient - safe to keep user logged in
+            // Note: removeReason is set but never used since removeUser=false
             passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
             errorMessage = `${errorMessage}: ${err.message}`;
             removeUser = false;
-            removeReason = 'network_error';
           } else if (err instanceof ErrorResponse) {
             passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
             errorMessage = `${errorMessage}: ${err.message || err.error_description}`;
@@ -810,8 +810,8 @@ export class Auth {
               || err.message.toLowerCase().includes('failed to fetch')
               || err.message.toLowerCase().includes('networkerror');
             if (isNetworkError) {
+              // Note: removeReason is not set since removeUser=false (event won't be emitted)
               removeUser = false;
-              removeReason = 'network_error';
             } else {
               // Unknown errors - safer to remove user
               removeReason = 'refresh_failed';
