@@ -24,7 +24,7 @@
     "typescript": "^5.6.2"
   },
   "peerDependencies": {
-    "next": "^14.2.0 || ^15.0.0",
+    "next": "14.2.25",
     "next-auth": "^5.0.0-beta.30",
     "react": "^18.2.0"
   },
