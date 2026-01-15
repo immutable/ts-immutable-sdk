@@ -14,7 +14,7 @@ import {
 } from 'next-auth/react';
 import type { Session } from 'next-auth';
 import {
-  Auth, AuthEvents, type User, type LoginOptions,
+  Auth, AuthEvents, type User, type LoginOptions, type UserRemovedReason,
 } from '@imtbl/auth';
 import type {
   ImmutableAuthConfig,
@@ -152,12 +152,35 @@ function ImmutableAuthInner({
       });
     };
 
+    // Handle user removal from Auth due to unrecoverable errors
+    // (e.g., network error during refresh, invalid refresh token).
+    // When this happens, we must clear the NextAuth session to prevent
+    // a mismatch where NextAuth thinks user is logged in but Auth SDK has no user.
+    const handleUserRemoved = async (payload: { reason: UserRemovedReason; error?: string }) => {
+      // eslint-disable-next-line no-console
+      console.warn('[auth-nextjs] User removed from Auth SDK:', payload.reason, payload.error);
+      // Sign out from NextAuth to clear the session cookie
+      // This prevents the state mismatch where session exists but Auth has no user
+      await signOut({ redirect: false });
+    };
+
+    // Handle explicit logout from Auth SDK (e.g., if user calls auth.logout() directly)
+    // This ensures NextAuth session is always in sync with Auth SDK state
+    const handleLoggedOut = async () => {
+      // Sign out from NextAuth to clear the session cookie
+      await signOut({ redirect: false });
+    };
+
     auth.eventEmitter.on(AuthEvents.LOGGED_IN, handleLoggedIn);
     auth.eventEmitter.on(AuthEvents.TOKEN_REFRESHED, handleTokenRefreshed);
+    auth.eventEmitter.on(AuthEvents.USER_REMOVED, handleUserRemoved);
+    auth.eventEmitter.on(AuthEvents.LOGGED_OUT, handleLoggedOut);
 
     return () => {
       auth.eventEmitter.removeListener(AuthEvents.LOGGED_IN, handleLoggedIn);
       auth.eventEmitter.removeListener(AuthEvents.TOKEN_REFRESHED, handleTokenRefreshed);
+      auth.eventEmitter.removeListener(AuthEvents.USER_REMOVED, handleUserRemoved);
+      auth.eventEmitter.removeListener(AuthEvents.LOGGED_OUT, handleLoggedOut);
     };
   }, [auth, isAuthReady, session, updateSession]);
 
@@ -357,11 +380,17 @@ export function useImmutableAuth(): UseImmutableAuthReturn {
       }
     }
 
-    // Fall back to session token, but check for errors first
-    // When server-side token refresh fails, the session contains both an error flag
-    // and the original stale token. We must not return the stale token in this case.
+    // Fall back to session token, but check for errors first.
+    // Session errors indicate authentication issues that require user action:
+    // - "TokenExpired": Access token expired and Auth instance couldn't refresh
+    //   (this happens if localStorage was cleared but session cookie remains)
+    // - "RefreshTokenError": Refresh token is invalid/expired, need re-login
     if (session?.error) {
-      throw new Error(`Token refresh failed: ${session.error}`);
+      throw new Error(
+        session.error === 'TokenExpired'
+          ? 'Session expired. Please log in again.'
+          : `Authentication error: ${session.error}`,
+      );
     }
 
     if (session?.accessToken) {

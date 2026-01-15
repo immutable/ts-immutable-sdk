@@ -240,6 +240,91 @@ describe('Auth', () => {
       expect(user).toBeNull();
       expect(mockEventEmitter.emit).not.toHaveBeenCalled();
     });
+
+    it('emits USER_REMOVED event when signinSilent fails with ErrorResponse', async () => {
+      const auth = Object.create(Auth.prototype) as Auth;
+      const mockEventEmitter = { emit: jest.fn() };
+      const mockUserManager = {
+        signinSilent: jest.fn().mockRejectedValue(
+          Object.assign(new Error('invalid_grant'), {
+            error: 'invalid_grant',
+            error_description: 'Unknown or invalid refresh token',
+          }),
+        ),
+        removeUser: jest.fn().mockResolvedValue(undefined),
+      };
+
+      // Make the error an instance of ErrorResponse
+      const { ErrorResponse } = jest.requireActual('oidc-client-ts');
+      const errorResponse = new ErrorResponse({
+        error: 'invalid_grant',
+        error_description: 'Unknown or invalid refresh token',
+      });
+      mockUserManager.signinSilent.mockRejectedValue(errorResponse);
+
+      (auth as any).eventEmitter = mockEventEmitter;
+      (auth as any).userManager = mockUserManager;
+      (auth as any).refreshingPromise = null;
+
+      await expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
+
+      expect(mockEventEmitter.emit).toHaveBeenCalledWith(
+        AuthEvents.USER_REMOVED,
+        expect.objectContaining({
+          reason: 'refresh_token_invalid',
+        }),
+      );
+      expect(mockUserManager.removeUser).toHaveBeenCalled();
+    });
+
+    it('emits USER_REMOVED event with network_error reason for network failures', async () => {
+      const auth = Object.create(Auth.prototype) as Auth;
+      const mockEventEmitter = { emit: jest.fn() };
+      const mockUserManager = {
+        signinSilent: jest.fn().mockRejectedValue(new Error('Network error: Failed to fetch')),
+        removeUser: jest.fn().mockResolvedValue(undefined),
+      };
+
+      (auth as any).eventEmitter = mockEventEmitter;
+      (auth as any).userManager = mockUserManager;
+      (auth as any).refreshingPromise = null;
+
+      await expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
+
+      expect(mockEventEmitter.emit).toHaveBeenCalledWith(
+        AuthEvents.USER_REMOVED,
+        expect.objectContaining({
+          reason: 'network_error',
+        }),
+      );
+      expect(mockUserManager.removeUser).toHaveBeenCalled();
+    });
+
+    it('does not emit USER_REMOVED event for ErrorTimeout', async () => {
+      const auth = Object.create(Auth.prototype) as Auth;
+      const mockEventEmitter = { emit: jest.fn() };
+      const mockUserManager = {
+        signinSilent: jest.fn(),
+        removeUser: jest.fn().mockResolvedValue(undefined),
+      };
+
+      // Mock ErrorTimeout
+      const { ErrorTimeout } = jest.requireActual('oidc-client-ts');
+      const timeoutError = new ErrorTimeout('Silent sign-in timed out');
+      mockUserManager.signinSilent.mockRejectedValue(timeoutError);
+
+      (auth as any).eventEmitter = mockEventEmitter;
+      (auth as any).userManager = mockUserManager;
+      (auth as any).refreshingPromise = null;
+
+      await expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
+
+      expect(mockEventEmitter.emit).not.toHaveBeenCalledWith(
+        AuthEvents.USER_REMOVED,
+        expect.anything(),
+      );
+      expect(mockUserManager.removeUser).not.toHaveBeenCalled();
+    });
   });
 
   describe('loginWithPopup', () => {

@@ -170,11 +170,11 @@ This package provides utilities for fetching authenticated data during SSR with 
 
 ### How It Works
 
-| Token State     | Server Behavior                              | Client Behavior                       |
-| --------------- | -------------------------------------------- | ------------------------------------- |
-| **Valid**       | Fetches data → `{ ssr: true, data: {...} }`  | Uses server data immediately          |
-| **Expired**     | Skips fetch → `{ ssr: false, data: null }`   | Refreshes token, fetches client-side  |
-| **Auth Error**  | Returns `{ authError: "..." }`               | Redirect to login                     |
+| Token State    | Server Behavior                             | Client Behavior                      |
+| -------------- | ------------------------------------------- | ------------------------------------ |
+| **Valid**      | Fetches data → `{ ssr: true, data: {...} }` | Uses server data immediately         |
+| **Expired**    | Skips fetch → `{ ssr: false, data: null }`  | Refreshes token, fetches client-side |
+| **Auth Error** | Returns `{ authError: "..." }`              | Redirect to login                    |
 
 ### Server Component: `getAuthenticatedData`
 
@@ -430,24 +430,24 @@ export default function Callback() {
 
 **`useHydratedData()` Return Value:**
 
-| Property    | Type                      | Description                                |
-| ----------- | ------------------------- | ------------------------------------------ |
-| `data`      | `T \| null`               | The fetched data (server or client)        |
-| `isLoading` | `boolean`                 | Whether data is being fetched client-side  |
-| `error`     | `Error \| null`           | Error if fetch failed                      |
-| `refetch`   | `() => Promise<void>`     | Function to manually refetch data          |
+| Property    | Type                  | Description                               |
+| ----------- | --------------------- | ----------------------------------------- |
+| `data`      | `T \| null`           | The fetched data (server or client)       |
+| `isLoading` | `boolean`             | Whether data is being fetched client-side |
+| `error`     | `Error \| null`       | Error if fetch failed                     |
+| `refetch`   | `() => Promise<void>` | Function to manually refetch data         |
 
 ### Server Exports (`@imtbl/auth-nextjs/server`)
 
-| Export                              | Description                                        |
-| ----------------------------------- | -------------------------------------------------- |
-| `createImmutableAuth`               | Re-exported for convenience                        |
-| `getAuthProps(auth)`                | Get auth props without data fetching               |
-| `getAuthenticatedData(auth, fetch)` | Fetch data on server with automatic SSR/CSR switch |
-| `getValidSession(auth)`             | Get session with detailed status                   |
-| `withServerAuth(auth, render, opts)`| Helper for conditional rendering based on auth     |
-| `createAuthMiddleware(auth, opts?)` | Create middleware for protecting routes            |
-| `withAuth(auth, handler)`           | HOC for protecting Server Actions/Route Handlers   |
+| Export                               | Description                                        |
+| ------------------------------------ | -------------------------------------------------- |
+| `createImmutableAuth`                | Re-exported for convenience                        |
+| `getAuthProps(auth)`                 | Get auth props without data fetching               |
+| `getAuthenticatedData(auth, fetch)`  | Fetch data on server with automatic SSR/CSR switch |
+| `getValidSession(auth)`              | Get session with detailed status                   |
+| `withServerAuth(auth, render, opts)` | Helper for conditional rendering based on auth     |
+| `createAuthMiddleware(auth, opts?)`  | Create middleware for protecting routes            |
+| `withAuth(auth, handler)`            | HOC for protecting Server Actions/Route Handlers   |
 
 **`createAuthMiddleware` Options:**
 
@@ -459,11 +459,11 @@ export default function Callback() {
 
 **Types:**
 
-| Type                | Description                                    |
-| ------------------- | ---------------------------------------------- |
-| `AuthProps`         | Basic auth props (session, ssr, authError)     |
-| `AuthPropsWithData` | Auth props with pre-fetched data               |
-| `ValidSessionResult`| Detailed session status result                 |
+| Type                 | Description                                |
+| -------------------- | ------------------------------------------ |
+| `AuthProps`          | Basic auth props (session, ssr, authError) |
+| `AuthPropsWithData`  | Auth props with pre-fetched data           |
+| `ValidSessionResult` | Detailed session status result             |
 
 ## How It Works
 
@@ -549,7 +549,8 @@ For components that don't use SSR data fetching:
 import { useImmutableAuth } from "@imtbl/auth-nextjs/client";
 
 export function ProtectedContent() {
-  const { session, user, signIn, isLoading, getAccessToken } = useImmutableAuth();
+  const { session, user, signIn, isLoading, getAccessToken } =
+    useImmutableAuth();
 
   if (isLoading) return <div>Loading...</div>;
 

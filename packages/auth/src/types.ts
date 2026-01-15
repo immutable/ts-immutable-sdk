@@ -146,7 +146,22 @@ export enum AuthEvents {
    * the new tokens must be synced to server-side session to prevent race conditions.
    */
   TOKEN_REFRESHED = 'tokenRefreshed',
+  /**
+   * Emitted when the user is removed from local storage due to an unrecoverable error
+   * (e.g., network error during token refresh, invalid refresh token).
+   * Consumers should sync this state by clearing their session (e.g., NextAuth signOut).
+   */
+  USER_REMOVED = 'userRemoved',
 }
+
+/**
+ * Error reason for USER_REMOVED event
+ */
+export type UserRemovedReason =
+  | 'refresh_token_invalid'
+  | 'refresh_failed'
+  | 'network_error'
+  | 'unknown';
 
 /**
  * Event map for typed event emitter
@@ -155,4 +170,5 @@ export interface AuthEventMap extends Record<string, any> {
   [AuthEvents.LOGGED_OUT]: [];
   [AuthEvents.LOGGED_IN]: [User];
   [AuthEvents.TOKEN_REFRESHED]: [User];
+  [AuthEvents.USER_REMOVED]: [{ reason: UserRemovedReason; error?: string }];
 }

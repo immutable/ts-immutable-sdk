@@ -778,6 +778,7 @@ export class Auth {
           let passportErrorType = PassportErrorType.AUTHENTICATION_ERROR;
           let errorMessage = 'Failed to refresh token';
           let removeUser = true;
+          let removeReason: 'refresh_token_invalid' | 'refresh_failed' | 'network_error' | 'unknown' = 'unknown';
 
           if (err instanceof ErrorTimeout) {
             passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
@@ -786,13 +787,25 @@ export class Auth {
           } else if (err instanceof ErrorResponse) {
             passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
             errorMessage = `${errorMessage}: ${err.message || err.error_description}`;
+            // Check for invalid_grant which indicates refresh token is invalid/expired
+            removeReason = err.error === 'invalid_grant' ? 'refresh_token_invalid' : 'refresh_failed';
           } else if (err instanceof Error) {
             errorMessage = `${errorMessage}: ${err.message}`;
+            // Network errors typically have specific messages
+            removeReason = err.message.toLowerCase().includes('network') ? 'network_error' : 'refresh_failed';
           } else if (typeof err === 'string') {
             errorMessage = `${errorMessage}: ${err}`;
+            removeReason = 'refresh_failed';
           }
 
           if (removeUser) {
+            // Emit USER_REMOVED event BEFORE removing user so consumers can react
+            // (e.g., auth-nextjs can clear the NextAuth session)
+            this.eventEmitter.emit(AuthEvents.USER_REMOVED, {
+              reason: removeReason,
+              error: errorMessage,
+            });
+
             try {
               await this.userManager.removeUser();
             } catch (removeUserError) {

@@ -20,6 +20,7 @@ export type {
   IdTokenPayload,
   PKCEData,
   AuthEventMap,
+  UserRemovedReason,
 } from './types';
 export {
   isUserZkEvm, RollupType, MarketingConsentStatus, AuthEvents,
