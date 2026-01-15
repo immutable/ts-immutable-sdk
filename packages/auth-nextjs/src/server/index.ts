@@ -42,6 +42,28 @@ export interface AuthPropsWithData<T> extends AuthProps {
 }
 
 /**
+ * Auth props without the authError field.
+ * Used when auth error handling is automatic via onAuthError callback.
+ */
+export interface ProtectedAuthProps {
+  /** Session with valid tokens, or null if token expired/unauthenticated */
+  session: Session | null;
+  /** If true, SSR data fetching occurred with valid token */
+  ssr: boolean;
+}
+
+/**
+ * Protected auth props with pre-fetched data.
+ * Used when auth error handling is automatic via onAuthError callback.
+ */
+export interface ProtectedAuthPropsWithData<T> extends ProtectedAuthProps {
+  /** Pre-fetched data from server (null if SSR was skipped or fetch failed) */
+  data: T | null;
+  /** Error message if server-side fetch failed */
+  fetchError?: string;
+}
+
+/**
  * Get auth props for passing to Client Components (without data fetching).
  * Use this when you want to handle data fetching separately or client-side only.
  *
@@ -219,6 +241,173 @@ export async function getValidSession(auth: AuthFunction): Promise<ValidSessionR
   }
 
   return { status: 'error', session, error: session.error };
+}
+
+/**
+ * Auth error handler signature.
+ * The handler should either redirect (using Next.js redirect()) or throw an error.
+ * It must never return normally - hence the `never` return type.
+ *
+ * @param error - The auth error (e.g., "RefreshTokenError")
+ */
+export type AuthErrorHandler = (error: string) => never;
+
+/**
+ * Create a protected data fetcher with automatic auth error handling.
+ *
+ * This eliminates the need to check `authError` on every page. Define the error
+ * handling once, and all pages using this fetcher will automatically redirect
+ * on auth errors.
+ *
+ * @param auth - The auth function from createImmutableAuth
+ * @param onAuthError - Handler called when there's an auth error (should redirect or throw)
+ * @returns A function to fetch protected data without needing authError checks
+ *
+ * @example
+ * ```typescript
+ * // lib/auth-server.ts
+ * import { createProtectedDataFetcher } from "@imtbl/auth-nextjs/server";
+ * import { auth } from "./auth";
+ * import { redirect } from "next/navigation";
+ *
+ * export const getProtectedData = createProtectedDataFetcher(auth, (error) => {
+ *   redirect(`/login?error=${encodeURIComponent(error)}`);
+ * });
+ *
+ * // app/dashboard/page.tsx - No authError check needed!
+ * export default async function DashboardPage() {
+ *   const props = await getProtectedData(fetchDashboardData);
+ *   return <Dashboard {...props} />; // authError is handled automatically
+ * }
+ * ```
+ */
+export function createProtectedDataFetcher(
+  auth: AuthFunction,
+  onAuthError: AuthErrorHandler,
+): <T>(fetcher: (accessToken: string) => Promise<T>) => Promise<ProtectedAuthPropsWithData<T>> {
+  return async function getProtectedData<T>(
+    fetcher: (accessToken: string) => Promise<T>,
+  ): Promise<ProtectedAuthPropsWithData<T>> {
+    const result = await getAuthenticatedData(auth, fetcher);
+
+    // If there's an auth error, call the handler (which should redirect/throw)
+    if (result.authError) {
+      onAuthError(result.authError);
+      // TypeScript knows this is unreachable due to `never` return type
+    }
+
+    // Remove authError from the result since it's handled
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { authError: handledAuthError, ...props } = result;
+    return props;
+  };
+}
+
+/**
+ * Create auth props getter with automatic auth error handling.
+ *
+ * Similar to createProtectedDataFetcher but for cases where you don't need
+ * server-side data fetching.
+ *
+ * @param auth - The auth function from createImmutableAuth
+ * @param onAuthError - Handler called when there's an auth error (should redirect or throw)
+ * @returns A function to get auth props without needing authError checks
+ *
+ * @example
+ * ```typescript
+ * // lib/auth-server.ts
+ * export const getProtectedAuthProps = createProtectedAuthProps(auth, (error) => {
+ *   redirect(`/login?error=${encodeURIComponent(error)}`);
+ * });
+ *
+ * // app/profile/page.tsx
+ * export default async function ProfilePage() {
+ *   const props = await getProtectedAuthProps();
+ *   return <Profile {...props} />;
+ * }
+ * ```
+ */
+export function createProtectedAuthProps(
+  auth: AuthFunction,
+  onAuthError: AuthErrorHandler,
+): () => Promise<ProtectedAuthProps> {
+  return async function getProtectedAuth(): Promise<ProtectedAuthProps> {
+    const result = await getAuthProps(auth);
+
+    if (result.authError) {
+      onAuthError(result.authError);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { authError: handledAuthError, ...props } = result;
+    return props;
+  };
+}
+
+/**
+ * Result of createProtectedFetchers
+ */
+export interface ProtectedFetchers {
+  /**
+   * Get auth props with automatic auth error handling.
+   * No data fetching - use when you only need session/auth state.
+   */
+  getAuthProps: () => Promise<ProtectedAuthProps>;
+  /**
+   * Fetch authenticated data with automatic auth error handling.
+   * Use for SSR data fetching with automatic fallback.
+   */
+  getData: <T>(fetcher: (accessToken: string) => Promise<T>) => Promise<ProtectedAuthPropsWithData<T>>;
+}
+
+/**
+ * Create protected fetchers with centralized auth error handling.
+ *
+ * This is the recommended way to set up auth error handling once and use it
+ * across all protected pages. Define your error handler once, then use the
+ * returned functions without needing to check authError on each page.
+ *
+ * @param auth - The auth function from createImmutableAuth
+ * @param onAuthError - Handler called when there's an auth error (should redirect or throw)
+ * @returns Object with getAuthProps and getData functions
+ *
+ * @example
+ * ```typescript
+ * // lib/auth-server.ts
+ * import { createProtectedFetchers } from "@imtbl/auth-nextjs/server";
+ * import { auth } from "./auth";
+ * import { redirect } from "next/navigation";
+ *
+ * // Define auth error handling ONCE
+ * export const { getAuthProps, getData } = createProtectedFetchers(auth, (error) => {
+ *   redirect(`/login?error=${encodeURIComponent(error)}`);
+ * });
+ *
+ * // app/dashboard/page.tsx - Clean, no boilerplate!
+ * import { getData } from "@/lib/auth-server";
+ *
+ * export default async function DashboardPage() {
+ *   const props = await getData(fetchDashboardData);
+ *   return <Dashboard {...props} />;
+ * }
+ *
+ * // app/profile/page.tsx - Works for auth-only pages too
+ * import { getAuthProps } from "@/lib/auth-server";
+ *
+ * export default async function ProfilePage() {
+ *   const props = await getAuthProps();
+ *   return <Profile {...props} />;
+ * }
+ * ```
+ */
+export function createProtectedFetchers(
+  auth: AuthFunction,
+  onAuthError: AuthErrorHandler,
+): ProtectedFetchers {
+  return {
+    getAuthProps: createProtectedAuthProps(auth, onAuthError),
+    getData: createProtectedDataFetcher(auth, onAuthError),
+  };
 }
 
 /**
