@@ -1,19 +1,13 @@
 // Server-side exports for App Router
-//
-// IMPORTANT: This module must NOT import from '../index' as that file imports
-// @imtbl/auth which has side effects that access browser-only APIs (navigator).
-// This breaks Edge Runtime (Next.js middleware) which doesn't have browser APIs.
-//
-// Instead, we import from '../createAuth' which is server-safe.
 
 import { type NextRequest, NextResponse } from 'next/server';
 import type { Session } from 'next-auth';
 import { matchPathPrefix } from '../utils/pathMatch';
 
-// Re-export createImmutableAuth from server-safe module (no @imtbl/auth dependency)
-export { createImmutableAuth } from '../createAuth';
+// Re-export createImmutableAuth from main module
+export { createImmutableAuth } from '..';
 
-// Re-export createAuthConfig directly from config (server-safe, no @imtbl/auth)
+// Re-export createAuthConfig
 export { createAuthConfig, createAuthOptions } from '../config';
 
 /**

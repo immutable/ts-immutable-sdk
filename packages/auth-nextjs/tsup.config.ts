@@ -10,15 +10,6 @@ const peerExternal = [
   "next/server",
 ];
 
-// Browser-only packages that must NOT be bundled into server/Edge Runtime code
-// These packages access browser APIs (navigator, window) at module load time
-const browserOnlyPackages = [
-  "@imtbl/auth",
-  "@imtbl/metrics",
-  "oidc-client-ts",
-  "localforage",
-];
-
 // Base configuration shared across all builds
 const baseConfig: Options = {
   outDir: "dist/node",
@@ -29,17 +20,16 @@ const baseConfig: Options = {
 };
 
 export default defineConfig([
-  // Server-only entry - MUST NOT bundle @imtbl/auth or its dependencies
-  // This is used in Next.js middleware (Edge Runtime) where browser APIs don't exist
+  // Server entry point
   {
     ...baseConfig,
     entry: {
       "server/index": "src/server/index.ts",
     },
-    external: [...peerExternal, ...browserOnlyPackages],
+    external: peerExternal,
     clean: true,
   },
-  // Main entry point - can bundle @imtbl/auth for client-side type re-exports
+  // Main entry point
   {
     ...baseConfig,
     entry: {

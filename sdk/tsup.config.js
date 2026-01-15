@@ -16,33 +16,6 @@ const peerDepsExternal = [
   'react-dom',
 ];
 
-// Browser-only packages that access navigator/window at module load time
-// These MUST be externalized for server/Edge Runtime entry points
-const browserOnlyPackages = [
-  '@imtbl/auth',
-  '@imtbl/metrics',
-  'oidc-client-ts',
-  'localforage',
-];
-
-// Packages that should be bundled into server entry points (not left as external re-exports)
-// This ensures Turbopack doesn't need to resolve these from the SDK's dependencies
-const serverBundlePackages = [
-  '@imtbl/auth-nextjs',
-];
-
-// Entry points that run in server/Edge Runtime and must NOT include browser-only code
-const serverEntryPoints = [
-  'src/auth_nextjs_server.ts',
-];
-
-// All other entry points (excluding server and browser-specific ones)
-const standardEntryPoints = [
-  'src',
-  '!src/index.browser.ts',
-  ...serverEntryPoints.map(e => `!${e}`),
-];
-
 export default defineConfig((options) => {
   if (options.watch) {
     // Watch mode
@@ -57,36 +30,9 @@ export default defineConfig((options) => {
   }
   
   return [
-    // Server/Edge Runtime entries - MUST externalize browser-only packages
-    // These are used in Next.js middleware where navigator/window don't exist
-    // We use noExternal to force bundling @imtbl/auth-nextjs content so Turbopack
-    // doesn't need to resolve it from SDK dependencies (which would load @imtbl/auth)
+    // Node & Browser Bundle for ESM
     {
-      entry: serverEntryPoints,
-      outDir: 'dist',
-      format: 'esm',
-      target: 'es2022',
-      bundle: true,
-      treeshake: true,
-      splitting: false,
-      external: [...peerDepsExternal, ...browserOnlyPackages],
-      noExternal: serverBundlePackages,
-    },
-    {
-      entry: serverEntryPoints,
-      outDir: 'dist',
-      platform: 'node',
-      format: 'cjs',
-      target: 'es2022',
-      bundle: true,
-      treeshake: true,
-      external: [...peerDepsExternal, ...browserOnlyPackages],
-      noExternal: serverBundlePackages,
-    },
-
-    // Standard entries - Node & Browser Bundle for ESM
-    {
-      entry: standardEntryPoints,
+      entry: ['src', '!src/index.browser.ts'],
       outDir: 'dist',
       format: 'esm',
       target: 'es2022',
@@ -96,9 +42,9 @@ export default defineConfig((options) => {
       external: peerDepsExternal,
     },
 
-    // Standard entries - Node Bundle for CJS
+    // Node Bundle for CJS
     {
-      entry: standardEntryPoints,
+      entry: ['src', '!src/index.browser.ts'],
       outDir: 'dist',
       platform: 'node',
       format: 'cjs',
