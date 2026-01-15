@@ -498,7 +498,6 @@ export function useHydratedData<T>(
 ): UseHydratedDataResult<T> {
   const { getAccessToken, auth } = useImmutableAuth();
   const {
-    session,
     ssr,
     data: serverData,
     fetchError,
@@ -559,16 +558,10 @@ export function useHydratedData<T>(
     setError(null);
 
     try {
-      let token: string;
-
-      if (ssr && session?.accessToken) {
-        // SSR mode with valid session: use session token
-        token = session.accessToken;
-      } else {
-        // CSR mode: get/refresh token client-side
-        token = await getAccessToken();
-      }
-
+      // Always get the current valid token via getAccessToken()
+      // This handles token refresh and uses the live session from useSession()
+      // rather than stale props.session which doesn't update after client-side refresh
+      const token = await getAccessToken();
       const result = await fetcher(token);
       setData(result);
     } catch (err) {
@@ -576,7 +569,7 @@ export function useHydratedData<T>(
     } finally {
       setIsLoading(false);
     }
-  }, [session, ssr, fetcher, getAccessToken]);
+  }, [fetcher, getAccessToken]);
 
   // Fetch client-side data when needed
   // When ssr is false (token expired server-side), we must wait for the Auth instance
