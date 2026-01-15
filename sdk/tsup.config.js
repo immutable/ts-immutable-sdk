@@ -16,6 +16,27 @@ const peerDepsExternal = [
   'react-dom',
 ];
 
+// Browser-only packages that access navigator/window at module load time
+// These MUST be externalized for server/Edge Runtime entry points
+const browserOnlyPackages = [
+  '@imtbl/auth',
+  '@imtbl/metrics',
+  'oidc-client-ts',
+  'localforage',
+];
+
+// Entry points that run in server/Edge Runtime and must NOT include browser-only code
+const serverEntryPoints = [
+  'src/auth_nextjs_server.ts',
+];
+
+// All other entry points (excluding server and browser-specific ones)
+const standardEntryPoints = [
+  'src',
+  '!src/index.browser.ts',
+  ...serverEntryPoints.map(e => `!${e}`),
+];
+
 export default defineConfig((options) => {
   if (options.watch) {
     // Watch mode
@@ -30,9 +51,32 @@ export default defineConfig((options) => {
   }
   
   return [
-    // Node & Browser Bundle for ESM
+    // Server/Edge Runtime entries - MUST externalize browser-only packages
+    // These are used in Next.js middleware where navigator/window don't exist
     {
-      entry: ['src'],
+      entry: serverEntryPoints,
+      outDir: 'dist',
+      format: 'esm',
+      target: 'es2022',
+      bundle: true,
+      treeshake: true,
+      splitting: false,
+      external: [...peerDepsExternal, ...browserOnlyPackages],
+    },
+    {
+      entry: serverEntryPoints,
+      outDir: 'dist',
+      platform: 'node',
+      format: 'cjs',
+      target: 'es2022',
+      bundle: true,
+      treeshake: true,
+      external: [...peerDepsExternal, ...browserOnlyPackages],
+    },
+
+    // Standard entries - Node & Browser Bundle for ESM
+    {
+      entry: standardEntryPoints,
       outDir: 'dist',
       format: 'esm',
       target: 'es2022',
@@ -42,9 +86,9 @@ export default defineConfig((options) => {
       external: peerDepsExternal,
     },
 
-    // Node Bundle for CJS
+    // Standard entries - Node Bundle for CJS
     {
-      entry: ['src', '!src/index.browser.ts'],
+      entry: standardEntryPoints,
       outDir: 'dist',
       platform: 'node',
       format: 'cjs',
