@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { Auth } from '@imtbl/auth';
 import type { ImmutableAuthConfig, ImmutableTokenData, ImmutableUser } from '../types';
@@ -12,6 +12,18 @@ import {
   DEFAULT_SCOPE,
   IMMUTABLE_PROVIDER_ID,
 } from '../constants';
+
+/**
+ * Get search params from the current URL.
+ * Uses window.location.search directly to avoid issues with useSearchParams()
+ * in Pages Router, where the hook may not be hydrated during initial render.
+ */
+function getSearchParams(): URLSearchParams {
+  if (typeof window === 'undefined') {
+    return new URLSearchParams();
+  }
+  return new URLSearchParams(window.location.search);
+}
 
 export interface CallbackPageProps {
   /**
@@ -91,13 +103,17 @@ export function CallbackPage({
   onError,
 }: CallbackPageProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   // Track whether callback has been processed to prevent double invocation
   // (React 18 StrictMode runs effects twice, and OAuth codes are single-use)
   const callbackProcessedRef = useRef(false);
 
   useEffect(() => {
+    // Get search params directly from window.location to ensure compatibility
+    // with both App Router and Pages Router. useSearchParams() from next/navigation
+    // has hydration issues in Pages Router where params may be empty initially.
+    const searchParams = getSearchParams();
+
     const handleCallback = async () => {
       try {
         // Create Auth instance to handle the callback
@@ -242,7 +258,7 @@ export function CallbackPage({
       onError(errorMessage);
     }
     setError(errorMessage);
-  }, [searchParams, router, config, redirectTo, onSuccess, onError]);
+  }, [router, config, redirectTo, onSuccess, onError]);
 
   if (error) {
     if (errorComponent) {
