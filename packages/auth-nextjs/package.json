@@ -87,5 +87,6 @@
     "access": "public"
   },
   "repository": "immutable/ts-immutable-sdk.git",
-  "type": "module"
+  "type": "module",
+  "sideEffects": false
 }

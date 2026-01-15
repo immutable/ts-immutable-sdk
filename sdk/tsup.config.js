@@ -25,6 +25,12 @@ const browserOnlyPackages = [
   'localforage',
 ];
 
+// Packages that should be bundled into server entry points (not left as external re-exports)
+// This ensures Turbopack doesn't need to resolve these from the SDK's dependencies
+const serverBundlePackages = [
+  '@imtbl/auth-nextjs',
+];
+
 // Entry points that run in server/Edge Runtime and must NOT include browser-only code
 const serverEntryPoints = [
   'src/auth_nextjs_server.ts',
@@ -53,6 +59,8 @@ export default defineConfig((options) => {
   return [
     // Server/Edge Runtime entries - MUST externalize browser-only packages
     // These are used in Next.js middleware where navigator/window don't exist
+    // We use noExternal to force bundling @imtbl/auth-nextjs content so Turbopack
+    // doesn't need to resolve it from SDK dependencies (which would load @imtbl/auth)
     {
       entry: serverEntryPoints,
       outDir: 'dist',
@@ -62,6 +70,7 @@ export default defineConfig((options) => {
       treeshake: true,
       splitting: false,
       external: [...peerDepsExternal, ...browserOnlyPackages],
+      noExternal: serverBundlePackages,
     },
     {
       entry: serverEntryPoints,
@@ -72,6 +81,7 @@ export default defineConfig((options) => {
       bundle: true,
       treeshake: true,
       external: [...peerDepsExternal, ...browserOnlyPackages],
+      noExternal: serverBundlePackages,
     },
 
     // Standard entries - Node & Browser Bundle for ESM
