@@ -104,6 +104,7 @@ export function CallbackPage({
         const auth = new Auth({
           clientId: config.clientId,
           redirectUri: config.redirectUri,
+          popupRedirectUri: config.popupRedirectUri,
           logoutRedirectUri: config.logoutRedirectUri,
           audience: config.audience || DEFAULT_AUDIENCE,
           scope: config.scope || DEFAULT_SCOPE,
