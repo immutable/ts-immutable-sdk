@@ -521,6 +521,13 @@ export function useHydratedData<T>(
   // Track if we've already started fetching to prevent duplicate calls
   const hasFetchedRef = useRef(false);
 
+  // Fetch ID counter to detect stale fetches.
+  // When props change, we increment this counter. In-flight fetches compare their
+  // captured ID against the current counter and ignore results if they don't match.
+  // This prevents race conditions where a slow client-side fetch overwrites
+  // fresh server data that arrived via prop changes (e.g., during soft navigation).
+  const fetchIdRef = useRef(0);
+
   // Track previous props to detect changes (for navigation between routes)
   const prevPropsRef = useRef({ serverData, ssr, fetchError });
 
@@ -537,6 +544,8 @@ export function useHydratedData<T>(
       prevPropsRef.current = { serverData, ssr, fetchError };
       // Reset fetch guard to allow fetching with new props
       hasFetchedRef.current = false;
+      // Increment fetch ID to invalidate any in-flight fetches
+      fetchIdRef.current += 1;
 
       // Sync state from new props
       if (ssr && !fetchError) {
@@ -554,6 +563,9 @@ export function useHydratedData<T>(
   }, [serverData, ssr, fetchError]);
 
   const fetchData = useCallback(async () => {
+    // Capture current fetch ID to detect staleness after async operations
+    const currentFetchId = fetchIdRef.current;
+
     setIsLoading(true);
     setError(null);
 
@@ -563,11 +575,24 @@ export function useHydratedData<T>(
       // rather than stale props.session which doesn't update after client-side refresh
       const token = await getAccessToken();
       const result = await fetcher(token);
-      setData(result);
+
+      // Only update state if this fetch is still current.
+      // If props changed while we were fetching, fetchIdRef will have been incremented
+      // and our captured ID will be stale - discard results to avoid overwriting
+      // fresh server data with stale client-fetched results.
+      if (fetchIdRef.current === currentFetchId) {
+        setData(result);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err : new Error(String(err)));
+      // Only update error state if this fetch is still current
+      if (fetchIdRef.current === currentFetchId) {
+        setError(err instanceof Error ? err : new Error(String(err)));
+      }
     } finally {
-      setIsLoading(false);
+      // Only update loading state if this fetch is still current
+      if (fetchIdRef.current === currentFetchId) {
+        setIsLoading(false);
+      }
     }
   }, [fetcher, getAccessToken]);
 
