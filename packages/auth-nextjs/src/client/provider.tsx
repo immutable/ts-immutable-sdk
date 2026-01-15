@@ -507,8 +507,10 @@ export function useHydratedData<T>(
   // Determine if we need to fetch client-side:
   // 1. SSR was skipped (token expired) - need to refresh token and fetch
   // 2. Server fetch failed - retry on client
-  // 3. No server data - need to fetch
-  const needsClientFetch = !ssr || Boolean(fetchError) || serverData === null;
+  // Note: We intentionally do NOT check serverData === null here.
+  // When ssr=true and no fetchError, null is a valid response (e.g., "no results found")
+  // and should not trigger a client-side refetch.
+  const needsClientFetch = !ssr || Boolean(fetchError);
 
   // Initialize state with server data if available
   const [data, setData] = useState<T | null>(serverData);
@@ -519,6 +521,38 @@ export function useHydratedData<T>(
 
   // Track if we've already started fetching to prevent duplicate calls
   const hasFetchedRef = useRef(false);
+
+  // Track previous props to detect changes (for navigation between routes)
+  const prevPropsRef = useRef({ serverData, ssr, fetchError });
+
+  // Sync state when props change (e.g., navigating between routes with same component).
+  // useState only uses initial value on mount - subsequent prop changes are ignored
+  // unless we explicitly sync them.
+  useEffect(() => {
+    const prevProps = prevPropsRef.current;
+    const propsChanged = prevProps.serverData !== serverData
+      || prevProps.ssr !== ssr
+      || prevProps.fetchError !== fetchError;
+
+    if (propsChanged) {
+      prevPropsRef.current = { serverData, ssr, fetchError };
+      // Reset fetch guard to allow fetching with new props
+      hasFetchedRef.current = false;
+
+      // Sync state from new props
+      if (ssr && !fetchError) {
+        // SSR succeeded: use server data directly (even if null - that's valid)
+        setData(serverData);
+        setIsLoading(false);
+        setError(null);
+      } else {
+        // Need client-side fetch: reset state to trigger fetch
+        setData(null);
+        setIsLoading(true);
+        setError(fetchError ? new Error(fetchError) : null);
+      }
+    }
+  }, [serverData, ssr, fetchError]);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
