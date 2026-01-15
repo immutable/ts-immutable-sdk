@@ -254,11 +254,11 @@ AUTH_SECRET=generate-with-openssl-rand-base64-32  # openssl rand -base64 32
 
 ### Redirect URIs Explained
 
-| Config Property | Purpose |
-| --------------- | ------- |
-| `redirectUri` | OAuth callback URL - where Immutable redirects after authentication (must match your callback page URL) |
-| `popupRedirectUri` | Same as `redirectUri` but for popup login flow. Defaults to `redirectUri` if not set |
-| `redirectTo` (CallbackPage prop) | Where to navigate the user AFTER authentication completes (e.g., `/dashboard`) |
+| Config Property                  | Purpose                                                                                                 |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `redirectUri`                    | OAuth callback URL - where Immutable redirects after authentication (must match your callback page URL) |
+| `popupRedirectUri`               | Same as `redirectUri` but for popup login flow. Defaults to `redirectUri` if not set                    |
+| `redirectTo` (CallbackPage prop) | Where to navigate the user AFTER authentication completes (e.g., `/dashboard`)                          |
 
 ### Login Flows
 
