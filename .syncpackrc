@@ -6,6 +6,13 @@
       "dependencies": ["$LOCAL"],
       "dependencyTypes": ["prod", "dev"],
       "pinVersion": "workspace:*"
+    },
+    {
+      "label": "Allow flexible Next.js peer dependency ranges for auth-nextjs and sdk",
+      "dependencies": ["next", "next-auth"],
+      "dependencyTypes": ["peer"],
+      "packages": ["@imtbl/auth-nextjs", "@imtbl/sdk"],
+      "isIgnored": true
     }
   ]
 }
