@@ -777,22 +777,33 @@ export class Auth {
         } catch (err) {
           let passportErrorType = PassportErrorType.AUTHENTICATION_ERROR;
           let errorMessage = 'Failed to refresh token';
-          let removeUser = true;
+          // Default to NOT removing user - only remove for permanent auth errors
+          let removeUser = false;
           let removeReason: 'refresh_token_invalid' | 'refresh_failed' | 'network_error' | 'unknown' = 'unknown';
 
           if (err instanceof ErrorTimeout) {
+            // Timeout is transient - don't remove user
             passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
             errorMessage = `${errorMessage}: ${err.message}`;
-            removeUser = false;
+            removeReason = 'network_error';
           } else if (err instanceof ErrorResponse) {
             passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
             errorMessage = `${errorMessage}: ${err.message || err.error_description}`;
-            // Check for invalid_grant which indicates refresh token is invalid/expired
-            removeReason = err.error === 'invalid_grant' ? 'refresh_token_invalid' : 'refresh_failed';
+            // ONLY remove user for invalid_grant - this means refresh token is truly invalid
+            // Other OAuth errors might be transient (server issues, rate limiting, etc.)
+            if (err.error === 'invalid_grant') {
+              removeUser = true;
+              removeReason = 'refresh_token_invalid';
+            } else {
+              removeReason = 'refresh_failed';
+            }
           } else if (err instanceof Error) {
             errorMessage = `${errorMessage}: ${err.message}`;
-            // Network errors typically have specific messages
-            removeReason = err.message.toLowerCase().includes('network') ? 'network_error' : 'refresh_failed';
+            // Network/fetch errors are transient - don't remove user
+            removeReason = err.message.toLowerCase().includes('network')
+              || err.message.toLowerCase().includes('fetch')
+              ? 'network_error'
+              : 'refresh_failed';
           } else if (typeof err === 'string') {
             errorMessage = `${errorMessage}: ${err}`;
             removeReason = 'refresh_failed';

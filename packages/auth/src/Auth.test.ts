@@ -241,7 +241,7 @@ describe('Auth', () => {
       expect(mockEventEmitter.emit).not.toHaveBeenCalled();
     });
 
-    it('emits USER_REMOVED event when signinSilent fails with ErrorResponse', async () => {
+    it('emits USER_REMOVED event ONLY for invalid_grant error (refresh token invalid)', async () => {
       const auth = Object.create(Auth.prototype) as Auth;
       const mockEventEmitter = { emit: jest.fn() };
       const mockUserManager = {
@@ -277,7 +277,7 @@ describe('Auth', () => {
       expect(mockUserManager.removeUser).toHaveBeenCalled();
     });
 
-    it('emits USER_REMOVED event with network_error reason for network failures', async () => {
+    it('does not emit USER_REMOVED event for network errors (transient)', async () => {
       const auth = Object.create(Auth.prototype) as Auth;
       const mockEventEmitter = { emit: jest.fn() };
       const mockUserManager = {
@@ -291,13 +291,42 @@ describe('Auth', () => {
 
       await expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
 
-      expect(mockEventEmitter.emit).toHaveBeenCalledWith(
+      // Network errors are transient - should NOT remove user or emit USER_REMOVED
+      expect(mockEventEmitter.emit).not.toHaveBeenCalledWith(
         AuthEvents.USER_REMOVED,
-        expect.objectContaining({
-          reason: 'network_error',
-        }),
+        expect.anything(),
       );
-      expect(mockUserManager.removeUser).toHaveBeenCalled();
+      expect(mockUserManager.removeUser).not.toHaveBeenCalled();
+    });
+
+    it('does not emit USER_REMOVED event for non-invalid_grant OAuth errors', async () => {
+      const auth = Object.create(Auth.prototype) as Auth;
+      const mockEventEmitter = { emit: jest.fn() };
+      const mockUserManager = {
+        signinSilent: jest.fn(),
+        removeUser: jest.fn().mockResolvedValue(undefined),
+      };
+
+      // Mock ErrorResponse with a different error (not invalid_grant)
+      const { ErrorResponse } = jest.requireActual('oidc-client-ts');
+      const errorResponse = new ErrorResponse({
+        error: 'server_error',
+        error_description: 'Internal server error',
+      });
+      mockUserManager.signinSilent.mockRejectedValue(errorResponse);
+
+      (auth as any).eventEmitter = mockEventEmitter;
+      (auth as any).userManager = mockUserManager;
+      (auth as any).refreshingPromise = null;
+
+      await expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
+
+      // Non-invalid_grant errors might be transient - should NOT remove user
+      expect(mockEventEmitter.emit).not.toHaveBeenCalledWith(
+        AuthEvents.USER_REMOVED,
+        expect.anything(),
+      );
+      expect(mockUserManager.removeUser).not.toHaveBeenCalled();
     });
 
     it('does not emit USER_REMOVED event for ErrorTimeout', async () => {
