@@ -2673,7 +2673,7 @@ importers:
         specifier: ^5.0.0-beta.25
         version: 5.0.0-beta.30(next@14.2.25(@babel/core@7.26.9)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       react:
-        specifier: ^18.2.0
+        specifier: ^18.2.0 || ^19.0.0
         version: 18.3.1
     devDependencies:
       eslint:
