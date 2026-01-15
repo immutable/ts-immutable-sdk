@@ -777,35 +777,48 @@ export class Auth {
         } catch (err) {
           let passportErrorType = PassportErrorType.AUTHENTICATION_ERROR;
           let errorMessage = 'Failed to refresh token';
-          // Default to NOT removing user - only remove for permanent auth errors
-          let removeUser = false;
+          // Default to REMOVING user - safer to log out on unknown errors
+          // Only keep user logged in for explicitly known transient errors
+          let removeUser = true;
           let removeReason: 'refresh_token_invalid' | 'refresh_failed' | 'network_error' | 'unknown' = 'unknown';
 
           if (err instanceof ErrorTimeout) {
-            // Timeout is transient - don't remove user
+            // Timeout is transient - safe to keep user logged in
             passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
             errorMessage = `${errorMessage}: ${err.message}`;
+            removeUser = false;
             removeReason = 'network_error';
           } else if (err instanceof ErrorResponse) {
             passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
             errorMessage = `${errorMessage}: ${err.message || err.error_description}`;
-            // ONLY remove user for invalid_grant - this means refresh token is truly invalid
-            // Other OAuth errors might be transient (server issues, rate limiting, etc.)
-            if (err.error === 'invalid_grant') {
-              removeUser = true;
-              removeReason = 'refresh_token_invalid';
-            } else {
+            // Check for known transient OAuth errors - safe to keep user logged in
+            // - server_error: auth server temporary issue
+            // - temporarily_unavailable: auth server overloaded
+            const transientErrors = ['server_error', 'temporarily_unavailable'];
+            if (err.error && transientErrors.includes(err.error)) {
+              removeUser = false;
               removeReason = 'refresh_failed';
+            } else {
+              // All other OAuth errors (invalid_grant, login_required, etc.) are permanent
+              removeReason = 'refresh_token_invalid';
             }
           } else if (err instanceof Error) {
             errorMessage = `${errorMessage}: ${err.message}`;
-            // Network/fetch errors are transient - don't remove user
-            removeReason = err.message.toLowerCase().includes('network')
+            // Network/fetch errors are transient - safe to keep user logged in
+            const isNetworkError = err.message.toLowerCase().includes('network')
               || err.message.toLowerCase().includes('fetch')
-              ? 'network_error'
-              : 'refresh_failed';
+              || err.message.toLowerCase().includes('failed to fetch')
+              || err.message.toLowerCase().includes('networkerror');
+            if (isNetworkError) {
+              removeUser = false;
+              removeReason = 'network_error';
+            } else {
+              // Unknown errors - safer to remove user
+              removeReason = 'refresh_failed';
+            }
           } else if (typeof err === 'string') {
             errorMessage = `${errorMessage}: ${err}`;
+            // Unknown string error - safer to remove user
             removeReason = 'refresh_failed';
           }
 

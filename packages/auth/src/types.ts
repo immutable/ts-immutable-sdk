@@ -147,8 +147,13 @@ export enum AuthEvents {
    */
   TOKEN_REFRESHED = 'tokenRefreshed',
   /**
-   * Emitted when the user is removed from local storage due to an unrecoverable error
-   * (e.g., network error during token refresh, invalid refresh token).
+   * Emitted when the user is removed from local storage due to a permanent auth error.
+   * Only emitted for errors where the refresh token is truly invalid:
+   * - invalid_grant: refresh token expired, revoked, or already used
+   * - login_required: user must re-authenticate
+   * - consent_required / interaction_required: user must interact with auth server
+   *
+   * NOT emitted for transient errors (network, timeout, server errors) - user stays logged in.
    * Consumers should sync this state by clearing their session (e.g., NextAuth signOut).
    */
   USER_REMOVED = 'userRemoved',

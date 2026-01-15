@@ -277,6 +277,37 @@ describe('Auth', () => {
       expect(mockUserManager.removeUser).toHaveBeenCalled();
     });
 
+    it('emits USER_REMOVED event for login_required error (permanent)', async () => {
+      const auth = Object.create(Auth.prototype) as Auth;
+      const mockEventEmitter = { emit: jest.fn() };
+      const mockUserManager = {
+        signinSilent: jest.fn(),
+        removeUser: jest.fn().mockResolvedValue(undefined),
+      };
+
+      const { ErrorResponse } = jest.requireActual('oidc-client-ts');
+      const errorResponse = new ErrorResponse({
+        error: 'login_required',
+        error_description: 'User must re-authenticate',
+      });
+      mockUserManager.signinSilent.mockRejectedValue(errorResponse);
+
+      (auth as any).eventEmitter = mockEventEmitter;
+      (auth as any).userManager = mockUserManager;
+      (auth as any).refreshingPromise = null;
+
+      await expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
+
+      // login_required is a permanent error - should remove user
+      expect(mockEventEmitter.emit).toHaveBeenCalledWith(
+        AuthEvents.USER_REMOVED,
+        expect.objectContaining({
+          reason: 'refresh_token_invalid',
+        }),
+      );
+      expect(mockUserManager.removeUser).toHaveBeenCalled();
+    });
+
     it('does not emit USER_REMOVED event for network errors (transient)', async () => {
       const auth = Object.create(Auth.prototype) as Auth;
       const mockEventEmitter = { emit: jest.fn() };
@@ -299,7 +330,7 @@ describe('Auth', () => {
       expect(mockUserManager.removeUser).not.toHaveBeenCalled();
     });
 
-    it('does not emit USER_REMOVED event for non-invalid_grant OAuth errors', async () => {
+    it('does not emit USER_REMOVED event for transient OAuth errors (server_error)', async () => {
       const auth = Object.create(Auth.prototype) as Auth;
       const mockEventEmitter = { emit: jest.fn() };
       const mockUserManager = {
@@ -307,7 +338,8 @@ describe('Auth', () => {
         removeUser: jest.fn().mockResolvedValue(undefined),
       };
 
-      // Mock ErrorResponse with a different error (not invalid_grant)
+      // Mock ErrorResponse with a transient error (server_error)
+      // These are temporary server issues - safe to keep user logged in
       const { ErrorResponse } = jest.requireActual('oidc-client-ts');
       const errorResponse = new ErrorResponse({
         error: 'server_error',
@@ -321,12 +353,36 @@ describe('Auth', () => {
 
       await expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
 
-      // Non-invalid_grant errors might be transient - should NOT remove user
+      // server_error is a transient error - should NOT remove user
       expect(mockEventEmitter.emit).not.toHaveBeenCalledWith(
         AuthEvents.USER_REMOVED,
         expect.anything(),
       );
       expect(mockUserManager.removeUser).not.toHaveBeenCalled();
+    });
+
+    it('emits USER_REMOVED event for unknown errors (safer default)', async () => {
+      const auth = Object.create(Auth.prototype) as Auth;
+      const mockEventEmitter = { emit: jest.fn() };
+      const mockUserManager = {
+        signinSilent: jest.fn().mockRejectedValue(new Error('Some unknown error')),
+        removeUser: jest.fn().mockResolvedValue(undefined),
+      };
+
+      (auth as any).eventEmitter = mockEventEmitter;
+      (auth as any).userManager = mockUserManager;
+      (auth as any).refreshingPromise = null;
+
+      await expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
+
+      // Unknown errors should remove user (safer default)
+      expect(mockEventEmitter.emit).toHaveBeenCalledWith(
+        AuthEvents.USER_REMOVED,
+        expect.objectContaining({
+          reason: 'refresh_failed',
+        }),
+      );
+      expect(mockUserManager.removeUser).toHaveBeenCalled();
     });
 
     it('does not emit USER_REMOVED event for ErrorTimeout', async () => {

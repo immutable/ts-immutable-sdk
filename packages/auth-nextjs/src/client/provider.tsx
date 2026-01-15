@@ -152,10 +152,10 @@ function ImmutableAuthInner({
       });
     };
 
-    // Handle user removal from Auth due to unrecoverable errors
-    // (e.g., network error during refresh, invalid refresh token).
-    // When this happens, we must clear the NextAuth session to prevent
-    // a mismatch where NextAuth thinks user is logged in but Auth SDK has no user.
+    // Handle user removal from Auth due to permanent auth errors
+    // (e.g., invalid_grant, login_required - refresh token is truly invalid).
+    // Transient errors (network, timeout, server errors) do NOT trigger this.
+    // When this happens, we must clear the NextAuth session to keep them in sync.
     const handleUserRemoved = async (payload: { reason: UserRemovedReason; error?: string }) => {
       // eslint-disable-next-line no-console
       console.warn('[auth-nextjs] User removed from Auth SDK:', payload.reason, payload.error);
