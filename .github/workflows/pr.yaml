@@ -68,6 +68,53 @@ jobs:
       - name: Prepare examples
         run: pnpm prepare:examples
 
+      - name: Debug - Check SDK path in example app
+        run: |
+          echo "=== Checking @imtbl/sdk path in example app package.json ==="
+          
+          # Check a sample example app
+          EXAMPLE_APP="examples/checkout/sdk-connect-with-nextjs/package.json"
+          echo "Example app: $EXAMPLE_APP"
+          
+          if [ -f "$EXAMPLE_APP" ]; then
+            echo "--- Full package.json ---"
+            cat "$EXAMPLE_APP"
+            
+            echo ""
+            echo "--- @imtbl/sdk dependency value ---"
+            SDK_PATH=$(jq -r '.dependencies["@imtbl/sdk"] // .devDependencies["@imtbl/sdk"] // "NOT_FOUND"' "$EXAMPLE_APP")
+            echo "SDK path: $SDK_PATH"
+            
+            # Extract the file path if it's a file: reference
+            if [[ "$SDK_PATH" == file:* ]]; then
+              FILE_PATH="${SDK_PATH#file:}"
+              echo ""
+              echo "--- Checking if tarball exists ---"
+              echo "Looking for: $FILE_PATH"
+              if [ -f "$FILE_PATH" ]; then
+                echo "SUCCESS: Tarball exists!"
+                ls -la "$FILE_PATH"
+              else
+                echo "ERROR: Tarball does NOT exist!"
+                echo ""
+                echo "--- Listing parent directory ---"
+                PARENT_DIR=$(dirname "$FILE_PATH")
+                echo "Parent dir: $PARENT_DIR"
+                if [ -d "$PARENT_DIR" ]; then
+                  ls -la "$PARENT_DIR" | grep -E "\.tgz$|^total" || echo "No .tgz files found"
+                else
+                  echo "Parent directory does not exist!"
+                fi
+              fi
+            fi
+          else
+            echo "Example app package.json not found!"
+          fi
+          
+          echo ""
+          echo "=== Listing all tarballs in workspace root ==="
+          ls -la "$(dirname $(pnpm root -w))"/*.tgz 2>/dev/null || echo "No tarballs found in workspace root"
+
       - name: Update modules
         run: pnpm install --frozen-lockfile=false
 
