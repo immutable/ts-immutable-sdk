@@ -11,7 +11,7 @@
   "type": "module",
   "main": "./dist/node/index.cjs",
   "module": "./dist/node/index.js",
-  "types": "./dist/node/index.d.ts",
+  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "development": {
@@ -20,7 +20,7 @@
         "default": "./dist/node/index.js"
       },
       "default": {
-        "types": "./dist/node/index.d.ts",
+        "types": "./dist/types/index.d.ts",
         "require": "./dist/node/index.cjs",
         "default": "./dist/node/index.js"
       }

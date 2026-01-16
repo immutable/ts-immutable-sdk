@@ -11,7 +11,7 @@
   "type": "module",
   "main": "./dist/node/index.cjs",
   "module": "./dist/node/index.js",
-  "types": "./dist/node/index.d.ts",
+  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "development": {
@@ -20,14 +20,14 @@
         "default": "./dist/node/index.js"
       },
       "default": {
-        "types": "./dist/node/index.d.ts",
+        "types": "./dist/types/index.d.ts",
         "require": "./dist/node/index.cjs",
         "default": "./dist/node/index.js"
       }
     }
   },
   "scripts": {
-    "build": "tsup && pnpm build:types",
+    "build": "pnpm transpile && pnpm typegen",
     "transpile": "tsup src/index.ts --config ../../tsup.config.js",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
