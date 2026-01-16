@@ -26,7 +26,7 @@ Always use conventional commit format for all commits and PR titles:
 - **revert**: Reverts a previous commit
 
 ### Scope Guidelines
-- **IMPORTANT**: Scopes should match the names of packages in the repo (without the `@imtbl/` prefix)
+- **IMPORTANT**: Scopes should match the names of packages in the repo (without the `@imtbl/` prefix).
 - Examples of valid scopes: `checkout-widgets`, `passport`, `config`, `blockchain-data`, etc.
 - Find the correct scope by checking the package.json `name` field in the relevant package directory
 - Use the full package name after `@imtbl/` (e.g., if package is `@imtbl/checkout-widgets`, use `checkout-widgets`)
