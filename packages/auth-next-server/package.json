@@ -1,0 +1,49 @@
+{
+  "name": "@imtbl/auth-next-server",
+  "version": "0.0.1",
+  "description": "Immutable Auth.js v5 integration for Next.js - Server-side utilities",
+  "author": "Immutable",
+  "license": "Apache-2.0",
+  "repository": "immutable/ts-immutable-sdk.git",
+  "type": "module",
+  "main": "./dist/node/index.cjs",
+  "module": "./dist/node/index.js",
+  "types": "./dist/node/index.d.ts",
+  "exports": {
+    ".": {
+      "development": {
+        "types": "./src/index.ts",
+        "require": "./dist/node/index.cjs",
+        "default": "./dist/node/index.js"
+      },
+      "default": {
+        "types": "./dist/node/index.d.ts",
+        "require": "./dist/node/index.cjs",
+        "default": "./dist/node/index.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsup && pnpm build:types",
+    "build:types": "tsc --project tsconfig.types.json",
+    "clean": "rm -rf dist",
+    "lint": "eslint src/**/*.ts --max-warnings=0",
+    "test": "jest"
+  },
+  "peerDependencies": {
+    "next": "^14.2.0 || ^15.0.0",
+    "next-auth": "^5.0.0-beta.25"
+  },
+  "devDependencies": {
+    "@swc/core": "^1.4.2",
+    "@swc/jest": "^0.2.36",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.10.7",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "next": "^15.1.6",
+    "next-auth": "^5.0.0-beta.30",
+    "tsup": "^8.0.2",
+    "typescript": "^5.6.2"
+  }
+}

@@ -8,10 +8,10 @@
       "pinVersion": "workspace:*"
     },
     {
-      "label": "Allow flexible peer dependency ranges for auth-nextjs and sdk",
+      "label": "Allow flexible peer dependency ranges for auth-next packages and sdk",
       "dependencies": ["next", "next-auth", "react"],
       "dependencyTypes": ["peer"],
-      "packages": ["@imtbl/auth-nextjs", "@imtbl/sdk"],
+      "packages": ["@imtbl/auth-next-server", "@imtbl/auth-next-client", "@imtbl/sdk"],
       "isIgnored": true
     }
   ]

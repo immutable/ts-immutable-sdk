@@ -1,5 +1,5 @@
 /**
- * Shared constants for @imtbl/auth-nextjs
+ * Shared constants for @imtbl/auth-next-client
  */
 
 /**
@@ -37,15 +37,3 @@ export const DEFAULT_TOKEN_EXPIRY_SECONDS = 900;
  * Default token expiry in milliseconds
  */
 export const DEFAULT_TOKEN_EXPIRY_MS = DEFAULT_TOKEN_EXPIRY_SECONDS * 1000;
-
-/**
- * Buffer time in seconds before token expiry to trigger refresh
- * Tokens will be refreshed when they expire within this window
- */
-export const TOKEN_EXPIRY_BUFFER_SECONDS = 60;
-
-/**
- * Default session max age in seconds (365 days)
- * This is how long the NextAuth session cookie will be valid
- */
-export const DEFAULT_SESSION_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;

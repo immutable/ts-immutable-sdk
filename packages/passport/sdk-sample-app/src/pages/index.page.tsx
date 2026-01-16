@@ -7,7 +7,7 @@ import Message from '@/components/Message';
 import Environment from '@/components/Environment';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
-import { useImmutableAuth } from '@imtbl/auth-nextjs/client';
+import { useImmutableAuth } from '@imtbl/auth-next-client';
 import { BASE_PATH } from '@/config';
 import PassportMethods from '@/components/PassportMethods';
 import ZkEvmWorkflow from '@/components/zkevm/ZkEvmWorkflow';

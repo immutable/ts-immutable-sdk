@@ -39,14 +39,14 @@ async function validateTokens(
 
     if (!response.ok) {
       // eslint-disable-next-line no-console
-      console.error('[auth-nextjs] Token validation failed:', response.status, response.statusText);
+      console.error('[auth-next-server] Token validation failed:', response.status, response.statusText);
       return null;
     }
 
     return await response.json();
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('[auth-nextjs] Token validation error:', error);
+    console.error('[auth-next-server] Token validation error:', error);
     return null;
   }
 }
@@ -58,7 +58,7 @@ async function validateTokens(
  * ```typescript
  * // lib/auth.ts
  * import NextAuth from "next-auth";
- * import { createAuthConfig } from "@imtbl/auth-nextjs";
+ * import { createAuthConfig } from "@imtbl/auth-next-server";
  *
  * const config = {
  *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
@@ -89,7 +89,7 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
             tokenData = JSON.parse(credentials.tokens);
           } catch (error) {
             // eslint-disable-next-line no-console
-            console.error('[auth-nextjs] Failed to parse token data:', error);
+            console.error('[auth-next-server] Failed to parse token data:', error);
             return null;
           }
 
@@ -107,7 +107,7 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
             || Number.isNaN(tokenData.accessTokenExpires)
           ) {
             // eslint-disable-next-line no-console
-            console.error('[auth-nextjs] Invalid token data structure - missing required fields');
+            console.error('[auth-next-server] Invalid token data structure - missing required fields');
             return null;
           }
 
@@ -116,7 +116,7 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
           const userInfo = await validateTokens(tokenData.accessToken, authDomain);
           if (!userInfo) {
             // eslint-disable-next-line no-console
-            console.error('[auth-nextjs] Token validation failed - rejecting authentication');
+            console.error('[auth-next-server] Token validation failed - rejecting authentication');
             return null;
           }
 
@@ -125,7 +125,7 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
           if (userInfo.sub !== tokenData.profile.sub) {
             // eslint-disable-next-line no-console
             console.error(
-              '[auth-nextjs] User ID mismatch - userinfo sub:',
+              '[auth-next-server] User ID mismatch - userinfo sub:',
               userInfo.sub,
               'provided sub:',
               tokenData.profile.sub,

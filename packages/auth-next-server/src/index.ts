@@ -1,14 +1,152 @@
-// Server-side exports for App Router
+/**
+ * @imtbl/auth-next-server
+ *
+ * Server-side utilities for Immutable Auth.js v5 integration with Next.js.
+ * This package has NO dependency on @imtbl/auth and is safe to use in
+ * Next.js middleware and Edge Runtime environments.
+ *
+ * For client-side components (provider, hooks, callback), use @imtbl/auth-next-client.
+ */
 
+import NextAuthImport from 'next-auth';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - Type exists in next-auth v5 but TS resolver may use stale types
+import type { NextAuthConfig, Session } from 'next-auth';
 import { type NextRequest, NextResponse } from 'next/server';
-import type { Session } from 'next-auth';
-import { matchPathPrefix } from '../utils/pathMatch';
+import { createAuthConfig } from './config';
+import type { ImmutableAuthConfig } from './types';
+import { matchPathPrefix } from './utils/pathMatch';
 
-// Re-export createImmutableAuth from main module
-export { createImmutableAuth } from '..';
+// Handle ESM/CJS interop - in some bundler configurations, the default export
+// may be nested under a 'default' property
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const NextAuth = ((NextAuthImport as any).default || NextAuthImport) as typeof NextAuthImport;
 
-// Re-export createAuthConfig
-export { createAuthConfig, createAuthOptions } from '../config';
+// ============================================================================
+// createImmutableAuth
+// ============================================================================
+
+/**
+ * Auth.js v5 config options that can be overridden.
+ * Excludes 'providers' as that's managed internally.
+ */
+export type ImmutableAuthOverrides = Omit<NextAuthConfig, 'providers'>;
+
+/**
+ * Return type of createImmutableAuth - the NextAuth instance with handlers
+ */
+export type ImmutableAuthResult = ReturnType<typeof NextAuth>;
+
+/**
+ * Create an Auth.js v5 instance with Immutable authentication
+ *
+ * @param config - Immutable auth configuration
+ * @param overrides - Optional Auth.js options to override defaults
+ * @returns NextAuth instance with { handlers, auth, signIn, signOut }
+ *
+ * @remarks
+ * Callback composition: The `jwt` and `session` callbacks are composed rather than
+ * replaced. Internal callbacks run first (handling token storage and refresh), then
+ * your custom callbacks receive the result. Other callbacks (`signIn`, `redirect`)
+ * are replaced entirely if provided.
+ *
+ * @example Basic usage (App Router)
+ * ```typescript
+ * // lib/auth.ts
+ * import { createImmutableAuth } from "@imtbl/auth-next-server";
+ *
+ * export const { handlers, auth, signIn, signOut } = createImmutableAuth({
+ *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+ *   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
+ * });
+ *
+ * // app/api/auth/[...nextauth]/route.ts
+ * import { handlers } from "@/lib/auth";
+ * export const { GET, POST } = handlers;
+ * ```
+ */
+export function createImmutableAuth(
+  config: ImmutableAuthConfig,
+  overrides?: ImmutableAuthOverrides,
+): ImmutableAuthResult {
+  const baseConfig = createAuthConfig(config);
+
+  // If no overrides, use base config directly
+  if (!overrides) {
+    return NextAuth(baseConfig);
+  }
+
+  // Merge configs with callback composition
+  const { callbacks: overrideCallbacks, ...otherOverrides } = overrides;
+
+  // Compose callbacks - our callbacks run first, then user's callbacks
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const composedCallbacks: any = { ...baseConfig.callbacks };
+
+  if (overrideCallbacks) {
+    // For jwt and session callbacks, compose them (ours first, then user's)
+    if (overrideCallbacks.jwt) {
+      const baseJwt = baseConfig.callbacks?.jwt;
+      const userJwt = overrideCallbacks.jwt;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      composedCallbacks.jwt = async (params: any) => {
+        const result = baseJwt ? await baseJwt(params) : params.token;
+        return userJwt({ ...params, token: result });
+      };
+    }
+
+    if (overrideCallbacks.session) {
+      const baseSession = baseConfig.callbacks?.session;
+      const userSession = overrideCallbacks.session;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      composedCallbacks.session = async (params: any) => {
+        const result = baseSession ? await baseSession(params) : params.session;
+        return userSession({ ...params, session: result });
+      };
+    }
+
+    // For other callbacks, user's callbacks replace ours entirely
+    if (overrideCallbacks.signIn) {
+      composedCallbacks.signIn = overrideCallbacks.signIn;
+    }
+    if (overrideCallbacks.redirect) {
+      composedCallbacks.redirect = overrideCallbacks.redirect;
+    }
+    if (overrideCallbacks.authorized) {
+      composedCallbacks.authorized = overrideCallbacks.authorized;
+    }
+  }
+
+  const mergedConfig: NextAuthConfig = {
+    ...baseConfig,
+    ...otherOverrides,
+    callbacks: composedCallbacks,
+  };
+
+  return NextAuth(mergedConfig);
+}
+
+// ============================================================================
+// Re-export config utilities
+// ============================================================================
+
+export { createAuthConfig, createAuthOptions } from './config';
+
+// ============================================================================
+// Type exports
+// ============================================================================
+
+export type {
+  ImmutableAuthConfig,
+  ImmutableTokenData,
+  UserInfoResponse,
+  ZkEvmUser,
+  ImmutableUser,
+} from './types';
+
+// ============================================================================
+// Server utilities
+// ============================================================================
 
 /**
  * Result from getValidSession indicating auth state
@@ -67,6 +205,11 @@ export interface ProtectedAuthPropsWithData<T> extends ProtectedAuthProps {
 }
 
 /**
+ * Type for the auth function returned by createImmutableAuth
+ */
+export type AuthFunction = () => Promise<Session | null>;
+
+/**
  * Get auth props for passing to Client Components (without data fetching).
  * Use this when you want to handle data fetching separately or client-side only.
  *
@@ -114,54 +257,6 @@ export async function getAuthProps(auth: AuthFunction): Promise<AuthProps> {
  * @param auth - The auth function from createImmutableAuth
  * @param fetcher - Async function that receives access token and returns data
  * @returns AuthPropsWithData containing session, ssr flag, and pre-fetched data
- *
- * @example
- * ```typescript
- * // app/dashboard/page.tsx (Server Component)
- * import { getAuthenticatedData } from "@imtbl/auth-nextjs/server";
- * import { auth } from "@/lib/auth";
- * import { redirect } from "next/navigation";
- * import Dashboard from "./Dashboard";
- *
- * async function fetchDashboardData(token: string) {
- *   const res = await fetch("https://api.example.com/dashboard", {
- *     headers: { Authorization: `Bearer ${token}` },
- *   });
- *   return res.json();
- * }
- *
- * export default async function DashboardPage() {
- *   const props = await getAuthenticatedData(auth, fetchDashboardData);
- *
- *   // Only redirect on auth errors (e.g., refresh token invalid)
- *   if (props.authError) redirect(`/login?error=${props.authError}`);
- *
- *   // Pass everything to client component - it handles both SSR and CSR cases
- *   return <Dashboard {...props} />;
- * }
- *
- * // app/dashboard/Dashboard.tsx (Client Component)
- * "use client";
- * import { useHydratedData } from "@imtbl/auth-nextjs/client";
- * import type { AuthPropsWithData } from "@imtbl/auth-nextjs/server";
- *
- * async function fetchDashboardData(token: string) {
- *   const res = await fetch("/api/dashboard", {
- *     headers: { Authorization: `Bearer ${token}` },
- *   });
- *   return res.json();
- * }
- *
- * export default function Dashboard(props: AuthPropsWithData<DashboardData>) {
- *   // When ssr=true: uses server-fetched data immediately (no loading)
- *   // When ssr=false: refreshes token client-side and fetches data
- *   const { data, isLoading, error } = useHydratedData(props, fetchDashboardData);
- *
- *   if (isLoading) return <DashboardSkeleton />;
- *   if (error) return <ErrorDisplay error={error} />;
- *   return <DashboardContent data={data} />;
- * }
- * ```
  */
 export async function getAuthenticatedData<T>(
   auth: AuthFunction,
@@ -211,22 +306,6 @@ export async function getAuthenticatedData<T>(
  *
  * @param auth - The auth function from createImmutableAuth
  * @returns Object with status and session
- *
- * @example
- * ```typescript
- * const result = await getValidSession(auth);
- *
- * switch (result.status) {
- *   case 'authenticated':
- *     return <ServerDashboard session={result.session} />;
- *   case 'token_expired':
- *     return <ClientDashboard />; // Client will refresh tokens
- *   case 'unauthenticated':
- *     redirect('/login');
- *   case 'error':
- *     redirect(`/login?error=${result.error}`);
- * }
- * ```
  */
 export async function getValidSession(auth: AuthFunction): Promise<ValidSessionResult> {
   const session = await auth();
@@ -265,24 +344,6 @@ export type AuthErrorHandler = (error: string) => never;
  * @param auth - The auth function from createImmutableAuth
  * @param onAuthError - Handler called when there's an auth error (should redirect or throw)
  * @returns A function to fetch protected data without needing authError checks
- *
- * @example
- * ```typescript
- * // lib/auth-server.ts
- * import { createProtectedDataFetcher } from "@imtbl/auth-nextjs/server";
- * import { auth } from "./auth";
- * import { redirect } from "next/navigation";
- *
- * export const getProtectedData = createProtectedDataFetcher(auth, (error) => {
- *   redirect(`/login?error=${encodeURIComponent(error)}`);
- * });
- *
- * // app/dashboard/page.tsx - No authError check needed!
- * export default async function DashboardPage() {
- *   const props = await getProtectedData(fetchDashboardData);
- *   return <Dashboard {...props} />; // authError is handled automatically
- * }
- * ```
  */
 export function createProtectedDataFetcher(
   auth: AuthFunction,
@@ -315,20 +376,6 @@ export function createProtectedDataFetcher(
  * @param auth - The auth function from createImmutableAuth
  * @param onAuthError - Handler called when there's an auth error (should redirect or throw)
  * @returns A function to get auth props without needing authError checks
- *
- * @example
- * ```typescript
- * // lib/auth-server.ts
- * export const getProtectedAuthProps = createProtectedAuthProps(auth, (error) => {
- *   redirect(`/login?error=${encodeURIComponent(error)}`);
- * });
- *
- * // app/profile/page.tsx
- * export default async function ProfilePage() {
- *   const props = await getProtectedAuthProps();
- *   return <Profile {...props} />;
- * }
- * ```
  */
 export function createProtectedAuthProps(
   auth: AuthFunction,
@@ -373,35 +420,6 @@ export interface ProtectedFetchers {
  * @param auth - The auth function from createImmutableAuth
  * @param onAuthError - Handler called when there's an auth error (should redirect or throw)
  * @returns Object with getAuthProps and getData functions
- *
- * @example
- * ```typescript
- * // lib/auth-server.ts
- * import { createProtectedFetchers } from "@imtbl/auth-nextjs/server";
- * import { auth } from "./auth";
- * import { redirect } from "next/navigation";
- *
- * // Define auth error handling ONCE
- * export const { getAuthProps, getData } = createProtectedFetchers(auth, (error) => {
- *   redirect(`/login?error=${encodeURIComponent(error)}`);
- * });
- *
- * // app/dashboard/page.tsx - Clean, no boilerplate!
- * import { getData } from "@/lib/auth-server";
- *
- * export default async function DashboardPage() {
- *   const props = await getData(fetchDashboardData);
- *   return <Dashboard {...props} />;
- * }
- *
- * // app/profile/page.tsx - Works for auth-only pages too
- * import { getAuthProps } from "@/lib/auth-server";
- *
- * export default async function ProfilePage() {
- *   const props = await getAuthProps();
- *   return <Profile {...props} />;
- * }
- * ```
  */
 export function createProtectedFetchers(
   auth: AuthFunction,
@@ -441,56 +459,10 @@ export interface WithServerAuthOptions<TFallback> {
  * Helper for Server Components that need authenticated data.
  * Automatically handles token expiration by rendering a client fallback.
  *
- * This eliminates the need for manual conditional checks in your Server Components:
- *
  * @param auth - The auth function from createImmutableAuth
  * @param serverRender - Async function that receives valid session and returns JSX
  * @param options - Fallback options for different auth states
  * @returns The rendered content based on auth state
- *
- * @example Basic usage with client fallback:
- * ```typescript
- * // app/dashboard/page.tsx
- * import { withServerAuth } from "@imtbl/auth-nextjs/server";
- * import { auth } from "@/lib/auth";
- * import { ClientDashboard } from "./ClientDashboard";
- *
- * export default function DashboardPage() {
- *   return withServerAuth(
- *     auth,
- *     async (session) => {
- *       // This only runs when token is valid
- *       const data = await fetchDashboardData(session.accessToken);
- *       return <ServerDashboard data={data} user={session.user} />;
- *     },
- *     {
- *       // Render client component when token expired - it will refresh & fetch
- *       onTokenExpired: <ClientDashboard />,
- *       onUnauthenticated: <LoginPrompt />,
- *     }
- *   );
- * }
- * ```
- *
- * @example With redirect on unauthenticated:
- * ```typescript
- * import { redirect } from "next/navigation";
- *
- * export default function ProtectedPage() {
- *   return withServerAuth(
- *     auth,
- *     async (session) => {
- *       const data = await fetchProtectedData(session.accessToken);
- *       return <ProtectedContent data={data} />;
- *     },
- *     {
- *       onTokenExpired: <ClientProtectedContent />,
- *       onUnauthenticated: () => redirect("/login"),
- *       onError: (error) => redirect(`/login?error=${error}`),
- *     }
- *   );
- * }
- * ```
  */
 export async function withServerAuth<TResult, TFallback = TResult>(
   auth: AuthFunction,
@@ -533,6 +505,10 @@ export async function withServerAuth<TResult, TFallback = TResult>(
   }
 }
 
+// ============================================================================
+// Middleware
+// ============================================================================
+
 /**
  * Options for createAuthMiddleware
  */
@@ -555,11 +531,6 @@ export interface AuthMiddlewareOptions {
 }
 
 /**
- * Type for the auth function returned by createImmutableAuth
- */
-export type AuthFunction = () => Promise<Session | null>;
-
-/**
  * Create a Next.js middleware for protecting routes with Immutable authentication.
  *
  * This is the App Router replacement for `withPageAuthRequired`.
@@ -571,7 +542,7 @@ export type AuthFunction = () => Promise<Session | null>;
  * @example Basic usage with Next.js middleware:
  * ```typescript
  * // middleware.ts
- * import { createAuthMiddleware } from "@imtbl/auth-nextjs/server";
+ * import { createAuthMiddleware } from "@imtbl/auth-next-server";
  * import { auth } from "@/lib/auth";
  *
  * export default createAuthMiddleware(auth, {
@@ -581,15 +552,6 @@ export type AuthFunction = () => Promise<Session | null>;
  * export const config = {
  *   matcher: ["/dashboard/:path*", "/profile/:path*"],
  * };
- * ```
- *
- * @example With path configuration:
- * ```typescript
- * export default createAuthMiddleware(auth, {
- *   loginUrl: "/login",
- *   protectedPaths: [/^\/dashboard/, /^\/profile/],
- *   publicPaths: [/^\/api\/public/],
- * });
  * ```
  */
 export function createAuthMiddleware(
@@ -671,37 +633,6 @@ export function createAuthMiddleware(
  * @param handler - The handler function to protect. Receives session as first arg,
  *                  followed by any arguments passed by Next.js (request, context, etc.)
  * @returns A protected handler that checks authentication before executing
- *
- * @example Protecting a Route Handler with request access:
- * ```typescript
- * // app/api/protected/route.ts
- * import { withAuth } from "@imtbl/auth-nextjs/server";
- * import { auth } from "@/lib/auth";
- *
- * export const POST = withAuth(auth, async (session, request: Request) => {
- *   const body = await request.json();
- *   return Response.json({ user: session.user, data: body });
- * });
- *
- * export const GET = withAuth(auth, async (session, request: Request, context) => {
- *   const { params } = context;
- *   return Response.json({ user: session.user, params: await params });
- * });
- * ```
- *
- * @example Protecting a Server Action:
- * ```typescript
- * // app/actions.ts
- * "use server";
- * import { withAuth } from "@imtbl/auth-nextjs/server";
- * import { auth } from "@/lib/auth";
- *
- * export const protectedAction = withAuth(auth, async (session, formData: FormData) => {
- *   const userId = session.user.sub;
- *   const name = formData.get("name");
- *   // ... your action logic
- * });
- * ```
  */
 export function withAuth<TArgs extends unknown[], TReturn>(
   auth: AuthFunction,

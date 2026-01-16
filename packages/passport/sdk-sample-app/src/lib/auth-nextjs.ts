@@ -1,4 +1,4 @@
-import { createImmutableAuth, type ImmutableAuthConfig } from "@imtbl/auth-nextjs";
+import { createImmutableAuth, type ImmutableAuthConfig } from "@imtbl/auth-next-server";
 import { EnvironmentNames } from "@/types";
 import { BASE_PATH } from "@/config";
 

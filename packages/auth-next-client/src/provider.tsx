@@ -17,27 +17,26 @@ import {
   Auth, AuthEvents, type User, type LoginOptions, type UserRemovedReason,
 } from '@imtbl/auth';
 import type {
-  ImmutableAuthConfig,
   ImmutableAuthProviderProps,
   UseImmutableAuthReturn,
-  ImmutableUser,
-  ImmutableTokenData,
-} from '../types';
-import { getTokenExpiry } from '../utils/token';
+  ImmutableUserClient,
+  ImmutableTokenDataClient,
+} from './types';
+import { getTokenExpiry } from './utils/token';
 import {
   DEFAULT_AUTH_DOMAIN,
   DEFAULT_AUDIENCE,
   DEFAULT_SCOPE,
   DEFAULT_NEXTAUTH_BASE_PATH,
   IMMUTABLE_PROVIDER_ID,
-} from '../constants';
+} from './constants';
 
 /**
  * Internal context for Immutable auth state
  */
 interface ImmutableAuthContextValue {
   auth: Auth | null;
-  config: ImmutableAuthConfig;
+  config: ImmutableAuthProviderProps['config'];
   basePath: string;
 }
 
@@ -52,7 +51,7 @@ function ImmutableAuthInner({
   basePath,
 }: {
   children: React.ReactNode;
-  config: ImmutableAuthConfig;
+  config: ImmutableAuthProviderProps['config'];
   basePath: string;
 }) {
   // Use state instead of ref so changes trigger re-renders and update context consumers
@@ -158,7 +157,7 @@ function ImmutableAuthInner({
     // When this happens, we must clear the NextAuth session to keep them in sync.
     const handleUserRemoved = async (payload: { reason: UserRemovedReason; error?: string }) => {
       // eslint-disable-next-line no-console
-      console.warn('[auth-nextjs] User removed from Auth SDK:', payload.reason, payload.error);
+      console.warn('[auth-next-client] User removed from Auth SDK:', payload.reason, payload.error);
       // Sign out from NextAuth to clear the session cookie
       // This prevents the state mismatch where session exists but Auth has no user
       await signOut({ redirect: false });
@@ -205,7 +204,7 @@ function ImmutableAuthInner({
  * ```tsx
  * // app/providers.tsx
  * "use client";
- * import { ImmutableAuthProvider } from "@imtbl/auth-nextjs/client";
+ * import { ImmutableAuthProvider } from "@imtbl/auth-next-client";
  *
  * const config = {
  *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
@@ -217,19 +216,6 @@ function ImmutableAuthInner({
  *     <ImmutableAuthProvider config={config}>
  *       {children}
  *     </ImmutableAuthProvider>
- *   );
- * }
- *
- * // app/layout.tsx
- * import { Providers } from "./providers";
- *
- * export default function RootLayout({ children }: { children: React.ReactNode }) {
- *   return (
- *     <html>
- *       <body>
- *         <Providers>{children}</Providers>
- *       </body>
- *     </html>
  *   );
  * }
  * ```
@@ -251,30 +237,6 @@ export function ImmutableAuthProvider({
  * Hook to access Immutable authentication state and methods
  *
  * Must be used within an ImmutableAuthProvider.
- *
- * @example
- * ```tsx
- * function MyComponent() {
- *   const { user, isLoading, isLoggingIn, signIn, signOut } = useImmutableAuth();
- *
- *   if (isLoading) return <div>Loading session...</div>;
- *
- *   if (user) {
- *     return (
- *       <div>
- *         <p>Welcome, {user.email}</p>
- *         <button onClick={signOut}>Logout</button>
- *       </div>
- *     );
- *   }
- *
- *   return (
- *     <button onClick={signIn} disabled={isLoggingIn}>
- *       {isLoggingIn ? 'Logging in...' : 'Login'}
- *     </button>
- *   );
- * }
- * ```
  */
 export function useImmutableAuth(): UseImmutableAuthReturn {
   const context = useContext(ImmutableAuthContext);
@@ -293,7 +255,7 @@ export function useImmutableAuth(): UseImmutableAuthReturn {
   const isAuthenticated = status === 'authenticated' && !!session;
 
   // Extract user from session
-  const user: ImmutableUser | null = session?.user
+  const user: ImmutableUserClient | null = session?.user
     ? {
       sub: session.user.sub,
       email: session.user.email,
@@ -316,7 +278,7 @@ export function useImmutableAuth(): UseImmutableAuthReturn {
       }
 
       // Build token data for NextAuth
-      const tokenData: ImmutableTokenData = {
+      const tokenData: ImmutableTokenDataClient = {
         accessToken: authUser.accessToken,
         refreshToken: authUser.refreshToken,
         idToken: authUser.idToken,
@@ -361,7 +323,7 @@ export function useImmutableAuth(): UseImmutableAuthReturn {
       } catch (error) {
         // Ignore errors (user may already be logged out)
         // eslint-disable-next-line no-console
-        console.warn('[auth-nextjs] Logout cleanup error:', error);
+        console.warn('[auth-next-client] Logout cleanup error:', error);
       }
     }
   }, [auth]);
@@ -415,20 +377,6 @@ export function useImmutableAuth(): UseImmutableAuthReturn {
 
 /**
  * Hook to get a function that returns a valid access token
- *
- * @example
- * ```tsx
- * function ApiComponent() {
- *   const getAccessToken = useAccessToken();
- *
- *   const fetchData = async () => {
- *     const token = await getAccessToken();
- *     const response = await fetch("/api/data", {
- *       headers: { Authorization: `Bearer ${token}` },
- *     });
- *   };
- * }
- * ```
  */
 export function useAccessToken(): () => Promise<string> {
   const { getAccessToken } = useImmutableAuth();
@@ -463,34 +411,6 @@ export interface HydratedDataProps<T> {
  * - When `ssr: true` and `data` exists: Uses pre-fetched server data immediately (no loading state)
  * - When `ssr: false`: Refreshes token client-side and fetches data
  * - When `fetchError` exists: Retries fetch client-side
- *
- * @param props - Props from getAuthenticatedData (session, ssr, data, fetchError)
- * @param fetcher - Async function that receives access token and returns data (for client-side fallback)
- * @returns Object with data, isLoading, error, and refetch function
- *
- * @example
- * ```tsx
- * // app/dashboard/page.tsx (Server Component)
- * import { getAuthenticatedData } from "@imtbl/auth-nextjs/server";
- *
- * export default async function DashboardPage() {
- *   const props = await getAuthenticatedData(auth, fetchDashboardData);
- *   if (props.authError) redirect("/login");
- *   return <Dashboard {...props} />;
- * }
- *
- * // app/dashboard/Dashboard.tsx (Client Component)
- * "use client";
- * import { useHydratedData } from "@imtbl/auth-nextjs/client";
- *
- * export default function Dashboard(props: AuthPropsWithData<DashboardData>) {
- *   const { data, isLoading, error } = useHydratedData(props, fetchDashboardData);
- *
- *   if (isLoading) return <Skeleton />;
- *   if (error) return <Error message={error.message} />;
- *   return <DashboardContent data={data} />;
- * }
- * ```
  */
 export function useHydratedData<T>(
   props: HydratedDataProps<T>,

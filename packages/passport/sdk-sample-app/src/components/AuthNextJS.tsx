@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { Stack } from "react-bootstrap";
 import { Body } from "@biom3/react";
-import { useImmutableAuth } from "@imtbl/auth-nextjs/client";
+import { useImmutableAuth } from "@imtbl/auth-next-client";
 import CardStack from "@/components/CardStack";
 import WorkflowButton from "@/components/WorkflowButton";
 import { useStatusProvider } from "@/context/StatusProvider";
@@ -9,7 +9,7 @@ import { useImmutableProvider } from "@/context/ImmutableProvider";
 import { usePassportProvider } from "@/context/PassportProvider";
 
 /**
- * Example component demonstrating @imtbl/auth-nextjs usage
+ * Example component demonstrating @imtbl/auth-next-client usage
  * Uses useImmutableAuth hook from the provider (which handles hydration automatically)
  */
 export default function AuthNextJS() {

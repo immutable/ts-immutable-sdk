@@ -6,7 +6,8 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/auth": "workspace:*",
-    "@imtbl/auth-nextjs": "workspace:*",
+    "@imtbl/auth-next-client": "workspace:*",
+    "@imtbl/auth-next-server": "workspace:*",
     "@imtbl/blockchain-data": "workspace:*",
     "@imtbl/checkout-sdk": "workspace:*",
     "@imtbl/config": "workspace:*",
@@ -192,18 +193,6 @@
         "browser": "./dist/wallet.js",
         "require": "./dist/wallet.cjs",
         "default": "./dist/wallet.js"
-      }
-    },
-    "./auth_nextjs": {
-      "development": {
-        "types": "./src/auth_nextjs.ts",
-        "require": "./dist/auth_nextjs.cjs",
-        "default": "./dist/auth_nextjs.js"
-      },
-      "default": {
-        "types": "./dist/auth_nextjs.d.ts",
-        "require": "./dist/auth_nextjs.cjs",
-        "default": "./dist/auth_nextjs.js"
       }
     },
     "./auth_nextjs/client": {

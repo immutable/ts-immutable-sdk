@@ -10,9 +10,9 @@ import {
 import { Orderbook, OrderbookOverrides } from '@imtbl/orderbook';
 import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
-import { ImmutableAuthProvider } from '@imtbl/auth-nextjs/client';
+import { ImmutableAuthProvider } from '@imtbl/auth-next-client';
 import type { Session } from 'next-auth';
-// Note: Session type is augmented in @imtbl/auth-nextjs/types
+// Note: Session type is augmented in @imtbl/auth-next-client/types
 import {
   AUDIENCE,
   POPUP_REDIRECT_URI,

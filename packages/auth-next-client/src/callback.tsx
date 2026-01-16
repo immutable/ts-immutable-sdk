@@ -4,14 +4,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { Auth } from '@imtbl/auth';
-import type { ImmutableAuthConfig, ImmutableTokenData, ImmutableUser } from '../types';
-import { getTokenExpiry } from '../utils/token';
+import type { ImmutableUserClient, ImmutableTokenDataClient } from './types';
+import { getTokenExpiry } from './utils/token';
 import {
   DEFAULT_AUTH_DOMAIN,
   DEFAULT_AUDIENCE,
   DEFAULT_SCOPE,
   IMMUTABLE_PROVIDER_ID,
-} from '../constants';
+} from './constants';
 
 /**
  * Get search params from the current URL.
@@ -25,31 +25,32 @@ function getSearchParams(): URLSearchParams {
   return new URLSearchParams(window.location.search);
 }
 
+/**
+ * Config for CallbackPage
+ */
+interface CallbackConfig {
+  clientId: string;
+  redirectUri: string;
+  popupRedirectUri?: string;
+  logoutRedirectUri?: string;
+  audience?: string;
+  scope?: string;
+  authenticationDomain?: string;
+  passportDomain?: string;
+}
+
 export interface CallbackPageProps {
   /**
    * Immutable auth configuration
    */
-  config: ImmutableAuthConfig;
+  config: CallbackConfig;
   /**
    * URL to redirect to after successful authentication (when not in popup).
    * Can be a string or a function that receives the authenticated user.
    * If a function returns void/undefined, defaults to "/".
    * @default "/"
-   *
-   * @example Static redirect
-   * ```tsx
-   * <CallbackPage config={config} redirectTo="/dashboard" />
-   * ```
-   *
-   * @example Dynamic redirect based on user
-   * ```tsx
-   * <CallbackPage
-   *   config={config}
-   *   redirectTo={(user) => user.email?.endsWith('@admin.com') ? '/admin' : '/dashboard'}
-   * />
-   * ```
    */
-  redirectTo?: string | ((user: ImmutableUser) => string | void);
+  redirectTo?: string | ((user: ImmutableUserClient) => string | void);
   /**
    * Custom loading component
    */
@@ -64,7 +65,7 @@ export interface CallbackPageProps {
    * Called before redirect (non-popup) or before window.close (popup).
    * If this callback returns a Promise, it will be awaited before proceeding.
    */
-  onSuccess?: (user: ImmutableUser) => void | Promise<void>;
+  onSuccess?: (user: ImmutableUserClient) => void | Promise<void>;
   /**
    * Callback fired when authentication fails.
    * Receives the error message as a parameter.
@@ -77,22 +78,6 @@ export interface CallbackPageProps {
  * Callback page component for handling OAuth redirects (App Router version).
  *
  * Use this in your callback page to process authentication responses.
- *
- * @example
- * ```tsx
- * // app/callback/page.tsx
- * "use client";
- * import { CallbackPage } from "@imtbl/auth-nextjs/client";
- *
- * const config = {
- *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
- *   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
- * };
- *
- * export default function Callback() {
- *   return <CallbackPage config={config} />;
- * }
- * ```
  */
 export function CallbackPage({
   config,
@@ -139,7 +124,7 @@ export function CallbackPage({
             throw new Error('Authentication failed: no user data received from login callback');
           }
           // Create user object for callbacks
-          const user: ImmutableUser = {
+          const user: ImmutableUserClient = {
             sub: authUser.profile.sub,
             email: authUser.profile.email,
             nickname: authUser.profile.nickname,
@@ -153,7 +138,7 @@ export function CallbackPage({
         } else if (authUser) {
           // Not in a popup - create NextAuth session before redirecting
           // This ensures SSR/session-based auth is authenticated
-          const tokenData: ImmutableTokenData = {
+          const tokenData: ImmutableTokenDataClient = {
             accessToken: authUser.accessToken,
             refreshToken: authUser.refreshToken,
             idToken: authUser.idToken,
@@ -183,7 +168,7 @@ export function CallbackPage({
           }
 
           // Create user object for callbacks and dynamic redirect
-          const user: ImmutableUser = {
+          const user: ImmutableUserClient = {
             sub: authUser.profile.sub,
             email: authUser.profile.email,
             nickname: authUser.profile.nickname,

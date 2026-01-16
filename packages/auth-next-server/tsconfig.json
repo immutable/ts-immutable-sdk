@@ -4,17 +4,13 @@
     "outDir": "./dist",
     "rootDirs": ["src"],
     "customConditions": ["development"],
-    "types": ["node"],
-    "jsx": "react-jsx"
+    "types": ["node"]
   },
   "include": ["src"],
   "exclude": [
     "node_modules",
     "dist",
     "src/**/*.test.ts",
-    "src/**/*.test.tsx",
-    "src/**/*.spec.ts",
-    "src/**/*.spec.tsx"
+    "src/**/*.spec.ts"
   ]
 }
-

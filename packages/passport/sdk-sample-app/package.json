@@ -4,7 +4,8 @@
   "dependencies": {
     "@biom3/design-tokens": "^0.4.5",
     "@biom3/react": "^0.29.4",
-    "@imtbl/auth-nextjs": "workspace:*",
+    "@imtbl/auth-next-client": "workspace:*",
+    "@imtbl/auth-next-server": "workspace:*",
     "@imtbl/blockchain-data": "workspace:*",
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",

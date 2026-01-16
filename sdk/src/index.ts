@@ -8,4 +8,3 @@ export * as webhook from './webhook';
 export * as mintingBackend from './minting_backend';
 export * as auth from './auth';
 export * as wallet from './wallet';
-export * as authNextjs from './auth_nextjs';

@@ -1,1 +1,1 @@
-export * from '@imtbl/auth-nextjs/client';
+export * from '@imtbl/auth-next-client';
