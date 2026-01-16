@@ -1,3 +1,3 @@
-import { sandboxAuth } from "@/lib/auth-nextjs";
+import { sandboxAuth } from "@/lib/immutable-auth";
 
 export const { GET, POST } = sandboxAuth.handlers;

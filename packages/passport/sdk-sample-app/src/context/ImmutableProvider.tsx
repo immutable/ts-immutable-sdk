@@ -26,7 +26,7 @@ import { EnvironmentNames } from '@/types';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { ImxApiClients, createConfig } from '@imtbl/generated-clients';
 import { BlockchainData, BlockchainDataModuleConfiguration } from '@imtbl/blockchain-data';
-import { getAuthConfig } from '@/lib/auth-nextjs';
+import { getAuthConfig } from '@/lib/immutable-auth';
 
 const getSdkConfig = (environment: EnvironmentNames): ImxModuleConfiguration => {
   switch (environment) {
@@ -245,7 +245,7 @@ export function ImmutableProvider({
     setEnvironment,
   }), [sdkClient, orderbookClient, passportClient, blockchainData, environment, setEnvironment]);
 
-  // Get auth-nextjs config based on current environment
+  // Get auth config based on current environment
   const authConfig = useMemo(() => getAuthConfig(environment), [environment]);
 
   // Get the NextAuth base path for the current environment

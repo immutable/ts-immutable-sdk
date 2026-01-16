@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CallbackPage, type ImmutableAuthConfig } from "@imtbl/auth-next-client";
-import { getAuthConfig } from "@/lib/auth-nextjs";
+import { getAuthConfig } from "@/lib/immutable-auth";
 import { EnvironmentNames } from "@/types";
 import { Container, Spinner } from "react-bootstrap";
 

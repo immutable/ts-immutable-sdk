@@ -1,3 +1,3 @@
-import { devAuth } from "@/lib/auth-nextjs";
+import { devAuth } from "@/lib/immutable-auth";
 
 export const { GET, POST } = devAuth.handlers;

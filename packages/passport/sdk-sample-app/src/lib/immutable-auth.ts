@@ -16,7 +16,7 @@ const AUTH_DOMAINS: Record<EnvironmentNames, string> = {
   [EnvironmentNames.DEV]: "https://auth.dev.immutable.com",
 };
 
-// Get auth-nextjs config for a specific environment
+// Get auth config for a specific environment
 export function getAuthConfig(environment: EnvironmentNames): ImmutableAuthConfig {
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
 

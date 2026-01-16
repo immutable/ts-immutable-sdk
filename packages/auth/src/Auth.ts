@@ -766,7 +766,7 @@ export class Auth {
           const newOidcUser = await this.userManager.signinSilent();
           if (newOidcUser) {
             const user = Auth.mapOidcUserToDomainModel(newOidcUser);
-            // Emit TOKEN_REFRESHED event so consumers (e.g., auth-nextjs) can sync
+            // Emit TOKEN_REFRESHED event so consumers (e.g., auth-next-client) can sync
             // the new tokens to their session. This is critical for refresh token
             // rotation - without this, the server-side session may have stale tokens.
             this.eventEmitter.emit(AuthEvents.TOKEN_REFRESHED, user);
@@ -824,7 +824,7 @@ export class Auth {
 
           if (removeUser) {
             // Emit USER_REMOVED event BEFORE removing user so consumers can react
-            // (e.g., auth-nextjs can clear the NextAuth session)
+            // (e.g., auth-next-client can clear the NextAuth session)
             this.eventEmitter.emit(AuthEvents.USER_REMOVED, {
               reason: removeReason,
               error: errorMessage,
