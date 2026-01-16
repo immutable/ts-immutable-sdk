@@ -20,7 +20,7 @@
     "@imtbl/x-provider": "workspace:*"
   },
   "devDependencies": {
-    "eslint": "^8.40.0",
+    "eslint": "^8.56.0",
     "tsup": "^8.3.0",
     "typescript": "^5.6.2"
   },
