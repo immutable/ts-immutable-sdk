@@ -5,6 +5,9 @@
   "author": "Immutable",
   "license": "Apache-2.0",
   "repository": "immutable/ts-immutable-sdk.git",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "./dist/node/index.cjs",
   "module": "./dist/node/index.js",
@@ -38,6 +41,17 @@
     "next": "^14.2.0 || ^15.0.0",
     "next-auth": "^5.0.0-beta.25",
     "react": "^18.2.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    },
+    "next-auth": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@swc/core": "^1.4.2",
