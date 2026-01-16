@@ -163,7 +163,7 @@ function ImmutableAuthInner({
       await signOut({ redirect: false });
     };
 
-    // Handle explicit logout from Auth SDK (e.g., if user calls auth.logout() directly)
+    // Handle explicit logout from Auth SDK (e.g., via auth.logout() or auth.getLogoutUrl())
     // This ensures NextAuth session is always in sync with Auth SDK state
     const handleLoggedOut = async () => {
       // Sign out from NextAuth to clear the session cookie
@@ -311,20 +311,20 @@ export function useImmutableAuth(): UseImmutableAuthReturn {
 
   // Sign out from both NextAuth and Immutable
   const handleSignOut = useCallback(async () => {
-    // Sign out from NextAuth first (clears session cookie)
-    await signOut({ redirect: false });
-
-    // Clear local Auth state without doing a full OIDC logout redirect
-    // We use getLogoutUrl() which clears local storage but returns URL instead of redirecting
     if (auth) {
       try {
-        // This removes the user from local storage without redirecting
+        // Clear local Auth state - this emits LOGGED_OUT event which triggers
+        // handleLoggedOut listener to call signOut() from NextAuth
         await auth.getLogoutUrl();
       } catch (error) {
-        // Ignore errors (user may already be logged out)
+        // If getLogoutUrl fails, fall back to direct signOut
         // eslint-disable-next-line no-console
         console.warn('[auth-next-client] Logout cleanup error:', error);
+        await signOut({ redirect: false });
       }
+    } else {
+      // No auth instance, just sign out from NextAuth directly
+      await signOut({ redirect: false });
     }
   }, [auth]);
 

@@ -1,6 +1,6 @@
 {
   "name": "@imtbl/auth-next-server",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Immutable Auth.js v5 integration for Next.js - Server-side utilities",
   "author": "Immutable",
   "license": "Apache-2.0",
