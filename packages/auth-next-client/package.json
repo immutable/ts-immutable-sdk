@@ -28,9 +28,11 @@
   },
   "scripts": {
     "build": "tsup && pnpm build:types",
-    "build:types": "tsc --project tsconfig.types.json",
-    "clean": "rm -rf dist",
-    "lint": "eslint src/**/*.{ts,tsx} --max-warnings=0",
+    "transpile": "tsup src/index.ts --config ../../tsup.config.js",
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
+    "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
+    "typecheck": "tsc --customConditions default --noEmit --jsx preserve",
     "test": "jest --passWithNoTests"
   },
   "dependencies": {

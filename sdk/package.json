@@ -195,28 +195,28 @@
         "default": "./dist/wallet.js"
       }
     },
-    "./auth_nextjs/client": {
+    "./auth-next-client": {
       "development": {
-        "types": "./src/auth_nextjs_client.ts",
-        "require": "./dist/auth_nextjs_client.cjs",
-        "default": "./dist/auth_nextjs_client.js"
+        "types": "./src/auth-next-client.ts",
+        "require": "./dist/auth-next-client.cjs",
+        "default": "./dist/auth-next-client.js"
       },
       "default": {
-        "types": "./dist/auth_nextjs_client.d.ts",
-        "require": "./dist/auth_nextjs_client.cjs",
-        "default": "./dist/auth_nextjs_client.js"
+        "types": "./dist/auth-next-client.d.ts",
+        "require": "./dist/auth-next-client.cjs",
+        "default": "./dist/auth-next-client.js"
       }
     },
-    "./auth_nextjs/server": {
+    "./auth-next-server": {
       "development": {
-        "types": "./src/auth_nextjs_server.ts",
-        "require": "./dist/auth_nextjs_server.cjs",
-        "default": "./dist/auth_nextjs_server.js"
+        "types": "./src/auth-next-server.ts",
+        "require": "./dist/auth-next-server.cjs",
+        "default": "./dist/auth-next-server.js"
       },
       "default": {
-        "types": "./dist/auth_nextjs_server.d.ts",
-        "require": "./dist/auth_nextjs_server.cjs",
-        "default": "./dist/auth_nextjs_server.js"
+        "types": "./dist/auth-next-server.d.ts",
+        "require": "./dist/auth-next-server.cjs",
+        "default": "./dist/auth-next-server.js"
       }
     }
   },
