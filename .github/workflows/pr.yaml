@@ -3,7 +3,7 @@ name: PR
 on:
   pull_request:
     branches:
-      - '**'
+      - "**"
   merge_group:
     branches:
       - main
@@ -42,7 +42,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build, Lint & Test
-        run: pnpm --if-present nx affected -t build,lint,test 
+        run: pnpm --if-present nx affected -t build,lint,test
 
   build-lint-test-examples:
     name: Build, Lint & Test Examples
@@ -64,7 +64,7 @@ jobs:
 
       - name: Prepare SDK
         run: pnpm prepare:sdk
-        
+
       - name: Prepare examples
         run: pnpm prepare:examples
 
@@ -118,7 +118,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-          
+
       - name: setup
         uses: ./.github/actions/setup
 
@@ -130,7 +130,7 @@ jobs:
 
       - name: Prepare tests
         run: pnpm prepare:tests
-        
+
       - name: Update modules
         run: pnpm install --frozen-lockfile=false
 

@@ -198,11 +198,13 @@
     "./auth-next-client": {
       "development": {
         "types": "./src/auth-next-client.ts",
+        "browser": "./dist/auth-next-client.js",
         "require": "./dist/auth-next-client.cjs",
         "default": "./dist/auth-next-client.js"
       },
       "default": {
         "types": "./dist/auth-next-client.d.ts",
+        "browser": "./dist/auth-next-client.js",
         "require": "./dist/auth-next-client.cjs",
         "default": "./dist/auth-next-client.js"
       }

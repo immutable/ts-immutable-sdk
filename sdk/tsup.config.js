@@ -39,7 +39,7 @@ export default defineConfig((options) => {
       bundle: true,
       treeshake: true,
       splitting: false,
-      external: peerDepsExternal,
+      external: [...peerDepsExternal],
     },
 
     // Node Bundle for CJS
@@ -51,7 +51,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       bundle: true,
       treeshake: true,
-      external: peerDepsExternal,
+      external: [...peerDepsExternal],
     },
 
     // Browser Bundle for CDN
