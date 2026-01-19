@@ -71,8 +71,8 @@ jobs:
       - name: Update modules
         run: pnpm install --frozen-lockfile=false
 
-      - name: Build examples (with debug)
-        run: ./build-examples-debug.sh
+      - name: Build examples
+        run: pnpm build:examples
 
       - name: Lint examples
         run: pnpm lint:examples
