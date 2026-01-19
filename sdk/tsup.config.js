@@ -6,15 +6,15 @@ import pkg from './package.json' assert { type: 'json' };
 
 // Packages that should NOT be bundled - they are peer dependencies
 // and should use the consumer's installed version
-const peerDepsExternal = [
-  'next',
-  'next-auth',
-  'next/navigation',
-  'next/headers',
-  'next/server',
-  'react',
-  'react-dom',
-];
+// const peerDepsExternal = [
+//   'next',
+//   'next-auth',
+//   'next/navigation',
+//   'next/headers',
+//   'next/server',
+//   'react',
+//   'react-dom',
+// ];
 
 export default defineConfig((options) => {
   if (options.watch) {
@@ -39,7 +39,7 @@ export default defineConfig((options) => {
       bundle: true,
       treeshake: true,
       splitting: false,
-      external: [...peerDepsExternal],
+      // external: [...peerDepsExternal],
     },
 
     // Node Bundle for CJS
@@ -51,7 +51,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       bundle: true,
       treeshake: true,
-      external: [...peerDepsExternal],
+      // external: [...peerDepsExternal],
     },
 
     // Browser Bundle for CDN
