@@ -137,7 +137,7 @@ describe('Auth', () => {
     });
   });
 
-  describe('username extraction', () => {
+  describe('mapOidcUserToDomainModel', () => {
     it('extracts username from id token when present', () => {
       const mockOidcUser = {
         id_token: 'token',
@@ -156,6 +156,88 @@ describe('Auth', () => {
 
       expect(decodeJwtPayload).toHaveBeenCalledWith('token');
       expect(result.profile.username).toEqual('username123');
+    });
+
+    it('extracts zkEvm chain data from passport metadata', () => {
+      const mockOidcUser = {
+        id_token: 'token',
+        access_token: 'access',
+        refresh_token: 'refresh',
+        expired: false,
+        profile: { sub: 'user-123', email: 'test@example.com', nickname: 'tester' },
+      };
+
+      (decodeJwtPayload as jest.Mock).mockReturnValue({
+        passport: {
+          zkevm_eth_address: '0xzkevmaddress',
+          zkevm_user_admin_address: '0xzkevmadmin',
+        },
+      });
+
+      const result = (Auth as any).mapOidcUserToDomainModel(mockOidcUser);
+
+      expect(result.zkEvm).toEqual({
+        ethAddress: '0xzkevmaddress',
+        userAdminAddress: '0xzkevmadmin',
+      });
+    });
+
+    it('extracts arbitrum_one chain data from nested passport metadata', () => {
+      const mockOidcUser = {
+        id_token: 'token',
+        access_token: 'access',
+        refresh_token: 'refresh',
+        expired: false,
+        profile: { sub: 'user-123', email: 'test@example.com', nickname: 'tester' },
+      };
+
+      (decodeJwtPayload as jest.Mock).mockReturnValue({
+        passport: {
+          arbitrum_one: {
+            eth_address: '0xarbaddress',
+            user_admin_address: '0xarbadmin',
+          },
+        },
+      });
+
+      const result = (Auth as any).mapOidcUserToDomainModel(mockOidcUser);
+
+      expect(result.arbitrum_one).toEqual({
+        ethAddress: '0xarbaddress',
+        userAdminAddress: '0xarbadmin',
+      });
+    });
+
+    it('extracts both zkEvm and arbitrum_one when present', () => {
+      const mockOidcUser = {
+        id_token: 'token',
+        access_token: 'access',
+        refresh_token: 'refresh',
+        expired: false,
+        profile: { sub: 'user-123', email: 'test@example.com', nickname: 'tester' },
+      };
+
+      (decodeJwtPayload as jest.Mock).mockReturnValue({
+        passport: {
+          zkevm_eth_address: '0xzkevmaddress',
+          zkevm_user_admin_address: '0xzkevmadmin',
+          arbitrum_one: {
+            eth_address: '0xarbaddress',
+            user_admin_address: '0xarbadmin',
+          },
+        },
+      });
+
+      const result = (Auth as any).mapOidcUserToDomainModel(mockOidcUser);
+
+      expect(result.zkEvm).toEqual({
+        ethAddress: '0xzkevmaddress',
+        userAdminAddress: '0xzkevmadmin',
+      });
+      expect(result.arbitrum_one).toEqual({
+        ethAddress: '0xarbaddress',
+        userAdminAddress: '0xarbadmin',
+      });
     });
 
     it('maps username when creating OIDC user from device tokens', () => {
