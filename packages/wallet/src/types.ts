@@ -200,7 +200,7 @@ export interface ChainConfig {
   /** Preferred token symbol for relayer fees (default: 'IMX') */
   feeTokenSymbol?: string;
 
-  /** Sequence RPC node URL */
+  /** Sequence RPC node URL TODO: check if this can be removed and only use rpcUrl */
   nodeUrl?: string;
 }
 
