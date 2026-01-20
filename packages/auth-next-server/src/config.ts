@@ -30,10 +30,6 @@ async function validateTokens(
   authDomain: string,
 ): Promise<UserInfoResponse | null> {
   try {
-    // eslint-disable-next-line no-console
-    console.debug('[auth-next-server] Validating tokens with authDomain:', authDomain);
-    // eslint-disable-next-line no-console
-    console.debug('[auth-next-server] Access token:', accessToken);
     const response = await fetch(`${authDomain}/userinfo`, {
       method: 'GET',
       headers: {
