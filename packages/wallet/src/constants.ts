@@ -9,6 +9,16 @@ export const IMMUTABLE_ZKEVM_MAINNET_CHAIN_ID = 13371;
 export const IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID = 13473;
 
 /**
+ * Chain ID constants for Arbitrum networks
+ */
+
+/** Arbitrum One Mainnet chain ID */
+export const ARBITRUM_ONE_CHAIN_ID = 42161;
+
+/** Arbitrum Sepolia Testnet chain ID */
+export const ARBITRUM_SEPOLIA_CHAIN_ID = 421614;
+
+/**
  * Magic configuration for Immutable networks
  * @internal
  */

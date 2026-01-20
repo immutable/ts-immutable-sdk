@@ -4,6 +4,11 @@ import {
 } from '@imtbl/auth';
 import { JsonRpcError } from './zkEvm/JsonRpcError';
 
+export enum EvmChain {
+  ZKEVM = 'zkevm',
+  ARBITRUM_ONE = 'arbitrum_one',
+}
+
 /**
  * A viem-compatible signer interface for wallet operations.
  * This replaces ethers' AbstractSigner/Signer.
@@ -191,6 +196,12 @@ export interface ChainConfig {
    * Defaults to 'https://tee.express.magiclabs.com'
    */
   magicTeeBasePath?: string;
+
+  /** Preferred token symbol for relayer fees (default: 'IMX') */
+  feeTokenSymbol?: string;
+
+  /** Sequence RPC node URL TODO: check if this can be removed and only use rpcUrl */
+  nodeUrl?: string;
 }
 
 /**
