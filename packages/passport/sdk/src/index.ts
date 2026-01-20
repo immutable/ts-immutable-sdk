@@ -38,4 +38,5 @@ export type {
 } from './types';
 export {
   MarketingConsentStatus,
+  EvmChain,
 } from './types';
