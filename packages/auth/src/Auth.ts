@@ -780,53 +780,24 @@ export class Auth {
           // Default to REMOVING user - safer to log out on unknown errors
           // Only keep user logged in for explicitly known transient errors
           let removeUser = true;
-          let removeReason: 'refresh_token_invalid' | 'refresh_failed' | 'unknown' = 'unknown';
-
           if (err instanceof ErrorTimeout) {
-            // Timeout is transient - safe to keep user logged in
-            // Note: removeReason is set but never used since removeUser=false
             passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
             errorMessage = `${errorMessage}: ${err.message}`;
             removeUser = false;
           } else if (err instanceof ErrorResponse) {
             passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
             errorMessage = `${errorMessage}: ${err.message || err.error_description}`;
-            // Check for known transient OAuth errors - safe to keep user logged in
-            // - server_error: auth server temporary issue
-            // - temporarily_unavailable: auth server overloaded
-            const transientErrors = ['server_error', 'temporarily_unavailable'];
-            if (err.error && transientErrors.includes(err.error)) {
-              removeUser = false;
-              removeReason = 'refresh_failed';
-            } else {
-              // All other OAuth errors (invalid_grant, login_required, etc.) are permanent
-              removeReason = 'refresh_token_invalid';
-            }
           } else if (err instanceof Error) {
             errorMessage = `${errorMessage}: ${err.message}`;
-            // Network/fetch errors are transient - safe to keep user logged in
-            const isNetworkError = err.message.toLowerCase().includes('network')
-              || err.message.toLowerCase().includes('fetch')
-              || err.message.toLowerCase().includes('failed to fetch')
-              || err.message.toLowerCase().includes('networkerror');
-            if (isNetworkError) {
-              // Note: removeReason is not set since removeUser=false (event won't be emitted)
-              removeUser = false;
-            } else {
-              // Unknown errors - safer to remove user
-              removeReason = 'refresh_failed';
-            }
           } else if (typeof err === 'string') {
             errorMessage = `${errorMessage}: ${err}`;
-            // Unknown string error - safer to remove user
-            removeReason = 'refresh_failed';
           }
 
           if (removeUser) {
             // Emit USER_REMOVED event BEFORE removing user so consumers can react
             // (e.g., auth-next-client can clear the NextAuth session)
             this.eventEmitter.emit(AuthEvents.USER_REMOVED, {
-              reason: removeReason,
+              reason: 'refresh_failed',
               error: errorMessage,
             });
 
