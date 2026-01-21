@@ -15,7 +15,6 @@ import {
 import type { DirectLoginOptions } from '@imtbl/auth';
 import {
   connectWallet,
-  ZkEvmProvider,
   WalletConfiguration,
   GuardianClient,
   MagicTEESigner,
@@ -24,7 +23,7 @@ import {
   EvmChain,
   getChainConfig,
 } from '@imtbl/wallet';
-import type { LinkWalletParams, LinkedWallet } from '@imtbl/wallet';
+import type { Provider, LinkWalletParams, LinkedWallet } from '@imtbl/wallet';
 import {
   PassportModuleConfiguration,
   ConnectEvmArguments,
@@ -205,7 +204,7 @@ export class Passport {
    * @param {EvmChain} options.chain - The EVM chain to connect to (defaults to ZKEVM)
    * @returns {Promise<Provider>} The EVM provider instance
    */
-  public async connectEvm(options: ConnectEvmArguments = { announceProvider: true }): Promise<ZkEvmProvider> {
+  public async connectEvm(options: ConnectEvmArguments = { announceProvider: true }): Promise<Provider> {
     return withMetricsAsync(async () => {
       const chain = options?.chain ?? EvmChain.ZKEVM;
 
