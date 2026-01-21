@@ -39,7 +39,7 @@ function ArbOneWorkflow() {
   }, [arbOneEventHandler, arbOneProvider]);
 
   return (
-    <CardStack title="Arbitrum Sepolia Workflow">
+    <CardStack title="Arbitrum One Workflow">
       <Stack direction="horizontal" style={{ flexWrap: 'wrap' }} gap={3}>
         {arbOneProvider && (
           <>

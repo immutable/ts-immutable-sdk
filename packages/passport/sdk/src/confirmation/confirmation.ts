@@ -10,6 +10,8 @@ import {
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
 import ConfirmationOverlay from '../overlay/confirmationOverlay';
+import { getEvmChainFromChainId } from '../sequence/chainConfig';
+import { EvmChain } from '../types';
 
 const CONFIRMATION_WINDOW_TITLE = 'Confirm this transaction';
 const CONFIRMATION_WINDOW_HEIGHT = 720;
@@ -42,7 +44,7 @@ export default class ConfirmationScreen {
   }
 
   private getHref(relativePath: string, queryStringParams?: { [key: string]: any }) {
-    let href = `${this.config.passportDomain}/transaction-confirmation/${relativePath}`;
+    let href = `http://localhost:4200/transaction-confirmation/${relativePath}`;
 
     if (queryStringParams) {
       const queryString = queryStringParams
@@ -66,7 +68,7 @@ export default class ConfirmationScreen {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
-          origin !== this.config.passportDomain
+          origin !== 'http://localhost:4200'
           || data.eventType !== PASSPORT_CONFIRMATION_EVENT_TYPE
         ) {
           return;
@@ -77,7 +79,7 @@ export default class ConfirmationScreen {
             this.confirmationWindow?.postMessage({
               eventType: PASSPORT_CONFIRMATION_EVENT_TYPE,
               messageType: ConfirmationSendMessage.CONFIRMATION_START,
-            }, this.config.passportDomain);
+            }, 'http://localhost:4200');
             break;
           }
           case ConfirmationReceiveMessage.TRANSACTION_CONFIRMED: {
@@ -91,7 +93,7 @@ export default class ConfirmationScreen {
             break;
           }
           case ConfirmationReceiveMessage.TRANSACTION_ERROR: {
-            this.closeWindow();
+            // this.closeWindow();
             reject(new Error('Error during transaction confirmation'));
             break;
           }
@@ -118,11 +120,12 @@ export default class ConfirmationScreen {
     messageID: string,
     etherAddress: string,
     messageType?: MessageType,
+    chainId?: string,
   ): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
-          origin !== this.config.passportDomain
+          origin !== 'http://localhost:4200'
           || data.eventType !== PASSPORT_CONFIRMATION_EVENT_TYPE
         ) {
           return;
@@ -132,7 +135,7 @@ export default class ConfirmationScreen {
             this.confirmationWindow?.postMessage({
               eventType: PASSPORT_CONFIRMATION_EVENT_TYPE,
               messageType: ConfirmationSendMessage.CONFIRMATION_START,
-            }, this.config.passportDomain);
+            }, 'http://localhost:4200');
             break;
           }
           case ConfirmationReceiveMessage.MESSAGE_CONFIRMED: {
@@ -157,9 +160,11 @@ export default class ConfirmationScreen {
       };
 
       window.addEventListener('message', messageHandler);
-      const href = this.getHref('zkevm/message', {
+      const chain = chainId ? getEvmChainFromChainId(chainId) : EvmChain.ZKEVM;
+      const href = this.getHref(`${chain.replace('_', '-')}/message`, {
         messageID,
         etherAddress,
+        chainID: chainId,
         ...(messageType ? { messageType } : {}),
       });
       this.showConfirmationScreen(href, messageHandler, resolve);

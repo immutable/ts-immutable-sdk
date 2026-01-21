@@ -227,7 +227,7 @@ const signMetaTransaction = async (
 async function fetchDeploymentSalt(
   accessToken: string
 ): Promise<string> {
-  const apiUrl = 'http://localhost:8072/passport-mr/v1/counterfactual-salt';
+  const apiUrl = 'http://localhost:8072/passport-mr/v1/chains/arbitrum-sepolia/counterfactual-salt';
   
   const response = await fetch(apiUrl, {
     method: 'GET',

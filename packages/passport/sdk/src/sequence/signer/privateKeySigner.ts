@@ -100,6 +100,7 @@ export class PrivateKeySigner implements ISigner {
   async signMessage(message: string | Uint8Array): Promise<string> {
     const pkWallet = await this.getWalletInstance();
     
+    // TODO remove "-arb-one"
     const privateKeyHash = keccak256(toUtf8Bytes(`${pkWallet.userIdentifier}-sequence-arb-one`)) as `0x${string}`;
     const signingKey = new SigningKey(privateKeyHash);
     

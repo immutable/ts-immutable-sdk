@@ -3,15 +3,18 @@ import {
   Form, Offcanvas, Spinner, Stack,
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
-import { ModalProps } from '@/types';
+import { RequestExampleProps, ModalProps } from '@/types';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { RequestArguments } from '@imtbl/passport';
 import WorkflowButton from '@/components/WorkflowButton';
+import RequestExampleAccordion from '@/components/zkevm/RequestExampleAccordion';
+import EthSignTypedDataV4Examples from './EthSignTypedDataV4Examples';
 
 enum EthereumParamType {
   string = 'string',
   object = 'object',
+  json = 'json',
 }
 
 interface EthereumParam {
@@ -24,6 +27,7 @@ interface EthereumParam {
 interface EthereumMethod {
   name: string;
   params?: Array<EthereumParam>;
+  exampleComponents?: Array<React.ComponentType<RequestExampleProps>>;
 }
 
 // Simplified Ethereum methods for ArbOne - only the essential ones
@@ -45,6 +49,21 @@ const ArbOneEthereumMethods: EthereumMethod[] = [
         placeholder: '{ "to": "0x...", "value": "0x0", "data": "0x" }',
       },
     ],
+  },
+  {
+    name: 'personal_sign',
+    params: [
+      { name: 'message' },
+      { name: 'address' },
+    ],
+  },
+  {
+    name: 'eth_signTypedData_v4',
+    params: [
+      { name: 'address' },
+      { name: 'payload', type: EthereumParamType.json, placeholder: 'A valid JSON string' },
+    ],
+    exampleComponents: EthSignTypedDataV4Examples,
   },
 ];
 
@@ -81,6 +100,21 @@ function ArbOneRequest({ showModal, setShowModal }: ModalProps) {
     }
   };
 
+  const handleExampleSubmitted = async (request: RequestArguments) => {
+    if (request.params) {
+      const newParams = params;
+      request.params.forEach((param, i) => {
+        try {
+          newParams[i] = JSON.stringify(param);
+        } catch (err) {
+          newParams[i] = param;
+        }
+      });
+      setParams(newParams);
+    }
+    return performRequest(request);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -91,7 +125,8 @@ function ArbOneRequest({ showModal, setShowModal }: ModalProps) {
         method: selectedEthMethod?.name || '',
         params: params.map((param, i) => {
           switch (selectedEthMethod.params![i].type) {
-            case EthereumParamType.object: {
+            case EthereumParamType.object:
+            case EthereumParamType.json: {
               return JSON.parse(param);
             }
             default: {
@@ -173,6 +208,13 @@ function ArbOneRequest({ showModal, setShowModal }: ModalProps) {
             { loadingRequest && <Spinner /> }
           </Stack>
         </Form>
+        { selectedEthMethod?.exampleComponents && (
+          <RequestExampleAccordion
+            disabled={loadingRequest}
+            handleExampleSubmitted={handleExampleSubmitted}
+            examples={selectedEthMethod.exampleComponents}
+          />
+        )}
       </Offcanvas.Body>
     </Offcanvas>
   );

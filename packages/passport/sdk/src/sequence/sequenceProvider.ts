@@ -24,9 +24,13 @@ import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { SequenceSigner } from './index';
 import { getChainConfig } from './chainConfig';
 import GuardianClient from '../guardian';
-import { JsonRpcProvider } from 'ethers';
+import { JsonRpcProvider, toBeHex } from 'ethers';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import jwt_decode from 'jwt-decode';
+import { signTypedDataV4 } from './signTypedDataV4';
+import { personalSign } from './personalSign';
+import { sendDeployTransactionAndPersonalSign } from './sendDeployTransactionAndPersonalSign';
+import { isWalletDeployed } from './walletHelpers';
 
 export type SequenceProviderInput = {
   authManager: AuthManager;
@@ -198,7 +202,7 @@ export class SequenceProvider implements Provider {
 
       case 'eth_sendTransaction': {
         console.log(`sequence eth_sendTransaction ${this.userWalletAddress}`);
-        const walletAddress = '0xc07a2904e04d9184cd3839dea00e32179bad47d7';//'0x3fadd1f6f02408c0fad35e362e3d5c65e722b67a'//'0x3fadd1f6f02408c0fad35e362e3d5c65e722b67a';//this.userWalletAddress;
+        const walletAddress = '0xc07a2904e04d9184cd3839dea00e32179bad47d7';//'0x3fadd1f6f02408c0fad35e362e3d5c65e722b67a';//this.userWalletAddress;
         // const walletAddress = this.userWalletAddress;
         // const walletAddress = await this.#getWalletAddress();
 
@@ -212,57 +216,6 @@ export class SequenceProvider implements Provider {
         const flow = trackFlow('passport', `ethSendTransaction_${this.#chain}`);
 
         try {
-          // return await sendTransaction({
-          //   params: request.params || [],
-          //   sequenceSigner: this.#ethSigner,
-          //   oxRpcProvider: this.#oxRpcProvider,
-          //   relayerClient: this.#relayerClient,
-          //   guardianClient: this.#guardianClient,
-          //   walletAddress,
-          //   flow,
-          //   authManager: this.#authManager,
-          //   chain: this.#chain,
-          // }); 
-
-          /*const params = request.params || [];
-          const transactionRequest = params[0];
-          const { to, value, data } = transactionRequest;
-          console.log(`to = ${to}`)
-          console.log(`value = ${value}`)
-          console.log(`data = ${data}`)
-
-          await this.#authManager.forceUserRefresh(); // TODO shouldn't have to refresh all the time
-
-          const authenticatedUser = await this.#authManager.getUser();
-        
-          if (!authenticatedUser?.idToken) {
-            throw new PassportError(
-              'User idToken not available',
-              PassportErrorType.NOT_LOGGED_IN_ERROR,
-            );
-          }
-
-          const idToken = authenticatedUser.idToken;
-          const decoded = jwt_decode<IdTokenPayload>(idToken);
-          const issuer = decoded.iss;
-          const audience = decoded.aud;
-
-          try {
-            const wallet = await this.authenticateAndSendTransaction(idToken, issuer, audience,
-              {
-                to: to,
-                value: `${value}`,
-                data: `${data}`,
-                chainId: 421614,
-              }
-            )
-            console.log(`wallet from pop up = ${wallet}`)
-            console.log('Authenticated! Wallet:', wallet)
-          } catch (err) {
-            console.error('Auth failed:', err)
-            return
-          }*/
-
           return await this.#guardianClient.withConfirmationScreen({
             width: 480,
             height: 720,
@@ -288,6 +241,115 @@ export class SequenceProvider implements Provider {
         } finally {
           flow.addEvent('End');
         }
+      }
+
+      case 'personal_sign': {
+        const walletAddress = '0xc07a2904e04d9184cd3839dea00e32179bad47d7';//'0x3fadd1f6f02408c0fad35e362e3d5c65e722b67a';//this.userWalletAddress;
+        // const walletAddress = this.userWalletAddress;
+        if (!walletAddress) {
+          throw new JsonRpcError(
+            ProviderErrorCode.UNAUTHORIZED,
+            'Unauthorised - call eth_requestAccounts first',
+          );
+        }
+
+        const flow = trackFlow('passport', 'personalSign');
+
+        try {
+          return await this.#guardianClient.withConfirmationScreen({
+            width: 480,
+            height: 720,
+          })(async () => {
+            if (this.#config.forceScwDeployBeforeMessageSignature) {
+              // Check if the smart contract wallet has been deployed
+              const deployed = await isWalletDeployed(this.#oxRpcProvider, walletAddress);
+              console.log(`personal_sign deployed ${deployed}`);
+              if (!deployed) {
+                // If the smart contract wallet has not been deployed,
+                // submit a transaction before signing the message
+                return await sendDeployTransactionAndPersonalSign({
+                  params: request.params || [],
+                  walletAddress,
+                  sequenceSigner: this.#ethSigner,
+                  oxRpcProvider: this.#oxRpcProvider,
+                  guardianClient: this.#guardianClient,
+                  relayerClient: this.#relayerClient,
+                  flow,
+                  authManager: this.#authManager,
+                  chain: this.#chain,
+                  environment: this.#config.baseConfig.environment,
+                });
+              }
+            }
+
+            return await personalSign({
+              params: request.params || [],
+              walletAddress,
+              sequenceSigner: this.#ethSigner,
+              oxRpcProvider: this.#oxRpcProvider,
+              guardianClient: this.#guardianClient,
+              flow,
+            });
+          });
+        } catch (error) {
+          if (error instanceof Error) {
+            trackError('passport', 'personal_sign', error, { flowId: flow.details.flowId });
+          } else {
+            flow.addEvent('errored');
+          }
+          throw error;
+        } finally {
+          flow.addEvent('End');
+        }
+      }
+
+      case 'eth_signTypedData':
+      case 'eth_signTypedData_v4': {
+        const walletAddress = '0xc07a2904e04d9184cd3839dea00e32179bad47d7';//'0x3fadd1f6f02408c0fad35e362e3d5c65e722b67a';//this.userWalletAddress;
+        // const walletAddress = this.userWalletAddress;
+        // const walletAddress = await this.#getWalletAddress();
+        if (!walletAddress) {
+          throw new JsonRpcError(
+            ProviderErrorCode.UNAUTHORIZED,
+            'Unauthorised - call eth_requestAccounts first',
+          );
+        }
+
+        const flow = trackFlow('passport', 'ethSignTypedDataV4');
+
+        try {
+          return await this.#guardianClient.withConfirmationScreen({
+            width: 480,
+            height: 720,
+          })(async () => await signTypedDataV4({
+            method: request.method,
+            params: request.params || [],
+            sequenceSigner: this.#ethSigner,
+            oxRpcProvider: this.#oxRpcProvider,
+            guardianClient: this.#guardianClient,
+            walletAddress: this.userWalletAddress!,
+            flow,
+          }));
+        } catch (error) {
+          if (error instanceof Error) {
+            trackError('passport', 'eth_signTypedData', error, { flowId: flow.details.flowId });
+          } else {
+            flow.addEvent('errored');
+          }
+          throw error;
+        } finally {
+          flow.addEvent('End');
+        }
+      }
+      case 'eth_chainId': {
+        // Call detect network to fetch the chainId so to take advantage of
+        // the caching layer provided by StaticJsonRpcProvider.
+        // In case Passport is changed from StaticJsonRpcProvider to a
+        // JsonRpcProvider, this function will still work as expected given
+        // that detectNetwork call _uncachedDetectNetwork which will force
+        // the provider to re-fetch the chainId from remote.
+        const { chainId } = await this.#rpcProvider.getNetwork();
+        return toBeHex(chainId);
       }
 
       // Pass through methods
@@ -358,146 +420,6 @@ export class SequenceProvider implements Provider {
     listener: (...args: any[]) => void,
   ): void {
     this.#providerEventEmitter.removeListener(event, listener);
-  }
-
-  async authenticateAndSendTransaction(idToken: string, issuer: string, audience: string, tx: any) {
-    return new Promise((resolve, reject) => {
-      const sessionId = crypto.randomUUID()
-      const requestId = crypto.randomUUID()
-      const stateConfigRequestId = crypto.randomUUID()
-      let authCompleted = false  // Track auth state
-      let stateConfigSet = false
-      
-      const popup = window.open(
-        `${this.walletOrigin}/auth/idtoken?origin=${window.location.origin}`,
-        'wallet',
-        'popup,width=400,height=600'
-      )
-  
-      const handleMessage = (event: MessageEvent) => {
-        if (event.origin !== this.walletOrigin) return
-        console.log('[SDK] Received:', event.data)
-  
-        // Step 1: Auth ready
-        if (event.data.type === 'IDTOKEN_AUTH_READY') {
-          popup?.postMessage({
-            type: 'IDTOKEN_AUTH',
-            idToken,
-            issuer,
-            audience,
-            redirect: 'none',
-            customStateConfig: {
-              walletAddress: '0xce86c5be4c5ff2c2530c626f7aa81604b7618717',
-              deploymentSalt: '0xc97a40f09209c878837cf2742fa66685fabc3a9d436e8759142e2a0f8259aec9',      // <-- Your deployment salt
-              realImageHash: '0x70be4a1f980f96997dff0583567db5e51e8ab68e5473405316ce1def5ee83b36',   
-            }
-          }, this.walletOrigin)
-        }
-  
-        // Step 2: Auth complete - now navigate popup to wallet root for tx
-        if (event.data.type === 'IDTOKEN_AUTH_RESULT' && event.data.success) {
-          this.userWalletAddress = event.data.wallet
-          authCompleted = true  // Mark auth as done
-          console.log('[SDK] Auth complete, navigating to transaction route')
-
-          // Navigate the popup to wallet root (which will send WALLET_OPENED)
-          // Wait 3 seconds for all signing to complete before navigating
-          setTimeout(() => {
-            console.log('[SDK] Navigating to transaction route')
-            if (popup) {
-              popup.location.href = `${this.walletOrigin}/request/transaction?sessionId=${sessionId}`
-            }
-          }, 3000)
-        }
-  
-        // Step 3: Wallet opened - send tx request
-        if (event.data.type === 'WALLET_OPENED' && authCompleted) {
-          popup?.postMessage({
-            id: crypto.randomUUID(),
-            type: 'INIT',
-            sessionId,
-          }, this.walletOrigin)
-
-          // popup?.postMessage({
-          //   id: requestId,
-          //   type: 'REQUEST',
-          //   sessionId,
-          //   action: 'signMessage',  // Changed from 'sendWalletTransaction'
-          //   payload: {
-          //     address: this.userWalletAddress,
-          //     chainId: tx.chainId,  // Optional for signing
-          //     message: 'Hellooooo, sign this message',     // Hex-encoded message to sign
-          //   }
-          // }, this.walletOrigin)
-
-          popup?.postMessage({
-            id: requestId,
-            type: 'REQUEST',
-            sessionId,
-            action: 'sendWalletTransaction',
-            payload: {
-              address: this.userWalletAddress,
-              chainId: tx.chainId,
-              transactionRequest: {
-                to: "0x35beC1b2E8a30aF9bfd138555a633245519b607C",
-                value: '0',
-                data: "0x1e957f1e",
-              }
-            }
-          }, this.walletOrigin)
-        }
-  
-        // Step 4: Transaction response
-        // TODO handle confirmation here <<<<<
-        // Step 4: Transaction CONFIRMED (not signed/sent yet)
-        // if (event.data.type === 'RESPONSE' && event.data.id === requestId) {
-        //   window.removeEventListener('message', handleMessage)
-        //   popup?.close()
-
-        //   if (event.data.error) {
-        //     reject(new Error(event.data.error.message || event.data.error))
-        //     return
-        //   }
-
-        //   const payload = event.data.payload
-
-        //   // Check if this is a confirmation-only response
-        //   if (payload?.confirmed === true) {
-        //     console.log('[SDK] Transaction CONFIRMED by user:', payload)
-            
-        //     // Now YOU sign and send the transaction on your side
-        //     // payload contains: { confirmed, walletAddress, chainId, transaction: { to, value, data } }
-        //     resolve({
-        //       confirmed: true,
-        //       walletAddress: payload.walletAddress,
-        //       chainId: payload.chainId,
-        //       transaction: payload.transaction,
-        //     })
-            
-        //     // TODO: Your code to sign and send:
-        //     // const txHash = await yourWdk.signAndSend(payload.transaction)
-        //     console.log(`payload = ${JSON.stringify(payload.transaction)}`)
-            
-        //   } else if (payload?.transactionHash) {
-        //     // Legacy: full sign+relay flow (if you ever re-enable it)
-        //     resolve({ txHash: payload.transactionHash })
-        //   } else {
-        //     reject(new Error('Unknown response format'))
-        //   }
-        // }
-        if (event.data.type === 'RESPONSE' && event.data.id === requestId) {
-          window.removeEventListener('message', handleMessage)
-          popup?.close()
-          if (event.data.error) {
-            reject(new Error(event.data.error.message))
-          } else {
-            resolve({ txHash: event.data.payload?.txHash })
-          }
-        }
-      }
-  
-      window.addEventListener('message', handleMessage)
-    })
   }
 }
 

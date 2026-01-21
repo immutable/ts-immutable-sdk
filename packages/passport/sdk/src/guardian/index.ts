@@ -82,6 +82,7 @@ export default class GuardianClient {
 
   private readonly multiRollupApiClients: GeneratedClients.MultiRollupApiClients;
 
+  // EIP-155 chainId to User key cache
   private chainIdToKeyCache: Map<string, string> = new Map();
 
   constructor({
@@ -99,15 +100,15 @@ export default class GuardianClient {
    * Converts API format (dashes) to User object format (underscores)
    */
   private async getChainKeyFromId(chainId: string): Promise<string> {
-    // Check cache first
-    if (this.chainIdToKeyCache.has(chainId)) {
-      return this.chainIdToKeyCache.get(chainId)!;
+    // Ensure chainId has eip155: prefix
+    const normalisedChainId = chainId.startsWith('eip155:') ? chainId : `eip155:${chainId}`;
+    if (this.chainIdToKeyCache.has(normalisedChainId)) {
+      return this.chainIdToKeyCache.get(normalisedChainId)!;
     }
 
     try {
       const chainListResponse = await this.multiRollupApiClients.chainsApi.listChains();
-      const chain = chainListResponse.data?.result?.find((c) => c.id === chainId);
-      
+      const chain = chainListResponse.data?.result?.find((c) => c.id === normalisedChainId);
       if (!chain?.name) {
         // Fallback to zkEvm if chain not found
         return RollupType.ZKEVM;
@@ -118,10 +119,10 @@ export default class GuardianClient {
       if (chain.name.startsWith(IMTBL_ZKEVM_CHAIN_PREFIX)) {
         chainKey = RollupType.ZKEVM;
       } else {
-        chainKey = getEvmChainFromChainId(chainId);
+        chainKey = getEvmChainFromChainId(normalisedChainId);
       }
 
-      this.chainIdToKeyCache.set(chainId, chainKey);
+      this.chainIdToKeyCache.set(normalisedChainId, chainKey);
       return chainKey;
     } catch (error) {
       // Fallback to zkEvm on error
@@ -142,7 +143,9 @@ export default class GuardianClient {
     }
 
     const chainKey = await this.getChainKeyFromId(chainId);
+    console.log(`chainKey ${chainKey}`);
     const ethAddress = (user as any)[chainKey]?.ethAddress;
+    console.log(`ethAddress ${ethAddress}`);
     // TODO remove, this is for local testing
     // const ethAddress = '0x3fadd1f6f02408c0fad35e362e3d5c65e722b67a';
 
@@ -364,6 +367,7 @@ export default class GuardianClient {
         messageId,
         ethAddress,
         'eip712',
+        chainID,
       );
 
       if (!confirmationResult.confirmed) {
@@ -414,6 +418,7 @@ export default class GuardianClient {
         messageId,
         ethAddress,
         'erc191',
+        String(chainID),
       );
 
       if (!confirmationResult.confirmed) {

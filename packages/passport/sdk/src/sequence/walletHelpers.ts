@@ -1,7 +1,11 @@
 import { Address, Abi, AbiFunction, Provider } from 'ox';
-import { BigNumberish } from 'ethers';
+import { BigNumberish, keccak256, solidityPacked, getBytes, TypedDataEncoder } from 'ethers';
+import { TypedDataPayload } from '..';
+import SequenceSigner from './sequenceSigner';
 
-const READ_NONCE = Abi.from(['function readNonce(uint256 _space) external view returns (uint256)'])[0]
+const READ_NONCE = Abi.from(['function readNonce(uint256 _space) external view returns (uint256)'])[0];
+
+const ETH_SIGN_PREFIX = '\x19\x01';
 
 export const isWalletDeployed = async (
   rpcProvider: Provider.Provider,
@@ -48,3 +52,33 @@ export const getNonce = async (
 };
 
 export const getEip155ChainId = (chainId: number): string => `eip155:${chainId}`;
+
+export const encodeMessageSubDigest = (chainId: bigint, walletAddress: string, digest: string): string => (
+  solidityPacked(
+    ['string', 'uint256', 'address', 'bytes32'],
+    [ETH_SIGN_PREFIX, chainId, walletAddress, digest],
+  )
+);
+
+export const signAndPackTypedData = async (
+  typedData: TypedDataPayload,
+  chainId: bigint,
+  walletAddress: string,
+  signer: SequenceSigner,
+): Promise<string> => {
+  // Ethers auto-generates the EIP712Domain type, so remove it for hashing
+  const types = { ...typedData.types };
+  // @ts-ignore
+  delete types.EIP712Domain;
+
+  // Hash the EIP712 payload and generate the complete payload
+  const typedDataHash = TypedDataEncoder.hash(typedData.domain, types, typedData.message);
+  const messageSubDigest = encodeMessageSubDigest(chainId, walletAddress, typedDataHash);
+  const hash = keccak256(messageSubDigest);
+
+  // Sign the sub-digest
+  const hashArray = getBytes(hash);
+  const signature = await signer.signMessage(hashArray);
+
+  return signature;
+};
