@@ -23,10 +23,10 @@ export {
   ARBITRUM_SEPOLIA,
   ARBITRUM_ONE_CHAIN,
   ARBITRUM_SEPOLIA_CHAIN,
-} from './presets';
+} from './network/presets';
 
 // Export chain registry for looking up chain configs
-export { getChainConfig } from './chainRegistry';
+export { getChainConfig, getEvmChainFromChainId } from './network/chainRegistry';
 
 // Export main wallet providers
 export { ZkEvmProvider } from './zkEvm/zkEvmProvider';

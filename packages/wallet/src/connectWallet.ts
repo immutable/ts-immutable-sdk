@@ -18,11 +18,12 @@ import { WalletConfiguration } from './config';
 import GuardianClient from './guardian';
 import MagicTEESigner from './magic/magicTEESigner';
 import { announceProvider, passportProviderInfo } from './provider/eip6963';
-import { DEFAULT_CHAINS } from './presets';
+import { DEFAULT_CHAINS } from './network/presets';
 import {
   MAGIC_CONFIG,
   IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID,
 } from './constants';
+import { ChainId } from './network/chains';
 
 /**
  * Type guard to check if chainId is a valid key for MAGIC_CONFIG
@@ -70,9 +71,14 @@ const DEFAULT_REDIRECT_FALLBACK = 'https://auth.immutable.com/im-logged-in';
 const DEFAULT_AUTHENTICATION_DOMAIN = 'https://auth.immutable.com';
 const SANDBOX_DOMAIN_REGEX = /(sandbox|testnet)/i;
 
+const ZKEVM_CHAIN_IDS = [
+  ChainId.IMTBL_ZKEVM_MAINNET,
+  ChainId.IMTBL_ZKEVM_TESTNET,
+  ChainId.IMTBL_ZKEVM_DEVNET,
+];
+
 function isZkEvmChain(chain: ChainConfig): boolean {
-  // Only zkEVM chains use magic
-  return !!chain.magicPublishableApiKey || isValidMagicChainId(chain.chainId);
+  return ZKEVM_CHAIN_IDS.includes(chain.chainId);
 }
 
 function isSandboxChain(chain: ChainConfig): boolean {

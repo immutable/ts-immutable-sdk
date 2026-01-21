@@ -122,10 +122,10 @@ describe('connectWallet', () => {
       expect(SequenceProvider).not.toHaveBeenCalled();
     });
 
-    it('uses ZkEvmProvider for chain with magic config', async () => {
+    it('uses ZkEvmProvider for zkEVM devnet chain', async () => {
       const auth = createAuthStub();
       const devChain = {
-        chainId: 99999, // unknown chainId
+        chainId: 15003, // zkEVM devnet chainId
         rpcUrl: 'https://rpc.dev.immutable.com',
         relayerUrl: 'https://relayer.dev.immutable.com',
         apiUrl: 'https://api.dev.immutable.com',
