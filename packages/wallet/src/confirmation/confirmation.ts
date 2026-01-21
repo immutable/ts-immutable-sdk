@@ -10,6 +10,8 @@ import {
 import { openPopupCenter } from './popup';
 import { IAuthConfiguration } from '@imtbl/auth';
 import ConfirmationOverlay from '../overlay/confirmationOverlay';
+import { getEvmChainFromChainId } from '../network/chainRegistry';
+import { EvmChain } from '../types';
 
 const CONFIRMATION_WINDOW_TITLE = 'Confirm this transaction';
 const CONFIRMATION_WINDOW_HEIGHT = 720;
@@ -105,7 +107,10 @@ export default class ConfirmationScreen {
       if (chainType === GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex) {
         href = this.getHref('transaction', { transactionId, etherAddress, chainType });
       } else {
-        href = this.getHref('zkevm/transaction', {
+        // Get chain path from chainId (e.g., 'zkevm', 'arbitrum-one')
+        const chain = chainId ? getEvmChainFromChainId(chainId) : EvmChain.ZKEVM;
+        const chainPath = chain.replace('_', '-');
+        href = this.getHref(`${chainPath}/transaction`, {
           transactionID: transactionId, etherAddress, chainType, chainID: chainId,
         });
       }
@@ -117,7 +122,8 @@ export default class ConfirmationScreen {
   requestMessageConfirmation(
     messageID: string,
     etherAddress: string,
-    messageType?: MessageType,
+    messageType: MessageType,
+    chainId: string,
   ): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
@@ -157,10 +163,14 @@ export default class ConfirmationScreen {
       };
 
       window.addEventListener('message', messageHandler);
-      const href = this.getHref('zkevm/message', {
+      // Get chain path from chainId (e.g., 'zkevm', 'arbitrum-one')
+      const chain = getEvmChainFromChainId(chainId);
+      const chainPath = chain.replace('_', '-');
+      const href = this.getHref(`${chainPath}/message`, {
         messageID,
         etherAddress,
-        ...(messageType ? { messageType } : {}),
+        chainID: chainId,
+        messageType,
       });
       this.showConfirmationScreen(href, messageHandler, resolve);
     });

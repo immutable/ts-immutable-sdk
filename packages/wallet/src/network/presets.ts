@@ -1,11 +1,11 @@
-import { ChainConfig } from './types';
+import { ChainConfig } from '../types';
 import {
   IMMUTABLE_ZKEVM_MAINNET_CHAIN_ID,
   IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID,
   ARBITRUM_ONE_CHAIN_ID,
   ARBITRUM_SEPOLIA_CHAIN_ID,
   MAGIC_CONFIG,
-} from './constants';
+} from '../constants';
 
 /**
  * Immutable zkEVM Mainnet chain configuration
