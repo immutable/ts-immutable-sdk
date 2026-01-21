@@ -46,8 +46,16 @@ export interface PassportEventMap extends AuthEventMap {
   [WalletEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
 }
 
-// Re-export zkEVM Provider type for public API
-export type { Provider } from './zkEvm/types';
+/**
+ * EIP-1193 Provider Interface
+ * Standard Ethereum provider interface for all chain types
+ */
+export type Provider = {
+  request: (request: RequestArguments) => Promise<any>;
+  on: (event: string, listener: (...args: any[]) => void) => void;
+  removeListener: (event: string, listener: (...args: any[]) => void) => void;
+  isPassport: boolean;
+};
 
 export interface RequestArguments {
   method: string;

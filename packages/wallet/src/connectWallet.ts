@@ -10,13 +10,19 @@ import {
   mr,
 } from '@imtbl/generated-clients';
 import { ZkEvmProvider } from './zkEvm/zkEvmProvider';
-import { ConnectWalletOptions, PassportEventMap, ChainConfig } from './types';
+import { SequenceProvider } from './sequence/sequenceProvider';
+import {
+  ConnectWalletOptions, PassportEventMap, ChainConfig, Provider,
+} from './types';
 import { WalletConfiguration } from './config';
 import GuardianClient from './guardian';
 import MagicTEESigner from './magic/magicTEESigner';
 import { announceProvider, passportProviderInfo } from './provider/eip6963';
 import { DEFAULT_CHAINS } from './presets';
-import { MAGIC_CONFIG, IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID } from './constants';
+import {
+  MAGIC_CONFIG,
+  IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID,
+} from './constants';
 
 /**
  * Type guard to check if chainId is a valid key for MAGIC_CONFIG
@@ -63,6 +69,11 @@ const DEFAULT_AUTH_AUDIENCE = 'platform_api';
 const DEFAULT_REDIRECT_FALLBACK = 'https://auth.immutable.com/im-logged-in';
 const DEFAULT_AUTHENTICATION_DOMAIN = 'https://auth.immutable.com';
 const SANDBOX_DOMAIN_REGEX = /(sandbox|testnet)/i;
+
+function isZkEvmChain(chain: ChainConfig): boolean {
+  // Only zkEVM chains use magic
+  return !!chain.magicPublishableApiKey || isValidMagicChainId(chain.chainId);
+}
 
 function isSandboxChain(chain: ChainConfig): boolean {
   if (chain.chainId === IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID) {
@@ -156,7 +167,7 @@ function createDefaultAuth(initialChain: ChainConfig, options: ConnectWalletOpti
  */
 export async function connectWallet(
   config: ConnectWalletOptions = {},
-): Promise<ZkEvmProvider> {
+): Promise<Provider> {
   // Use default chains if not provided (testnet + mainnet)
   const chains = config.chains && config.chains.length > 0
     ? config.chains
@@ -216,7 +227,10 @@ export async function connectWallet(
     feeTokenSymbol: config.feeTokenSymbol,
   });
 
-  // 6. Create GuardianClient
+  // 6. Create PassportEventEmitter
+  const passportEventEmitter = config.passportEventEmitter || new TypedEventEmitter<PassportEventMap>();
+
+  // 7. Create GuardianClient
   const guardianApi = new mr.GuardianApi(apiConfig);
 
   const guardianClient = new GuardianClient({
@@ -226,50 +240,57 @@ export async function connectWallet(
     authConfig,
   });
 
-  // 7. Get Magic config for initial chain (from chain config or hard-coded default)
-  const magicConfig = getMagicConfigForChain(initialChain);
+  // 8. Create provider based on chain type
+  let provider: Provider;
 
-  // 8. Create MagicTEESigner with Magic TEE base path (separate from backend API)
-  const magicTeeBasePath = initialChain.magicTeeBasePath || 'https://tee.express.magiclabs.com';
-  const magicTeeApiClients = new MagicTeeApiClients({
-    basePath: magicTeeBasePath,
-    timeout: 10000,
-    magicPublishableApiKey: magicConfig.magicPublishableApiKey,
-    magicProviderId: magicConfig.magicProviderId,
-  });
+  if (isZkEvmChain(initialChain)) {
+    // 9. Get Magic config for initial chain (from chain config or hard-coded default)
+    const magicConfig = getMagicConfigForChain(initialChain);
 
-  const ethSigner = new MagicTEESigner(auth, magicTeeApiClients);
+    // 10. Create MagicTEESigner with Magic TEE base path (separate from backend API)
+    const magicTeeBasePath = initialChain.magicTeeBasePath || 'https://tee.express.magiclabs.com';
+    const magicTeeApiClients = new MagicTeeApiClients({
+      basePath: magicTeeBasePath,
+      timeout: 10000,
+      magicPublishableApiKey: magicConfig.magicPublishableApiKey,
+      magicProviderId: magicConfig.magicProviderId,
+    });
+    const ethSigner = new MagicTEESigner(auth, magicTeeApiClients);
 
-  // 9. Determine session activity API URL (only for mainnet, testnet, devnet)
-  let sessionActivityApiUrl: string | null = null;
-  if (initialChain.chainId === 13371) {
-    // Mainnet
-    sessionActivityApiUrl = 'https://api.immutable.com';
-  } else if (initialChain.chainId === 13473) {
-    // Testnet
-    sessionActivityApiUrl = 'https://api.sandbox.immutable.com';
-  } else if (initialChain.apiUrl) {
-    // Devnet - use the apiUrl from chain config
-    sessionActivityApiUrl = initialChain.apiUrl;
+    // 11. Determine session activity API URL (only for mainnet, testnet, devnet)
+    let sessionActivityApiUrl: string | null = null;
+    if (initialChain.chainId === 13371) {
+      // Mainnet
+      sessionActivityApiUrl = 'https://api.immutable.com';
+    } else if (initialChain.chainId === 13473) {
+      // Testnet
+      sessionActivityApiUrl = 'https://api.sandbox.immutable.com';
+    } else if (initialChain.apiUrl) {
+      // Devnet - use the apiUrl from chain config
+      sessionActivityApiUrl = initialChain.apiUrl;
+    }
+    // For any other chain, sessionActivityApiUrl remains null (no session activity tracking)
+
+    // 12. Create ZkEvmProvider
+    provider = new ZkEvmProvider({
+      auth,
+      config: walletConfig,
+      multiRollupApiClients,
+      passportEventEmitter,
+      guardianClient,
+      ethSigner,
+      user,
+      sessionActivityApiUrl,
+    });
+  } else {
+    // Non-zkEVM chain - use SequenceProvider
+    provider = new SequenceProvider({
+      chainConfig: initialChain,
+      guardianClient,
+    });
   }
-  // For any other chain, sessionActivityApiUrl remains null (no session activity tracking)
 
-  // 10. Create PassportEventEmitter
-  const passportEventEmitter = config.passportEventEmitter || new TypedEventEmitter<PassportEventMap>();
-
-  // 11. Create ZkEvmProvider
-  const provider = new ZkEvmProvider({
-    auth,
-    config: walletConfig,
-    multiRollupApiClients,
-    passportEventEmitter,
-    guardianClient,
-    ethSigner,
-    user,
-    sessionActivityApiUrl,
-  });
-
-  // 12. Announce provider via EIP-6963
+  // 13. Announce provider via EIP-6963
   if (config.announceProvider !== false) {
     announceProvider({
       info: passportProviderInfo,
