@@ -2,9 +2,10 @@
 import { MagicTeeApiClients } from '@imtbl/generated-clients';
 import { Flow, trackDuration } from '@imtbl/metrics';
 import { WalletError, WalletErrorType } from '../errors';
-import { Auth } from '@imtbl/auth';
 import { withMetricsAsync } from '../utils/metrics';
-import { isUserZkEvm, User, WalletSigner } from '../types';
+import {
+  isUserZkEvm, User, WalletSigner, GetUserFunction,
+} from '../types';
 import { isAxiosError } from '../utils/http';
 
 const CHAIN_IDENTIFIER = 'ETH';
@@ -62,7 +63,7 @@ const toBase64 = (value: string): string => {
  * This signer delegates cryptographic operations to the Magic TEE service.
  */
 export default class MagicTEESigner implements WalletSigner {
-  private readonly auth: Auth;
+  private readonly getUser: GetUserFunction;
 
   private readonly magicTeeApiClient: MagicTeeApiClients;
 
@@ -70,8 +71,8 @@ export default class MagicTEESigner implements WalletSigner {
 
   private createWalletPromise: Promise<UserWallet> | null = null;
 
-  constructor(auth: Auth, magicTeeApiClient: MagicTeeApiClients) {
-    this.auth = auth;
+  constructor(getUser: GetUserFunction, magicTeeApiClient: MagicTeeApiClients) {
+    this.getUser = getUser;
     this.magicTeeApiClient = magicTeeApiClient;
   }
 
@@ -164,7 +165,8 @@ export default class MagicTEESigner implements WalletSigner {
   }
 
   private async getUserOrThrow(): Promise<User> {
-    const user = await this.auth.getUser();
+    const user = await this.getUser();
+
     if (!user) {
       throw new WalletError(
         'User has been logged out',

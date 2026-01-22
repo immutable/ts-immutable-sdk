@@ -6,131 +6,38 @@
  * Next.js middleware and Edge Runtime environments.
  *
  * For client-side components (provider, hooks, callback), use @imtbl/auth-next-client.
- */
-
-import NextAuthImport from 'next-auth';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore - Type exists in next-auth v5 but TS resolver may use stale types
-import type { NextAuthConfig, Session } from 'next-auth';
-import { type NextRequest, NextResponse } from 'next/server';
-import { createAuthConfig } from './config';
-import type { ImmutableAuthConfig } from './types';
-import { matchPathPrefix } from './utils/pathMatch';
-
-// Handle ESM/CJS interop - in some bundler configurations, the default export
-// may be nested under a 'default' property
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const NextAuth = ((NextAuthImport as any).default || NextAuthImport) as typeof NextAuthImport;
-
-// ============================================================================
-// createImmutableAuth
-// ============================================================================
-
-/**
- * Auth.js v5 config options that can be overridden.
- * Excludes 'providers' as that's managed internally.
- */
-export type ImmutableAuthOverrides = Omit<NextAuthConfig, 'providers'>;
-
-/**
- * Return type of createImmutableAuth - the NextAuth instance with handlers
- */
-export type ImmutableAuthResult = ReturnType<typeof NextAuth>;
-
-/**
- * Create an Auth.js v5 instance with Immutable authentication
  *
- * @param config - Immutable auth configuration
- * @param overrides - Optional Auth.js options to override defaults
- * @returns NextAuth instance with { handlers, auth, signIn, signOut }
- *
- * @remarks
- * Callback composition: The `jwt` and `session` callbacks are composed rather than
- * replaced. Internal callbacks run first (handling token storage and refresh), then
- * your custom callbacks receive the result. Other callbacks (`signIn`, `redirect`)
- * are replaced entirely if provided.
- *
- * @example Basic usage (App Router)
+ * @example Basic usage
  * ```typescript
  * // lib/auth.ts
- * import { createImmutableAuth } from "@imtbl/auth-next-server";
+ * import NextAuth from "next-auth";
+ * import { createAuthConfig } from "@imtbl/auth-next-server";
  *
- * export const { handlers, auth, signIn, signOut } = createImmutableAuth({
+ * export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig({
  *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
  *   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
- * });
- *
- * // app/api/auth/[...nextauth]/route.ts
- * import { handlers } from "@/lib/auth";
- * export const { GET, POST } = handlers;
+ * }));
  * ```
  */
-export function createImmutableAuth(
-  config: ImmutableAuthConfig,
-  overrides?: ImmutableAuthOverrides,
-): ImmutableAuthResult {
-  const baseConfig = createAuthConfig(config);
 
-  // If no overrides, use base config directly
-  if (!overrides) {
-    return NextAuth(baseConfig);
-  }
-
-  // Merge configs with callback composition
-  const { callbacks: overrideCallbacks, ...otherOverrides } = overrides;
-
-  // Compose callbacks - our callbacks run first, then user's callbacks
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const composedCallbacks: any = { ...baseConfig.callbacks };
-
-  if (overrideCallbacks) {
-    // For jwt and session callbacks, compose them (ours first, then user's)
-    if (overrideCallbacks.jwt) {
-      const baseJwt = baseConfig.callbacks?.jwt;
-      const userJwt = overrideCallbacks.jwt;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      composedCallbacks.jwt = async (params: any) => {
-        const result = baseJwt ? await baseJwt(params) : params.token;
-        return userJwt({ ...params, token: result });
-      };
-    }
-
-    if (overrideCallbacks.session) {
-      const baseSession = baseConfig.callbacks?.session;
-      const userSession = overrideCallbacks.session;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      composedCallbacks.session = async (params: any) => {
-        const result = baseSession ? await baseSession(params) : params.session;
-        return userSession({ ...params, session: result });
-      };
-    }
-
-    // For other callbacks, user's callbacks replace ours entirely
-    if (overrideCallbacks.signIn) {
-      composedCallbacks.signIn = overrideCallbacks.signIn;
-    }
-    if (overrideCallbacks.redirect) {
-      composedCallbacks.redirect = overrideCallbacks.redirect;
-    }
-    if (overrideCallbacks.authorized) {
-      composedCallbacks.authorized = overrideCallbacks.authorized;
-    }
-  }
-
-  const mergedConfig: NextAuthConfig = {
-    ...baseConfig,
-    ...otherOverrides,
-    callbacks: composedCallbacks,
-  };
-
-  return NextAuth(mergedConfig);
-}
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - Type exists in next-auth v5 but TS resolver may use stale types
+import type { Session } from 'next-auth';
+import { type NextRequest, NextResponse } from 'next/server';
+import { matchPathPrefix } from './utils/pathMatch';
 
 // ============================================================================
 // Re-export config utilities
 // ============================================================================
 
 export { createAuthConfig, createAuthOptions } from './config';
+export {
+  isTokenExpired,
+  refreshAccessToken,
+  extractZkEvmFromIdToken,
+  type RefreshedTokens,
+  type ZkEvmData,
+} from './refresh';
 
 // ============================================================================
 // Type exports
@@ -205,7 +112,7 @@ export interface ProtectedAuthPropsWithData<T> extends ProtectedAuthProps {
 }
 
 /**
- * Type for the auth function returned by createImmutableAuth
+ * Type for the auth function returned by NextAuth(createAuthConfig(...))
  */
 export type AuthFunction = () => Promise<Session | null>;
 
@@ -215,7 +122,7 @@ export type AuthFunction = () => Promise<Session | null>;
  *
  * For SSR data fetching, use `getAuthenticatedData` instead.
  *
- * @param auth - The auth function from createImmutableAuth
+ * @param auth - The auth function from NextAuth(createAuthConfig(...))
  * @returns AuthProps with session and ssr flag
  *
  * @example
@@ -254,7 +161,7 @@ export async function getAuthProps(auth: AuthFunction): Promise<AuthProps> {
  * - When token is valid: Fetches data server-side, returns with `ssr: true`
  * - When token is expired: Skips fetch, returns `ssr: false` for client-side handling
  *
- * @param auth - The auth function from createImmutableAuth
+ * @param auth - The auth function from NextAuth(createAuthConfig(...))
  * @param fetcher - Async function that receives access token and returns data
  * @returns AuthPropsWithData containing session, ssr flag, and pre-fetched data
  */
@@ -304,7 +211,7 @@ export async function getAuthenticatedData<T>(
  * Get session with detailed status for Server Components.
  * Use this when you need fine-grained control over different auth states.
  *
- * @param auth - The auth function from createImmutableAuth
+ * @param auth - The auth function from NextAuth(createAuthConfig(...))
  * @returns Object with status and session
  */
 export async function getValidSession(auth: AuthFunction): Promise<ValidSessionResult> {
@@ -341,7 +248,7 @@ export type AuthErrorHandler = (error: string) => never;
  * handling once, and all pages using this fetcher will automatically redirect
  * on auth errors.
  *
- * @param auth - The auth function from createImmutableAuth
+ * @param auth - The auth function from NextAuth(createAuthConfig(...))
  * @param onAuthError - Handler called when there's an auth error (should redirect or throw)
  * @returns A function to fetch protected data without needing authError checks
  */
@@ -373,7 +280,7 @@ export function createProtectedDataFetcher(
  * Similar to createProtectedDataFetcher but for cases where you don't need
  * server-side data fetching.
  *
- * @param auth - The auth function from createImmutableAuth
+ * @param auth - The auth function from NextAuth(createAuthConfig(...))
  * @param onAuthError - Handler called when there's an auth error (should redirect or throw)
  * @returns A function to get auth props without needing authError checks
  */
@@ -417,7 +324,7 @@ export interface ProtectedFetchers {
  * across all protected pages. Define your error handler once, then use the
  * returned functions without needing to check authError on each page.
  *
- * @param auth - The auth function from createImmutableAuth
+ * @param auth - The auth function from NextAuth(createAuthConfig(...))
  * @param onAuthError - Handler called when there's an auth error (should redirect or throw)
  * @returns Object with getAuthProps and getData functions
  */
@@ -459,7 +366,7 @@ export interface WithServerAuthOptions<TFallback> {
  * Helper for Server Components that need authenticated data.
  * Automatically handles token expiration by rendering a client fallback.
  *
- * @param auth - The auth function from createImmutableAuth
+ * @param auth - The auth function from NextAuth(createAuthConfig(...))
  * @param serverRender - Async function that receives valid session and returns JSX
  * @param options - Fallback options for different auth states
  * @returns The rendered content based on auth state
@@ -535,7 +442,7 @@ export interface AuthMiddlewareOptions {
  *
  * This is the App Router replacement for `withPageAuthRequired`.
  *
- * @param auth - The auth function from createImmutableAuth
+ * @param auth - The auth function from NextAuth(createAuthConfig(...))
  * @param options - Middleware options
  * @returns A Next.js middleware function
  *
@@ -629,7 +536,7 @@ export function createAuthMiddleware(
  * The returned function forwards all arguments from Next.js to your handler,
  * allowing access to the request, context, form data, or any other arguments.
  *
- * @param auth - The auth function from createImmutableAuth
+ * @param auth - The auth function from NextAuth(createAuthConfig(...))
  * @param handler - The handler function to protect. Receives session as first arg,
  *                  followed by any arguments passed by Next.js (request, context, etc.)
  * @returns A protected handler that checks authentication before executing

@@ -4,26 +4,31 @@
  * Client-side components for Immutable Auth.js v5 integration with Next.js.
  * This package provides React components and hooks for authentication.
  *
- * Note: This package depends on @imtbl/auth and should only be used in
- * browser/client environments. For server-side utilities, use @imtbl/auth-next-server.
+ * This package is designed to work with:
+ * - SessionProvider from next-auth/react (user-provided)
+ * - createAuthConfig from @imtbl/auth-next-server
+ * - Standalone login functions from @imtbl/auth
+ *
+ * @example Basic setup
+ * ```tsx
+ * // app/providers.tsx
+ * "use client";
+ * import { SessionProvider } from "next-auth/react";
+ *
+ * export function Providers({ children }: { children: React.ReactNode }) {
+ *   return <SessionProvider>{children}</SessionProvider>;
+ * }
+ * ```
  */
 
-// Client-side components and hooks
-export {
-  ImmutableAuthProvider,
-  useImmutableAuth,
-  useAccessToken,
-  useHydratedData,
-  type UseHydratedDataResult,
-  type HydratedDataProps,
-} from './provider';
+// Callback page component
+export { CallbackPage, type CallbackPageProps, type CallbackConfig } from './callback';
 
-export { CallbackPage, type CallbackPageProps } from './callback';
+// Session hook with getUser for wallet integration
+export { useImmutableSession, type UseImmutableSessionReturn, type ImmutableSession } from './hooks';
 
 // Re-export types
 export type {
-  ImmutableAuthProviderProps,
-  UseImmutableAuthReturn,
   ImmutableUserClient,
   ImmutableTokenDataClient,
   ZkEvmInfo,
@@ -39,6 +44,17 @@ export type {
   ProtectedAuthProps,
   ProtectedAuthPropsWithData,
 } from '@imtbl/auth-next-server';
+
+// Re-export standalone login functions and types from @imtbl/auth for convenience
+export {
+  loginWithPopup,
+  loginWithEmbedded,
+  loginWithRedirect,
+  handleLoginCallback,
+  type LoginConfig,
+  type TokenResponse,
+  type StandaloneLoginOptions,
+} from '@imtbl/auth';
 
 // Re-export login-related types from @imtbl/auth for convenience
 export type { LoginOptions, DirectLoginOptions } from '@imtbl/auth';

@@ -14,10 +14,10 @@ import {
   ProviderEventMap,
   RequestArguments,
 } from './types';
-import { Auth, TypedEventEmitter } from '@imtbl/auth';
+import { TypedEventEmitter } from '@imtbl/auth';
 import { WalletConfiguration } from '../config';
 import {
-  PassportEventMap, AuthEvents, WalletEvents, User, UserZkEvm, WalletSigner,
+  WalletEventMap, WalletEvents, User, UserZkEvm, WalletSigner, GetUserFunction,
 } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
@@ -32,20 +32,28 @@ import { sendDeployTransactionAndPersonalSign } from './sendDeployTransactionAnd
 import { signEjectionTransaction } from './signEjectionTransaction';
 
 export type ZkEvmProviderInput = {
-  auth: Auth;
+  /**
+   * Function that returns the current user with fresh tokens.
+   * This is the primary way to provide authentication to the wallet.
+   */
+  getUser: GetUserFunction;
+  /**
+   * Client ID for session activity tracking.
+   */
+  clientId: string;
   config: WalletConfiguration;
   multiRollupApiClients: MultiRollupApiClients;
-  passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  walletEventEmitter: TypedEventEmitter<WalletEventMap>;
   guardianClient: GuardianClient;
   ethSigner: WalletSigner;
   user: User | null;
   sessionActivityApiUrl: string | null;
 };
 
-const isZkEvmUser = (user: User): user is UserZkEvm => 'zkEvm' in user;
+const isZkEvmUser = (user: User): user is UserZkEvm => !!user.zkEvm;
 
 export class ZkEvmProvider implements Provider {
-  readonly #auth: Auth;
+  readonly #getUser: GetUserFunction;
 
   readonly #config: WalletConfiguration;
 
@@ -57,9 +65,9 @@ export class ZkEvmProvider implements Provider {
   readonly #providerEventEmitter: TypedEventEmitter<ProviderEventMap>;
 
   /**
-   * intended to emit internal Passport events
+   * intended to emit internal wallet events
    */
-  readonly #passportEventEmitter: TypedEventEmitter<ProviderEventMap>;
+  readonly #walletEventEmitter: TypedEventEmitter<WalletEventMap>;
 
   readonly #guardianClient: GuardianClient;
 
@@ -71,22 +79,26 @@ export class ZkEvmProvider implements Provider {
 
   readonly #ethSigner: WalletSigner;
 
+  readonly #clientId: string;
+
   public readonly isPassport: boolean = true;
 
   constructor({
-    auth,
+    getUser,
+    clientId,
     config,
     multiRollupApiClients,
-    passportEventEmitter,
+    walletEventEmitter,
     guardianClient,
     ethSigner,
     user,
     sessionActivityApiUrl,
   }: ZkEvmProviderInput) {
-    this.#auth = auth;
+    this.#getUser = getUser;
+    this.#clientId = clientId;
     this.#config = config;
     this.#guardianClient = guardianClient;
-    this.#passportEventEmitter = passportEventEmitter;
+    this.#walletEventEmitter = walletEventEmitter;
     this.#sessionActivityApiUrl = sessionActivityApiUrl;
     this.#ethSigner = ethSigner;
 
@@ -99,7 +111,7 @@ export class ZkEvmProvider implements Provider {
     this.#relayerClient = new RelayerClient({
       config: this.#config,
       rpcProvider: this.#rpcProvider,
-      auth: this.#auth,
+      getUser: this.#getUser,
     });
 
     this.#multiRollupApiClients = multiRollupApiClients;
@@ -109,13 +121,9 @@ export class ZkEvmProvider implements Provider {
       this.#callSessionActivity(user.zkEvm.ethAddress);
     }
 
-    passportEventEmitter.on(AuthEvents.LOGGED_IN, (loggedInUser: User) => {
-      if (isZkEvmUser(loggedInUser)) {
-        this.#callSessionActivity(loggedInUser.zkEvm.ethAddress);
-      }
-    });
-    passportEventEmitter.on(AuthEvents.LOGGED_OUT, this.#handleLogout);
-    passportEventEmitter.on(
+    // Listen for logout events
+    walletEventEmitter.on(WalletEvents.LOGGED_OUT, this.#handleLogout);
+    walletEventEmitter.on(
       WalletEvents.ACCOUNTS_REQUESTED,
       trackSessionActivity,
     );
@@ -125,7 +133,14 @@ export class ZkEvmProvider implements Provider {
     this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
   };
 
-  async #callSessionActivity(zkEvmAddress: string, clientId?: string) {
+  /**
+   * Get the current user using getUser function.
+   */
+  async #getCurrentUser(): Promise<User | null> {
+    return this.#getUser();
+  }
+
+  async #callSessionActivity(zkEvmAddress: string) {
     // Only emit session activity event for supported chains (mainnet, testnet, devnet)
     if (!this.#sessionActivityApiUrl) {
       return;
@@ -147,18 +162,19 @@ export class ZkEvmProvider implements Provider {
       nonceSpace,
       isBackgroundTransaction: true,
     });
-    this.#passportEventEmitter.emit(WalletEvents.ACCOUNTS_REQUESTED, {
+
+    this.#walletEventEmitter.emit(WalletEvents.ACCOUNTS_REQUESTED, {
       sessionActivityApiUrl: this.#sessionActivityApiUrl,
       sendTransaction: sendTransactionClosure,
       walletAddress: zkEvmAddress,
-      passportClient: clientId || await this.#auth.getClientId(),
+      passportClient: this.#clientId,
     });
   }
 
   // Used to get the registered zkEvm address from the User session
   async #getZkEvmAddress() {
     try {
-      const user = await this.#auth.getUser();
+      const user = await this.#getCurrentUser();
       if (user && isZkEvmUser(user)) {
         return user.zkEvm.ethAddress;
       }
@@ -179,8 +195,15 @@ export class ZkEvmProvider implements Provider {
         const flow = trackFlow('passport', 'ethRequestAccounts');
 
         try {
-          const user = await this.#auth.getUserOrLogin();
-          flow.addEvent('endGetUserOrLogin');
+          // Get user via getUser function
+          const user = await this.#getUser();
+          if (!user) {
+            throw new JsonRpcError(
+              ProviderErrorCode.UNAUTHORIZED,
+              'User not authenticated. Please log in first.',
+            );
+          }
+          flow.addEvent('endGetUser');
 
           let userZkEvmEthAddress: string | undefined;
 
@@ -189,13 +212,18 @@ export class ZkEvmProvider implements Provider {
 
             userZkEvmEthAddress = await registerZkEvmUser({
               ethSigner: this.#ethSigner,
-              auth: this.#auth,
+              getUser: this.#getUser,
               multiRollupApiClients: this.#multiRollupApiClients,
               accessToken: user.accessToken,
               rpcProvider: this.#rpcProvider,
               flow,
             });
             flow.addEvent('endUserRegistration');
+
+            // Force refresh to update session with zkEvm claims from IDP
+            // This ensures subsequent getUser() calls return the updated user
+            await this.#getUser(true);
+            flow.addEvent('endForceRefresh');
           } else {
             userZkEvmEthAddress = user.zkEvm.ethAddress;
           }
@@ -420,10 +448,9 @@ export class ZkEvmProvider implements Provider {
         }
       }
       case 'im_addSessionActivity': {
-        const [clientId] = request.params || [];
         const zkEvmAddress = await this.#getZkEvmAddress();
         if (zkEvmAddress) {
-          this.#callSessionActivity(zkEvmAddress, clientId);
+          this.#callSessionActivity(zkEvmAddress);
         }
         return null;
       }

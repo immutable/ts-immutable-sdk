@@ -4,7 +4,7 @@
 import type { NextAuthConfig } from 'next-auth';
 import CredentialsImport from 'next-auth/providers/credentials';
 import type { ImmutableAuthConfig, ImmutableTokenData, UserInfoResponse } from './types';
-import { isTokenExpired } from './refresh';
+import { isTokenExpired, refreshAccessToken, extractZkEvmFromIdToken } from './refresh';
 import {
   DEFAULT_AUTH_DOMAIN,
   IMMUTABLE_PROVIDER_ID,
@@ -169,12 +169,44 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
           };
         }
 
-        // Handle session update (for client-side token sync)
+        // Handle session update (for client-side token sync or forceRefresh)
         // When client-side Auth refreshes tokens via TOKEN_REFRESHED event,
         // it calls updateSession() which triggers this callback with the new tokens.
         // We clear any stale error (e.g., TokenExpired) on successful update.
         if (trigger === 'update' && sessionUpdate) {
           const update = sessionUpdate as Record<string, unknown>;
+
+          // If forceRefresh is requested, perform server-side token refresh
+          // This is used after zkEVM registration to get updated claims from IDP
+          if (update.forceRefresh && token.refreshToken) {
+            try {
+              const refreshed = await refreshAccessToken(
+                token.refreshToken as string,
+                config.clientId,
+                authDomain,
+              );
+              // Extract zkEvm claims from the refreshed idToken
+              const zkEvm = extractZkEvmFromIdToken(refreshed.idToken);
+              return {
+                ...token,
+                accessToken: refreshed.accessToken,
+                refreshToken: refreshed.refreshToken,
+                idToken: refreshed.idToken,
+                accessTokenExpires: refreshed.accessTokenExpires,
+                zkEvm: zkEvm ?? token.zkEvm, // Keep existing zkEvm if not in new token
+                error: undefined,
+              };
+            } catch (error) {
+              // eslint-disable-next-line no-console
+              console.error('[auth-next-server] Force refresh failed:', error);
+              return {
+                ...token,
+                error: 'RefreshTokenError',
+              };
+            }
+          }
+
+          // Standard session update - merge provided values
           return {
             ...token,
             ...(update.accessToken ? { accessToken: update.accessToken } : {}),
@@ -192,18 +224,37 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
           return token;
         }
 
-        // Token expired - DON'T refresh server-side!
-        // Server-side refresh causes race conditions with 403 errors when multiple
-        // concurrent SSR requests detect expired tokens. The pendingRefreshes Map
-        // mutex doesn't work across serverless isolates/processes.
-        //
-        // Instead, mark the token as expired and let the client handle refresh:
-        // 1. SSR completes with session.error = "TokenExpired"
-        // 2. Client hydrates, calls getAccessToken() for data fetches
-        // 3. getAccessToken() calls auth.getAccessToken() which auto-refreshes
-        //    with proper mutex protection (refreshingPromise in @imtbl/auth)
-        // 4. TOKEN_REFRESHED event fires → updateSession() syncs fresh tokens
-        // 5. NextAuth receives update trigger → clears error, stores fresh tokens
+        // Token expired - attempt server-side refresh
+        // This ensures clients always get fresh tokens from session callbacks
+        if (token.refreshToken) {
+          try {
+            const refreshed = await refreshAccessToken(
+              token.refreshToken as string,
+              config.clientId,
+              authDomain,
+            );
+            // Extract zkEvm claims from the refreshed idToken
+            const zkEvm = extractZkEvmFromIdToken(refreshed.idToken);
+            return {
+              ...token,
+              accessToken: refreshed.accessToken,
+              refreshToken: refreshed.refreshToken,
+              idToken: refreshed.idToken,
+              accessTokenExpires: refreshed.accessTokenExpires,
+              zkEvm: zkEvm ?? token.zkEvm, // Keep existing zkEvm if not in new token
+              error: undefined, // Clear any previous error
+            };
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('[auth-next-server] Token refresh failed:', error);
+            return {
+              ...token,
+              error: 'RefreshTokenError',
+            };
+          }
+        }
+
+        // No refresh token available
         return {
           ...token,
           error: 'TokenExpired',

@@ -35,3 +35,17 @@ export {
 } from './errors';
 
 export { decodeJwtPayload } from './utils/jwt';
+
+// ============================================================================
+// Standalone Login Functions (stateless, for use with NextAuth or similar)
+// ============================================================================
+
+export {
+  loginWithPopup,
+  loginWithEmbedded,
+  loginWithRedirect,
+  handleLoginCallback,
+  type LoginConfig,
+  type TokenResponse,
+  type StandaloneLoginOptions,
+} from './login/standalone';

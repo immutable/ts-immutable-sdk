@@ -3,40 +3,26 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { Auth } from '@imtbl/auth';
-import type { ImmutableUserClient, ImmutableTokenDataClient } from './types';
-import { getTokenExpiry } from './utils/token';
-import {
-  DEFAULT_AUTH_DOMAIN,
-  DEFAULT_AUDIENCE,
-  DEFAULT_SCOPE,
-  IMMUTABLE_PROVIDER_ID,
-} from './constants';
+import { handleLoginCallback as handleAuthCallback, type TokenResponse } from '@imtbl/auth';
+import type { ImmutableUserClient } from './types';
+import { IMMUTABLE_PROVIDER_ID } from './constants';
 
 /**
- * Get search params from the current URL.
- * Uses window.location.search directly to avoid issues with useSearchParams()
- * in Pages Router, where the hook may not be hydrated during initial render.
+ * Config for CallbackPage - matches LoginConfig from @imtbl/auth
  */
-function getSearchParams(): URLSearchParams {
-  if (typeof window === 'undefined') {
-    return new URLSearchParams();
-  }
-  return new URLSearchParams(window.location.search);
-}
-
-/**
- * Config for CallbackPage
- */
-interface CallbackConfig {
+export interface CallbackConfig {
+  /** Your Immutable application client ID */
   clientId: string;
+  /** The OAuth redirect URI for your application */
   redirectUri: string;
+  /** Optional separate redirect URI for popup flows */
   popupRedirectUri?: string;
-  logoutRedirectUri?: string;
+  /** OAuth audience (default: "platform_api") */
   audience?: string;
+  /** OAuth scopes (default: "openid profile email offline_access transact") */
   scope?: string;
+  /** Authentication domain (default: "https://auth.immutable.com") */
   authenticationDomain?: string;
-  passportDomain?: string;
 }
 
 export interface CallbackPageProps {
@@ -75,9 +61,53 @@ export interface CallbackPageProps {
 }
 
 /**
- * Callback page component for handling OAuth redirects (App Router version).
+ * Get search params from the current URL.
+ * Uses window.location.search directly to avoid issues with useSearchParams()
+ * in Pages Router, where the hook may not be hydrated during initial render.
+ */
+function getSearchParams(): URLSearchParams {
+  if (typeof window === 'undefined') {
+    return new URLSearchParams();
+  }
+  return new URLSearchParams(window.location.search);
+}
+
+/**
+ * Map TokenResponse to token data format expected by NextAuth signIn
+ */
+function mapTokensToSignInData(tokens: TokenResponse) {
+  return {
+    accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken,
+    idToken: tokens.idToken,
+    accessTokenExpires: tokens.accessTokenExpires,
+    profile: tokens.profile,
+    zkEvm: tokens.zkEvm,
+  };
+}
+
+/**
+ * Callback page component for handling OAuth redirects.
  *
- * Use this in your callback page to process authentication responses.
+ * This component handles the OAuth callback by:
+ * 1. Using `handleLoginCallback` from @imtbl/auth to exchange the code for tokens
+ * 2. Signing in to NextAuth with the tokens
+ * 3. Redirecting to the specified URL
+ *
+ * @example
+ * ```tsx
+ * // app/callback/page.tsx
+ * import { CallbackPage } from '@imtbl/auth-next-client';
+ *
+ * const config = {
+ *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+ *   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
+ * };
+ *
+ * export default function Callback() {
+ *   return <CallbackPage config={config} redirectTo="/" />;
+ * }
+ * ```
  */
 export function CallbackPage({
   config,
@@ -95,65 +125,40 @@ export function CallbackPage({
 
   useEffect(() => {
     // Get search params directly from window.location to ensure compatibility
-    // with both App Router and Pages Router. useSearchParams() from next/navigation
-    // has hydration issues in Pages Router where params may be empty initially.
+    // with both App Router and Pages Router
     const searchParams = getSearchParams();
 
     const handleCallback = async () => {
       try {
-        // Create Auth instance to handle the callback
-        const auth = new Auth({
-          clientId: config.clientId,
-          redirectUri: config.redirectUri,
-          popupRedirectUri: config.popupRedirectUri,
-          logoutRedirectUri: config.logoutRedirectUri,
-          audience: config.audience || DEFAULT_AUDIENCE,
-          scope: config.scope || DEFAULT_SCOPE,
-          authenticationDomain: config.authenticationDomain || DEFAULT_AUTH_DOMAIN,
-          passportDomain: config.passportDomain,
-        });
+        // Use standalone handleLoginCallback from @imtbl/auth
+        // This handles PKCE code exchange and returns tokens without state management
+        const tokens = await handleAuthCallback(config);
 
-        // Process the callback - this extracts tokens from the URL and returns the user
-        const authUser = await auth.loginCallback();
+        // If no tokens, the callback failed
+        if (!tokens) {
+          throw new Error('Authentication failed: no tokens received from callback');
+        }
 
         // Check if we're in a popup window
         if (window.opener) {
-          // Validate authUser before closing - if loginCallback failed silently,
-          // we need to show an error instead of closing the popup
-          if (!authUser) {
-            throw new Error('Authentication failed: no user data received from login callback');
-          }
           // Create user object for callbacks
           const user: ImmutableUserClient = {
-            sub: authUser.profile.sub,
-            email: authUser.profile.email,
-            nickname: authUser.profile.nickname,
+            sub: tokens.profile.sub,
+            email: tokens.profile.email,
+            nickname: tokens.profile.nickname,
           };
           // Call onSuccess callback before closing popup
           if (onSuccess) {
             await onSuccess(user);
           }
-          // Close the popup - the parent window will receive the tokens via Auth events
+          // For popup flows, we need to communicate tokens back to the parent
+          // The parent window is polling for the redirect and will handle the tokens
+          // Close the popup - parent window's loginWithPopup handles the rest
           window.close();
-        } else if (authUser) {
-          // Not in a popup - create NextAuth session before redirecting
-          // This ensures SSR/session-based auth is authenticated
-          const tokenData: ImmutableTokenDataClient = {
-            accessToken: authUser.accessToken,
-            refreshToken: authUser.refreshToken,
-            idToken: authUser.idToken,
-            accessTokenExpires: getTokenExpiry(authUser.accessToken),
-            profile: {
-              sub: authUser.profile.sub,
-              email: authUser.profile.email,
-              nickname: authUser.profile.nickname,
-            },
-            zkEvm: authUser.zkEvm,
-          };
+        } else {
+          // Not in a popup - sign in to NextAuth with the tokens
+          const tokenData = mapTokensToSignInData(tokens);
 
-          // Sign in to NextAuth with the tokens
-          // Note: signIn uses the basePath from SessionProvider context,
-          // so ensure CallbackPage is rendered within ImmutableAuthProvider
           const result = await signIn(IMMUTABLE_PROVIDER_ID, {
             tokens: JSON.stringify(tokenData),
             redirect: false,
@@ -169,9 +174,9 @@ export function CallbackPage({
 
           // Create user object for callbacks and dynamic redirect
           const user: ImmutableUserClient = {
-            sub: authUser.profile.sub,
-            email: authUser.profile.email,
-            nickname: authUser.profile.nickname,
+            sub: tokens.profile.sub,
+            email: tokens.profile.email,
+            nickname: tokens.profile.nickname,
           };
 
           // Call onSuccess callback before redirect
@@ -186,10 +191,6 @@ export function CallbackPage({
 
           // Only redirect after successful session creation
           router.replace(resolvedRedirectTo);
-        } else {
-          // authUser is undefined - loginCallback failed silently
-          // This can happen if the OIDC signinCallback returns null
-          throw new Error('Authentication failed: no user data received from login callback');
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Authentication failed';

@@ -54,3 +54,16 @@ Always use conventional commit format for all commits and PR titles:
 - Wrap the body at 72 characters
 
 When creating PRs, always follow this conventional commit style for both the commit messages and PR titles.
+
+## Principles
+The following list of principles should be honoured when introducing changes:
+- always check what's the best practice in the industry
+- raise with the user if there is a package out there that is a 80-90% fit instead of writing from scratch
+- always clean up after changes
+- focus on root cause instead of fixing symptoms
+- trace changes applied locally and in-branch against main when debugging issues locally to first understand if it's a pre-existing bug
+- do not come up with new requirements or alter requirements by yourself. Propose alternatives first.
+- follow the same architecture pattern in the repo. If there is significant benefit to do things differently, raise it first.
+- when refactoring, check if any existing functionality has been changed/broken or new functionality has been added. if inevertible, call it out.
+- always check if changes have introduced any bugs
+- when coming up with a fix, keep going after the first layer of root cause until you can reason about the entire data flow/userflow is sound.

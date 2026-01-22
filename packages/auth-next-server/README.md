@@ -37,12 +37,13 @@ Create a file to configure Immutable authentication:
 
 ```typescript
 // lib/auth.ts
-import { createImmutableAuth } from "@imtbl/auth-next-server";
+import NextAuth from "next-auth";
+import { createAuthConfig } from "@imtbl/auth-next-server";
 
-export const { handlers, auth, signIn, signOut } = createImmutableAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig({
   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
-});
+}));
 ```
 
 ### 2. Set Up API Route
@@ -67,14 +68,15 @@ AUTH_SECRET=your-secret-key-min-32-characters
 
 ## Configuration
 
-### `createImmutableAuth(config, overrides?)`
+### `createAuthConfig(config)`
 
-Creates an Auth.js v5 instance configured for Immutable authentication.
+Creates an Auth.js v5 configuration object for Immutable authentication. You pass this to `NextAuth()` to create your auth instance.
 
 ```typescript
-import { createImmutableAuth } from "@imtbl/auth-next-server";
+import NextAuth from "next-auth";
+import { createAuthConfig } from "@imtbl/auth-next-server";
 
-const { handlers, auth, signIn, signOut } = createImmutableAuth({
+const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig({
   // Required
   clientId: "your-client-id",
   redirectUri: "https://your-app.com/callback",
@@ -83,7 +85,7 @@ const { handlers, auth, signIn, signOut } = createImmutableAuth({
   audience: "platform_api",                           // Default: "platform_api"
   scope: "openid profile email offline_access transact", // Default scope
   authenticationDomain: "https://auth.immutable.com", // Default domain
-});
+}));
 ```
 
 #### Configuration Options
@@ -96,25 +98,39 @@ const { handlers, auth, signIn, signOut } = createImmutableAuth({
 | `scope` | `string` | No | OAuth scopes (default: `"openid profile email offline_access transact"`) |
 | `authenticationDomain` | `string` | No | Auth domain (default: `"https://auth.immutable.com"`) |
 
-#### Auth.js Overrides
+#### Extending the Configuration
 
-You can override any Auth.js configuration options:
+You can spread the config and add your own Auth.js options:
 
 ```typescript
-const { handlers, auth } = createImmutableAuth(config, {
+import NextAuth from "next-auth";
+import { createAuthConfig } from "@imtbl/auth-next-server";
+
+const baseConfig = createAuthConfig({
+  clientId: "your-client-id",
+  redirectUri: "https://your-app.com/callback",
+});
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...baseConfig,
   // Auth.js options
   secret: process.env.AUTH_SECRET,
   trustHost: true,
   basePath: "/api/auth/custom",
   
-  // Callbacks are composed, not replaced
+  // Extend callbacks (be sure to call the base callbacks first)
   callbacks: {
-    jwt({ token }) {
-      // Your custom JWT callback - runs after internal callback
+    ...baseConfig.callbacks,
+    async jwt(params) {
+      // Call base jwt callback first
+      const token = await baseConfig.callbacks?.jwt?.(params) ?? params.token;
+      // Add your custom logic
       return token;
     },
-    session({ session }) {
-      // Your custom session callback - runs after internal callback
+    async session(params) {
+      // Call base session callback first
+      const session = await baseConfig.callbacks?.session?.(params) ?? params.session;
+      // Add your custom logic
       return session;
     },
   },
@@ -157,7 +173,7 @@ export default async function DashboardPage() {
     redirect("/login");
   }
   
-  // DashboardClient will fetch its own data using useImmutableAuth().getAccessToken()
+  // DashboardClient will fetch its own data using useImmutableSession().getUser()
   return <DashboardClient {...authProps} />;
 }
 ```
@@ -466,6 +482,53 @@ interface Session {
   };
   error?: string;       // "TokenExpired" or "RefreshTokenError"
 }
+```
+
+## Token Refresh
+
+### Automatic Refresh on Token Expiry
+
+The `jwt` callback automatically refreshes tokens when the access token expires. This happens transparently during any session access (page load, API call, etc.).
+
+### Force Refresh (for Updated Claims)
+
+After operations that update the user's profile on the identity provider (e.g., zkEVM registration), you may need to force a token refresh to get the updated claims.
+
+The `getUser` function from `@imtbl/auth-next-client` supports this:
+
+```tsx
+import { useImmutableSession } from "@imtbl/auth-next-client";
+
+function MyComponent() {
+  const { getUser } = useImmutableSession();
+  
+  const handleRegistration = async () => {
+    // After zkEVM registration completes...
+    
+    // Force refresh to get updated zkEvm claims from IDP
+    const freshUser = await getUser(true);
+    console.log("Updated zkEvm:", freshUser?.zkEvm);
+  };
+}
+```
+
+When `forceRefresh` is triggered:
+1. Client calls `update({ forceRefresh: true })` via NextAuth
+2. The `jwt` callback detects `trigger === 'update'` with `forceRefresh: true`
+3. Server performs a token refresh using the refresh token
+4. Updated claims (like `zkEvm`) are extracted from the new ID token
+5. Session is updated with fresh data
+
+### Exported Utilities
+
+The package also exports utilities for manual token handling:
+
+```typescript
+import { 
+  isTokenExpired,         // Check if access token is expired
+  refreshAccessToken,     // Manually refresh tokens
+  extractZkEvmFromIdToken // Extract zkEvm claims from ID token
+} from "@imtbl/auth-next-server";
 ```
 
 ## Error Handling
