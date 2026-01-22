@@ -29,7 +29,10 @@ export default function Home() {
       <main>
         <Container>
           <Row className="my-3">
-            <Environment disabled={isLoading || !!imxProvider || !!zkEvmProvider || !!arbitrumProvider || !!defaultWalletProvider} />
+            <Environment
+              disabled={isLoading || !!imxProvider || !!zkEvmProvider
+                || !!arbitrumProvider || !!defaultWalletProvider}
+            />
           </Row>
           <Row className="my-3">
             <PassportMethods />
