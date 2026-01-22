@@ -83,6 +83,7 @@ export default class GuardianClient {
         clientId,
         redirectUri: 'https://auth.immutable.com/im-logged-in',
       },
+      crossSdkBridgeEnabled: config.crossSdkBridgeEnabled,
     });
     this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled;
     this.guardianApi = guardianApi;
