@@ -40,7 +40,7 @@
     "@imtbl/auth-next-server": "workspace:*"
   },
   "peerDependencies": {
-    "next": "^14.2.0 || ^15.0.0",
+    "next": "^15.0.0",
     "next-auth": "^5.0.0-beta.25",
     "react": "^18.2.0 || ^19.0.0"
   },
