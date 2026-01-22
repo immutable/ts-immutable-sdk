@@ -10,8 +10,7 @@
  * @example Basic usage
  * ```typescript
  * // lib/auth.ts
- * import NextAuth from "next-auth";
- * import { createAuthConfig } from "@imtbl/auth-next-server";
+ * import { NextAuth, createAuthConfig } from "@imtbl/auth-next-server";
  *
  * export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig({
  *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
@@ -25,6 +24,14 @@
 import type { Session } from 'next-auth';
 import { type NextRequest, NextResponse } from 'next/server';
 import { matchPathPrefix } from './utils/pathMatch';
+
+// ============================================================================
+// Re-export NextAuth to ensure type compatibility
+// Consumers should import NextAuth from this package to avoid type conflicts
+// caused by multiple next-auth installations in monorepos
+// ============================================================================
+
+export { default as NextAuth } from 'next-auth';
 
 // ============================================================================
 // Re-export config utilities

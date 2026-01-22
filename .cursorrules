@@ -65,5 +65,5 @@ The following list of principles should be honoured when introducing changes:
 - do not come up with new requirements or alter requirements by yourself. Propose alternatives first.
 - follow the same architecture pattern in the repo. If there is significant benefit to do things differently, raise it first.
 - when refactoring, check if any existing functionality has been changed/broken or new functionality has been added. if inevertible, call it out.
-- always check if changes have introduced any bugs
+- always check or ask if a problem/bug exists after certain changes. trace back and find all the changes applied in between and use that as scope for debugging.
 - when coming up with a fix, keep going after the first layer of root cause until you can reason about the entire data flow/userflow is sound.

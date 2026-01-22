@@ -4,8 +4,7 @@
  * 
  * For client-safe utilities, see ./immutable-auth.ts
  */
-import NextAuth from "next-auth";
-import { createAuthConfig } from "@imtbl/auth-next-server";
+import { NextAuth, createAuthConfig } from "@imtbl/auth-next-server";
 import { EnvironmentNames } from "@/types";
 import { getAuthConfig } from "./immutable-auth";
 
