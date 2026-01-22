@@ -1,6 +1,11 @@
 import { Flow } from '@imtbl/metrics';
-import { TypedEventEmitter } from '@imtbl/auth';
+import { TypedEventEmitter, User } from '@imtbl/auth';
 import { JsonRpcError } from './zkEvm/JsonRpcError';
+
+export enum EvmChain {
+  ZKEVM = 'zkevm',
+  ARBITRUM_ONE = 'arbitrum_one',
+}
 
 /**
  * A viem-compatible signer interface for wallet operations.
@@ -43,8 +48,16 @@ export interface WalletEventMap extends Record<string, any> {
 // Legacy alias for backwards compatibility with Passport
 export type PassportEventMap = WalletEventMap;
 
-// Re-export zkEVM Provider type for public API
-export type { Provider } from './zkEvm/types';
+/**
+ * EIP-1193 Provider Interface
+ * Standard Ethereum provider interface for all chain types
+ */
+export type Provider = {
+  request: (request: RequestArguments) => Promise<any>;
+  on: (event: string, listener: (...args: any[]) => void) => void;
+  removeListener: (event: string, listener: (...args: any[]) => void) => void;
+  isPassport: boolean;
+};
 
 export interface RequestArguments {
   method: string;
@@ -193,6 +206,12 @@ export interface ChainConfig {
    * Defaults to 'https://tee.express.magiclabs.com'
    */
   magicTeeBasePath?: string;
+
+  /** Preferred token symbol for relayer fees (default: 'IMX') */
+  feeTokenSymbol?: string;
+
+  /** Sequence RPC node URL TODO: check if this can be removed and only use rpcUrl */
+  nodeUrl?: string;
 }
 
 /**

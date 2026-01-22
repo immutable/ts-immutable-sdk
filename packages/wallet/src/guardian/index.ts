@@ -252,6 +252,7 @@ export default class GuardianClient {
         messageId,
         user.zkEvm.ethAddress,
         'eip712',
+        chainID,
       );
 
       if (!confirmationResult.confirmed) {
@@ -300,6 +301,7 @@ export default class GuardianClient {
         messageId,
         user.zkEvm.ethAddress,
         'erc191',
+        String(chainID),
       );
 
       if (!confirmationResult.confirmed) {

@@ -17,13 +17,19 @@ export type {
   AuthModuleConfiguration,
   PopupOverlayOptions,
   PassportMetadata,
+  PassportChainMetadata,
+  ChainAddress,
   IdTokenPayload,
   PKCEData,
   AuthEventMap,
   UserRemovedReason,
 } from './types';
 export {
-  isUserZkEvm, RollupType, MarketingConsentStatus, AuthEvents,
+  isUserZkEvm,
+  RollupType,
+  EvmChain,
+  MarketingConsentStatus,
+  AuthEvents,
 } from './types';
 
 // Export TypedEventEmitter

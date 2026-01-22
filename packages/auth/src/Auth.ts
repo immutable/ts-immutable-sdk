@@ -29,6 +29,7 @@ import {
   PassportMetadata,
   IdTokenPayload,
   isUserZkEvm,
+  EvmChain,
 } from './types';
 import EmbeddedLoginPrompt from './login/embeddedLoginPrompt';
 import TypedEventEmitter from './utils/typedEventEmitter';
@@ -570,12 +571,25 @@ export class Auth {
         username,
       },
     };
+
     if (passport?.zkevm_eth_address && passport?.zkevm_user_admin_address) {
       user.zkEvm = {
         ethAddress: passport.zkevm_eth_address,
         userAdminAddress: passport.zkevm_user_admin_address,
       };
     }
+
+    const chains = Object.values(EvmChain).filter((chain) => chain !== EvmChain.ZKEVM);
+    for (const chain of chains) {
+      const chainMetadata = passport?.[chain as Exclude<EvmChain, EvmChain.ZKEVM>];
+      if (chainMetadata?.eth_address && chainMetadata?.user_admin_address) {
+        user[chain] = {
+          ethAddress: chainMetadata.eth_address,
+          userAdminAddress: chainMetadata.user_admin_address,
+        };
+      }
+    }
+
     return user;
   };
 
