@@ -1,13 +1,13 @@
 import React from 'react';
 import Head from 'next/head';
 import { Container, Row } from 'react-bootstrap';
+import { useImmutableSession } from '@imtbl/auth-next-client';
 import Status from '@/components/Status';
 import ImxWorkflow from '@/components/imx/ImxWorkflow';
 import Message from '@/components/Message';
 import Environment from '@/components/Environment';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
-import { useImmutableAuth } from '@imtbl/auth-next-client';
 import { BASE_PATH } from '@/config';
 import PassportMethods from '@/components/PassportMethods';
 import ZkEvmWorkflow from '@/components/zkevm/ZkEvmWorkflow';
@@ -16,7 +16,7 @@ import AuthNextJS from '@/components/AuthNextJS';
 export default function Home() {
   const { isLoading } = useStatusProvider();
   const { imxProvider, zkEvmProvider, defaultWalletProvider } = usePassportProvider();
-  const { isAuthenticated: isAuthNextJSAuthenticated } = useImmutableAuth();
+  const { isAuthenticated: isAuthNextJSAuthenticated } = useImmutableSession();
 
   return (
     <>

@@ -1,4 +1,10 @@
-import { createImmutableAuth, type ImmutableAuthConfig } from "@imtbl/auth-next-server";
+/**
+ * Client-safe auth configuration utilities.
+ * This file can be imported by both client and server code.
+ * 
+ * For NextAuth instances (server-only), see ./immutable-auth.server.ts
+ */
+import type { ImmutableAuthConfig } from "@imtbl/auth-next-server";
 import { EnvironmentNames } from "@/types";
 import { BASE_PATH } from "@/config";
 
@@ -28,31 +34,6 @@ export function getAuthConfig(environment: EnvironmentNames): ImmutableAuthConfi
     authenticationDomain: AUTH_DOMAINS[environment],
   };
 }
-
-// Create auth instances for each environment
-// Note: In a real app, you'd typically have one environment
-// This sample app supports multiple environments for testing
-
-// Shared auth options with development secret
-// In production, use AUTH_SECRET environment variable instead
-const sharedAuthOptions = {
-  secret: process.env.AUTH_SECRET || "dev-secret-do-not-use-in-production-32ch",
-  trustHost: true,
-};
-
-// Each environment needs its own basePath to match the route structure
-export const devAuth = createImmutableAuth(getAuthConfig(EnvironmentNames.DEV), {
-  ...sharedAuthOptions,
-  basePath: "/api/auth/dev",
-});
-export const sandboxAuth = createImmutableAuth(getAuthConfig(EnvironmentNames.SANDBOX), {
-  ...sharedAuthOptions,
-  basePath: "/api/auth/sandbox",
-});
-export const prodAuth = createImmutableAuth(getAuthConfig(EnvironmentNames.PRODUCTION), {
-  ...sharedAuthOptions,
-  basePath: "/api/auth/prod",
-});
 
 // Export types for convenience
 export type { ImmutableAuthConfig };
