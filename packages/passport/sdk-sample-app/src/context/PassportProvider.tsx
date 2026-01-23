@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import { IMXProvider } from '@imtbl/x-provider';
 import {
-  LinkedWallet, LinkWalletParams, Provider, UserProfile, MarketingConsentStatus, EvmChain,
+  LinkedWallet, LinkWalletParams, UserProfile, MarketingConsentStatus, EvmChain,
 } from '@imtbl/passport';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
@@ -116,7 +116,10 @@ export function PassportProvider({
   const connectArbitrum = useCallback(async () => {
     setIsLoading(true);
     try {
-      const provider = await passportClient.connectEvm({ chain: EvmChain.ARBITRUM_ONE, announceProvider: true }) as SequenceProvider;
+      const provider = await passportClient.connectEvm({ 
+        chain: EvmChain.ARBITRUM_ONE, 
+        announceProvider: true 
+      }) as SequenceProvider;
       if (provider) {
         setArbitrumProvider(provider);
         addMessage('ConnectArbitrum', 'Connected');
