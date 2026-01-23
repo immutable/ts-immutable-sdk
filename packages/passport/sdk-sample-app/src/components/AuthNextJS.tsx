@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import { Stack } from "react-bootstrap";
 import { Body } from "@biom3/react";
-import { loginWithEmbedded, useImmutableSession, type LoginConfig } from "@imtbl/auth-next-client";
-import { signIn, signOut } from "next-auth/react";
+import { useLogin, useImmutableSession, type LoginConfig } from "@imtbl/auth-next-client";
+import { signOut } from "next-auth/react";
 import { getAuthConfig } from "@/lib/immutable-auth";
 import CardStack from "@/components/CardStack";
 import WorkflowButton from "@/components/WorkflowButton";
@@ -18,6 +18,7 @@ export default function AuthNextJS() {
   const { environment } = useImmutableProvider();
   const { logout: passportLogout } = usePassportProvider();
   const { session, isLoading, isAuthenticated } = useImmutableSession();
+  const { loginWithEmbedded, isLoggingIn } = useLogin();
   const user = session?.user;
 
   const handleSignIn = useCallback(async () => {
@@ -32,26 +33,14 @@ export default function AuthNextJS() {
         authenticationDomain: authConfig.authenticationDomain,
       };
 
-      // Use standalone loginWithEmbedded to show iframe modal and get tokens
-      const tokens = await loginWithEmbedded(loginConfig);
-
-      // Sign in to NextAuth with the obtained tokens
-      await signIn("immutable", {
-        tokens: JSON.stringify({
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          idToken: tokens.idToken,
-          accessTokenExpires: tokens.accessTokenExpires,
-          profile: tokens.profile,
-        }),
-        redirect: false,
-      });
+      // Use loginWithEmbedded to show iframe modal, get tokens, and sign in to NextAuth
+      await loginWithEmbedded(loginConfig);
 
       addMessage("Auth NextJS", `Login successful (${environment})`);
     } catch (error) {
       addMessage("Auth NextJS", error);
     }
-  }, [environment, addMessage]);
+  }, [environment, addMessage, loginWithEmbedded]);
 
   const handleSignOut = useCallback(async () => {
     try {
@@ -93,16 +82,16 @@ export default function AuthNextJS() {
         ⚠️ This section is only testable when running the sample app locally with: pnpm run dev-with-sdk
       </Body>
       <Stack direction="horizontal" style={{ flexWrap: "wrap" }} gap={3}>
-        <WorkflowButton disabled={isLoading || isAuthenticated} onClick={handleSignIn}>
-          Login
+        <WorkflowButton disabled={isLoading || isLoggingIn || isAuthenticated} onClick={handleSignIn}>
+          {isLoggingIn ? "Signing in..." : "Login"}
         </WorkflowButton>
-        <WorkflowButton disabled={isLoading || !isAuthenticated} onClick={handleSignOut}>
+        <WorkflowButton disabled={isLoading || isLoggingIn || !isAuthenticated} onClick={handleSignOut}>
           Logout
         </WorkflowButton>
-        <WorkflowButton disabled={isLoading || !isAuthenticated} onClick={handleGetUserInfo}>
+        <WorkflowButton disabled={isLoading || isLoggingIn || !isAuthenticated} onClick={handleGetUserInfo}>
           Get User Info
         </WorkflowButton>
-        <WorkflowButton disabled={isLoading || !isAuthenticated} onClick={handleGetSessionInfo}>
+        <WorkflowButton disabled={isLoading || isLoggingIn || !isAuthenticated} onClick={handleGetSessionInfo}>
           Get Session Info
         </WorkflowButton>
       </Stack>

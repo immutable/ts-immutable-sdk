@@ -4,12 +4,12 @@ Client-side React components and hooks for Immutable authentication with Auth.js
 
 ## Overview
 
-This package provides minimal client-side utilities for Next.js applications using Immutable authentication. It's designed to work with Next.js's native `SessionProvider` and the standalone login functions from `@imtbl/auth`.
+This package provides minimal client-side utilities for Next.js applications using Immutable authentication. It's designed to work with Next.js's native `SessionProvider` and integrates seamlessly with NextAuth.
 
 **Key features:**
+- `useLogin` - Hook for login flows with state management (loading, error)
+- `useImmutableSession` - Hook that provides session state and a `getUser` function for wallet integration
 - `CallbackPage` - OAuth callback handler component
-- `useImmutableSession` - Hook that provides a `getUser` function for wallet integration
-- Re-exports standalone login functions from `@imtbl/auth`
 
 For server-side utilities, use [`@imtbl/auth-next-server`](../auth-next-server).
 
@@ -98,33 +98,35 @@ export default function Callback() {
 
 ### 5. Add Login Button
 
-Use the standalone login functions from `@imtbl/auth`:
+Use the `useLogin` hook for login flows with built-in state management:
 
 ```tsx
 // components/LoginButton.tsx
 "use client";
 
-import { loginWithPopup } from "@imtbl/auth-next-client";
-import { signIn } from "next-auth/react";
+import { useLogin, useImmutableSession } from "@imtbl/auth-next-client";
 
 const config = {
   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
-  redirectUri: `${window.location.origin}/callback`,
+  redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
 };
 
 export function LoginButton() {
-  const handleLogin = async () => {
-    // Open popup login
-    const tokens = await loginWithPopup(config);
-    
-    // Sign in to NextAuth with the tokens
-    await signIn("immutable", {
-      tokens: JSON.stringify(tokens),
-      redirect: false,
-    });
-  };
+  const { isAuthenticated } = useImmutableSession();
+  const { loginWithPopup, isLoggingIn, error } = useLogin();
 
-  return <button onClick={handleLogin}>Sign In with Immutable</button>;
+  if (isAuthenticated) {
+    return <p>You are logged in!</p>;
+  }
+
+  return (
+    <div>
+      <button onClick={() => loginWithPopup(config)} disabled={isLoggingIn}>
+        {isLoggingIn ? "Signing in..." : "Sign In with Immutable"}
+      </button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </div>
+  );
 }
 ```
 
@@ -205,6 +207,89 @@ export default function Callback() {
 
 ## Hooks
 
+### `useLogin()`
+
+A hook for handling login flows with built-in state management. Provides login functions that automatically sign in to NextAuth after successful OAuth authentication.
+
+```tsx
+"use client";
+
+import { useLogin, useImmutableSession } from "@imtbl/auth-next-client";
+
+const config = {
+  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+  redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
+  popupRedirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`, // Optional: separate URI for popups
+};
+
+function LoginComponent() {
+  const { isAuthenticated } = useImmutableSession();
+  const { loginWithPopup, loginWithEmbedded, loginWithRedirect, isLoggingIn, error } = useLogin();
+
+  if (isAuthenticated) {
+    return <p>You are logged in!</p>;
+  }
+
+  return (
+    <div>
+      <button onClick={() => loginWithPopup(config)} disabled={isLoggingIn}>
+        Sign In with Popup
+      </button>
+      <button onClick={() => loginWithEmbedded(config)} disabled={isLoggingIn}>
+        Sign In with Embedded
+      </button>
+      <button onClick={() => loginWithRedirect(config)} disabled={isLoggingIn}>
+        Sign In with Redirect
+      </button>
+      {isLoggingIn && <p>Signing in...</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </div>
+  );
+}
+```
+
+#### Return Value
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `loginWithPopup` | `(config, options?) => Promise<void>` | Opens popup for OAuth, then signs in to NextAuth |
+| `loginWithEmbedded` | `(config) => Promise<void>` | Shows embedded modal, then popup for OAuth |
+| `loginWithRedirect` | `(config, options?) => Promise<void>` | Redirects to OAuth provider |
+| `isLoggingIn` | `boolean` | Whether a login is in progress |
+| `error` | `string \| null` | Error message from last login attempt |
+
+#### Login Methods
+
+- **`loginWithPopup(config, options?)`** - Opens a popup window for authentication. Best for single-page apps where you don't want to navigate away.
+
+- **`loginWithEmbedded(config)`** - Shows an embedded modal for login method selection (email, Google, etc.), then opens a popup. Provides a smoother UX.
+
+- **`loginWithRedirect(config, options?)`** - Redirects the entire page to the OAuth provider. Use `CallbackPage` to handle the callback. Best for traditional web apps.
+
+#### Direct Login Options
+
+You can pass `options` to specify a direct login method:
+
+```tsx
+import { MarketingConsentStatus } from "@imtbl/auth-next-client";
+
+// Direct to Google login
+await loginWithPopup(config, {
+  directLoginOptions: {
+    directLoginMethod: "google",
+  },
+});
+
+// Direct to email login with marketing consent
+await loginWithPopup(config, {
+  directLoginOptions: {
+    directLoginMethod: "email",
+    email: "user@example.com",
+    marketingConsentStatus: MarketingConsentStatus.OPTED_IN,
+  },
+});
+```
+
 ### `useImmutableSession()`
 
 A convenience hook that wraps `next-auth/react`'s `useSession` with a `getUser` function for wallet integration.
@@ -259,62 +344,11 @@ When `forceRefresh` is `true`:
 3. Updated claims (like `zkEvm` data after registration) are extracted from the new ID token
 4. Returns the refreshed user data
 
-## Login Functions
-
-This package re-exports the standalone login functions from `@imtbl/auth`:
-
-### `loginWithPopup(config)`
-
-Opens a popup window for authentication and returns tokens.
-
-```tsx
-import { loginWithPopup } from "@imtbl/auth-next-client";
-import { signIn } from "next-auth/react";
-
-async function handlePopupLogin() {
-  const tokens = await loginWithPopup({
-    clientId: "your-client-id",
-    redirectUri: `${window.location.origin}/callback`,
-  });
-  
-  await signIn("immutable", {
-    tokens: JSON.stringify(tokens),
-    redirect: false,
-  });
-}
-```
-
-### `loginWithRedirect(config)`
-
-Redirects the page to the authentication provider. Use `CallbackPage` on the callback page.
-
-```tsx
-import { loginWithRedirect } from "@imtbl/auth-next-client";
-
-function handleRedirectLogin() {
-  loginWithRedirect({
-    clientId: "your-client-id",
-    redirectUri: `${window.location.origin}/callback`,
-  });
-}
-```
-
-### `handleLoginCallback(config)`
-
-Handles the OAuth callback (used internally by `CallbackPage`).
-
-```tsx
-import { handleLoginCallback } from "@imtbl/auth-next-client";
-
-const tokens = await handleLoginCallback({
-  clientId: "your-client-id",
-  redirectUri: `${window.location.origin}/callback`,
-});
-```
-
 ## Types
 
-### Session Type
+### ImmutableSession
+
+The session type returned by `useImmutableSession`:
 
 ```typescript
 interface ImmutableSession {
@@ -337,27 +371,38 @@ interface ImmutableSession {
 
 ### LoginConfig
 
+Configuration for the `useLogin` hook's login functions:
+
 ```typescript
 interface LoginConfig {
+  /** Your Immutable application client ID */
   clientId: string;
+  /** The OAuth redirect URI for your application */
   redirectUri: string;
+  /** Optional separate redirect URI for popup flows */
   popupRedirectUri?: string;
+  /** OAuth audience (default: "platform_api") */
   audience?: string;
+  /** OAuth scopes (default: "openid profile email offline_access transact") */
   scope?: string;
+  /** Authentication domain (default: "https://auth.immutable.com") */
   authenticationDomain?: string;
 }
 ```
 
-### TokenResponse
+### StandaloneLoginOptions
+
+Options for `loginWithPopup` and `loginWithRedirect`:
 
 ```typescript
-interface TokenResponse {
-  accessToken: string;
-  refreshToken?: string;
-  idToken?: string;
-  accessTokenExpires: number;
-  profile: { sub: string; email?: string; nickname?: string };
-  zkEvm?: { ethAddress: string; userAdminAddress: string };
+interface StandaloneLoginOptions {
+  directLoginOptions?: DirectLoginOptions;
+}
+
+interface DirectLoginOptions {
+  directLoginMethod: "google" | "apple" | "email";
+  email?: string; // Required when directLoginMethod is "email"
+  marketingConsentStatus?: MarketingConsentStatus;
 }
 ```
 

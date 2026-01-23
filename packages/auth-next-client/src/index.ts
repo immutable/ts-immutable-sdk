@@ -27,6 +27,9 @@ export { CallbackPage, type CallbackPageProps, type CallbackConfig } from './cal
 // Session hook with getUser for wallet integration
 export { useImmutableSession, type UseImmutableSessionReturn, type ImmutableSession } from './hooks';
 
+// Login hook with state management
+export { useLogin, type UseLoginReturn } from './hooks';
+
 // Re-export types
 export type {
   ImmutableUserClient,
@@ -45,17 +48,10 @@ export type {
   ProtectedAuthPropsWithData,
 } from '@imtbl/auth-next-server';
 
-// Re-export standalone login functions and types from @imtbl/auth for convenience
-export {
-  loginWithPopup,
-  loginWithEmbedded,
-  loginWithRedirect,
-  handleLoginCallback,
-  type LoginConfig,
-  type TokenResponse,
-  type StandaloneLoginOptions,
+// Re-export types needed for useLogin hook
+export type {
+  LoginConfig,
+  StandaloneLoginOptions,
+  DirectLoginOptions,
 } from '@imtbl/auth';
-
-// Re-export login-related types from @imtbl/auth for convenience
-export type { LoginOptions, DirectLoginOptions } from '@imtbl/auth';
 export { MarketingConsentStatus } from '@imtbl/auth';
