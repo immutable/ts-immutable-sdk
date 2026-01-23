@@ -1,4 +1,4 @@
-import { keccak256, toBytes, toHex } from 'viem';
+import { keccak256, toBytes } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { WalletError, WalletErrorType } from '../../errors';
 import { Auth, User } from '@imtbl/auth';
@@ -35,10 +35,7 @@ export class PrivateKeySigner implements SequenceSigner {
   async #getUserOrThrow(): Promise<User> {
     const user = await this.#auth.getUser();
     if (!user) {
-      throw new WalletError(
-        'User not authenticated',
-        WalletErrorType.NOT_LOGGED_IN_ERROR,
-      );
+      throw new WalletError('User not authenticated', WalletErrorType.NOT_LOGGED_IN_ERROR);
     }
     return user;
   }
@@ -63,11 +60,9 @@ export class PrivateKeySigner implements SequenceSigner {
     this.#createWalletPromise = (async () => {
       try {
         this.#privateKeyWallet = null;
-        const authenticatedUser = user || await this.#getUserOrThrow();
+        const authenticatedUser = user || (await this.#getUserOrThrow());
 
-        const privateKeyHash = keccak256(
-          toBytes(`${authenticatedUser.profile.sub}-sequence`),
-        );
+        const privateKeyHash = keccak256(toBytes(`${authenticatedUser.profile.sub}-sequence`));
         const signer = new Signers.Pk.Pk(privateKeyHash);
         const signerAddress = signer.address;
 
@@ -109,8 +104,8 @@ export class PrivateKeySigner implements SequenceSigner {
 
     // Use viem's account to sign
     const account = privateKeyToAccount(pkWallet.privateKey);
-    const messageToSign = typeof message === 'string' ? message : toHex(message);
+    const messageToSign = typeof message === 'string' ? message : { raw: message };
 
-    return account.signMessage({ message: messageToSign });
+    return await account.signMessage({ message: messageToSign });
   }
 }
