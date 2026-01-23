@@ -16,13 +16,13 @@ test.describe("home page", () => {
 test.describe("create listing with ERC721", () => {
   test("loads creation screen", async ({ page }) => {
     await page.getByTestId("create-listing-with-erc721").click();
-    await expect(page.getByRole("heading", { name: /Create.*Listing.*ERC721/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Create ERC721 listing/i })).toBeVisible();
   });
 });
 
 test.describe("create listing with ERC1155", () => {
   test("loads creation screen", async ({ page }) => {
     await page.getByTestId("create-listing-with-erc1155").click();
-    await expect(page.getByRole("heading", { name: /Create.*Listing.*ERC1155/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Create ERC1155 listing/i })).toBeVisible();
   });
 });
