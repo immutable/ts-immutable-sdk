@@ -8,16 +8,17 @@ import {
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { EnvironmentNames } from '@/types';
+import { SequenceProvider, ZkEvmProvider } from '@imtbl/wallet';
 
 const PassportContext = createContext<{
   imxProvider: IMXProvider | undefined;
-  zkEvmProvider: Provider | undefined;
-  arbitrumProvider: Provider | undefined;
-  defaultWalletProvider: Provider | undefined;
-  activeZkEvmProvider: Provider | undefined;
+  zkEvmProvider: ZkEvmProvider | undefined;
+  arbitrumProvider: SequenceProvider | undefined;
+  defaultWalletProvider: ZkEvmProvider | undefined;
+  activeZkEvmProvider: ZkEvmProvider | undefined;
   activeZkEvmAccount: string;
   isSandboxEnvironment: boolean;
-  setDefaultWalletProvider: (provider?: Provider) => void;
+  setDefaultWalletProvider: (provider?: ZkEvmProvider) => void;
   connectImx:() => void;
   connectZkEvm: () => void;
   connectArbitrum: () => void;
@@ -67,9 +68,9 @@ export function PassportProvider({
   children,
 }: { children: JSX.Element | JSX.Element[] }) {
   const [imxProvider, setImxProvider] = useState<IMXProvider | undefined>();
-  const [zkEvmProvider, setZkEvmProvider] = useState<Provider | undefined>();
-  const [arbitrumProvider, setArbitrumProvider] = useState<Provider | undefined>();
-  const [defaultWalletProvider, setDefaultWalletProvider] = useState<Provider | undefined>();
+  const [zkEvmProvider, setZkEvmProvider] = useState<ZkEvmProvider | undefined>();
+  const [arbitrumProvider, setArbitrumProvider] = useState<SequenceProvider | undefined>();
+  const [defaultWalletProvider, setDefaultWalletProvider] = useState<ZkEvmProvider | undefined>();
   const [activeZkEvmAccount, setActiveZkEvmAccount] = useState<string>('');
 
   const { addMessage, setIsLoading } = useStatusProvider();
@@ -102,7 +103,7 @@ export function PassportProvider({
 
   const connectZkEvm = useCallback(async () => {
     setIsLoading(true);
-    const provider = await passportClient.connectEvm();
+    const provider = await passportClient.connectEvm() as ZkEvmProvider;
     if (provider) {
       setZkEvmProvider(provider);
       addMessage('ConnectZkEvm', 'Connected');
@@ -115,7 +116,7 @@ export function PassportProvider({
   const connectArbitrum = useCallback(async () => {
     setIsLoading(true);
     try {
-      const provider = await passportClient.connectEvm({ chain: EvmChain.ARBITRUM_ONE, announceProvider: true });
+      const provider = await passportClient.connectEvm({ chain: EvmChain.ARBITRUM_ONE, announceProvider: true }) as SequenceProvider;
       if (provider) {
         setArbitrumProvider(provider);
         addMessage('ConnectArbitrum', 'Connected');
