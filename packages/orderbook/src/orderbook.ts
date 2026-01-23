@@ -418,7 +418,7 @@ export class Orderbook {
               orderHash: listing.orderHash,
               orderSignature: sig,
               makerFees: listingParam.makerFees,
-            // Swallow failed creations - this gets mapped in the response to the caller as failed
+              // Swallow failed creations - this gets mapped in the response to the caller as failed
             }).catch(() => undefined);
           }),
         );
@@ -748,7 +748,7 @@ export class Orderbook {
     const network = await this.orderbookConfig.provider.getNetwork();
     const domain = {
       name: 'imtbl-order-book',
-      chainId: network.chainId.toString(),
+      chainId: Number(network.chainId),
       verifyingContract: this.orderbookConfig.seaportContractAddress,
     };
 
