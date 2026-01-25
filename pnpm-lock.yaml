@@ -1360,7 +1360,7 @@ importers:
         version: 5.0.7(rollup@4.28.0)
       '@rollup/plugin-typescript':
         specifier: ^11.1.6
-        version: 11.1.6(rollup@4.28.0)(tslib@2.7.0)(typescript@5.6.2)
+        version: 11.1.6(rollup@4.28.0)(tslib@2.8.1)(typescript@5.6.2)
       '@segment/analytics-next':
         specifier: ^1.53.2
         version: 1.54.0(encoding@0.1.13)
@@ -2316,6 +2316,18 @@ importers:
         specifier: ~2.18.0
         version: 2.18.2(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
     devDependencies:
+      '@0xsequence/identity-instrument':
+        specifier: 3.0.0-beta.10
+        version: 3.0.0-beta.10(typescript@5.6.2)
+      '@0xsequence/wallet-core':
+        specifier: 3.0.0-beta.10
+        version: 3.0.0-beta.10(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@0xsequence/wallet-primitives':
+        specifier: 3.0.0-beta.10
+        version: 3.0.0-beta.10(typescript@5.6.2)
+      '@0xsequence/wallet-wdk':
+        specifier: 3.0.0-beta.10
+        version: 3.0.0-beta.10(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
       '@jest/test-sequencer':
         specifier: ^29.7.0
         version: 29.7.0
@@ -2337,6 +2349,9 @@ importers:
       jest-environment-jsdom:
         specifier: ^29.4.3
         version: 29.6.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ox:
+        specifier: ^0.9.17
+        version: 0.9.17(typescript@5.6.2)
       ts-node:
         specifier: ^10.9.1
         version: 10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2)
@@ -2754,10 +2769,31 @@ packages:
     peerDependencies:
       ethers: '>=6'
 
+  '@0xsequence/guard@3.0.0-beta.10':
+    resolution: {integrity: sha512-CNf3+ivEiUT7op8WKhrqWnDNtuEpF5NLYiV4X1sl+CkDawzxBlLgsmNrK8isPF75x5HwQGy4fH4F/U3O80crEQ==}
+
+  '@0xsequence/identity-instrument@3.0.0-beta.10':
+    resolution: {integrity: sha512-Dm11v2vuK3hiKzl8PYvGqCz5Y+6/bVViswo30w5J16LVey+AzhltoI6ezqUe/h9SpLi/AT7ZQTVJipSOae6Prw==}
+
+  '@0xsequence/relayer@3.0.0-beta.10':
+    resolution: {integrity: sha512-d4lw9o6rgVNHTpHPqv7u8/JBJ0MfmoOUbJE9cMRDqNKGv63/DMl3UNX9hZiqKvR32xhYpoO6d0DBzp26TUHwZg==}
+
+  '@0xsequence/tee-verifier@0.1.2':
+    resolution: {integrity: sha512-7sKr8/T4newknx6LAukjlRI3siGiGhBnZohz2Z3jX0zb0EBQdKUq0L//A7CPSckHFPxTg/QvQU2v8e9x9GfkDw==}
+
   '@0xsequence/utils@2.3.38':
     resolution: {integrity: sha512-XCe17omFbLjQnDW7HNhNzTqcpeeiXeSCc5ttFjOYex+GO8v9imPt3qbcn4N2v4dlylfkSfpdh4DcnKlcAPAtFw==}
     peerDependencies:
       ethers: '>=6'
+
+  '@0xsequence/wallet-core@3.0.0-beta.10':
+    resolution: {integrity: sha512-tOZCnwInFgk61za5VCRblmA+ur94DFiREW4TCGTMvTWHEl4Ins6xoaiywTRdnMvoWFHITPkGraA+f1xB+XRvmA==}
+
+  '@0xsequence/wallet-primitives@3.0.0-beta.10':
+    resolution: {integrity: sha512-yE+4+afIiPh369U9b3GLhQ2R0giirF6JSo5LlBJD9nBAFqsgtJwdwD1wYIDXYvCYc8/1HFvuAQ4oa+uc7OXRZw==}
+
+  '@0xsequence/wallet-wdk@3.0.0-beta.10':
+    resolution: {integrity: sha512-F+gh8W4TW5YN1xEiqerzWfsq085LpwYFHoKclk4Ngv6AzQdh34DEsiO0CEWlPVFlUR43N3c9PC5xXciw1fuRww==}
 
   '@0xsquid/sdk@2.8.25':
     resolution: {integrity: sha512-fSMKVdKIX8G3qFpoTf3WfcyjhGdc9hE0uSu1bs1gsh4+iG19ILguDdrY8g87dUknt9PCKBb6TIt1QeYEgbXjdA==}
@@ -8305,6 +8341,10 @@ packages:
   asn1@0.2.6:
     resolution: {integrity: sha512-ix/FxPn0MDjeyJ7i/yoHGFt/EX6LyNbxSEhPPXODPL+KB0VPk86UYfL0lMdy+KCnv+fmvIzySwaK5COwqVbWTQ==}
 
+  asn1js@3.0.7:
+    resolution: {integrity: sha512-uLvq6KJu04qoQM6gvBfKFjlh6Gl0vOKQuR5cJMDHQkmwfMOQeN3F3SHCv9SNYSL+CRoHvOGFfllDlVz03GQjvQ==}
+    engines: {node: '>=12.0.0'}
+
   assert@2.0.0:
     resolution: {integrity: sha512-se5Cd+js9dXJnu6Ag2JFc00t+HmHOen+8Q+L7O9zI0PqQXr20uk2J0XQqMxZEeo5U50o8Nvmmx7dZrl+Ufr35A==}
 
@@ -8790,6 +8830,10 @@ packages:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
     engines: {node: '>= 0.8'}
 
+  bytestreamjs@2.0.1:
+    resolution: {integrity: sha512-U1Z/ob71V/bXfVABvNr/Kumf5VyeQRBEm6Txb0PQ6S7V5GpBM3w4Cbqz/xPDicR5tN0uvDifng8C+5qECeGwyQ==}
+    engines: {node: '>=6.0.0'}
+
   cac@6.7.14:
     resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
     engines: {node: '>=8'}
@@ -8867,6 +8911,10 @@ packages:
 
   caseless@0.12.0:
     resolution: {integrity: sha512-4tYFyifaFfGacoiObjJegolkwSU4xQNGbVgUiNYVUxbQ2x2lUsFvY4hVgVzGiIe6WLOPqycWXA40l+PWsxthUw==}
+
+  cbor2@1.12.0:
+    resolution: {integrity: sha512-3Cco8XQhi27DogSp9Ri6LYNZLi/TBY/JVnDe+mj06NkBjW/ZYOtekaEU4wZ4xcRMNrFkDv8KNtOAqHyDfz3lYg==}
+    engines: {node: '>=18.7'}
 
   cbor@8.1.0:
     resolution: {integrity: sha512-DwGjNW9omn6EwP70aXsn7FQJx5kO12tX0bZkaTjzdVFM6/7nhA4t0EENocKGx6D2Bch9PE2KzCUf5SceBdeijg==}
@@ -11510,6 +11558,9 @@ packages:
   idb@7.1.1:
     resolution: {integrity: sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ==}
 
+  idb@8.0.3:
+    resolution: {integrity: sha512-LtwtVyVYO5BqRvcsKuB2iUMnHwPVByPCXFXOpuU96IZPPoPN6xjOGxZQ74pgSVVLQWtUOYgyeL4GE98BY5D3wg==}
+
   identity-obj-proxy@3.0.0:
     resolution: {integrity: sha512-00n6YnVHKrinT9t0d9+5yZC6UBNJANpYEQvL2LlX6Ab9lnmxzIRcEmTPuyGScvl1+jKuCICX1Z0Ab1pPKKdikA==}
     engines: {node: '>=4'}
@@ -12483,6 +12534,9 @@ packages:
 
   json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
+
+  json-canonicalize@2.0.0:
+    resolution: {integrity: sha512-yyrnK/mEm6Na3ChbJUWueXdapueW0p380RUyTW87XGb1ww8l8hU0pRrGC3vSWHe9CxrbPHX2fGUOZpNiHR0IIg==}
 
   json-parse-better-errors@1.0.2:
     resolution: {integrity: sha512-mrqyZKfX5EhL7hvqcV6WG1yYjnjeuYDzDhhcAAUrq8Po85NBQBJP+ZDUT75qZQ98IkUoBqdkExkukOU7Ts2wrw==}
@@ -13691,6 +13745,14 @@ packages:
   outvariant@1.4.0:
     resolution: {integrity: sha512-AlWY719RF02ujitly7Kk/0QlV+pXGFDHrHf9O2OKqyqgBieaPOIeuSkL8sRK6j2WK+/ZAURq2kZsY0d8JapUiw==}
 
+  ox@0.9.17:
+    resolution: {integrity: sha512-rKAnhzhRU3Xh3hiko+i1ZxywZ55eWQzeS/Q4HRKLx2PqfHOolisZHErSsJVipGlmQKHW5qwOED/GighEw9dbLg==}
+    peerDependencies:
+      typescript: '>=5.4.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   ox@0.9.6:
     resolution: {integrity: sha512-8SuCbHPvv2eZLYXrNmC0EC12rdzXQLdhnOMlHDW2wiCPLxBrOOJwX5L5E61by+UjTPOryqQiRSnjIKCI+GykKg==}
     peerDependencies:
@@ -14013,6 +14075,10 @@ packages:
   pkg-up@3.1.0:
     resolution: {integrity: sha512-nDywThFk1i4BQK4twPQ6TA4RT8bDY96yeuCVBWL3ePARCiEKDRSrNGbFIgUJpLp+XeIR65v8ra7WuJOFUBtkMA==}
     engines: {node: '>=8'}
+
+  pkijs@3.3.3:
+    resolution: {integrity: sha512-+KD8hJtqQMYoTuL1bbGOqxb4z+nZkTAwVdNtWwe8Tc2xNbEmdJYIYoc6Qt0uF55e6YW6KuTHw1DjQ18gMhzepw==}
+    engines: {node: '>=16.0.0'}
 
   playwright-core@1.45.3:
     resolution: {integrity: sha512-+ym0jNbcjikaOwwSZycFbwkWgfruWvYlJfThKYAlImbxUgdWFO2oW70ojPm4OpE4t6TAo2FY/smM+hpVTtkhDA==}
@@ -14664,6 +14730,13 @@ packages:
 
   pure-rand@6.1.0:
     resolution: {integrity: sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA==}
+
+  pvtsutils@1.3.6:
+    resolution: {integrity: sha512-PLgQXQ6H2FWCaeRak8vvk1GW462lMxB5s3Jm673N82zI4vqtVUPuZdffdZbPDFRoU8kAhItWFtPCWiPpp4/EDg==}
+
+  pvutils@1.1.5:
+    resolution: {integrity: sha512-KTqnxsgGiQ6ZAzZCVlJH5eOjSnvlyEgx1m8bkRJfOhmGRqfo5KLvmAlACQkrjEtOQ4B7wF9TdSLIs9O90MX9xA==}
+    engines: {node: '>=16.0.0'}
 
   q@1.5.1:
     resolution: {integrity: sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==}
@@ -16391,6 +16464,9 @@ packages:
   tslib@2.7.0:
     resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
 
+  tslib@2.8.1:
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
   tsort@0.0.1:
     resolution: {integrity: sha512-Tyrf5mxF8Ofs1tNoxA13lFeZ2Zrbd6cKbuH3V+MQ5sb6DtBj5FjrXVsRWT8YvNAQTqNoz66dz1WsbigI22aEnw==}
 
@@ -16795,6 +16871,10 @@ packages:
   utils-merge@1.0.1:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
+
+  uuid@13.0.0:
+    resolution: {integrity: sha512-XQegIaBTVUjSHliKqcnFqYypAd4S+WCYt5NIeRs6w/UAry7z8Y9j5ZwRRL4kzq9U3sD6v+85er9FvkEaBpji2w==}
+    hasBin: true
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
@@ -17396,10 +17476,82 @@ snapshots:
       '@0xsequence/utils': 2.3.38(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
 
+  '@0xsequence/guard@3.0.0-beta.10(typescript@5.6.2)':
+    dependencies:
+      ox: 0.9.17(typescript@5.6.2)
+    transitivePeerDependencies:
+      - typescript
+      - zod
+
+  '@0xsequence/identity-instrument@3.0.0-beta.10(typescript@5.6.2)':
+    dependencies:
+      json-canonicalize: 2.0.0
+      jwt-decode: 4.0.0
+      ox: 0.9.17(typescript@5.6.2)
+    transitivePeerDependencies:
+      - typescript
+      - zod
+
+  '@0xsequence/relayer@3.0.0-beta.10(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@0xsequence/wallet-primitives': 3.0.0-beta.10(typescript@5.6.2)
+      mipd: 0.0.7(typescript@5.6.2)
+      ox: 0.9.17(typescript@5.6.2)
+      viem: 2.41.2(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - typescript
+      - utf-8-validate
+      - zod
+
+  '@0xsequence/tee-verifier@0.1.2':
+    dependencies:
+      cbor2: 1.12.0
+      pkijs: 3.3.3
+
   '@0xsequence/utils@2.3.38(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
     dependencies:
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       js-base64: 3.7.8
+
+  '@0xsequence/wallet-core@3.0.0-beta.10(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@0xsequence/guard': 3.0.0-beta.10(typescript@5.6.2)
+      '@0xsequence/relayer': 3.0.0-beta.10(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@0xsequence/wallet-primitives': 3.0.0-beta.10(typescript@5.6.2)
+      mipd: 0.0.7(typescript@5.6.2)
+      ox: 0.9.17(typescript@5.6.2)
+      viem: 2.41.2(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - typescript
+      - utf-8-validate
+      - zod
+
+  '@0xsequence/wallet-primitives@3.0.0-beta.10(typescript@5.6.2)':
+    dependencies:
+      ox: 0.9.17(typescript@5.6.2)
+    transitivePeerDependencies:
+      - typescript
+      - zod
+
+  '@0xsequence/wallet-wdk@3.0.0-beta.10(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@0xsequence/guard': 3.0.0-beta.10(typescript@5.6.2)
+      '@0xsequence/identity-instrument': 3.0.0-beta.10(typescript@5.6.2)
+      '@0xsequence/relayer': 3.0.0-beta.10(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@0xsequence/tee-verifier': 0.1.2
+      '@0xsequence/wallet-core': 3.0.0-beta.10(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@0xsequence/wallet-primitives': 3.0.0-beta.10(typescript@5.6.2)
+      idb: 8.0.3
+      jwt-decode: 4.0.0
+      ox: 0.9.17(typescript@5.6.2)
+      uuid: 13.0.0
+    transitivePeerDependencies:
+      - bufferutil
+      - typescript
+      - utf-8-validate
+      - zod
 
   '@0xsquid/sdk@2.8.25(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
@@ -19369,7 +19521,7 @@ snapshots:
       '@cosmjs/encoding': 0.31.3
       '@cosmjs/math': 0.31.3
       '@cosmjs/utils': 0.31.3
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.8.0
       bn.js: 5.2.1
       elliptic: 6.6.1
       libsodium-wrappers-sumo: 0.7.15
@@ -21146,7 +21298,7 @@ snapshots:
       '@types/istanbul-lib-coverage': 2.0.4
       collect-v8-coverage: 1.0.2
 
-  '@jest/test-sequencer@26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(utf-8-validate@5.0.10)':
+  '@jest/test-sequencer@26.6.3':
     dependencies:
       '@jest/test-result': 26.6.2
       graceful-fs: 4.2.11
@@ -21154,11 +21306,7 @@ snapshots:
       jest-runner: 26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(utf-8-validate@5.0.10)
       jest-runtime: 26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(utf-8-validate@5.0.10)
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   '@jest/test-sequencer@27.5.1':
     dependencies:
@@ -21513,7 +21661,7 @@ snapshots:
     dependencies:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.1.0
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.8.0
       '@scure/base': 1.1.7
       '@types/debug': 4.1.8
       debug: 4.3.7(supports-color@8.1.1)
@@ -21527,7 +21675,7 @@ snapshots:
     dependencies:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.1.0
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.8.0
       '@scure/base': 1.1.7
       '@types/debug': 4.1.8
       debug: 4.3.7(supports-color@8.1.1)
@@ -23277,14 +23425,14 @@ snapshots:
     optionalDependencies:
       rollup: 4.28.0
 
-  '@rollup/plugin-typescript@11.1.6(rollup@4.28.0)(tslib@2.7.0)(typescript@5.6.2)':
+  '@rollup/plugin-typescript@11.1.6(rollup@4.28.0)(tslib@2.8.1)(typescript@5.6.2)':
     dependencies:
       '@rollup/pluginutils': 5.1.0(rollup@4.28.0)
       resolve: 1.22.8
       typescript: 5.6.2
     optionalDependencies:
       rollup: 4.28.0
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@rollup/pluginutils@3.1.0(rollup@2.79.1)':
     dependencies:
@@ -26143,6 +26291,12 @@ snapshots:
     dependencies:
       safer-buffer: 2.1.2
 
+  asn1js@3.0.7:
+    dependencies:
+      pvtsutils: 1.3.6
+      pvutils: 1.1.5
+      tslib: 2.8.1
+
   assert@2.0.0:
     dependencies:
       es6-object-assign: 1.1.0
@@ -26158,7 +26312,7 @@ snapshots:
 
   ast-types@0.15.2:
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   astral-regex@1.0.0: {}
 
@@ -26170,7 +26324,7 @@ snapshots:
 
   async-mutex@0.2.6:
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   async@1.5.2: {}
 
@@ -26875,6 +27029,8 @@ snapshots:
 
   bytes@3.1.2: {}
 
+  bytestreamjs@2.0.1: {}
+
   cac@6.7.14: {}
 
   cacache@17.1.3:
@@ -26967,6 +27123,8 @@ snapshots:
   case-sensitive-paths-webpack-plugin@2.4.0: {}
 
   caseless@0.12.0: {}
+
+  cbor2@1.12.0: {}
 
   cbor@8.1.0:
     dependencies:
@@ -30830,6 +30988,8 @@ snapshots:
 
   idb@7.1.1: {}
 
+  idb@8.0.3: {}
+
   identity-obj-proxy@3.0.0:
     dependencies:
       harmony-reflect: 1.6.2
@@ -31570,7 +31730,7 @@ snapshots:
   jest-config@26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(utf-8-validate@5.0.10):
     dependencies:
       '@babel/core': 7.26.10
-      '@jest/test-sequencer': 26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(utf-8-validate@5.0.10)
+      '@jest/test-sequencer': 26.6.3
       '@jest/types': 26.6.2
       babel-jest: 26.6.3(@babel/core@7.26.10)
       chalk: 4.1.2
@@ -33058,6 +33218,8 @@ snapshots:
   jsesc@3.1.0: {}
 
   json-buffer@3.0.1: {}
+
+  json-canonicalize@2.0.0: {}
 
   json-parse-better-errors@1.0.2: {}
 
@@ -34592,6 +34754,21 @@ snapshots:
 
   outvariant@1.4.0: {}
 
+  ox@0.9.17(typescript@5.6.2):
+    dependencies:
+      '@adraffy/ens-normalize': 1.11.1
+      '@noble/ciphers': 1.3.0
+      '@noble/curves': 1.9.1
+      '@noble/hashes': 1.8.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
+      abitype: 1.1.0(typescript@5.6.2)
+      eventemitter3: 5.0.1
+    optionalDependencies:
+      typescript: 5.6.2
+    transitivePeerDependencies:
+      - zod
+
   ox@0.9.6(typescript@5.6.2):
     dependencies:
       '@adraffy/ens-normalize': 1.11.1
@@ -34946,6 +35123,15 @@ snapshots:
   pkg-up@3.1.0:
     dependencies:
       find-up: 3.0.0
+
+  pkijs@3.3.3:
+    dependencies:
+      '@noble/hashes': 1.4.0
+      asn1js: 3.0.7
+      bytestreamjs: 2.0.1
+      pvtsutils: 1.3.6
+      pvutils: 1.1.5
+      tslib: 2.8.1
 
   playwright-core@1.45.3: {}
 
@@ -35620,6 +35806,12 @@ snapshots:
 
   pure-rand@6.1.0: {}
 
+  pvtsutils@1.3.6:
+    dependencies:
+      tslib: 2.8.1
+
+  pvutils@1.1.5: {}
+
   q@1.5.1: {}
 
   qr-code-styling@1.6.0-rc.1:
@@ -36259,7 +36451,7 @@ snapshots:
       ast-types: 0.15.2
       esprima: 4.0.1
       source-map: 0.6.1
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   rechoir@0.6.2:
     dependencies:
@@ -38241,6 +38433,8 @@ snapshots:
 
   tslib@2.7.0: {}
 
+  tslib@2.8.1: {}
+
   tsort@0.0.1: {}
 
   tsup@8.3.0(@swc/core@1.15.3(@swc/helpers@0.5.13))(jiti@1.21.0)(postcss@8.4.49)(typescript@5.6.2)(yaml@2.5.0):
@@ -38645,6 +38839,8 @@ snapshots:
   utility-types@3.11.0: {}
 
   utils-merge@1.0.1: {}
+
+  uuid@13.0.0: {}
 
   uuid@8.3.2: {}
 
