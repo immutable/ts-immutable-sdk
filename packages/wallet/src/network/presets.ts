@@ -49,6 +49,7 @@ export const ARBITRUM_ONE_CHAIN: ChainConfig = {
   apiUrl: 'https://api.immutable.com',
   passportDomain: 'https://passport.immutable.com',
   feeTokenSymbol: 'ETH',
+  sequenceIdentityInstrumentEndpoint: 'https://next-identity.sequence.app',
 };
 
 /**
@@ -63,6 +64,7 @@ export const ARBITRUM_SEPOLIA_CHAIN: ChainConfig = {
   apiUrl: 'https://api.sandbox.immutable.com',
   passportDomain: 'https://passport.sandbox.immutable.com',
   feeTokenSymbol: 'ETH',
+  sequenceIdentityInstrumentEndpoint: 'https://next-identity.sequence-dev.app',
 };
 
 /**

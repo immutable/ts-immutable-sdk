@@ -46,6 +46,14 @@ jest.mock('./sequence/sequenceProvider', () => ({
   SequenceProvider: jest.fn(),
 }));
 
+jest.mock('./sequence/signer', () => ({
+  createSequenceSigner: jest.fn().mockReturnValue({
+    getAddress: jest.fn().mockResolvedValue('0x1234'),
+    signPayload: jest.fn(),
+    signMessage: jest.fn(),
+  }),
+}));
+
 jest.mock('./provider/eip6963', () => ({
   announceProvider: jest.fn(),
   passportProviderInfo: { name: 'passport', rdns: 'com.immutable.passport', icon: '' },

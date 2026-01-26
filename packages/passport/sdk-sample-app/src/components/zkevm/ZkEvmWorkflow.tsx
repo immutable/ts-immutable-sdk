@@ -4,7 +4,7 @@ import React, {
   useState,
 } from 'react';
 import { Stack } from 'react-bootstrap';
-import { connectWallet, type ChainConfig } from '@imtbl/wallet';
+import { connectWallet, type ChainConfig, ZkEvmProvider } from '@imtbl/wallet';
 import { useImmutableSession } from '@imtbl/auth-next-client';
 import { usePassportProvider } from '@/context/PassportProvider';
 import Request from '@/components/zkevm/Request';
@@ -49,7 +49,6 @@ function ZkEvmWorkflow() {
   const { isLoading, addMessage, setIsLoading } = useStatusProvider();
   const {
     connectZkEvm,
-    zkEvmProvider,
     defaultWalletProvider,
     activeZkEvmProvider,
     setDefaultWalletProvider,
@@ -74,7 +73,7 @@ function ZkEvmWorkflow() {
         getUser: isNextAuthAuthenticated ? getUser : undefined,
         clientId: authConfig.clientId,
         chains,
-      });
+      }) as ZkEvmProvider;
 
       if (provider) {
         // Request accounts to trigger login/registration flow
