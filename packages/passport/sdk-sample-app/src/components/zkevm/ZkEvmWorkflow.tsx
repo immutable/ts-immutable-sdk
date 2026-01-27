@@ -5,7 +5,7 @@ import React, {
   useState,
 } from 'react';
 import { Stack } from 'react-bootstrap';
-import { connectWallet } from '@imtbl/wallet';
+import { connectWallet, ZkEvmProvider } from '@imtbl/wallet';
 import { usePassportProvider } from '@/context/PassportProvider';
 import Request from '@/components/zkevm/Request';
 import CardStack from '@/components/CardStack';
@@ -22,7 +22,6 @@ function ZkEvmWorkflow() {
   const { isLoading, addMessage, setIsLoading } = useStatusProvider();
   const {
     connectZkEvm,
-    zkEvmProvider,
     defaultWalletProvider,
     activeZkEvmProvider,
     setDefaultWalletProvider,
@@ -47,7 +46,7 @@ function ZkEvmWorkflow() {
     }
     setIsLoading(true);
     try {
-      const provider = await connectWallet();
+      const provider = await connectWallet() as ZkEvmProvider;
       if (provider) {
         setDefaultWalletProvider(provider);
         addMessage(

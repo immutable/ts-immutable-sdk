@@ -10,10 +10,13 @@ import { useStatusProvider } from '@/context/StatusProvider';
 import { BASE_PATH } from '@/config';
 import PassportMethods from '@/components/PassportMethods';
 import ZkEvmWorkflow from '@/components/zkevm/ZkEvmWorkflow';
+import ArbitrumWorkflow from '@/components/arbitrum/ArbitrumWorkflow';
 
 export default function Home() {
   const { isLoading } = useStatusProvider();
-  const { imxProvider, zkEvmProvider, defaultWalletProvider } = usePassportProvider();
+  const {
+    imxProvider, zkEvmProvider, arbitrumProvider, defaultWalletProvider,
+  } = usePassportProvider();
 
   return (
     <>
@@ -26,7 +29,10 @@ export default function Home() {
       <main>
         <Container>
           <Row className="my-3">
-            <Environment disabled={isLoading || !!imxProvider || !!zkEvmProvider || !!defaultWalletProvider} />
+            <Environment
+              disabled={isLoading || !!imxProvider || !!zkEvmProvider
+                || !!arbitrumProvider || !!defaultWalletProvider}
+            />
           </Row>
           <Row className="my-3">
             <PassportMethods />
@@ -36,6 +42,9 @@ export default function Home() {
           </Row>
           <Row className="my-3">
             <ZkEvmWorkflow />
+          </Row>
+          <Row className="my-3">
+            <ArbitrumWorkflow />
           </Row>
           <Row className="mb-3">
             <Message />

@@ -3,22 +3,25 @@ import React, {
 } from 'react';
 import { IMXProvider } from '@imtbl/x-provider';
 import {
-  LinkedWallet, LinkWalletParams, Provider, UserProfile, MarketingConsentStatus,
+  LinkedWallet, LinkWalletParams, UserProfile, MarketingConsentStatus, EvmChain,
 } from '@imtbl/passport';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { EnvironmentNames } from '@/types';
+import { SequenceProvider, ZkEvmProvider } from '@imtbl/wallet';
 
 const PassportContext = createContext<{
   imxProvider: IMXProvider | undefined;
-  zkEvmProvider: Provider | undefined;
-  defaultWalletProvider: Provider | undefined;
-  activeZkEvmProvider: Provider | undefined;
+  zkEvmProvider: ZkEvmProvider | undefined;
+  arbitrumProvider: SequenceProvider | undefined;
+  defaultWalletProvider: ZkEvmProvider | undefined;
+  activeZkEvmProvider: ZkEvmProvider | undefined;
   activeZkEvmAccount: string;
   isSandboxEnvironment: boolean;
-  setDefaultWalletProvider: (provider?: Provider) => void;
+  setDefaultWalletProvider: (provider?: ZkEvmProvider) => void;
   connectImx:() => void;
   connectZkEvm: () => void;
+  connectArbitrum: () => void;
   logout: () => void;
   login: () => void;
   popupRedirect: () => void;
@@ -36,6 +39,7 @@ const PassportContext = createContext<{
 }>({
       imxProvider: undefined,
       zkEvmProvider: undefined,
+      arbitrumProvider: undefined,
       defaultWalletProvider: undefined,
       activeZkEvmProvider: undefined,
       activeZkEvmAccount: '',
@@ -43,6 +47,7 @@ const PassportContext = createContext<{
       isSandboxEnvironment: false,
       connectImx: () => undefined,
       connectZkEvm: () => undefined,
+      connectArbitrum: () => undefined,
       logout: () => undefined,
       login: () => Promise.resolve(undefined),
       popupRedirect: () => Promise.resolve(undefined),
@@ -63,8 +68,9 @@ export function PassportProvider({
   children,
 }: { children: JSX.Element | JSX.Element[] }) {
   const [imxProvider, setImxProvider] = useState<IMXProvider | undefined>();
-  const [zkEvmProvider, setZkEvmProvider] = useState<Provider | undefined>();
-  const [defaultWalletProvider, setDefaultWalletProvider] = useState<Provider | undefined>();
+  const [zkEvmProvider, setZkEvmProvider] = useState<ZkEvmProvider | undefined>();
+  const [arbitrumProvider, setArbitrumProvider] = useState<SequenceProvider | undefined>();
+  const [defaultWalletProvider, setDefaultWalletProvider] = useState<ZkEvmProvider | undefined>();
   const [activeZkEvmAccount, setActiveZkEvmAccount] = useState<string>('');
 
   const { addMessage, setIsLoading } = useStatusProvider();
@@ -97,7 +103,7 @@ export function PassportProvider({
 
   const connectZkEvm = useCallback(async () => {
     setIsLoading(true);
-    const provider = await passportClient.connectEvm();
+    const provider = await passportClient.connectEvm() as ZkEvmProvider;
     if (provider) {
       setZkEvmProvider(provider);
       addMessage('ConnectZkEvm', 'Connected');
@@ -105,6 +111,26 @@ export function PassportProvider({
       addMessage('ConnectZkEvm', 'Failed to connect');
     }
     setIsLoading(false);
+  }, [passportClient, setIsLoading, addMessage]);
+
+  const connectArbitrum = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const provider = await passportClient.connectEvm({ 
+        chain: EvmChain.ARBITRUM_ONE, 
+        announceProvider: true 
+      }) as SequenceProvider;
+      if (provider) {
+        setArbitrumProvider(provider);
+        addMessage('ConnectArbitrum', 'Connected');
+      } else {
+        addMessage('ConnectArbitrum', 'Failed to connect');
+      }
+    } catch (err) {
+      addMessage('ConnectArbitrum', err);
+    } finally {
+      setIsLoading(false);
+    }
   }, [passportClient, setIsLoading, addMessage]);
 
   const getIdToken = useCallback(async () => {
@@ -162,6 +188,7 @@ export function PassportProvider({
       await passportClient.logout();
       setImxProvider(undefined);
       setZkEvmProvider(undefined);
+      setArbitrumProvider(undefined);
       setDefaultWalletProvider(undefined);
     } catch (err) {
       addMessage('Logout', err);
@@ -362,12 +389,14 @@ export function PassportProvider({
   const providerValues = useMemo(() => ({
     imxProvider,
     zkEvmProvider,
+    arbitrumProvider,
     defaultWalletProvider,
     activeZkEvmProvider,
     activeZkEvmAccount,
     setDefaultWalletProvider,
     connectImx,
     connectZkEvm,
+    connectArbitrum,
     logout,
     popupRedirect,
     popupRedirectGoogle,
@@ -386,12 +415,14 @@ export function PassportProvider({
   }), [
     imxProvider,
     zkEvmProvider,
+    arbitrumProvider,
     defaultWalletProvider,
     activeZkEvmProvider,
     activeZkEvmAccount,
     isSandboxEnvironment,
     connectImx,
     connectZkEvm,
+    connectArbitrum,
     logout,
     popupRedirect,
     popupRedirectGoogle,
@@ -420,6 +451,7 @@ export function usePassportProvider() {
   const {
     imxProvider,
     zkEvmProvider,
+    arbitrumProvider,
     defaultWalletProvider,
     activeZkEvmProvider,
     activeZkEvmAccount,
@@ -427,6 +459,7 @@ export function usePassportProvider() {
     setDefaultWalletProvider,
     connectImx,
     connectZkEvm,
+    connectArbitrum,
     logout,
     popupRedirect,
     popupRedirectGoogle,
@@ -445,6 +478,7 @@ export function usePassportProvider() {
   return {
     imxProvider,
     zkEvmProvider,
+    arbitrumProvider,
     defaultWalletProvider,
     activeZkEvmProvider,
     activeZkEvmAccount,
@@ -452,6 +486,7 @@ export function usePassportProvider() {
     setDefaultWalletProvider,
     connectImx,
     connectZkEvm,
+    connectArbitrum,
     logout,
     popupRedirect,
     popupRedirectGoogle,
