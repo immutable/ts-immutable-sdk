@@ -1,7 +1,7 @@
 import { keccak256, toBytes } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { WalletError, WalletErrorType } from '../../errors';
-import { Auth, User } from '@imtbl/auth';
+import { User } from '@imtbl/auth';
 import { Signers } from '@0xsequence/wallet-core';
 import {
   Payload,
@@ -9,6 +9,7 @@ import {
 } from '@0xsequence/wallet-primitives';
 import { SequenceSigner } from './types';
 import { Address } from 'ox';
+import { GetUserFunction } from '../../types';
 
 interface PrivateKeyWallet {
   userIdentifier: string;
@@ -22,18 +23,18 @@ interface PrivateKeyWallet {
  * Uses a deterministic private key derived from the user's sub.
  */
 export class PrivateKeySigner implements SequenceSigner {
-  readonly #auth: Auth;
+  readonly #getUser: GetUserFunction;
 
   #privateKeyWallet: PrivateKeyWallet | null = null;
 
   #createWalletPromise: Promise<PrivateKeyWallet> | null = null;
 
-  constructor(auth: Auth) {
-    this.#auth = auth;
+  constructor(getUser: GetUserFunction) {
+    this.#getUser = getUser;
   }
 
   async #getUserOrThrow(): Promise<User> {
-    const user = await this.#auth.getUser();
+    const user = await this.#getUser();
     if (!user) {
       throw new WalletError('User not authenticated', WalletErrorType.NOT_LOGGED_IN_ERROR);
     }

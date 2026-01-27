@@ -2,13 +2,14 @@ import { hashMessage, toHex, concat } from 'viem';
 import { Identity } from '@0xsequence/wallet-wdk';
 import { IdentityInstrument, IdTokenChallenge } from '@0xsequence/identity-instrument';
 import { WalletError, WalletErrorType } from '../../errors';
-import { Auth, User, decodeJwtPayload } from '@imtbl/auth';
+import { User, decodeJwtPayload } from '@imtbl/auth';
 import { Hex, Address } from 'ox';
 import {
   Payload,
   Signature as SequenceSignature,
 } from '@0xsequence/wallet-primitives';
 import { SequenceSigner } from './types';
+import { GetUserFunction } from '../../types';
 
 interface IdTokenPayload {
   iss: string;
@@ -36,7 +37,7 @@ export interface IdentityInstrumentSignerConfig {
 }
 
 export class IdentityInstrumentSigner implements SequenceSigner {
-  readonly #auth: Auth;
+  readonly #getUser: GetUserFunction;
 
   readonly #config: IdentityInstrumentSignerConfig;
 
@@ -44,13 +45,13 @@ export class IdentityInstrumentSigner implements SequenceSigner {
 
   #createWalletPromise: Promise<UserWallet> | null = null;
 
-  constructor(auth: Auth, config: IdentityInstrumentSignerConfig) {
-    this.#auth = auth;
+  constructor(getUser: GetUserFunction, config: IdentityInstrumentSignerConfig) {
+    this.#getUser = getUser;
     this.#config = config;
   }
 
   async #getUserOrThrow(): Promise<User> {
-    const user = await this.#auth.getUser();
+    const user = await this.#getUser();
     if (!user) {
       throw new WalletError(
         'User not authenticated',
@@ -80,7 +81,8 @@ export class IdentityInstrumentSigner implements SequenceSigner {
     this.#createWalletPromise = (async () => {
       try {
         this.#userWallet = null;
-        await this.#auth.forceUserRefresh(); // TODO shouldn't have to refresh all the time
+        // Force refresh to get latest user data including idToken
+        await this.#getUser(true);
 
         const authenticatedUser = user || await this.#getUserOrThrow();
 
