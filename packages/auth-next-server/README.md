@@ -147,7 +147,6 @@ This package provides several utilities for handling authentication in Server Co
 | `getAuthenticatedData` | SSR data fetching with client fallback | Yes | Manual |
 | `createProtectedFetchers` | Multiple pages with same error handling | Optional | Centralized |
 | `getValidSession` | Custom logic for each auth state | No | Manual (detailed) |
-| `withServerAuth` | Render different JSX per auth state | Yes | Via callbacks |
 
 ### `getAuthProps(auth)`
 
@@ -315,53 +314,6 @@ export default async function AccountPage() {
       // Auth system error (e.g., refresh token revoked) - needs re-login
       return <AuthErrorPage error={result.error} />;
   }
-}
-```
-
-### `withServerAuth(auth, serverRender, options)`
-
-**Use case:** You want to render a Server Component with authenticated data, but declaratively specify fallback components for different auth states.
-
-**When to use:**
-- Server Components that fetch and render data in one place
-- When you prefer a declarative, callback-based API over imperative if/else
-- Pages where the fallback UI is a different component (not just a redirect)
-
-**Comparison with `getAuthenticatedData`:**
-- `getAuthenticatedData` returns data for you to pass to a Client Component
-- `withServerAuth` lets you render JSX directly in the Server Component
-
-```typescript
-// app/inventory/page.tsx
-// Use case: Server Component that renders inventory with fallback components
-import { auth } from "@/lib/auth";
-import { withServerAuth } from "@imtbl/auth-next-server";
-import { redirect } from "next/navigation";
-
-export default async function InventoryPage() {
-  return withServerAuth(
-    auth,
-    // This runs when token is valid - fetch and render server-side
-    async (session) => {
-      const inventory = await fetchInventory(session.accessToken);
-      return (
-        <div>
-          <h1>Your Inventory</h1>
-          <InventoryGrid items={inventory} />
-        </div>
-      );
-    },
-    {
-      // Token expired - render a client component that will refresh and fetch
-      onTokenExpired: <InventoryClientFallback />,
-      
-      // Not authenticated - redirect to login
-      onUnauthenticated: () => redirect("/login"),
-      
-      // Auth error - redirect with error message
-      onError: (error) => redirect(`/login?error=${error}`),
-    }
-  );
 }
 ```
 
