@@ -12,8 +12,8 @@ export type {
  * zkEVM wallet information
  */
 export interface ZkEvmInfo {
-  ethAddress: string;
-  userAdminAddress: string;
+  ethAddress: `0x${string}`;
+  userAdminAddress: `0x${string}`;
 }
 
 /**

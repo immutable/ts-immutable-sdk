@@ -8,6 +8,7 @@ import type {
   LoginConfig,
   StandaloneLoginOptions,
 } from '@imtbl/auth';
+import type { ZkEvmInfo } from './types';
 import {
   loginWithPopup as rawLoginWithPopup,
   loginWithEmbedded as rawLoginWithEmbedded,
@@ -23,10 +24,7 @@ export interface ImmutableSession extends Session {
   refreshToken?: string;
   idToken?: string;
   accessTokenExpires: number;
-  zkEvm?: {
-    ethAddress: string;
-    userAdminAddress: string;
-  };
+  zkEvm?: ZkEvmInfo;
   error?: string;
 }
 
@@ -242,7 +240,7 @@ export function useLogin(): UseLoginReturn {
     idToken?: string;
     accessTokenExpires: number;
     profile: { sub: string; email?: string; nickname?: string };
-    zkEvm?: { ethAddress: string; userAdminAddress: string };
+    zkEvm?: ZkEvmInfo;
   }) => {
     const result = await signIn(IMMUTABLE_PROVIDER_ID, {
       tokens: JSON.stringify(tokens),

@@ -8,8 +8,8 @@ import type { DefaultSession } from 'next-auth';
  * zkEVM wallet information for module augmentation
  */
 interface ZkEvmInfo {
-  ethAddress: string;
-  userAdminAddress: string;
+  ethAddress: `0x${string}`;
+  userAdminAddress: `0x${string}`;
 }
 
 /**
