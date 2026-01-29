@@ -91,9 +91,10 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
   // Create Guardian client for IMX provider
   const guardianClient = new GuardianClient({
     config: walletConfig,
-    auth,
+    getUser: (forceRefresh) => (forceRefresh ? auth.forceUserRefresh() : auth.getUser()),
     guardianApi: multiRollupApiClients.guardianApi,
-    authConfig,
+    passportDomain: passportConfig.passportDomain,
+    clientId: passportConfig.oidcConfiguration.clientId,
   });
 
   const imxGuardianClient = new ImxGuardianClient({
@@ -110,7 +111,10 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     magicPublishableApiKey: passportConfig.magicPublishableApiKey,
     magicProviderId: passportConfig.magicProviderId,
   });
-  const magicTEESigner = new MagicTEESigner(auth, magicTeeApiClients);
+  const magicTEESigner = new MagicTEESigner(
+    (forceRefresh) => (forceRefresh ? auth.forceUserRefresh() : auth.getUser()),
+    magicTeeApiClients,
+  );
 
   const imxApiClients = buildImxApiClients(passportModuleConfiguration);
 
@@ -220,8 +224,14 @@ export class Passport {
       const feeTokenSymbol = chainConfig.feeTokenSymbol ?? 'IMX';
 
       // Use connectWallet to create the provider (it will create WalletConfiguration internally)
+      // Wrap Auth instance in getUser function for the new wallet API
+      // getUserOrLogin will trigger login popup if user is not authenticated
+      // forceRefresh triggers forceUserRefresh to get updated claims after registration
       const provider = await connectWallet({
-        auth: this.auth,
+        getUser: (forceRefresh) => (forceRefresh
+          ? this.auth.forceUserRefresh()
+          : this.auth.getUserOrLogin()),
+        clientId: this.passportConfig.oidcConfiguration.clientId,
         chains: [chainConfig],
         crossSdkBridgeEnabled: this.passportConfig.crossSdkBridgeEnabled,
         jsonRpcReferrer: this.passportConfig.jsonRpcReferrer,

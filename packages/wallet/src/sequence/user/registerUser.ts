@@ -2,12 +2,12 @@ import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
 import type { PublicClient } from 'viem';
 import { getEip155ChainId } from '../../zkEvm/walletHelpers';
-import { Auth } from '@imtbl/auth';
 import { JsonRpcError, RpcErrorCode } from '../../zkEvm/JsonRpcError';
 import { SequenceSigner } from '../signer';
+import { GetUserFunction } from '../../types';
 
 export type RegisterUserInput = {
-  auth: Auth;
+  getUser: GetUserFunction;
   ethSigner: SequenceSigner;
   multiRollupApiClients: MultiRollupApiClients;
   accessToken: string;
@@ -39,7 +39,7 @@ function formatSignature(signature: string): string {
  * Creates a counterfactual address for the user on the specified chain.
  */
 export async function registerUser({
-  auth,
+  getUser,
   ethSigner,
   multiRollupApiClients,
   accessToken,
@@ -87,7 +87,8 @@ export async function registerUser({
     });
     flow.addEvent('endCreateCounterfactualAddress');
 
-    auth.forceUserRefreshInBackground();
+    // Trigger background refresh to get updated user data with the new chain registration
+    getUser(true).catch(() => {});
 
     return registrationResponse.data.counterfactual_address;
   } catch (error) {

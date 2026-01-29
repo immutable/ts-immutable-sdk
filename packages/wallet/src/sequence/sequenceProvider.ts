@@ -5,7 +5,7 @@ import {
   type PublicClient,
 } from 'viem';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { Auth, TypedEventEmitter, User } from '@imtbl/auth';
+import { TypedEventEmitter, User } from '@imtbl/auth';
 import { trackFlow, trackError, identify } from '@imtbl/metrics';
 import {
   Provider,
@@ -14,6 +14,7 @@ import {
   RequestArguments,
   ChainConfig,
   EvmChain,
+  GetUserFunction,
 } from '../types';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import GuardianClient from '../guardian';
@@ -22,7 +23,7 @@ import { registerUser } from './user';
 import { getEvmChainFromChainId } from '../network/chainRegistry';
 
 export type SequenceProviderInput = {
-  auth: Auth;
+  getUser: GetUserFunction;
   chainConfig: ChainConfig;
   multiRollupApiClients: MultiRollupApiClients;
   guardianClient: GuardianClient;
@@ -50,7 +51,7 @@ function getUserChainAddress(user: User, chain: SequenceChain): string | undefin
 }
 
 export class SequenceProvider implements Provider {
-  readonly #auth: Auth;
+  readonly #getUser: GetUserFunction;
 
   readonly #chainConfig: ChainConfig;
 
@@ -69,7 +70,7 @@ export class SequenceProvider implements Provider {
   public readonly isPassport: boolean = true;
 
   constructor({
-    auth,
+    getUser,
     chainConfig,
     multiRollupApiClients,
     guardianClient,
@@ -83,7 +84,7 @@ export class SequenceProvider implements Provider {
     }
     this.#evmChain = evmChain;
 
-    this.#auth = auth;
+    this.#getUser = getUser;
     this.#chainConfig = chainConfig;
     this.#multiRollupApiClients = multiRollupApiClients;
     this.#guardianClient = guardianClient;
@@ -100,7 +101,7 @@ export class SequenceProvider implements Provider {
    * Get the user's address for this chain if already registered.
    */
   async #getChainAddress(): Promise<string | undefined> {
-    const user = await this.#auth.getUser();
+    const user = await this.#getUser();
     if (user && isUserRegisteredForChain(user, this.#evmChain)) {
       return getUserChainAddress(user, this.#evmChain);
     }
@@ -117,8 +118,15 @@ export class SequenceProvider implements Provider {
         const flow = trackFlow('passport', 'ethRequestAccounts');
 
         try {
-          const user = await this.#auth.getUserOrLogin();
-          flow.addEvent('endGetUserOrLogin');
+          const user = await this.#getUser();
+          flow.addEvent('endGetUser');
+
+          if (!user) {
+            throw new JsonRpcError(
+              RpcErrorCode.INTERNAL_ERROR,
+              'User not authenticated',
+            );
+          }
 
           let userEthAddress: string | undefined;
 
@@ -126,7 +134,7 @@ export class SequenceProvider implements Provider {
             flow.addEvent('startUserRegistration');
 
             userEthAddress = await registerUser({
-              auth: this.#auth,
+              getUser: this.#getUser,
               ethSigner: this.#ethSigner,
               multiRollupApiClients: this.#multiRollupApiClients,
               accessToken: user.accessToken,

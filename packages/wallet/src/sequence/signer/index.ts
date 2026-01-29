@@ -1,18 +1,18 @@
-import { Auth, IAuthConfiguration } from '@imtbl/auth';
 import { SequenceSigner } from './types';
 import { IdentityInstrumentSigner } from './identityInstrumentSigner';
 import { PrivateKeySigner } from './privateKeySigner';
+import { GetUserFunction } from '../../types';
 
 export type { SequenceSigner } from './types';
 export { IdentityInstrumentSigner } from './identityInstrumentSigner';
 export type { IdentityInstrumentSignerConfig } from './identityInstrumentSigner';
 export { PrivateKeySigner } from './privateKeySigner';
 
-const DEV_AUTH_DOMAIN = 'https://auth.dev.immutable.com';
-
 export interface CreateSequenceSignerConfig {
   /** Identity Instrument endpoint (required for prod/sandbox) */
   identityInstrumentEndpoint?: string;
+  /** Whether this is a dev environment (uses PrivateKeySigner instead of IdentityInstrumentSigner) */
+  isDevEnvironment?: boolean;
 }
 
 /**
@@ -20,26 +20,22 @@ export interface CreateSequenceSignerConfig {
  * - Dev environment (behind VPN): uses PrivateKeySigner
  * - Prod/Sandbox: uses IdentityInstrumentSigner
  *
- * @param auth - Auth instance
- * @param authConfig - Auth configuration (to determine environment)
+ * @param getUser - Function to get the current user
  * @param config - Signer configuration
  */
 export function createSequenceSigner(
-  auth: Auth,
-  authConfig: IAuthConfiguration,
+  getUser: GetUserFunction,
   config: CreateSequenceSignerConfig = {},
 ): SequenceSigner {
-  const isDevEnvironment = authConfig.authenticationDomain === DEV_AUTH_DOMAIN;
-
-  if (isDevEnvironment) {
-    return new PrivateKeySigner(auth);
+  if (config.isDevEnvironment) {
+    return new PrivateKeySigner(getUser);
   }
 
   if (!config.identityInstrumentEndpoint) {
     throw new Error('identityInstrumentEndpoint is required for non-dev environments');
   }
 
-  return new IdentityInstrumentSigner(auth, {
+  return new IdentityInstrumentSigner(getUser, {
     identityInstrumentEndpoint: config.identityInstrumentEndpoint,
   });
 }

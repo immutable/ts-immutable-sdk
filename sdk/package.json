@@ -6,6 +6,8 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/auth": "workspace:*",
+    "@imtbl/auth-next-client": "workspace:*",
+    "@imtbl/auth-next-server": "workspace:*",
     "@imtbl/blockchain-data": "workspace:*",
     "@imtbl/checkout-sdk": "workspace:*",
     "@imtbl/config": "workspace:*",
@@ -18,9 +20,25 @@
     "@imtbl/x-provider": "workspace:*"
   },
   "devDependencies": {
-    "eslint": "^8.40.0",
+    "eslint": "^8.56.0",
     "tsup": "^8.3.0",
     "typescript": "^5.6.2"
+  },
+  "peerDependencies": {
+    "next": "^14.2.0 || ^15.0.0",
+    "next-auth": "^5.0.0-beta.25",
+    "react": "^18.2.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    },
+    "next-auth": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=20.0.0"
@@ -147,6 +165,60 @@
         "types": "./dist/minting_backend.d.ts",
         "require": "./dist/minting_backend.cjs",
         "default": "./dist/minting_backend.js"
+      }
+    },
+    "./auth": {
+      "development": {
+        "types": "./src/auth.ts",
+        "browser": "./dist/auth.js",
+        "require": "./dist/auth.cjs",
+        "default": "./dist/auth.js"
+      },
+      "default": {
+        "types": "./dist/auth.d.ts",
+        "browser": "./dist/auth.js",
+        "require": "./dist/auth.cjs",
+        "default": "./dist/auth.js"
+      }
+    },
+    "./wallet": {
+      "development": {
+        "types": "./src/wallet.ts",
+        "browser": "./dist/wallet.js",
+        "require": "./dist/wallet.cjs",
+        "default": "./dist/wallet.js"
+      },
+      "default": {
+        "types": "./dist/wallet.d.ts",
+        "browser": "./dist/wallet.js",
+        "require": "./dist/wallet.cjs",
+        "default": "./dist/wallet.js"
+      }
+    },
+    "./auth-next-client": {
+      "development": {
+        "types": "./src/auth-next-client.ts",
+        "browser": "./dist/auth-next-client.js",
+        "require": "./dist/auth-next-client.cjs",
+        "default": "./dist/auth-next-client.js"
+      },
+      "default": {
+        "types": "./dist/auth-next-client.d.ts",
+        "browser": "./dist/auth-next-client.js",
+        "require": "./dist/auth-next-client.cjs",
+        "default": "./dist/auth-next-client.js"
+      }
+    },
+    "./auth-next-server": {
+      "development": {
+        "types": "./src/auth-next-server.ts",
+        "require": "./dist/auth-next-server.cjs",
+        "default": "./dist/auth-next-server.js"
+      },
+      "default": {
+        "types": "./dist/auth-next-server.d.ts",
+        "require": "./dist/auth-next-server.cjs",
+        "default": "./dist/auth-next-server.js"
       }
     }
   },

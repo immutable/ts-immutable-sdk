@@ -15,9 +15,12 @@ export function WalletOptions() {
   useEffect(() => {
     if (!connectors) return;
     // filter the available connectors to show only Passport
-    setFilteredConnectors(connectors.filter((connector) => connector.name.includes('Immutable Passport')));
-    // enable button when loading has finished
-    setLoadingState(false);
+    const filtered = connectors.filter((connector) => connector.name.includes('Immutable Passport'));
+    setFilteredConnectors(filtered);
+    // only enable button when we have found the Passport connector
+    if (filtered.length > 0) {
+      setLoadingState(false);
+    }
   }, [connectors]);
 
   function passportLogin(connector:Connector) {

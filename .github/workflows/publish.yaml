@@ -69,17 +69,17 @@ jobs:
           echo "Check user permissions for triggering actor - ${{ github.triggering_actor }}"
           echo "user-permission = ${{ steps.check_user_permission.outputs.user-permission }}"
           echo "require-result = ${{ steps.check_user_permission.outputs.require-result }}"
-  
+
       - name: Admin Permission Check
         if: ${{ steps.check_user_permission.outputs.require-result != 'true' && env.RELEASE_TYPE == 'major' }}
         run: exit 1
-  
+
       - name: Allowed Actors Check
         id: allowed_actors_check
         # only allow certain SDK team members to run this workflow
         if: ${{ contains(fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS), github.triggering_actor) && env.RELEASE_TYPE == 'major' }}
         run: echo "ALLOWED_ACTOR=true" >> $GITHUB_OUTPUT
-  
+
       - name: Allowed Actors Filter
         if: ${{ steps.allowed_actors_check.outputs.ALLOWED_ACTOR != 'true' && env.RELEASE_TYPE == 'major' }}
         run: exit 1
@@ -97,7 +97,7 @@ jobs:
         run: |
           git config user.name "platform-sa"
           git config user.email "platform-sa@users.noreply.github.com"
-        
+
       - name: Initialize current versions
         run: pnpm --filter @imtbl/sdk... --filter @imtbl/checkout-widgets... exec sh -c "jq --arg version \"$(npm view @imtbl/metrics versions --json | jq -r '.[-1]')\" '.version = \$version' package.json > package.tmp.json && mv package.tmp.json package.json"
 
@@ -106,7 +106,7 @@ jobs:
 
       - name: Build SDK & Checkout Widgets
         run: pnpm build
-      
+
       - name: Pack SDK & Checkout Widgets packages and dependencies
         run: pnpm pack-npm-packages
 
@@ -118,7 +118,7 @@ jobs:
 
       - name: Publish Github Release
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
-        run: pnpm nx release changelog $(jq -r '.version' ./sdk/package.json) $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") 
+        run: pnpm nx release changelog $(jq -r '.version' ./sdk/package.json) $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "")
 
       - name: Tag Git Pre-Release
         if: ${{ startsWith(env.RELEASE_TYPE, 'pre') }}
@@ -163,7 +163,7 @@ jobs:
         uses: ./.github/actions/notify-slack-publish-status
         with:
           message: "❌ Failed to publish SDK version ${{steps.release.outputs.RELEASE_NAME}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
-          
+
       - name: Wait for NPM @latest Update
         id: wait_for_npm_update
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') && github.event_name != 'push' }} && env.DRY_RUN == 'false'
