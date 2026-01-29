@@ -152,8 +152,8 @@ function mapTokenResponseToResult(
 
       if (passport?.zkevm_eth_address && passport?.zkevm_user_admin_address) {
         zkEvm = {
-          ethAddress: passport.zkevm_eth_address,
-          userAdminAddress: passport.zkevm_user_admin_address,
+          ethAddress: passport.zkevm_eth_address as `0x${string}`,
+          userAdminAddress: passport.zkevm_user_admin_address as `0x${string}`,
         };
       }
     } catch {

@@ -30,6 +30,7 @@ import {
   IdTokenPayload,
   isUserZkEvm,
   EvmChain,
+  ChainAddress,
 } from './types';
 import EmbeddedLoginPrompt from './login/embeddedLoginPrompt';
 import TypedEventEmitter from './utils/typedEventEmitter';
@@ -74,6 +75,11 @@ const extractTokenErrorMessage = (
   }
   return `Token request failed with status ${status}`;
 };
+
+const toChainAddress = (ethAddress: string, userAdminAddress: string): ChainAddress => ({
+  ethAddress: ethAddress as `0x${string}`,
+  userAdminAddress: userAdminAddress as `0x${string}`,
+});
 
 const logoutEndpoint = '/v2/logout';
 const crossSdkBridgeLogoutEndpoint = '/im-logged-out';
@@ -573,20 +579,14 @@ export class Auth {
     };
 
     if (passport?.zkevm_eth_address && passport?.zkevm_user_admin_address) {
-      user.zkEvm = {
-        ethAddress: passport.zkevm_eth_address,
-        userAdminAddress: passport.zkevm_user_admin_address,
-      };
+      user.zkEvm = toChainAddress(passport.zkevm_eth_address, passport.zkevm_user_admin_address);
     }
 
     const chains = Object.values(EvmChain).filter((chain) => chain !== EvmChain.ZKEVM);
     for (const chain of chains) {
       const chainMetadata = passport?.[chain as Exclude<EvmChain, EvmChain.ZKEVM>];
       if (chainMetadata?.eth_address && chainMetadata?.user_admin_address) {
-        user[chain] = {
-          ethAddress: chainMetadata.eth_address,
-          userAdminAddress: chainMetadata.user_admin_address,
-        };
+        user[chain] = toChainAddress(chainMetadata.eth_address, chainMetadata.user_admin_address);
       }
     }
 
