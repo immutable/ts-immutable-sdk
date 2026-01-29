@@ -3,28 +3,51 @@
 /**
  * Post-build script to fix the Unity HTML bundle.
  * 
- * Parcel 2 with viem creates code-split bundles for the HTML target which don't work
- * in the Unity embedded browser. This script:
- * 1. Takes the complete JS bundle from the unreal target
- * 2. Creates a proper self-contained HTML file for Unity
+ * ROOT CAUSE:
+ * viem uses dynamic import() for lazy-loading CCIP (Cross-Chain Interoperability Protocol) code:
+ *   const { offchainLookup } = await import('../../utils/ccip.js');
+ * (see: viem/_esm/actions/public/call.js line 126)
  * 
- * The unreal target uses index.ts as entry point and produces a single complete JS bundle,
- * while the HTML target incorrectly splits the code.
+ * When Parcel builds the HTML target with <script type="module">, it:
+ * 1. Creates a separate ccip.*.js chunk for the dynamic import
+ * 2. Uses absolute paths in script src (e.g., /game-bridge.*.js) which don't work offline
+ * 
+ * Parcel's bundler configuration (minBundles, manualSharedBundles) only affects *shared* bundles
+ * between multiple entry points, NOT async bundles from dynamic imports.
+ * 
+ * WORKAROUND:
+ * This script inlines all external JS files into the HTML to create a self-contained bundle.
+ * This ensures the Unity embedded browser (which runs offline) can load everything.
  */
 
 const fs = require('fs');
 const path = require('path');
 
 const UNITY_DIST_DIR = path.join(__dirname, '..', 'dist', 'unity');
-const UNREAL_DIST_DIR = path.join(__dirname, '..', 'dist', 'unreal');
 const HTML_FILE = path.join(UNITY_DIST_DIR, 'index.html');
-const UNREAL_JS_FILE = path.join(UNREAL_DIST_DIR, 'index.js');
 
 console.log('Fixing Unity build...');
 
-// Read the complete JS bundle from unreal target
-const jsContent = fs.readFileSync(UNREAL_JS_FILE, 'utf8');
-console.log(`Read unreal bundle: ${jsContent.length} bytes`);
+// Read all JS files in the dist directory (sorted so main bundle comes first)
+const jsFiles = fs.readdirSync(UNITY_DIST_DIR)
+  .filter(f => f.endsWith('.js') && !f.endsWith('.map'))
+  .sort((a, b) => {
+    // Main bundle should be first
+    if (a.startsWith('game-bridge')) return -1;
+    if (b.startsWith('game-bridge')) return 1;
+    return a.localeCompare(b);
+  });
+
+console.log(`Found ${jsFiles.length} JS file(s):`, jsFiles);
+
+// Combine all JS files
+let combinedJs = '';
+for (const jsFile of jsFiles) {
+  const jsPath = path.join(UNITY_DIST_DIR, jsFile);
+  const jsContent = fs.readFileSync(jsPath, 'utf8');
+  combinedJs += jsContent + '\n';
+  console.log(`  - ${jsFile}: ${jsContent.length} bytes`);
+}
 
 // Create a self-contained HTML file
 const html = `<!DOCTYPE html>
@@ -32,16 +55,11 @@ const html = `<!DOCTYPE html>
 <head>
     <meta charset="utf-8">
     <title>GameSDK Bridge</title>
-    <script>${jsContent}</script>
+    <script>${combinedJs}</script>
 </head>
 <body>
 </body>
 </html>`;
-
-// Ensure the unity dist directory exists
-if (!fs.existsSync(UNITY_DIST_DIR)) {
-  fs.mkdirSync(UNITY_DIST_DIR, { recursive: true });
-}
 
 // Write the fixed HTML
 fs.writeFileSync(HTML_FILE, html, 'utf8');
@@ -49,8 +67,7 @@ fs.writeFileSync(HTML_FILE, html, 'utf8');
 console.log('Unity build fixed successfully!');
 console.log(`Output: ${HTML_FILE} (${html.length} bytes)`);
 
-// Clean up any split JS files from the broken HTML build
-const jsFiles = fs.readdirSync(UNITY_DIST_DIR).filter(f => f.endsWith('.js'));
+// Clean up JS files (now inlined)
 for (const jsFile of jsFiles) {
   const jsPath = path.join(UNITY_DIST_DIR, jsFile);
   fs.unlinkSync(jsPath);
