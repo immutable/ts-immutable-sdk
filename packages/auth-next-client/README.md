@@ -7,7 +7,9 @@ Client-side React components and hooks for Immutable authentication with Auth.js
 This package provides minimal client-side utilities for Next.js applications using Immutable authentication. It's designed to work with Next.js's native `SessionProvider` and integrates seamlessly with NextAuth.
 
 **Key features:**
+
 - `useLogin` - Hook for login flows with state management (loading, error)
+- `useLogout` - Hook for logout with federated logout support (clears both local and upstream sessions)
 - `useImmutableSession` - Hook that provides session state and a `getUser` function for wallet integration
 - `CallbackPage` - OAuth callback handler component
 
@@ -36,10 +38,12 @@ First, set up the server-side authentication following the [`@imtbl/auth-next-se
 import NextAuth from "next-auth";
 import { createAuthConfig } from "@imtbl/auth-next-server";
 
-export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig({
-  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
-  redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
-}));
+export const { handlers, auth, signIn, signOut } = NextAuth(
+  createAuthConfig({
+    clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+    redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
+  }),
+);
 ```
 
 ### 2. Create Providers Component
@@ -130,7 +134,41 @@ export function LoginButton() {
 }
 ```
 
-### 6. Connect Wallet with getUser
+### 6. Add Logout Button
+
+Use the `useLogout` hook for logout with federated logout support. This ensures that when users log in again, they'll be prompted to select an account instead of automatically logging in with the previous account:
+
+```tsx
+// components/LogoutButton.tsx
+"use client";
+
+import { useLogout, useImmutableSession } from "@imtbl/auth-next-client";
+
+const logoutConfig = {
+  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+  logoutRedirectUri: process.env.NEXT_PUBLIC_BASE_URL!, // Where to redirect after logout
+};
+
+export function LogoutButton() {
+  const { isAuthenticated } = useImmutableSession();
+  const { logout, isLoggingOut, error } = useLogout();
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return (
+    <div>
+      <button onClick={() => logout(logoutConfig)} disabled={isLoggingOut}>
+        {isLoggingOut ? "Signing out..." : "Sign Out"}
+      </button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </div>
+  );
+}
+```
+
+### 7. Connect Wallet with getUser
 
 Use `useImmutableSession` for wallet integration:
 
@@ -147,7 +185,7 @@ export function WalletConnect() {
   const handleConnect = async () => {
     // Pass getUser directly to wallet - it returns fresh tokens from session
     const provider = await connectWallet({ getUser });
-    
+
     // Use the provider for blockchain interactions
     const accounts = await provider.request({ method: "eth_requestAccounts" });
     console.log("Connected:", accounts);
@@ -194,16 +232,16 @@ export default function Callback() {
 
 #### Props
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `config` | `CallbackConfig` | Yes | Authentication configuration |
-| `config.clientId` | `string` | Yes | Immutable application client ID |
-| `config.redirectUri` | `string` | Yes | OAuth redirect URI |
-| `redirectTo` | `string \| ((user) => string)` | No | Redirect destination after login (default: `"/"`) |
-| `loadingComponent` | `ReactElement` | No | Custom loading component |
-| `errorComponent` | `(error: string) => ReactElement` | No | Custom error component |
-| `onSuccess` | `(user) => void \| Promise<void>` | No | Success callback (runs before redirect) |
-| `onError` | `(error: string) => void` | No | Error callback |
+| Prop                 | Type                              | Required | Description                                       |
+| -------------------- | --------------------------------- | -------- | ------------------------------------------------- |
+| `config`             | `CallbackConfig`                  | Yes      | Authentication configuration                      |
+| `config.clientId`    | `string`                          | Yes      | Immutable application client ID                   |
+| `config.redirectUri` | `string`                          | Yes      | OAuth redirect URI                                |
+| `redirectTo`         | `string \| ((user) => string)`    | No       | Redirect destination after login (default: `"/"`) |
+| `loadingComponent`   | `ReactElement`                    | No       | Custom loading component                          |
+| `errorComponent`     | `(error: string) => ReactElement` | No       | Custom error component                            |
+| `onSuccess`          | `(user) => void \| Promise<void>` | No       | Success callback (runs before redirect)           |
+| `onError`            | `(error: string) => void`         | No       | Error callback                                    |
 
 ## Hooks
 
@@ -224,7 +262,13 @@ const config = {
 
 function LoginComponent() {
   const { isAuthenticated } = useImmutableSession();
-  const { loginWithPopup, loginWithEmbedded, loginWithRedirect, isLoggingIn, error } = useLogin();
+  const {
+    loginWithPopup,
+    loginWithEmbedded,
+    loginWithRedirect,
+    isLoggingIn,
+    error,
+  } = useLogin();
 
   if (isAuthenticated) {
     return <p>You are logged in!</p>;
@@ -250,13 +294,13 @@ function LoginComponent() {
 
 #### Return Value
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `loginWithPopup` | `(config, options?) => Promise<void>` | Opens popup for OAuth, then signs in to NextAuth |
-| `loginWithEmbedded` | `(config) => Promise<void>` | Shows embedded modal, then popup for OAuth |
-| `loginWithRedirect` | `(config, options?) => Promise<void>` | Redirects to OAuth provider |
-| `isLoggingIn` | `boolean` | Whether a login is in progress |
-| `error` | `string \| null` | Error message from last login attempt |
+| Property            | Type                                  | Description                                      |
+| ------------------- | ------------------------------------- | ------------------------------------------------ |
+| `loginWithPopup`    | `(config, options?) => Promise<void>` | Opens popup for OAuth, then signs in to NextAuth |
+| `loginWithEmbedded` | `(config) => Promise<void>`           | Shows embedded modal, then popup for OAuth       |
+| `loginWithRedirect` | `(config, options?) => Promise<void>` | Redirects to OAuth provider                      |
+| `isLoggingIn`       | `boolean`                             | Whether a login is in progress                   |
+| `error`             | `string \| null`                      | Error message from last login attempt            |
 
 #### Login Methods
 
@@ -290,6 +334,65 @@ await loginWithPopup(config, {
 });
 ```
 
+### `useLogout()`
+
+A hook for handling logout with federated logout support. This ensures that when users log out:
+
+1. The local NextAuth session (JWT cookie) is cleared
+2. The upstream Immutable/Auth0 session is cleared by redirecting to the logout endpoint
+
+This is important for social logins (like Google) - without federated logout, users would be automatically logged in with the same account on their next login attempt.
+
+```tsx
+"use client";
+
+import { useLogout, useImmutableSession } from "@imtbl/auth-next-client";
+
+const logoutConfig = {
+  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+  logoutRedirectUri: process.env.NEXT_PUBLIC_BASE_URL!,
+  // Optional: specify auth domain for non-production environments
+  // authenticationDomain: "https://auth.dev.immutable.com",
+};
+
+function LogoutComponent() {
+  const { isAuthenticated } = useImmutableSession();
+  const { logout, isLoggingOut, error } = useLogout();
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return (
+    <div>
+      <button onClick={() => logout(logoutConfig)} disabled={isLoggingOut}>
+        {isLoggingOut ? "Signing out..." : "Sign Out"}
+      </button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </div>
+  );
+}
+```
+
+#### Return Value
+
+| Property       | Type                                      | Description                             |
+| -------------- | ----------------------------------------- | --------------------------------------- |
+| `logout`       | `(config: LogoutConfig) => Promise<void>` | Performs federated logout and redirects |
+| `isLoggingOut` | `boolean`                                 | Whether logout is in progress           |
+| `error`        | `string \| null`                          | Error message from last logout attempt  |
+
+#### Why Federated Logout?
+
+When using social login providers like Google, the auth server (Auth0/Immutable) maintains its own session. If you only clear the local NextAuth session:
+
+1. User logs in with Google Account A
+2. User logs out (only local session cleared)
+3. User clicks "Login with Google" again
+4. Auth server still has the Google session cached → auto-logs in with Account A
+
+With federated logout, the auth server's session is also cleared, so users can select a different account on their next login.
+
 ### `useImmutableSession()`
 
 A convenience hook that wraps `next-auth/react`'s `useSession` with a `getUser` function for wallet integration.
@@ -301,11 +404,11 @@ import { useImmutableSession } from "@imtbl/auth-next-client";
 
 function MyComponent() {
   const {
-    session,         // Session with tokens
-    status,          // 'loading' | 'authenticated' | 'unauthenticated'
-    isLoading,       // True during initial load
+    session, // Session with tokens
+    status, // 'loading' | 'authenticated' | 'unauthenticated'
+    isLoading, // True during initial load
     isAuthenticated, // True when logged in
-    getUser,         // Function for wallet integration
+    getUser, // Function for wallet integration
   } = useImmutableSession();
 
   if (isLoading) return <div>Loading...</div>;
@@ -317,13 +420,13 @@ function MyComponent() {
 
 #### Return Value
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `session` | `ImmutableSession \| null` | Session with access/refresh tokens |
-| `status` | `string` | Auth status: `'loading'`, `'authenticated'`, `'unauthenticated'` |
-| `isLoading` | `boolean` | Whether initial auth state is loading |
-| `isAuthenticated` | `boolean` | Whether user is authenticated |
-| `getUser` | `(forceRefresh?: boolean) => Promise<User \| null>` | Get user function for wallet integration |
+| Property          | Type                                                | Description                                                      |
+| ----------------- | --------------------------------------------------- | ---------------------------------------------------------------- |
+| `session`         | `ImmutableSession \| null`                          | Session with access/refresh tokens                               |
+| `status`          | `string`                                            | Auth status: `'loading'`, `'authenticated'`, `'unauthenticated'` |
+| `isLoading`       | `boolean`                                           | Whether initial auth state is loading                            |
+| `isAuthenticated` | `boolean`                                           | Whether user is authenticated                                    |
+| `getUser`         | `(forceRefresh?: boolean) => Promise<User \| null>` | Get user function for wallet integration                         |
 
 #### The `getUser` Function
 
@@ -339,6 +442,7 @@ const freshUser = await getUser(true);
 ```
 
 When `forceRefresh` is `true`:
+
 1. Triggers the NextAuth `jwt` callback with `trigger='update'`
 2. Server performs a token refresh with the identity provider
 3. Updated claims (like `zkEvm` data after registration) are extracted from the new ID token
@@ -406,14 +510,31 @@ interface DirectLoginOptions {
 }
 ```
 
+### LogoutConfig
+
+Configuration for the `useLogout` hook:
+
+```typescript
+interface LogoutConfig {
+  /** Your Immutable application client ID */
+  clientId: string;
+  /** URL to redirect to after logout completes (must be registered in your app settings) */
+  logoutRedirectUri?: string;
+  /** Authentication domain (default: "https://auth.immutable.com") */
+  authenticationDomain?: string;
+}
+```
+
+**Note:** The `logoutRedirectUri` must be registered as an allowed logout URL in your Immutable Hub application settings.
+
 ## Error Handling
 
 The session may contain an `error` field indicating authentication issues:
 
-| Error | Description | Handling |
-|-------|-------------|----------|
-| `"TokenExpired"` | Access token expired | Server-side refresh will happen automatically |
-| `"RefreshTokenError"` | Refresh token invalid | Prompt user to sign in again |
+| Error                 | Description           | Handling                                      |
+| --------------------- | --------------------- | --------------------------------------------- |
+| `"TokenExpired"`      | Access token expired  | Server-side refresh will happen automatically |
+| `"RefreshTokenError"` | Refresh token invalid | Prompt user to sign in again                  |
 
 ```tsx
 import { useImmutableSession } from "@imtbl/auth-next-client";

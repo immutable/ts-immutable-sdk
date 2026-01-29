@@ -42,6 +42,7 @@ import logger from './utils/logger';
 import { isAccessTokenExpiredOrExpiring } from './utils/token';
 import LoginPopupOverlay from './overlay/loginPopupOverlay';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
+import { buildLogoutUrl } from './logout';
 
 const formUrlEncodedHeaders = {
   'Content-Type': 'application/x-www-form-urlencoded',
@@ -81,13 +82,7 @@ const toChainAddress = (ethAddress: string, userAdminAddress: string): ChainAddr
   userAdminAddress: userAdminAddress as `0x${string}`,
 });
 
-const logoutEndpoint = '/v2/logout';
-const crossSdkBridgeLogoutEndpoint = '/im-logged-out';
 const authorizeEndpoint = '/authorize';
-
-const getLogoutEndpointPath = (crossSdkBridgeEnabled: boolean): string => (
-  crossSdkBridgeEnabled ? crossSdkBridgeLogoutEndpoint : logoutEndpoint
-);
 
 const getAuthConfiguration = (config: IAuthConfiguration): UserManagerSettings => {
   const { authenticationDomain, oidcConfiguration } = config;
@@ -102,14 +97,12 @@ const getAuthConfiguration = (config: IAuthConfiguration): UserManagerSettings =
   }
   const userStore = new WebStorageStateStore({ store });
 
-  const endSessionEndpoint = new URL(
-    getLogoutEndpointPath(config.crossSdkBridgeEnabled),
-    authenticationDomain.replace(/^(?:https?:\/\/)?(.*)/, 'https://$1'),
-  );
-  endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
-  if (oidcConfiguration.logoutRedirectUri) {
-    endSessionEndpoint.searchParams.set('returnTo', oidcConfiguration.logoutRedirectUri);
-  }
+  const endSessionEndpoint = buildLogoutUrl({
+    clientId: oidcConfiguration.clientId,
+    authenticationDomain,
+    logoutRedirectUri: oidcConfiguration.logoutRedirectUri,
+    crossSdkBridgeEnabled: config.crossSdkBridgeEnabled,
+  });
 
   return {
     authority: authenticationDomain,
@@ -120,7 +113,7 @@ const getAuthConfiguration = (config: IAuthConfiguration): UserManagerSettings =
       authorization_endpoint: `${authenticationDomain}/authorize`,
       token_endpoint: `${authenticationDomain}/oauth/token`,
       userinfo_endpoint: `${authenticationDomain}/userinfo`,
-      end_session_endpoint: endSessionEndpoint.toString(),
+      end_session_endpoint: endSessionEndpoint,
       revocation_endpoint: `${authenticationDomain}/oauth/revoke`,
     },
     automaticSilentRenew: false,

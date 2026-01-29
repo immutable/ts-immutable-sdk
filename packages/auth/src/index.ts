@@ -56,3 +56,14 @@ export {
   type TokenResponse,
   type StandaloneLoginOptions,
 } from './login/standalone';
+
+// ============================================================================
+// Standalone Logout Functions (stateless, for use with NextAuth or similar)
+// ============================================================================
+
+export {
+  logoutWithRedirect,
+  logoutSilent,
+  buildLogoutUrl,
+  type LogoutConfig,
+} from './login/standalone';

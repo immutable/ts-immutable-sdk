@@ -1,18 +1,20 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
-import { useSession, signIn } from 'next-auth/react';
+import { useSession, signIn, signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
 import type {
   User,
   LoginConfig,
   StandaloneLoginOptions,
+  LogoutConfig,
 } from '@imtbl/auth';
 import type { ZkEvmInfo } from './types';
 import {
   loginWithPopup as rawLoginWithPopup,
   loginWithEmbedded as rawLoginWithEmbedded,
   loginWithRedirect as rawLoginWithRedirect,
+  logoutWithRedirect as rawLogoutWithRedirect,
 } from '@imtbl/auth';
 import { IMMUTABLE_PROVIDER_ID } from './constants';
 
@@ -328,6 +330,103 @@ export function useLogin(): UseLoginReturn {
     loginWithEmbedded,
     loginWithRedirect,
     isLoggingIn,
+    error,
+  };
+}
+
+/**
+ * Return type for useLogout hook
+ */
+export interface UseLogoutReturn {
+  /**
+   * Logout with federated logout support.
+   * Clears both the local NextAuth session AND the upstream Immutable/Auth0 session.
+   * This ensures that when the user logs in again, they will be prompted to select
+   * an account instead of being automatically logged in with the previous account.
+   *
+   * @param config - Logout configuration with clientId and optional redirectUri
+   */
+  logout: (config: LogoutConfig) => Promise<void>;
+  /** Whether logout is currently in progress */
+  isLoggingOut: boolean;
+  /** Error message from the last logout attempt, or null if none */
+  error: string | null;
+}
+
+/**
+ * Hook to handle Immutable authentication logout with federated logout support.
+ *
+ * This hook provides a `logout` function that performs federated logout:
+ * 1. Clears the local NextAuth session (JWT cookie)
+ * 2. Redirects to the Immutable auth domain's logout endpoint to clear the upstream session
+ *
+ * This ensures that when the user logs in again, they will be prompted to select
+ * an account (for social logins like Google) instead of being automatically logged
+ * in with the previous account.
+ *
+ * Must be used within a SessionProvider from next-auth/react.
+ *
+ * @example
+ * ```tsx
+ * import { useLogout, useImmutableSession } from '@imtbl/auth-next-client';
+ *
+ * const logoutConfig = {
+ *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+ *   logoutRedirectUri: process.env.NEXT_PUBLIC_BASE_URL!,
+ * };
+ *
+ * function LogoutButton() {
+ *   const { isAuthenticated } = useImmutableSession();
+ *   const { logout, isLoggingOut, error } = useLogout();
+ *
+ *   if (!isAuthenticated) {
+ *     return null;
+ *   }
+ *
+ *   return (
+ *     <>
+ *       <button onClick={() => logout(logoutConfig)} disabled={isLoggingOut}>
+ *         {isLoggingOut ? 'Signing out...' : 'Sign Out'}
+ *       </button>
+ *       {error && <p style={{ color: 'red' }}>{error}</p>}
+ *     </>
+ *   );
+ * }
+ * ```
+ */
+export function useLogout(): UseLogoutReturn {
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  /**
+   * Logout with federated logout.
+   * First clears the NextAuth session, then redirects to the auth domain's logout endpoint.
+   */
+  const logout = useCallback(async (config: LogoutConfig): Promise<void> => {
+    setIsLoggingOut(true);
+    setError(null);
+
+    try {
+      // First, clear the NextAuth session (this clears the JWT cookie)
+      // We use redirect: false to handle the redirect ourselves for federated logout
+      await signOut({ redirect: false });
+
+      // Redirect to the auth domain's logout endpoint using the standalone function
+      // This clears the upstream session (Auth0/Immutable) so that on next login,
+      // the user will be prompted to select an account instead of auto-logging in
+      rawLogoutWithRedirect(config);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Logout failed';
+      setError(errorMessage);
+      setIsLoggingOut(false);
+      throw err;
+    }
+    // Don't set isLoggingOut to false here - page is redirecting
+  }, []);
+
+  return {
+    logout,
+    isLoggingOut,
     error,
   };
 }

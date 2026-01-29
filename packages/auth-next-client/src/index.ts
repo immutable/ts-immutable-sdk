@@ -30,6 +30,9 @@ export { useImmutableSession, type UseImmutableSessionReturn, type ImmutableSess
 // Login hook with state management
 export { useLogin, type UseLoginReturn } from './hooks';
 
+// Logout hook with federated logout support
+export { useLogout, type UseLogoutReturn } from './hooks';
+
 // Re-export types
 export type {
   ImmutableUserClient,
@@ -48,10 +51,11 @@ export type {
   ProtectedAuthPropsWithData,
 } from '@imtbl/auth-next-server';
 
-// Re-export types needed for useLogin hook
+// Re-export types needed for useLogin and useLogout hooks
 export type {
   LoginConfig,
   StandaloneLoginOptions,
   DirectLoginOptions,
+  LogoutConfig,
 } from '@imtbl/auth';
 export { MarketingConsentStatus } from '@imtbl/auth';

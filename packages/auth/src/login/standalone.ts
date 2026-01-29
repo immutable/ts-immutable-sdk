@@ -10,6 +10,7 @@ import type {
   DirectLoginOptions, IdTokenPayload, MarketingConsentStatus, ZkEvmInfo,
 } from '../types';
 import { PASSPORT_OVERLAY_CONTENTS_ID } from '../overlay/constants';
+import { buildLogoutUrl as internalBuildLogoutUrl } from '../logout';
 
 // ============================================================================
 // Types
@@ -742,4 +743,164 @@ export async function handleLoginCallback(
   clearPKCEData();
 
   return tokens;
+}
+
+// ============================================================================
+// Logout Types
+// ============================================================================
+
+/**
+ * Configuration for standalone logout functions
+ */
+export interface LogoutConfig {
+  /** Your Immutable application client ID */
+  clientId: string;
+  /** URL to redirect to after logout completes (must be registered in your app settings) */
+  logoutRedirectUri?: string;
+  /** Authentication domain (default: "https://auth.immutable.com") */
+  authenticationDomain?: string;
+}
+
+// ============================================================================
+// Logout Functions
+// ============================================================================
+
+/**
+ * Build the logout URL for federated logout.
+ * This URL can be used to redirect to the auth domain's logout endpoint,
+ * which clears the session on the auth server (including social provider sessions).
+ *
+ * @param config - Logout configuration
+ * @returns The full logout URL
+ *
+ * @example
+ * ```typescript
+ * import { buildLogoutUrl } from '@imtbl/auth';
+ *
+ * const logoutUrl = buildLogoutUrl({
+ *   clientId: 'your-client-id',
+ *   logoutRedirectUri: 'https://your-app.com',
+ * });
+ * // => "https://auth.immutable.com/v2/logout?client_id=your-client-id&returnTo=https://your-app.com"
+ * ```
+ */
+export function buildLogoutUrl(config: LogoutConfig): string {
+  // Use internal implementation (crossSdkBridgeEnabled defaults to false for public API)
+  return internalBuildLogoutUrl(config);
+}
+
+/**
+ * Logout with redirect.
+ * Redirects the current page to the auth domain's logout endpoint,
+ * which clears the session on the auth server (including social provider sessions like Google).
+ *
+ * This is the recommended logout method for most applications as it ensures
+ * complete session cleanup. After logout, the user will be redirected to
+ * the `logoutRedirectUri` if provided.
+ *
+ * @param config - Logout configuration
+ *
+ * @example
+ * ```typescript
+ * import { logoutWithRedirect } from '@imtbl/auth';
+ *
+ * // In your logout button handler
+ * logoutWithRedirect({
+ *   clientId: 'your-client-id',
+ *   logoutRedirectUri: 'https://your-app.com',
+ * });
+ * // Page will redirect to auth domain, then back to your app
+ * ```
+ */
+export function logoutWithRedirect(config: LogoutConfig): void {
+  track('passport', 'standaloneLogoutWithRedirect');
+
+  const logoutUrl = buildLogoutUrl(config);
+  window.location.href = logoutUrl;
+}
+
+/**
+ * Logout silently using a hidden iframe.
+ * Clears the session on the auth server without redirecting the current page.
+ *
+ * Note: Silent logout may not work in all browsers due to third-party cookie
+ * restrictions. For more reliable session cleanup, use `logoutWithRedirect`.
+ *
+ * @param config - Logout configuration
+ * @param timeout - Timeout in milliseconds (default: 5000)
+ * @returns Promise that resolves when logout is complete or times out
+ *
+ * @example
+ * ```typescript
+ * import { logoutSilent } from '@imtbl/auth';
+ *
+ * try {
+ *   await logoutSilent({
+ *     clientId: 'your-client-id',
+ *   });
+ *   console.log('Logged out silently');
+ * } catch (error) {
+ *   console.error('Silent logout failed:', error);
+ *   // Fall back to redirect logout
+ * }
+ * ```
+ */
+export async function logoutSilent(
+  config: LogoutConfig,
+  timeout: number = 5000,
+): Promise<void> {
+  track('passport', 'standaloneLogoutSilent');
+
+  return new Promise((resolve, reject) => {
+    const logoutUrl = buildLogoutUrl(config);
+
+    // Create hidden iframe
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.setAttribute('aria-hidden', 'true');
+
+    let timeoutId: ReturnType<typeof setTimeout>;
+    let resolved = false;
+
+    const cleanup = () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      iframe.remove();
+    };
+
+    const handleLoad = () => {
+      if (!resolved) {
+        resolved = true;
+        cleanup();
+        resolve();
+      }
+    };
+
+    const handleError = () => {
+      if (!resolved) {
+        resolved = true;
+        cleanup();
+        reject(new Error('Silent logout failed: iframe load error'));
+      }
+    };
+
+    iframe.addEventListener('load', handleLoad);
+    iframe.addEventListener('error', handleError);
+
+    // Set timeout
+    timeoutId = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        cleanup();
+        // Resolve instead of reject on timeout - the logout request was sent,
+        // we just can't confirm it completed due to cross-origin restrictions
+        resolve();
+      }
+    }, timeout);
+
+    // Start logout
+    iframe.src = logoutUrl;
+    document.body.appendChild(iframe);
+  });
 }
