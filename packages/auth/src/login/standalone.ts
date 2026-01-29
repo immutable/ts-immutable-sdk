@@ -7,7 +7,7 @@
 import { Detail, getDetail, track } from '@imtbl/metrics';
 import { decodeJwtPayload } from '../utils/jwt';
 import type {
-  DirectLoginOptions, IdTokenPayload, MarketingConsentStatus,
+  DirectLoginOptions, IdTokenPayload, MarketingConsentStatus, ZkEvmInfo,
 } from '../types';
 import { PASSPORT_OVERLAY_CONTENTS_ID } from '../overlay/constants';
 
@@ -70,10 +70,7 @@ export interface TokenResponse {
     nickname?: string;
   };
   /** zkEVM wallet information if available */
-  zkEvm?: {
-    ethAddress: string;
-    userAdminAddress: string;
-  };
+  zkEvm?: ZkEvmInfo;
 }
 
 /**

@@ -7,7 +7,7 @@ import type { DefaultSession } from 'next-auth';
 /**
  * zkEVM wallet information for module augmentation
  */
-interface ZkEvmInfo {
+export interface ZkEvmInfo {
   ethAddress: `0x${string}`;
   userAdminAddress: `0x${string}`;
 }
@@ -88,10 +88,7 @@ export interface ImmutableTokenData {
     email?: string;
     nickname?: string;
   };
-  zkEvm?: {
-    ethAddress: string;
-    userAdminAddress: string;
-  };
+  zkEvm?: ZkEvmInfo;
 }
 
 /**
@@ -108,10 +105,7 @@ export interface UserInfoResponse {
 /**
  * zkEVM user data stored in session
  */
-export interface ZkEvmUser {
-  ethAddress: string;
-  userAdminAddress: string;
-}
+export type ZkEvmUser = ZkEvmInfo;
 
 /**
  * Immutable user data structure

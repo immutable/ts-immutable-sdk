@@ -26,9 +26,11 @@ export enum EvmChain {
 }
 
 export type ChainAddress = {
-  ethAddress: string;
-  userAdminAddress: string;
+  ethAddress: `0x${string}`;
+  userAdminAddress: `0x${string}`;
 };
+
+export type ZkEvmInfo = ChainAddress;
 
 export type User = {
   idToken?: string;

@@ -19,6 +19,7 @@ export type {
   PassportMetadata,
   PassportChainMetadata,
   ChainAddress,
+  ZkEvmInfo,
   IdTokenPayload,
   PKCEData,
   AuthEventMap,

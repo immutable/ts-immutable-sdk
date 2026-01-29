@@ -1,4 +1,5 @@
 import { TOKEN_EXPIRY_BUFFER_SECONDS, DEFAULT_AUTH_DOMAIN } from './constants';
+import type { ZkEvmInfo } from './types';
 
 /**
  * Check if the access token is expired or about to expire
@@ -52,10 +53,7 @@ function decodeJwtExpiry(token: string): number {
 /**
  * zkEvm user data extracted from the ID token
  */
-export interface ZkEvmData {
-  ethAddress: string;
-  userAdminAddress: string;
-}
+export type ZkEvmData = ZkEvmInfo;
 
 /**
  * Extract zkEvm claims from an ID token.
