@@ -1,13 +1,14 @@
 import type { PublicClient, Hex } from 'viem';
-import { Auth } from '@imtbl/auth';
+import { isUserZkEvm, type UserZkEvm } from '@imtbl/auth';
 import { WalletConfiguration } from '../config';
 import { FeeOption, RelayerTransaction, TypedDataPayload } from './types';
+import type { GetUserFunction } from '../types';
 import { getEip155ChainId } from './walletHelpers';
 
 export type RelayerClientInput = {
   config: WalletConfiguration,
   rpcProvider: PublicClient,
-  auth: Auth
+  getUser: GetUserFunction,
 };
 
 // JsonRpc base Types
@@ -94,18 +95,33 @@ export class RelayerClient {
 
   private readonly rpcProvider: PublicClient;
 
-  private readonly auth: Auth;
+  private readonly getUser: GetUserFunction;
 
-  constructor({ config, rpcProvider, auth }: RelayerClientInput) {
+  constructor({
+    config, rpcProvider, getUser,
+  }: RelayerClientInput) {
     this.config = config;
     this.rpcProvider = rpcProvider;
-    this.auth = auth;
+    this.getUser = getUser;
   }
 
   private static getResponsePreview(text: string): string {
     return text.length > 100
       ? `${text.substring(0, 50)}...${text.substring(text.length - 50)}`
       : text;
+  }
+
+  /**
+   * Get zkEvm user using getUser function.
+   */
+  private async getUserZkEvm(): Promise<UserZkEvm> {
+    const user = await this.getUser();
+
+    if (!user || !isUserZkEvm(user)) {
+      throw new Error('User not authenticated or missing zkEvm data');
+    }
+
+    return user;
   }
 
   private async postToRelayer<T>(request: RelayerTransactionRequest): Promise<T> {
@@ -115,7 +131,7 @@ export class RelayerClient {
       ...request,
     };
 
-    const user = await this.auth.getUserZkEvm();
+    const user = await this.getUserZkEvm();
 
     const response = await fetch(`${this.config.relayerUrl}/v1/transactions`, {
       method: 'POST',

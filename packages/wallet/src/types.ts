@@ -1,7 +1,5 @@
 import { Flow } from '@imtbl/metrics';
-import {
-  Auth, TypedEventEmitter, type AuthEventMap,
-} from '@imtbl/auth';
+import { TypedEventEmitter, User } from '@imtbl/auth';
 import { JsonRpcError } from './zkEvm/JsonRpcError';
 
 export enum EvmChain {
@@ -22,15 +20,15 @@ export interface WalletSigner {
 
 // Re-export auth types for convenience
 export type {
-  User, UserProfile, UserZkEvm, DirectLoginMethod, AuthEventMap,
+  User, UserProfile, UserZkEvm, DirectLoginMethod,
 } from '@imtbl/auth';
 export { isUserZkEvm } from '@imtbl/auth';
 export type { RollupType } from '@imtbl/auth';
-export { AuthEvents } from '@imtbl/auth';
 
-// Wallet-specific event (in addition to AuthEvents)
+// Wallet events
 export enum WalletEvents {
   ACCOUNTS_REQUESTED = 'accountsRequested',
+  LOGGED_OUT = 'loggedOut',
 }
 
 export type AccountsRequestedEvent = {
@@ -41,10 +39,14 @@ export type AccountsRequestedEvent = {
   flow?: Flow;
 };
 
-// PassportEventMap combines auth events and wallet-specific events
-export interface PassportEventMap extends AuthEventMap {
+// WalletEventMap for internal wallet events
+export interface WalletEventMap extends Record<string, any> {
   [WalletEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
+  [WalletEvents.LOGGED_OUT]: [];
 }
+
+// Legacy alias for backwards compatibility with Passport
+export type PassportEventMap = WalletEventMap;
 
 /**
  * EIP-1193 Provider Interface
@@ -229,15 +231,45 @@ export interface PopupOverlayOptions {
 }
 
 /**
+ * Function type for getting the current user.
+ * Used as an alternative to passing an Auth instance.
+ * This function should return fresh tokens from the session manager.
+ *
+ * @param forceRefresh - When true, the auth layer should trigger a server-side
+ *   token refresh to get updated claims (e.g., after zkEVM registration).
+ *   This ensures the returned user has the latest data from the identity provider.
+ */
+export type GetUserFunction = (forceRefresh?: boolean) => Promise<User | null>;
+
+/**
  * Options for connecting a wallet via connectWallet()
  * High-level configuration that gets transformed into internal WalletConfiguration
  */
 export interface ConnectWalletOptions {
   /**
-   * Auth instance. Optional – if omitted, a default Auth instance
-   * configured with Immutable hosted defaults will be created.
+   * Function that returns the current user with fresh tokens.
+   * This is the primary way to provide authentication to the wallet.
+   *
+   * For NextAuth integration:
+   * @example
+   * ```typescript
+   * import { connectWallet } from '@imtbl/wallet';
+   * import { useImmutableSession } from '@imtbl/auth-next-client';
+   *
+   * const { getUser } = useImmutableSession();
+   * const provider = await connectWallet({ getUser });
+   * ```
+   *
+   * If not provided, a default implementation using @imtbl/auth will be created.
    */
-  auth?: Auth;
+  getUser?: GetUserFunction;
+
+  /**
+   * Client ID for Immutable authentication.
+   * Required when getUser is not provided (for default auth).
+   * Also used for session activity tracking.
+   */
+  clientId?: string;
 
   /**
    * Chain configurations (supports multi-chain)
@@ -272,5 +304,5 @@ export interface ConnectWalletOptions {
   /**
    * @internal - Only used by Passport for internal event communication
    */
-  passportEventEmitter?: TypedEventEmitter<PassportEventMap>;
+  passportEventEmitter?: TypedEventEmitter<WalletEventMap>;
 }

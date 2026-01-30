@@ -77,12 +77,9 @@ export function PassportProvider({
   const { passportClient, environment } = useImmutableProvider();
   const isSandboxEnvironment = environment === EnvironmentNames.SANDBOX;
   // `zkEvmProvider` is initialised using Passport package. 
-  // `defaultWalletProvider` is created by connectWallet(), which includes a default auth instance underneath.
-  // In sandbox environment, we allow testing the default wallet provider because the 
-  // conenectWallet works with testnet and sandbox env when no arguements are provided.
-  const activeZkEvmProvider = isSandboxEnvironment
-    ? (defaultWalletProvider || zkEvmProvider)
-    : zkEvmProvider;
+  // `defaultWalletProvider` is created by connectWallet() with getUser from NextAuth or default auth.
+  // Both providers can be used for zkEVM operations in any environment.
+  const activeZkEvmProvider = defaultWalletProvider || zkEvmProvider;
 
   const connectImx = useCallback(async () => {
     try {
@@ -103,14 +100,26 @@ export function PassportProvider({
 
   const connectZkEvm = useCallback(async () => {
     setIsLoading(true);
-    const provider = await passportClient.connectEvm() as ZkEvmProvider;
-    if (provider) {
-      setZkEvmProvider(provider);
-      addMessage('ConnectZkEvm', 'Connected');
-    } else {
-      addMessage('ConnectZkEvm', 'Failed to connect');
+    try {
+      const provider = await passportClient.connectEvm() as ZkEvmProvider;
+      if (provider) {
+        // Call eth_requestAccounts to trigger zkEvm registration if needed
+        // This ensures the user has a zkEvm address before setting the provider
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        if (accounts && accounts.length > 0) {
+          setZkEvmProvider(provider);
+          addMessage('ConnectZkEvm', `Connected: ${accounts[0]}`);
+        } else {
+          addMessage('ConnectZkEvm', 'No accounts returned');
+        }
+      } else {
+        addMessage('ConnectZkEvm', 'Failed to connect');
+      }
+    } catch (err) {
+      addMessage('ConnectZkEvm', err);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, [passportClient, setIsLoading, addMessage]);
 
   const connectArbitrum = useCallback(async () => {
@@ -337,11 +346,11 @@ export function PassportProvider({
     }
   }, [addMessage, passportClient, setIsLoading]);
 
+  // Clear wallet provider when environment changes to ensure clean state
   useEffect(() => {
-    if (environment !== EnvironmentNames.SANDBOX && defaultWalletProvider) {
-      setDefaultWalletProvider(undefined);
-    }
-  }, [environment, defaultWalletProvider]);
+    setDefaultWalletProvider(undefined);
+    setZkEvmProvider(undefined);
+  }, [environment]);
 
   useEffect(() => {
     if (!activeZkEvmProvider) {
