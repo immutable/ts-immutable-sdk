@@ -132,6 +132,21 @@ export function useImmutableSession(): UseImmutableSessionReturn {
     ? true
     : currentlyAuthenticated;
 
+  // DEBUG: Log state changes to understand auth flow
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('[auth-next-client][useImmutableSession] State:', {
+      status,
+      isLoading,
+      isRefreshing,
+      currentlyAuthenticated,
+      wasAuthenticatedRef: wasAuthenticatedRef.current,
+      isAuthenticated,
+      hasSession: !!session,
+      sessionError: session?.error,
+    });
+  }, [status, isLoading, isRefreshing, currentlyAuthenticated, isAuthenticated, session]);
+
   // Use a ref to always have access to the latest session.
   // This avoids stale closure issues when the wallet stores the getUser function
   // and calls it later - the ref always points to the current session.
