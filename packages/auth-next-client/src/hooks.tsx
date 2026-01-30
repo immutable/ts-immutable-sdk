@@ -1,6 +1,11 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
 import type {
@@ -42,6 +47,8 @@ export interface UseImmutableSessionReturn {
   isLoading: boolean;
   /** Whether the user is authenticated */
   isAuthenticated: boolean;
+  /** Whether a session refresh is in progress (e.g., after wallet registration) */
+  isRefreshing: boolean;
   /**
    * Get user function for wallet integration.
    * Returns a User object compatible with @imtbl/wallet's getUser option.
@@ -87,11 +94,36 @@ export interface UseImmutableSessionReturn {
 export function useImmutableSession(): UseImmutableSessionReturn {
   const { data: sessionData, status, update } = useSession();
 
+  // Track when a refresh is in progress to prevent brief false states
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   // Cast session to our extended type
   const session = sessionData as ImmutableSession | null;
 
   const isLoading = status === 'loading';
-  const isAuthenticated = status === 'authenticated' && !!session;
+
+  // Core authentication check from NextAuth
+  const currentlyAuthenticated = status === 'authenticated' && !!session;
+
+  // Track the last known authenticated state to prevent brief false states during refresh.
+  // When NextAuth's update() is called, it can briefly set status to 'loading' or
+  // 'unauthenticated' before the refreshed session is available. This ref helps
+  // maintain isAuthenticated = true during that brief window.
+  const wasAuthenticatedRef = useRef(false);
+
+  // Update the ref when we have a stable authenticated state (not during refresh)
+  useEffect(() => {
+    if (!isRefreshing) {
+      wasAuthenticatedRef.current = currentlyAuthenticated;
+    }
+  }, [currentlyAuthenticated, isRefreshing]);
+
+  // Prevent isAuthenticated from going false during a refresh.
+  // If we were authenticated before the refresh started, maintain that state
+  // until the refresh completes to avoid triggering logout/reset logic in consumers.
+  const isAuthenticated = isRefreshing && wasAuthenticatedRef.current
+    ? true
+    : currentlyAuthenticated;
 
   // Use a ref to always have access to the latest session.
   // This avoids stale closure issues when the wallet stores the getUser function
@@ -102,6 +134,10 @@ export function useImmutableSession(): UseImmutableSessionReturn {
   // Also store update in a ref so the callback is stable
   const updateRef = useRef(update);
   updateRef.current = update;
+
+  // Store setIsRefreshing in a ref for stable callback
+  const setIsRefreshingRef = useRef(setIsRefreshing);
+  setIsRefreshingRef.current = setIsRefreshing;
 
   /**
    * Get user function for wallet integration.
@@ -118,6 +154,8 @@ export function useImmutableSession(): UseImmutableSessionReturn {
     // If forceRefresh is requested, trigger server-side refresh via NextAuth
     // This calls the jwt callback with trigger='update' and sessionUpdate.forceRefresh=true
     if (forceRefresh) {
+      // Set refreshing state to prevent isAuthenticated from going false
+      setIsRefreshingRef.current(true);
       try {
         // update() returns the refreshed session
         const updatedSession = await updateRef.current({ forceRefresh: true });
@@ -131,6 +169,8 @@ export function useImmutableSession(): UseImmutableSessionReturn {
         console.error('[auth-next-client] Force refresh failed:', error);
         // Fall back to current session from ref
         currentSession = sessionRef.current;
+      } finally {
+        setIsRefreshingRef.current(false);
       }
     } else {
       // Read from ref - instant, no network call
@@ -167,6 +207,7 @@ export function useImmutableSession(): UseImmutableSessionReturn {
     status,
     isLoading,
     isAuthenticated,
+    isRefreshing,
     getUser,
   };
 }
