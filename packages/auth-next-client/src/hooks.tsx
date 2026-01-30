@@ -94,7 +94,7 @@ export interface UseImmutableSessionReturn {
 export function useImmutableSession(): UseImmutableSessionReturn {
   const { data: sessionData, status, update } = useSession();
 
-  // Track when a refresh is in progress to prevent brief false states
+  // Track when a manual refresh is in progress (via getUser(true))
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Cast session to our extended type
@@ -105,23 +105,30 @@ export function useImmutableSession(): UseImmutableSessionReturn {
   // Core authentication check from NextAuth
   const currentlyAuthenticated = status === 'authenticated' && !!session;
 
-  // Track the last known authenticated state to prevent brief false states during refresh.
-  // When NextAuth's update() is called, it can briefly set status to 'loading' or
-  // 'unauthenticated' before the refreshed session is available. This ref helps
-  // maintain isAuthenticated = true during that brief window.
+  // Track the last known authenticated state to prevent brief false states.
+  // This handles two scenarios:
+  // 1. When NextAuth's update() is called (manual refresh via getUser(true))
+  // 2. When NextAuth automatically refetches the session (on window focus, polling, etc.)
+  // In both cases, status can briefly become 'loading' before the refreshed session is available.
   const wasAuthenticatedRef = useRef(false);
 
-  // Update the ref when we have a stable authenticated state (not during refresh)
+  // Update the ref when we have a stable authenticated state (not during loading or refresh)
   useEffect(() => {
-    if (!isRefreshing) {
+    // Only update the ref when we have a definitive auth state.
+    // During loading or manual refresh, we keep the previous value.
+    if (!isRefreshing && !isLoading) {
       wasAuthenticatedRef.current = currentlyAuthenticated;
     }
-  }, [currentlyAuthenticated, isRefreshing]);
+  }, [currentlyAuthenticated, isRefreshing, isLoading]);
 
-  // Prevent isAuthenticated from going false during a refresh.
-  // If we were authenticated before the refresh started, maintain that state
-  // until the refresh completes to avoid triggering logout/reset logic in consumers.
-  const isAuthenticated = isRefreshing && wasAuthenticatedRef.current
+  // Prevent isAuthenticated from going false during any session loading/refresh.
+  // If we were authenticated before the loading started, maintain that state
+  // until the loading completes to avoid triggering logout/reset logic in consumers.
+  // This covers:
+  // - Manual refresh via getUser(true) - isRefreshing provides immediate protection
+  //   before NextAuth's status transitions to 'loading'
+  // - Automatic NextAuth session refetch (window focus, polling, token expiry)
+  const isAuthenticated = (isRefreshing || isLoading) && wasAuthenticatedRef.current
     ? true
     : currentlyAuthenticated;
 
