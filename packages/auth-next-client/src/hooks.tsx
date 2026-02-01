@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
 import type {
@@ -103,49 +98,14 @@ export function useImmutableSession(): UseImmutableSessionReturn {
   const isLoading = status === 'loading';
 
   // Core authentication check from NextAuth
-  const currentlyAuthenticated = status === 'authenticated' && !!session;
+  const hasSession = status === 'authenticated' && !!session;
 
-  // Track the last known authenticated state to prevent brief false states.
-  // This handles two scenarios:
-  // 1. When NextAuth's update() is called (manual refresh via getUser(true))
-  // 2. When NextAuth automatically refetches the session (on window focus, polling, etc.)
-  // In both cases, status can briefly become 'loading' before the refreshed session is available.
-  const wasAuthenticatedRef = useRef(false);
-
-  // Update the ref when we have a stable authenticated state (not during loading or refresh)
-  useEffect(() => {
-    // Only update the ref when we have a definitive auth state.
-    // During loading or manual refresh, we keep the previous value.
-    if (!isRefreshing && !isLoading) {
-      wasAuthenticatedRef.current = currentlyAuthenticated;
-    }
-  }, [currentlyAuthenticated, isRefreshing, isLoading]);
-
-  // Prevent isAuthenticated from going false during any session loading/refresh.
-  // If we were authenticated before the loading started, maintain that state
-  // until the loading completes to avoid triggering logout/reset logic in consumers.
-  // This covers:
-  // - Manual refresh via getUser(true) - isRefreshing provides immediate protection
-  //   before NextAuth's status transitions to 'loading'
-  // - Automatic NextAuth session refetch (window focus, polling, token expiry)
-  const isAuthenticated = (isRefreshing || isLoading) && wasAuthenticatedRef.current
-    ? true
-    : currentlyAuthenticated;
-
-  // DEBUG: Log state changes to understand auth flow
-  useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('[auth-next-client][useImmutableSession] State:', {
-      status,
-      isLoading,
-      isRefreshing,
-      currentlyAuthenticated,
-      wasAuthenticatedRef: wasAuthenticatedRef.current,
-      isAuthenticated,
-      hasSession: !!session,
-      sessionError: session?.error,
-    });
-  }, [status, isLoading, isRefreshing, currentlyAuthenticated, isAuthenticated, session]);
+  // During loading/refreshing, keep showing authenticated if we had a session (avoids UI flicker
+  // when NextAuth refetches on window focus or after getUser(forceRefresh)).
+  const hadSessionRef = useRef(false);
+  if (hasSession) hadSessionRef.current = true;
+  if (!hasSession && !isLoading && !isRefreshing) hadSessionRef.current = false;
+  const isAuthenticated = hasSession || ((isLoading || isRefreshing) && hadSessionRef.current);
 
   // Use a ref to always have access to the latest session.
   // This avoids stale closure issues when the wallet stores the getUser function
