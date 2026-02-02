@@ -7,6 +7,7 @@ export {
   IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID,
   ARBITRUM_ONE_CHAIN_ID,
   ARBITRUM_SEPOLIA_CHAIN_ID,
+  ETHEREUM_SEPOLIA_CHAIN_ID,
 } from './constants';
 
 // Export presets (public API)
@@ -23,6 +24,9 @@ export {
   ARBITRUM_SEPOLIA,
   ARBITRUM_ONE_CHAIN,
   ARBITRUM_SEPOLIA_CHAIN,
+  // Ethereum chains
+  ETHEREUM_SEPOLIA,
+  ETHEREUM_SEPOLIA_CHAIN,
 } from './network/presets';
 
 // Export chain registry for looking up chain configs

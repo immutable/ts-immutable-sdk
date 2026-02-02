@@ -18,6 +18,9 @@ export const ARBITRUM_ONE_CHAIN_ID = 42161;
 /** Arbitrum Sepolia Testnet chain ID */
 export const ARBITRUM_SEPOLIA_CHAIN_ID = 421614;
 
+/** Ethereum Sepolia Testnet chain ID */
+export const ETHEREUM_SEPOLIA_CHAIN_ID = 11155111;
+
 /**
  * Magic configuration for Immutable networks
  * @internal
