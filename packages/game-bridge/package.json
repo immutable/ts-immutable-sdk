@@ -10,12 +10,14 @@
     "ethers": "^6.13.4"
   },
   "devDependencies": {
+    "@parcel/bundler-default": "^2.16.3",
+    "@parcel/config-default": "^2.16.3",
     "eslint": "^8.40.0",
     "parcel": "^2.13.3"
   },
   "scripts": {
-    "build": "parcel build --no-cache --no-scope-hoist",
-    "build:local": "parcel build --no-cache --no-scope-hoist && pnpm updateSdkVersion",
+    "build": "parcel build --no-cache --no-scope-hoist && node scripts/fixUnityBuild.js",
+    "build:local": "parcel build --no-cache --no-scope-hoist && node scripts/fixUnityBuild.js && pnpm updateSdkVersion",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "start": "parcel",
     "updateSdkVersion": "./scripts/updateSdkVersion.sh"
@@ -25,6 +27,9 @@
     "unity": {
       "context": "browser",
       "source": "src/index.html",
+      "outputFormat": "global",
+      "scopeHoist": false,
+      "isLibrary": false,
       "engines": {
         "browsers": "Chrome 90"
       }
@@ -33,6 +38,8 @@
       "outputFormat": "global",
       "context": "browser",
       "source": "src/index.ts",
+      "scopeHoist": false,
+      "isLibrary": false,
       "engines": {
         "browsers": "Chrome 90"
       }
