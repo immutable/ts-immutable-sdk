@@ -1,7 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { getChainConfig, getEvmChainFromChainId } from './chainRegistry';
 import { EvmChain } from '../types';
-import { ARBITRUM_ONE_CHAIN, ARBITRUM_SEPOLIA_CHAIN } from './presets';
+import { ARBITRUM_ONE_CHAIN, ETHEREUM_SEPOLIA_CHAIN } from './presets';
 
 describe('chainRegistry', () => {
   describe('getChainConfig', () => {
@@ -13,12 +13,12 @@ describe('chainRegistry', () => {
       expect(config.name).toBe('Arbitrum One');
     });
 
-    it('returns Arbitrum Sepolia config for SANDBOX', () => {
+    it('returns Ethereum Sepolia config for SANDBOX', () => {
       const config = getChainConfig(EvmChain.ARBITRUM_ONE, Environment.SANDBOX);
 
-      expect(config).toEqual(ARBITRUM_SEPOLIA_CHAIN);
-      expect(config.chainId).toBe(421614);
-      expect(config.name).toBe('Arbitrum Sepolia');
+      expect(config).toEqual(ETHEREUM_SEPOLIA_CHAIN);
+      expect(config.chainId).toBe(11155111);
+      expect(config.name).toBe('Ethereum Sepolia');
     });
 
     it('throws error for unsupported chain', () => {
@@ -45,8 +45,8 @@ describe('chainRegistry', () => {
       expect(getEvmChainFromChainId(42161)).toBe(EvmChain.ARBITRUM_ONE);
     });
 
-    it('returns ARBITRUM_ONE for Arbitrum Sepolia chainId', () => {
-      expect(getEvmChainFromChainId(421614)).toBe(EvmChain.ARBITRUM_ONE);
+    it('returns ARBITRUM_ONE for Ethereum Sepolia chainId', () => {
+      expect(getEvmChainFromChainId(11155111)).toBe(EvmChain.ARBITRUM_ONE);
     });
 
     it('handles string chainId', () => {

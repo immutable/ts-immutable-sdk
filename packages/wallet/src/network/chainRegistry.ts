@@ -4,7 +4,7 @@ import {
   IMMUTABLE_ZKEVM_MAINNET_CHAIN,
   IMMUTABLE_ZKEVM_TESTNET_CHAIN,
   ARBITRUM_ONE_CHAIN,
-  ARBITRUM_SEPOLIA_CHAIN,
+  ETHEREUM_SEPOLIA_CHAIN,
 } from './presets';
 import { ChainId } from './chains';
 
@@ -18,7 +18,7 @@ const CHAIN_REGISTRY: Record<EvmChain, Record<Environment, ChainConfig>> = {
   },
   [EvmChain.ARBITRUM_ONE]: {
     [Environment.PRODUCTION]: ARBITRUM_ONE_CHAIN,
-    [Environment.SANDBOX]: ARBITRUM_SEPOLIA_CHAIN,
+    [Environment.SANDBOX]: ETHEREUM_SEPOLIA_CHAIN,
   },
 };
 

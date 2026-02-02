@@ -4,6 +4,7 @@ import {
   IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID,
   ARBITRUM_ONE_CHAIN_ID,
   ARBITRUM_SEPOLIA_CHAIN_ID,
+  ETHEREUM_SEPOLIA_CHAIN_ID,
   MAGIC_CONFIG,
 } from '../constants';
 
@@ -61,6 +62,21 @@ export const ARBITRUM_SEPOLIA_CHAIN: ChainConfig = {
   rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
   relayerUrl: 'https://next-arbitrum-sepolia-relayer.sequence.app',
   nodeUrl: 'https://next-nodes.sequence.app/arbitrum-sepolia',
+  apiUrl: 'https://api.sandbox.immutable.com',
+  passportDomain: 'https://passport.sandbox.immutable.com',
+  feeTokenSymbol: 'ETH',
+  sequenceIdentityInstrumentEndpoint: 'https://next-identity.sequence-dev.app',
+};
+
+/**
+ * Ethereum Sepolia Testnet chain configuration
+ */
+export const ETHEREUM_SEPOLIA_CHAIN: ChainConfig = {
+  chainId: ETHEREUM_SEPOLIA_CHAIN_ID,
+  name: 'Ethereum Sepolia',
+  rpcUrl: 'https://rpc.sepolia.org',
+  relayerUrl: 'https://next-sepolia-relayer.sequence.app',
+  nodeUrl: 'https://next-nodes.sequence.app/sepolia',
   apiUrl: 'https://api.sandbox.immutable.com',
   passportDomain: 'https://passport.sandbox.immutable.com',
   feeTokenSymbol: 'ETH',
@@ -151,4 +167,19 @@ export const ARBITRUM_ONE = {
  */
 export const ARBITRUM_SEPOLIA = {
   chains: [ARBITRUM_SEPOLIA_CHAIN],
+};
+
+/**
+ * Ethereum Sepolia testnet only preset
+ *
+ * @example
+ * ```typescript
+ * const provider = await connectWallet({
+ *   ...ETHEREUM_SEPOLIA,
+ *   auth,
+ * });
+ * ```
+ */
+export const ETHEREUM_SEPOLIA = {
+  chains: [ETHEREUM_SEPOLIA_CHAIN],
 };
