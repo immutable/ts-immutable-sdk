@@ -36,7 +36,13 @@ export function isAPIError(error: any): error is imx.APIError {
 
 type AxiosLikeError = {
   response?: {
+    status?: number;
     data?: unknown;
+  };
+  config?: {
+    url?: string;
+    baseURL?: string;
+    method?: string;
   };
 };
 
@@ -57,6 +63,23 @@ const extractApiError = (error: unknown): imx.APIError | undefined => {
   }
 
   return undefined;
+};
+
+const appendHttpDebugInfo = (message: string, error: unknown): string => {
+  const e = error as AxiosLikeError;
+  const status = e?.response?.status;
+  const url = e?.config?.url;
+  const baseURL = e?.config?.baseURL;
+  const fullUrl = (
+    typeof url === 'string' && typeof baseURL === 'string' && !/^https?:\/\//i.test(url)
+      ? `${baseURL}${url}`
+      : url
+  );
+
+  if (status == null && fullUrl == null) return message;
+  if (message.includes('[httpStatus=')) return message;
+
+  return `${message} [httpStatus=${status ?? 'unknown'} url=${fullUrl ?? 'unknown'}]`;
 };
 
 export class PassportError extends Error {
@@ -86,6 +109,11 @@ export const withPassportError = async <T>(
       errorMessage = apiError.message;
     } else {
       errorMessage = (error as Error).message;
+    }
+
+    // Debug aid: preserve which HTTP endpoint/status failed for IMX offchain registration.
+    if (customErrorType === PassportErrorType.USER_REGISTRATION_ERROR) {
+      errorMessage = appendHttpDebugInfo(errorMessage, error);
     }
 
     throw new PassportError(errorMessage, customErrorType);
