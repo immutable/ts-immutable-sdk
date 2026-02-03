@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DIST_DIR = path.join(__dirname, '..', 'dist');
+const DIST_DIR = path.join(__dirname, '..', 'dist', 'unity');
 const HTML_FILE = path.join(DIST_DIR, 'index.html');
 
 console.log('🔧 Fixing Unity build...');
