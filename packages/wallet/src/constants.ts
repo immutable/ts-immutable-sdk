@@ -15,9 +15,6 @@ export const IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID = 13473;
 /** Arbitrum One Mainnet chain ID */
 export const ARBITRUM_ONE_CHAIN_ID = 42161;
 
-/** Arbitrum Sepolia Testnet chain ID */
-export const ARBITRUM_SEPOLIA_CHAIN_ID = 421614;
-
 /** Ethereum Sepolia Testnet chain ID */
 export const ETHEREUM_SEPOLIA_CHAIN_ID = 11155111;
 

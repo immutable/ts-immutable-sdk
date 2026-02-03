@@ -3,7 +3,6 @@ import {
   IMMUTABLE_ZKEVM_MAINNET_CHAIN_ID,
   IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID,
   ARBITRUM_ONE_CHAIN_ID,
-  ARBITRUM_SEPOLIA_CHAIN_ID,
   ETHEREUM_SEPOLIA_CHAIN_ID,
   MAGIC_CONFIG,
 } from '../constants';
@@ -51,21 +50,6 @@ export const ARBITRUM_ONE_CHAIN: ChainConfig = {
   passportDomain: 'https://passport.immutable.com',
   feeTokenSymbol: 'ETH',
   sequenceIdentityInstrumentEndpoint: 'https://next-identity.sequence.app',
-};
-
-/**
- * Arbitrum Sepolia Testnet chain configuration
- */
-export const ARBITRUM_SEPOLIA_CHAIN: ChainConfig = {
-  chainId: ARBITRUM_SEPOLIA_CHAIN_ID,
-  name: 'Arbitrum Sepolia',
-  rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
-  relayerUrl: 'https://next-arbitrum-sepolia-relayer.sequence.app',
-  nodeUrl: 'https://next-nodes.sequence.app/arbitrum-sepolia',
-  apiUrl: 'https://api.sandbox.immutable.com',
-  passportDomain: 'https://passport.sandbox.immutable.com',
-  feeTokenSymbol: 'ETH',
-  sequenceIdentityInstrumentEndpoint: 'https://next-identity.sequence-dev.app',
 };
 
 /**
@@ -152,21 +136,6 @@ export const IMMUTABLE_ZKEVM_MULTICHAIN = {
  */
 export const ARBITRUM_ONE = {
   chains: [ARBITRUM_ONE_CHAIN],
-};
-
-/**
- * Arbitrum testnet only preset
- *
- * @example
- * ```typescript
- * const provider = await connectWallet({
- *   ...ARBITRUM_SEPOLIA,
- *   auth,
- * });
- * ```
- */
-export const ARBITRUM_SEPOLIA = {
-  chains: [ARBITRUM_SEPOLIA_CHAIN],
 };
 
 /**
