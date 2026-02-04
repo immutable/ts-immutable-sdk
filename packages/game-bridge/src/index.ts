@@ -14,42 +14,12 @@ import * as ethers from 'ethers';
 // eslint-disable-next-line import/no-duplicates
 import { BrowserProvider, getAddress } from 'ethers';
 
-console.log('[GAME-BRIDGE] Starting imports...');
-
-console.log('[GAME-BRIDGE] All imports successful');
-
-// Browser feature detection
-console.log('[GAME-BRIDGE] Browser features:', {
-  BigInt: typeof BigInt !== 'undefined',
-  fetch: typeof fetch !== 'undefined',
-  ErrorCause: (function errorCauseCheck() {
-    try {
-      const testError = new Error('test', { cause: new Error('cause') });
-      return typeof testError.cause !== 'undefined';
-    } catch {
-      return false;
-    }
-  }()),
-  TextEncoder: typeof TextEncoder !== 'undefined',
-  Promise: typeof Promise !== 'undefined',
-  AsyncFunction: (function asyncCheck() {
-    try {
-      // eslint-disable-next-line no-eval
-      eval('(async () => {})');
-      return true;
-    } catch {
-      return false;
-    }
-  }()),
-});
-
 // This patches a bundler issue where @0xsequence/core expects
 // `ethers.getAddress` to exist on the `ethers` namespace, but Parcel
 // fails to attach it in a global build. This ensures the function is
 // available before any Passport code executes.
 if (typeof ethers === 'object' && !ethers.getAddress) {
   (ethers as any).getAddress = getAddress;
-  console.log('[GAME-BRIDGE] Applied ethers.getAddress patch');
 }
 
 /* eslint-disable no-undef */
@@ -101,49 +71,6 @@ const PASSPORT_FUNCTIONS = {
     getTransactionReceipt: 'zkEvmGetTransactionReceipt',
   },
 };
-
-function safeJson(value: unknown, maxLen: number = 1500): string | undefined {
-  try {
-    const str = JSON.stringify(value);
-    if (typeof str !== 'string') return undefined;
-    return str.length > maxLen ? `${str.slice(0, maxLen)}…` : str;
-  } catch {
-    return undefined;
-  }
-}
-
-function logHttpErrorDetails(context: string, err: unknown): void {
-  const e: any = err as any;
-  const status = e?.response?.status;
-  const method = e?.config?.method;
-  const url = e?.config?.url;
-  const baseURL = e?.config?.baseURL;
-  const fullUrl = typeof url === 'string'
-    && typeof baseURL === 'string'
-    && !/^https?:\/\//i.test(url)
-    ? `${baseURL}${url}`
-    : url;
-
-  // If it doesn't look like an HTTP client error, avoid spamming logs.
-  if (status == null && url == null && baseURL == null) return;
-
-  console.log(`[GAME-BRIDGE] HTTP error details (${context})`, {
-    isAxiosError: e?.isAxiosError,
-    status,
-    method,
-    url,
-    baseURL,
-    fullUrl,
-    message: e?.message,
-    name: e?.name,
-    code: e?.code,
-  });
-
-  const dataJson = safeJson(e?.response?.data);
-  if (dataJson) {
-    console.log(`[GAME-BRIDGE] HTTP error response.data (${context})`, dataJson);
-  }
-}
 
 function getHttpErrorSummary(err: unknown): {
   status?: number;
@@ -257,20 +184,6 @@ type VersionInfo = {
 
 const callbackToGame = (data: CallbackData) => {
   const message = JSON.stringify(data);
-  console.log('[GAME-BRIDGE] callbackToGame called:', {
-    responseFor: data.responseFor,
-    requestId: data.requestId,
-    success: data.success,
-  });
-
-  // Debug: Check all available game callbacks
-  console.log('[GAME-BRIDGE] Available callbacks:', {
-    'window.ue': typeof window.ue !== 'undefined',
-    blu_event: typeof blu_event !== 'undefined',
-    UnityPostMessage: typeof UnityPostMessage !== 'undefined',
-    'window.Unity': typeof window.Unity !== 'undefined',
-    'window.uwb': typeof window.uwb !== 'undefined',
-  });
 
   try {
     if (typeof window.ue !== 'undefined') {
@@ -278,28 +191,21 @@ const callbackToGame = (data: CallbackData) => {
         const unrealError = 'Unreal JSConnector not defined';
         console.error('[GAME-BRIDGE]', unrealError);
         throw new Error(unrealError);
-      } else {
-        console.log('[GAME-BRIDGE] Using window.ue.jsconnector');
-        window.ue.jsconnector.sendtogame(message);
       }
+      window.ue.jsconnector.sendtogame(message);
     } else if (typeof blu_event !== 'undefined') {
-      console.log('[GAME-BRIDGE] Using blu_event');
       blu_event('sendtogame', message);
     } else if (typeof UnityPostMessage !== 'undefined') {
-      console.log('[GAME-BRIDGE] Using UnityPostMessage');
       UnityPostMessage(message);
     } else if (typeof window.Unity !== 'undefined') {
-      console.log('[GAME-BRIDGE] Using window.Unity');
       window.Unity.call(message);
     } else if (typeof window.uwb !== 'undefined') {
-      console.log('[GAME-BRIDGE] Using window.uwb');
       window.uwb.ExecuteJsMethod('callback', message);
     } else {
       const gameBridgeError = 'No available game callbacks to call from ImmutableSDK game-bridge';
       console.error('[GAME-BRIDGE]', gameBridgeError);
       throw new Error(gameBridgeError);
     }
-    console.log('[GAME-BRIDGE] Callback sent successfully');
   } catch (error) {
     console.error('[GAME-BRIDGE] Error in callbackToGame:', error);
     throw error;
@@ -377,20 +283,12 @@ window.callFunction = async (jsonData: string) => {
 
     switch (fxName) {
       case PASSPORT_FUNCTIONS.init: {
-        console.log('[GAME-BRIDGE] Starting PASSPORT_FUNCTIONS.init');
         const request = JSON.parse(data);
         const redirect: string | null = request?.redirectUri;
         const logoutMode: 'silent' | 'redirect' = request?.isSilentLogout === true ? 'silent' : 'redirect';
 
-        console.log('[GAME-BRIDGE] Init request:', {
-          environment: request.environment,
-          clientId: request.clientId ? 'present' : 'missing',
-          redirectUri: redirect,
-        });
-
         if (!passportClient || passportInitData !== data) {
           passportInitData = data;
-          console.log(`[GAME-BRIDGE] Connecting to ${request.environment} environment`);
 
           let passportConfig: passport.PassportModuleConfiguration;
 
@@ -398,10 +296,6 @@ window.callFunction = async (jsonData: string) => {
             ? config.Environment.PRODUCTION
             : config.Environment.SANDBOX;
           const baseConfig = new config.ImmutableConfiguration({ environment });
-          // Backend requires x-sdk-version minor >= 0.42 for /v2/passport/users.
-          // The default placeholder-based version currently resolves to 0.0.0 in our builds,
-          // so explicitly set a compatible value via IMXClient overrides.
-          const imxSdkVersionHeader = '0.42';
 
           if (request.environment === 'dev' || request.environment === 'development') {
             passportConfig = {
@@ -427,7 +321,7 @@ window.callFunction = async (jsonData: string) => {
                       chainID: 5,
                       coreContractAddress: '0xd05323731807A35599BF9798a1DE15e89d6D6eF1',
                       registrationContractAddress: '0x7EB840223a3b1E0e8D54bF8A6cd83df5AFfC88B2',
-                      sdkVersion: imxSdkVersionHeader,
+                      sdkVersion: sdkVersionTag,
                       baseConfig,
                     }),
                   },
@@ -453,10 +347,8 @@ window.callFunction = async (jsonData: string) => {
             };
           }
 
-          console.log('[GAME-BRIDGE] Creating Passport client...');
           try {
             passportClient = new passport.Passport(passportConfig);
-            console.log('[GAME-BRIDGE] Passport client created successfully');
             trackDuration(moduleName, 'initialisedPassport', mt(markStart));
           } catch (initError) {
             console.error('[GAME-BRIDGE] Error creating Passport client:', initError);
@@ -464,14 +356,12 @@ window.callFunction = async (jsonData: string) => {
           }
         }
 
-        console.log('[GAME-BRIDGE] Calling back to game with success...');
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
           error: null,
         });
-        console.log('[GAME-BRIDGE] Init callback sent');
 
         // version check
         const { engineVersion } = request;
@@ -976,9 +866,6 @@ window.callFunction = async (jsonData: string) => {
     }
   } catch (error: any) {
     console.log(`Error in callFunction: ${error}`);
-
-    // Best-effort: log HTTP status + URL for network failures (e.g. IMX offchain register).
-    logHttpErrorDetails(`${fxName} requestId=${requestId}`, error);
 
     let wrappedError;
 
