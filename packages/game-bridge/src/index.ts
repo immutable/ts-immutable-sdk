@@ -78,15 +78,22 @@ function getHttpErrorSummary(err: unknown): {
   traceId?: string;
   requestId?: string;
   cfRay?: string;
-  responseSnippet?: string;
 } {
   const e: any = err as any;
   const status: number | undefined = e?.response?.status;
   const url: string | undefined = e?.config?.url;
   const baseURL: string | undefined = e?.config?.baseURL;
-  const fullUrl = typeof url === 'string' && typeof baseURL === 'string' && !/^https?:\/\//i.test(url)
+  let fullUrl = typeof url === 'string' && typeof baseURL === 'string' && !/^https?:\/\//i.test(url)
     ? `${baseURL}${url}`
     : url;
+
+  // Remove query parameters to avoid exposing sensitive data (tokens, API keys, etc.)
+  if (typeof fullUrl === 'string') {
+    const queryIndex = fullUrl.indexOf('?');
+    if (queryIndex !== -1) {
+      fullUrl = fullUrl.substring(0, queryIndex);
+    }
+  }
 
   const headers: Record<string, string> | undefined = e?.response?.headers;
   const traceId = headers?.['x-amzn-trace-id'] ?? headers?.['x-trace-id'];
@@ -95,26 +102,12 @@ function getHttpErrorSummary(err: unknown): {
     ?? headers?.['x-request-id'];
   const cfRay = headers?.['cf-ray'];
 
-  // Best-effort: keep a short body snippet for correlation.
-  let responseSnippet: string | undefined;
-  try {
-    const data = e?.response?.data;
-    if (typeof data === 'string') responseSnippet = data;
-    else if (data != null) responseSnippet = JSON.stringify(data);
-  } catch {
-    // ignore
-  }
-  if (typeof responseSnippet === 'string' && responseSnippet.length > 200) {
-    responseSnippet = `${responseSnippet.slice(0, 200)}…`;
-  }
-
   return {
     status,
     fullUrl,
     traceId,
     requestId,
     cfRay,
-    responseSnippet,
   };
 }
 
@@ -882,7 +875,6 @@ window.callFunction = async (jsonData: string) => {
       traceId,
       requestId: httpRequestId,
       cfRay,
-      responseSnippet,
     } = getHttpErrorSummary(error);
     if (
       fxName === PASSPORT_FUNCTIONS.imx.registerOffchain
@@ -897,8 +889,7 @@ window.callFunction = async (jsonData: string) => {
         + ` url=${effectiveUrl ?? 'unknown'}`
         + ` trace=${traceId ?? 'unknown'}`
         + ` reqId=${httpRequestId ?? 'unknown'}`
-        + ` cfRay=${cfRay ?? 'unknown'}`
-        + ` resp=${responseSnippet ?? ''}]`;
+        + ` cfRay=${cfRay ?? 'unknown'}]`;
       // If a previous layer already added a minimal suffix like:
       //   "... [httpStatus=500 url=...]"
       // upgrade it to include trace/reqId/resp instead of skipping.
