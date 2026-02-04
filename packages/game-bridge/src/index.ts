@@ -72,6 +72,57 @@ const PASSPORT_FUNCTIONS = {
   },
 };
 
+function getHttpErrorSummary(err: unknown): {
+  status?: number;
+  fullUrl?: string;
+  traceId?: string;
+  requestId?: string;
+  cfRay?: string;
+} {
+  const e: any = err as any;
+  const status: number | undefined = e?.response?.status;
+  const url: string | undefined = e?.config?.url;
+  const baseURL: string | undefined = e?.config?.baseURL;
+  let fullUrl = typeof url === 'string' && typeof baseURL === 'string' && !/^https?:\/\//i.test(url)
+    ? `${baseURL}${url}`
+    : url;
+
+  // Remove query parameters to avoid exposing sensitive data (tokens, API keys, etc.)
+  if (typeof fullUrl === 'string') {
+    const queryIndex = fullUrl.indexOf('?');
+    if (queryIndex !== -1) {
+      fullUrl = fullUrl.substring(0, queryIndex);
+    }
+  }
+
+  const headers: Record<string, string> | undefined = e?.response?.headers;
+  const traceId = headers?.['x-amzn-trace-id'] ?? headers?.['x-trace-id'];
+  const requestId = headers?.['x-amzn-requestid']
+    ?? headers?.['x-amzn-request-id']
+    ?? headers?.['x-request-id'];
+  const cfRay = headers?.['cf-ray'];
+
+  return {
+    status,
+    fullUrl,
+    traceId,
+    requestId,
+    cfRay,
+  };
+}
+
+function parseHttpStatusSuffix(message: string): { status?: number; url?: string } {
+  // Matches our existing suffix formats like:
+  //   "... [httpStatus=500 url=https://...]" or
+  //   "... [httpStatus=500 url=https://... trace=... ...]"
+  const m = message.match(/\[httpStatus=([^\s\]]+)\s+url=([^\s\]]+)[^\]]*\]/);
+  if (!m) return {};
+  const statusStr = m[1];
+  const url = m[2];
+  const status = statusStr && /^[0-9]+$/.test(statusStr) ? Number(statusStr) : undefined;
+  return { status, url };
+}
+
 // To notify game engine that this file is loaded
 const initRequest = 'init';
 const initRequestId = '1';
@@ -126,27 +177,31 @@ type VersionInfo = {
 
 const callbackToGame = (data: CallbackData) => {
   const message = JSON.stringify(data);
-  console.log(`callbackToGame: ${message}`);
-  if (typeof window.ue !== 'undefined') {
-    if (typeof window.ue.jsconnector === 'undefined') {
-      const unrealError = 'Unreal JSConnector not defined';
-      console.error(unrealError);
-      throw new Error(unrealError);
-    } else {
+
+  try {
+    if (typeof window.ue !== 'undefined') {
+      if (typeof window.ue.jsconnector === 'undefined') {
+        const unrealError = 'Unreal JSConnector not defined';
+        console.error('[GAME-BRIDGE]', unrealError);
+        throw new Error(unrealError);
+      }
       window.ue.jsconnector.sendtogame(message);
+    } else if (typeof blu_event !== 'undefined') {
+      blu_event('sendtogame', message);
+    } else if (typeof UnityPostMessage !== 'undefined') {
+      UnityPostMessage(message);
+    } else if (typeof window.Unity !== 'undefined') {
+      window.Unity.call(message);
+    } else if (typeof window.uwb !== 'undefined') {
+      window.uwb.ExecuteJsMethod('callback', message);
+    } else {
+      const gameBridgeError = 'No available game callbacks to call from ImmutableSDK game-bridge';
+      console.error('[GAME-BRIDGE]', gameBridgeError);
+      throw new Error(gameBridgeError);
     }
-  } else if (typeof blu_event !== 'undefined') {
-    blu_event('sendtogame', message);
-  } else if (typeof UnityPostMessage !== 'undefined') {
-    UnityPostMessage(message);
-  } else if (typeof window.Unity !== 'undefined') {
-    window.Unity.call(message);
-  } else if (typeof window.uwb !== 'undefined') {
-    window.uwb.ExecuteJsMethod('callback', message);
-  } else {
-    const gameBridgeError = 'No available game callbacks to call from ImmutableSDK game-bridge';
-    console.error(gameBridgeError);
-    throw new Error(gameBridgeError);
+  } catch (error) {
+    console.error('[GAME-BRIDGE] Error in callbackToGame:', error);
+    throw error;
   }
 };
 
@@ -224,9 +279,9 @@ window.callFunction = async (jsonData: string) => {
         const request = JSON.parse(data);
         const redirect: string | null = request?.redirectUri;
         const logoutMode: 'silent' | 'redirect' = request?.isSilentLogout === true ? 'silent' : 'redirect';
+
         if (!passportClient || passportInitData !== data) {
           passportInitData = data;
-          console.log(`Connecting to ${request.environment} environment`);
 
           let passportConfig: passport.PassportModuleConfiguration;
 
@@ -259,6 +314,8 @@ window.callFunction = async (jsonData: string) => {
                       chainID: 5,
                       coreContractAddress: '0xd05323731807A35599BF9798a1DE15e89d6D6eF1',
                       registrationContractAddress: '0x7EB840223a3b1E0e8D54bF8A6cd83df5AFfC88B2',
+                      sdkVersion: sdkVersionTag,
+                      baseConfig,
                     }),
                   },
                 }),
@@ -283,9 +340,15 @@ window.callFunction = async (jsonData: string) => {
             };
           }
 
-          passportClient = new passport.Passport(passportConfig);
-          trackDuration(moduleName, 'initialisedPassport', mt(markStart));
+          try {
+            passportClient = new passport.Passport(passportConfig);
+            trackDuration(moduleName, 'initialisedPassport', mt(markStart));
+          } catch (initError) {
+            console.error('[GAME-BRIDGE] Error creating Passport client:', initError);
+            throw initError;
+          }
         }
+
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -805,6 +868,41 @@ window.callFunction = async (jsonData: string) => {
       wrappedError = error;
     }
 
+    // Make endpoint visible in Unity Output for debugging (CI logs don't include JS console).
+    const {
+      status,
+      fullUrl,
+      traceId,
+      requestId: httpRequestId,
+      cfRay,
+    } = getHttpErrorSummary(error);
+    if (
+      fxName === PASSPORT_FUNCTIONS.imx.registerOffchain
+      && wrappedError instanceof Error
+    ) {
+      // Some upstream errors embed "[httpStatus=... url=...]" only in the message string
+      // without preserving axios-like fields. Parse what we can so we can still enrich.
+      const parsed = parseHttpStatusSuffix(wrappedError.message);
+      const effectiveStatus = status ?? parsed.status;
+      const effectiveUrl = fullUrl ?? parsed.url;
+      const suffix = ` [httpStatus=${effectiveStatus ?? 'unknown'}`
+        + ` url=${effectiveUrl ?? 'unknown'}`
+        + ` trace=${traceId ?? 'unknown'}`
+        + ` reqId=${httpRequestId ?? 'unknown'}`
+        + ` cfRay=${cfRay ?? 'unknown'}]`;
+      // If a previous layer already added a minimal suffix like:
+      //   "... [httpStatus=500 url=...]"
+      // upgrade it to include trace/reqId/resp instead of skipping.
+      if (wrappedError.message.includes('[httpStatus=')) {
+        if (!wrappedError.message.includes('trace=')) {
+          const upgraded = wrappedError.message.replace(/\[httpStatus=[^\]]*\]/g, suffix.trim());
+          wrappedError = new Error(upgraded);
+        }
+      } else {
+        wrappedError = new Error(`${wrappedError.message}${suffix}`);
+      }
+    }
+
     const errorType = error instanceof passport.PassportError
       ? error?.type
       : undefined;
@@ -827,7 +925,10 @@ window.callFunction = async (jsonData: string) => {
       responseFor: fxName,
       requestId,
       success: false,
-      error: error?.message !== null && error?.message !== undefined ? error.message : 'Error',
+      // IMPORTANT: return the wrapped error message so we include extra HTTP diagnostics
+      // (httpStatus/url/trace/reqId/resp) in Unity CI logs.
+      error: wrappedError?.message
+        ?? (error?.message !== null && error?.message !== undefined ? error.message : 'Error'),
       errorType: error instanceof passport.PassportError ? error?.type : null,
     });
   }
