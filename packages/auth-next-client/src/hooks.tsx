@@ -97,15 +97,19 @@ export function useImmutableSession(): UseImmutableSessionReturn {
 
   const isLoading = status === 'loading';
 
-  // Core authentication check from NextAuth
-  const hasSession = status === 'authenticated' && !!session;
+  // Core authentication check - user has a valid session with usable access token.
+  // A session can exist but be unusable if the access token is missing or refresh failed.
+  const hasValidSession = status === 'authenticated'
+    && !!session
+    && !!session.accessToken
+    && !session.error;
 
-  // During loading/refreshing, keep showing authenticated if we had a session (avoids UI flicker
+  // During loading/refreshing, keep showing authenticated if we had a valid session (avoids UI flicker
   // when NextAuth refetches on window focus or after getUser(forceRefresh)).
   const hadSessionRef = useRef(false);
-  if (hasSession) hadSessionRef.current = true;
-  if (!hasSession && !isLoading && !isRefreshing) hadSessionRef.current = false;
-  const isAuthenticated = hasSession || ((isLoading || isRefreshing) && hadSessionRef.current);
+  if (hasValidSession) hadSessionRef.current = true;
+  if (!hasValidSession && !isLoading && !isRefreshing) hadSessionRef.current = false;
+  const isAuthenticated = hasValidSession || ((isLoading || isRefreshing) && hadSessionRef.current);
 
   // Use a ref to always have access to the latest session.
   // This avoids stale closure issues when the wallet stores the getUser function
