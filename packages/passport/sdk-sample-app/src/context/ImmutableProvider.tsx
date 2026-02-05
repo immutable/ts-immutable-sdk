@@ -1,3 +1,5 @@
+'use client';
+
 import React, {
   createContext, useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -10,6 +12,9 @@ import {
 import { Orderbook, OrderbookOverrides } from '@imtbl/orderbook';
 import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
+import { SessionProvider } from 'next-auth/react';
+import type { Session } from 'next-auth';
+// Note: Session type is augmented in @imtbl/auth-next-client/types
 import {
   AUDIENCE,
   POPUP_REDIRECT_URI,
@@ -200,7 +205,8 @@ const ImmutableContext = createContext<{
 
 export function ImmutableProvider({
   children,
-}: { children: JSX.Element | JSX.Element[] }) {
+  session,
+}: { children: JSX.Element | JSX.Element[]; session?: Session }) {
   const [environment, setEnvironment] = useLocalStorage(
     'IMX_PASSPORT_SAMPLE_ENVIRONMENT',
     useContext(ImmutableContext).environment,
@@ -240,9 +246,23 @@ export function ImmutableProvider({
     setEnvironment,
   }), [sdkClient, orderbookClient, passportClient, blockchainData, environment, setEnvironment]);
 
+  // Get the NextAuth base path for the current environment
+  const authBasePath = useMemo(() => {
+    switch (environment) {
+      case EnvironmentNames.DEV:
+        return '/api/auth/dev';
+      case EnvironmentNames.PRODUCTION:
+        return '/api/auth/prod';
+      default:
+        return '/api/auth/sandbox';
+    }
+  }, [environment]);
+
   return (
     <ImmutableContext.Provider value={providerValues}>
-      {children}
+      <SessionProvider session={session ?? null} basePath={authBasePath}>
+        {children}
+      </SessionProvider>
     </ImmutableContext.Provider>
   );
 }

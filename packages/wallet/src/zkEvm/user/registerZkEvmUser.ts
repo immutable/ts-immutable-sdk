@@ -2,13 +2,16 @@ import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
 import type { PublicClient } from 'viem';
 import { getEip155ChainId } from '../walletHelpers';
-import { Auth } from '@imtbl/auth';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 import { signRaw } from '../../utils/crypto';
-import type { WalletSigner } from '../../types';
+import type { WalletSigner, GetUserFunction } from '../../types';
 
 export type RegisterZkEvmUserInput = {
-  auth: Auth;
+  /**
+   * Function to get fresh user tokens. Used for triggering background refresh after registration.
+   * If not provided, no background refresh is performed.
+   */
+  getUser?: GetUserFunction;
   ethSigner: WalletSigner,
   multiRollupApiClients: MultiRollupApiClients,
   accessToken: string;
@@ -19,7 +22,7 @@ export type RegisterZkEvmUserInput = {
 const MESSAGE_TO_SIGN = 'Only sign this message from Immutable Passport';
 
 export async function registerZkEvmUser({
-  auth,
+  getUser,
   ethSigner,
   multiRollupApiClients,
   accessToken,
@@ -67,7 +70,15 @@ export async function registerZkEvmUser({
     });
     flow.addEvent('endCreateCounterfactualAddress');
 
-    auth.forceUserRefreshInBackground();
+    // Trigger a background refresh to get the updated user with zkEvm info.
+    // This is a best-effort operation - the caller will need to get updated
+    // user data from their session manager (e.g., NextAuth session callback
+    // will refresh tokens and return updated user).
+    if (getUser) {
+      getUser().catch(() => {
+        // Ignore errors - this is a best-effort refresh
+      });
+    }
 
     return registrationResponse.data.counterfactual_address;
   } catch (error) {

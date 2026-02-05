@@ -1,0 +1,62 @@
+{
+  "name": "@imtbl/auth-next-server",
+  "version": "0.0.0",
+  "description": "Immutable Auth.js v5 integration for Next.js - Server-side utilities",
+  "author": "Immutable",
+  "license": "Apache-2.0",
+  "repository": "immutable/ts-immutable-sdk.git",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./dist/node/index.cjs",
+  "module": "./dist/node/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "development": {
+        "types": "./src/index.ts",
+        "require": "./dist/node/index.cjs",
+        "default": "./dist/node/index.js"
+      },
+      "default": {
+        "types": "./dist/types/index.d.ts",
+        "require": "./dist/node/index.cjs",
+        "default": "./dist/node/index.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "pnpm transpile && pnpm typegen",
+    "transpile": "tsup src/index.ts --config ./tsup.config.ts",
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
+    "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
+    "typecheck": "tsc --customConditions default --noEmit --jsx preserve",
+    "test": "jest --passWithNoTests"
+  },
+  "peerDependencies": {
+    "next": "^15.0.0",
+    "next-auth": "^5.0.0-beta.25"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    },
+    "next-auth": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@swc/core": "^1.4.2",
+    "@swc/jest": "^0.2.37",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.10.7",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "next": "^15.1.6",
+    "next-auth": "^5.0.0-beta.30",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.2"
+  }
+}

@@ -1,6 +1,5 @@
 import {
   Auth,
-  IAuthConfiguration,
   TypedEventEmitter,
 } from '@imtbl/auth';
 import {
@@ -12,7 +11,7 @@ import {
 import { ZkEvmProvider } from './zkEvm/zkEvmProvider';
 import { SequenceProvider } from './sequence/sequenceProvider';
 import {
-  ConnectWalletOptions, PassportEventMap, ChainConfig, Provider,
+  ConnectWalletOptions, PassportEventMap, ChainConfig, Provider, GetUserFunction,
 } from './types';
 import { WalletConfiguration } from './config';
 import GuardianClient from './guardian';
@@ -121,13 +120,22 @@ function getDefaultClientId(chain: ChainConfig): string {
   return isSandboxChain(chain) ? DEFAULT_SANDBOX_CLIENT_ID : DEFAULT_PRODUCTION_CLIENT_ID;
 }
 
-function createDefaultAuth(initialChain: ChainConfig, options: ConnectWalletOptions): Auth {
+/**
+ * Create a default getUser function using internal Auth instance.
+ * This is used when no external getUser is provided.
+ * @internal
+ */
+function createDefaultGetUser(initialChain: ChainConfig, options: ConnectWalletOptions): {
+  getUser: GetUserFunction;
+  clientId: string;
+} {
   const passportDomain = derivePassportDomain(initialChain);
   const authenticationDomain = deriveAuthenticationDomain();
   const redirectUri = deriveRedirectUri();
+  const clientId = options.clientId || getDefaultClientId(initialChain);
 
-  return new Auth({
-    clientId: getDefaultClientId(initialChain),
+  const auth = new Auth({
+    clientId,
     redirectUri,
     popupRedirectUri: redirectUri,
     logoutRedirectUri: redirectUri,
@@ -138,6 +146,29 @@ function createDefaultAuth(initialChain: ChainConfig, options: ConnectWalletOpti
     popupOverlayOptions: options.popupOverlayOptions,
     crossSdkBridgeEnabled: options.crossSdkBridgeEnabled,
   });
+
+  // Set up message listener for popup login callback
+  if (typeof window !== 'undefined') {
+    window.addEventListener('message', async (event) => {
+      if (event.data.code && event.data.state) {
+        const currentQueryString = window.location.search;
+        const newQueryString = new URLSearchParams(currentQueryString);
+        newQueryString.set('code', event.data.code);
+        newQueryString.set('state', event.data.state);
+        window.history.replaceState(null, '', `?${newQueryString.toString()}`);
+        await auth.loginCallback();
+        newQueryString.delete('code');
+        newQueryString.delete('state');
+        window.history.replaceState(null, '', `?${newQueryString.toString()}`);
+      }
+    });
+  }
+
+  // Return getUser function that wraps Auth.getUserOrLogin
+  return {
+    getUser: async () => auth.getUserOrLogin(),
+    clientId,
+  };
 }
 
 /**
@@ -146,30 +177,24 @@ function createDefaultAuth(initialChain: ChainConfig, options: ConnectWalletOpti
  * @param config - Wallet configuration
  * @returns EIP-1193 compliant provider with multi-chain support
  *
- * If no Auth instance is provided, a default Immutable-hosted client id will be used.
+ * If getUser is not provided, a default implementation using @imtbl/auth will be created.
  *
- * @example
+ * @example Using external auth (e.g., NextAuth)
  * ```typescript
- * import { Auth } from '@imtbl/auth';
- * import { connectWallet, IMMUTABLE_ZKEVM_MAINNET_CHAIN } from '@imtbl/wallet';
+ * import { connectWallet } from '@imtbl/wallet';
+ * import { useImmutableSession } from '@imtbl/auth-next-client';
  *
- * // Create auth
- * const auth = new Auth({
- *   authenticationDomain: 'https://auth.immutable.com',
- *   passportDomain: 'https://passport.immutable.com',
- *   clientId: 'your-client-id',
- *   redirectUri: 'https://your-app.com/callback',
- *   scope: 'openid profile email offline_access transact',
- * });
+ * const { getUser } = useImmutableSession();
+ * const provider = await connectWallet({ getUser });
+ * ```
  *
- * // Connect wallet (defaults to testnet + mainnet, starts on testnet)
- * const provider = await connectWallet({ auth });
+ * @example Using default auth (simplest setup)
+ * ```typescript
+ * import { connectWallet } from '@imtbl/wallet';
  *
- * // Or specify a single chain
- * const provider = await connectWallet({
- *   auth,
- *   chains: [IMMUTABLE_ZKEVM_MAINNET_CHAIN],
- * });
+ * // Uses default Immutable-hosted authentication
+ * const provider = await connectWallet();
+ * const accounts = await provider.request({ method: 'eth_requestAccounts' });
  * ```
  */
 export async function connectWallet(
@@ -198,33 +223,28 @@ export async function connectWallet(
     passport: apiConfig,
   });
 
-  // 3. Resolve Auth (use provided instance or create a default)
-  const auth = config.auth ?? createDefaultAuth(initialChain, config);
-  if (!config.auth && typeof window !== 'undefined') {
-    window.addEventListener('message', async (event) => {
-      if (event.data.code && event.data.state) {
-        // append to the current querystring making sure both cases of no existing and having existing params are handled
-        const currentQueryString = window.location.search;
-        const newQueryString = new URLSearchParams(currentQueryString);
-        newQueryString.set('code', event.data.code);
-        newQueryString.set('state', event.data.state);
-        window.history.replaceState(null, '', `?${newQueryString.toString()}`);
-        await auth.loginCallback();
-        // remove the code and state from the querystring
-        newQueryString.delete('code');
-        newQueryString.delete('state');
-        window.history.replaceState(null, '', `?${newQueryString.toString()}`);
-      }
-    });
+  // 3. Resolve getUser function
+  // If not provided, create a default implementation using internal Auth
+  let getUser: GetUserFunction;
+  let clientId: string;
+
+  if (config.getUser) {
+    getUser = config.getUser;
+    clientId = config.clientId || getDefaultClientId(initialChain);
+  } else {
+    // Create default getUser using internal Auth
+    const defaultAuth = createDefaultGetUser(initialChain, config);
+    getUser = defaultAuth.getUser;
+    clientId = defaultAuth.clientId;
   }
 
-  // 4. Extract Auth configuration and current user
-  const authConfig: IAuthConfiguration = auth.getConfig();
-  const user = await auth.getUser();
+  // 4. Get current user (may be null if not logged in)
+  const user = await getUser().catch(() => null);
 
   // 5. Create wallet configuration with concrete URLs
+  const passportDomain = initialChain.passportDomain || initialChain.apiUrl.replace('api.', 'passport.');
   const walletConfig = new WalletConfiguration({
-    passportDomain: initialChain.passportDomain || initialChain.apiUrl.replace('api.', 'passport.'),
+    passportDomain,
     zkEvmRpcUrl: initialChain.rpcUrl,
     relayerUrl: initialChain.relayerUrl,
     indexerMrBasePath: initialChain.apiUrl,
@@ -242,9 +262,10 @@ export async function connectWallet(
 
   const guardianClient = new GuardianClient({
     config: walletConfig,
-    auth,
+    getUser,
     guardianApi,
-    authConfig,
+    passportDomain,
+    clientId,
   });
 
   // 8. Create provider based on chain type
@@ -262,7 +283,7 @@ export async function connectWallet(
       magicPublishableApiKey: magicConfig.magicPublishableApiKey,
       magicProviderId: magicConfig.magicProviderId,
     });
-    const ethSigner = new MagicTEESigner(auth, magicTeeApiClients);
+    const ethSigner = new MagicTEESigner(getUser, magicTeeApiClients);
 
     // 11. Determine session activity API URL (only for mainnet, testnet, devnet)
     let sessionActivityApiUrl: string | null = null;
@@ -280,24 +301,29 @@ export async function connectWallet(
 
     // 12. Create ZkEvmProvider
     provider = new ZkEvmProvider({
-      auth,
+      getUser,
+      clientId,
       config: walletConfig,
       multiRollupApiClients,
-      passportEventEmitter,
+      walletEventEmitter: passportEventEmitter,
       guardianClient,
       ethSigner,
       user,
       sessionActivityApiUrl,
     });
   } else {
+    // Determine if this is a dev environment based on domain
+    const isDevEnvironment = passportDomain.includes('.dev.') || initialChain.apiUrl.includes('.dev.');
+
     // Create Sequence signer based on environment
-    const sequenceSigner = createSequenceSigner(auth, authConfig, {
+    const sequenceSigner = createSequenceSigner(getUser, {
       identityInstrumentEndpoint: initialChain.sequenceIdentityInstrumentEndpoint,
+      isDevEnvironment,
     });
 
     // Non-zkEVM chain - use SequenceProvider
     provider = new SequenceProvider({
-      auth,
+      getUser,
       chainConfig: initialChain,
       multiRollupApiClients,
       guardianClient,

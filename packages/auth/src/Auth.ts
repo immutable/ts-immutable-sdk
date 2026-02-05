@@ -30,6 +30,7 @@ import {
   IdTokenPayload,
   isUserZkEvm,
   EvmChain,
+  ChainAddress,
 } from './types';
 import EmbeddedLoginPrompt from './login/embeddedLoginPrompt';
 import TypedEventEmitter from './utils/typedEventEmitter';
@@ -41,6 +42,7 @@ import logger from './utils/logger';
 import { isAccessTokenExpiredOrExpiring } from './utils/token';
 import LoginPopupOverlay from './overlay/loginPopupOverlay';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
+import { buildLogoutUrl } from './logout';
 
 const formUrlEncodedHeaders = {
   'Content-Type': 'application/x-www-form-urlencoded',
@@ -75,13 +77,12 @@ const extractTokenErrorMessage = (
   return `Token request failed with status ${status}`;
 };
 
-const logoutEndpoint = '/v2/logout';
-const crossSdkBridgeLogoutEndpoint = '/im-logged-out';
-const authorizeEndpoint = '/authorize';
+const toChainAddress = (ethAddress: string, userAdminAddress: string): ChainAddress => ({
+  ethAddress: ethAddress as `0x${string}`,
+  userAdminAddress: userAdminAddress as `0x${string}`,
+});
 
-const getLogoutEndpointPath = (crossSdkBridgeEnabled: boolean): string => (
-  crossSdkBridgeEnabled ? crossSdkBridgeLogoutEndpoint : logoutEndpoint
-);
+const authorizeEndpoint = '/authorize';
 
 const getAuthConfiguration = (config: IAuthConfiguration): UserManagerSettings => {
   const { authenticationDomain, oidcConfiguration } = config;
@@ -96,14 +97,12 @@ const getAuthConfiguration = (config: IAuthConfiguration): UserManagerSettings =
   }
   const userStore = new WebStorageStateStore({ store });
 
-  const endSessionEndpoint = new URL(
-    getLogoutEndpointPath(config.crossSdkBridgeEnabled),
-    authenticationDomain.replace(/^(?:https?:\/\/)?(.*)/, 'https://$1'),
-  );
-  endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
-  if (oidcConfiguration.logoutRedirectUri) {
-    endSessionEndpoint.searchParams.set('returnTo', oidcConfiguration.logoutRedirectUri);
-  }
+  const endSessionEndpoint = buildLogoutUrl({
+    clientId: oidcConfiguration.clientId,
+    authenticationDomain,
+    logoutRedirectUri: oidcConfiguration.logoutRedirectUri,
+    crossSdkBridgeEnabled: config.crossSdkBridgeEnabled,
+  });
 
   return {
     authority: authenticationDomain,
@@ -114,7 +113,7 @@ const getAuthConfiguration = (config: IAuthConfiguration): UserManagerSettings =
       authorization_endpoint: `${authenticationDomain}/authorize`,
       token_endpoint: `${authenticationDomain}/oauth/token`,
       userinfo_endpoint: `${authenticationDomain}/userinfo`,
-      end_session_endpoint: endSessionEndpoint.toString(),
+      end_session_endpoint: endSessionEndpoint,
       revocation_endpoint: `${authenticationDomain}/oauth/revoke`,
     },
     automaticSilentRenew: false,
@@ -573,20 +572,14 @@ export class Auth {
     };
 
     if (passport?.zkevm_eth_address && passport?.zkevm_user_admin_address) {
-      user.zkEvm = {
-        ethAddress: passport.zkevm_eth_address,
-        userAdminAddress: passport.zkevm_user_admin_address,
-      };
+      user.zkEvm = toChainAddress(passport.zkevm_eth_address, passport.zkevm_user_admin_address);
     }
 
     const chains = Object.values(EvmChain).filter((chain) => chain !== EvmChain.ZKEVM);
     for (const chain of chains) {
       const chainMetadata = passport?.[chain as Exclude<EvmChain, EvmChain.ZKEVM>];
       if (chainMetadata?.eth_address && chainMetadata?.user_admin_address) {
-        user[chain] = {
-          ethAddress: chainMetadata.eth_address,
-          userAdminAddress: chainMetadata.user_admin_address,
-        };
+        user[chain] = toChainAddress(chainMetadata.eth_address, chainMetadata.user_admin_address);
       }
     }
 
@@ -779,15 +772,21 @@ export class Auth {
         try {
           const newOidcUser = await this.userManager.signinSilent();
           if (newOidcUser) {
-            resolve(Auth.mapOidcUserToDomainModel(newOidcUser));
+            const user = Auth.mapOidcUserToDomainModel(newOidcUser);
+            // Emit TOKEN_REFRESHED event so consumers (e.g., auth-next-client) can sync
+            // the new tokens to their session. This is critical for refresh token
+            // rotation - without this, the server-side session may have stale tokens.
+            this.eventEmitter.emit(AuthEvents.TOKEN_REFRESHED, user);
+            resolve(user);
             return;
           }
           resolve(null);
         } catch (err) {
           let passportErrorType = PassportErrorType.AUTHENTICATION_ERROR;
           let errorMessage = 'Failed to refresh token';
+          // Default to REMOVING user - safer to log out on unknown errors
+          // Only keep user logged in for explicitly known transient errors
           let removeUser = true;
-
           if (err instanceof ErrorTimeout) {
             passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
             errorMessage = `${errorMessage}: ${err.message}`;
@@ -802,6 +801,13 @@ export class Auth {
           }
 
           if (removeUser) {
+            // Emit USER_REMOVED event BEFORE removing user so consumers can react
+            // (e.g., auth-next-client can clear the NextAuth session)
+            this.eventEmitter.emit(AuthEvents.USER_REMOVED, {
+              reason: 'refresh_failed',
+              error: errorMessage,
+            });
+
             try {
               await this.userManager.removeUser();
             } catch (removeUserError) {

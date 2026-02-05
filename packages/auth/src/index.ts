@@ -19,9 +19,11 @@ export type {
   PassportMetadata,
   PassportChainMetadata,
   ChainAddress,
+  ZkEvmInfo,
   IdTokenPayload,
   PKCEData,
   AuthEventMap,
+  UserRemovedReason,
 } from './types';
 export {
   isUserZkEvm,
@@ -40,3 +42,28 @@ export {
 } from './errors';
 
 export { decodeJwtPayload } from './utils/jwt';
+
+// ============================================================================
+// Standalone Login Functions (stateless, for use with NextAuth or similar)
+// ============================================================================
+
+export {
+  loginWithPopup,
+  loginWithEmbedded,
+  loginWithRedirect,
+  handleLoginCallback,
+  type LoginConfig,
+  type TokenResponse,
+  type StandaloneLoginOptions,
+} from './login/standalone';
+
+// ============================================================================
+// Standalone Logout Functions (stateless, for use with NextAuth or similar)
+// ============================================================================
+
+export {
+  logoutWithRedirect,
+  logoutSilent,
+  buildLogoutUrl,
+  type LogoutConfig,
+} from './login/standalone';

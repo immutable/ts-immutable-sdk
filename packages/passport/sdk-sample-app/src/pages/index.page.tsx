@@ -1,6 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 import { Container, Row } from 'react-bootstrap';
+import { useImmutableSession } from '@imtbl/auth-next-client';
 import Status from '@/components/Status';
 import ImxWorkflow from '@/components/imx/ImxWorkflow';
 import Message from '@/components/Message';
@@ -11,12 +12,14 @@ import { BASE_PATH } from '@/config';
 import PassportMethods from '@/components/PassportMethods';
 import ZkEvmWorkflow from '@/components/zkevm/ZkEvmWorkflow';
 import ArbitrumWorkflow from '@/components/arbitrum/ArbitrumWorkflow';
+import AuthNextJS from '@/components/AuthNextJS';
 
 export default function Home() {
   const { isLoading } = useStatusProvider();
   const {
     imxProvider, zkEvmProvider, arbitrumProvider, defaultWalletProvider,
   } = usePassportProvider();
+  const { isAuthenticated: isAuthNextJSAuthenticated } = useImmutableSession();
 
   return (
     <>
@@ -31,8 +34,11 @@ export default function Home() {
           <Row className="my-3">
             <Environment
               disabled={isLoading || !!imxProvider || !!zkEvmProvider
-                || !!arbitrumProvider || !!defaultWalletProvider}
+                || !!arbitrumProvider || !!defaultWalletProvider || isAuthNextJSAuthenticated}
             />
+          </Row>
+          <Row className="my-3">
+            <AuthNextJS />
           </Row>
           <Row className="my-3">
             <PassportMethods />

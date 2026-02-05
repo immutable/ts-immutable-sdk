@@ -4,6 +4,8 @@
   "dependencies": {
     "@biom3/design-tokens": "^0.4.5",
     "@biom3/react": "^0.29.4",
+    "@imtbl/auth-next-client": "workspace:*",
+    "@imtbl/auth-next-server": "workspace:*",
     "@imtbl/blockchain-data": "workspace:*",
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
@@ -19,21 +21,22 @@
     "enc-utils": "^3.0.0",
     "ethers": "^6.13.4",
     "motion": "^11.17.0",
-    "next": "14.2.25",
+    "next": "^15.1.6",
+    "next-auth": "^5.0.0-beta.30",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^13.4.7",
-    "@swc/core": "^1.3.36",
-    "@types/node": "^18.14.2",
+    "@swc/core": "^1.4.2",
+    "@types/node": "^22.10.7",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "concurrently": "^8.2.2",
-    "eslint": "^8.40.0",
+    "eslint": "^8.56.0",
     "eslint-config-next": "13.3.1",
     "typescript": "^5.6.2"
   },
@@ -41,7 +44,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "dev-with-sdk": "concurrently 'pnpm dev' 'pnpm run -w dev'",
+    "dev-with-sdk": "concurrently 'ENABLE_API_ROUTES=true pnpm dev' 'pnpm run -w dev'",
     "lint": "eslint 'src/**/*.{ts,tsx}' --max-warnings=0",
     "start": "next start"
   }

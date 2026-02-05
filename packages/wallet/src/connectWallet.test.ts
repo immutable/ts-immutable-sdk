@@ -9,6 +9,7 @@ jest.mock('@imtbl/auth', () => {
       },
     }),
     getUser: jest.fn().mockResolvedValue({ profile: { sub: 'user' } }),
+    getUserOrLogin: jest.fn().mockResolvedValue({ profile: { sub: 'user' }, accessToken: 'token' }),
   }));
 
   const TypedEventEmitter = jest.fn().mockImplementation(() => ({
@@ -79,20 +80,13 @@ const arbitrumChain = {
   relayerUrl: 'https://next-arbitrum-one-relayer.sequence.app',
   apiUrl: 'https://api.immutable.com',
   name: 'Arbitrum One',
+  sequenceIdentityInstrumentEndpoint: 'https://sequence.immutable.com',
 };
 
-const createAuthStub = () => ({
-  getConfig: jest.fn().mockReturnValue({
-    authenticationDomain: 'https://auth.immutable.com',
-    passportDomain: 'https://passport.immutable.com',
-    oidcConfiguration: {
-      clientId: 'client',
-      redirectUri: 'https://redirect',
-    },
-  }),
-  getUser: jest.fn().mockResolvedValue({ profile: { sub: 'user' } }),
-  loginCallback: jest.fn(),
-  eventEmitter: { emit: jest.fn(), on: jest.fn() },
+// Create a mock getUser function for tests
+const createGetUserMock = () => jest.fn().mockResolvedValue({
+  profile: { sub: 'user' },
+  accessToken: 'token',
 });
 
 describe('connectWallet', () => {
@@ -101,9 +95,9 @@ describe('connectWallet', () => {
   });
 
   it('announces provider by default', async () => {
-    const auth = createAuthStub();
+    const getUser = createGetUserMock();
 
-    const provider = await connectWallet({ auth, chains: [zkEvmChain] });
+    const provider = await connectWallet({ getUser, chains: [zkEvmChain] });
 
     expect(ZkEvmProvider).toHaveBeenCalled();
     expect(announceProvider).toHaveBeenCalledWith({
@@ -113,25 +107,25 @@ describe('connectWallet', () => {
   });
 
   it('does not announce provider when disabled', async () => {
-    const auth = createAuthStub();
+    const getUser = createGetUserMock();
 
-    await connectWallet({ auth, chains: [zkEvmChain], announceProvider: false });
+    await connectWallet({ getUser, chains: [zkEvmChain], announceProvider: false });
 
     expect(announceProvider).not.toHaveBeenCalled();
   });
 
   describe('provider selection', () => {
     it('uses ZkEvmProvider for zkEVM chain (by chainId)', async () => {
-      const auth = createAuthStub();
+      const getUser = createGetUserMock();
 
-      await connectWallet({ auth, chains: [zkEvmChain] });
+      await connectWallet({ getUser, chains: [zkEvmChain] });
 
       expect(ZkEvmProvider).toHaveBeenCalled();
       expect(SequenceProvider).not.toHaveBeenCalled();
     });
 
     it('uses ZkEvmProvider for zkEVM devnet chain', async () => {
-      const auth = createAuthStub();
+      const getUser = createGetUserMock();
       const devChain = {
         chainId: 15003, // zkEVM devnet chainId
         rpcUrl: 'https://rpc.dev.immutable.com',
@@ -142,16 +136,16 @@ describe('connectWallet', () => {
         magicProviderId: 'provider-123',
       };
 
-      await connectWallet({ auth, chains: [devChain] });
+      await connectWallet({ getUser, chains: [devChain] });
 
       expect(ZkEvmProvider).toHaveBeenCalled();
       expect(SequenceProvider).not.toHaveBeenCalled();
     });
 
     it('uses SequenceProvider for non-zkEVM chain (Arbitrum)', async () => {
-      const auth = createAuthStub();
+      const getUser = createGetUserMock();
 
-      await connectWallet({ auth, chains: [arbitrumChain] });
+      await connectWallet({ getUser, chains: [arbitrumChain] });
 
       expect(SequenceProvider).toHaveBeenCalled();
       expect(ZkEvmProvider).not.toHaveBeenCalled();

@@ -6,3 +6,5 @@ export * as checkout from './checkout';
 export * as x from './x';
 export * as webhook from './webhook';
 export * as mintingBackend from './minting_backend';
+export * as auth from './auth';
+export * as wallet from './wallet';
