@@ -428,6 +428,43 @@ function MyComponent() {
 | `isAuthenticated` | `boolean`                                           | Whether user is authenticated                                    |
 | `getUser`         | `(forceRefresh?: boolean) => Promise<User \| null>` | Get user function for wallet integration                         |
 
+#### Checking Authentication Status
+
+**Always use `isAuthenticated` to determine if a user is logged in.** Do not use the `session` object or `status` field directly for this purpose.
+
+**Why not `!!session`?**
+
+A `session` object can exist but be **unusable**. For example, the session may be present but the access token is missing, or a token refresh may have failed (indicated by `session.error === "RefreshTokenError"`). Checking `!!session` would incorrectly treat these broken sessions as authenticated.
+
+**Why not `status === 'authenticated'`?**
+
+The `status` field comes directly from NextAuth's `useSession` and only reflects whether NextAuth considers the session valid at the cookie/JWT level. It does **not** account for whether the access token is actually present or whether a token refresh has failed. A session can have `status === 'authenticated'` while `session.error` is set to `"RefreshTokenError"`, meaning the tokens are no longer usable.
+
+**What `isAuthenticated` checks:**
+
+The `isAuthenticated` boolean validates all of the following:
+
+1. NextAuth reports `'authenticated'` status
+2. The session object exists
+3. A valid access token is present in the session
+4. No session-level error exists (e.g., `RefreshTokenError`)
+
+It also handles transient states gracefully — during session refetches (e.g., window focus) or manual refreshes (e.g., after wallet registration via `getUser(true)`), `isAuthenticated` remains `true` if the user was previously authenticated, preventing UI flicker.
+
+```tsx
+// ✅ Correct - uses isAuthenticated
+const { isAuthenticated } = useImmutableSession();
+if (!isAuthenticated) return <div>Please log in</div>;
+
+// ❌ Incorrect - session can exist with expired/invalid tokens
+const { session } = useImmutableSession();
+if (!session) return <div>Please log in</div>;
+
+// ❌ Incorrect - status doesn't account for token errors
+const { status } = useImmutableSession();
+if (status !== "authenticated") return <div>Please log in</div>;
+```
+
 #### The `getUser` Function
 
 The `getUser` function returns fresh tokens from the session. It accepts an optional `forceRefresh` parameter:
