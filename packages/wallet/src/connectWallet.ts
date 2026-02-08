@@ -23,7 +23,6 @@ import {
   IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID,
 } from './constants';
 import { ChainId } from './network/chains';
-import { createSequenceSigner } from './sequence/signer';
 
 /**
  * Type guard to check if chainId is a valid key for MAGIC_CONFIG
@@ -312,23 +311,11 @@ export async function connectWallet(
       sessionActivityApiUrl,
     });
   } else {
-    // Determine if this is a dev environment based on domain
-    const isDevEnvironment = passportDomain.includes('.dev.') || initialChain.apiUrl.includes('.dev.');
-
-    // Create Sequence signer based on environment
-    const sequenceSigner = createSequenceSigner(getUser, {
-      identityInstrumentEndpoint: initialChain.sequenceIdentityInstrumentEndpoint,
-      isDevEnvironment,
-    });
-
     // Non-zkEVM chain - use SequenceProvider
     provider = new SequenceProvider({
       getUser,
       chainConfig: initialChain,
-      multiRollupApiClients,
       guardianClient,
-      ethSigner: sequenceSigner,
-      passportEventEmitter,
     });
   }
 

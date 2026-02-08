@@ -4,58 +4,27 @@ import {
   toHex,
   type PublicClient,
 } from 'viem';
-import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { TypedEventEmitter, User } from '@imtbl/auth';
-import { trackFlow, trackError, identify } from '@imtbl/metrics';
+import { TypedEventEmitter } from '@imtbl/auth';
 import {
   Provider,
-  ProviderEvent,
   ProviderEventMap,
   RequestArguments,
   ChainConfig,
-  EvmChain,
   GetUserFunction,
 } from '../types';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import GuardianClient from '../guardian';
-import { SequenceSigner } from './signer';
-import { registerUser } from './user';
-import { getEvmChainFromChainId } from '../network/chainRegistry';
 
 export type SequenceProviderInput = {
   getUser: GetUserFunction;
   chainConfig: ChainConfig;
-  multiRollupApiClients: MultiRollupApiClients;
   guardianClient: GuardianClient;
-  ethSigner: SequenceSigner;
-  passportEventEmitter: TypedEventEmitter<ProviderEventMap>;
 };
-
-/** Non-zkEVM chain type */
-type SequenceChain = Exclude<EvmChain, EvmChain.ZKEVM>;
-
-/**
- * Check if user is registered for a non-zkEVM chain.
- * The chain data is stored as user[chainName] (e.g., user.arbitrum_one).
- */
-function isUserRegisteredForChain(user: User, chain: SequenceChain): boolean {
-  return chain in user && !!(user as any)[chain]?.ethAddress;
-}
-
-/**
- * Get the user's eth address for a non-zkEVM chain.
- */
-function getUserChainAddress(user: User, chain: SequenceChain): string | undefined {
-  const chainData = (user as any)[chain];
-  return chainData?.ethAddress;
-}
 
 export class SequenceProvider implements Provider {
   readonly #getUser: GetUserFunction;
 
   readonly #chainConfig: ChainConfig;
-
-  readonly #multiRollupApiClients: MultiRollupApiClients;
 
   readonly #rpcProvider: PublicClient;
 
@@ -63,33 +32,17 @@ export class SequenceProvider implements Provider {
 
   readonly #guardianClient: GuardianClient;
 
-  readonly #ethSigner: SequenceSigner;
-
-  readonly #evmChain: SequenceChain;
-
   public readonly isPassport: boolean = true;
 
   constructor({
     getUser,
     chainConfig,
-    multiRollupApiClients,
     guardianClient,
-    ethSigner,
-    passportEventEmitter,
   }: SequenceProviderInput) {
     // Validate this is not a zkEVM chain
-    const evmChain = getEvmChainFromChainId(chainConfig.chainId);
-    if (evmChain === EvmChain.ZKEVM) {
-      throw new Error('SequenceProvider cannot be used for zkEVM chains. Use ZkEvmProvider instead.');
-    }
-    this.#evmChain = evmChain;
-
     this.#getUser = getUser;
     this.#chainConfig = chainConfig;
-    this.#multiRollupApiClients = multiRollupApiClients;
     this.#guardianClient = guardianClient;
-    this.#ethSigner = ethSigner;
-    this.#providerEventEmitter = passportEventEmitter;
 
     // Create PublicClient for reading from the chain using viem
     this.#rpcProvider = createPublicClient({
@@ -97,84 +50,18 @@ export class SequenceProvider implements Provider {
     });
   }
 
-  /**
-   * Get the user's address for this chain if already registered.
-   */
-  async #getChainAddress(): Promise<string | undefined> {
-    const user = await this.#getUser();
-    if (user && isUserRegisteredForChain(user, this.#evmChain)) {
-      return getUserChainAddress(user, this.#evmChain);
-    }
-    return undefined;
-  }
-
   async #performRequest(request: RequestArguments): Promise<any> {
     switch (request.method) {
+      // TODO: Implement eth_requestAccounts
       case 'eth_requestAccounts': {
-        // Check if already registered
-        const existingAddress = await this.#getChainAddress();
-        if (existingAddress) return [existingAddress];
-
-        const flow = trackFlow('passport', 'ethRequestAccounts');
-
-        try {
-          const user = await this.#getUser();
-          flow.addEvent('endGetUser');
-
-          if (!user) {
-            throw new JsonRpcError(
-              RpcErrorCode.INTERNAL_ERROR,
-              'User not authenticated',
-            );
-          }
-
-          let userEthAddress: string | undefined;
-
-          if (!isUserRegisteredForChain(user, this.#evmChain)) {
-            flow.addEvent('startUserRegistration');
-
-            userEthAddress = await registerUser({
-              getUser: this.#getUser,
-              ethSigner: this.#ethSigner,
-              multiRollupApiClients: this.#multiRollupApiClients,
-              accessToken: user.accessToken,
-              rpcProvider: this.#rpcProvider,
-              flow,
-            });
-            flow.addEvent('endUserRegistration');
-          } else {
-            userEthAddress = getUserChainAddress(user, this.#evmChain);
-          }
-
-          if (!userEthAddress) {
-            throw new JsonRpcError(
-              RpcErrorCode.INTERNAL_ERROR,
-              'Failed to get user address after registration',
-            );
-          }
-
-          this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [
-            userEthAddress,
-          ]);
-          identify({
-            passportId: user.profile.sub,
-          });
-          return [userEthAddress];
-        } catch (error) {
-          if (error instanceof Error) {
-            trackError('passport', 'ethRequestAccounts', error, { flowId: flow.details.flowId });
-          } else {
-            flow.addEvent('errored');
-          }
-          throw error;
-        } finally {
-          flow.addEvent('End');
-        }
+        throw new JsonRpcError(
+          ProviderErrorCode.UNSUPPORTED_METHOD,
+          'eth_requestAccounts not yet implemented for this chain',
+        );
       }
 
       case 'eth_accounts': {
-        const address = await this.#getChainAddress();
-        return address ? [address] : [];
+        return [];
       }
 
       // TODO: Implement eth_sendTransaction

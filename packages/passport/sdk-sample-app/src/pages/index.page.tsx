@@ -49,9 +49,6 @@ export default function Home() {
           <Row className="my-3">
             <ZkEvmWorkflow />
           </Row>
-          <Row className="my-3">
-            <ArbitrumWorkflow />
-          </Row>
           <Row className="mb-3">
             <Message />
           </Row>

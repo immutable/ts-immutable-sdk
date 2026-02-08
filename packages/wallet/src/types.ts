@@ -212,11 +212,6 @@ export interface ChainConfig {
 
   /** Sequence RPC node URL TODO: check if this can be removed and only use rpcUrl */
   nodeUrl?: string;
-
-  /**
-   * Sequence Identity Instrument endpoint (for non-zkEVM chains in prod/sandbox)
-   */
-  sequenceIdentityInstrumentEndpoint?: string;
 }
 
 /**
