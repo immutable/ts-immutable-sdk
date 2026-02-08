@@ -30,6 +30,8 @@ import {
   IdTokenPayload,
   isUserZkEvm,
   EvmChain,
+  ChainAddress,
+  isUserForChain,
 } from './types';
 import EmbeddedLoginPrompt from './login/embeddedLoginPrompt';
 import TypedEventEmitter from './utils/typedEventEmitter';
@@ -309,6 +311,24 @@ export class Auth {
    */
   async getUserZkEvm(): Promise<UserZkEvm> {
     return this.getUserZkEvmInternal();
+  }
+
+  /**
+   * Get the current authenticated user for a specific chain
+   * @param chain - The chain to get the user for
+   * @returns Promise that resolves with the user and the user's ETH address for the chain
+   */
+  async getUserForChain(chain: EvmChain): Promise<{user: User, ethAddress: string}> {
+    if (chain === EvmChain.ZKEVM) {
+      const user = await this.getUserZkEvmInternal();
+      return { user, ethAddress: user.zkEvm.ethAddress };
+    }
+    
+    const user = await this.getUserForChainInternal(chain);
+    if (!user || !user[chain]) {
+      throw new Error('Failed to obtain a User with the required chain attributes');
+    }
+    return { user, ethAddress: user[chain]!.ethAddress };
   }
 
   /**
@@ -856,6 +876,14 @@ export class Auth {
     const user = await this.getUserInternal(isUserZkEvm);
     if (!user) {
       throw new Error('Failed to obtain a User with the required ZkEvm attributes');
+    }
+    return user;
+  }
+
+  private async getUserForChainInternal(chain: Exclude<EvmChain, EvmChain.ZKEVM>): Promise<User> {
+    const user = await this.getUserInternal((user: User) => isUserForChain(user, chain));
+    if (!user) {
+      throw new Error('Failed to obtain a User with the required chain attributes');
     }
     return user;
   }

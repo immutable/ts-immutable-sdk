@@ -20,6 +20,9 @@ import GuardianClient from '../guardian';
 import { SequenceSigner } from './signer';
 import { registerUser } from './user';
 import { getEvmChainFromChainId } from '../network/chainRegistry';
+import { SequenceRelayerClient } from './sequenceRelayerClient';
+import { sendTransaction } from './sendTransaction';
+import { Provider as OxProvider, RpcTransport } from 'ox';
 
 export type SequenceProviderInput = {
   auth: Auth;
@@ -66,6 +69,10 @@ export class SequenceProvider implements Provider {
 
   readonly #evmChain: SequenceChain;
 
+  readonly #relayerClient: SequenceRelayerClient;
+
+  readonly #oxRpcProvider: OxProvider.Provider;
+
   public readonly isPassport: boolean = true;
 
   constructor({
@@ -93,6 +100,15 @@ export class SequenceProvider implements Provider {
     // Create PublicClient for reading from the chain using viem
     this.#rpcProvider = createPublicClient({
       transport: http(this.#chainConfig.rpcUrl),
+    });
+
+    if (!this.#chainConfig.nodeUrl) {
+      throw new Error('nodeUrl is required');
+    }
+    this.#oxRpcProvider = OxProvider.from(RpcTransport.fromHttp(this.#chainConfig.nodeUrl));
+
+    this.#relayerClient = new SequenceRelayerClient({
+      config: this.#chainConfig,
     });
   }
 
@@ -171,10 +187,40 @@ export class SequenceProvider implements Provider {
 
       // TODO: Implement eth_sendTransaction
       case 'eth_sendTransaction': {
-        throw new JsonRpcError(
-          ProviderErrorCode.UNSUPPORTED_METHOD,
-          'eth_sendTransaction not yet implemented for this chain',
-        );
+        const address = await this.#getChainAddress();
+        if (!address) {
+          throw new JsonRpcError(
+            ProviderErrorCode.UNAUTHORIZED,
+            'Unauthorised - call eth_requestAccounts first',
+          );
+        }
+
+        const flow = trackFlow('passport', 'ethSendTransaction');
+
+        try {
+          return await this.#guardianClient.withConfirmationScreen({
+            width: 480,
+            height: 720,
+          })(async () => await sendTransaction({
+            params: request.params || [],
+            sequenceSigner: this.#ethSigner,
+            oxRpcProvider: this.#oxRpcProvider,
+            guardianClient: this.#guardianClient,
+            relayerClient: this.#relayerClient,
+            walletAddress: address,
+            auth: this.#auth,
+            flow,
+          }));
+        } catch (error) {
+          if (error instanceof Error) {
+            trackError('passport', 'eth_sendTransaction', error, { flowId: flow.details.flowId });
+          } else {
+            flow.addEvent('errored');
+          }
+          throw error;
+        } finally {
+          flow.addEvent('End');
+        }
       }
 
       // TODO: Implement personal_sign

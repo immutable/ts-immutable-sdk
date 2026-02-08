@@ -209,9 +209,9 @@ export class Passport {
       const chain = options?.chain ?? EvmChain.ZKEVM;
 
       // TODO: Remove this check once other chains are fully implemented
-      if (chain !== EvmChain.ZKEVM) {
-        throw new Error(`Chain ${chain} is not yet supported. Only ZKEVM is currently available.`);
-      }
+      // if (chain !== EvmChain.ZKEVM) {
+      //   throw new Error(`Chain ${chain} is not yet supported. Only ZKEVM is currently available.`);
+      // }
 
       // Build chain configuration based on selected chain
       const chainConfig = this.buildChainConfig(chain);
@@ -298,6 +298,7 @@ export class Passport {
         ...chainConfig,
         apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || chainConfig.apiUrl,
         passportDomain: this.passportConfig.passportDomain,
+        sequenceProjectAccessKey: this.passportConfig.sequenceProjectAccessKey,
       };
     }
 
@@ -306,6 +307,7 @@ export class Passport {
       ...chainConfig,
       apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || chainConfig.apiUrl,
       passportDomain: this.passportConfig.passportDomain,
+      sequenceProjectAccessKey: this.passportConfig.sequenceProjectAccessKey,
     };
   }
 

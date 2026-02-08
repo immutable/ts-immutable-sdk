@@ -10,7 +10,7 @@ import {
 export { Environment, ImmutableConfiguration } from '@imtbl/config';
 export class ApiConfiguration extends imx.Configuration { }
 
-const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
+const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-1.0.0' };
 
 interface ImmutableXConfigurationParams {
   basePath: string;
@@ -107,7 +107,7 @@ export const createImmutableXConfiguration = ({
   coreContractAddress,
   registrationContractAddress,
   registrationV4ContractAddress,
-  sdkVersion: 'ts-immutable-sdk-__SDK_VERSION__',
+  sdkVersion: 'ts-immutable-sdk-1.0.0',
   baseConfig,
 });
 

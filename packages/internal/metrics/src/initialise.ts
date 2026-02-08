@@ -5,7 +5,7 @@ import { post } from './utils/request';
 import { flattenProperties, getDetail, storeDetail } from './utils/state';
 
 // WARNING: DO NOT CHANGE THE STRING BELOW. IT GETS REPLACED AT BUILD TIME.
-const SDK_VERSION = '__SDK_VERSION__';
+const SDK_VERSION = '1.0.0';
 
 const getFrameParentDomain = () => {
   if (isNode()) {

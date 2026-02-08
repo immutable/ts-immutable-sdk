@@ -8,7 +8,7 @@ import {
 import { mr } from '@imtbl/generated-clients';
 
 const defaultHeaders = {
-  sdkVersion: 'ts-immutable-sdk-multi-rollup-api-client-__SDK_VERSION__',
+  sdkVersion: 'ts-immutable-sdk-multi-rollup-api-client-1.0.0',
 };
 
 export interface APIConfigurationParams {

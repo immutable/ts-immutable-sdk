@@ -1,6 +1,6 @@
 import * as GeneratedClients from '@imtbl/generated-clients';
 import { zeroAddress } from 'viem';
-import { Auth, IAuthConfiguration } from '@imtbl/auth';
+import { Auth, EvmChain, IAuthConfiguration } from '@imtbl/auth';
 import ConfirmationScreen from '../confirmation/confirmation';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
@@ -8,6 +8,7 @@ import { WalletConfiguration } from '../config';
 import { getEip155ChainId } from '../zkEvm/walletHelpers';
 import { WalletError, WalletErrorType } from '../errors';
 import { isAxiosError } from '../utils/http';
+import { getEvmChainFromChainId } from '../network/chainRegistry';
 
 export type GuardianClientParams = {
   config: WalletConfiguration;
@@ -120,7 +121,8 @@ export default class GuardianClient {
     nonce,
     metaTransactions,
   }: GuardianEVMTxnEvaluationParams): Promise<GeneratedClients.mr.TransactionEvaluationResponse> {
-    const user = await this.auth.getUserZkEvm();
+    const evmChain = getEvmChainFromChainId(chainId);
+    const { user, ethAddress } = await this.auth.getUserForChain(evmChain);
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const guardianTransactions = transformGuardianTransactions(metaTransactions);
     try {
@@ -128,11 +130,11 @@ export default class GuardianClient {
         {
           id: 'evm',
           transactionEvaluationRequest: {
-            chainType: 'evm',
+            chainType: evmChain === EvmChain.ZKEVM ? 'evm' : evmChain,
             chainId,
             transactionData: {
               nonce,
-              userAddress: user.zkEvm.ethAddress,
+              userAddress: ethAddress,
               metaTransactions: guardianTransactions,
             },
           },
@@ -175,11 +177,12 @@ export default class GuardianClient {
     }
 
     if (confirmationRequired && !!transactionId) {
-      const user = await this.auth.getUserZkEvm();
+      const evmChain = getEvmChainFromChainId(chainId);
+      const { ethAddress } = await this.auth.getUserForChain(evmChain);
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         transactionId,
-        user.zkEvm.ethAddress,
-        GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Evm,
+        ethAddress,
+        evmChain === EvmChain.ZKEVM ? GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Evm : GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.ArbitrumOne,
         chainId,
       );
 
@@ -200,7 +203,7 @@ export default class GuardianClient {
     { chainID, payload }: GuardianEIP712MessageEvaluationParams,
   ): Promise<GeneratedClients.mr.MessageEvaluationResponse> {
     try {
-      const user = await this.auth.getUserZkEvm();
+      const { user } = await this.auth.getUserForChain(getEvmChainFromChainId(chainID));
       if (user === null) {
         throw new JsonRpcError(
           ProviderErrorCode.UNAUTHORIZED,
@@ -227,10 +230,10 @@ export default class GuardianClient {
       throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
     }
     if (confirmationRequired && !!messageId) {
-      const user = await this.auth.getUserZkEvm();
+      const { ethAddress } = await this.auth.getUserForChain(getEvmChainFromChainId(chainID));
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
-        user.zkEvm.ethAddress,
+        ethAddress,
         'eip712',
         chainID,
       );
@@ -250,7 +253,7 @@ export default class GuardianClient {
     { chainID, payload }: GuardianERC191MessageEvaluationParams,
   ): Promise<GeneratedClients.mr.MessageEvaluationResponse> {
     try {
-      const user = await this.auth.getUserZkEvm();
+      const { user } = await this.auth.getUserForChain(getEvmChainFromChainId(Number(chainID)));
       if (user === null) {
         throw new JsonRpcError(
           ProviderErrorCode.UNAUTHORIZED,
@@ -282,10 +285,10 @@ export default class GuardianClient {
       throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
     }
     if (confirmationRequired && !!messageId) {
-      const user = await this.auth.getUserZkEvm();
+      const { ethAddress } = await this.auth.getUserForChain(getEvmChainFromChainId(Number(chainID)));
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
-        user.zkEvm.ethAddress,
+        ethAddress,
         'erc191',
         String(chainID),
       );

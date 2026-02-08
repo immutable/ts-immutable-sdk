@@ -63,6 +63,8 @@ export class PassportConfiguration {
 
   readonly overrides?: PassportOverrides;
 
+  readonly sequenceProjectAccessKey?: string;
+
   constructor({
     baseConfig,
     overrides,
@@ -123,6 +125,7 @@ export class PassportConfiguration {
           basePath: overrides.passportMrBasePath,
         }),
       };
+      this.sequenceProjectAccessKey = overrides.sequenceProjectAccessKey;
     } else {
       switch (baseConfig.environment) {
         case Environment.PRODUCTION: {

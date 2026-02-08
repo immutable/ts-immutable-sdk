@@ -74,6 +74,9 @@ export interface PassportOverrides {
    * Defaults to 'https://tee.express.magiclabs.com'
    */
   magicTeeBasePath?: string;
+
+  /** Sequence project access key. Only used for non-zkEVM chains */
+  sequenceProjectAccessKey?: string;
 }
 
 export interface PopupOverlayOptions {

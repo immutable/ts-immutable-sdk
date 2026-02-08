@@ -140,6 +140,7 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
           indexerMrBasePath: 'https://api.dev.immutable.com',
           orderBookMrBasePath: 'https://api.dev.immutable.com',
           passportMrBasePath: 'https://api.dev.immutable.com',
+          sequenceProjectAccessKey: 'AQAAAAAAAAB5QznGqk9paa4EQjom09ERpJs',
         },
         ...sharedConfigurationValues,
       };

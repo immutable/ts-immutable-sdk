@@ -2312,6 +2312,9 @@ importers:
       '@imtbl/metrics':
         specifier: workspace:*
         version: link:../internal/metrics
+      ox:
+        specifier: ^0.9.14
+        version: 0.9.17(typescript@5.6.2)
       viem:
         specifier: ~2.18.0
         version: 2.18.2(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
@@ -2319,6 +2322,9 @@ importers:
       '@0xsequence/identity-instrument':
         specifier: 3.0.0-beta.10
         version: 3.0.0-beta.10(typescript@5.6.2)
+      '@0xsequence/relayer':
+        specifier: 3.0.0-beta.10
+        version: 3.0.0-beta.10(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
       '@0xsequence/wallet-core':
         specifier: 3.0.0-beta.10
         version: 3.0.0-beta.10(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
@@ -2349,9 +2355,6 @@ importers:
       jest-environment-jsdom:
         specifier: ^29.4.3
         version: 29.6.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      ox:
-        specifier: ^0.9.17
-        version: 0.9.17(typescript@5.6.2)
       ts-node:
         specifier: ^10.9.1
         version: 10.9.2(@swc/core@1.9.3(@swc/helpers@0.5.13))(@types/node@18.15.13)(typescript@5.6.2)
@@ -21298,7 +21301,7 @@ snapshots:
       '@types/istanbul-lib-coverage': 2.0.4
       collect-v8-coverage: 1.0.2
 
-  '@jest/test-sequencer@26.6.3':
+  '@jest/test-sequencer@26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(utf-8-validate@5.0.10)':
     dependencies:
       '@jest/test-result': 26.6.2
       graceful-fs: 4.2.11
@@ -21306,7 +21309,11 @@ snapshots:
       jest-runner: 26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(utf-8-validate@5.0.10)
       jest-runtime: 26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(utf-8-validate@5.0.10)
     transitivePeerDependencies:
+      - bufferutil
+      - canvas
       - supports-color
+      - ts-node
+      - utf-8-validate
 
   '@jest/test-sequencer@27.5.1':
     dependencies:
@@ -31730,7 +31737,7 @@ snapshots:
   jest-config@26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(utf-8-validate@5.0.10):
     dependencies:
       '@babel/core': 7.26.10
-      '@jest/test-sequencer': 26.6.3
+      '@jest/test-sequencer': 26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.13))(@types/node@20.14.13)(typescript@5.6.2))(utf-8-validate@5.0.10)
       '@jest/types': 26.6.2
       babel-jest: 26.6.3(@babel/core@7.26.10)
       chalk: 4.1.2

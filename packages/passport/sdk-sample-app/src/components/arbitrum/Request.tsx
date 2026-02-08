@@ -9,18 +9,39 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import { RequestArguments } from '@imtbl/passport';
 import WorkflowButton from '@/components/WorkflowButton';
 
+enum EthereumParamType {
+  string = 'string',
+  flag = 'flag',
+  object = 'object',
+  json = 'json',
+}
+
+interface EthereumParam {
+  name: string;
+  type?: EthereumParamType;
+  default?: string;
+  placeholder?: string;
+}
 interface EthereumMethod {
   name: string;
+  params?: Array<EthereumParam>;
 }
 
 const EthereumMethods: EthereumMethod[] = [
   { name: 'eth_requestAccounts' },
   { name: 'eth_accounts' },
+  {
+    name: 'eth_sendTransaction',
+    params: [
+      { name: 'transaction', type: EthereumParamType.object },
+    ],
+  },
   { name: 'eth_chainId' },
 ];
 
 function Request({ showModal, setShowModal }: ModalProps) {
   const [selectedEthMethod, setSelectedEthMethod] = useState<EthereumMethod>(EthereumMethods[0]);
+  const [params, setParams] = useState<string[]>([]);
   const [loadingRequest, setLoadingRequest] = useState<boolean>(false);
   const [isInvalid, setInvalid] = useState<boolean | undefined>(undefined);
 
@@ -28,6 +49,7 @@ function Request({ showModal, setShowModal }: ModalProps) {
   const { arbitrumProvider } = usePassportProvider();
 
   const resetForm = () => {
+    setParams([]);
     setInvalid(false);
   };
 
@@ -64,6 +86,19 @@ function Request({ showModal, setShowModal }: ModalProps) {
     if (form.checkValidity()) {
       await performRequest({
         method: selectedEthMethod?.name || '',
+        params: params.map((param, i) => {
+          switch (selectedEthMethod.params![i].type) {
+            case EthereumParamType.flag: {
+              return param === 'true';
+            }
+            case EthereumParamType.object: {
+              return JSON.parse(param);
+            }
+            default: {
+              return param;
+            }
+          }
+        }),
       });
     } else {
       setInvalid(true);
@@ -77,6 +112,7 @@ function Request({ showModal, setShowModal }: ModalProps) {
       console.error('Invalid eth method');
     } else {
       setSelectedEthMethod(ethMethod);
+      setParams(ethMethod.params ? ethMethod.params.map((param) => param.default || '') : []);
     }
   };
 
@@ -105,6 +141,27 @@ function Request({ showModal, setShowModal }: ModalProps) {
                 ))
               }
             </Form.Select>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            {
+              selectedEthMethod?.params?.map((param, index) => (
+                <div key={param.name}>
+                  <Form.Label>{param.name}</Form.Label>
+                  <Form.Control
+                    disabled={loadingRequest}
+                    key={param.name}
+                    type="text"
+                    value={params[index]}
+                    onChange={(e) => {
+                      const newParams = [...params];
+                      newParams[index] = e.target.value;
+                      setParams(newParams);
+                    }}
+                    placeholder={param.placeholder}
+                  />
+                </div>
+              ))
+            }
           </Form.Group>
           <Stack direction="horizontal" gap={3}>
             <WorkflowButton

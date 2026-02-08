@@ -44,7 +44,8 @@ export interface ZkEvmTransactionEvaluationRequest {
 }
 
 export const ZkEvmTransactionEvaluationRequestChainTypeEnum = {
-    Evm: 'evm'
+    Evm: 'evm',
+    ArbitrumOne: 'arbitrum_one',
 } as const;
 
 export type ZkEvmTransactionEvaluationRequestChainTypeEnum = typeof ZkEvmTransactionEvaluationRequestChainTypeEnum[keyof typeof ZkEvmTransactionEvaluationRequestChainTypeEnum];

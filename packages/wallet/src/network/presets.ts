@@ -58,7 +58,7 @@ export const ARBITRUM_ONE_CHAIN: ChainConfig = {
 export const ETHEREUM_SEPOLIA_CHAIN: ChainConfig = {
   chainId: ETHEREUM_SEPOLIA_CHAIN_ID,
   name: 'Ethereum Sepolia',
-  rpcUrl: 'https://rpc.sepolia.org',
+  rpcUrl: 'https://ethereum-sepolia-rpc.publicnode.com',
   relayerUrl: 'https://next-sepolia-relayer.sequence.app',
   nodeUrl: 'https://next-nodes.sequence.app/sepolia',
   apiUrl: 'https://api.sandbox.immutable.com',

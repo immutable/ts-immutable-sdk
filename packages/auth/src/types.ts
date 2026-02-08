@@ -101,6 +101,8 @@ export type UserZkEvm = WithRequired<User, RollupType.ZKEVM>;
 
 export const isUserZkEvm = (user: User): user is UserZkEvm => !!user[RollupType.ZKEVM];
 
+export const isUserForChain = (user: User, chain: Exclude<EvmChain, EvmChain.ZKEVM>): user is User & { [K in Exclude<EvmChain, EvmChain.ZKEVM>]: ChainAddress } => !!user[chain];
+
 export type DeviceTokenResponse = {
   access_token: string;
   refresh_token?: string;

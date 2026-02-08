@@ -215,6 +215,9 @@ export interface ChainConfig {
    * Sequence Identity Instrument endpoint (for non-zkEVM chains in prod/sandbox)
    */
   sequenceIdentityInstrumentEndpoint?: string;
+
+  /** Sequence project access key (required for non-zkEVM chains) */
+  sequenceProjectAccessKey?: string;
 }
 
 /**
