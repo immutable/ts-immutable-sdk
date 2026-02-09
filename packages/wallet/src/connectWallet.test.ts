@@ -104,7 +104,7 @@ describe('connectWallet', () => {
     it('uses ZkEvmProvider for zkEVM devnet chain', async () => {
       const getUser = createGetUserMock();
       const devChain = {
-        chainId: 15003, // zkEVM devnet chainId
+        chainId: 99999, // unknown chainId
         rpcUrl: 'https://rpc.dev.immutable.com',
         relayerUrl: 'https://relayer.dev.immutable.com',
         apiUrl: 'https://api.dev.immutable.com',

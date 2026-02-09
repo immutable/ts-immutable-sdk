@@ -16,7 +16,7 @@ import { WalletConfiguration } from './config';
 import GuardianClient from './guardian';
 import MagicTEESigner from './magic/magicTEESigner';
 import { announceProvider, passportProviderInfo } from './provider/eip6963';
-import { DEFAULT_CHAINS } from './network/presets';
+import { DEFAULT_CHAINS } from './presets';
 import {
   MAGIC_CONFIG,
   IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID,
