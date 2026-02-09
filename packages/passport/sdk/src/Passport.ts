@@ -15,15 +15,14 @@ import {
 import type { DirectLoginOptions } from '@imtbl/auth';
 import {
   connectWallet,
+  ZkEvmProvider,
   WalletConfiguration,
   GuardianClient,
   MagicTEESigner,
   ChainConfig,
   ConfirmationScreen,
-  EvmChain,
-  getChainConfig,
 } from '@imtbl/wallet';
-import type { Provider, LinkWalletParams, LinkedWallet } from '@imtbl/wallet';
+import type { LinkWalletParams, LinkedWallet } from '@imtbl/wallet';
 import {
   PassportModuleConfiguration,
   ConnectEvmArguments,
@@ -205,59 +204,19 @@ export class Passport {
    * Uses: Auth + Wallet packages
    * @param {Object} options - Configuration options
    * @param {boolean} options.announceProvider - Whether to announce the provider via EIP-6963 for wallet discovery (defaults to true)
-   * @param {EvmChain} options.chain - The EVM chain to connect to (defaults to ZKEVM)
    * @returns {Promise<Provider>} The EVM provider instance
    */
-  public async connectEvm(options: ConnectEvmArguments = { announceProvider: true }): Promise<Provider> {
+  public async connectEvm(options: ConnectEvmArguments = { announceProvider: true }): Promise<ZkEvmProvider> {
     return withMetricsAsync(async () => {
-      const chain = options?.chain ?? EvmChain.ZKEVM;
+      // Access PassportOverrides from PassportConfiguration
+      const passportOverrides = this.passportConfig.overrides;
 
-      // TODO: Remove this check once other chains are fully implemented
-      if (chain !== EvmChain.ZKEVM) {
-        throw new Error(`Chain ${chain} is not yet supported. Only ZKEVM is currently available.`);
-      }
+      // Build complete chain configuration
+      let chainConfig: ChainConfig;
 
-      // Build chain configuration based on selected chain
-      const chainConfig = this.buildChainConfig(chain);
-
-      // Use fee token from chain config, default to IMX for zkEVM
-      const feeTokenSymbol = chainConfig.feeTokenSymbol ?? 'IMX';
-
-      // Use connectWallet to create the provider (it will create WalletConfiguration internally)
-      // Wrap Auth instance in getUser function for the new wallet API
-      // getUserOrLogin will trigger login popup if user is not authenticated
-      // forceRefresh triggers forceUserRefresh to get updated claims after registration
-      const provider = await connectWallet({
-        getUser: (forceRefresh) => (forceRefresh
-          ? this.auth.forceUserRefresh()
-          : this.auth.getUserOrLogin()),
-        clientId: this.passportConfig.oidcConfiguration.clientId,
-        chains: [chainConfig],
-        crossSdkBridgeEnabled: this.passportConfig.crossSdkBridgeEnabled,
-        jsonRpcReferrer: this.passportConfig.jsonRpcReferrer,
-        forceScwDeployBeforeMessageSignature: this.passportConfig.forceScwDeployBeforeMessageSignature,
-        passportEventEmitter: this.auth.eventEmitter,
-        feeTokenSymbol,
-        announceProvider: options?.announceProvider ?? true,
-      });
-
-      return provider;
-    }, 'connectEvm', false);
-  }
-
-  /**
-   * Build chain configuration based on selected chain and environment
-   * @internal
-   */
-  private buildChainConfig(chain: EvmChain): ChainConfig {
-    // Access PassportOverrides from PassportConfiguration
-    const passportOverrides = this.passportConfig.overrides;
-
-    // For zkEVM chain (default)
-    if (chain === EvmChain.ZKEVM) {
       if (passportOverrides?.zkEvmChainId) {
         // Dev environment with custom chain
-        return {
+        chainConfig = {
           chainId: passportOverrides.zkEvmChainId,
           name: passportOverrides.zkEvmChainName || 'Dev Chain',
           rpcUrl: this.passportConfig.zkEvmRpcUrl,
@@ -268,11 +227,9 @@ export class Passport {
           magicProviderId: this.passportConfig.magicProviderId,
           magicTeeBasePath: passportOverrides.magicTeeBasePath || this.passportConfig.magicTeeBasePath,
         };
-      }
-
-      if (this.environment === Environment.PRODUCTION) {
+      } else if (this.environment === Environment.PRODUCTION) {
         // Production environment
-        return {
+        chainConfig = {
           chainId: 13371,
           name: 'Immutable zkEVM',
           rpcUrl: this.passportConfig.zkEvmRpcUrl,
@@ -283,40 +240,38 @@ export class Passport {
           magicProviderId: this.passportConfig.magicProviderId,
           magicTeeBasePath: this.passportConfig.magicTeeBasePath,
         };
+      } else {
+        // Sandbox/testnet environment
+        chainConfig = {
+          chainId: 13473,
+          name: 'Immutable zkEVM Testnet',
+          rpcUrl: this.passportConfig.zkEvmRpcUrl,
+          relayerUrl: this.passportConfig.relayerUrl,
+          apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || this.passportConfig.passportDomain,
+          passportDomain: this.passportConfig.passportDomain,
+          magicPublishableApiKey: this.passportConfig.magicPublishableApiKey,
+          magicProviderId: this.passportConfig.magicProviderId,
+          magicTeeBasePath: this.passportConfig.magicTeeBasePath,
+        };
       }
 
-      // Sandbox/testnet environment
-      return {
-        chainId: 13473,
-        name: 'Immutable zkEVM Testnet',
-        rpcUrl: this.passportConfig.zkEvmRpcUrl,
-        relayerUrl: this.passportConfig.relayerUrl,
-        apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || this.passportConfig.passportDomain,
-        passportDomain: this.passportConfig.passportDomain,
-        magicPublishableApiKey: this.passportConfig.magicPublishableApiKey,
-        magicProviderId: this.passportConfig.magicProviderId,
-        magicTeeBasePath: this.passportConfig.magicTeeBasePath,
-      };
-    }
+      // Use connectWallet to create the provider (it will create WalletConfiguration internally)
+      const provider = await connectWallet({
+        getUser: (forceRefresh) => (forceRefresh
+          ? this.auth.forceUserRefresh()
+          : this.auth.getUserOrLogin()),
+        clientId: this.passportConfig.oidcConfiguration.clientId,
+        chains: [chainConfig],
+        crossSdkBridgeEnabled: this.passportConfig.crossSdkBridgeEnabled,
+        jsonRpcReferrer: this.passportConfig.jsonRpcReferrer,
+        forceScwDeployBeforeMessageSignature: this.passportConfig.forceScwDeployBeforeMessageSignature,
+        passportEventEmitter: this.auth.eventEmitter,
+        feeTokenSymbol: 'IMX',
+        announceProvider: options?.announceProvider ?? true,
+      });
 
-    // For all other chains, use the registry lookup
-    const chainConfig = getChainConfig(chain, this.environment);
-
-    // If dev overrides exist, use dev-specific Passport config
-    if (passportOverrides) {
-      return {
-        ...chainConfig,
-        apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || chainConfig.apiUrl,
-        passportDomain: this.passportConfig.passportDomain,
-      };
-    }
-
-    // Standard SANDBOX/PRODUCTION
-    return {
-      ...chainConfig,
-      apiUrl: this.passportConfig.multiRollupConfig.indexer.basePath || chainConfig.apiUrl,
-      passportDomain: this.passportConfig.passportDomain,
-    };
+      return provider;
+    }, 'connectEvm', false);
   }
 
   // ============================================================================

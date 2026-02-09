@@ -43,17 +43,6 @@ jest.mock('@imtbl/wallet', () => {
     MagicTEESigner: jest.fn(),
     WalletConfiguration: jest.fn(),
     ConfirmationScreen: jest.fn(),
-    EvmChain: {
-      ZKEVM: 'zkevm',
-      ARBITRUM_ONE: 'arbitrum_one',
-    },
-    getChainConfig: jest.fn().mockReturnValue({
-      chainId: 42161,
-      rpcUrl: 'https://arb1.arbitrum.io/rpc',
-      relayerUrl: 'https://relayer.sequence.app',
-      apiUrl: 'https://api.immutable.com',
-      name: 'Arbitrum One',
-    }),
     __mocked: {
       connectWalletMock,
     },
@@ -223,32 +212,6 @@ describe('Passport', () => {
       expect(connectWalletMock).toHaveBeenCalledWith(expect.objectContaining({
         announceProvider: false,
       }));
-    });
-
-    it('uses zkEVM chain config by default', async () => {
-      connectWalletMock.mockResolvedValue({ kind: 'zkEvm' });
-      const passport = createPassport();
-
-      await passport.connectEvm({ announceProvider: true });
-
-      expect(connectWalletMock).toHaveBeenCalledWith(expect.objectContaining({
-        chains: expect.arrayContaining([
-          expect.objectContaining({
-            chainId: 13473, // zkEVM testnet for SANDBOX
-            name: 'Immutable zkEVM Testnet',
-          }),
-        ]),
-        feeTokenSymbol: 'IMX',
-      }));
-    });
-
-    it('throws error for non-zkEVM chains (not yet implemented)', async () => {
-      const { EvmChain: evmChain } = jest.requireMock('@imtbl/wallet');
-      const passport = createPassport();
-
-      await expect(
-        passport.connectEvm({ announceProvider: true, chain: evmChain.ARBITRUM_ONE }),
-      ).rejects.toThrow('Chain arbitrum_one is not yet supported. Only ZKEVM is currently available.');
     });
   });
 
