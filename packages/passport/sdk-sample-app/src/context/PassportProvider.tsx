@@ -95,7 +95,7 @@ export function PassportProvider({
   const connectZkEvm = useCallback(async () => {
     setIsLoading(true);
     try {
-      const provider = await passportClient.connectEvm() as ZkEvmProvider;
+      const provider = await passportClient.connectEvm();
       if (provider) {
         // Call eth_requestAccounts to trigger zkEvm registration if needed
         // This ensures the user has a zkEvm address before setting the provider

@@ -16,16 +16,20 @@ export enum RollupType {
   ZKEVM = 'zkEvm',
 }
 
+export type ChainAddress = {
+  ethAddress: `0x${string}`;
+  userAdminAddress: `0x${string}`;
+};
+
+export type ZkEvmInfo = ChainAddress;
+
 export type User = {
   idToken?: string;
   accessToken: string;
   refreshToken?: string;
   profile: UserProfile;
   expired?: boolean;
-  [RollupType.ZKEVM]?: {
-    ethAddress: string;
-    userAdminAddress: string;
-  };
+  [RollupType.ZKEVM]?: ChainAddress;
 };
 
 export type PassportMetadata = {

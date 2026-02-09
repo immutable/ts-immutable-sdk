@@ -264,8 +264,6 @@ const signature = await provider.request({
 import {
   IMMUTABLE_ZKEVM_MAINNET_CHAIN_ID,  // 13371
   IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID,  // 13473
-  ARBITRUM_ONE_CHAIN_ID,              // 42161
-  ARBITRUM_SEPOLIA_CHAIN_ID,          // 421614
 } from '@imtbl/wallet';
 ```
 
@@ -296,20 +294,6 @@ const provider = await connectWallet({
 });
 ```
 
-#### Arbitrum (Multi-chain Support)
-
-```typescript
-import {
-  ARBITRUM_ONE_CHAIN,      // Arbitrum One Mainnet
-  ARBITRUM_SEPOLIA_CHAIN,  // Arbitrum Sepolia Testnet
-} from '@imtbl/wallet';
-
-// Connect to Arbitrum One
-const provider = await connectWallet({
-  chains: [ARBITRUM_ONE_CHAIN],
-});
-```
-
 ### Chain Presets (Spread-friendly)
 
 ```typescript
@@ -317,8 +301,6 @@ import {
   IMMUTABLE_ZKEVM_MAINNET,     // { chains: [mainnet] }
   IMMUTABLE_ZKEVM_TESTNET,     // { chains: [testnet] }
   IMMUTABLE_ZKEVM_MULTICHAIN,  // { chains: [testnet, mainnet] }
-  ARBITRUM_ONE,                // { chains: [arbitrum one] }
-  ARBITRUM_SEPOLIA,            // { chains: [arbitrum sepolia] }
 } from '@imtbl/wallet';
 
 // Easy to spread into connectWallet
@@ -346,18 +328,6 @@ const customChain: ChainConfig = {
   // Optional: Fee token (defaults to 'IMX')
   feeTokenSymbol: 'IMX',
 };
-```
-
-### Chain Registry Utilities
-
-```typescript
-import { getChainConfig, getEvmChainFromChainId } from '@imtbl/wallet';
-
-// Get chain config by chain ID
-const config = getChainConfig(13371); // Returns IMMUTABLE_ZKEVM_MAINNET_CHAIN
-
-// Get EVM chain type from chain ID
-const evmChain = getEvmChainFromChainId(13371); // Returns EvmChain.ZKEVM
 ```
 
 ---

@@ -40,10 +40,6 @@
     "viem": "~2.18.0"
   },
   "devDependencies": {
-    "@0xsequence/identity-instrument": "3.0.0-beta.10",
-    "@0xsequence/wallet-wdk": "3.0.0-beta.10",
-    "@0xsequence/wallet-core": "3.0.0-beta.10",
-    "@0xsequence/wallet-primitives": "3.0.0-beta.10",
     "@swc/core": "^1.4.2",
     "@swc/jest": "^0.2.37",
     "@types/jest": "^29.5.12",
