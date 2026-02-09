@@ -37,3 +37,9 @@ export const DEFAULT_TOKEN_EXPIRY_SECONDS = 900;
  * Default token expiry in milliseconds
  */
 export const DEFAULT_TOKEN_EXPIRY_MS = DEFAULT_TOKEN_EXPIRY_SECONDS * 1000;
+
+/**
+ * Buffer time in milliseconds before token expiry to trigger refresh.
+ * Matches TOKEN_EXPIRY_BUFFER_SECONDS (60s) in @imtbl/auth-next-server.
+ */
+export const TOKEN_EXPIRY_BUFFER_MS = 60 * 1000;

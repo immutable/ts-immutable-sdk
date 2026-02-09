@@ -1,6 +1,8 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
 import type {
@@ -16,12 +18,34 @@ import {
   loginWithRedirect as rawLoginWithRedirect,
   logoutWithRedirect as rawLogoutWithRedirect,
 } from '@imtbl/auth';
-import { IMMUTABLE_PROVIDER_ID } from './constants';
+import { IMMUTABLE_PROVIDER_ID, TOKEN_EXPIRY_BUFFER_MS } from './constants';
+
+// ---------------------------------------------------------------------------
+// Module-level deduplication for session refresh
+// ---------------------------------------------------------------------------
 
 /**
- * Extended session type with Immutable token data
+ * Deduplicates concurrent session refresh calls.
+ * Multiple components may mount useImmutableSession simultaneously; without
+ * deduplication each would trigger its own update() call, which could fail
+ * if the auth server rotates refresh tokens.
  */
-export interface ImmutableSession extends Session {
+let pendingRefresh: Promise<Session | null | undefined> | null = null;
+
+function deduplicatedUpdate(
+  update: () => Promise<Session | null | undefined>,
+): Promise<Session | null | undefined> {
+  if (!pendingRefresh) {
+    pendingRefresh = update().finally(() => { pendingRefresh = null; });
+  }
+  return pendingRefresh;
+}
+
+/**
+ * Internal session type with full token data (not exported).
+ * Used internally by the hook for token validation, refresh logic, and getUser/getAccessToken.
+ */
+interface ImmutableSessionInternal extends Session {
   accessToken: string;
   refreshToken?: string;
   idToken?: string;
@@ -29,6 +53,15 @@ export interface ImmutableSession extends Session {
   zkEvm?: ZkEvmInfo;
   error?: string;
 }
+
+/**
+ * Public session type exposed to consumers.
+ *
+ * Does **not** include `accessToken` -- consumers must use the `getAccessToken()`
+ * function returned by `useImmutableSession()` to obtain a guaranteed-fresh token.
+ * This prevents accidental use of stale/expired tokens.
+ */
+export type ImmutableSession = Omit<ImmutableSessionInternal, 'accessToken'>;
 
 /**
  * Return type for useImmutableSession hook
@@ -53,6 +86,13 @@ export interface UseImmutableSessionReturn {
    *   The refreshed session will include updated zkEvm data if available.
    */
   getUser: (forceRefresh?: boolean) => Promise<User | null>;
+  /**
+   * Get a guaranteed-fresh access token.
+   * Returns immediately if the current token is valid.
+   * If expired, triggers a refresh and blocks (awaits) until the fresh token is available.
+   * Throws if the user is not authenticated or if refresh fails.
+   */
+  getAccessToken: () => Promise<string>;
 }
 
 /**
@@ -92,8 +132,8 @@ export function useImmutableSession(): UseImmutableSessionReturn {
   // Track when a manual refresh is in progress (via getUser(true))
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Cast session to our extended type
-  const session = sessionData as ImmutableSession | null;
+  // Cast session to our internal type (includes accessToken for internal logic)
+  const session = sessionData as ImmutableSessionInternal | null;
 
   const isLoading = status === 'loading';
 
@@ -114,7 +154,7 @@ export function useImmutableSession(): UseImmutableSessionReturn {
   // Use a ref to always have access to the latest session.
   // This avoids stale closure issues when the wallet stores the getUser function
   // and calls it later - the ref always points to the current session.
-  const sessionRef = useRef<ImmutableSession | null>(session);
+  const sessionRef = useRef<ImmutableSessionInternal | null>(session);
   sessionRef.current = session;
 
   // Also store update in a ref so the callback is stable
@@ -124,6 +164,26 @@ export function useImmutableSession(): UseImmutableSessionReturn {
   // Store setIsRefreshing in a ref for stable callback
   const setIsRefreshingRef = useRef(setIsRefreshing);
   setIsRefreshingRef.current = setIsRefreshing;
+
+  // ---------------------------------------------------------------------------
+  // Proactive token refresh
+  // ---------------------------------------------------------------------------
+
+  // Reactive refresh: when the effect runs and the token is already expired
+  // (e.g., after tab regains focus), trigger an immediate refresh.
+  // For tokens that are still valid, getAccessToken() handles refresh on demand.
+  useEffect(() => {
+    if (!session?.accessTokenExpires) return;
+
+    const timeUntilExpiry = session.accessTokenExpires - Date.now() - TOKEN_EXPIRY_BUFFER_MS;
+
+    if (timeUntilExpiry <= 0) {
+      // Already expired -- refresh now
+      setIsRefreshingRef.current(true);
+      deduplicatedUpdate(() => updateRef.current())
+        .finally(() => setIsRefreshingRef.current(false));
+    }
+  }, [session?.accessTokenExpires]);
 
   /**
    * Get user function for wallet integration.
@@ -135,7 +195,7 @@ export function useImmutableSession(): UseImmutableSessionReturn {
    * @param forceRefresh - When true, triggers a server-side token refresh
    */
   const getUser = useCallback(async (forceRefresh?: boolean): Promise<User | null> => {
-    let currentSession: ImmutableSession | null;
+    let currentSession: ImmutableSessionInternal | null;
 
     // If forceRefresh is requested, trigger server-side refresh via NextAuth
     // This calls the jwt callback with trigger='update' and sessionUpdate.forceRefresh=true
@@ -145,7 +205,7 @@ export function useImmutableSession(): UseImmutableSessionReturn {
       try {
         // update() returns the refreshed session
         const updatedSession = await updateRef.current({ forceRefresh: true });
-        currentSession = updatedSession as ImmutableSession | null;
+        currentSession = updatedSession as ImmutableSessionInternal | null;
         // Also update the ref so subsequent calls get the fresh data
         if (currentSession) {
           sessionRef.current = currentSession;
@@ -157,6 +217,16 @@ export function useImmutableSession(): UseImmutableSessionReturn {
         currentSession = sessionRef.current;
       } finally {
         setIsRefreshingRef.current(false);
+      }
+    } else if (pendingRefresh) {
+      // If a refresh is in-flight (proactive timer or another getAccessToken call),
+      // wait for it and use the refreshed session rather than returning a stale token.
+      const refreshed = await pendingRefresh;
+      if (refreshed) {
+        currentSession = refreshed as ImmutableSessionInternal;
+        sessionRef.current = currentSession;
+      } else {
+        currentSession = sessionRef.current;
       }
     } else {
       // Read from ref - instant, no network call
@@ -188,13 +258,55 @@ export function useImmutableSession(): UseImmutableSessionReturn {
     };
   }, []); // Empty deps - uses refs for latest values
 
+  /**
+   * Get a guaranteed-fresh access token.
+   * Returns immediately if the current token is valid (fast path, no network call).
+   * If expired, triggers a server-side refresh and blocks (awaits) until the fresh
+   * token is available. Piggybacks on any in-flight refresh to avoid duplicate calls.
+   *
+   * @throws Error if the user is not authenticated or if the refresh fails.
+   */
+  const getAccessToken = useCallback(async (): Promise<string> => {
+    const currentSession = sessionRef.current;
+
+    // Fast path: token is valid -- return immediately
+    if (
+      currentSession?.accessToken
+      && currentSession.accessTokenExpires
+      && Date.now() < currentSession.accessTokenExpires - TOKEN_EXPIRY_BUFFER_MS
+      && !currentSession.error
+    ) {
+      return currentSession.accessToken;
+    }
+
+    // Token is expired or missing -- wait for in-flight refresh or trigger one
+    const refreshed = await deduplicatedUpdate(
+      () => updateRef.current(),
+    ) as ImmutableSessionInternal | null;
+
+    if (!refreshed?.accessToken || refreshed.error) {
+      throw new Error(
+        `[auth-next-client] Failed to get access token: ${refreshed?.error || 'no session'}`,
+      );
+    }
+
+    // Update ref so subsequent sync reads get the fresh data
+    sessionRef.current = refreshed;
+    return refreshed.accessToken;
+  }, []); // Empty deps -- uses refs for latest values
+
+  // Cast to public type (omits accessToken) to prevent consumers from
+  // accidentally using a potentially stale token. Use getAccessToken() instead.
+  const publicSession = session as ImmutableSession | null;
+
   return {
-    session,
+    session: publicSession,
     status,
     isLoading,
     isAuthenticated,
     isRefreshing,
     getUser,
+    getAccessToken,
   };
 }
 
