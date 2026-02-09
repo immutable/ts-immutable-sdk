@@ -10,17 +10,14 @@ import {
 } from '@imtbl/generated-clients';
 import { ZkEvmProvider } from './zkEvm/zkEvmProvider';
 import {
-  ConnectWalletOptions, PassportEventMap, ChainConfig, Provider, GetUserFunction,
+  ConnectWalletOptions, PassportEventMap, ChainConfig, GetUserFunction,
 } from './types';
 import { WalletConfiguration } from './config';
 import GuardianClient from './guardian';
 import MagicTEESigner from './magic/magicTEESigner';
 import { announceProvider, passportProviderInfo } from './provider/eip6963';
 import { DEFAULT_CHAINS } from './presets';
-import {
-  MAGIC_CONFIG,
-  IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID,
-} from './constants';
+import { MAGIC_CONFIG, IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID } from './constants';
 
 /**
  * Type guard to check if chainId is a valid key for MAGIC_CONFIG
@@ -186,7 +183,7 @@ function createDefaultGetUser(initialChain: ChainConfig, options: ConnectWalletO
  */
 export async function connectWallet(
   config: ConnectWalletOptions = {},
-): Promise<Provider> {
+): Promise<ZkEvmProvider> {
   // Use default chains if not provided (testnet + mainnet)
   const chains = config.chains && config.chains.length > 0
     ? config.chains
@@ -255,10 +252,10 @@ export async function connectWallet(
     clientId,
   });
 
-  // 8. Get Magic config for initial chain (from chain config or hard-coded default)
+  // 9. Get Magic config for initial chain (from chain config or hard-coded default)
   const magicConfig = getMagicConfigForChain(initialChain);
 
-  // 9. Create MagicTEESigner with Magic TEE base path (separate from backend API)
+  // 10. Create MagicTEESigner with Magic TEE base path (separate from backend API)
   const magicTeeBasePath = initialChain.magicTeeBasePath || 'https://tee.express.magiclabs.com';
   const magicTeeApiClients = new MagicTeeApiClients({
     basePath: magicTeeBasePath,
@@ -268,7 +265,7 @@ export async function connectWallet(
   });
   const ethSigner = new MagicTEESigner(getUser, magicTeeApiClients);
 
-  // 10. Determine session activity API URL (only for mainnet, testnet, devnet)
+  // 11. Determine session activity API URL (only for mainnet, testnet, devnet)
   let sessionActivityApiUrl: string | null = null;
   if (initialChain.chainId === 13371) {
     // Mainnet
@@ -280,9 +277,8 @@ export async function connectWallet(
     // Devnet - use the apiUrl from chain config
     sessionActivityApiUrl = initialChain.apiUrl;
   }
-  // For any other chain, sessionActivityApiUrl remains null (no session activity tracking)
 
-  // 11. Create provider
+  // 12. Create provider
   const provider = new ZkEvmProvider({
     getUser,
     clientId,

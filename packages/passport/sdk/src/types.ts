@@ -2,7 +2,6 @@ import { Environment, ModuleConfiguration } from '@imtbl/config';
 import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
-import { EvmChain } from '@imtbl/wallet';
 
 /**
  * Direct login method identifier
@@ -14,7 +13,6 @@ export type DirectLoginMethod = string;
 // Re-export events from auth and wallet
 export { AuthEvents } from '@imtbl/auth';
 export { WalletEvents } from '@imtbl/wallet';
-export { EvmChain };
 
 export type AccountsRequestedEvent = {
   environment: Environment;
@@ -123,13 +121,16 @@ export type PKCEData = {
 // Re-export wallet linking types from wallet package
 export type { LinkWalletParams, LinkedWallet } from '@imtbl/wallet';
 
+// Re-export EvmChain enum for specifying which chain to connect to
+export { EvmChain } from '@imtbl/wallet';
+
 export type ConnectEvmArguments = {
   announceProvider: boolean;
   /**
    * The EVM chain to connect to (defaults to ZKEVM)
    * @default EvmChain.ZKEVM
    */
-  chain?: EvmChain;
+  chain?: import('@imtbl/wallet').EvmChain;
 };
 
 // Export ZkEvmProvider for return type

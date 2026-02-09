@@ -28,7 +28,7 @@ export {
 // Export chain registry for looking up chain configs
 export { getChainConfig } from './chainRegistry';
 
-// Export main wallet providers
+// Export main wallet provider
 export { ZkEvmProvider } from './zkEvm/zkEvmProvider';
 
 // Export internal configuration (for Passport/advanced usage)
