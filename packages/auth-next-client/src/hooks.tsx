@@ -170,18 +170,22 @@ export function useImmutableSession(): UseImmutableSessionReturn {
   // ---------------------------------------------------------------------------
 
   // Reactive refresh: when the effect runs and the token is already expired
-  // (e.g., after tab regains focus), trigger an immediate refresh.
+  // (e.g., after tab regains focus), trigger an immediate silent refresh.
   // For tokens that are still valid, getAccessToken() handles refresh on demand.
+  //
+  // NOTE: This intentionally does NOT set isRefreshing. isRefreshing is reserved
+  // for explicit user-triggered refreshes (e.g., getUser(true) after wallet
+  // registration). Background token refreshes must be invisible to consumers --
+  // setting isRefreshing would cause downstream hooks that gate SWR keys on
+  // `!isRefreshing` to briefly lose their cached data, resulting in UI flicker.
   useEffect(() => {
     if (!session?.accessTokenExpires) return;
 
     const timeUntilExpiry = session.accessTokenExpires - Date.now() - TOKEN_EXPIRY_BUFFER_MS;
 
     if (timeUntilExpiry <= 0) {
-      // Already expired -- refresh now
-      setIsRefreshingRef.current(true);
-      deduplicatedUpdate(() => updateRef.current())
-        .finally(() => setIsRefreshingRef.current(false));
+      // Already expired -- refresh silently
+      deduplicatedUpdate(() => updateRef.current());
     }
   }, [session?.accessTokenExpires]);
 

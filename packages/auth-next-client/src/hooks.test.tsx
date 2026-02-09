@@ -245,6 +245,35 @@ describe('useImmutableSession', () => {
       expect(mockUpdate).toHaveBeenCalled();
     });
 
+    it('does not set isRefreshing during reactive refresh (prevents UI flicker)', async () => {
+      const session = createSession({
+        accessTokenExpires: Date.now() - 1000, // already expired
+      });
+      setupUseSession(session);
+
+      const freshSession = createSession({
+        accessToken: 'immediate-refresh',
+      });
+      mockUpdate.mockResolvedValue(freshSession);
+
+      const capturedIsRefreshing: boolean[] = [];
+      const { result } = renderHook(() => {
+        const hook = useImmutableSession();
+        capturedIsRefreshing.push(hook.isRefreshing);
+        return hook;
+      });
+
+      await act(async () => {
+        // Let the reactive refresh effect run and complete
+        await mockUpdate.mock.results[0]?.value;
+      });
+
+      // isRefreshing should NEVER have been true during reactive refresh.
+      // It is reserved for explicit user-triggered refreshes (getUser(true)).
+      expect(capturedIsRefreshing.every((v) => v === false)).toBe(true);
+      expect(result.current.isRefreshing).toBe(false);
+    });
+
     it('does not trigger refresh when token is valid and far from expiry', async () => {
       const session = createSession({
         accessTokenExpires: Date.now() + 10 * 60 * 1000, // 10 min from now, well beyond buffer
