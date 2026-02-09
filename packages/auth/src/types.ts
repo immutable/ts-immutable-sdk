@@ -16,15 +16,6 @@ export enum RollupType {
   ZKEVM = 'zkEvm',
 }
 
-/**
- * Supported EVM chains for user registration
- * Matches EvmChain from @imtbl/wallet but defined here to avoid circular dependency
- */
-export enum EvmChain {
-  ZKEVM = 'zkevm',
-  ARBITRUM_ONE = 'arbitrum_one',
-}
-
 export type ChainAddress = {
   ethAddress: `0x${string}`;
   userAdminAddress: `0x${string}`;
@@ -39,24 +30,12 @@ export type User = {
   profile: UserProfile;
   expired?: boolean;
   [RollupType.ZKEVM]?: ChainAddress;
-} & {
-  [K in Exclude<EvmChain, EvmChain.ZKEVM>]?: ChainAddress;
 };
 
-export type PassportChainMetadata = {
-  eth_address: string;
-  user_admin_address: string;
-};
-
-/**
- * Passport metadata
- * - zkEVM: flat fields (zkevm_eth_address, zkevm_user_admin_address)
- * - Other chains: nested objects (arbitrum_one: { eth_address, user_admin_address })
- */
 export type PassportMetadata = {
   zkevm_eth_address?: string;
   zkevm_user_admin_address?: string;
-} & Partial<Record<Exclude<EvmChain, EvmChain.ZKEVM>, PassportChainMetadata>>;
+};
 
 export interface OidcConfiguration {
   clientId: string;

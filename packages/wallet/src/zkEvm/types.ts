@@ -1,5 +1,4 @@
 import { JsonRpcError } from './JsonRpcError';
-import type { Provider as ProviderType } from '../types';
 
 export enum RelayerTransactionStatus {
   PENDING = 'PENDING',
@@ -92,9 +91,16 @@ export interface JsonRpcResponsePayload {
   id?: string | number;
 }
 
-export type { Provider } from '../types';
-
-type Provider = ProviderType;
+/**
+ * EIP-1193 Provider Interface
+ * Standard Ethereum provider interface
+ */
+export type Provider = {
+  request: (request: RequestArguments) => Promise<any>;
+  on: (event: string, listener: (...args: any[]) => void) => void;
+  removeListener: (event: string, listener: (...args: any[]) => void) => void;
+  isPassport: boolean;
+};
 
 export enum ProviderEvent {
   ACCOUNTS_CHANGED = 'accountsChanged',

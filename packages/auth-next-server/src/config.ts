@@ -154,31 +154,80 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
       async jwt({
         token, user, trigger, session: sessionUpdate,
       }: any) {
-        // Initial sign in - store all token data
-        if (user) {
-          return {
-            ...token,
-            sub: user.sub,
-            email: user.email,
-            nickname: user.nickname,
-            accessToken: user.accessToken,
-            refreshToken: user.refreshToken,
-            idToken: user.idToken,
-            accessTokenExpires: user.accessTokenExpires,
-            zkEvm: user.zkEvm,
-          };
-        }
+        try {
+          // Initial sign in - store all token data
+          if (user) {
+            return {
+              ...token,
+              sub: user.sub,
+              email: user.email,
+              nickname: user.nickname,
+              accessToken: user.accessToken,
+              refreshToken: user.refreshToken,
+              idToken: user.idToken,
+              accessTokenExpires: user.accessTokenExpires,
+              zkEvm: user.zkEvm,
+            };
+          }
 
-        // Handle session update (for client-side token sync or forceRefresh)
-        // When client-side Auth refreshes tokens via TOKEN_REFRESHED event,
-        // it calls updateSession() which triggers this callback with the new tokens.
-        // We clear any stale error (e.g., TokenExpired) on successful update.
-        if (trigger === 'update' && sessionUpdate) {
-          const update = sessionUpdate as Record<string, unknown>;
+          // Handle session update (for client-side token sync or forceRefresh)
+          // When client-side Auth refreshes tokens via TOKEN_REFRESHED event,
+          // it calls updateSession() which triggers this callback with the new tokens.
+          // We clear any stale error (e.g., TokenExpired) on successful update.
+          if (trigger === 'update' && sessionUpdate) {
+            const update = sessionUpdate as Record<string, unknown>;
 
-          // If forceRefresh is requested, perform server-side token refresh
-          // This is used after zkEVM registration to get updated claims from IDP
-          if (update.forceRefresh && token.refreshToken) {
+            // If forceRefresh is requested, perform server-side token refresh
+            // This is used after zkEVM registration to get updated claims from IDP
+            if (update.forceRefresh && token.refreshToken) {
+              try {
+                const refreshed = await refreshAccessToken(
+                  token.refreshToken as string,
+                  config.clientId,
+                  authDomain,
+                );
+                // Extract zkEvm claims from the refreshed idToken
+                const zkEvm = extractZkEvmFromIdToken(refreshed.idToken);
+                return {
+                  ...token,
+                  accessToken: refreshed.accessToken,
+                  refreshToken: refreshed.refreshToken,
+                  idToken: refreshed.idToken,
+                  accessTokenExpires: refreshed.accessTokenExpires,
+                  zkEvm: zkEvm ?? token.zkEvm, // Keep existing zkEvm if not in new token
+                  error: undefined,
+                };
+              } catch (error) {
+              // eslint-disable-next-line no-console
+                console.error('[auth-next-server] Force refresh failed:', error);
+                return {
+                  ...token,
+                  error: 'RefreshTokenError',
+                };
+              }
+            }
+
+            // Standard session update - merge provided values
+            return {
+              ...token,
+              ...(update.accessToken ? { accessToken: update.accessToken } : {}),
+              ...(update.refreshToken ? { refreshToken: update.refreshToken } : {}),
+              ...(update.idToken ? { idToken: update.idToken } : {}),
+              ...(update.accessTokenExpires ? { accessTokenExpires: update.accessTokenExpires } : {}),
+              ...(update.zkEvm ? { zkEvm: update.zkEvm } : {}),
+              // Clear any stale error when valid tokens are synced from client-side
+              error: undefined,
+            };
+          }
+
+          // Return token if not expired
+          if (!isTokenExpired(token.accessTokenExpires as number)) {
+            return token;
+          }
+
+          // Token expired - attempt server-side refresh
+          // This ensures clients always get fresh tokens from session callbacks
+          if (token.refreshToken) {
             try {
               const refreshed = await refreshAccessToken(
                 token.refreshToken as string,
@@ -194,11 +243,11 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
                 idToken: refreshed.idToken,
                 accessTokenExpires: refreshed.accessTokenExpires,
                 zkEvm: zkEvm ?? token.zkEvm, // Keep existing zkEvm if not in new token
-                error: undefined,
+                error: undefined, // Clear any previous error
               };
             } catch (error) {
-              // eslint-disable-next-line no-console
-              console.error('[auth-next-server] Force refresh failed:', error);
+            // eslint-disable-next-line no-console
+              console.error('[auth-next-server] Token refresh failed:', error);
               return {
                 ...token,
                 error: 'RefreshTokenError',
@@ -206,79 +255,42 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
             }
           }
 
-          // Standard session update - merge provided values
+          // No refresh token available
           return {
             ...token,
-            ...(update.accessToken ? { accessToken: update.accessToken } : {}),
-            ...(update.refreshToken ? { refreshToken: update.refreshToken } : {}),
-            ...(update.idToken ? { idToken: update.idToken } : {}),
-            ...(update.accessTokenExpires ? { accessTokenExpires: update.accessTokenExpires } : {}),
-            ...(update.zkEvm ? { zkEvm: update.zkEvm } : {}),
-            // Clear any stale error when valid tokens are synced from client-side
-            error: undefined,
+            error: 'TokenExpired',
           };
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('[auth-next-server] JWT callback error:', error);
+          throw error;
         }
-
-        // Return token if not expired
-        if (!isTokenExpired(token.accessTokenExpires as number)) {
-          return token;
-        }
-
-        // Token expired - attempt server-side refresh
-        // This ensures clients always get fresh tokens from session callbacks
-        if (token.refreshToken) {
-          try {
-            const refreshed = await refreshAccessToken(
-              token.refreshToken as string,
-              config.clientId,
-              authDomain,
-            );
-            // Extract zkEvm claims from the refreshed idToken
-            const zkEvm = extractZkEvmFromIdToken(refreshed.idToken);
-            return {
-              ...token,
-              accessToken: refreshed.accessToken,
-              refreshToken: refreshed.refreshToken,
-              idToken: refreshed.idToken,
-              accessTokenExpires: refreshed.accessTokenExpires,
-              zkEvm: zkEvm ?? token.zkEvm, // Keep existing zkEvm if not in new token
-              error: undefined, // Clear any previous error
-            };
-          } catch (error) {
-            // eslint-disable-next-line no-console
-            console.error('[auth-next-server] Token refresh failed:', error);
-            return {
-              ...token,
-              error: 'RefreshTokenError',
-            };
-          }
-        }
-
-        // No refresh token available
-        return {
-          ...token,
-          error: 'TokenExpired',
-        };
       },
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       async session({ session, token }: any) {
-        // Expose token data to the session
-        return {
-          ...session,
-          user: {
-            ...session.user,
-            sub: token.sub as string,
-            email: token.email as string | undefined,
-            nickname: token.nickname as string | undefined,
-          },
-          accessToken: token.accessToken as string,
-          refreshToken: token.refreshToken as string | undefined,
-          idToken: token.idToken as string | undefined,
-          accessTokenExpires: token.accessTokenExpires as number,
-          zkEvm: token.zkEvm,
-          ...(token.error && { error: token.error as string }),
-        };
+        try {
+          // Expose token data to the session
+          return {
+            ...session,
+            user: {
+              ...session.user,
+              sub: token.sub as string,
+              email: token.email as string | undefined,
+              nickname: token.nickname as string | undefined,
+            },
+            accessToken: token.accessToken as string,
+            refreshToken: token.refreshToken as string | undefined,
+            idToken: token.idToken as string | undefined,
+            accessTokenExpires: token.accessTokenExpires as number,
+            zkEvm: token.zkEvm,
+            ...(token.error && { error: token.error as string }),
+          };
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('[auth-next-server] Session callback error:', error);
+          throw error;
+        }
       },
     },
 
