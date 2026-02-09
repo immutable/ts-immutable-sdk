@@ -5,28 +5,17 @@ export { connectWallet } from './connectWallet';
 export {
   IMMUTABLE_ZKEVM_MAINNET_CHAIN_ID,
   IMMUTABLE_ZKEVM_TESTNET_CHAIN_ID,
-  ARBITRUM_ONE_CHAIN_ID,
-  ARBITRUM_SEPOLIA_CHAIN_ID,
 } from './constants';
 
 // Export presets (public API)
 export {
-  // zkEVM chains
   IMMUTABLE_ZKEVM_MAINNET,
   IMMUTABLE_ZKEVM_TESTNET,
   IMMUTABLE_ZKEVM_MULTICHAIN,
   IMMUTABLE_ZKEVM_MAINNET_CHAIN,
   IMMUTABLE_ZKEVM_TESTNET_CHAIN,
   DEFAULT_CHAINS,
-  // Arbitrum chains
-  ARBITRUM_ONE,
-  ARBITRUM_SEPOLIA,
-  ARBITRUM_ONE_CHAIN,
-  ARBITRUM_SEPOLIA_CHAIN,
 } from './presets';
-
-// Export chain registry for looking up chain configs
-export { getChainConfig } from './chainRegistry';
 
 // Export main wallet provider
 export { ZkEvmProvider } from './zkEvm/zkEvmProvider';

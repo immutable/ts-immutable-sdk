@@ -121,16 +121,8 @@ export type PKCEData = {
 // Re-export wallet linking types from wallet package
 export type { LinkWalletParams, LinkedWallet } from '@imtbl/wallet';
 
-// Re-export EvmChain enum for specifying which chain to connect to
-export { EvmChain } from '@imtbl/wallet';
-
 export type ConnectEvmArguments = {
   announceProvider: boolean;
-  /**
-   * The EVM chain to connect to (defaults to ZKEVM)
-   * @default EvmChain.ZKEVM
-   */
-  chain?: import('@imtbl/wallet').EvmChain;
 };
 
 // Export ZkEvmProvider for return type
