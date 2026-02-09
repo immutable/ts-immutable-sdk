@@ -647,7 +647,7 @@ import type {
 For advanced use cases, you can access the provider classes directly:
 
 ```typescript
-import { ZkEvmProvider, SequenceProvider } from '@imtbl/wallet';
+import { ZkEvmProvider } from '@imtbl/wallet';
 ```
 
 ### Relayer Client

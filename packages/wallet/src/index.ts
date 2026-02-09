@@ -30,7 +30,6 @@ export { getChainConfig, getEvmChainFromChainId } from './network/chainRegistry'
 
 // Export main wallet providers
 export { ZkEvmProvider } from './zkEvm/zkEvmProvider';
-export { SequenceProvider } from './sequence/sequenceProvider';
 
 // Export internal configuration (for Passport/advanced usage)
 export { WalletConfiguration } from './config';
