@@ -1,17 +1,12 @@
-import type { GuardianClient, MagicTEESigner } from '@imtbl/wallet';
 import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients, imx } from '@imtbl/generated-clients';
 import { Auth, User } from '@imtbl/auth';
+import { GuardianClient, MagicTEESigner } from '@imtbl/wallet';
 import { PassportImxProvider } from './passportImxProvider';
 import { ImxGuardianClient } from './imxGuardianClient';
 import registerOffchain from './workflows/registerOffchain';
 import { getStarkSigner } from './getStarkSigner';
 import { PassportError, PassportErrorType } from '../errors/passportError';
-
-jest.mock('@imtbl/wallet', () => ({
-  GuardianClient: jest.fn(),
-  MagicTEESigner: jest.fn(),
-}));
 
 jest.mock('./workflows/registerOffchain');
 jest.mock('./getStarkSigner');

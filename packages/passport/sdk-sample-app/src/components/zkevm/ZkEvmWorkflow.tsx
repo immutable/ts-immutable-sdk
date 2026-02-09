@@ -49,6 +49,7 @@ function ZkEvmWorkflow() {
   const { isLoading, addMessage, setIsLoading } = useStatusProvider();
   const {
     connectZkEvm,
+    zkEvmProvider,
     defaultWalletProvider,
     activeZkEvmProvider,
     setDefaultWalletProvider,

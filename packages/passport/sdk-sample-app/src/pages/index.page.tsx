@@ -11,13 +11,12 @@ import { useStatusProvider } from '@/context/StatusProvider';
 import { BASE_PATH } from '@/config';
 import PassportMethods from '@/components/PassportMethods';
 import ZkEvmWorkflow from '@/components/zkevm/ZkEvmWorkflow';
-import ArbitrumWorkflow from '@/components/arbitrum/ArbitrumWorkflow';
 import AuthNextJS from '@/components/AuthNextJS';
 
 export default function Home() {
   const { isLoading } = useStatusProvider();
   const {
-    imxProvider, zkEvmProvider, arbitrumProvider, defaultWalletProvider,
+    imxProvider, zkEvmProvider, defaultWalletProvider,
   } = usePassportProvider();
   const { isAuthenticated: isAuthNextJSAuthenticated } = useImmutableSession();
 
@@ -34,7 +33,7 @@ export default function Home() {
           <Row className="my-3">
             <Environment
               disabled={isLoading || !!imxProvider || !!zkEvmProvider
-                || !!arbitrumProvider || !!defaultWalletProvider || isAuthNextJSAuthenticated}
+                || !!defaultWalletProvider || isAuthNextJSAuthenticated}
             />
           </Row>
           <Row className="my-3">
@@ -48,9 +47,6 @@ export default function Home() {
           </Row>
           <Row className="my-3">
             <ZkEvmWorkflow />
-          </Row>
-          <Row className="my-3">
-            <ArbitrumWorkflow />
           </Row>
           <Row className="mb-3">
             <Message />
