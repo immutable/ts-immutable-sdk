@@ -85,7 +85,6 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
       async encode(params) {
         const { token, ...rest } = params;
         if (token) {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { idToken, ...cookieToken } = token as Record<string, unknown>;
           return defaultJwtEncode({ ...rest, token: cookieToken });
         }
