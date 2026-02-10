@@ -10,7 +10,7 @@ This package provides minimal client-side utilities for Next.js applications usi
 
 - `useLogin` - Hook for login flows with state management (loading, error)
 - `useLogout` - Hook for logout with federated logout support (clears both local and upstream sessions)
-- `useImmutableSession` - Hook that provides session state and a `getUser` function for wallet integration
+- `useImmutableSession` - Hook that provides session state, `getAccessToken()` for guaranteed-fresh tokens, and `getUser` for wallet integration
 - `CallbackPage` - OAuth callback handler component
 
 For server-side utilities, use [`@imtbl/auth-next-server`](../auth-next-server).
@@ -395,7 +395,11 @@ With federated logout, the auth server's session is also cleared, so users can s
 
 ### `useImmutableSession()`
 
-A convenience hook that wraps `next-auth/react`'s `useSession` with a `getUser` function for wallet integration.
+A convenience hook that wraps `next-auth/react`'s `useSession` with:
+
+- `getAccessToken()` -- async function that returns a **guaranteed-fresh** access token
+- `getUser()` -- function for wallet integration
+- Automatic token refresh -- detects expired tokens and refreshes on demand
 
 ```tsx
 "use client";
@@ -404,10 +408,12 @@ import { useImmutableSession } from "@imtbl/auth-next-client";
 
 function MyComponent() {
   const {
-    session, // Session with tokens
+    session, // Session metadata (user info, zkEvm, error) -- does NOT include accessToken
     status, // 'loading' | 'authenticated' | 'unauthenticated'
     isLoading, // True during initial load
     isAuthenticated, // True when logged in
+    isRefreshing, // True during token refresh
+    getAccessToken, // Async function: returns a guaranteed-fresh access token
     getUser, // Function for wallet integration
   } = useImmutableSession();
 
@@ -420,13 +426,36 @@ function MyComponent() {
 
 #### Return Value
 
-| Property          | Type                                                | Description                                                      |
-| ----------------- | --------------------------------------------------- | ---------------------------------------------------------------- |
-| `session`         | `ImmutableSession \| null`                          | Session with access/refresh tokens                               |
-| `status`          | `string`                                            | Auth status: `'loading'`, `'authenticated'`, `'unauthenticated'` |
-| `isLoading`       | `boolean`                                           | Whether initial auth state is loading                            |
-| `isAuthenticated` | `boolean`                                           | Whether user is authenticated                                    |
-| `getUser`         | `(forceRefresh?: boolean) => Promise<User \| null>` | Get user function for wallet integration                         |
+| Property          | Type                                                | Description                                                                             |
+| ----------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `session`         | `ImmutableSession \| null`                          | Session metadata (user, zkEvm, error). Does **not** include `accessToken` -- see below. |
+| `status`          | `string`                                            | Auth status: `'loading'`, `'authenticated'`, `'unauthenticated'`                        |
+| `isLoading`       | `boolean`                                           | Whether initial auth state is loading                                                   |
+| `isAuthenticated` | `boolean`                                           | Whether user is authenticated                                                           |
+| `isRefreshing`    | `boolean`                                           | Whether a token refresh is in progress                                                  |
+| `getAccessToken`  | `() => Promise<string>`                             | Get a guaranteed-fresh access token. Throws if not authenticated or refresh fails.      |
+| `getUser`         | `(forceRefresh?: boolean) => Promise<User \| null>` | Get user function for wallet integration                                                |
+
+#### Why no `accessToken` on `session`?
+
+The `session` object intentionally does **not** expose `accessToken`. This is a deliberate design choice to prevent consumers from accidentally using a stale/expired token.
+
+**Always use `getAccessToken()`** to obtain a token for authenticated requests:
+
+```tsx
+// ✅ Correct - always fresh
+const token = await getAccessToken();
+await authenticatedGet("/api/data", token);
+
+// ❌ Incorrect - session.accessToken does not exist on the type
+const token = session?.accessToken; // TypeScript error
+```
+
+`getAccessToken()` guarantees freshness:
+
+- **Fast path**: If the current token is valid, returns immediately (no network call).
+- **Slow path**: If the token is expired, triggers a server-side refresh and **blocks** (awaits) until the fresh token is available.
+- **Deduplication**: Multiple concurrent calls share a single refresh request.
 
 #### Checking Authentication Status
 
@@ -465,6 +494,64 @@ const { status } = useImmutableSession();
 if (status !== "authenticated") return <div>Please log in</div>;
 ```
 
+#### Using `getAccessToken()` in Practice
+
+**SWR fetcher:**
+
+```tsx
+import useSWR from "swr";
+import { useImmutableSession } from "@imtbl/auth-next-client";
+
+function useProfile() {
+  const { getAccessToken, isAuthenticated } = useImmutableSession();
+
+  return useSWR(
+    isAuthenticated ? "/passport-profile/v1/profile" : null,
+    async (path) => {
+      const token = await getAccessToken(); // blocks until fresh
+      return authenticatedGet(path, token);
+    },
+  );
+}
+```
+
+**Event handler:**
+
+```tsx
+import { useImmutableSession } from "@imtbl/auth-next-client";
+
+function ClaimRewardButton({ questId }: { questId: string }) {
+  const { getAccessToken } = useImmutableSession();
+
+  const handleClaim = async () => {
+    const token = await getAccessToken(); // blocks until fresh
+    await authenticatedPost("/v1/quests/claim", token, { questId });
+  };
+
+  return <button onClick={handleClaim}>Claim</button>;
+}
+```
+
+**Periodic polling:**
+
+```tsx
+import useSWR from "swr";
+import { useImmutableSession } from "@imtbl/auth-next-client";
+
+function ActivityFeed() {
+  const { getAccessToken, isAuthenticated } = useImmutableSession();
+
+  return useSWR(
+    isAuthenticated ? "/v1/activities" : null,
+    async (path) => {
+      const token = await getAccessToken();
+      return authenticatedGet(path, token);
+    },
+    { refreshInterval: 10000 }, // polls every 10s, always gets a fresh token
+  );
+}
+```
+
 #### The `getUser` Function
 
 The `getUser` function returns fresh tokens from the session. It accepts an optional `forceRefresh` parameter:
@@ -489,11 +576,11 @@ When `forceRefresh` is `true`:
 
 ### ImmutableSession
 
-The session type returned by `useImmutableSession`:
+The session type returned by `useImmutableSession`. Note that `accessToken` is intentionally **not** included -- use `getAccessToken()` instead to obtain a guaranteed-fresh token.
 
 ```typescript
 interface ImmutableSession {
-  accessToken: string;
+  // accessToken is NOT exposed -- use getAccessToken() instead
   refreshToken?: string;
   idToken?: string; // Only present transiently after sign-in or token refresh (not stored in cookie)
   accessTokenExpires: number;
@@ -570,17 +657,19 @@ interface LogoutConfig {
 
 The session may contain an `error` field indicating authentication issues:
 
-| Error                 | Description           | Handling                                      |
-| --------------------- | --------------------- | --------------------------------------------- |
-| `"TokenExpired"`      | Access token expired  | Server-side refresh will happen automatically |
-| `"RefreshTokenError"` | Refresh token invalid | Prompt user to sign in again                  |
+| Error                 | Description           | Handling                                     |
+| --------------------- | --------------------- | -------------------------------------------- |
+| `"TokenExpired"`      | Access token expired  | Proactive refresh handles this automatically |
+| `"RefreshTokenError"` | Refresh token invalid | Prompt user to sign in again                 |
+
+`getAccessToken()` throws an error if the token cannot be obtained (e.g., refresh failure). Handle it with try/catch:
 
 ```tsx
 import { useImmutableSession } from "@imtbl/auth-next-client";
-import { signIn, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 function ProtectedContent() {
-  const { session, isAuthenticated } = useImmutableSession();
+  const { session, isAuthenticated, getAccessToken } = useImmutableSession();
 
   if (session?.error === "RefreshTokenError") {
     return (
@@ -595,10 +684,19 @@ function ProtectedContent() {
     return (
       <div>
         <p>Please sign in to continue.</p>
-        <button onClick={() => signIn()}>Sign In</button>
       </div>
     );
   }
+
+  const handleFetch = async () => {
+    try {
+      const token = await getAccessToken();
+      // Use token for authenticated requests
+    } catch (error) {
+      // Token refresh failed -- session may be expired
+      console.error("Failed to get access token:", error);
+    }
+  };
 
   return <div>Protected content here</div>;
 }

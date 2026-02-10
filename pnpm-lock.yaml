@@ -68,7 +68,7 @@ importers:
         version: 17.1.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0)(typescript@5.6.2))(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.6.2))(eslint@8.57.0))(eslint@8.57.0)
       eslint-plugin-react-refresh:
         specifier: latest
-        version: 0.4.24(eslint@8.57.0)
+        version: 0.5.0(eslint@8.57.0)
       http-server:
         specifier: ^14.1.1
         version: 14.1.1
@@ -135,7 +135,7 @@ importers:
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@imtbl/sdk':
         specifier: latest
-        version: 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 2.12.6(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typescript@5.6.2)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
         version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -344,7 +344,7 @@ importers:
     dependencies:
       '@imtbl/contracts':
         specifier: latest
-        version: 2.2.17(bufferutil@4.0.8)(eslint@9.16.0(jiti@1.21.0))(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
+        version: 2.2.18(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
       '@imtbl/sdk':
         specifier: workspace:*
         version: link:../../sdk
@@ -1058,6 +1058,12 @@ importers:
       '@swc/jest':
         specifier: ^0.2.37
         version: 0.2.37(@swc/core@1.15.3(@swc/helpers@0.5.15))
+      '@testing-library/jest-dom':
+        specifier: ^5.16.5
+        version: 5.17.0
+      '@testing-library/react':
+        specifier: ^13.4.0
+        version: 13.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/jest':
         specifier: ^29.5.12
         version: 29.5.14
@@ -2848,19 +2854,6 @@ importers:
         version: 5.6.2
 
 packages:
-
-  '@0xsequence/abi@2.3.38':
-    resolution: {integrity: sha512-KdR0JkjA9qnkZg5G/gFJT6xg5Ngzargf9blDGjniVqLhK3i/PuVMKV23CVmNi8Yg4QKB1DcwwB4hXKx6rXmJgQ==}
-
-  '@0xsequence/core@2.3.38':
-    resolution: {integrity: sha512-H87zfeIX9YjlsDgxj2xJ2sIPU4bonRN5iHnOerWeVpHAfsUgVT6CwRSEvd2Ek3Yw1sI+s7kG9b4XxmJuh6Dp6Q==}
-    peerDependencies:
-      ethers: '>=6'
-
-  '@0xsequence/utils@2.3.38':
-    resolution: {integrity: sha512-XCe17omFbLjQnDW7HNhNzTqcpeeiXeSCc5ttFjOYex+GO8v9imPt3qbcn4N2v4dlylfkSfpdh4DcnKlcAPAtFw==}
-    peerDependencies:
-      ethers: '>=6'
 
   '@0xsquid/sdk@2.8.25':
     resolution: {integrity: sha512-fSMKVdKIX8G3qFpoTf3WfcyjhGdc9hE0uSu1bs1gsh4+iG19ILguDdrY8g87dUknt9PCKBb6TIt1QeYEgbXjdA==}
@@ -4824,71 +4817,77 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@imtbl/blockchain-data@2.11.0':
-    resolution: {integrity: sha512-UmgjEWN3pad+lZCVTx+BV5rFx9VMVM7WDSiVyYMqES3C+WgJeel/7dJKNjGpW9kq0BwPy6tSVRMKb+kokGL/dw==}
+  '@imtbl/auth@2.12.6':
+    resolution: {integrity: sha512-ufyh6XUfJ2JooE9i3F/lQvara+9KlpHnchtbkMeOEE3Dmxz1oR7idx6DTXcGwCaQ0wuDgTe/bH4JoZkddJ1vQw==}
 
-  '@imtbl/bridge-sdk@2.11.0':
-    resolution: {integrity: sha512-xZ6KoAlRY8Im7alyfKcqqcvIGxR+BiJ0S9tV4q6BXNSq0VKRoLt+4asJdzwQvfpFag1j2gZFP2jIz7zytShRVA==}
+  '@imtbl/blockchain-data@2.12.6':
+    resolution: {integrity: sha512-87KLXVcZkCqWjYr47ILzxAcPzoLHhJqJxMRQmpAkp2rkHjH52T4uurLHu3sjK4be0noAjORvj5Bh9rbkzwzaZw==}
+
+  '@imtbl/bridge-sdk@2.12.6':
+    resolution: {integrity: sha512-jKqGVoLd5OD5U2cMHqxTl2E+j++fHdHNdhU7tSOD2wfg3Pu/Gl6Lkb0/pZgICWZxImJuBHYPVY7jA4ruqhcvjw==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/checkout-sdk@2.11.0':
-    resolution: {integrity: sha512-qOVzOW2fdys9sl2zMKYtrfvyzVvp+Q3R1uVUeN2NQ+yscDp4mvpVgWEr1s4FhYZ75gYG/+18mrKnvxLik+t2xA==}
+  '@imtbl/checkout-sdk@2.12.6':
+    resolution: {integrity: sha512-Oafxw1gQfOWBce9o+avG+SZKzbxInIEJPOQS2hBsxwGXjslh0+v/YauPH4RQnA+r8rF45d7p3J15eAcTtFUsTg==}
 
-  '@imtbl/config@2.11.0':
-    resolution: {integrity: sha512-huORWo89gUYCXQPvKKl/cB440MrFhW2pU7nOELxHat/8hm3JirazemMmF5wyuaLJ+F0HjeWakqlOOnfM51ajiQ==}
+  '@imtbl/config@2.12.6':
+    resolution: {integrity: sha512-CwfFneBWCW3NMW+XRHEQlJ2fYo8q0qi1tJ6AOM0S5pMsZjjsXZsn1VsZFMjN+HvsYEdKyiOLBQORMjVrRr1ZGw==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/contracts@2.2.17':
-    resolution: {integrity: sha512-JakmzqU019vo4T52nPQIgXmGM5tlzPO5QRiMKU9xJQVMKPaICTc3UPIFEBfHr/Jq4cj720Dj8YaJ3SgowwO+bg==}
+  '@imtbl/contracts@2.2.18':
+    resolution: {integrity: sha512-wxjfE32t9jzEs4PswKwZDMlBO6wqCfSpVxseyFADFVG+Y2oFBrf1lK4eA0e81BbrXTGAbR+snSnSjPS305JoIQ==}
 
   '@imtbl/contracts@2.2.6':
     resolution: {integrity: sha512-2cfE3Tojfp4GnxwVKSwoZY1CWd+/drCIbCKawyH9Nh2zASXd7VC71lo27aD5RnCweXHkZVhPzjqwQf/xrtnmIQ==}
 
-  '@imtbl/dex-sdk@2.11.0':
-    resolution: {integrity: sha512-FSXplji/Thqd4DNgFad3T/AKszt0Ua5D+/hGjUzj+OaWIabTH9maeXtZThkJAV38Mm22mYz0xNgNCsszuhseNw==}
+  '@imtbl/dex-sdk@2.12.6':
+    resolution: {integrity: sha512-EdjdUuX+0afXBh9QHS+Wpm6SjDQkrVv3fVTyHu7+2PzNLUBGp31SJAPBCYIIiJ5brBbfS4ctVLq+dv+GnTchfw==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/generated-clients@2.11.0':
-    resolution: {integrity: sha512-tYzqEnH2XIE5GYf1iMMJGPhdp9cQctLymy3Gav9aRCHQzXnLwSLQGEk0/M0JJ/3QTMoocawY6rV/Cs+vSTMsCw==}
+  '@imtbl/generated-clients@2.12.6':
+    resolution: {integrity: sha512-kc9SOuG1Q3gWP39kRnTjSUyiw9GuQGi1mTtB/T0lTQ9CJ0P5fOEDqQNTt36iALGMuOrFci9B1TyNaj+2S+cX9w==}
     engines: {node: '>=20.11.0'}
 
   '@imtbl/image-resizer-utils@0.0.3':
     resolution: {integrity: sha512-/EOJKMJF4gD/Dv0qNhpUTpp2AgWeQ7XgYK9Xjl+xP2WWgaarNv1SHe1aeqSb8aZT5W7wSXdUGzn6TIxNsuCWGw==}
 
-  '@imtbl/metrics@2.11.0':
-    resolution: {integrity: sha512-e7ZFsYScv0P5Wy50PvC0L5GlGxnDLec5DvyHHd93RJGzkDs3spYkkGCXjoybbb6agTgtoL1IyKawcGe5K8HNLQ==}
+  '@imtbl/metrics@2.12.6':
+    resolution: {integrity: sha512-NFw10TNGcPEqkAIgO0/cyLJWSOfkvU2taWguB5lWAlP8uWY0YqULMdzYGwAwSiyWgfDANqmTHfs96F4jMFmkMA==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/minting-backend@2.11.0':
-    resolution: {integrity: sha512-SouAioAynwpXjgzBOOT1SfK+T6JpNaUw+ouIuNdpnR+fOE7DOsL9N+WxbmhFP6BLPrEOgE34ZtI+QNBX614iPA==}
+  '@imtbl/minting-backend@2.12.6':
+    resolution: {integrity: sha512-cgcygWPWTcjP4ZUeIJ/r1OriqSKmss7L7nj+KLnsAiy8oRsgoWOni8nno8Q+n9f7yWsRRfleSOhXjo0aIb9mGw==}
 
-  '@imtbl/orderbook@2.11.0':
-    resolution: {integrity: sha512-Mq1NXB/hs+In4hOrdGJmBM44rtSrYDejM4ixRaMbzRrSxehKpmsMI6W4fmv/3ZyJx2m8bvhAvZrS//jLL61UtQ==}
+  '@imtbl/orderbook@2.12.6':
+    resolution: {integrity: sha512-63Qyb7v8JsV87L46RAMElX9I8EsEsxXQ7TfOPCD7cR7I7ROY88cAd9qSRsUacrUVrNuPLUHgjogfCWQTnPgU/w==}
 
-  '@imtbl/passport@2.11.0':
-    resolution: {integrity: sha512-hcBJmgoN2yjrczbRc+sZ6oCyqFmyBsIZRjR7QywhZIRwunGsGpzjO+kwmWzUOHCNl7zEShmEsfFOtpxlRBOckA==}
+  '@imtbl/passport@2.12.6':
+    resolution: {integrity: sha512-pRMnB2os13h5YlCI9hI7TTQsjqr2S9mAT2/ZHZbyagRKy/yXcw0AOiPdV8pzYK9gyy52Po0S6Zmae5GN8x+DvA==}
     engines: {node: '>=20.11.0'}
 
   '@imtbl/react-analytics@0.3.4-alpha':
     resolution: {integrity: sha512-4VWvfm8RZtpLub7+x2D2wNQ507nIVBCSAPA7B5lxdb0cKrHEujM6Y/HScMImHZHvgjUFQT1jiD9b2BL/DS43Pg==}
 
-  '@imtbl/sdk@2.11.0':
-    resolution: {integrity: sha512-JyRj1bgVbQY7LzgROEvJba0a6DQRKgOP+Fou2lOjWJrxMdz7rYmEohhHS3eWaMnDvi+zRg8Ffbwy1bxlp9RLVQ==}
+  '@imtbl/sdk@2.12.6':
+    resolution: {integrity: sha512-XOEtWHfOMfNGgjwxZcqIspiTpjzJ5+zpaOagiBJMLAvX105HzldF95wiqFZ/8eS97ybjc3bjVObgrzGQt1g3QA==}
     engines: {node: '>=20.0.0'}
 
-  '@imtbl/toolkit@2.11.0':
-    resolution: {integrity: sha512-yL+V8wqHiAcQ4Q/TOE5euLMlRh/5rnhER5oFRtZss1lzTsmTqfygB/lg+8yyQ5i0pNNtt9bc/26uyXYl37JlhA==}
+  '@imtbl/toolkit@2.12.6':
+    resolution: {integrity: sha512-VZD6d1N1yupD7KDWmUdXAajWDGLbrtmyONNJNUM8rFU8MKSG1EVGmAwnrR/N+KuKHslBQcN3hA+1DoBC6cNmdA==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/webhook@2.11.0':
-    resolution: {integrity: sha512-xmeraQ6STLaCceEd4IFPE0htPrTb8oGVXPrk8zTRhuPzMRp/S4zfbOtnqpiLIU/Q+TzH7lrC7C1Fk3KxVe2OBw==}
+  '@imtbl/wallet@2.12.6':
+    resolution: {integrity: sha512-RnKL1+qt3dgkwmSSwBJoAwHctqLoRs21D41CENTWRR4qnkW8YniECYW2Z8EkttpWHaYAWVI/uc4T6588P77Z5w==}
 
-  '@imtbl/x-client@2.11.0':
-    resolution: {integrity: sha512-jW+W4uG0Z/XqJpNnDMJhlpp+JRMYz0rnsCpZxGKYUG55YwcHjXxMpkPuQSWWrwu7CNOrcFSYETZ2Mb+BKrR7gQ==}
+  '@imtbl/webhook@2.12.6':
+    resolution: {integrity: sha512-3L3RkksQxX4ri96qaGIK/jH13oECZ7/n4H6Nn7GAaJsDmXKb5uA0v8tSgtKzicuN56shyOlqanSurIPvatwBSQ==}
+
+  '@imtbl/x-client@2.12.6':
+    resolution: {integrity: sha512-dDUTR9jLapN3dA3QulCGpCN3RI7xDLy/lyAYSl3j2JqOe2KwFYLBnTt+7+FumK4Kl7wLD7H78k5mkkZYbzio9g==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/x-provider@2.11.0':
-    resolution: {integrity: sha512-2le+7s1WO2e6/scYQaV/XROucvWmJjvLRHuVCBbpfMaMZgp9HcF4DerHn8/wFcMzyi1AxHpQ8dG+UwzknYKPaA==}
+  '@imtbl/x-provider@2.12.6':
+    resolution: {integrity: sha512-e0w570ekiAvU3V0T7cOjTvekrfYTYubvpkVxd2VgsPFWBPUBf1b3VUjryqmpHqj2HJLU9evbtp3iyLvtLmKmqA==}
     engines: {node: '>=20.11.0'}
 
   '@ioredis/commands@1.2.0':
@@ -5134,6 +5133,12 @@ packages:
   '@lezer/lr@1.4.5':
     resolution: {integrity: sha512-/YTRKP5yPPSo1xImYQk7AZZMAgap0kegzqCSYHjAL9x1AZ0ZQW+IpcEzMKagCsbTsLnVeWkxYrCNeXG8xEPrjg==}
 
+  '@limitbreak/creator-token-standards@5.0.0':
+    resolution: {integrity: sha512-BhrD3SMCq8YrGbJildBbu4BpHia7uby60XpGYVyFnb4xEvFey7bRbnOeVQ2mrTx07y02KvTWS5gESIPj5O4Mtg==}
+
+  '@limitbreak/permit-c@1.0.0':
+    resolution: {integrity: sha512-7BooxTklXlCPzfdccfKL7Tt2Cm4MntOHR51dHqjKePn7AynMKsUtaKH75ZXHzWRPZSmyixFNzQ7tIJDdPxF2MA==}
+
   '@lit-labs/ssr-dom-shim@1.2.0':
     resolution: {integrity: sha512-yWJKmpGE6lUURKAaIltoPIE/wrbY3TEkqQt+X0m+7fQNnAv0keydnYvbiJFP1PnMhizmIWRWOG5KLhYyc/xl+g==}
 
@@ -5177,24 +5182,6 @@ packages:
   '@lukeed/uuid@2.0.1':
     resolution: {integrity: sha512-qC72D4+CDdjGqJvkFMMEAtancHUQ7/d/tAiHf64z8MopFDmcrtbcJuerDtFceuAfQJ2pDSfCKCtbqoGBNnwg0w==}
     engines: {node: '>=8'}
-
-  '@magic-ext/oidc@12.0.5':
-    resolution: {integrity: sha512-EAmmRRZn/c5jmxHZ1H3IHtEqUKHYrsRtH9O+WuMFOZMv0llef/9MBa4DiRZkpnB0EPKb2hwsY7us8qk/LaFRNA==}
-    deprecated: 'Deprecation Notice: The OIDC extension will be deprecated soon. Please migrate to API Wallet, which offers improved performance and faster response times. Learn more: https://docs.magic.link/api-wallets/introduction'
-
-  '@magic-sdk/commons@25.4.2':
-    resolution: {integrity: sha512-R3wJ1NWa+uDH9+Cc6kLjPDCSkelG3VM9pnuHR0zpE52XxiYaL0IplSG8DsjCqt2FeurTgqlUHGUEFrDHIdXEFQ==}
-    peerDependencies:
-      '@magic-sdk/provider': '>=18.6.0'
-      '@magic-sdk/types': '>=15.8.0'
-
-  '@magic-sdk/provider@29.5.0':
-    resolution: {integrity: sha512-OAd813MLFfJDdRk/puRYqoGpBukGbTAlnR0n7f5AHG1NH9vQd/VSo3g6FunAPgoMfnLtJjFH9PdmD+Sh+f1yWA==}
-    peerDependencies:
-      localforage: ^1.7.4
-
-  '@magic-sdk/types@24.22.0':
-    resolution: {integrity: sha512-FLa9ChjsHcuRNF+dcXIFK4wPb1hJMjGtW+dz1gY5Oyhv37UB7xmOaIlR6YAe4jAxQvO+Hz2Q2Htk4JGI7WRluA==}
 
   '@metamask/detect-provider@2.0.0':
     resolution: {integrity: sha512-sFpN+TX13E9fdBDh9lvQeZdJn4qYoRb/6QF2oZZK/Pn559IhCFacPMU1rMuqyXoFQF3JSJfii2l98B87QDPeCQ==}
@@ -5840,6 +5827,9 @@ packages:
 
   '@openzeppelin/contracts@3.4.2':
     resolution: {integrity: sha512-z0zMCjyhhp4y7XKAcDAi3Vgms4T2PstwBdahiO0+9NaGICQKjynK3wduSRplTgk4LXmoO1yfDGO5RbjKYxtuxA==}
+
+  '@openzeppelin/contracts@4.8.3':
+    resolution: {integrity: sha512-bQHV8R9Me8IaJoJ2vPG4rXcL7seB7YVuskr4f+f5RyOStSZetwzkWtoqDMl5erkBJy0lDRUnIR2WIkPiC0GJlg==}
 
   '@openzeppelin/contracts@4.9.6':
     resolution: {integrity: sha512-xSmezSupL+y9VkHZJGDoCBpmnB2ogM13ccaYDWqJTfS3dbuHkgjuwDFUmaFauBCboQMGB/S5UqUl2y54X99BmA==}
@@ -10500,6 +10490,9 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
+  erc721a@4.2.3:
+    resolution: {integrity: sha512-0deF0hOOK1XI1Vxv3NKDh2E9sgzRlENuOoexjXRJIRfYCsLlqi9ejl2RF6Wcd9HfH0ldqC03wleQ2WDjxoOUvA==}
+
   err-code@2.0.3:
     resolution: {integrity: sha512-2bmlRpNKBxT/CRmPOlyISQpNj+qSeYvcym/uT0Jx2bMOlKLtSy1ZmLuVxSEKKyor/N5yhvp/ZiG1oE3DEYMSFA==}
 
@@ -10789,10 +10782,10 @@ packages:
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
 
-  eslint-plugin-react-refresh@0.4.24:
-    resolution: {integrity: sha512-nLHIW7TEq3aLrEYWpVaJ1dRgFR+wLDPN8e8FpYAql/bMV2oBEfC37K0gLEGgv9fy66juNShSMV8OkTqzltcG/w==}
+  eslint-plugin-react-refresh@0.5.0:
+    resolution: {integrity: sha512-ZYvmh7VfVgqR/7wR71I3Zl6hK/C5CcxdWYKZSpHawS5JCNgE4efhQWg/+/WPpgGAp9Ngp/rRZYyaIwmPQBq/lA==}
     peerDependencies:
-      eslint: '>=8.40'
+      eslint: '>=9'
 
   eslint-plugin-react@7.35.0:
     resolution: {integrity: sha512-v501SSMOWv8gerHkk+IIQBkcGRGrO2nfybfj5pLxuJNFTPxxA3PSryhXTK+9pNbtkggheDdsC0E9Q8CuPk6JKA==}
@@ -11555,37 +11548,40 @@ packages:
   glob@10.3.10:
     resolution: {integrity: sha512-fa46+tv1Ak0UPK1TOy/pZrIybNNt4HCv7SDzwyfiOZkvZLEbjsZkJBPtDHVshZjbecAoAGSC20MjLDG/qr679g==}
     engines: {node: '>=16 || 14 >=14.17'}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@10.4.5:
     resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@11.0.0:
     resolution: {integrity: sha512-9UiX/Bl6J2yaBbxKoEBRm4Cipxgok8kQYcOPEhScPwebu2I0HoQOuYdIO6S3hLuWoZgpDpwQZMzTFxgpkyT76g==}
     engines: {node: 20 || >=22}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@5.0.15:
     resolution: {integrity: sha512-c9IPMazfRITpmAAKi22dK1VKxGDX9ehhqfABDriL/lzO92xcUKEJPQHrVA/2YHSNFB4iFlykVmWvwo48nr3OxA==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   glob@7.1.7:
     resolution: {integrity: sha512-OvD9ENzPLbegENnYP5UUfJIirTg4+XwMWGaQfQTY0JenxNvvIKP3U3/tAQSPIu/lHxXYSZmpXlUHeqAIdKzBLQ==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   glob@7.2.0:
     resolution: {integrity: sha512-lmLf6gtyrPq8tTjSmrO94wBeQbFR3HbLHbuyD69wuyQkImp2hWqMGB47OX65FBkPffO641IP9jWa1z4ivqG26Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   glob@8.1.0:
     resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==}
     engines: {node: '>=12'}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   global-const@0.1.2:
     resolution: {integrity: sha512-yb8pTRSbWcdjmKhRfdB1+s7oU9UXTPPcRwd0oPal0WHta7B/3roXz7yGLMU+KhgByoeX/1QOFKY8aCTETexKAg==}
@@ -12860,9 +12856,6 @@ packages:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
 
-  js-base64@3.7.8:
-    resolution: {integrity: sha512-hNngCeKxIUQiEUN3GPJOkz4wF/YvdUdbNL9hsBcMQTkKzboD7T/q3OYOuuPZLUE6dBxSGpwhk5mwuDud7JVAow==}
-
   js-cookie@3.0.1:
     resolution: {integrity: sha512-+0rgsUXZu4ncpPxRL+lNEptWMOWl9etvPHc/koSRp6MPwpRYAhmk0dUG00J4bxVV3r9uUzfo24wW0knS07SKSw==}
     engines: {node: '>=12'}
@@ -12993,9 +12986,6 @@ packages:
   jsx-ast-utils@3.3.5:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
-
-  jwt-decode@3.1.2:
-    resolution: {integrity: sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==}
 
   jwt-decode@4.0.0:
     resolution: {integrity: sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==}
@@ -13355,9 +13345,6 @@ packages:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
     hasBin: true
 
-  magic-sdk@29.4.2:
-    resolution: {integrity: sha512-m5DFM+FUxAwDkmG8cuGKp9aIcJfIrI7TUoL5oL2ywumVAPAfBdJys0Udda7nZMJMN0mtHAhYPhqoOSqDU9HvgA==}
-
   magic-string@0.25.9:
     resolution: {integrity: sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==}
 
@@ -13675,9 +13662,6 @@ packages:
     engines: {node: '>= 14.0.0'}
     hasBin: true
 
-  moment@2.30.1:
-    resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
-
   motion-dom@11.18.1:
     resolution: {integrity: sha512-g76KvA001z+atjfxczdRtw/RXOM3OMSdd1f4DL77qCTF/+avrRJiawSG4yDibEQ215sr9kpinSlX2pCTJ9zbhw==}
 
@@ -13788,6 +13772,7 @@ packages:
   next@14.2.25:
     resolution: {integrity: sha512-N5M7xMc4wSb4IkPvEV5X2BRRXUmhVHNyaXwEM86+voXthSZz8ZiRyQW4p9mwAoAPIm6OzuVZtn7idgEJeAJN3Q==}
     engines: {node: '>=18.17.0'}
+    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -15165,6 +15150,7 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qr-code-styling@1.6.0-rc.1:
@@ -15812,15 +15798,30 @@ packages:
   seaport-core@0.0.1:
     resolution: {integrity: sha512-fgdSIC0ru8xK+fdDfF4bgTFH8ssr6EwbPejC2g/JsWzxy+FvG7JfaX57yn/eIv6hoscgZL87Rm+kANncgwLH3A==}
 
+  seaport-core@1.6.5:
+    resolution: {integrity: sha512-jpGOpaKpH1B49oOYqAYAAVXN8eGlI/NjE6fYHPYlQaDVx325NS5dpiDDgGLtQZNgQ3EbqrfhfB5KyIbg7owyFg==}
+
   seaport-core@https://codeload.github.com/immutable/seaport-core/tar.gz/0633350ec34f21fcede657ff812f11cf7d19144e:
     resolution: {tarball: https://codeload.github.com/immutable/seaport-core/tar.gz/0633350ec34f21fcede657ff812f11cf7d19144e}
     version: 1.5.0
+
+  seaport-core@https://codeload.github.com/immutable/seaport-core/tar.gz/f9b2e50267862570d0df3ed7e3e32d1ff2cd9813:
+    resolution: {tarball: https://codeload.github.com/immutable/seaport-core/tar.gz/f9b2e50267862570d0df3ed7e3e32d1ff2cd9813}
+    version: 1.6.6
 
   seaport-sol@1.6.0:
     resolution: {integrity: sha512-a1FBK1jIeEQXZ9CmQvtmfG0w7CE8nIad89btGg7qrrrtF4j1S0Ilmzpe2Hderap05Uvf3EWS9P/aghDQCNAwkA==}
 
   seaport-types@0.0.1:
     resolution: {integrity: sha512-m7MLa7sq3YPwojxXiVvoX1PM9iNVtQIn7AdEtBnKTwgxPfGRWUlbs/oMgetpjT/ZYTmv3X5/BghOcstWYvKqRA==}
+
+  seaport-types@1.6.3:
+    resolution: {integrity: sha512-Rm9dTTEUKmXqMgc5TiRtfX/sFOX6SjKkT9l/spTdRknplYh5tmJ0fMJzbE60pCzV1/Izq0cCua6uvWszo6zOAQ==}
+
+  seaport@https://codeload.github.com/immutable/seaport/tar.gz/8345d291c69b7777a77bd81996ce46b28183586c:
+    resolution: {tarball: https://codeload.github.com/immutable/seaport/tar.gz/8345d291c69b7777a77bd81996ce46b28183586c}
+    version: 1.6.0
+    engines: {node: '>=18.15.0'}
 
   seaport@https://codeload.github.com/immutable/seaport/tar.gz/ae061dc008105dd8d05937df9ad9a676f878cbf9:
     resolution: {tarball: https://codeload.github.com/immutable/seaport/tar.gz/ae061dc008105dd8d05937df9ad9a676f878cbf9}
@@ -16593,6 +16594,7 @@ packages:
   tar@6.1.15:
     resolution: {integrity: sha512-/zKt9UyngnxIT/EAGYuxaMYgOIJiP81ab9ZfkILq4oNLPFX50qyYmu7jRj9qeXoxmJHjGlbH0+cm2uy1WCs10A==}
     engines: {node: '>=10'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   temp-dir@2.0.0:
     resolution: {integrity: sha512-aoBAniQmmwtcKp/7BzsH8Cxzv8OL736p7v1ihGb5e9DJ9kTwGWHrQrVB5+lfVDzfGrdRzXch+ig7LHaY1JTOrg==}
@@ -17559,10 +17561,12 @@ packages:
 
   whatwg-encoding@1.0.5:
     resolution: {integrity: sha512-b5lim54JOPN9HtzvK9HFXvBma/rnfFeqsic0hSpjtDbVxR3dJKLc+KB4V6GgiGOvl7CY/KNh8rxSo9DKQrnUEw==}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-encoding@2.0.0:
     resolution: {integrity: sha512-p41ogyeMUrw3jWclHWTQg1k05DSVXPLcVxRTYsXUk+ZooOCZLcoYgPZ/HL/D/N+uQPOtcp1me1WhBEaX02mhWg==}
     engines: {node: '>=12'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-fetch@3.6.20:
     resolution: {integrity: sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==}
@@ -17904,19 +17908,6 @@ packages:
         optional: true
 
 snapshots:
-
-  '@0xsequence/abi@2.3.38': {}
-
-  '@0xsequence/core@2.3.38(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
-    dependencies:
-      '@0xsequence/abi': 2.3.38
-      '@0xsequence/utils': 2.3.38(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))
-      ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-
-  '@0xsequence/utils@2.3.38(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
-    dependencies:
-      ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      js-base64: 3.7.8
 
   '@0xsquid/sdk@2.8.25(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
@@ -20955,17 +20946,26 @@ snapshots:
   '@img/sharp-win32-x64@0.34.5':
     optional: true
 
-  '@imtbl/blockchain-data@2.11.0':
+  '@imtbl/auth@2.12.6':
     dependencies:
-      '@imtbl/config': 2.11.0
-      '@imtbl/generated-clients': 2.11.0
+      '@imtbl/generated-clients': 2.12.6
+      '@imtbl/metrics': 2.12.6
+      localforage: 1.10.0
+      oidc-client-ts: 3.4.1
+    transitivePeerDependencies:
+      - debug
+
+  '@imtbl/blockchain-data@2.12.6':
+    dependencies:
+      '@imtbl/config': 2.12.6
+      '@imtbl/generated-clients': 2.12.6
       axios: 1.7.7
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/bridge-sdk@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/bridge-sdk@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/config': 2.11.0
+      '@imtbl/config': 2.12.6
       '@jest/globals': 29.7.0
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -20975,51 +20975,51 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@imtbl/checkout-sdk@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/checkout-sdk@2.12.6(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/blockchain-data': 2.11.0
-      '@imtbl/bridge-sdk': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/config': 2.11.0
-      '@imtbl/dex-sdk': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/generated-clients': 2.11.0
-      '@imtbl/metrics': 2.11.0
-      '@imtbl/orderbook': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/passport': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/blockchain-data': 2.12.6
+      '@imtbl/bridge-sdk': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/config': 2.12.6
+      '@imtbl/dex-sdk': 2.12.6(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)
+      '@imtbl/generated-clients': 2.12.6
+      '@imtbl/metrics': 2.12.6
+      '@imtbl/orderbook': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/passport': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      semver: 7.7.1
-      uuid: 8.3.2
+      semver: 7.7.3
+      uuid: 9.0.1
     transitivePeerDependencies:
       - bufferutil
       - debug
       - hardhat
       - supports-color
+      - typescript
       - utf-8-validate
+      - zod
 
-  '@imtbl/config@2.11.0':
+  '@imtbl/config@2.12.6':
     dependencies:
-      '@imtbl/metrics': 2.11.0
-    transitivePeerDependencies:
-      - debug
+      '@imtbl/metrics': 2.12.6
 
-  '@imtbl/contracts@2.2.17(bufferutil@4.0.8)(eslint@9.16.0(jiti@1.21.0))(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/contracts@2.2.18(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@axelar-network/axelar-gmp-sdk-solidity': 5.10.0
+      '@limitbreak/creator-token-standards': 5.0.0
       '@openzeppelin/contracts': 4.9.6
       '@openzeppelin/contracts-upgradeable': 4.9.6
-      '@rari-capital/solmate': 6.4.0
-      eslint-plugin-mocha: 10.5.0(eslint@9.16.0(jiti@1.21.0))
-      moment: 2.30.1
       openzeppelin-contracts-5.0.2: '@openzeppelin/contracts@5.0.2'
       openzeppelin-contracts-upgradeable-4.9.3: '@openzeppelin/contracts-upgradeable@4.9.6'
       seaport: https://codeload.github.com/immutable/seaport/tar.gz/ae061dc008105dd8d05937df9ad9a676f878cbf9(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
+      seaport-16: seaport@https://codeload.github.com/immutable/seaport/tar.gz/8345d291c69b7777a77bd81996ce46b28183586c(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
+      seaport-core-16: seaport-core@https://codeload.github.com/immutable/seaport-core/tar.gz/f9b2e50267862570d0df3ed7e3e32d1ff2cd9813
+      seaport-types-16: seaport-types@1.6.3
       solidity-bits: 0.4.0
       solidity-bytes-utils: 0.8.2
     transitivePeerDependencies:
       - bufferutil
       - c-kzg
-      - eslint
       - supports-color
       - ts-node
       - typescript
@@ -21046,20 +21046,19 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@imtbl/dex-sdk@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/dex-sdk@2.12.6(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/config': 2.11.0
+      '@imtbl/config': 2.12.6
       '@uniswap/sdk-core': 3.2.3
-      '@uniswap/swap-router-contracts': 1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
-      '@uniswap/v3-sdk': 3.10.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@uniswap/swap-router-contracts': 1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@uniswap/v3-sdk': 3.10.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
-      - debug
       - hardhat
       - utf-8-validate
 
-  '@imtbl/generated-clients@2.11.0':
+  '@imtbl/generated-clients@2.12.6':
     dependencies:
       axios: 1.7.7
     transitivePeerDependencies:
@@ -21069,22 +21068,19 @@ snapshots:
     dependencies:
       buffer: 6.0.3
 
-  '@imtbl/metrics@2.11.0':
+  '@imtbl/metrics@2.12.6':
     dependencies:
-      axios: 1.7.7
       global-const: 0.1.2
       lru-memorise: 0.3.0
-    transitivePeerDependencies:
-      - debug
 
-  '@imtbl/minting-backend@2.11.0':
+  '@imtbl/minting-backend@2.12.6':
     dependencies:
-      '@imtbl/blockchain-data': 2.11.0
-      '@imtbl/config': 2.11.0
-      '@imtbl/generated-clients': 2.11.0
-      '@imtbl/metrics': 2.11.0
-      '@imtbl/webhook': 2.11.0
-      uuid: 8.3.2
+      '@imtbl/blockchain-data': 2.12.6
+      '@imtbl/config': 2.12.6
+      '@imtbl/generated-clients': 2.12.6
+      '@imtbl/metrics': 2.12.6
+      '@imtbl/webhook': 2.12.6
+      uuid: 9.0.1
     optionalDependencies:
       pg: 8.11.5
       prisma: 5.20.0
@@ -21092,10 +21088,10 @@ snapshots:
       - debug
       - pg-native
 
-  '@imtbl/orderbook@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/orderbook@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/config': 2.11.0
-      '@imtbl/metrics': 2.11.0
+      '@imtbl/config': 2.12.6
+      '@imtbl/metrics': 2.12.6
       '@opensea/seaport-js': 4.0.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -21106,31 +21102,25 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/passport@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/passport@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
-      '@0xsequence/abi': 2.3.38
-      '@0xsequence/core': 2.3.38(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))
-      '@imtbl/config': 2.11.0
-      '@imtbl/generated-clients': 2.11.0
-      '@imtbl/metrics': 2.11.0
-      '@imtbl/toolkit': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-client': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-provider': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@magic-ext/oidc': 12.0.5
-      '@magic-sdk/provider': 29.5.0(localforage@1.10.0)
-      '@metamask/detect-provider': 2.0.0
-      axios: 1.7.7
+      '@imtbl/auth': 2.12.6
+      '@imtbl/config': 2.12.6
+      '@imtbl/generated-clients': 2.12.6
+      '@imtbl/metrics': 2.12.6
+      '@imtbl/toolkit': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/wallet': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-provider': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      events: 3.3.0
-      jwt-decode: 3.1.2
       localforage: 1.10.0
-      magic-sdk: 29.4.2
       oidc-client-ts: 3.4.1
-      uuid: 8.3.2
     transitivePeerDependencies:
       - bufferutil
       - debug
+      - typescript
       - utf-8-validate
+      - zod
 
   '@imtbl/react-analytics@0.3.4-alpha(encoding@0.1.13)':
     dependencies:
@@ -21140,54 +21130,69 @@ snapshots:
       - encoding
       - supports-color
 
-  '@imtbl/sdk@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/sdk@2.12.6(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/blockchain-data': 2.11.0
-      '@imtbl/checkout-sdk': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/config': 2.11.0
-      '@imtbl/minting-backend': 2.11.0
-      '@imtbl/orderbook': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/passport': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/webhook': 2.11.0
-      '@imtbl/x-client': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-provider': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/auth': 2.12.6
+      '@imtbl/blockchain-data': 2.12.6
+      '@imtbl/checkout-sdk': 2.12.6(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/config': 2.12.6
+      '@imtbl/minting-backend': 2.12.6
+      '@imtbl/orderbook': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/passport': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/wallet': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/webhook': 2.12.6
+      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-provider': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
       - hardhat
       - pg-native
       - supports-color
+      - typescript
       - utf-8-validate
+      - zod
 
-  '@imtbl/toolkit@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/toolkit@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/x-client': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@magic-ext/oidc': 12.0.5
+      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       bn.js: 5.2.1
       enc-utils: 3.0.0
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      magic-sdk: 29.4.2
       oidc-client-ts: 3.4.1
     transitivePeerDependencies:
       - bufferutil
       - debug
       - utf-8-validate
 
-  '@imtbl/webhook@2.11.0':
+  '@imtbl/wallet@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/config': 2.11.0
-      '@imtbl/generated-clients': 2.11.0
+      '@imtbl/auth': 2.12.6
+      '@imtbl/generated-clients': 2.12.6
+      '@imtbl/metrics': 2.12.6
+      viem: 2.18.2(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - typescript
+      - utf-8-validate
+      - zod
+
+  '@imtbl/webhook@2.12.6':
+    dependencies:
+      '@imtbl/config': 2.12.6
+      '@imtbl/generated-clients': 2.12.6
       sns-validator: 0.3.5
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/x-client@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/x-client@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@ethereumjs/wallet': 2.0.4
-      '@imtbl/config': 2.11.0
-      '@imtbl/generated-clients': 2.11.0
+      '@imtbl/config': 2.12.6
+      '@imtbl/generated-clients': 2.12.6
       axios: 1.7.7
       bn.js: 5.2.1
       elliptic: 6.6.1
@@ -21199,18 +21204,16 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/x-provider@2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/x-provider@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/config': 2.11.0
-      '@imtbl/generated-clients': 2.11.0
-      '@imtbl/toolkit': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-client': 2.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@magic-ext/oidc': 12.0.5
+      '@imtbl/config': 2.12.6
+      '@imtbl/generated-clients': 2.12.6
+      '@imtbl/toolkit': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       enc-utils: 3.0.0
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      magic-sdk: 29.4.2
       oidc-client-ts: 3.4.1
     transitivePeerDependencies:
       - bufferutil
@@ -21825,6 +21828,16 @@ snapshots:
     dependencies:
       '@lezer/common': 1.4.0
 
+  '@limitbreak/creator-token-standards@5.0.0':
+    dependencies:
+      '@limitbreak/permit-c': 1.0.0
+      '@openzeppelin/contracts': 4.8.3
+      erc721a: 4.2.3
+
+  '@limitbreak/permit-c@1.0.0':
+    dependencies:
+      '@openzeppelin/contracts': 4.8.3
+
   '@lit-labs/ssr-dom-shim@1.2.0': {}
 
   '@lit/reactive-element@1.6.3':
@@ -21854,21 +21867,6 @@ snapshots:
   '@lukeed/uuid@2.0.1':
     dependencies:
       '@lukeed/csprng': 1.1.0
-
-  '@magic-ext/oidc@12.0.5': {}
-
-  '@magic-sdk/commons@25.4.2(@magic-sdk/provider@29.5.0(localforage@1.10.0))(@magic-sdk/types@24.22.0)':
-    dependencies:
-      '@magic-sdk/provider': 29.5.0(localforage@1.10.0)
-      '@magic-sdk/types': 24.22.0
-
-  '@magic-sdk/provider@29.5.0(localforage@1.10.0)':
-    dependencies:
-      '@magic-sdk/types': 24.22.0
-      eventemitter3: 4.0.7
-      localforage: 1.10.0
-
-  '@magic-sdk/types@24.22.0': {}
 
   '@metamask/detect-provider@2.0.0': {}
 
@@ -22030,7 +22028,7 @@ snapshots:
       '@types/debug': 4.1.8
       debug: 4.3.7(supports-color@8.1.1)
       pony-cause: 2.1.11
-      semver: 7.7.1
+      semver: 7.7.3
       uuid: 9.0.1
     transitivePeerDependencies:
       - supports-color
@@ -22044,7 +22042,7 @@ snapshots:
       '@types/debug': 4.1.8
       debug: 4.3.7(supports-color@8.1.1)
       pony-cause: 2.1.11
-      semver: 7.7.1
+      semver: 7.7.3
       uuid: 9.0.1
     transitivePeerDependencies:
       - supports-color
@@ -22464,7 +22462,7 @@ snapshots:
 
   '@npmcli/fs@3.1.0':
     dependencies:
-      semver: 7.7.1
+      semver: 7.7.3
 
   '@nrwl/devkit@19.7.3(nx@19.7.3(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.25)(typescript@5.6.2))(@swc/core@1.9.3(@swc/helpers@0.5.15)))':
     dependencies:
@@ -22655,6 +22653,8 @@ snapshots:
   '@openzeppelin/contracts-upgradeable@4.9.6': {}
 
   '@openzeppelin/contracts@3.4.2': {}
+
+  '@openzeppelin/contracts@4.8.3': {}
 
   '@openzeppelin/contracts@4.9.6': {}
 
@@ -22854,7 +22854,7 @@ snapshots:
       '@parcel/rust': 2.16.3
       '@parcel/utils': 2.16.3
       nullthrows: 1.1.1
-      semver: 7.7.1
+      semver: 7.7.3
     transitivePeerDependencies:
       - '@parcel/core'
       - napi-wasm
@@ -23128,7 +23128,7 @@ snapshots:
       browserslist: 4.28.1
       json5: 2.2.3
       nullthrows: 1.1.1
-      semver: 7.7.1
+      semver: 7.7.3
     transitivePeerDependencies:
       - '@parcel/core'
       - napi-wasm
@@ -23178,7 +23178,7 @@ snapshots:
       browserslist: 4.28.1
       nullthrows: 1.1.1
       regenerator-runtime: 0.14.1
-      semver: 7.7.1
+      semver: 7.7.3
     transitivePeerDependencies:
       - napi-wasm
 
@@ -23206,7 +23206,7 @@ snapshots:
       clone: 2.1.2
       nullthrows: 1.1.1
       postcss-value-parser: 4.2.0
-      semver: 7.7.1
+      semver: 7.7.3
     transitivePeerDependencies:
       - '@parcel/core'
       - napi-wasm
@@ -25801,6 +25801,17 @@ snapshots:
       tiny-invariant: 1.3.1
       toformat: 2.0.0
 
+  '@uniswap/swap-router-contracts@1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+    dependencies:
+      '@openzeppelin/contracts': 3.4.2
+      '@uniswap/v2-core': 1.0.1
+      '@uniswap/v3-core': 1.0.0
+      '@uniswap/v3-periphery': 1.4.4
+      dotenv: 14.3.2
+      hardhat-watcher: 2.5.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+    transitivePeerDependencies:
+      - hardhat
+
   '@uniswap/swap-router-contracts@1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
     dependencies:
       '@openzeppelin/contracts': 3.4.2
@@ -25831,6 +25842,19 @@ snapshots:
       '@uniswap/v2-core': 1.0.1
       '@uniswap/v3-core': 1.0.0
       base64-sol: 1.0.1
+
+  '@uniswap/v3-sdk@3.10.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
+    dependencies:
+      '@ethersproject/abi': 5.7.0
+      '@ethersproject/solidity': 5.7.0
+      '@uniswap/sdk-core': 4.0.6
+      '@uniswap/swap-router-contracts': 1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@uniswap/v3-periphery': 1.4.3
+      '@uniswap/v3-staker': 1.0.0
+      tiny-invariant: 1.3.1
+      tiny-warning: 1.0.3
+    transitivePeerDependencies:
+      - hardhat
 
   '@uniswap/v3-sdk@3.10.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))':
     dependencies:
@@ -27141,7 +27165,7 @@ snapshots:
   bin-version-check@5.1.0:
     dependencies:
       bin-version: 6.0.0
-      semver: 7.7.1
+      semver: 7.7.3
       semver-truncate: 3.0.0
 
   bin-version@6.0.0:
@@ -28721,6 +28745,8 @@ snapshots:
 
   envinfo@7.14.0: {}
 
+  erc721a@4.2.3: {}
+
   err-code@2.0.3: {}
 
   error-ex@1.3.2:
@@ -29457,7 +29483,7 @@ snapshots:
     dependencies:
       eslint: 8.57.0
 
-  eslint-plugin-react-refresh@0.4.24(eslint@8.57.0):
+  eslint-plugin-react-refresh@0.5.0(eslint@8.57.0):
     dependencies:
       eslint: 8.57.0
 
@@ -30371,7 +30397,7 @@ snapshots:
       memfs: 3.5.3
       minimatch: 3.1.2
       schema-utils: 2.7.0
-      semver: 7.7.1
+      semver: 7.7.3
       tapable: 1.1.3
       typescript: 5.6.2
       webpack: 5.88.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(esbuild@0.24.2)
@@ -30391,7 +30417,7 @@ snapshots:
       memfs: 3.5.3
       minimatch: 3.1.2
       schema-utils: 2.7.0
-      semver: 7.7.1
+      semver: 7.7.3
       tapable: 1.1.3
       typescript: 5.6.2
       webpack: 5.88.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(esbuild@0.24.2)
@@ -30801,6 +30827,11 @@ snapshots:
       - bufferutil
       - debug
       - utf-8-validate
+
+  hardhat-watcher@2.5.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)):
+    dependencies:
+      chokidar: 3.6.0
+      hardhat: 2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
 
   hardhat-watcher@2.5.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)):
     dependencies:
@@ -31611,7 +31642,7 @@ snapshots:
       '@babel/parser': 7.27.0
       '@istanbuljs/schema': 0.1.3
       istanbul-lib-coverage: 3.2.2
-      semver: 7.7.1
+      semver: 7.7.3
     transitivePeerDependencies:
       - supports-color
 
@@ -32640,7 +32671,7 @@ snapshots:
       jest-resolve: 26.6.2
       natural-compare: 1.4.0
       pretty-format: 26.6.2
-      semver: 7.7.1
+      semver: 7.7.3
     transitivePeerDependencies:
       - supports-color
 
@@ -32667,7 +32698,7 @@ snapshots:
       jest-util: 27.5.1
       natural-compare: 1.4.0
       pretty-format: 27.5.1
-      semver: 7.7.1
+      semver: 7.7.3
     transitivePeerDependencies:
       - supports-color
 
@@ -32919,8 +32950,6 @@ snapshots:
 
   joycon@3.1.1: {}
 
-  js-base64@3.7.8: {}
-
   js-cookie@3.0.1: {}
 
   js-levenshtein@1.1.6: {}
@@ -33097,8 +33126,6 @@ snapshots:
       array.prototype.flat: 1.3.2
       object.assign: 4.1.5
       object.values: 1.2.0
-
-  jwt-decode@3.1.2: {}
 
   jwt-decode@4.0.0: {}
 
@@ -33439,7 +33466,7 @@ snapshots:
 
   lower-case@2.0.2:
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   lowercase-keys@2.0.0: {}
 
@@ -33467,13 +33494,6 @@ snapshots:
   lunr@2.3.9: {}
 
   lz-string@1.5.0: {}
-
-  magic-sdk@29.4.2:
-    dependencies:
-      '@magic-sdk/commons': 25.4.2(@magic-sdk/provider@29.5.0(localforage@1.10.0))(@magic-sdk/types@24.22.0)
-      '@magic-sdk/provider': 29.5.0(localforage@1.10.0)
-      '@magic-sdk/types': 24.22.0
-      localforage: 1.10.0
 
   magic-string@0.25.9:
     dependencies:
@@ -33931,8 +33951,6 @@ snapshots:
       yargs: 16.2.0
       yargs-parser: 20.2.9
       yargs-unparser: 2.0.0
-
-  moment@2.30.1: {}
 
   motion-dom@11.18.1:
     dependencies:
@@ -36658,9 +36676,17 @@ snapshots:
     dependencies:
       seaport-types: 0.0.1
 
+  seaport-core@1.6.5:
+    dependencies:
+      seaport-types: 1.6.3
+
   seaport-core@https://codeload.github.com/immutable/seaport-core/tar.gz/0633350ec34f21fcede657ff812f11cf7d19144e:
     dependencies:
       seaport-types: 0.0.1
+
+  seaport-core@https://codeload.github.com/immutable/seaport-core/tar.gz/f9b2e50267862570d0df3ed7e3e32d1ff2cd9813:
+    dependencies:
+      seaport-types: 1.6.3
 
   seaport-sol@1.6.0:
     dependencies:
@@ -36668,6 +36694,28 @@ snapshots:
       seaport-types: 0.0.1
 
   seaport-types@0.0.1: {}
+
+  seaport-types@1.6.3: {}
+
+  seaport@https://codeload.github.com/immutable/seaport/tar.gz/8345d291c69b7777a77bd81996ce46b28183586c(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10):
+    dependencies:
+      '@nomicfoundation/hardhat-network-helpers': 1.0.11(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
+      '@openzeppelin/contracts': 4.9.6
+      ethers: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ethers-eip712: 0.2.0(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+      hardhat: 2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
+      merkletreejs: 0.3.11
+      seaport-core: 1.6.5
+      seaport-sol: 1.6.0
+      seaport-types: 1.6.3
+      solady: 0.0.84
+    transitivePeerDependencies:
+      - bufferutil
+      - c-kzg
+      - supports-color
+      - ts-node
+      - typescript
+      - utf-8-validate
 
   seaport@https://codeload.github.com/immutable/seaport/tar.gz/ae061dc008105dd8d05937df9ad9a676f878cbf9(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10):
     dependencies:
@@ -36736,7 +36784,7 @@ snapshots:
 
   semver-truncate@3.0.0:
     dependencies:
-      semver: 7.7.1
+      semver: 7.7.3
 
   semver@5.7.2: {}
 
