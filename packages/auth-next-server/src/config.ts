@@ -3,6 +3,7 @@
 // @ts-ignore - Type exists in next-auth v5 but TS resolver may use stale types
 import type { NextAuthConfig } from 'next-auth';
 import CredentialsImport from 'next-auth/providers/credentials';
+import { encode as encodeImport } from 'next-auth/jwt';
 import type { ImmutableAuthConfig, ImmutableTokenData, UserInfoResponse } from './types';
 import { isTokenExpired, refreshAccessToken, extractZkEvmFromIdToken } from './refresh';
 import {
@@ -15,6 +16,8 @@ import {
 // may be nested under a 'default' property
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Credentials = ((CredentialsImport as any).default || CredentialsImport) as typeof CredentialsImport;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const defaultJwtEncode = ((encodeImport as any).default || encodeImport) as typeof encodeImport;
 
 /**
  * Validate tokens by calling the userinfo endpoint.
@@ -72,6 +75,24 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
   const authDomain = config.authenticationDomain || DEFAULT_AUTH_DOMAIN;
 
   return {
+    // Custom jwt.encode: strip idToken from the cookie to reduce size and avoid
+    // CloudFront 413 "Request Entity Too Large" errors. The idToken (~1-2 KB) is
+    // still available in session responses (after sign-in or token refresh) because
+    // the session callback runs BEFORE encode. All data extracted FROM idToken
+    // (email, nickname, zkEvm) remains in the cookie as separate fields.
+    // On the client, idToken is persisted in localStorage by @imtbl/auth-next-client.
+    jwt: {
+      async encode(params) {
+        const { token, ...rest } = params;
+        if (token) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { idToken, ...cookieToken } = token as Record<string, unknown>;
+          return defaultJwtEncode({ ...rest, token: cookieToken });
+        }
+        return defaultJwtEncode(params);
+      },
+    },
+
     providers: [
       Credentials({
         id: IMMUTABLE_PROVIDER_ID,

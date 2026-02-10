@@ -495,7 +495,7 @@ The session type returned by `useImmutableSession`:
 interface ImmutableSession {
   accessToken: string;
   refreshToken?: string;
-  idToken?: string;
+  idToken?: string; // Only present transiently after sign-in or token refresh (not stored in cookie)
   accessTokenExpires: number;
   zkEvm?: {
     ethAddress: string;
@@ -509,6 +509,8 @@ interface ImmutableSession {
   };
 }
 ```
+
+> **Note:** The `idToken` is **not** stored in the session cookie (to avoid CloudFront 413 errors from oversized headers). It is only present in the session response transiently after sign-in or token refresh. `@imtbl/auth-next-client` automatically persists it in `localStorage` so that `getUser()` always returns a valid `idToken` for wallet operations. All data extracted from the idToken (`email`, `nickname`, `zkEvm`) remains in the cookie as separate fields and is always available in the session.
 
 ### LoginConfig
 

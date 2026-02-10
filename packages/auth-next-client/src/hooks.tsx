@@ -1,6 +1,8 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
 import type {
@@ -17,6 +19,7 @@ import {
   logoutWithRedirect as rawLogoutWithRedirect,
 } from '@imtbl/auth';
 import { IMMUTABLE_PROVIDER_ID } from './constants';
+import { storeIdToken, getStoredIdToken, clearStoredIdToken } from './idTokenStorage';
 
 /**
  * Extended session type with Immutable token data
@@ -125,6 +128,20 @@ export function useImmutableSession(): UseImmutableSessionReturn {
   const setIsRefreshingRef = useRef(setIsRefreshing);
   setIsRefreshingRef.current = setIsRefreshing;
 
+  // ---------------------------------------------------------------------------
+  // Sync idToken to localStorage
+  // ---------------------------------------------------------------------------
+
+  // The idToken is stripped from the cookie by jwt.encode on the server to avoid
+  // CloudFront 413 errors. It is only present in the session response transiently
+  // after sign-in or token refresh. When present, persist it in localStorage so
+  // that getUser() can always return it (used by wallet's MagicTEESigner).
+  useEffect(() => {
+    if (session?.idToken) {
+      storeIdToken(session.idToken);
+    }
+  }, [session?.idToken]);
+
   /**
    * Get user function for wallet integration.
    * Returns a User object compatible with @imtbl/wallet's getUser option.
@@ -149,6 +166,10 @@ export function useImmutableSession(): UseImmutableSessionReturn {
         // Also update the ref so subsequent calls get the fresh data
         if (currentSession) {
           sessionRef.current = currentSession;
+          // Immediately persist fresh idToken to localStorage (avoids race with useEffect)
+          if (currentSession.idToken) {
+            storeIdToken(currentSession.idToken);
+          }
         }
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -178,7 +199,9 @@ export function useImmutableSession(): UseImmutableSessionReturn {
     return {
       accessToken: currentSession.accessToken,
       refreshToken: currentSession.refreshToken,
-      idToken: currentSession.idToken,
+      // Prefer session idToken (fresh after sign-in or refresh, before useEffect
+      // stores it), fall back to localStorage for normal reads (cookie has no idToken).
+      idToken: currentSession.idToken || getStoredIdToken(),
       profile: {
         sub: currentSession.user?.sub ?? '',
         email: currentSession.user?.email ?? undefined,
@@ -271,6 +294,12 @@ export function useLogin(): UseLoginReturn {
     profile: { sub: string; email?: string; nickname?: string };
     zkEvm?: ZkEvmInfo;
   }) => {
+    // Persist idToken to localStorage before signIn so it's available immediately.
+    // The cookie won't contain idToken (stripped by jwt.encode on the server).
+    if (tokens.idToken) {
+      storeIdToken(tokens.idToken);
+    }
+
     const result = await signIn(IMMUTABLE_PROVIDER_ID, {
       tokens: JSON.stringify(tokens),
       redirect: false,
@@ -434,6 +463,9 @@ export function useLogout(): UseLogoutReturn {
     setError(null);
 
     try {
+      // Clear idToken from localStorage before clearing session
+      clearStoredIdToken();
+
       // First, clear the NextAuth session (this clears the JWT cookie)
       // We use redirect: false to handle the redirect ourselves for federated logout
       await signOut({ redirect: false });
