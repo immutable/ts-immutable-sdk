@@ -26,6 +26,12 @@ export default function Home() {
       size="medium" 
       rc={<NextLink href="/connect-with-wagmi" />}>
         Connect with Wagmi
-      </Button> 
+      </Button>
+      <Button       
+      className="mb-1"
+      size="medium" 
+      rc={<NextLink href="/connect-with-auth-next" />}>
+        🆕 Connect with Auth-Next (Default Auth)
+      </Button>
   </>);
 }
