@@ -37,7 +37,7 @@ export { default as NextAuth } from 'next-auth';
 // Re-export config utilities
 // ============================================================================
 
-export { createAuthConfig, createAuthOptions } from './config';
+export { createAuthConfig, createDefaultAuthConfig, createAuthOptions } from './config';
 export {
   isTokenExpired,
   refreshAccessToken,
@@ -45,6 +45,16 @@ export {
   type RefreshedTokens,
   type ZkEvmData,
 } from './refresh';
+export {
+  DEFAULT_AUTH_DOMAIN,
+  DEFAULT_AUDIENCE,
+  DEFAULT_SCOPE,
+  IMMUTABLE_PROVIDER_ID,
+  DEFAULT_NEXTAUTH_BASE_PATH,
+  DEFAULT_PRODUCTION_CLIENT_ID,
+  DEFAULT_SANDBOX_CLIENT_ID,
+  DEFAULT_REDIRECT_URI_PATH,
+} from './constants';
 
 // ============================================================================
 // Type exports

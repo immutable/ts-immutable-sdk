@@ -9,12 +9,60 @@ import {
   DEFAULT_AUTH_DOMAIN,
   IMMUTABLE_PROVIDER_ID,
   DEFAULT_SESSION_MAX_AGE_SECONDS,
+  DEFAULT_PRODUCTION_CLIENT_ID,
+  DEFAULT_SANDBOX_CLIENT_ID,
+  DEFAULT_REDIRECT_URI_PATH,
 } from './constants';
 
 // Handle ESM/CJS interop - in some bundler configurations, the default export
 // may be nested under a 'default' property
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Credentials = ((CredentialsImport as any).default || CredentialsImport) as typeof CredentialsImport;
+
+/**
+ * Detect if we're in a sandbox/test environment based on the current URL.
+ * Checks if the hostname includes 'sandbox' or 'localhost'.
+ * Server-side safe: returns false if window is not available.
+ *
+ * @returns true if in sandbox environment, false otherwise
+ * @internal
+ */
+function isSandboxEnvironment(): boolean {
+  if (typeof window === 'undefined') {
+    // Server-side: cannot detect, default to production for safety
+    return false;
+  }
+
+  const hostname = window.location.hostname.toLowerCase();
+  return hostname.includes('sandbox') || hostname.includes('localhost');
+}
+
+/**
+ * Derive the default clientId based on the environment.
+ * Uses public Immutable client IDs for sandbox and production.
+ *
+ * @returns Default client ID for the current environment
+ * @internal
+ */
+function deriveDefaultClientId(): string {
+  return isSandboxEnvironment() ? DEFAULT_SANDBOX_CLIENT_ID : DEFAULT_PRODUCTION_CLIENT_ID;
+}
+
+/**
+ * Derive the default redirectUri based on the current URL.
+ * Server-side safe: returns a placeholder that will be replaced client-side.
+ *
+ * @returns Default redirect URI
+ * @internal
+ */
+function deriveDefaultRedirectUri(): string {
+  if (typeof window === 'undefined') {
+    // Server-side: return path only, will be combined with window.location.origin client-side
+    return DEFAULT_REDIRECT_URI_PATH;
+  }
+
+  return `${window.location.origin}${DEFAULT_REDIRECT_URI_PATH}`;
+}
 
 /**
  * Validate tokens by calling the userinfo endpoint.
@@ -304,3 +352,50 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
 
 // Keep backwards compatibility alias
 export const createAuthOptions = createAuthConfig;
+
+/**
+ * Create Auth.js v5 configuration for Immutable authentication with all parameters optional.
+ *
+ * This is a convenience wrapper around `createAuthConfig` that provides sensible defaults:
+ * - Auto-detects `clientId` based on environment (sandbox vs production)
+ * - Auto-derives `redirectUri` from `window.location.origin + '/callback'`
+ * - Uses default values for `audience`, `scope`, and `authenticationDomain`
+ *
+ * **Important**: This uses public Immutable client IDs for development convenience.
+ * For production applications, you should use your own client ID from Immutable Hub.
+ *
+ * @param config - Optional partial configuration. All fields can be overridden.
+ * @returns Auth.js v5 configuration object
+ *
+ * @example
+ * ```typescript
+ * // Minimal setup - all defaults
+ * import NextAuth from "next-auth";
+ * import { createDefaultAuthConfig } from "@imtbl/auth-next-server";
+ *
+ * export const { handlers, auth, signIn, signOut } = NextAuth(createDefaultAuthConfig());
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Override specific fields
+ * import NextAuth from "next-auth";
+ * import { createDefaultAuthConfig } from "@imtbl/auth-next-server";
+ *
+ * export const { handlers, auth, signIn, signOut } = NextAuth(createDefaultAuthConfig({
+ *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID, // Use your own client ID
+ * }));
+ * ```
+ */
+export function createDefaultAuthConfig(config?: Partial<ImmutableAuthConfig>): NextAuthConfig {
+  const clientId = config?.clientId || deriveDefaultClientId();
+  const redirectUri = config?.redirectUri || deriveDefaultRedirectUri();
+
+  return createAuthConfig({
+    clientId,
+    redirectUri,
+    audience: config?.audience,
+    scope: config?.scope,
+    authenticationDomain: config?.authenticationDomain,
+  });
+}

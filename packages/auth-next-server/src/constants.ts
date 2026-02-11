@@ -49,3 +49,15 @@ export const TOKEN_EXPIRY_BUFFER_SECONDS = 60;
  * This is how long the NextAuth session cookie will be valid
  */
 export const DEFAULT_SESSION_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
+
+/**
+ * Default Client IDs for auto-detection
+ * These are public client IDs for Immutable's default applications
+ */
+export const DEFAULT_PRODUCTION_CLIENT_ID = 'PtQRK4iRJ8GkXjiz6xfImMAYhPhW0cYk';
+export const DEFAULT_SANDBOX_CLIENT_ID = 'mjtCL8mt06BtbxSkp2vbrYStKWnXVZfo';
+
+/**
+ * Default redirect URI fallback (will be replaced at runtime with window.location.origin + '/callback')
+ */
+export const DEFAULT_REDIRECT_URI_PATH = '/callback';
