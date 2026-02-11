@@ -49,7 +49,7 @@ export function LoginWithOverride() {
       </button>
       {error && <p className="error">Error: {error}</p>}
       <p className="info">
-        This tests <span className="code">loginWithPopup(&#123; clientId: '...' &#125;)</span><br/>
+        This tests <span className="code">loginWithPopup(&#123; clientId: &apos;...&apos; &#125;)</span><br/>
         Custom clientId overrides the default, but redirectUri is still auto-detected.
       </p>
     </div>

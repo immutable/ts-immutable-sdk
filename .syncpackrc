@@ -13,6 +13,13 @@
       "dependencyTypes": ["peer"],
       "packages": ["@imtbl/auth-next-server", "@imtbl/auth-next-client", "@imtbl/sdk"],
       "isIgnored": true
+    },
+    {
+      "label": "Allow Next.js 14 in auth-next devDependencies for compatibility",
+      "dependencies": ["next"],
+      "dependencyTypes": ["dev"],
+      "packages": ["@imtbl/auth-next-server", "@imtbl/auth-next-client"],
+      "isIgnored": true
     }
   ]
 }

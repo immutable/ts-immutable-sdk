@@ -44,7 +44,7 @@ export function LogoutWithOverride() {
       </button>
       {error && <p className="error">Error: {error}</p>}
       <p className="info">
-        This tests <span className="code">logout(&#123; logoutRedirectUri: '...' &#125;)</span><br/>
+        This tests <span className="code">logout(&#123; logoutRedirectUri: &apos;...&apos; &#125;)</span><br/>
         Custom redirect after logout, but clientId is still auto-detected.
       </p>
     </div>

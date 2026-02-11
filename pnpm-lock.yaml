@@ -135,10 +135,10 @@ importers:
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@imtbl/sdk':
         specifier: latest
-        version: 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+        version: 2.12.6(typescript@5.6.2)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -181,7 +181,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -224,7 +224,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -267,7 +267,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -310,7 +310,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -381,7 +381,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -424,7 +424,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -467,7 +467,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -510,7 +510,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -553,7 +553,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -596,7 +596,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -635,11 +635,11 @@ importers:
         specifier: workspace:*
         version: link:../../../packages/auth-next-server
       next:
-        specifier: ^15.1.6
-        version: 15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 14.2.25
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
         specifier: ^5.0.0-beta.30
-        version: 5.0.0-beta.30(next@15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -670,7 +670,7 @@ importers:
         version: link:../../../sdk
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -716,7 +716,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -759,7 +759,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -814,7 +814,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
         specifier: ^5.0.0-beta.30
         version: 5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
@@ -875,7 +875,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -924,7 +924,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -1016,7 +1016,7 @@ importers:
         version: 16.4.5
       next:
         specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -1126,11 +1126,11 @@ importers:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@22.19.7)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))
       next:
-        specifier: ^15.1.6
-        version: 15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^14.2.25
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
         specifier: ^5.0.0-beta.30
-        version: 5.0.0-beta.30(next@15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -1162,11 +1162,11 @@ importers:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@22.19.7)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))
       next:
-        specifier: ^15.1.6
-        version: 15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
+        specifier: ^14.2.25
+        version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
       next-auth:
         specifier: ^5.0.0-beta.30
-        version: 5.0.0-beta.30(next@15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
+        version: 5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
       tsup:
         specifier: ^8.3.0
         version: 8.3.0(@swc/core@1.15.3(@swc/helpers@0.5.15))(jiti@1.21.0)(postcss@8.4.49)(typescript@5.6.2)(yaml@2.5.0)
@@ -1948,7 +1948,7 @@ importers:
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       next:
         specifier: ^15.1.6
-        version: 15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 15.5.10(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       postcss:
         specifier: 8.4.31
         version: 8.4.31
@@ -2393,10 +2393,10 @@ importers:
         version: 11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next:
         specifier: ^15.1.6
-        version: 15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 15.5.10(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
         specifier: ^5.0.0-beta.30
-        version: 5.0.0-beta.30(next@15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 5.0.0-beta.30(next@15.5.10(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -2759,10 +2759,10 @@ importers:
         version: link:../packages/x-provider
       next:
         specifier: ^14.2.0 || ^15.0.0
-        version: 15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 15.5.10(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
         specifier: ^5.0.0-beta.25
-        version: 5.0.0-beta.30(next@15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 5.0.0-beta.30(next@15.5.10(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.2.0 || ^19.0.0
         version: 18.3.1
@@ -9193,9 +9193,6 @@ packages:
 
   caniuse-lite@1.0.30001660:
     resolution: {integrity: sha512-GacvNTTuATm26qC74pt+ad1fW15mlQ/zuTzzY1ZoIzECTP8HURDfF43kNxPgf7H1jmelCBQTTbBNxdSXOA7Bqg==}
-
-  caniuse-lite@1.0.30001703:
-    resolution: {integrity: sha512-kRlAGTRWgPsOj7oARC9m1okJEXdL/8fekFVcxA8Hl7GH4r/sN4OJn/i6Flde373T50KS7Y37oFbMwlE8+F42kQ==}
 
   caniuse-lite@1.0.30001760:
     resolution: {integrity: sha512-7AAMPcueWELt1p3mi13HR/LHH0TJLT11cnwDJEs3xA4+CK/PLKeO9Kl1oru24htkyUKtkGCvAx4ohB0Ttry8Dw==}
@@ -20051,7 +20048,7 @@ snapshots:
 
   '@emnapi/runtime@1.8.1':
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
     optional: true
 
   '@emnapi/wasi-threads@1.0.1':
@@ -20807,7 +20804,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/bridge-sdk@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/bridge-sdk@2.12.6':
     dependencies:
       '@imtbl/config': 2.12.6
       '@jest/globals': 29.7.0
@@ -20819,16 +20816,16 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@imtbl/checkout-sdk@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/checkout-sdk@2.12.6(typescript@5.6.2)':
     dependencies:
       '@imtbl/blockchain-data': 2.12.6
-      '@imtbl/bridge-sdk': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/bridge-sdk': 2.12.6
       '@imtbl/config': 2.12.6
-      '@imtbl/dex-sdk': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/dex-sdk': 2.12.6
       '@imtbl/generated-clients': 2.12.6
       '@imtbl/metrics': 2.12.6
-      '@imtbl/orderbook': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/passport': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/orderbook': 2.12.6
+      '@imtbl/passport': 2.12.6(typescript@5.6.2)
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -20890,7 +20887,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@imtbl/dex-sdk@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/dex-sdk@2.12.6':
     dependencies:
       '@imtbl/config': 2.12.6
       '@uniswap/sdk-core': 3.2.3
@@ -20932,7 +20929,7 @@ snapshots:
       - debug
       - pg-native
 
-  '@imtbl/orderbook@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/orderbook@2.12.6':
     dependencies:
       '@imtbl/config': 2.12.6
       '@imtbl/metrics': 2.12.6
@@ -20946,16 +20943,16 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/passport@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/passport@2.12.6(typescript@5.6.2)':
     dependencies:
       '@imtbl/auth': 2.12.6
       '@imtbl/config': 2.12.6
       '@imtbl/generated-clients': 2.12.6
       '@imtbl/metrics': 2.12.6
-      '@imtbl/toolkit': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/wallet': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
-      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-provider': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/toolkit': 2.12.6
+      '@imtbl/wallet': 2.12.6(typescript@5.6.2)
+      '@imtbl/x-client': 2.12.6
+      '@imtbl/x-provider': 2.12.6
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       localforage: 1.10.0
       oidc-client-ts: 3.4.1
@@ -20974,19 +20971,19 @@ snapshots:
       - encoding
       - supports-color
 
-  '@imtbl/sdk@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/sdk@2.12.6(typescript@5.6.2)':
     dependencies:
       '@imtbl/auth': 2.12.6
       '@imtbl/blockchain-data': 2.12.6
-      '@imtbl/checkout-sdk': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/checkout-sdk': 2.12.6(typescript@5.6.2)
       '@imtbl/config': 2.12.6
       '@imtbl/minting-backend': 2.12.6
-      '@imtbl/orderbook': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/passport': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
-      '@imtbl/wallet': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/orderbook': 2.12.6
+      '@imtbl/passport': 2.12.6(typescript@5.6.2)
+      '@imtbl/wallet': 2.12.6(typescript@5.6.2)
       '@imtbl/webhook': 2.12.6
-      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-provider': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-client': 2.12.6
+      '@imtbl/x-provider': 2.12.6
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -20997,9 +20994,9 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@imtbl/toolkit@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/toolkit@2.12.6':
     dependencies:
-      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-client': 2.12.6
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       bn.js: 5.2.1
@@ -21011,7 +21008,7 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/wallet@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/wallet@2.12.6(typescript@5.6.2)':
     dependencies:
       '@imtbl/auth': 2.12.6
       '@imtbl/generated-clients': 2.12.6
@@ -21032,7 +21029,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/x-client@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/x-client@2.12.6':
     dependencies:
       '@ethereumjs/wallet': 2.0.4
       '@imtbl/config': 2.12.6
@@ -21048,12 +21045,12 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/x-provider@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/x-provider@2.12.6':
     dependencies:
       '@imtbl/config': 2.12.6
       '@imtbl/generated-clients': 2.12.6
-      '@imtbl/toolkit': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/toolkit': 2.12.6
+      '@imtbl/x-client': 2.12.6
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       enc-utils: 3.0.0
@@ -24946,7 +24943,7 @@ snapshots:
   '@swc/helpers@0.5.5':
     dependencies:
       '@swc/counter': 0.1.3
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@swc/jest@0.2.36(@swc/core@1.15.3(@swc/helpers@0.5.15))':
     dependencies:
@@ -27306,8 +27303,6 @@ snapshots:
       lodash.uniq: 4.5.0
 
   caniuse-lite@1.0.30001660: {}
-
-  caniuse-lite@1.0.30001703: {}
 
   caniuse-lite@1.0.30001760: {}
 
@@ -31669,7 +31664,7 @@ snapshots:
       jest-environment-jsdom: 26.6.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       jest-environment-node: 26.6.2
       jest-get-type: 26.3.0
-      jest-jasmine2: 26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(utf-8-validate@5.0.10)
+      jest-jasmine2: 26.6.3
       jest-regex-util: 26.0.0
       jest-resolve: 26.6.2
       jest-util: 26.6.2
@@ -32016,7 +32011,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  jest-jasmine2@26.6.3(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(utf-8-validate@5.0.10):
+  jest-jasmine2@26.6.3:
     dependencies:
       '@babel/traverse': 7.27.0
       '@jest/environment': 26.6.2
@@ -32037,11 +32032,7 @@ snapshots:
       pretty-format: 26.6.2
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   jest-jasmine2@27.5.1:
     dependencies:
@@ -33852,35 +33843,35 @@ snapshots:
     dependencies:
       '@segment/isodate': 1.0.3
 
+  next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106):
+    dependencies:
+      '@auth/core': 0.41.0
+      next: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
+      react: 19.0.0-rc-66855b96-20241106
+
   next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
       '@auth/core': 0.41.0
-      next: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
 
-  next-auth@5.0.0-beta.30(next@15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
+  next-auth@5.0.0-beta.30(next@15.5.10(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
       '@auth/core': 0.41.0
-      next: 15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.5.10(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
 
-  next-auth@5.0.0-beta.30(next@15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106):
-    dependencies:
-      '@auth/core': 0.41.0
-      next: 15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
-      react: 19.0.0-rc-66855b96-20241106
-
-  next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 14.2.25
       '@swc/helpers': 0.5.5
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001703
+      caniuse-lite: 1.0.30001760
       graceful-fs: 4.2.11
       postcss: 8.4.31
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      styled-jsx: 5.1.1(@babel/core@7.26.10)(react@18.3.1)
+      styled-jsx: 5.1.1(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react@18.3.1)
     optionalDependencies:
       '@next/swc-darwin-arm64': 14.2.25
       '@next/swc-darwin-x64': 14.2.25
@@ -33896,7 +33887,33 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  next@15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106):
+    dependencies:
+      '@next/env': 14.2.25
+      '@swc/helpers': 0.5.5
+      busboy: 1.6.0
+      caniuse-lite: 1.0.30001760
+      graceful-fs: 4.2.11
+      postcss: 8.4.31
+      react: 19.0.0-rc-66855b96-20241106
+      react-dom: 18.3.1(react@19.0.0-rc-66855b96-20241106)
+      styled-jsx: 5.1.1(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react@19.0.0-rc-66855b96-20241106)
+    optionalDependencies:
+      '@next/swc-darwin-arm64': 14.2.25
+      '@next/swc-darwin-x64': 14.2.25
+      '@next/swc-linux-arm64-gnu': 14.2.25
+      '@next/swc-linux-arm64-musl': 14.2.25
+      '@next/swc-linux-x64-gnu': 14.2.25
+      '@next/swc-linux-x64-musl': 14.2.25
+      '@next/swc-win32-arm64-msvc': 14.2.25
+      '@next/swc-win32-ia32-msvc': 14.2.25
+      '@next/swc-win32-x64-msvc': 14.2.25
+      '@playwright/test': 1.45.3
+    transitivePeerDependencies:
+      - '@babel/core'
+      - babel-plugin-macros
+
+  next@15.5.10(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 15.5.10
       '@swc/helpers': 0.5.15
@@ -33904,30 +33921,7 @@ snapshots:
       postcss: 8.4.31
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      styled-jsx: 5.1.6(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react@18.3.1)
-    optionalDependencies:
-      '@next/swc-darwin-arm64': 15.5.7
-      '@next/swc-darwin-x64': 15.5.7
-      '@next/swc-linux-arm64-gnu': 15.5.7
-      '@next/swc-linux-arm64-musl': 15.5.7
-      '@next/swc-linux-x64-gnu': 15.5.7
-      '@next/swc-linux-x64-musl': 15.5.7
-      '@next/swc-win32-arm64-msvc': 15.5.7
-      '@next/swc-win32-x64-msvc': 15.5.7
-      sharp: 0.34.5
-    transitivePeerDependencies:
-      - '@babel/core'
-      - babel-plugin-macros
-
-  next@15.5.10(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106):
-    dependencies:
-      '@next/env': 15.5.10
-      '@swc/helpers': 0.5.15
-      caniuse-lite: 1.0.30001760
-      postcss: 8.4.31
-      react: 19.0.0-rc-66855b96-20241106
-      react-dom: 18.3.1(react@19.0.0-rc-66855b96-20241106)
-      styled-jsx: 5.1.6(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react@19.0.0-rc-66855b96-20241106)
+      styled-jsx: 5.1.6(@babel/core@7.26.10)(react@18.3.1)
     optionalDependencies:
       '@next/swc-darwin-arm64': 15.5.7
       '@next/swc-darwin-x64': 15.5.7
@@ -37276,14 +37270,7 @@ snapshots:
     dependencies:
       webpack: 5.88.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(esbuild@0.23.1)
 
-  styled-jsx@5.1.1(@babel/core@7.26.10)(react@18.3.1):
-    dependencies:
-      client-only: 0.0.1
-      react: 18.3.1
-    optionalDependencies:
-      '@babel/core': 7.26.10
-
-  styled-jsx@5.1.6(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react@18.3.1):
+  styled-jsx@5.1.1(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react@18.3.1):
     dependencies:
       client-only: 0.0.1
       react: 18.3.1
@@ -37291,13 +37278,20 @@ snapshots:
       '@babel/core': 7.26.10
       babel-plugin-macros: 3.1.0
 
-  styled-jsx@5.1.6(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react@19.0.0-rc-66855b96-20241106):
+  styled-jsx@5.1.1(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react@19.0.0-rc-66855b96-20241106):
     dependencies:
       client-only: 0.0.1
       react: 19.0.0-rc-66855b96-20241106
     optionalDependencies:
       '@babel/core': 7.26.10
       babel-plugin-macros: 3.1.0
+
+  styled-jsx@5.1.6(@babel/core@7.26.10)(react@18.3.1):
+    dependencies:
+      client-only: 0.0.1
+      react: 18.3.1
+    optionalDependencies:
+      '@babel/core': 7.26.10
 
   stylehacks@5.1.1(postcss@8.4.49):
     dependencies:

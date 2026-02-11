@@ -41,7 +41,7 @@ export function ConfigInfo() {
         <li><strong>ClientId:</strong> <span className="code">{info.expectedClientId}</span></li>
         <li><strong>RedirectUri:</strong> <span className="code">{info.redirectUri}</span></li>
       </ul>
-      <p><small>These values are automatically detected and don't need to be configured!</small></p>
+      <p><small>These values are automatically detected and don&apos;t need to be configured!</small></p>
     </div>
   );
 }

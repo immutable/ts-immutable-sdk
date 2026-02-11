@@ -8,4 +8,4 @@ import { createDefaultAuthConfig } from "@imtbl/auth-next-server";
  * - redirectUri: auto-derived from window.location.origin + '/callback'
  * - audience, scope, authenticationDomain: use sensible defaults
  */
-export const { handlers, auth, signIn, signOut } = NextAuth(createDefaultAuthConfig());
+export const { handlers, auth, signIn, signOut } = NextAuth(createDefaultAuthConfig() as any);
