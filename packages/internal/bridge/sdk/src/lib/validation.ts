@@ -80,7 +80,7 @@ export async function checkReceiver(
     } catch {
       // no receive or fallback
       throw new BridgeError(
-        `address ${address} is not a valid receipient`,
+        `address ${address} is not a valid recipient`,
         BridgeErrorType.INVALID_RECIPIENT,
       );
     }

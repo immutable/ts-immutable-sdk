@@ -237,7 +237,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swapParams.recipient).toBe(params.fromAddress);
       expect(swap.transaction.to).toBe(TEST_SWAP_PROXY_ADDRESS);
       expect(swap.transaction.from).toBe(params.fromAddress);
-      expect(swap.transaction.value).toBe('0x00'); // // expect 0 native tokens to be transferred
+      expect(swap.transaction.value).toBe('0x00'); // expect 0 native tokens to be transferred
       expect(formatEther(swapParams.amountOut)).toBe('1000.0');
       expect(formatTokenAmount(swapParams.amountInMaximum, USDC_TEST_TOKEN)).toBe('104.03'); // amount with slippage and fees applied
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0');
@@ -369,7 +369,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swapParams.recipient).toBe(params.fromAddress);
       expect(swap.transaction.to).toBe(TEST_ROUTER_ADDRESS);
       expect(swap.transaction.from).toBe(params.fromAddress);
-      expect(swap.transaction.value).toBe('0x00'); // // expect 0 native tokens to be transferred
+      expect(swap.transaction.value).toBe('0x00'); // expect 0 native tokens to be transferred
       expect(formatEther(swapParams.amountOut)).toBe('1000.0');
       expect(formatTokenAmount(swapParams.amountInMaximum, USDC_TEST_TOKEN)).toBe('100.1'); // includes slippage
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0');

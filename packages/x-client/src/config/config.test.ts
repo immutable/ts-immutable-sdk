@@ -116,7 +116,7 @@ describe('imxClientConfig', () => {
     expect(() => imxClientConfig()).toThrowError('configOptions is required');
   });
 
-  it('should throw when the Enironment parameter is not a valid Environment', () => {
+  it('should throw when the Environment parameter is not a valid Environment', () => {
     // @ts-expect-error
     expect(() => imxClientConfig({ environment: 'invalid' }))
       .toThrowError('Invalid environment: invalid');
