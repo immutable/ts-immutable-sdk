@@ -1,0 +1,25 @@
+{
+  "name": "@examples/auth-next-default-test",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@imtbl/auth-next-client": "workspace:*",
+    "@imtbl/auth-next-server": "workspace:*",
+    "next": "^15.1.6",
+    "next-auth": "^5.0.0-beta.30",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5"
+  }
+}
