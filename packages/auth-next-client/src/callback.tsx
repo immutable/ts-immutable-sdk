@@ -6,6 +6,7 @@ import { signIn } from 'next-auth/react';
 import { handleLoginCallback as handleAuthCallback, type TokenResponse } from '@imtbl/auth';
 import type { ImmutableUserClient } from './types';
 import { IMMUTABLE_PROVIDER_ID } from './constants';
+import { storeIdToken } from './idTokenStorage';
 
 /**
  * Config for CallbackPage - matches LoginConfig from @imtbl/auth
@@ -158,6 +159,12 @@ export function CallbackPage({
         } else {
           // Not in a popup - sign in to NextAuth with the tokens
           const tokenData = mapTokensToSignInData(tokens);
+
+          // Persist idToken to localStorage before signIn so it's available
+          // immediately. The cookie won't contain idToken (stripped by jwt.encode).
+          if (tokens.idToken) {
+            storeIdToken(tokens.idToken);
+          }
 
           const result = await signIn(IMMUTABLE_PROVIDER_ID, {
             tokens: JSON.stringify(tokenData),
