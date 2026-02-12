@@ -69,6 +69,34 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 AUTH_SECRET=your-secret-key-min-32-characters
 ```
 
+## Default Auth (Zero Config)
+
+For development and quick prototyping, you can use `createDefaultAuthConfig()` with no configuration. It auto-detects:
+- `clientId` based on environment (sandbox for localhost, production otherwise)
+- `redirectUri` from `window.location.origin + '/callback'`
+
+```typescript
+// lib/auth.ts
+import NextAuth from "next-auth";
+import { createDefaultAuthConfig } from "@imtbl/auth-next-server";
+
+// Zero config - only AUTH_SECRET required in .env
+export const { handlers, auth, signIn, signOut } = NextAuth(createDefaultAuthConfig());
+```
+
+With partial overrides:
+
+```typescript
+// Override only clientId, rest uses defaults
+export const { handlers, auth, signIn, signOut } = NextAuth(
+  createDefaultAuthConfig({
+    clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+  }),
+);
+```
+
+> **Note:** Default auth uses public Immutable client IDs. For production apps, use your own client ID from Immutable Hub.
+
 ## Configuration
 
 ### `createAuthConfig(config)`

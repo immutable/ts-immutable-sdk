@@ -10,10 +10,8 @@ import {
   DEFAULT_AUTH_DOMAIN,
   IMMUTABLE_PROVIDER_ID,
   DEFAULT_SESSION_MAX_AGE_SECONDS,
-  DEFAULT_PRODUCTION_CLIENT_ID,
-  DEFAULT_SANDBOX_CLIENT_ID,
-  DEFAULT_REDIRECT_URI_PATH,
 } from './constants';
+import { deriveDefaultClientId, deriveDefaultRedirectUri } from './defaultConfig';
 
 // Handle ESM/CJS interop - in some bundler configurations, the default export
 // may be nested under a 'default' property
@@ -21,51 +19,6 @@ import {
 const Credentials = ((CredentialsImport as any).default || CredentialsImport) as typeof CredentialsImport;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const defaultJwtEncode = ((encodeImport as any).default || encodeImport) as typeof encodeImport;
-
-/**
- * Detect if we're in a sandbox/test environment based on the current URL.
- * Checks if the hostname includes 'sandbox' or 'localhost'.
- * Server-side safe: returns false if window is not available.
- *
- * @returns true if in sandbox environment, false otherwise
- * @internal
- */
-function isSandboxEnvironment(): boolean {
-  if (typeof window === 'undefined') {
-    // Server-side: cannot detect, default to production for safety
-    return false;
-  }
-
-  const hostname = window.location.hostname.toLowerCase();
-  return hostname.includes('sandbox') || hostname.includes('localhost');
-}
-
-/**
- * Derive the default clientId based on the environment.
- * Uses public Immutable client IDs for sandbox and production.
- *
- * @returns Default client ID for the current environment
- * @internal
- */
-function deriveDefaultClientId(): string {
-  return isSandboxEnvironment() ? DEFAULT_SANDBOX_CLIENT_ID : DEFAULT_PRODUCTION_CLIENT_ID;
-}
-
-/**
- * Derive the default redirectUri based on the current URL.
- * Server-side safe: returns a placeholder that will be replaced client-side.
- *
- * @returns Default redirect URI
- * @internal
- */
-function deriveDefaultRedirectUri(): string {
-  if (typeof window === 'undefined') {
-    // Server-side: return path only, will be combined with window.location.origin client-side
-    return DEFAULT_REDIRECT_URI_PATH;
-  }
-
-  return `${window.location.origin}${DEFAULT_REDIRECT_URI_PATH}`;
-}
 
 /**
  * Validate tokens by calling the userinfo endpoint.

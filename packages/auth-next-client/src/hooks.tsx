@@ -19,11 +19,12 @@ import {
   logoutWithRedirect as rawLogoutWithRedirect,
 } from '@imtbl/auth';
 import {
+  deriveDefaultClientId,
+  deriveDefaultRedirectUri,
+} from '@imtbl/auth-next-server';
+import {
   IMMUTABLE_PROVIDER_ID,
   TOKEN_EXPIRY_BUFFER_MS,
-  DEFAULT_PRODUCTION_CLIENT_ID,
-  DEFAULT_SANDBOX_CLIENT_ID,
-  DEFAULT_REDIRECT_URI_PATH,
   DEFAULT_POPUP_REDIRECT_URI_PATH,
   DEFAULT_LOGOUT_REDIRECT_URI_PATH,
   DEFAULT_AUTH_DOMAIN,
@@ -54,49 +55,8 @@ function deduplicatedUpdate(
 }
 
 // ---------------------------------------------------------------------------
-// Default configuration helpers
+// Default configuration helpers (extend shared logic from auth-next-server)
 // ---------------------------------------------------------------------------
-
-/**
- * Detect if we're in a sandbox/test environment based on the current URL.
- * Checks if the hostname includes 'sandbox' or 'localhost'.
- *
- * @returns true if in sandbox environment, false otherwise
- * @internal
- */
-function isSandboxEnvironment(): boolean {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-
-  const hostname = window.location.hostname.toLowerCase();
-  return hostname.includes('sandbox') || hostname.includes('localhost');
-}
-
-/**
- * Derive the default clientId based on the environment.
- * Uses public Immutable client IDs for sandbox and production.
- *
- * @returns Default client ID for the current environment
- * @internal
- */
-function deriveDefaultClientId(): string {
-  return isSandboxEnvironment() ? DEFAULT_SANDBOX_CLIENT_ID : DEFAULT_PRODUCTION_CLIENT_ID;
-}
-
-/**
- * Derive the default redirectUri based on the current URL.
- *
- * @returns Default redirect URI
- * @internal
- */
-function deriveDefaultRedirectUri(): string {
-  if (typeof window === 'undefined') {
-    return DEFAULT_REDIRECT_URI_PATH;
-  }
-
-  return `${window.location.origin}${DEFAULT_REDIRECT_URI_PATH}`;
-}
 
 /**
  * Derive the default popupRedirectUri based on the current URL.
@@ -459,6 +419,11 @@ export function useImmutableSession(): UseImmutableSessionReturn {
 
 /**
  * Return type for useLogin hook
+ *
+ * Config uses `Partial<LoginConfig>` by design:
+ * - No params: `loginWithPopup()` uses all defaults (clientId, redirectUri, etc. auto-detected)
+ * - Partial params: `loginWithPopup({ clientId: 'custom' })` overrides only what you pass, rest use defaults
+ * - Without Partial, you'd need to pass the full LoginConfig when overriding any field
  */
 export interface UseLoginReturn {
   /** Start login with popup flow */

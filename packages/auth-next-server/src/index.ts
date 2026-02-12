@@ -54,7 +54,12 @@ export {
   DEFAULT_PRODUCTION_CLIENT_ID,
   DEFAULT_SANDBOX_CLIENT_ID,
   DEFAULT_REDIRECT_URI_PATH,
+  DEFAULT_POPUP_REDIRECT_URI_PATH,
+  DEFAULT_LOGOUT_REDIRECT_URI_PATH,
+  DEFAULT_TOKEN_EXPIRY_MS,
+  TOKEN_EXPIRY_BUFFER_MS,
 } from './constants';
+export { deriveDefaultClientId, deriveDefaultRedirectUri } from './defaultConfig';
 
 // ============================================================================
 // Type exports

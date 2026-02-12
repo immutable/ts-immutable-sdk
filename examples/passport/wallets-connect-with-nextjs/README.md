@@ -24,7 +24,8 @@ browse to `http://localhost:3000` to see the full list of examples.
 - NEXT_PUBLIC_CLIENT_ID // replace with your client ID from Hub
 
 ### For Auth-Next Example (Default Auth)
-- AUTH_SECRET // required for NextAuth.js (min 32 characters)
+- `AUTH_SECRET` - Required for NextAuth.js (min 32 characters). Generate one with:
+  `openssl rand -base64 32`, or see [NextAuth.js configuration](https://next-auth.js.org/configuration/options#nextauth_secret)
 - No other variables needed! ClientId and redirectUri are auto-detected.
 
 ## Auth-Next Default Auth

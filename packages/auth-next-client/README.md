@@ -100,6 +100,36 @@ export default function Callback() {
 }
 ```
 
+### Default Auth (Zero Config)
+
+When using `createDefaultAuthConfig()` on the server, you can call login/logout with no config—clientId and redirectUri are auto-detected:
+
+```tsx
+// With default auth - no config needed
+function LoginButton() {
+  const { isAuthenticated } = useImmutableSession();
+  const { loginWithPopup, isLoggingIn, error } = useLogin();
+
+  if (isAuthenticated) return <p>You are logged in!</p>;
+
+  return (
+    <button onClick={() => loginWithPopup()} disabled={isLoggingIn}>
+      {isLoggingIn ? "Signing in..." : "Sign In"}
+    </button>
+  );
+}
+```
+
+Or with partial overrides (only override what you need):
+
+```tsx
+// Override only clientId, rest uses defaults
+loginWithPopup({ clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID! });
+logout({ clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID! });
+```
+
+See the [wallets-connect-with-nextjs](../../examples/passport/wallets-connect-with-nextjs) example for a full integration with `@imtbl/wallet`.
+
 ### 5. Add Login Button
 
 Use the `useLogin` hook for login flows with built-in state management:

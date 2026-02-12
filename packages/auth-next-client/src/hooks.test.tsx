@@ -23,6 +23,24 @@ jest.mock('@imtbl/auth', () => ({
   logoutWithRedirect: jest.fn(),
 }));
 
+// Mock auth-next-server to avoid loading next/server (Request not defined in Node/Jest)
+jest.mock('@imtbl/auth-next-server', () => ({
+  DEFAULT_AUTH_DOMAIN: 'https://auth.immutable.com',
+  DEFAULT_AUDIENCE: 'platform_api',
+  DEFAULT_SCOPE: 'openid profile email offline_access transact',
+  IMMUTABLE_PROVIDER_ID: 'immutable',
+  DEFAULT_NEXTAUTH_BASE_PATH: '/api/auth',
+  DEFAULT_PRODUCTION_CLIENT_ID: 'prod-client-id',
+  DEFAULT_SANDBOX_CLIENT_ID: 'sandbox-client-id',
+  DEFAULT_REDIRECT_URI_PATH: '/callback',
+  DEFAULT_POPUP_REDIRECT_URI_PATH: '/callback',
+  DEFAULT_LOGOUT_REDIRECT_URI_PATH: '/',
+  DEFAULT_TOKEN_EXPIRY_MS: 900000,
+  TOKEN_EXPIRY_BUFFER_MS: 60000,
+  deriveDefaultClientId: jest.fn(() => 'sandbox-client-id'),
+  deriveDefaultRedirectUri: jest.fn(() => 'http://localhost:3000/callback'),
+}));
+
 import { useImmutableSession } from './hooks';
 
 // ---------------------------------------------------------------------------
