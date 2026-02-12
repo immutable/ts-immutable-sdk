@@ -30,6 +30,16 @@ yarn add @imtbl/auth-next-server next-auth@5
 - `next` >= 14.0.0
 - `next-auth` >= 5.0.0-beta.25
 
+### Next.js 14 Compatibility
+
+This package is compatible with both Next.js 14 and 15. It uses only standard APIs available in both versions:
+
+- `next/server`: `NextRequest`, `NextResponse` (middleware)
+- `next/navigation`: `redirect` (Server Components)
+- NextAuth v5 with App Router
+
+No Next.js 15-only APIs are used (e.g. async `headers()`/`cookies()`, `unstable_after`).
+
 ## Quick Start
 
 ### 1. Create Auth Configuration
@@ -71,17 +81,19 @@ AUTH_SECRET=your-secret-key-min-32-characters
 
 ## Default Auth (Zero Config)
 
-For development and quick prototyping, you can use `createDefaultAuthConfig()` with no configuration. It auto-detects:
-- `clientId` based on environment (sandbox for localhost, production otherwise)
+For development and quick prototyping, you can use `createAuthConfig()` with no configuration. It auto-detects:
+- `clientId` based on environment (sandbox for localhost/sandbox hostnames or when `NODE_ENV=development`, production otherwise)
 - `redirectUri` from `window.location.origin + '/callback'`
+
+> **Server-side detection:** On the server, `window` is unavailable, so sandbox is inferred from `NODE_ENV === 'development'`. This keeps client and server in sync when running locally with `next dev`. For production deployments, pass `clientId` explicitly.
 
 ```typescript
 // lib/auth.ts
 import NextAuth from "next-auth";
-import { createDefaultAuthConfig } from "@imtbl/auth-next-server";
+import { createAuthConfig } from "@imtbl/auth-next-server";
 
 // Zero config - only AUTH_SECRET required in .env
-export const { handlers, auth, signIn, signOut } = NextAuth(createDefaultAuthConfig());
+export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig());
 ```
 
 With partial overrides:
@@ -89,7 +101,7 @@ With partial overrides:
 ```typescript
 // Override only clientId, rest uses defaults
 export const { handlers, auth, signIn, signOut } = NextAuth(
-  createDefaultAuthConfig({
+  createAuthConfig({
     clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
   }),
 );
@@ -99,17 +111,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth(
 
 ## Configuration
 
-### `createAuthConfig(config)`
+### `createAuthConfig(config?)`
 
-Creates an Auth.js v5 configuration object for Immutable authentication. You pass this to `NextAuth()` to create your auth instance.
+Creates an Auth.js v5 configuration object for Immutable authentication. Config is optional—when omitted, sensible defaults are used. Pass this to `NextAuth()` to create your auth instance.
 
 ```typescript
 import NextAuth from "next-auth";
 import { createAuthConfig } from "@imtbl/auth-next-server";
 
+// Zero config
+const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig());
+
+// Or with custom config
 const { handlers, auth, signIn, signOut } = NextAuth(
   createAuthConfig({
-    // Required
     clientId: "your-client-id",
     redirectUri: "https://your-app.com/callback",
 
@@ -125,7 +140,7 @@ const { handlers, auth, signIn, signOut } = NextAuth(
 
 | Option                 | Type     | Required | Description                                                              |
 | ---------------------- | -------- | -------- | ------------------------------------------------------------------------ |
-| `clientId`             | `string` | Yes      | Your Immutable application client ID                                     |
+| `clientId`             | `string` | Optional | Your Immutable application client ID (default: auto-detected)             |
 | `redirectUri`          | `string` | Yes      | OAuth redirect URI configured in Immutable Hub                           |
 | `audience`             | `string` | No       | OAuth audience (default: `"platform_api"`)                               |
 | `scope`                | `string` | No       | OAuth scopes (default: `"openid profile email offline_access transact"`) |

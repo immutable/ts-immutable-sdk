@@ -37,7 +37,7 @@ export { default as NextAuth } from 'next-auth';
 // Re-export config utilities
 // ============================================================================
 
-export { createAuthConfig, createDefaultAuthConfig, createAuthOptions } from './config';
+export { createAuthConfig, createAuthOptions } from './config';
 export {
   isTokenExpired,
   refreshAccessToken,

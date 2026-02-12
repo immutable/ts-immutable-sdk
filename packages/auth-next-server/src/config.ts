@@ -56,24 +56,46 @@ async function validateTokens(
 }
 
 /**
- * Create Auth.js v5 configuration for Immutable authentication
+ * Create Auth.js v5 configuration for Immutable authentication.
+ *
+ * Config is optional - when omitted, sensible defaults are used:
+ * - `clientId`: Auto-detected (sandbox for localhost/sandbox hostnames or NODE_ENV=development, production otherwise)
+ * - `redirectUri`: Auto-derived from `window.location.origin + '/callback'` (path only on server)
+ *
+ * @param config - Optional configuration. All fields can be overridden.
  *
  * @example
  * ```typescript
- * // lib/auth.ts
+ * // Zero config - only AUTH_SECRET required in .env
  * import NextAuth from "next-auth";
  * import { createAuthConfig } from "@imtbl/auth-next-server";
  *
- * const config = {
+ * export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig());
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // With custom config
+ * import NextAuth from "next-auth";
+ * import { createAuthConfig } from "@imtbl/auth-next-server";
+ *
+ * export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig({
  *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
  *   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
- * };
- *
- * export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig(config));
+ * }));
  * ```
  */
-export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
-  const authDomain = config.authenticationDomain || DEFAULT_AUTH_DOMAIN;
+export function createAuthConfig(config?: Partial<ImmutableAuthConfig>): NextAuthConfig {
+  const clientId = config?.clientId || deriveDefaultClientId();
+  const redirectUri = config?.redirectUri || deriveDefaultRedirectUri();
+  const resolvedConfig: ImmutableAuthConfig = {
+    clientId,
+    redirectUri,
+    audience: config?.audience,
+    scope: config?.scope,
+    authenticationDomain: config?.authenticationDomain,
+  };
+  const authDomain = resolvedConfig.authenticationDomain || DEFAULT_AUTH_DOMAIN;
 
   return {
     // Custom jwt.encode: strip idToken from the cookie to reduce size and avoid
@@ -204,7 +226,7 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
               try {
                 const refreshed = await refreshAccessToken(
                   token.refreshToken as string,
-                  config.clientId,
+                  resolvedConfig.clientId,
                   authDomain,
                 );
                 // Extract zkEvm claims from the refreshed idToken
@@ -252,7 +274,7 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
             try {
               const refreshed = await refreshAccessToken(
                 token.refreshToken as string,
-                config.clientId,
+                resolvedConfig.clientId,
                 authDomain,
               );
               // Extract zkEvm claims from the refreshed idToken
@@ -325,50 +347,3 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
 
 // Keep backwards compatibility alias
 export const createAuthOptions = createAuthConfig;
-
-/**
- * Create Auth.js v5 configuration for Immutable authentication with all parameters optional.
- *
- * This is a convenience wrapper around `createAuthConfig` that provides sensible defaults:
- * - Auto-detects `clientId` based on environment (sandbox vs production)
- * - Auto-derives `redirectUri` from `window.location.origin + '/callback'`
- * - Uses default values for `audience`, `scope`, and `authenticationDomain`
- *
- * **Important**: This uses public Immutable client IDs for development convenience.
- * For production applications, you should use your own client ID from Immutable Hub.
- *
- * @param config - Optional partial configuration. All fields can be overridden.
- * @returns Auth.js v5 configuration object
- *
- * @example
- * ```typescript
- * // Minimal setup - all defaults
- * import NextAuth from "next-auth";
- * import { createDefaultAuthConfig } from "@imtbl/auth-next-server";
- *
- * export const { handlers, auth, signIn, signOut } = NextAuth(createDefaultAuthConfig());
- * ```
- *
- * @example
- * ```typescript
- * // Override specific fields
- * import NextAuth from "next-auth";
- * import { createDefaultAuthConfig } from "@imtbl/auth-next-server";
- *
- * export const { handlers, auth, signIn, signOut } = NextAuth(createDefaultAuthConfig({
- *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID, // Use your own client ID
- * }));
- * ```
- */
-export function createDefaultAuthConfig(config?: Partial<ImmutableAuthConfig>): NextAuthConfig {
-  const clientId = config?.clientId || deriveDefaultClientId();
-  const redirectUri = config?.redirectUri || deriveDefaultRedirectUri();
-
-  return createAuthConfig({
-    clientId,
-    redirectUri,
-    audience: config?.audience,
-    scope: config?.scope,
-    authenticationDomain: config?.authenticationDomain,
-  });
-}

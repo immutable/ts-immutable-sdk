@@ -13,14 +13,16 @@ import {
 
 /**
  * Detect if we're in a sandbox/test environment based on the current URL.
- * Checks if the hostname includes 'sandbox' or 'localhost'.
- * Server-side safe: returns false if window is not available.
+ * Client-side: checks if the hostname includes 'sandbox' or 'localhost'.
+ * Server-side: uses NODE_ENV === 'development' as fallback so server and client
+ * use the same sandbox client ID when running locally (e.g. `next dev`).
  *
  * @returns true if in sandbox environment, false otherwise
  */
 export function isSandboxEnvironment(): boolean {
   if (typeof window === 'undefined') {
-    return false;
+    // Server-side: NODE_ENV is set by Next.js (development in `next dev`, production in `next build` + `next start`)
+    return process.env.NODE_ENV === 'development';
   }
 
   const hostname = window.location.hostname.toLowerCase();

@@ -27,6 +27,10 @@ npm install @imtbl/auth-next-client @imtbl/auth-next-server next-auth@5
 - `next` >= 14.0.0
 - `next-auth` >= 5.0.0-beta.25
 
+### Next.js 14 Compatibility
+
+This package is compatible with both Next.js 14 and 15. It uses only standard APIs available in both versions (`next/navigation` for `useRouter`, `next-auth/react`). No Next.js 15-only APIs are used.
+
 ## Quick Start
 
 ### 1. Set Up Server-Side Auth
@@ -102,7 +106,7 @@ export default function Callback() {
 
 ### Default Auth (Zero Config)
 
-When using `createDefaultAuthConfig()` on the server, you can call login/logout with no config—clientId and redirectUri are auto-detected:
+When using `createAuthConfig()` with no args on the server, you can call login/logout with no config—clientId and redirectUri are auto-detected:
 
 ```tsx
 // With default auth - no config needed
