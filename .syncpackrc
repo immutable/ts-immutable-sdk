@@ -15,7 +15,7 @@
       "isIgnored": true
     },
     {
-      "label": "Allow Next.js 14 in auth-next devDependencies for compatibility",
+      "label": "Allow Next.js version flexibility in auth-next devDependencies",
       "dependencies": ["next"],
       "dependencyTypes": ["dev"],
       "packages": ["@imtbl/auth-next-server", "@imtbl/auth-next-client"],
