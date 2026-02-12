@@ -90,11 +90,11 @@ function deriveDefaultLogoutRedirectUri(): string {
  * Create a complete LoginConfig with default values.
  * All fields are optional and will be auto-derived if not provided.
  *
- * @param config - Optional partial login configuration
+ * @param config - Optional login configuration (when provided, must be complete)
  * @returns Complete LoginConfig with defaults applied
  * @internal
  */
-function createDefaultLoginConfig(config?: Partial<LoginConfig>): LoginConfig {
+function createDefaultLoginConfig(config?: LoginConfig): LoginConfig {
   return {
     clientId: config?.clientId || deriveDefaultClientId(),
     redirectUri: config?.redirectUri || deriveDefaultRedirectUri(),
@@ -109,11 +109,11 @@ function createDefaultLoginConfig(config?: Partial<LoginConfig>): LoginConfig {
  * Create a complete LogoutConfig with default values.
  * All fields are optional and will be auto-derived if not provided.
  *
- * @param config - Optional partial logout configuration
+ * @param config - Optional logout configuration (when provided, must be complete)
  * @returns Complete LogoutConfig with defaults applied
  * @internal
  */
-function createDefaultLogoutConfig(config?: Partial<LogoutConfig>): LogoutConfig {
+function createDefaultLogoutConfig(config?: LogoutConfig): LogoutConfig {
   return {
     clientId: config?.clientId || deriveDefaultClientId(),
     logoutRedirectUri: config?.logoutRedirectUri || deriveDefaultLogoutRedirectUri(),
@@ -420,18 +420,16 @@ export function useImmutableSession(): UseImmutableSessionReturn {
 /**
  * Return type for useLogin hook
  *
- * Config uses `Partial<LoginConfig>` by design:
- * - No params: `loginWithPopup()` uses all defaults (clientId, redirectUri, etc. auto-detected)
- * - Partial params: `loginWithPopup({ clientId: 'custom' })` overrides only what you pass, rest use defaults
- * - Without Partial, you'd need to pass the full LoginConfig when overriding any field
+ * Config is optional - when omitted, defaults are auto-derived (clientId, redirectUri, etc.).
+ * When provided, must be a complete LoginConfig.
  */
 export interface UseLoginReturn {
   /** Start login with popup flow */
-  loginWithPopup: (config?: Partial<LoginConfig>, options?: StandaloneLoginOptions) => Promise<void>;
+  loginWithPopup: (config?: LoginConfig, options?: StandaloneLoginOptions) => Promise<void>;
   /** Start login with embedded modal flow */
-  loginWithEmbedded: (config?: Partial<LoginConfig>) => Promise<void>;
+  loginWithEmbedded: (config?: LoginConfig) => Promise<void>;
   /** Start login with redirect flow (navigates away from page) */
-  loginWithRedirect: (config?: Partial<LoginConfig>, options?: StandaloneLoginOptions) => Promise<void>;
+  loginWithRedirect: (config?: LoginConfig, options?: StandaloneLoginOptions) => Promise<void>;
   /** Whether login is currently in progress */
   isLoggingIn: boolean;
   /** Error message from the last login attempt, or null if none */
@@ -491,7 +489,8 @@ export interface UseLoginReturn {
  *
  *   const handleLogin = () => {
  *     loginWithPopup({
- *       clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID, // Use your own client ID
+ *       clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID,
+ *       redirectUri: `${window.location.origin}/callback`,
  *     });
  *   };
  *
@@ -550,7 +549,7 @@ export function useLogin(): UseLoginReturn {
    * Config is optional - defaults will be auto-derived if not provided.
    */
   const loginWithPopup = useCallback(async (
-    config?: Partial<LoginConfig>,
+    config?: LoginConfig,
     options?: StandaloneLoginOptions,
   ): Promise<void> => {
     setIsLoggingIn(true);
@@ -574,7 +573,7 @@ export function useLogin(): UseLoginReturn {
    * Shows a modal for login method selection, then opens a popup for OAuth.
    * Config is optional - defaults will be auto-derived if not provided.
    */
-  const loginWithEmbedded = useCallback(async (config?: Partial<LoginConfig>): Promise<void> => {
+  const loginWithEmbedded = useCallback(async (config?: LoginConfig): Promise<void> => {
     setIsLoggingIn(true);
     setError(null);
 
@@ -599,7 +598,7 @@ export function useLogin(): UseLoginReturn {
    * Config is optional - defaults will be auto-derived if not provided.
    */
   const loginWithRedirect = useCallback(async (
-    config?: Partial<LoginConfig>,
+    config?: LoginConfig,
     options?: StandaloneLoginOptions,
   ): Promise<void> => {
     setIsLoggingIn(true);
@@ -641,7 +640,7 @@ export interface UseLogoutReturn {
    *
    * @param config - Optional logout configuration with clientId and optional redirectUri
    */
-  logout: (config?: Partial<LogoutConfig>) => Promise<void>;
+  logout: (config?: LogoutConfig) => Promise<void>;
   /** Whether logout is currently in progress */
   isLoggingOut: boolean;
   /** Error message from the last logout attempt, or null if none */
@@ -704,8 +703,8 @@ export interface UseLogoutReturn {
  *     <>
  *       <button
  *         onClick={() => logout({
- *           clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID, // Use your own client ID
- *           logoutRedirectUri: '/custom-logout', // Custom redirect
+ *           clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID,
+ *           logoutRedirectUri: `${window.location.origin}/custom-logout`,
  *         })}
  *         disabled={isLoggingOut}
  *       >
@@ -726,7 +725,7 @@ export function useLogout(): UseLogoutReturn {
    * First clears the NextAuth session, then redirects to the auth domain's logout endpoint.
    * Config is optional - defaults will be auto-derived if not provided.
    */
-  const logout = useCallback(async (config?: Partial<LogoutConfig>): Promise<void> => {
+  const logout = useCallback(async (config?: LogoutConfig): Promise<void> => {
     setIsLoggingOut(true);
     setError(null);
 

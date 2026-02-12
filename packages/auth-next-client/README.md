@@ -120,12 +120,18 @@ function LoginButton() {
 }
 ```
 
-Or with partial overrides (only override what you need):
+Or with custom config (pass full LoginConfig/LogoutConfig when overriding):
 
 ```tsx
-// Override only clientId, rest uses defaults
-loginWithPopup({ clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID! });
-logout({ clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID! });
+// With custom config - pass complete config
+loginWithPopup({
+  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+  redirectUri: `${window.location.origin}/callback`,
+});
+logout({
+  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+  logoutRedirectUri: process.env.NEXT_PUBLIC_BASE_URL!,
+});
 ```
 
 See the [wallets-connect-with-nextjs](../../examples/passport/wallets-connect-with-nextjs) example for a full integration with `@imtbl/wallet`.
