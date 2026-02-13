@@ -35,3 +35,12 @@ export const prodAuth = NextAuth({
   ...sharedAuthOptions,
   basePath: "/api/auth/prod",
 });
+
+// Default auth (zero config): uses createAuthConfig() with no args.
+// Auto-detects sandbox (NODE_ENV=development) or production client ID.
+// Enables testing default auth with wallet and transactions.
+export const defaultAuth = NextAuth({
+  ...createAuthConfig(),
+  ...sharedAuthOptions,
+  basePath: "/api/auth/default",
+});
