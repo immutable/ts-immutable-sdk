@@ -81,11 +81,13 @@ AUTH_SECRET=your-secret-key-min-32-characters
 
 ## Default Auth (Zero Config)
 
-For development and quick prototyping, you can use `createAuthConfig()` with no configuration. It auto-detects:
-- `clientId` based on environment (sandbox for localhost/sandbox hostnames or when `NODE_ENV=development`, production otherwise)
-- `redirectUri` from `window.location.origin + '/callback'`
+Policy: **provide nothing → full sandbox; provide config → provide everything.**
 
-> **Server-side detection:** On the server, `window` is unavailable, so sandbox is inferred from `NODE_ENV === 'development'`. This keeps client and server in sync when running locally with `next dev`. For production deployments, pass `clientId` explicitly.
+With no configuration, `createAuthConfig()` uses sandbox defaults:
+- `clientId`: sandbox (public Immutable client ID)
+- `redirectUri`: from `window.location.origin + '/callback'` (path only on server)
+
+When providing config, pass `clientId` and `redirectUri` (and optionally `audience`, `scope`, `authenticationDomain`) to avoid conflicts.
 
 ```typescript
 // lib/auth.ts
@@ -99,10 +101,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig());
 With partial overrides:
 
 ```typescript
-// Override only clientId, rest uses defaults
+// With config - provide clientId and redirectUri
 export const { handlers, auth, signIn, signOut } = NextAuth(
   createAuthConfig({
     clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+    redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
   }),
 );
 ```
@@ -140,8 +143,8 @@ const { handlers, auth, signIn, signOut } = NextAuth(
 
 | Option                 | Type     | Required | Description                                                              |
 | ---------------------- | -------- | -------- | ------------------------------------------------------------------------ |
-| `clientId`             | `string` | Optional | Your Immutable application client ID (default: auto-detected)             |
-| `redirectUri`          | `string` | Yes      | OAuth redirect URI configured in Immutable Hub                           |
+| `clientId`             | `string` | Yes*     | Your Immutable application client ID (*required when config is provided) |
+| `redirectUri`          | `string` | Yes*     | OAuth redirect URI (*required when config is provided)                   |
 | `audience`             | `string` | No       | OAuth audience (default: `"platform_api"`)                               |
 | `scope`                | `string` | No       | OAuth scopes (default: `"openid profile email offline_access transact"`) |
 | `authenticationDomain` | `string` | No       | Auth domain (default: `"https://auth.immutable.com"`)                    |

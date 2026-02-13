@@ -11,7 +11,7 @@ export enum EnvironmentNames {
   DEV = 'dev',
   SANDBOX = 'sandbox',
   PRODUCTION = 'production',
-  /** Zero-config auth: uses createAuthConfig() with no args, auto-detects sandbox/production */
+  /** Zero-config auth: uses createAuthConfig() with no args, always sandbox */
   DEFAULT = 'default',
 }
 

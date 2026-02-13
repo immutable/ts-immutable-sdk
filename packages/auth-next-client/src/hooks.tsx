@@ -117,6 +117,7 @@ function createDefaultLogoutConfig(config?: LogoutConfig): LogoutConfig {
   return {
     clientId: config?.clientId || deriveDefaultClientId(),
     logoutRedirectUri: config?.logoutRedirectUri || deriveDefaultLogoutRedirectUri(),
+    authenticationDomain: config?.authenticationDomain || DEFAULT_AUTH_DOMAIN,
   };
 }
 

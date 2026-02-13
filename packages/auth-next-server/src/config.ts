@@ -58,15 +58,15 @@ async function validateTokens(
 /**
  * Create Auth.js v5 configuration for Immutable authentication.
  *
- * Config is optional - when omitted, sensible defaults are used:
- * - `clientId`: Auto-detected (sandbox for localhost/sandbox hostnames or NODE_ENV=development, production otherwise)
- * - `redirectUri`: Auto-derived from `window.location.origin + '/callback'` (path only on server)
+ * Policy: provide nothing → full sandbox config; provide config → provide everything.
+ * - Zero config: sandbox clientId, auto-derived redirectUri. No conflicts.
+ * - With config: clientId and redirectUri required. Pass full config to avoid conflicts.
  *
- * @param config - Optional configuration. All fields can be overridden.
+ * @param config - Optional. When omitted, uses sandbox defaults. When provided, clientId and redirectUri are required.
  *
  * @example
  * ```typescript
- * // Zero config - only AUTH_SECRET required in .env
+ * // Zero config - sandbox, only AUTH_SECRET required in .env
  * import NextAuth from "next-auth";
  * import { createAuthConfig } from "@imtbl/auth-next-server";
  *
@@ -75,7 +75,7 @@ async function validateTokens(
  *
  * @example
  * ```typescript
- * // With custom config
+ * // With config - provide clientId and redirectUri (and optionally audience, scope, authenticationDomain)
  * import NextAuth from "next-auth";
  * import { createAuthConfig } from "@imtbl/auth-next-server";
  *
@@ -85,9 +85,24 @@ async function validateTokens(
  * }));
  * ```
  */
-export function createAuthConfig(config?: Partial<ImmutableAuthConfig>): NextAuthConfig {
-  const clientId = config?.clientId || deriveDefaultClientId();
-  const redirectUri = config?.redirectUri || deriveDefaultRedirectUri();
+export function createAuthConfig(config?: ImmutableAuthConfig): NextAuthConfig {
+  let clientId: string;
+  let redirectUri: string;
+
+  if (config) {
+    if (!config.clientId || !config.redirectUri) {
+      throw new Error(
+        '[auth-next-server] When providing config, clientId and redirectUri are required. '
+        + 'Provide full config to avoid conflicts.',
+      );
+    }
+    clientId = config.clientId;
+    redirectUri = config.redirectUri;
+  } else {
+    clientId = deriveDefaultClientId();
+    redirectUri = deriveDefaultRedirectUri();
+  }
+
   const resolvedConfig: ImmutableAuthConfig = {
     clientId,
     redirectUri,

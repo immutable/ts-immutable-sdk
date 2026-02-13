@@ -106,7 +106,7 @@ export default function Callback() {
 
 ### Default Auth (Zero Config)
 
-When using `createAuthConfig()` with no args on the server, you can call login/logout with no config—clientId and redirectUri are auto-detected:
+When using `createAuthConfig()` with no args on the server, you can call login/logout with no config—sandbox clientId and redirectUri are used:
 
 ```tsx
 // With default auth - no config needed
