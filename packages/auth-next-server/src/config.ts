@@ -11,6 +11,7 @@ import {
   IMMUTABLE_PROVIDER_ID,
   DEFAULT_SESSION_MAX_AGE_SECONDS,
 } from './constants';
+import { deriveDefaultClientId, deriveDefaultRedirectUri } from './defaultConfig';
 
 // Handle ESM/CJS interop - in some bundler configurations, the default export
 // may be nested under a 'default' property
@@ -55,24 +56,61 @@ async function validateTokens(
 }
 
 /**
- * Create Auth.js v5 configuration for Immutable authentication
+ * Create Auth.js v5 configuration for Immutable authentication.
+ *
+ * Policy: provide nothing → full sandbox config; provide config → provide everything.
+ * - Zero config: sandbox clientId, auto-derived redirectUri. No conflicts.
+ * - With config: clientId and redirectUri required. Pass full config to avoid conflicts.
+ *
+ * @param config - Optional. When omitted, uses sandbox defaults. When provided, clientId and redirectUri are required.
  *
  * @example
  * ```typescript
- * // lib/auth.ts
+ * // Zero config - sandbox, only AUTH_SECRET required in .env
  * import NextAuth from "next-auth";
  * import { createAuthConfig } from "@imtbl/auth-next-server";
  *
- * const config = {
+ * export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig());
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // With config - provide clientId and redirectUri (and optionally audience, scope, authenticationDomain)
+ * import NextAuth from "next-auth";
+ * import { createAuthConfig } from "@imtbl/auth-next-server";
+ *
+ * export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig({
  *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
  *   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
- * };
- *
- * export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig(config));
+ * }));
  * ```
  */
-export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
-  const authDomain = config.authenticationDomain || DEFAULT_AUTH_DOMAIN;
+export function createAuthConfig(config?: ImmutableAuthConfig): NextAuthConfig {
+  let clientId: string;
+  let redirectUri: string;
+
+  if (config) {
+    if (!config.clientId || !config.redirectUri) {
+      throw new Error(
+        '[auth-next-server] When providing config, clientId and redirectUri are required. '
+        + 'Provide full config to avoid conflicts.',
+      );
+    }
+    clientId = config.clientId;
+    redirectUri = config.redirectUri;
+  } else {
+    clientId = deriveDefaultClientId();
+    redirectUri = deriveDefaultRedirectUri();
+  }
+
+  const resolvedConfig: ImmutableAuthConfig = {
+    clientId,
+    redirectUri,
+    audience: config?.audience,
+    scope: config?.scope,
+    authenticationDomain: config?.authenticationDomain,
+  };
+  const authDomain = resolvedConfig.authenticationDomain || DEFAULT_AUTH_DOMAIN;
 
   return {
     // Custom jwt.encode: strip idToken from the cookie to reduce size and avoid
@@ -203,7 +241,7 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
               try {
                 const refreshed = await refreshAccessToken(
                   token.refreshToken as string,
-                  config.clientId,
+                  resolvedConfig.clientId,
                   authDomain,
                 );
                 // Extract zkEvm claims from the refreshed idToken
@@ -251,7 +289,7 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
             try {
               const refreshed = await refreshAccessToken(
                 token.refreshToken as string,
-                config.clientId,
+                resolvedConfig.clientId,
                 authDomain,
               );
               // Extract zkEvm claims from the refreshed idToken

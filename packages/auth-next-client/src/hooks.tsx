@@ -18,7 +18,19 @@ import {
   loginWithRedirect as rawLoginWithRedirect,
   logoutWithRedirect as rawLogoutWithRedirect,
 } from '@imtbl/auth';
-import { IMMUTABLE_PROVIDER_ID, TOKEN_EXPIRY_BUFFER_MS } from './constants';
+import {
+  deriveDefaultClientId,
+  deriveDefaultRedirectUri,
+} from '@imtbl/auth-next-server';
+import {
+  IMMUTABLE_PROVIDER_ID,
+  TOKEN_EXPIRY_BUFFER_MS,
+  DEFAULT_POPUP_REDIRECT_URI_PATH,
+  DEFAULT_LOGOUT_REDIRECT_URI_PATH,
+  DEFAULT_AUTH_DOMAIN,
+  DEFAULT_SCOPE,
+  DEFAULT_AUDIENCE,
+} from './constants';
 import { storeIdToken, getStoredIdToken, clearStoredIdToken } from './idTokenStorage';
 
 // ---------------------------------------------------------------------------
@@ -40,6 +52,73 @@ function deduplicatedUpdate(
     pendingRefresh = update().finally(() => { pendingRefresh = null; });
   }
   return pendingRefresh;
+}
+
+// ---------------------------------------------------------------------------
+// Default configuration helpers (extend shared logic from auth-next-server)
+// ---------------------------------------------------------------------------
+
+/**
+ * Derive the default popupRedirectUri based on the current URL.
+ *
+ * @returns Default popup redirect URI
+ * @internal
+ */
+function deriveDefaultPopupRedirectUri(): string {
+  if (typeof window === 'undefined') {
+    return DEFAULT_POPUP_REDIRECT_URI_PATH;
+  }
+
+  return `${window.location.origin}${DEFAULT_POPUP_REDIRECT_URI_PATH}`;
+}
+
+/**
+ * Derive the default logoutRedirectUri based on the current URL.
+ *
+ * @returns Default logout redirect URI
+ * @internal
+ */
+function deriveDefaultLogoutRedirectUri(): string {
+  if (typeof window === 'undefined') {
+    return DEFAULT_LOGOUT_REDIRECT_URI_PATH;
+  }
+
+  return window.location.origin + DEFAULT_LOGOUT_REDIRECT_URI_PATH;
+}
+
+/**
+ * Create a complete LoginConfig with default values.
+ * All fields are optional and will be auto-derived if not provided.
+ *
+ * @param config - Optional login configuration (when provided, must be complete)
+ * @returns Complete LoginConfig with defaults applied
+ * @internal
+ */
+function createDefaultLoginConfig(config?: LoginConfig): LoginConfig {
+  return {
+    clientId: config?.clientId || deriveDefaultClientId(),
+    redirectUri: config?.redirectUri || deriveDefaultRedirectUri(),
+    popupRedirectUri: config?.popupRedirectUri || deriveDefaultPopupRedirectUri(),
+    scope: config?.scope || DEFAULT_SCOPE,
+    audience: config?.audience || DEFAULT_AUDIENCE,
+    authenticationDomain: config?.authenticationDomain || DEFAULT_AUTH_DOMAIN,
+  };
+}
+
+/**
+ * Create a complete LogoutConfig with default values.
+ * All fields are optional and will be auto-derived if not provided.
+ *
+ * @param config - Optional logout configuration (when provided, must be complete)
+ * @returns Complete LogoutConfig with defaults applied
+ * @internal
+ */
+function createDefaultLogoutConfig(config?: LogoutConfig): LogoutConfig {
+  return {
+    clientId: config?.clientId || deriveDefaultClientId(),
+    logoutRedirectUri: config?.logoutRedirectUri || deriveDefaultLogoutRedirectUri(),
+    authenticationDomain: config?.authenticationDomain || DEFAULT_AUTH_DOMAIN,
+  };
 }
 
 /**
@@ -341,14 +420,17 @@ export function useImmutableSession(): UseImmutableSessionReturn {
 
 /**
  * Return type for useLogin hook
+ *
+ * Config is optional - when omitted, defaults are auto-derived (clientId, redirectUri, etc.).
+ * When provided, must be a complete LoginConfig.
  */
 export interface UseLoginReturn {
   /** Start login with popup flow */
-  loginWithPopup: (config: LoginConfig, options?: StandaloneLoginOptions) => Promise<void>;
+  loginWithPopup: (config?: LoginConfig, options?: StandaloneLoginOptions) => Promise<void>;
   /** Start login with embedded modal flow */
-  loginWithEmbedded: (config: LoginConfig) => Promise<void>;
+  loginWithEmbedded: (config?: LoginConfig) => Promise<void>;
   /** Start login with redirect flow (navigates away from page) */
-  loginWithRedirect: (config: LoginConfig, options?: StandaloneLoginOptions) => Promise<void>;
+  loginWithRedirect: (config?: LoginConfig, options?: StandaloneLoginOptions) => Promise<void>;
   /** Whether login is currently in progress */
   isLoggingIn: boolean;
   /** Error message from the last login attempt, or null if none */
@@ -356,27 +438,28 @@ export interface UseLoginReturn {
 }
 
 /**
- * Hook to handle Immutable authentication login flows.
+ * Hook to handle Immutable authentication login flows with automatic defaults.
  *
  * Provides login functions that:
  * 1. Handle OAuth authentication via popup, embedded modal, or redirect
  * 2. Automatically sign in to NextAuth after successful authentication
  * 3. Track loading and error states
+ * 4. Auto-detect clientId and redirectUri if not provided (uses defaults)
  *
- * Config is passed at call time to allow different configurations for different
- * login methods (e.g., different redirectUri vs popupRedirectUri).
+ * Config can be passed at call time or omitted to use sensible defaults:
+ * - `clientId`: Auto-detected based on environment (sandbox vs production)
+ * - `redirectUri`: Auto-derived from `window.location.origin + '/callback'`
+ * - `popupRedirectUri`: Auto-derived from `window.location.origin + '/callback'` (same as redirectUri)
+ * - `logoutRedirectUri`: Auto-derived from `window.location.origin`
+ * - `scope`: `'openid profile email offline_access transact'`
+ * - `audience`: `'platform_api'`
+ * - `authenticationDomain`: `'https://auth.immutable.com'`
  *
  * Must be used within a SessionProvider from next-auth/react.
  *
- * @example
+ * @example Minimal usage (uses all defaults)
  * ```tsx
  * import { useLogin, useImmutableSession } from '@imtbl/auth-next-client';
- *
- * const config = {
- *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
- *   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
- *   popupRedirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback/popup`,
- * };
  *
  * function LoginButton() {
  *   const { isAuthenticated } = useImmutableSession();
@@ -388,7 +471,37 @@ export interface UseLoginReturn {
  *
  *   return (
  *     <>
- *       <button onClick={() => loginWithPopup(config)} disabled={isLoggingIn}>
+ *       <button onClick={() => loginWithPopup()} disabled={isLoggingIn}>
+ *         {isLoggingIn ? 'Signing in...' : 'Sign In'}
+ *       </button>
+ *       {error && <p style={{ color: 'red' }}>{error}</p>}
+ *     </>
+ *   );
+ * }
+ * ```
+ *
+ * @example With custom configuration
+ * ```tsx
+ * import { useLogin, useImmutableSession } from '@imtbl/auth-next-client';
+ *
+ * function LoginButton() {
+ *   const { isAuthenticated } = useImmutableSession();
+ *   const { loginWithPopup, isLoggingIn, error } = useLogin();
+ *
+ *   const handleLogin = () => {
+ *     loginWithPopup({
+ *       clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID,
+ *       redirectUri: `${window.location.origin}/callback`,
+ *     });
+ *   };
+ *
+ *   if (isAuthenticated) {
+ *     return <p>You are logged in!</p>;
+ *   }
+ *
+ *   return (
+ *     <>
+ *       <button onClick={handleLogin} disabled={isLoggingIn}>
  *         {isLoggingIn ? 'Signing in...' : 'Sign In'}
  *       </button>
  *       {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -434,16 +547,18 @@ export function useLogin(): UseLoginReturn {
   /**
    * Login with a popup window.
    * Opens a popup for OAuth authentication, then signs in to NextAuth.
+   * Config is optional - defaults will be auto-derived if not provided.
    */
   const loginWithPopup = useCallback(async (
-    config: LoginConfig,
+    config?: LoginConfig,
     options?: StandaloneLoginOptions,
   ): Promise<void> => {
     setIsLoggingIn(true);
     setError(null);
 
     try {
-      const tokens = await rawLoginWithPopup(config, options);
+      const fullConfig = createDefaultLoginConfig(config);
+      const tokens = await rawLoginWithPopup(fullConfig, options);
       await signInWithTokens(tokens);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
@@ -457,13 +572,15 @@ export function useLogin(): UseLoginReturn {
   /**
    * Login with an embedded modal.
    * Shows a modal for login method selection, then opens a popup for OAuth.
+   * Config is optional - defaults will be auto-derived if not provided.
    */
-  const loginWithEmbedded = useCallback(async (config: LoginConfig): Promise<void> => {
+  const loginWithEmbedded = useCallback(async (config?: LoginConfig): Promise<void> => {
     setIsLoggingIn(true);
     setError(null);
 
     try {
-      const tokens = await rawLoginWithEmbedded(config);
+      const fullConfig = createDefaultLoginConfig(config);
+      const tokens = await rawLoginWithEmbedded(fullConfig);
       await signInWithTokens(tokens);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
@@ -479,16 +596,18 @@ export function useLogin(): UseLoginReturn {
    * Redirects the page to OAuth authentication.
    * After authentication, the user will be redirected to your callback page.
    * Use the CallbackPage component to complete the flow.
+   * Config is optional - defaults will be auto-derived if not provided.
    */
   const loginWithRedirect = useCallback(async (
-    config: LoginConfig,
+    config?: LoginConfig,
     options?: StandaloneLoginOptions,
   ): Promise<void> => {
     setIsLoggingIn(true);
     setError(null);
 
     try {
-      await rawLoginWithRedirect(config, options);
+      const fullConfig = createDefaultLoginConfig(config);
+      await rawLoginWithRedirect(fullConfig, options);
       // Note: The page will redirect, so this code may not run
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
@@ -518,9 +637,11 @@ export interface UseLogoutReturn {
    * This ensures that when the user logs in again, they will be prompted to select
    * an account instead of being automatically logged in with the previous account.
    *
-   * @param config - Logout configuration with clientId and optional redirectUri
+   * Config is optional - defaults will be auto-derived if not provided.
+   *
+   * @param config - Optional logout configuration with clientId and optional redirectUri
    */
-  logout: (config: LogoutConfig) => Promise<void>;
+  logout: (config?: LogoutConfig) => Promise<void>;
   /** Whether logout is currently in progress */
   isLoggingOut: boolean;
   /** Error message from the last logout attempt, or null if none */
@@ -538,16 +659,15 @@ export interface UseLogoutReturn {
  * an account (for social logins like Google) instead of being automatically logged
  * in with the previous account.
  *
+ * Config is optional - defaults will be auto-derived if not provided:
+ * - `clientId`: Auto-detected based on environment (sandbox vs production)
+ * - `logoutRedirectUri`: Auto-derived from `window.location.origin`
+ *
  * Must be used within a SessionProvider from next-auth/react.
  *
- * @example
+ * @example Minimal usage (uses all defaults)
  * ```tsx
  * import { useLogout, useImmutableSession } from '@imtbl/auth-next-client';
- *
- * const logoutConfig = {
- *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
- *   logoutRedirectUri: process.env.NEXT_PUBLIC_BASE_URL!,
- * };
  *
  * function LogoutButton() {
  *   const { isAuthenticated } = useImmutableSession();
@@ -559,7 +679,36 @@ export interface UseLogoutReturn {
  *
  *   return (
  *     <>
- *       <button onClick={() => logout(logoutConfig)} disabled={isLoggingOut}>
+ *       <button onClick={() => logout()} disabled={isLoggingOut}>
+ *         {isLoggingOut ? 'Signing out...' : 'Sign Out'}
+ *       </button>
+ *       {error && <p style={{ color: 'red' }}>{error}</p>}
+ *     </>
+ *   );
+ * }
+ * ```
+ *
+ * @example With custom configuration
+ * ```tsx
+ * import { useLogout, useImmutableSession } from '@imtbl/auth-next-client';
+ *
+ * function LogoutButton() {
+ *   const { isAuthenticated } = useImmutableSession();
+ *   const { logout, isLoggingOut, error } = useLogout();
+ *
+ *   if (!isAuthenticated) {
+ *     return null;
+ *   }
+ *
+ *   return (
+ *     <>
+ *       <button
+ *         onClick={() => logout({
+ *           clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID,
+ *           logoutRedirectUri: `${window.location.origin}/custom-logout`,
+ *         })}
+ *         disabled={isLoggingOut}
+ *       >
  *         {isLoggingOut ? 'Signing out...' : 'Sign Out'}
  *       </button>
  *       {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -575,8 +724,9 @@ export function useLogout(): UseLogoutReturn {
   /**
    * Logout with federated logout.
    * First clears the NextAuth session, then redirects to the auth domain's logout endpoint.
+   * Config is optional - defaults will be auto-derived if not provided.
    */
-  const logout = useCallback(async (config: LogoutConfig): Promise<void> => {
+  const logout = useCallback(async (config?: LogoutConfig): Promise<void> => {
     setIsLoggingOut(true);
     setError(null);
 
@@ -588,10 +738,13 @@ export function useLogout(): UseLogoutReturn {
       // We use redirect: false to handle the redirect ourselves for federated logout
       await signOut({ redirect: false });
 
+      // Create full config with defaults
+      const fullConfig = createDefaultLogoutConfig(config);
+
       // Redirect to the auth domain's logout endpoint using the standalone function
       // This clears the upstream session (Auth0/Immutable) so that on next login,
       // the user will be prompted to select an account instead of auto-logging in
-      rawLogoutWithRedirect(config);
+      rawLogoutWithRedirect(fullConfig);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Logout failed';
       setError(errorMessage);

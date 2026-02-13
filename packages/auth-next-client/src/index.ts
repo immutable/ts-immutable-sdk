@@ -59,3 +59,17 @@ export type {
   LogoutConfig,
 } from '@imtbl/auth';
 export { MarketingConsentStatus } from '@imtbl/auth';
+
+// Re-export constants and default config helpers for consumer convenience
+export {
+  DEFAULT_AUTH_DOMAIN,
+  DEFAULT_AUDIENCE,
+  DEFAULT_SCOPE,
+  IMMUTABLE_PROVIDER_ID,
+  DEFAULT_PRODUCTION_CLIENT_ID,
+  DEFAULT_SANDBOX_CLIENT_ID,
+  DEFAULT_REDIRECT_URI_PATH,
+  DEFAULT_POPUP_REDIRECT_URI_PATH,
+  DEFAULT_LOGOUT_REDIRECT_URI_PATH,
+} from './constants';
+export { deriveDefaultClientId, deriveDefaultRedirectUri } from '@imtbl/auth-next-server';

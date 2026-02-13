@@ -45,7 +45,35 @@ export const DEFAULT_TOKEN_EXPIRY_MS = DEFAULT_TOKEN_EXPIRY_SECONDS * 1000;
 export const TOKEN_EXPIRY_BUFFER_SECONDS = 60;
 
 /**
+ * Buffer time in milliseconds before token expiry to trigger refresh.
+ * Used by auth-next-client for client-side refresh timing.
+ */
+export const TOKEN_EXPIRY_BUFFER_MS = TOKEN_EXPIRY_BUFFER_SECONDS * 1000;
+
+/**
  * Default session max age in seconds (365 days)
  * This is how long the NextAuth session cookie will be valid
  */
 export const DEFAULT_SESSION_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
+
+/**
+ * Default Client IDs for auto-detection
+ * These are public client IDs for Immutable's default applications
+ */
+export const DEFAULT_PRODUCTION_CLIENT_ID = 'PtQRK4iRJ8GkXjiz6xfImMAYhPhW0cYk';
+export const DEFAULT_SANDBOX_CLIENT_ID = 'mjtCL8mt06BtbxSkp2vbrYStKWnXVZfo';
+
+/**
+ * Default redirect URI fallback (will be replaced at runtime with window.location.origin + '/callback')
+ */
+export const DEFAULT_REDIRECT_URI_PATH = '/callback';
+
+/**
+ * Default popup redirect URI path. Same as redirectUri to align with @imtbl/auth and @imtbl/wallet.
+ */
+export const DEFAULT_POPUP_REDIRECT_URI_PATH = '/callback';
+
+/**
+ * Default logout redirect URI path
+ */
+export const DEFAULT_LOGOUT_REDIRECT_URI_PATH = '/';
