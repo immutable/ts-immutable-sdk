@@ -59,7 +59,7 @@ export {
   DEFAULT_TOKEN_EXPIRY_MS,
   TOKEN_EXPIRY_BUFFER_MS,
 } from './constants';
-export { deriveDefaultClientId, deriveDefaultRedirectUri } from './defaultConfig';
+export { deriveDefaultRedirectUri } from './defaultConfig';
 
 // ============================================================================
 // Type exports

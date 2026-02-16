@@ -8,10 +8,11 @@ import type { ImmutableAuthConfig, ImmutableTokenData, UserInfoResponse } from '
 import { isTokenExpired, refreshAccessToken, extractZkEvmFromIdToken } from './refresh';
 import {
   DEFAULT_AUTH_DOMAIN,
+  DEFAULT_SANDBOX_CLIENT_ID,
   IMMUTABLE_PROVIDER_ID,
   DEFAULT_SESSION_MAX_AGE_SECONDS,
 } from './constants';
-import { deriveDefaultClientId, deriveDefaultRedirectUri } from './defaultConfig';
+import { deriveDefaultRedirectUri } from './defaultConfig';
 
 // Handle ESM/CJS interop - in some bundler configurations, the default export
 // may be nested under a 'default' property
@@ -90,16 +91,10 @@ export function createAuthConfig(config?: ImmutableAuthConfig): NextAuthConfig {
   let redirectUri: string;
 
   if (config) {
-    if (!config.clientId || !config.redirectUri) {
-      throw new Error(
-        '[auth-next-server] When providing config, clientId and redirectUri are required. '
-        + 'Provide full config to avoid conflicts.',
-      );
-    }
     clientId = config.clientId;
     redirectUri = config.redirectUri;
   } else {
-    clientId = deriveDefaultClientId();
+    clientId = DEFAULT_SANDBOX_CLIENT_ID;
     redirectUri = deriveDefaultRedirectUri();
   }
 
@@ -256,7 +251,7 @@ export function createAuthConfig(config?: ImmutableAuthConfig): NextAuthConfig {
                   error: undefined,
                 };
               } catch (error) {
-              // eslint-disable-next-line no-console
+                // eslint-disable-next-line no-console
                 console.error('[auth-next-server] Force refresh failed:', error);
                 return {
                   ...token,
@@ -304,7 +299,7 @@ export function createAuthConfig(config?: ImmutableAuthConfig): NextAuthConfig {
                 error: undefined, // Clear any previous error
               };
             } catch (error) {
-            // eslint-disable-next-line no-console
+              // eslint-disable-next-line no-console
               console.error('[auth-next-server] Token refresh failed:', error);
               return {
                 ...token,

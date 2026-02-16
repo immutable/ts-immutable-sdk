@@ -72,4 +72,4 @@ export {
   DEFAULT_POPUP_REDIRECT_URI_PATH,
   DEFAULT_LOGOUT_REDIRECT_URI_PATH,
 } from './constants';
-export { deriveDefaultClientId, deriveDefaultRedirectUri } from '@imtbl/auth-next-server';
+export { deriveDefaultRedirectUri } from './defaultConfig';

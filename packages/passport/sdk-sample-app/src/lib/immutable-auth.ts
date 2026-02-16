@@ -5,7 +5,7 @@
  * For NextAuth instances (server-only), see ./immutable-auth.server.ts
  */
 import type { ImmutableAuthConfig } from "@imtbl/auth-next-server";
-import { deriveDefaultClientId } from "@imtbl/auth-next-server";
+import { DEFAULT_SANDBOX_CLIENT_ID } from "@imtbl/auth-next-server";
 import { EnvironmentNames } from "@/types";
 import { BASE_PATH } from "@/config";
 
@@ -14,7 +14,7 @@ const CLIENT_IDS: Partial<Record<EnvironmentNames, string>> = {
   [EnvironmentNames.PRODUCTION]: "PtQRK4iRJ8GkXjiz6xfImMAYhPhW0cYk",
   [EnvironmentNames.SANDBOX]: "mjtCL8mt06BtbxSkp2vbrYStKWnXVZfo",
   [EnvironmentNames.DEV]: "pCtSnHovRnPiQuBcFkXAnbCNqNVcDM3m",
-  // DEFAULT uses deriveDefaultClientId() - not in this map
+  // DEFAULT uses DEFAULT_SANDBOX_CLIENT_ID - not in this map
 };
 
 // Auth domains for each environment
@@ -30,7 +30,7 @@ export function getAuthConfig(environment: EnvironmentNames): ImmutableAuthConfi
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
 
   return {
-    clientId: environment === EnvironmentNames.DEFAULT ? deriveDefaultClientId() : CLIENT_IDS[environment]!,
+    clientId: environment === EnvironmentNames.DEFAULT ? DEFAULT_SANDBOX_CLIENT_ID : CLIENT_IDS[environment]!,
     redirectUri: `${baseUrl}${BASE_PATH}/callback`,
     audience: "platform_api",
     scope: "openid profile email offline_access transact",

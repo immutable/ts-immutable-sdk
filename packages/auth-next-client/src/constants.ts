@@ -1,18 +1,18 @@
 /**
- * Re-export constants from auth-next-server for consistency.
- * All shared constants live in auth-next-server to avoid duplication.
+ * Client-side constants for @imtbl/auth-next-client.
+ * Defined locally to avoid importing from auth-next-server (which uses next/server).
+ * Values must stay in sync with auth-next-server constants.
  */
-export {
-  DEFAULT_AUTH_DOMAIN,
-  DEFAULT_AUDIENCE,
-  DEFAULT_SCOPE,
-  IMMUTABLE_PROVIDER_ID,
-  DEFAULT_NEXTAUTH_BASE_PATH,
-  DEFAULT_PRODUCTION_CLIENT_ID,
-  DEFAULT_SANDBOX_CLIENT_ID,
-  DEFAULT_REDIRECT_URI_PATH,
-  DEFAULT_POPUP_REDIRECT_URI_PATH,
-  DEFAULT_LOGOUT_REDIRECT_URI_PATH,
-  DEFAULT_TOKEN_EXPIRY_MS,
-  TOKEN_EXPIRY_BUFFER_MS,
-} from '@imtbl/auth-next-server';
+
+export const DEFAULT_AUTH_DOMAIN = 'https://auth.immutable.com';
+export const DEFAULT_AUDIENCE = 'platform_api';
+export const DEFAULT_SCOPE = 'openid profile email offline_access transact';
+export const IMMUTABLE_PROVIDER_ID = 'immutable';
+export const DEFAULT_NEXTAUTH_BASE_PATH = '/api/auth';
+export const DEFAULT_PRODUCTION_CLIENT_ID = 'PtQRK4iRJ8GkXjiz6xfImMAYhPhW0cYk';
+export const DEFAULT_SANDBOX_CLIENT_ID = 'mjtCL8mt06BtbxSkp2vbrYStKWnXVZfo';
+export const DEFAULT_REDIRECT_URI_PATH = '/callback';
+export const DEFAULT_POPUP_REDIRECT_URI_PATH = '/callback';
+export const DEFAULT_LOGOUT_REDIRECT_URI_PATH = '/';
+export const DEFAULT_TOKEN_EXPIRY_MS = 900_000;
+export const TOKEN_EXPIRY_BUFFER_MS = 60_000;

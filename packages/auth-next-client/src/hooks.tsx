@@ -18,14 +18,11 @@ import {
   loginWithRedirect as rawLoginWithRedirect,
   logoutWithRedirect as rawLogoutWithRedirect,
 } from '@imtbl/auth';
-import {
-  deriveDefaultClientId,
-  deriveDefaultRedirectUri,
-} from '@imtbl/auth-next-server';
+import { deriveDefaultRedirectUri } from './defaultConfig';
 import {
   IMMUTABLE_PROVIDER_ID,
   TOKEN_EXPIRY_BUFFER_MS,
-  DEFAULT_POPUP_REDIRECT_URI_PATH,
+  DEFAULT_SANDBOX_CLIENT_ID,
   DEFAULT_LOGOUT_REDIRECT_URI_PATH,
   DEFAULT_AUTH_DOMAIN,
   DEFAULT_SCOPE,
@@ -55,69 +52,29 @@ function deduplicatedUpdate(
 }
 
 // ---------------------------------------------------------------------------
-// Default configuration helpers (extend shared logic from auth-next-server)
+// Sandbox defaults for zero-config (no config or full config - no merge)
 // ---------------------------------------------------------------------------
 
-/**
- * Derive the default popupRedirectUri based on the current URL.
- *
- * @returns Default popup redirect URI
- * @internal
- */
-function deriveDefaultPopupRedirectUri(): string {
-  if (typeof window === 'undefined') {
-    return DEFAULT_POPUP_REDIRECT_URI_PATH;
-  }
-
-  return `${window.location.origin}${DEFAULT_POPUP_REDIRECT_URI_PATH}`;
-}
-
-/**
- * Derive the default logoutRedirectUri based on the current URL.
- *
- * @returns Default logout redirect URI
- * @internal
- */
-function deriveDefaultLogoutRedirectUri(): string {
-  if (typeof window === 'undefined') {
-    return DEFAULT_LOGOUT_REDIRECT_URI_PATH;
-  }
-
-  return window.location.origin + DEFAULT_LOGOUT_REDIRECT_URI_PATH;
-}
-
-/**
- * Create a complete LoginConfig with default values.
- * All fields are optional and will be auto-derived if not provided.
- *
- * @param config - Optional login configuration (when provided, must be complete)
- * @returns Complete LoginConfig with defaults applied
- * @internal
- */
-function createDefaultLoginConfig(config?: LoginConfig): LoginConfig {
+function getSandboxLoginConfig(): LoginConfig {
+  const redirectUri = deriveDefaultRedirectUri();
   return {
-    clientId: config?.clientId || deriveDefaultClientId(),
-    redirectUri: config?.redirectUri || deriveDefaultRedirectUri(),
-    popupRedirectUri: config?.popupRedirectUri || deriveDefaultPopupRedirectUri(),
-    scope: config?.scope || DEFAULT_SCOPE,
-    audience: config?.audience || DEFAULT_AUDIENCE,
-    authenticationDomain: config?.authenticationDomain || DEFAULT_AUTH_DOMAIN,
+    clientId: DEFAULT_SANDBOX_CLIENT_ID,
+    redirectUri,
+    popupRedirectUri: redirectUri,
+    scope: DEFAULT_SCOPE,
+    audience: DEFAULT_AUDIENCE,
+    authenticationDomain: DEFAULT_AUTH_DOMAIN,
   };
 }
 
-/**
- * Create a complete LogoutConfig with default values.
- * All fields are optional and will be auto-derived if not provided.
- *
- * @param config - Optional logout configuration (when provided, must be complete)
- * @returns Complete LogoutConfig with defaults applied
- * @internal
- */
-function createDefaultLogoutConfig(config?: LogoutConfig): LogoutConfig {
+function getSandboxLogoutConfig(): LogoutConfig {
+  const logoutRedirectUri = typeof window === 'undefined'
+    ? DEFAULT_LOGOUT_REDIRECT_URI_PATH
+    : window.location.origin + DEFAULT_LOGOUT_REDIRECT_URI_PATH;
   return {
-    clientId: config?.clientId || deriveDefaultClientId(),
-    logoutRedirectUri: config?.logoutRedirectUri || deriveDefaultLogoutRedirectUri(),
-    authenticationDomain: config?.authenticationDomain || DEFAULT_AUTH_DOMAIN,
+    clientId: DEFAULT_SANDBOX_CLIENT_ID,
+    logoutRedirectUri,
+    authenticationDomain: DEFAULT_AUTH_DOMAIN,
   };
 }
 
@@ -557,7 +514,7 @@ export function useLogin(): UseLoginReturn {
     setError(null);
 
     try {
-      const fullConfig = createDefaultLoginConfig(config);
+      const fullConfig = config ?? getSandboxLoginConfig();
       const tokens = await rawLoginWithPopup(fullConfig, options);
       await signInWithTokens(tokens);
     } catch (err) {
@@ -579,7 +536,7 @@ export function useLogin(): UseLoginReturn {
     setError(null);
 
     try {
-      const fullConfig = createDefaultLoginConfig(config);
+      const fullConfig = config ?? getSandboxLoginConfig();
       const tokens = await rawLoginWithEmbedded(fullConfig);
       await signInWithTokens(tokens);
     } catch (err) {
@@ -606,7 +563,7 @@ export function useLogin(): UseLoginReturn {
     setError(null);
 
     try {
-      const fullConfig = createDefaultLoginConfig(config);
+      const fullConfig = config ?? getSandboxLoginConfig();
       await rawLoginWithRedirect(fullConfig, options);
       // Note: The page will redirect, so this code may not run
     } catch (err) {
@@ -739,7 +696,7 @@ export function useLogout(): UseLogoutReturn {
       await signOut({ redirect: false });
 
       // Create full config with defaults
-      const fullConfig = createDefaultLogoutConfig(config);
+      const fullConfig = config ?? getSandboxLogoutConfig();
 
       // Redirect to the auth domain's logout endpoint using the standalone function
       // This clears the upstream session (Auth0/Immutable) so that on next login,
