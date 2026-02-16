@@ -57,6 +57,19 @@ async function validateTokens(
 }
 
 /**
+ * Resolve redirect URI for zero-config mode.
+ * Uses __NEXT_PRIVATE_ORIGIN when available (Next.js internal), otherwise path-only.
+ */
+function resolveDefaultRedirectUri(): string {
+  // eslint-disable-next-line no-underscore-dangle -- Next.js internal env var
+  const origin = process.env.__NEXT_PRIVATE_ORIGIN;
+  if (origin) {
+    return new URL(DEFAULT_REDIRECT_URI_PATH, origin).href;
+  }
+  return DEFAULT_REDIRECT_URI_PATH;
+}
+
+/**
  * Create Auth.js v5 configuration for Immutable authentication.
  *
  * Policy: provide nothing → full sandbox config; provide config → provide everything.
@@ -89,7 +102,7 @@ async function validateTokens(
 export function createAuthConfig(config?: ImmutableAuthConfig): NextAuthConfig {
   const resolvedConfig: ImmutableAuthConfig = config ?? {
     clientId: DEFAULT_SANDBOX_CLIENT_ID,
-    redirectUri: DEFAULT_REDIRECT_URI_PATH,
+    redirectUri: resolveDefaultRedirectUri(),
   };
   const authDomain = resolvedConfig.authenticationDomain || DEFAULT_AUTH_DOMAIN;
 

@@ -33,6 +33,7 @@ const getChainConfig = (environment: EnvironmentNames): ChainConfig[] | undefine
         magicProviderId: 'd196052b-8175-4a45-ba13-838a715d370f',
       }];
     case EnvironmentNames.SANDBOX:
+    case EnvironmentNames.DEFAULT:
       // Use testnet (default chain in wallet package)
       return undefined;
     case EnvironmentNames.PRODUCTION:
