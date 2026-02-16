@@ -8,11 +8,11 @@ import type { ImmutableAuthConfig, ImmutableTokenData, UserInfoResponse } from '
 import { isTokenExpired, refreshAccessToken, extractZkEvmFromIdToken } from './refresh';
 import {
   DEFAULT_AUTH_DOMAIN,
+  DEFAULT_REDIRECT_URI_PATH,
   DEFAULT_SANDBOX_CLIENT_ID,
   IMMUTABLE_PROVIDER_ID,
   DEFAULT_SESSION_MAX_AGE_SECONDS,
 } from './constants';
-import { deriveDefaultRedirectUri } from './defaultConfig';
 
 // Handle ESM/CJS interop - in some bundler configurations, the default export
 // may be nested under a 'default' property
@@ -89,7 +89,7 @@ async function validateTokens(
 export function createAuthConfig(config?: ImmutableAuthConfig): NextAuthConfig {
   const resolvedConfig: ImmutableAuthConfig = config ?? {
     clientId: DEFAULT_SANDBOX_CLIENT_ID,
-    redirectUri: deriveDefaultRedirectUri(),
+    redirectUri: DEFAULT_REDIRECT_URI_PATH,
   };
   const authDomain = resolvedConfig.authenticationDomain || DEFAULT_AUTH_DOMAIN;
 
