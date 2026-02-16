@@ -68,9 +68,13 @@ function getSandboxLoginConfig(): LoginConfig {
 }
 
 function getSandboxLogoutConfig(): LogoutConfig {
-  const logoutRedirectUri = typeof window === 'undefined'
-    ? DEFAULT_LOGOUT_REDIRECT_URI_PATH
-    : window.location.origin + DEFAULT_LOGOUT_REDIRECT_URI_PATH;
+  if (typeof window === 'undefined') {
+    throw new Error(
+      '[auth-next-client] getSandboxLogoutConfig requires window. '
+      + 'Logout runs in the browser when the user triggers it.',
+    );
+  }
+  const logoutRedirectUri = window.location.origin + DEFAULT_LOGOUT_REDIRECT_URI_PATH;
   return {
     clientId: DEFAULT_SANDBOX_CLIENT_ID,
     logoutRedirectUri,

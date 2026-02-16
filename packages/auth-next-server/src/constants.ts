@@ -57,21 +57,14 @@ export const TOKEN_EXPIRY_BUFFER_MS = TOKEN_EXPIRY_BUFFER_SECONDS * 1000;
 export const DEFAULT_SESSION_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
 
 /**
- * Public client IDs for Immutable's default applications.
- * auth-next zero-config uses DEFAULT_SANDBOX_CLIENT_ID only.
+ * Sandbox client ID for auth-next zero-config.
  */
-export const DEFAULT_PRODUCTION_CLIENT_ID = 'PtQRK4iRJ8GkXjiz6xfImMAYhPhW0cYk';
 export const DEFAULT_SANDBOX_CLIENT_ID = 'mjtCL8mt06BtbxSkp2vbrYStKWnXVZfo';
 
 /**
  * Default redirect URI path for sandbox zero-config.
  */
 export const DEFAULT_REDIRECT_URI_PATH = '/callback';
-
-/**
- * Default popup redirect URI path. Same as redirectUri to align with @imtbl/auth and @imtbl/wallet.
- */
-export const DEFAULT_POPUP_REDIRECT_URI_PATH = '/callback';
 
 /**
  * Default logout redirect URI path

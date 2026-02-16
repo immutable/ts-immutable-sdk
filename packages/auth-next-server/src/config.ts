@@ -87,23 +87,9 @@ async function validateTokens(
  * ```
  */
 export function createAuthConfig(config?: ImmutableAuthConfig): NextAuthConfig {
-  let clientId: string;
-  let redirectUri: string;
-
-  if (config) {
-    clientId = config.clientId;
-    redirectUri = config.redirectUri;
-  } else {
-    clientId = DEFAULT_SANDBOX_CLIENT_ID;
-    redirectUri = deriveDefaultRedirectUri();
-  }
-
-  const resolvedConfig: ImmutableAuthConfig = {
-    clientId,
-    redirectUri,
-    audience: config?.audience,
-    scope: config?.scope,
-    authenticationDomain: config?.authenticationDomain,
+  const resolvedConfig: ImmutableAuthConfig = config ?? {
+    clientId: DEFAULT_SANDBOX_CLIENT_ID,
+    redirectUri: deriveDefaultRedirectUri(),
   };
   const authDomain = resolvedConfig.authenticationDomain || DEFAULT_AUTH_DOMAIN;
 
