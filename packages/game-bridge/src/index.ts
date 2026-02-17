@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
-import * as provider from '@imtbl/x-provider';
 import * as xClient from '@imtbl/x-client';
 import {
   track,
@@ -43,10 +42,8 @@ const sdkVersionSha = '__SDK_VERSION_SHA__';
 const PASSPORT_FUNCTIONS = {
   init: 'init',
   relogin: 'relogin',
-  reconnect: 'reconnect',
   getPKCEAuthUrl: 'getPKCEAuthUrl',
   loginPKCE: 'loginPKCE',
-  connectPKCE: 'connectPKCE',
   getAccessToken: 'getAccessToken',
   getIdToken: 'getIdToken',
   logout: 'logout',
@@ -54,13 +51,6 @@ const PASSPORT_FUNCTIONS = {
   getPassportId: 'getPassportId',
   getLinkedAddresses: 'getLinkedAddresses',
   storeTokens: 'storeTokens',
-  imx: {
-    getAddress: 'getAddress',
-    isRegisteredOffchain: 'isRegisteredOffchain',
-    registerOffchain: 'registerOffchain',
-    transfer: 'imxTransfer',
-    batchNftTransfer: 'imxBatchNftTransfer',
-  },
   zkEvm: {
     connectEvm: 'connectEvm',
     sendTransaction: 'zkEvmSendTransaction',
@@ -72,64 +62,12 @@ const PASSPORT_FUNCTIONS = {
   },
 };
 
-function getHttpErrorSummary(err: unknown): {
-  status?: number;
-  fullUrl?: string;
-  traceId?: string;
-  requestId?: string;
-  cfRay?: string;
-} {
-  const e: any = err as any;
-  const status: number | undefined = e?.response?.status;
-  const url: string | undefined = e?.config?.url;
-  const baseURL: string | undefined = e?.config?.baseURL;
-  let fullUrl = typeof url === 'string' && typeof baseURL === 'string' && !/^https?:\/\//i.test(url)
-    ? `${baseURL}${url}`
-    : url;
-
-  // Remove query parameters to avoid exposing sensitive data (tokens, API keys, etc.)
-  if (typeof fullUrl === 'string') {
-    const queryIndex = fullUrl.indexOf('?');
-    if (queryIndex !== -1) {
-      fullUrl = fullUrl.substring(0, queryIndex);
-    }
-  }
-
-  const headers: Record<string, string> | undefined = e?.response?.headers;
-  const traceId = headers?.['x-amzn-trace-id'] ?? headers?.['x-trace-id'];
-  const requestId = headers?.['x-amzn-requestid']
-    ?? headers?.['x-amzn-request-id']
-    ?? headers?.['x-request-id'];
-  const cfRay = headers?.['cf-ray'];
-
-  return {
-    status,
-    fullUrl,
-    traceId,
-    requestId,
-    cfRay,
-  };
-}
-
-function parseHttpStatusSuffix(message: string): { status?: number; url?: string } {
-  // Matches our existing suffix formats like:
-  //   "... [httpStatus=500 url=https://...]" or
-  //   "... [httpStatus=500 url=https://... trace=... ...]"
-  const m = message.match(/\[httpStatus=([^\s\]]+)\s+url=([^\s\]]+)[^\]]*\]/);
-  if (!m) return {};
-  const statusStr = m[1];
-  const url = m[2];
-  const status = statusStr && /^[0-9]+$/.test(statusStr) ? Number(statusStr) : undefined;
-  return { status, url };
-}
-
 // To notify game engine that this file is loaded
 const initRequest = 'init';
 const initRequestId = '1';
 
 let passportClient: passport.Passport | null;
 let passportInitData: string | null = null;
-let providerInstance: provider.IMXProvider | null;
 let zkEvmProviderInstance: passport.Provider | null;
 let versionInfo: VersionInfo | null;
 
@@ -210,25 +148,6 @@ const getPassportClient = (): passport.Passport => {
     throw new Error('No Passport client');
   }
   return passportClient;
-};
-
-const setProvider = (
-  passportProvider: provider.IMXProvider | null | undefined,
-): boolean => {
-  if (passportProvider !== null && passportProvider !== undefined) {
-    providerInstance = passportProvider;
-    console.log('IMX provider set');
-    return true;
-  }
-  console.log('No IMX provider');
-  return false;
-};
-
-const getProvider = (): provider.IMXProvider => {
-  if (providerInstance == null) {
-    throw new Error('No IMX provider');
-  }
-  return providerInstance;
 };
 
 const setZkEvmProvider = (zkEvmProvider: passport.Provider | null | undefined): boolean => {
@@ -397,32 +316,6 @@ window.callFunction = async (jsonData: string) => {
         });
         break;
       }
-      case PASSPORT_FUNCTIONS.reconnect: {
-        let providerSet = false;
-        const userInfo = await getPassportClient().login({
-          useCachedSession: true,
-        });
-        if (userInfo) {
-          const passportProvider = await getPassportClient().connectImx();
-          providerSet = setProvider(passportProvider);
-          identify({ passportId: userInfo?.sub });
-        }
-
-        if (!providerSet) {
-          throw new Error('Failed to reconnect');
-        }
-
-        trackDuration(moduleName, 'performedReconnect', mt(markStart), {
-          succeeded: userInfo !== null,
-        });
-        callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success: providerSet,
-          error: null,
-        });
-        break;
-      }
       case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
         const request = data ? JSON.parse(data) : {};
         const directLoginOptions: passport.DirectLoginOptions | undefined = request?.directLoginOptions;
@@ -454,34 +347,8 @@ window.callFunction = async (jsonData: string) => {
         });
         break;
       }
-      case PASSPORT_FUNCTIONS.connectPKCE: {
-        const request = JSON.parse(data);
-        const profile = await getPassportClient().loginWithPKCEFlowCallback(
-          request.authorizationCode,
-          request.state,
-        );
-        const passportProvider = await getPassportClient().connectImx();
-        const providerSet = setProvider(passportProvider);
-
-        if (!providerSet) {
-          throw new Error('Failed to connect via PKCE');
-        }
-
-        identify({ passportId: profile.sub });
-        trackDuration(moduleName, 'performedConnectPkce', mt(markStart), {
-          succeeded: providerSet,
-        });
-        callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success: providerSet,
-          error: null,
-        });
-        break;
-      }
       case PASSPORT_FUNCTIONS.logout: {
         const logoutUrl = await getPassportClient().getLogoutUrl();
-        providerInstance = null;
         zkEvmProviderInstance = null;
         trackDuration(moduleName, 'performedGetLogoutUrl', mt(markStart));
         callbackToGame({
@@ -587,84 +454,6 @@ window.callFunction = async (jsonData: string) => {
           success: true,
           error: null,
           result: response,
-        });
-        break;
-      }
-      case PASSPORT_FUNCTIONS.imx.getAddress: {
-        const address = await getProvider().getAddress();
-        trackDuration(moduleName, 'performedImxGetAddress', mt(markStart));
-        callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success: true,
-          error: null,
-          result: address,
-        });
-        break;
-      }
-      case PASSPORT_FUNCTIONS.imx.isRegisteredOffchain: {
-        const registered = await getProvider().isRegisteredOffchain();
-        trackDuration(moduleName, 'performedImxIsRegisteredOffchain', mt(markStart));
-        callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success: true,
-          error: null,
-          result: registered,
-        });
-        break;
-      }
-      case PASSPORT_FUNCTIONS.imx.registerOffchain: {
-        const response = await getProvider().registerOffchain();
-        trackDuration(moduleName, 'performedImxRegisterOffchain', mt(markStart));
-        callbackToGame({
-          ...{
-            responseFor: fxName,
-            requestId,
-            success: true,
-            error: null,
-          },
-          ...response,
-        });
-        break;
-      }
-      case PASSPORT_FUNCTIONS.imx.transfer: {
-        const unsignedTransferRequest = JSON.parse(data);
-        const response = await getProvider().transfer(unsignedTransferRequest);
-        trackDuration(moduleName, 'performedImxTransfer', mt(markStart), {
-          requestId,
-          transferRequest: JSON.stringify(unsignedTransferRequest),
-          transferResponse: JSON.stringify(response),
-        });
-        callbackToGame({
-          ...{
-            responseFor: fxName,
-            requestId,
-            success: true,
-            error: null,
-          },
-          ...response,
-        });
-        break;
-      }
-      case PASSPORT_FUNCTIONS.imx.batchNftTransfer: {
-        const nftTransferDetails = JSON.parse(data);
-        const response = await getProvider().batchNftTransfer(
-          nftTransferDetails,
-        );
-        trackDuration(moduleName, 'performedImxBatchNftTransfer', mt(markStart), {
-          requestId,
-          transferRequest: JSON.stringify(nftTransferDetails),
-          transferResponse: JSON.stringify(response),
-        });
-        callbackToGame({
-          ...{
-            responseFor: fxName,
-            requestId,
-            success: true,
-            error: null,
-          },
-          ...response,
         });
         break;
       }
@@ -869,40 +658,6 @@ window.callFunction = async (jsonData: string) => {
     }
 
     // Make endpoint visible in Unity Output for debugging (CI logs don't include JS console).
-    const {
-      status,
-      fullUrl,
-      traceId,
-      requestId: httpRequestId,
-      cfRay,
-    } = getHttpErrorSummary(error);
-    if (
-      fxName === PASSPORT_FUNCTIONS.imx.registerOffchain
-      && wrappedError instanceof Error
-    ) {
-      // Some upstream errors embed "[httpStatus=... url=...]" only in the message string
-      // without preserving axios-like fields. Parse what we can so we can still enrich.
-      const parsed = parseHttpStatusSuffix(wrappedError.message);
-      const effectiveStatus = status ?? parsed.status;
-      const effectiveUrl = fullUrl ?? parsed.url;
-      const suffix = ` [httpStatus=${effectiveStatus ?? 'unknown'}`
-        + ` url=${effectiveUrl ?? 'unknown'}`
-        + ` trace=${traceId ?? 'unknown'}`
-        + ` reqId=${httpRequestId ?? 'unknown'}`
-        + ` cfRay=${cfRay ?? 'unknown'}]`;
-      // If a previous layer already added a minimal suffix like:
-      //   "... [httpStatus=500 url=...]"
-      // upgrade it to include trace/reqId/resp instead of skipping.
-      if (wrappedError.message.includes('[httpStatus=')) {
-        if (!wrappedError.message.includes('trace=')) {
-          const upgraded = wrappedError.message.replace(/\[httpStatus=[^\]]*\]/g, suffix.trim());
-          wrappedError = new Error(upgraded);
-        }
-      } else {
-        wrappedError = new Error(`${wrappedError.message}${suffix}`);
-      }
-    }
-
     const errorType = error instanceof passport.PassportError
       ? error?.type
       : undefined;
