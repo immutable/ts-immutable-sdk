@@ -8,6 +8,8 @@ import type { ImmutableAuthConfig, ImmutableTokenData, UserInfoResponse } from '
 import { isTokenExpired, refreshAccessToken, extractZkEvmFromIdToken } from './refresh';
 import {
   DEFAULT_AUTH_DOMAIN,
+  DEFAULT_REDIRECT_URI_PATH,
+  DEFAULT_SANDBOX_CLIENT_ID,
   IMMUTABLE_PROVIDER_ID,
   DEFAULT_SESSION_MAX_AGE_SECONDS,
 } from './constants';
@@ -55,24 +57,54 @@ async function validateTokens(
 }
 
 /**
- * Create Auth.js v5 configuration for Immutable authentication
+ * Resolve redirect URI for zero-config mode.
+ * Uses __NEXT_PRIVATE_ORIGIN when available (Next.js internal), otherwise path-only.
+ */
+function resolveDefaultRedirectUri(): string {
+  // eslint-disable-next-line no-underscore-dangle -- Next.js internal env var
+  const origin = process.env.__NEXT_PRIVATE_ORIGIN;
+  if (origin) {
+    return new URL(DEFAULT_REDIRECT_URI_PATH, origin).href;
+  }
+  return DEFAULT_REDIRECT_URI_PATH;
+}
+
+/**
+ * Create Auth.js v5 configuration for Immutable authentication.
+ *
+ * Policy: provide nothing → full sandbox config; provide config → provide everything.
+ * - Zero config: sandbox clientId, auto-derived redirectUri. No conflicts.
+ * - With config: clientId and redirectUri required. Pass full config to avoid conflicts.
+ *
+ * @param config - Optional. When omitted, uses sandbox defaults. When provided, clientId and redirectUri are required.
  *
  * @example
  * ```typescript
- * // lib/auth.ts
+ * // Zero config - sandbox, only AUTH_SECRET required in .env
  * import NextAuth from "next-auth";
  * import { createAuthConfig } from "@imtbl/auth-next-server";
  *
- * const config = {
+ * export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig());
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // With config - provide clientId and redirectUri (and optionally audience, scope, authenticationDomain)
+ * import NextAuth from "next-auth";
+ * import { createAuthConfig } from "@imtbl/auth-next-server";
+ *
+ * export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig({
  *   clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
  *   redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
- * };
- *
- * export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig(config));
+ * }));
  * ```
  */
-export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
-  const authDomain = config.authenticationDomain || DEFAULT_AUTH_DOMAIN;
+export function createAuthConfig(config?: ImmutableAuthConfig): NextAuthConfig {
+  const resolvedConfig: ImmutableAuthConfig = config ?? {
+    clientId: DEFAULT_SANDBOX_CLIENT_ID,
+    redirectUri: resolveDefaultRedirectUri(),
+  };
+  const authDomain = resolvedConfig.authenticationDomain || DEFAULT_AUTH_DOMAIN;
 
   return {
     // Custom jwt.encode: strip idToken from the cookie to reduce size and avoid
@@ -203,7 +235,7 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
               try {
                 const refreshed = await refreshAccessToken(
                   token.refreshToken as string,
-                  config.clientId,
+                  resolvedConfig.clientId,
                   authDomain,
                 );
                 // Extract zkEvm claims from the refreshed idToken
@@ -218,7 +250,7 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
                   error: undefined,
                 };
               } catch (error) {
-              // eslint-disable-next-line no-console
+                // eslint-disable-next-line no-console
                 console.error('[auth-next-server] Force refresh failed:', error);
                 return {
                   ...token,
@@ -251,7 +283,7 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
             try {
               const refreshed = await refreshAccessToken(
                 token.refreshToken as string,
-                config.clientId,
+                resolvedConfig.clientId,
                 authDomain,
               );
               // Extract zkEvm claims from the refreshed idToken
@@ -266,7 +298,7 @@ export function createAuthConfig(config: ImmutableAuthConfig): NextAuthConfig {
                 error: undefined, // Clear any previous error
               };
             } catch (error) {
-            // eslint-disable-next-line no-console
+              // eslint-disable-next-line no-console
               console.error('[auth-next-server] Token refresh failed:', error);
               return {
                 ...token,

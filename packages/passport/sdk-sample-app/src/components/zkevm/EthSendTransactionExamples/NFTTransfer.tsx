@@ -29,6 +29,7 @@ type NFTCandidate = BlockchainData.NFTWithBalance & {
 const chainNameMapping = (environment: EnvironmentNames) => {
   switch (environment) {
     case EnvironmentNames.SANDBOX:
+    case EnvironmentNames.DEFAULT:
       return 'imtbl-zkevm-testnet';
     case EnvironmentNames.PRODUCTION:
       return 'imtbl-zkevm-mainnet';

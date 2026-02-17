@@ -16,6 +16,7 @@ enum ApproveType {
 const getErc721DefaultContractAddress = (environment: EnvironmentNames) => {
   switch (environment) {
     case EnvironmentNames.SANDBOX:
+    case EnvironmentNames.DEFAULT:
       return '0xbe499b1eaa5c9992486be90ad3a3a4c15dcdfcda';
     case EnvironmentNames.PRODUCTION:
       return '0xb7d76448b0e887ce731e8d17c97ad605df412fb0';

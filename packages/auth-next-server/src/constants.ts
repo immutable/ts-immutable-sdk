@@ -45,7 +45,28 @@ export const DEFAULT_TOKEN_EXPIRY_MS = DEFAULT_TOKEN_EXPIRY_SECONDS * 1000;
 export const TOKEN_EXPIRY_BUFFER_SECONDS = 60;
 
 /**
+ * Buffer time in milliseconds before token expiry to trigger refresh.
+ * Used by auth-next-client for client-side refresh timing.
+ */
+export const TOKEN_EXPIRY_BUFFER_MS = TOKEN_EXPIRY_BUFFER_SECONDS * 1000;
+
+/**
  * Default session max age in seconds (365 days)
  * This is how long the NextAuth session cookie will be valid
  */
 export const DEFAULT_SESSION_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
+
+/**
+ * Sandbox client ID for auth-next zero-config.
+ */
+export const DEFAULT_SANDBOX_CLIENT_ID = 'mjtCL8mt06BtbxSkp2vbrYStKWnXVZfo';
+
+/**
+ * Default redirect URI path for sandbox zero-config.
+ */
+export const DEFAULT_REDIRECT_URI_PATH = '/callback';
+
+/**
+ * Default logout redirect URI path
+ */
+export const DEFAULT_LOGOUT_REDIRECT_URI_PATH = '/';

@@ -27,6 +27,10 @@ npm install @imtbl/auth-next-client @imtbl/auth-next-server next-auth@5
 - `next` >= 14.0.0
 - `next-auth` >= 5.0.0-beta.25
 
+### Next.js 14 Compatibility
+
+This package is compatible with both Next.js 14 and 15. It uses only standard APIs available in both versions (`next/navigation` for `useRouter`, `next-auth/react`). No Next.js 15-only APIs are used.
+
 ## Quick Start
 
 ### 1. Set Up Server-Side Auth
@@ -99,6 +103,42 @@ export default function Callback() {
   return <CallbackPage config={config} redirectTo="/dashboard" />;
 }
 ```
+
+### Default Auth (Zero Config)
+
+When using `createAuthConfig()` with no args on the server, you can call login/logout with no config—sandbox clientId and redirectUri are used:
+
+```tsx
+// With default auth - no config needed
+function LoginButton() {
+  const { isAuthenticated } = useImmutableSession();
+  const { loginWithPopup, isLoggingIn, error } = useLogin();
+
+  if (isAuthenticated) return <p>You are logged in!</p>;
+
+  return (
+    <button onClick={() => loginWithPopup()} disabled={isLoggingIn}>
+      {isLoggingIn ? "Signing in..." : "Sign In"}
+    </button>
+  );
+}
+```
+
+Or with custom config (pass full LoginConfig/LogoutConfig when overriding):
+
+```tsx
+// With custom config - pass complete config
+loginWithPopup({
+  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+  redirectUri: `${window.location.origin}/callback`,
+});
+logout({
+  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+  logoutRedirectUri: process.env.NEXT_PUBLIC_BASE_URL!,
+});
+```
+
+See the [wallets-connect-with-nextjs](../../examples/passport/wallets-connect-with-nextjs) example for a full integration with `@imtbl/wallet`.
 
 ### 5. Add Login Button
 
