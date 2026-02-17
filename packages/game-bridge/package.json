@@ -6,7 +6,6 @@
     "@imtbl/metrics": "workspace:*",
     "@imtbl/passport": "workspace:*",
     "@imtbl/x-client": "workspace:*",
-    "@imtbl/x-provider": "workspace:*",
     "ethers": "^6.13.4"
   },
   "devDependencies": {
