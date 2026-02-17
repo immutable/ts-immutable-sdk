@@ -37,7 +37,8 @@ const getSdkConfig = (environment: EnvironmentNames): ImxModuleConfiguration => 
         baseConfig,
       };
     }
-    case EnvironmentNames.SANDBOX: {
+    case EnvironmentNames.SANDBOX:
+    case EnvironmentNames.DEFAULT: {
       const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
       return {
         baseConfig,
@@ -72,7 +73,8 @@ const getBlockchainDataConfig = (environment: EnvironmentNames): BlockchainDataM
         baseConfig,
       };
     }
-    case EnvironmentNames.SANDBOX: {
+    case EnvironmentNames.SANDBOX:
+    case EnvironmentNames.DEFAULT: {
       const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
       return { baseConfig };
     }
@@ -114,7 +116,9 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
         ...sharedConfigurationValues,
       };
     }
-    case EnvironmentNames.SANDBOX: {
+    case EnvironmentNames.SANDBOX:
+    case EnvironmentNames.DEFAULT: {
+      // DEFAULT uses sandbox client ID to match default auth
       return {
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
@@ -163,7 +167,8 @@ const getOrderbookConfig = (environment: EnvironmentNames): ModuleConfiguration<
         baseConfig,
       };
     }
-    case EnvironmentNames.SANDBOX: {
+    case EnvironmentNames.SANDBOX:
+    case EnvironmentNames.DEFAULT: {
       const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
       return {
         baseConfig,
@@ -253,6 +258,8 @@ export function ImmutableProvider({
         return '/api/auth/dev';
       case EnvironmentNames.PRODUCTION:
         return '/api/auth/prod';
+      case EnvironmentNames.DEFAULT:
+        return '/api/auth/default';
       default:
         return '/api/auth/sandbox';
     }

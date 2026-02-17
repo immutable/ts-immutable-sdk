@@ -30,6 +30,16 @@ yarn add @imtbl/auth-next-server next-auth@5
 - `next` >= 14.0.0
 - `next-auth` >= 5.0.0-beta.25
 
+### Next.js 14 Compatibility
+
+This package is compatible with both Next.js 14 and 15. It uses only standard APIs available in both versions:
+
+- `next/server`: `NextRequest`, `NextResponse` (middleware)
+- `next/navigation`: `redirect` (Server Components)
+- NextAuth v5 with App Router
+
+No Next.js 15-only APIs are used (e.g. async `headers()`/`cookies()`, `unstable_after`).
+
 ## Quick Start
 
 ### 1. Create Auth Configuration
@@ -69,19 +79,55 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 AUTH_SECRET=your-secret-key-min-32-characters
 ```
 
+## Default Auth (Zero Config)
+
+Policy: **provide nothing → full sandbox; provide config → provide everything.**
+
+With no configuration, `createAuthConfig()` uses sandbox defaults:
+- `clientId`: sandbox (public Immutable client ID)
+- `redirectUri`: from `window.location.origin + '/callback'` (path only on server)
+
+When providing config, pass `clientId` and `redirectUri` (and optionally `audience`, `scope`, `authenticationDomain`) to avoid conflicts.
+
+```typescript
+// lib/auth.ts
+import NextAuth from "next-auth";
+import { createAuthConfig } from "@imtbl/auth-next-server";
+
+// Zero config - only AUTH_SECRET required in .env
+export const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig());
+```
+
+With partial overrides:
+
+```typescript
+// With config - provide clientId and redirectUri
+export const { handlers, auth, signIn, signOut } = NextAuth(
+  createAuthConfig({
+    clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID!,
+    redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/callback`,
+  }),
+);
+```
+
+> **Note:** Default auth uses public Immutable client IDs. For production apps, use your own client ID from Immutable Hub.
+
 ## Configuration
 
-### `createAuthConfig(config)`
+### `createAuthConfig(config?)`
 
-Creates an Auth.js v5 configuration object for Immutable authentication. You pass this to `NextAuth()` to create your auth instance.
+Creates an Auth.js v5 configuration object for Immutable authentication. Config is optional—when omitted, sensible defaults are used. Pass this to `NextAuth()` to create your auth instance.
 
 ```typescript
 import NextAuth from "next-auth";
 import { createAuthConfig } from "@imtbl/auth-next-server";
 
+// Zero config
+const { handlers, auth, signIn, signOut } = NextAuth(createAuthConfig());
+
+// Or with custom config
 const { handlers, auth, signIn, signOut } = NextAuth(
   createAuthConfig({
-    // Required
     clientId: "your-client-id",
     redirectUri: "https://your-app.com/callback",
 
@@ -97,8 +143,8 @@ const { handlers, auth, signIn, signOut } = NextAuth(
 
 | Option                 | Type     | Required | Description                                                              |
 | ---------------------- | -------- | -------- | ------------------------------------------------------------------------ |
-| `clientId`             | `string` | Yes      | Your Immutable application client ID                                     |
-| `redirectUri`          | `string` | Yes      | OAuth redirect URI configured in Immutable Hub                           |
+| `clientId`             | `string` | Yes*     | Your Immutable application client ID (*required when config is provided) |
+| `redirectUri`          | `string` | Yes*     | OAuth redirect URI (*required when config is provided)                   |
 | `audience`             | `string` | No       | OAuth audience (default: `"platform_api"`)                               |
 | `scope`                | `string` | No       | OAuth scopes (default: `"openid profile email offline_access transact"`) |
 | `authenticationDomain` | `string` | No       | Auth domain (default: `"https://auth.immutable.com"`)                    |

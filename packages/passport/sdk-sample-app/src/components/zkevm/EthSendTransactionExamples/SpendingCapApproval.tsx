@@ -11,6 +11,7 @@ import { Interface } from 'ethers';
 const getErc20DefaultContractAddress = (environment: EnvironmentNames) => {
   switch (environment) {
     case EnvironmentNames.SANDBOX:
+    case EnvironmentNames.DEFAULT:
       return '0x7bbe61ba86dc1b128b7c6228a4834bf2c1394240';
     case EnvironmentNames.PRODUCTION:
       return '0x52a6c53869ce09a731cd772f245b97a4401d3348';

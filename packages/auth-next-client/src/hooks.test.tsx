@@ -23,6 +23,10 @@ jest.mock('@imtbl/auth', () => ({
   logoutWithRedirect: jest.fn(),
 }));
 
+jest.mock('./defaultConfig', () => ({
+  deriveDefaultRedirectUri: jest.fn(() => 'http://localhost:3000/callback'),
+}));
+
 import { useImmutableSession } from './hooks';
 
 // ---------------------------------------------------------------------------

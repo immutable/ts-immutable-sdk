@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { Container, Row } from 'react-bootstrap';
 import { useImmutableSession } from '@imtbl/auth-next-client';
@@ -8,17 +8,41 @@ import Message from '@/components/Message';
 import Environment from '@/components/Environment';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
+import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { BASE_PATH } from '@/config';
 import PassportMethods from '@/components/PassportMethods';
 import ZkEvmWorkflow from '@/components/zkevm/ZkEvmWorkflow';
 import AuthNextJS from '@/components/AuthNextJS';
+import { EnvironmentNames } from '@/types';
 
+/**
+ * Login flow visibility rules:
+ * - DEFAULT env: only Auth NextJS (SSR) makes sense; Passport Methods hidden
+ * - Logged in via SSR: Passport Methods hidden (mutually exclusive)
+ * - Logged in via Passport (imx/zkEvm): Auth NextJS hidden (mutually exclusive)
+ *
+ * Conditional rendering is deferred until after mount to avoid hydration mismatch:
+ * environment (localStorage), session, and providers differ between server and client.
+ */
 export default function Home() {
+  const [hasMounted, setHasMounted] = useState(false);
   const { isLoading } = useStatusProvider();
+  const { environment } = useImmutableProvider();
   const {
     imxProvider, zkEvmProvider, defaultWalletProvider,
   } = usePassportProvider();
   const { isAuthenticated: isAuthNextJSAuthenticated } = useImmutableSession();
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  const isDefaultEnv = environment === EnvironmentNames.DEFAULT;
+  const isPassportConnected = !!imxProvider || !!zkEvmProvider;
+
+  // Before mount: show both for consistent server/client HTML (avoids hydration mismatch)
+  const showAuthNextJS = !hasMounted || isDefaultEnv || !isPassportConnected;
+  const showPassportMethods = !hasMounted || (!isDefaultEnv && !isAuthNextJSAuthenticated);
 
   return (
     <>
@@ -36,12 +60,16 @@ export default function Home() {
                 || !!defaultWalletProvider || isAuthNextJSAuthenticated}
             />
           </Row>
-          <Row className="my-3">
-            <AuthNextJS />
-          </Row>
-          <Row className="my-3">
-            <PassportMethods />
-          </Row>
+          {showAuthNextJS && (
+            <Row className="my-3">
+              <AuthNextJS />
+            </Row>
+          )}
+          {showPassportMethods && (
+            <Row className="my-3">
+              <PassportMethods />
+            </Row>
+          )}
           <Row className="my-3">
             <ImxWorkflow />
           </Row>
