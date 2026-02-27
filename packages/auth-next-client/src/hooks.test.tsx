@@ -291,6 +291,23 @@ describe('useImmutableSession', () => {
       // Should NOT have called update -- token is still valid
       expect(mockUpdate).not.toHaveBeenCalled();
     });
+
+    it('does not trigger refresh when session has error (prevents infinite loop)', async () => {
+      // Simulate: token expired and last refresh failed (e.g. RefreshTokenError)
+      const sessionWithError = createSession({
+        accessTokenExpires: Date.now() - 1000, // expired
+        error: 'RefreshTokenError',
+      });
+      setupUseSession(sessionWithError);
+
+      await act(async () => {
+        renderHook(() => useImmutableSession());
+      });
+
+      // Must NOT call update - otherwise we would retry refresh repeatedly
+      // and cause an infinite loop (update -> same session with error -> effect re-runs -> update again).
+      expect(mockUpdate).not.toHaveBeenCalled();
+    });
   });
 
   describe('getUser() respects pending refresh', () => {
