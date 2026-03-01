@@ -221,6 +221,8 @@ export function useImmutableSession(): UseImmutableSessionReturn {
   // `!isRefreshing` to briefly lose their cached data, resulting in UI flicker.
   useEffect(() => {
     if (!session?.accessTokenExpires) return;
+    // Don't retry if the last refresh already failed - prevents infinite loops
+    if (session?.error) return;
 
     const timeUntilExpiry = session.accessTokenExpires - Date.now() - TOKEN_EXPIRY_BUFFER_MS;
 
@@ -228,7 +230,7 @@ export function useImmutableSession(): UseImmutableSessionReturn {
       // Already expired -- refresh silently
       deduplicatedUpdate(() => updateRef.current());
     }
-  }, [session?.accessTokenExpires]);
+  }, [session?.accessTokenExpires, session?.error]);
 
   // ---------------------------------------------------------------------------
   // Sync idToken to localStorage

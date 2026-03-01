@@ -291,6 +291,23 @@ describe('useImmutableSession', () => {
       // Should NOT have called update -- token is still valid
       expect(mockUpdate).not.toHaveBeenCalled();
     });
+
+    it('does not trigger refresh when session has error (prevents infinite loop)', async () => {
+      // Simulate: token expired and last refresh failed (e.g. RefreshTokenError)
+      const sessionWithError = createSession({
+        accessTokenExpires: Date.now() - 1000, // expired
+        error: 'RefreshTokenError',
+      });
+      setupUseSession(sessionWithError);
+
+      await act(async () => {
+        renderHook(() => useImmutableSession());
+      });
+
+      // Must NOT call update - otherwise we would retry refresh repeatedly
+      // and cause an infinite loop (update -> same session with error -> effect re-runs -> update again).
+      expect(mockUpdate).not.toHaveBeenCalled();
+    });
   });
 
   describe('getUser() respects pending refresh', () => {
@@ -316,6 +333,36 @@ describe('useImmutableSession', () => {
 
       // getUser() should have waited for the refresh and gotten the fresh token
       expect(user?.accessToken).toBe('user-fresh-token');
+    });
+
+    it('getUser(true) still calls update with forceRefresh even when session has error', async () => {
+      // Session is in error state (e.g. previous refresh failed)
+      const sessionWithError = createSession({
+        accessTokenExpires: Date.now() - 1000,
+        error: 'RefreshTokenError',
+      });
+      setupUseSession(sessionWithError);
+
+      // Server recovers and returns a valid session (e.g. user re-authenticated elsewhere)
+      const recoveredSession = createSession({
+        accessToken: 'recovered-token',
+        accessTokenExpires: Date.now() + 10 * 60 * 1000,
+        user: { sub: 'user-1', email: 'recovered@test.com' },
+      });
+      mockUpdate.mockResolvedValue(recoveredSession);
+
+      const { result } = renderHook(() => useImmutableSession());
+
+      let user: any;
+      await act(async () => {
+        user = await result.current.getUser(true);
+      });
+
+      // forceRefresh must have been attempted (proactive effect does NOT run when session.error is set)
+      expect(mockUpdate).toHaveBeenCalledWith({ forceRefresh: true });
+      // When server returns a good session, we get the user
+      expect(user?.accessToken).toBe('recovered-token');
+      expect(user?.profile?.email).toBe('recovered@test.com');
     });
   });
 });
