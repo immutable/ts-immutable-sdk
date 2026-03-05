@@ -138,7 +138,7 @@ importers:
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@imtbl/sdk':
         specifier: latest
-        version: 2.12.6(typescript@5.6.2)
+        version: 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
         version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -998,6 +998,39 @@ importers:
         version: 14.2.10(eslint@8.57.0)(typescript@5.6.2)
       typescript:
         specifier: ^5
+        version: 5.6.2
+
+  packages/audience/sdk:
+    devDependencies:
+      '@swc/core':
+        specifier: ^1.4.2
+        version: 1.15.3(@swc/helpers@0.5.15)
+      '@swc/jest':
+        specifier: ^0.2.37
+        version: 0.2.37(@swc/core@1.15.3(@swc/helpers@0.5.15))
+      '@types/jest':
+        specifier: ^29.5.12
+        version: 29.5.14
+      '@types/node':
+        specifier: ^22.10.7
+        version: 22.19.7
+      eslint:
+        specifier: ^8.56.0
+        version: 8.57.0
+      jest:
+        specifier: ^29.7.0
+        version: 29.7.0(@types/node@22.19.7)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)
+      jest-environment-jsdom:
+        specifier: ^29.4.3
+        version: 29.6.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ts-jest:
+        specifier: ^29.1.0
+        version: 29.2.5(@babel/core@7.26.10)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.10))(esbuild@0.23.1)(jest@29.7.0(@types/node@22.19.7)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2))(typescript@5.6.2)
+      tsup:
+        specifier: ^8.3.0
+        version: 8.3.0(@swc/core@1.15.3(@swc/helpers@0.5.15))(jiti@1.21.0)(postcss@8.4.49)(typescript@5.6.2)(yaml@2.5.0)
+      typescript:
+        specifier: ^5.6.2
         version: 5.6.2
 
   packages/auth:
@@ -20733,7 +20766,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/bridge-sdk@2.12.6':
+  '@imtbl/bridge-sdk@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@imtbl/config': 2.12.6
       '@jest/globals': 29.7.0
@@ -20745,16 +20778,16 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@imtbl/checkout-sdk@2.12.6(typescript@5.6.2)':
+  '@imtbl/checkout-sdk@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@imtbl/blockchain-data': 2.12.6
-      '@imtbl/bridge-sdk': 2.12.6
+      '@imtbl/bridge-sdk': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/config': 2.12.6
-      '@imtbl/dex-sdk': 2.12.6
+      '@imtbl/dex-sdk': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@imtbl/generated-clients': 2.12.6
       '@imtbl/metrics': 2.12.6
-      '@imtbl/orderbook': 2.12.6
-      '@imtbl/passport': 2.12.6(typescript@5.6.2)
+      '@imtbl/orderbook': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/passport': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -20816,7 +20849,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@imtbl/dex-sdk@2.12.6':
+  '@imtbl/dex-sdk@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@imtbl/config': 2.12.6
       '@uniswap/sdk-core': 3.2.3
@@ -20858,7 +20891,7 @@ snapshots:
       - debug
       - pg-native
 
-  '@imtbl/orderbook@2.12.6':
+  '@imtbl/orderbook@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@imtbl/config': 2.12.6
       '@imtbl/metrics': 2.12.6
@@ -20872,16 +20905,16 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/passport@2.12.6(typescript@5.6.2)':
+  '@imtbl/passport@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@imtbl/auth': 2.12.6
       '@imtbl/config': 2.12.6
       '@imtbl/generated-clients': 2.12.6
       '@imtbl/metrics': 2.12.6
-      '@imtbl/toolkit': 2.12.6
-      '@imtbl/wallet': 2.12.6(typescript@5.6.2)
-      '@imtbl/x-client': 2.12.6
-      '@imtbl/x-provider': 2.12.6
+      '@imtbl/toolkit': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/wallet': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-provider': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       localforage: 1.10.0
       oidc-client-ts: 3.4.1
@@ -20900,19 +20933,19 @@ snapshots:
       - encoding
       - supports-color
 
-  '@imtbl/sdk@2.12.6(typescript@5.6.2)':
+  '@imtbl/sdk@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@imtbl/auth': 2.12.6
       '@imtbl/blockchain-data': 2.12.6
-      '@imtbl/checkout-sdk': 2.12.6(typescript@5.6.2)
+      '@imtbl/checkout-sdk': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
       '@imtbl/config': 2.12.6
       '@imtbl/minting-backend': 2.12.6
-      '@imtbl/orderbook': 2.12.6
-      '@imtbl/passport': 2.12.6(typescript@5.6.2)
-      '@imtbl/wallet': 2.12.6(typescript@5.6.2)
+      '@imtbl/orderbook': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/passport': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/wallet': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
       '@imtbl/webhook': 2.12.6
-      '@imtbl/x-client': 2.12.6
-      '@imtbl/x-provider': 2.12.6
+      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-provider': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -20923,9 +20956,9 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@imtbl/toolkit@2.12.6':
+  '@imtbl/toolkit@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/x-client': 2.12.6
+      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       bn.js: 5.2.1
@@ -20937,7 +20970,7 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/wallet@2.12.6(typescript@5.6.2)':
+  '@imtbl/wallet@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@imtbl/auth': 2.12.6
       '@imtbl/generated-clients': 2.12.6
@@ -20958,7 +20991,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/x-client@2.12.6':
+  '@imtbl/x-client@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@ethereumjs/wallet': 2.0.4
       '@imtbl/config': 2.12.6
@@ -20974,12 +21007,12 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/x-provider@2.12.6':
+  '@imtbl/x-provider@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@imtbl/config': 2.12.6
       '@imtbl/generated-clients': 2.12.6
-      '@imtbl/toolkit': 2.12.6
-      '@imtbl/x-client': 2.12.6
+      '@imtbl/toolkit': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       enc-utils: 3.0.0
