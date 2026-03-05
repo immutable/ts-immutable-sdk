@@ -21,6 +21,7 @@ package.json @immutable/blockchain-services
 /packages/blockchain-data @immutable/activation
 /packages/minting-backend @shineli1984
 /packages/webhook @shineli1984
+/packages/audience @immutable/game-page-team
 /packages/game-bridge @immutable/gamesdk @immutable/blockchain-services
 /examples @immutable/devgrowth
 **/package.json @immutable/blockchain-services
