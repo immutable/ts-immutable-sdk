@@ -4704,14 +4704,6 @@
               "type": "string"
             },
             "description": "ID of evm chain"
-          },
-          {
-            "in": "query",
-            "name": "includeSimulation",
-            "schema": {
-              "type": "boolean"
-            },
-            "description": "Include simulation results"
           }
         ],
         "responses": {
@@ -4803,14 +4795,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "in": "query",
-            "name": "includeSimulation",
-            "schema": {
-              "type": "boolean"
-            },
-            "description": "Include simulation results"
           }
         ],
         "responses": {

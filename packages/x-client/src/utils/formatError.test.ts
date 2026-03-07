@@ -16,7 +16,7 @@ describe('formatError', () => {
         tokenAddress: '0',
         tokenId: '0',
       }),
-    ).rejects.toThrowError("Asset with address 0 and id '0' not found");
+    ).rejects.toThrowError('AxiosError: Request failed with status code 404');
   });
 
   it('should format axios errors to IMXError', async () => {

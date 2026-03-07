@@ -343,11 +343,10 @@ export const GuardianApiAxiosParamCreator = function (configuration?: Configurat
          * Get an evm message by id
          * @summary Info for a specific evm message
          * @param {string} messageID The id of the evm message
-         * @param {boolean} [includeSimulation] Include simulation results
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMessageByID: async (messageID: string, includeSimulation?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getMessageByID: async (messageID: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'messageID' is not null or undefined
             assertParamExists('getMessageByID', 'messageID', messageID)
             const localVarPath = `/guardian/v1/messages/{messageID}`
@@ -367,10 +366,6 @@ export const GuardianApiAxiosParamCreator = function (configuration?: Configurat
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-            if (includeSimulation !== undefined) {
-                localVarQueryParameter['includeSimulation'] = includeSimulation;
-            }
-
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -388,11 +383,10 @@ export const GuardianApiAxiosParamCreator = function (configuration?: Configurat
          * @param {string} transactionID The id of the starkex transaction to retrieve
          * @param {GetTransactionByIDChainTypeEnum} chainType roll up type
          * @param {string} [chainID] ID of evm chain
-         * @param {boolean} [includeSimulation] Include simulation results
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getTransactionByID: async (transactionID: string, chainType: GetTransactionByIDChainTypeEnum, chainID?: string, includeSimulation?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getTransactionByID: async (transactionID: string, chainType: GetTransactionByIDChainTypeEnum, chainID?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'transactionID' is not null or undefined
             assertParamExists('getTransactionByID', 'transactionID', transactionID)
             // verify required parameter 'chainType' is not null or undefined
@@ -420,10 +414,6 @@ export const GuardianApiAxiosParamCreator = function (configuration?: Configurat
 
             if (chainID !== undefined) {
                 localVarQueryParameter['chainID'] = chainID;
-            }
-
-            if (includeSimulation !== undefined) {
-                localVarQueryParameter['includeSimulation'] = includeSimulation;
             }
 
 
@@ -530,12 +520,11 @@ export const GuardianApiFp = function(configuration?: Configuration) {
          * Get an evm message by id
          * @summary Info for a specific evm message
          * @param {string} messageID The id of the evm message
-         * @param {boolean} [includeSimulation] Include simulation results
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getMessageByID(messageID: string, includeSimulation?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EVMMessage>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getMessageByID(messageID, includeSimulation, options);
+        async getMessageByID(messageID: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EVMMessage>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMessageByID(messageID, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -544,12 +533,11 @@ export const GuardianApiFp = function(configuration?: Configuration) {
          * @param {string} transactionID The id of the starkex transaction to retrieve
          * @param {GetTransactionByIDChainTypeEnum} chainType roll up type
          * @param {string} [chainID] ID of evm chain
-         * @param {boolean} [includeSimulation] Include simulation results
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getTransactionByID(transactionID: string, chainType: GetTransactionByIDChainTypeEnum, chainID?: string, includeSimulation?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Transaction>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getTransactionByID(transactionID, chainType, chainID, includeSimulation, options);
+        async getTransactionByID(transactionID: string, chainType: GetTransactionByIDChainTypeEnum, chainID?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Transaction>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTransactionByID(transactionID, chainType, chainID, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -640,7 +628,7 @@ export const GuardianApiFactory = function (configuration?: Configuration, baseP
          * @throws {RequiredError}
          */
         getMessageByID(requestParameters: GuardianApiGetMessageByIDRequest, options?: AxiosRequestConfig): AxiosPromise<EVMMessage> {
-            return localVarFp.getMessageByID(requestParameters.messageID, requestParameters.includeSimulation, options).then((request) => request(axios, basePath));
+            return localVarFp.getMessageByID(requestParameters.messageID, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a transaction by payload hash
@@ -650,7 +638,7 @@ export const GuardianApiFactory = function (configuration?: Configuration, baseP
          * @throws {RequiredError}
          */
         getTransactionByID(requestParameters: GuardianApiGetTransactionByIDRequest, options?: AxiosRequestConfig): AxiosPromise<Transaction> {
-            return localVarFp.getTransactionByID(requestParameters.transactionID, requestParameters.chainType, requestParameters.chainID, requestParameters.includeSimulation, options).then((request) => request(axios, basePath));
+            return localVarFp.getTransactionByID(requestParameters.transactionID, requestParameters.chainType, requestParameters.chainID, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -779,13 +767,6 @@ export interface GuardianApiGetMessageByIDRequest {
      * @memberof GuardianApiGetMessageByID
      */
     readonly messageID: string
-
-    /**
-     * Include simulation results
-     * @type {boolean}
-     * @memberof GuardianApiGetMessageByID
-     */
-    readonly includeSimulation?: boolean
 }
 
 /**
@@ -814,13 +795,6 @@ export interface GuardianApiGetTransactionByIDRequest {
      * @memberof GuardianApiGetTransactionByID
      */
     readonly chainID?: string
-
-    /**
-     * Include simulation results
-     * @type {boolean}
-     * @memberof GuardianApiGetTransactionByID
-     */
-    readonly includeSimulation?: boolean
 }
 
 /**
@@ -923,7 +897,7 @@ export class GuardianApi extends BaseAPI {
      * @memberof GuardianApi
      */
     public getMessageByID(requestParameters: GuardianApiGetMessageByIDRequest, options?: AxiosRequestConfig) {
-        return GuardianApiFp(this.configuration).getMessageByID(requestParameters.messageID, requestParameters.includeSimulation, options).then((request) => request(this.axios, this.basePath));
+        return GuardianApiFp(this.configuration).getMessageByID(requestParameters.messageID, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -935,7 +909,7 @@ export class GuardianApi extends BaseAPI {
      * @memberof GuardianApi
      */
     public getTransactionByID(requestParameters: GuardianApiGetTransactionByIDRequest, options?: AxiosRequestConfig) {
-        return GuardianApiFp(this.configuration).getTransactionByID(requestParameters.transactionID, requestParameters.chainType, requestParameters.chainID, requestParameters.includeSimulation, options).then((request) => request(this.axios, this.basePath));
+        return GuardianApiFp(this.configuration).getTransactionByID(requestParameters.transactionID, requestParameters.chainType, requestParameters.chainID, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
