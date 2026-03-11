@@ -310,6 +310,85 @@ describe('useImmutableSession', () => {
     });
   });
 
+  describe('session reference stability', () => {
+    it('returns same reference when useSession returns new object with identical data', () => {
+      const sessionData = createSession();
+      setupUseSession(sessionData);
+      mockUpdate.mockResolvedValue(sessionData);
+
+      const { result, rerender } = renderHook(() => useImmutableSession());
+
+      const firstRef = result.current.session;
+
+      // Simulate window-focus refetch: useSession returns a new object with identical data
+      setupUseSession(createSession());
+      rerender();
+
+      expect(result.current.session).toBe(firstRef);
+    });
+
+    it('returns new reference when accessToken changes', () => {
+      const sessionData = createSession();
+      setupUseSession(sessionData);
+      mockUpdate.mockResolvedValue(sessionData);
+
+      const { result, rerender } = renderHook(() => useImmutableSession());
+
+      const firstRef = result.current.session;
+
+      // Simulate token refresh: new accessToken
+      setupUseSession(createSession({ accessToken: 'new-token' }));
+      rerender();
+
+      expect(result.current.session).not.toBe(firstRef);
+    });
+
+    it('returns new reference when error appears', () => {
+      const sessionData = createSession();
+      setupUseSession(sessionData);
+      mockUpdate.mockResolvedValue(sessionData);
+
+      const { result, rerender } = renderHook(() => useImmutableSession());
+
+      const firstRef = result.current.session;
+
+      // Simulate refresh failure: error field added
+      setupUseSession(createSession({ error: 'RefreshTokenError' }));
+      rerender();
+
+      expect(result.current.session).not.toBe(firstRef);
+    });
+
+    it('returns new reference when going from null to session', () => {
+      setupUseSession(null, 'unauthenticated');
+      mockUpdate.mockResolvedValue(null);
+
+      const { result, rerender } = renderHook(() => useImmutableSession());
+
+      expect(result.current.session).toBeNull();
+
+      setupUseSession(createSession());
+      rerender();
+
+      expect(result.current.session).not.toBeNull();
+    });
+
+    it('returns new reference when going from session to null', () => {
+      const sessionData = createSession();
+      setupUseSession(sessionData);
+      mockUpdate.mockResolvedValue(sessionData);
+
+      const { result, rerender } = renderHook(() => useImmutableSession());
+
+      expect(result.current.session).not.toBeNull();
+
+      setupUseSession(null, 'unauthenticated');
+      rerender();
+
+      expect(result.current.session).toBeNull();
+    });
+  });
+
   describe('getUser() respects pending refresh', () => {
     it('waits for in-flight refresh before returning user', async () => {
       const expiredSession = createSession({
