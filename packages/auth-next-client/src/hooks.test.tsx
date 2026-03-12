@@ -320,8 +320,12 @@ describe('useImmutableSession', () => {
 
       const firstRef = result.current.session;
 
-      // Simulate window-focus refetch: useSession returns a new object with identical data
-      setupUseSession(createSession());
+      // Simulate window-focus refetch: useSession returns a new object with identical data.
+      // Pin timestamps from the first session to avoid ms drift between Date.now() calls.
+      setupUseSession(createSession({
+        accessTokenExpires: sessionData.accessTokenExpires,
+        expires: sessionData.expires,
+      }));
       rerender();
 
       expect(result.current.session).toBe(firstRef);
