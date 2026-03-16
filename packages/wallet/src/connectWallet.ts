@@ -148,9 +148,13 @@ function createDefaultGetUser(initialChain: ChainConfig, options: ConnectWalletO
     });
   }
 
-  // Return getUser function that wraps Auth.getUserOrLogin
+  // Return getUser function that wraps Auth.getUserOrLogin/getUser based on options
   return {
-    getUser: async () => auth.getUserOrLogin(),
+    getUser: async (forceRefresh?: boolean, getUserOptions?: { silent?: boolean }) => {
+      if (forceRefresh) return auth.forceUserRefresh();
+      if (getUserOptions?.silent) return auth.getUser();
+      return auth.getUserOrLogin();
+    },
     clientId,
   };
 }
@@ -222,8 +226,9 @@ export async function connectWallet(
     clientId = defaultAuth.clientId;
   }
 
-  // 4. Get current user (may be null if not logged in)
-  const user = await getUser().catch(() => null);
+  // 4. Get current user (may be null if not logged in).
+  // Use silent: true to avoid triggering login popup on page load.
+  const user = await getUser(undefined, { silent: true }).catch(() => null);
 
   // 5. Create wallet configuration with concrete URLs
   const passportDomain = initialChain.passportDomain || initialChain.apiUrl.replace('api.', 'passport.');

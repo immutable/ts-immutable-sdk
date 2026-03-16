@@ -23,6 +23,7 @@ export type { RollupType } from '@imtbl/auth';
 // Wallet events
 export enum WalletEvents {
   ACCOUNTS_REQUESTED = 'accountsRequested',
+  LOGGED_IN = 'loggedIn',
   LOGGED_OUT = 'loggedOut',
 }
 
@@ -35,8 +36,10 @@ export type AccountsRequestedEvent = {
 };
 
 // WalletEventMap for internal wallet events
+// LOGGED_IN uses same event name as AuthEvents.LOGGED_IN (auth.eventEmitter is shared)
 export interface WalletEventMap extends Record<string, any> {
   [WalletEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
+  [WalletEvents.LOGGED_IN]: [User];
   [WalletEvents.LOGGED_OUT]: [];
 }
 
@@ -215,6 +218,17 @@ export interface PopupOverlayOptions {
 }
 
 /**
+ * Options for GetUserFunction calls.
+ */
+export interface GetUserOptions {
+  /**
+   * When true, do not trigger login (e.g. open popup) if user is not authenticated.
+   * Returns null instead. Use during page load to avoid unwanted popups.
+   */
+  silent?: boolean;
+}
+
+/**
  * Function type for getting the current user.
  * Used as an alternative to passing an Auth instance.
  * This function should return fresh tokens from the session manager.
@@ -222,8 +236,13 @@ export interface PopupOverlayOptions {
  * @param forceRefresh - When true, the auth layer should trigger a server-side
  *   token refresh to get updated claims (e.g., after zkEVM registration).
  *   This ensures the returned user has the latest data from the identity provider.
+ * @param options - Optional. When options.silent is true, return null if not
+ *   authenticated instead of triggering login (avoids popup on page load).
  */
-export type GetUserFunction = (forceRefresh?: boolean) => Promise<User | null>;
+export type GetUserFunction = (
+  forceRefresh?: boolean,
+  options?: GetUserOptions,
+) => Promise<User | null>;
 
 /**
  * Options for connecting a wallet via connectWallet()

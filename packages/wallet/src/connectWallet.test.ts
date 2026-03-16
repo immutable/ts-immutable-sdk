@@ -128,11 +128,11 @@ describe('connectWallet', () => {
         );
       });
 
-      it('uses getUserOrLogin from internal Auth', async () => {
+      it('uses getUser from internal Auth when silent (avoids popup on page load)', async () => {
         await connectWallet({ chains: [zkEvmChain] });
 
-        // Internal Auth's getUserOrLogin should be called during setup
-        expect(mockAuthInstance.getUserOrLogin).toHaveBeenCalled();
+        // Internal Auth's getUser should be called during setup (silent mode to avoid popup)
+        expect(mockAuthInstance.getUser).toHaveBeenCalled();
       });
 
       it('derives passportDomain from chain apiUrl', async () => {
@@ -491,7 +491,7 @@ describe('connectWallet', () => {
 
     describe('error handling', () => {
       it('handles auth failure gracefully', async () => {
-        mockAuthInstance.getUserOrLogin.mockRejectedValueOnce(new Error('Auth failed'));
+        mockAuthInstance.getUser.mockRejectedValueOnce(new Error('Auth failed'));
 
         const provider = await connectWallet({ chains: [zkEvmChain] });
 
