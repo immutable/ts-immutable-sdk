@@ -12,6 +12,7 @@ export enum ProviderErrorCode {
 
 export enum RpcErrorCode {
   RPC_SERVER_ERROR = -32000,
+  TRANSACTION_REVERTED = -32015,
   INVALID_REQUEST = -32600,
   METHOD_NOT_FOUND = -32601,
   INVALID_PARAMS = -32602,
