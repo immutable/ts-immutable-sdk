@@ -18,6 +18,43 @@ export const defaultOrderQuote: OrderQuote = {
   totalAmount: {},
 };
 
+/* Local dev bypass: window.__MOCK_PRIMARY_SALES_QUOTE__ → skip API */
+/* eslint-disable @typescript-eslint/naming-convention, max-len, object-curly-newline */
+const MOCK_QUOTE_JSON: OrderQuoteApiResponse = {
+  config: { contract_id: '0x0000000000000000000000000000000000000000' },
+  currencies: [
+    {
+      base: true,
+      decimals: 18,
+      erc20_address: '0x0000000000000000000000000000000000000000',
+      exchange_id: 'immutable',
+      name: 'tIMX',
+    },
+    {
+      base: false,
+      decimals: 6,
+      erc20_address: '0x3b2d8a1931736fc321c24864bceee981b11c3c57',
+      exchange_id: 'usd-coin',
+      name: 'USDC',
+    },
+  ],
+  products: {
+    kangaroo: {
+      pricing: {
+        tIMX: { amount: 10, currency: 'tIMX', type: 'crypto' },
+        USDC: { amount: 10, currency: 'USDC', type: 'crypto' },
+      },
+      product_id: 'kangaroo',
+      quantity: 1,
+    },
+  },
+  total_amount: {
+    tIMX: { amount: 10, currency: 'tIMX', type: 'crypto' },
+    USDC: { amount: 10, currency: 'USDC', type: 'crypto' },
+  },
+};
+/* eslint-enable @typescript-eslint/naming-convention, max-len, object-curly-newline */
+
 /* eslint-disable @typescript-eslint/naming-convention */
 const transformCurrencies = (
   currencies: OrderQuoteApiResponse['currencies'],
@@ -69,6 +106,7 @@ export const transformToOrderQuote = (
   ),
   totalAmount: total_amount,
 });
+/* eslint-enable @typescript-eslint/naming-convention */
 
 export const useQuoteOrder = ({
   environment,
@@ -112,23 +150,25 @@ export const useQuoteOrder = ({
 
       try {
         fetching.current = true;
-        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/quote?${queryParams}`;
 
-        // eslint-disable-next-line
-        const response = await fetch(baseUrl, {
-          method: 'GET',
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (!response.ok) {
-          throw new Error(`${response.status} - ${response.statusText}`);
+        /* eslint-disable no-underscore-dangle, @typescript-eslint/naming-convention */
+        const useMock = typeof window !== 'undefined'
+          && (window as Window & { __MOCK_PRIMARY_SALES_QUOTE__?: boolean }).__MOCK_PRIMARY_SALES_QUOTE__;
+        /* eslint-enable no-underscore-dangle, @typescript-eslint/naming-convention */
+        let json: OrderQuoteApiResponse;
+        if (useMock) {
+          json = MOCK_QUOTE_JSON;
+        } else {
+          const response = await fetch(
+            `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/quote?${queryParams}`,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            { method: 'GET', headers: { 'Content-Type': 'application/json' } },
+          );
+          if (!response.ok) throw new Error(`${response.status} - ${response.statusText}`);
+          json = await response.json();
         }
 
-        const quote = transformToOrderQuote(
-          await response.json(),
-          preferredCurrency,
-        );
+        const quote = transformToOrderQuote(json, preferredCurrency);
 
         const currency = getSelectedCurrency(quote);
 

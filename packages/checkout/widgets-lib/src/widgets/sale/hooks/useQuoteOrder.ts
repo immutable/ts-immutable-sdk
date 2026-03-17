@@ -7,6 +7,98 @@ import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 import { OrderQuote, OrderQuoteCurrency, SaleErrorTypes } from '../types';
 import { transformToOrderQuote } from '../functions/transformToOrderQuote';
 
+/* eslint-disable @typescript-eslint/naming-convention, max-len */
+const MOCK_QUOTE_JSON = {
+  config: { contract_id: '0x0000000000000000000000000000000000000000' },
+  currencies: [
+    {
+      base: true,
+      decimals: 18,
+      erc20_address: '0x0000000000000000000000000000000000000000',
+      exchange_id: 'immutable',
+      name: 'tIMX',
+    },
+    {
+      base: false,
+      decimals: 6,
+      erc20_address: '0x3b2d8a1931736fc321c24864bceee981b11c3c57',
+      exchange_id: 'usd-coin',
+      name: 'USDC',
+    },
+  ],
+  products: {
+    kangaroo: {
+      pricing: {
+        tIMX: { amount: 10, currency: 'tIMX', type: 'crypto' },
+        USDC: { amount: 10, currency: 'USDC', type: 'crypto' },
+      },
+      product_id: 'kangaroo',
+      quantity: 1,
+    },
+    quokka: {
+      pricing: {
+        tIMX: { amount: 10, currency: 'tIMX', type: 'crypto' },
+        USDC: { amount: 10, currency: 'USDC', type: 'crypto' },
+      },
+      product_id: 'quokka',
+      quantity: 1,
+    },
+    wombat: {
+      pricing: {
+        tIMX: { amount: 10, currency: 'tIMX', type: 'crypto' },
+        USDC: { amount: 10, currency: 'USDC', type: 'crypto' },
+      },
+      product_id: 'wombat',
+      quantity: 1,
+    },
+    kiwi: {
+      pricing: {
+        tIMX: { amount: 10, currency: 'tIMX', type: 'crypto' },
+        USDC: { amount: 10, currency: 'USDC', type: 'crypto' },
+      },
+      product_id: 'kiwi',
+      quantity: 1,
+    },
+    emu: {
+      pricing: {
+        tIMX: { amount: 10, currency: 'tIMX', type: 'crypto' },
+        USDC: { amount: 10, currency: 'USDC', type: 'crypto' },
+      },
+      product_id: 'emu',
+      quantity: 1,
+    },
+    corgi: {
+      pricing: {
+        tIMX: { amount: 10, currency: 'tIMX', type: 'crypto' },
+        USDC: { amount: 10, currency: 'USDC', type: 'crypto' },
+      },
+      product_id: 'corgi',
+      quantity: 1,
+    },
+    bull: {
+      pricing: {
+        tIMX: { amount: 10, currency: 'tIMX', type: 'crypto' },
+        USDC: { amount: 10, currency: 'USDC', type: 'crypto' },
+      },
+      product_id: 'bull',
+      quantity: 1,
+    },
+    ibis: {
+      pricing: {
+        tIMX: { amount: 10, currency: 'tIMX', type: 'crypto' },
+        USDC: { amount: 10, currency: 'USDC', type: 'crypto' },
+      },
+      product_id: 'ibis',
+      quantity: 1,
+    },
+  },
+  total_amount: {
+    tIMX: { amount: 80, currency: 'tIMX', type: 'crypto' },
+    USDC: { amount: 80, currency: 'USDC', type: 'crypto' },
+  },
+};
+/* eslint-enable @typescript-eslint/naming-convention, max-len */
+
 type UseQuoteOrderParams = {
   items: SaleItem[];
   environmentId: string;
@@ -83,21 +175,28 @@ export const useQuoteOrder = ({
 
       try {
         fetching.current = true;
-        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/quote?${queryParams}`;
 
-        // eslint-disable-next-line
-        const response = await fetch(baseUrl, {
-          method: 'GET',
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (!response.ok) {
-          throw new Error(`${response.status} - ${response.statusText}`);
+        // Local dev bypass: ?mockPrimarySales=1 → skip API, use mock
+        /* eslint-disable no-underscore-dangle, @typescript-eslint/naming-convention */
+        const useMock = typeof window !== 'undefined'
+          && (window as Window & { __MOCK_PRIMARY_SALES_QUOTE__?: boolean }).__MOCK_PRIMARY_SALES_QUOTE__;
+        /* eslint-enable no-underscore-dangle, @typescript-eslint/naming-convention */
+        let json: Record<string, unknown>;
+        if (useMock) {
+          json = MOCK_QUOTE_JSON;
+        } else {
+          const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/quote?${queryParams}`;
+          const response = await fetch(baseUrl, {
+            method: 'GET',
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            headers: { 'Content-Type': 'application/json' },
+          });
+          if (!response.ok) throw new Error(`${response.status} - ${response.statusText}`);
+          json = await response.json();
         }
 
         const config = transformToOrderQuote(
-          await response.json(),
+          json as Parameters<typeof transformToOrderQuote>[0],
           preferredCurrency,
         );
         setOrderQuote(config);

@@ -191,7 +191,7 @@ function CheckoutUI() {
       items: itemsMock,
       environmentId: "4dfc4bec-1867-49aa-ad35-d8a13b206c94",
       collectionName: "Pixel Aussie Farm",
-      excludePaymentTypes: [SalePaymentTypes.CREDIT],
+      excludePaymentTypes: [SalePaymentTypes.CREDIT, SalePaymentTypes.DEBIT], // Force IMX for Issue 3 test
       // preferredCurrency: 'USDC',
     },
     SWAP: {
@@ -421,9 +421,54 @@ function CheckoutUI() {
     }
   }, [browserProvider, widget]);
 
+  // Issue 3 simulation: reproduce "Crunching Numbers" stuck state
+  const [simulateIssue3, setSimulateIssue3] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const qs = window.location.search;
+    return (
+      qs.includes("simulateIssue3=1") ||
+      qs.includes("simulateIssue=1") ||
+      (window as Window & { __CHECKOUT_SIMULATE_ISSUE_3__?: boolean }).__CHECKOUT_SIMULATE_ISSUE_3__ === true
+    );
+  });
+
+  const toggleSimulateIssue3 = () => {
+    const win = window as Window & { __CHECKOUT_SIMULATE_ISSUE_3__?: boolean };
+    const next = !simulateIssue3;
+    win.__CHECKOUT_SIMULATE_ISSUE_3__ = next ? true : undefined;
+    setSimulateIssue3(next);
+    const params = new URLSearchParams(window.location.search);
+    if (next) params.set("simulateIssue3", "1");
+    else params.delete("simulateIssue3");
+    window.history.replaceState(null, "", `?${params.toString()}`);
+  };
+
   return (
     <Box sx={{ p: "base.spacing.x4" }}>
       <Box sx={{ mb: "base.spacing.x4" }}>
+        <Box
+          sx={{
+            mb: "base.spacing.x2",
+            p: "base.spacing.x3",
+            backgroundColor: simulateIssue3 ? "base.color.status.attention.bright" : "base.color.translucent.standard.2",
+            brad: "base.borderRadius.x2",
+          }}
+        >
+          <Stack direction="row" gap="base.spacing.x2" sx={{ alignItems: "center" }}>
+            <Checkbox
+              checked={simulateIssue3}
+              onChange={toggleSimulateIssue3}
+            />
+            <Box>
+              <Body size="small">
+                <strong>Simulate Issue 3:</strong> Routing hangs (Crunching Numbers stuck).
+              </Body>
+              <Body size="xSmall" sx={{ mt: "base.spacing.x1", opacity: 0.9 }}>
+                Passos: 1) Marque o checkbox. 2) Selecione "SALE" no dropdown "Select a Flow". 3) Conecte Passport. 4) Selecione IMX como pagamento. 5) O loading deve travar (sem correção) ou terminar em 10s (com correção). Para bypass da API primary-sales (500/404): use ?mockPrimarySales=1 na URL.
+              </Body>
+            </Box>
+          </Stack>
+        </Box>
         <AppHeaderBar>
           <AppHeaderBar.OverflowPopoverMenu variant="secondary">
             <MenuItem
@@ -489,8 +534,7 @@ function CheckoutUI() {
                   ],
                   environmentId: "249d9b0b-ee16-4dd5-91ee-96bece3b0473",
                   collectionName: "Pixel Aussie Farm",
-                  // excludePaymentTypes: [checkout.SalePaymentTypes.CREDIT],
-                  // preferredCurrency: 'USDC',
+                  excludePaymentTypes: [SalePaymentTypes.CREDIT, SalePaymentTypes.DEBIT],
                 });
               }}
             >

@@ -11,6 +11,7 @@ import { useStatusProvider } from '@/context/StatusProvider';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { BASE_PATH } from '@/config';
 import PassportMethods from '@/components/PassportMethods';
+import TreeverseFlowSimulation from '@/components/TreeverseFlowSimulation';
 import ZkEvmWorkflow from '@/components/zkevm/ZkEvmWorkflow';
 import AuthNextJS from '@/components/AuthNextJS';
 import { EnvironmentNames } from '@/types';
@@ -68,6 +69,11 @@ export default function Home() {
           {showPassportMethods && (
             <Row className="my-3">
               <PassportMethods />
+            </Row>
+          )}
+          {!isDefaultEnv && (
+            <Row className="my-3">
+              <TreeverseFlowSimulation />
             </Row>
           )}
           <Row className="my-3">

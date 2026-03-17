@@ -34,6 +34,21 @@ import { onRampRoute } from './onRamp';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
 import { measureAsyncExecution } from '../../logger/debugLogger';
 
+/**
+ * Check if Issue 3 simulation is active (routing never completes).
+ * Set via: ?simulateIssue3=1 in URL, or window.__CHECKOUT_SIMULATE_ISSUE_3__ = true
+ * Used for local testing to reproduce "Crunching Numbers" stuck state.
+ */
+/* eslint-disable no-underscore-dangle */
+const isSimulateIssue3Active = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  const win = window as Window & { __CHECKOUT_SIMULATE_ISSUE_3__?: boolean };
+  return win.__CHECKOUT_SIMULATE_ISSUE_3__ === true
+    || window.location.search.includes('simulateIssue3=1')
+    || window.location.search.includes('simulateIssue=1');
+};
+/* eslint-enable no-underscore-dangle */
+
 const hasAvailableRoutingOptions = (
   availableRoutingOptions: AvailableRoutingOptions,
 ) => availableRoutingOptions.bridge
@@ -232,6 +247,11 @@ export const routingCalculator = async (
   availableRoutingOptions: AvailableRoutingOptions,
   onFundingRoute?: (fundingRoute: FundingRoute) => void,
 ): Promise<RoutingOutcome> => {
+  // Simulation: hang indefinitely to reproduce Issue 3 "Crunching Numbers" stuck state
+  if (isSimulateIssue3Active()) {
+    await new Promise(() => {}); // Never resolves
+  }
+
   if (!hasAvailableRoutingOptions(availableRoutingOptions)) {
     return {
       type: RoutingOutcomeType.NO_ROUTE_OPTIONS,

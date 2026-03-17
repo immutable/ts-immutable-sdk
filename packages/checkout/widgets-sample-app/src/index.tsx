@@ -3,6 +3,11 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+// Local dev: ?mockPrimarySales=1 → bypass primary-sales API, use mock
+if (new URLSearchParams(window.location.search).get("mockPrimarySales") === "1") {
+  (window as Window & { __MOCK_PRIMARY_SALES_QUOTE__?: boolean }).__MOCK_PRIMARY_SALES_QUOTE__ = true;
+}
 import ConnectUI from "./components/ui/connect/connect";
 import WalletUI from "./components/ui/wallet/wallet";
 import SwapUI from "./components/ui/swap/swap";
