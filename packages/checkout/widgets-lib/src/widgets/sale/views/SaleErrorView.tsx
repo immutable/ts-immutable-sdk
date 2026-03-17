@@ -36,6 +36,7 @@ type SaleErrorViewProps = {
   errorType: SaleErrorTypes | undefined;
   transactionHash?: string;
   blockExplorerLink?: string;
+  vendorMessage?: string;
 };
 
 export function SaleErrorView({
@@ -43,6 +44,7 @@ export function SaleErrorView({
   transactionHash,
   blockExplorerLink,
   errorType,
+  vendorMessage,
 }: SaleErrorViewProps) {
   const { t } = useTranslation();
   const {
@@ -198,6 +200,13 @@ export function SaleErrorView({
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
+    [SaleErrorTypes.SALE_AUTHORIZATION_REJECTED]: {
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
+      statusIconStyles: {
+        fill: biomeTheme.color.status.fatal.dim,
+      },
+    },
     [SaleErrorTypes.INVALID_PARAMETERS]: {
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.ALERT,
@@ -222,11 +231,13 @@ export function SaleErrorView({
       ? t(`views.SALE_FAIL.errors.${currentErrorType}.secondaryAction`)
       : t(`views.SALE_FAIL.errors.${SaleErrorTypes.DEFAULT}.secondaryAction`);
 
+    const useVendorMessage = currentErrorType === SaleErrorTypes.SALE_AUTHORIZATION_REJECTED
+      && vendorMessage;
+
     return {
       headingText: t('views.PAYMENT_METHODS.handover.error.heading'),
-      subheadingText: t(
-        `views.SALE_FAIL.errors.${currentErrorType}.description`,
-      ),
+      subheadingText: useVendorMessage
+        || t(`views.SALE_FAIL.errors.${currentErrorType}.description`),
       primaryButtonText: t(
         `views.SALE_FAIL.errors.${currentErrorType}.primaryAction`,
       ),

@@ -459,6 +459,10 @@
           "primaryAction": "もう一度試す",
           "secondaryAction": "キャンセル"
         },
+        "SALE_AUTHORIZATION_REJECTED": {
+          "description": "申し訳ございません。購入を完了できませんでした。",
+          "secondaryAction": "閉じる"
+        },
         "DEFAULT_ERROR": {
           "description": "申し訳ありませんが、何かがうまくいかなかったようです。もう一度お試しください。",
           "primaryAction": "もう一度試す",

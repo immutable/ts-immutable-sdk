@@ -159,6 +159,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
               biomeTheme={biomeTheme}
               errorType={viewState.view.data?.errorType}
               transactionHash={viewState.view.data?.transactionHash}
+              vendorMessage={viewState.view.data?.vendorError?.message}
               blockExplorerLink={BlockExplorerService.getTransactionLink(
                 chainId.current as ChainId,
                 viewState.view.data?.transactionHash!,

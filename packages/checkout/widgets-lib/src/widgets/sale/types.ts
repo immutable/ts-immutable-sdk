@@ -59,7 +59,7 @@ export type SignOrderInput = {
 
 export type SignOrderError = {
   type: SaleErrorTypes;
-  data?: Record<string, string>;
+  data?: Record<string, unknown>;
 };
 
 export type ExecutedTransaction = {
@@ -85,6 +85,7 @@ export enum SaleErrorTypes {
   WALLET_REJECTED_NO_FUNDS = 'WALLET_REJECTED_NO_FUNDS',
   WALLET_POPUP_BLOCKED = 'WALLET_POPUP_BLOCKED',
   FUNDING_ROUTE_EXECUTE_ERROR = 'FUNDING_ROUTE_EXECUTE_ERROR',
+  SALE_AUTHORIZATION_REJECTED = 'SALE_AUTHORIZATION_REJECTED',
 }
 
 export type OrderQuoteCurrency = {

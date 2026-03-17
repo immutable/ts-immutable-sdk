@@ -43,6 +43,7 @@ interface SaleFailView extends ViewType {
   data?: {
     errorType: SaleErrorTypes;
     transactionHash?: string;
+    vendorError?: { code: string; message?: string };
     [key: string]: unknown;
   };
 }

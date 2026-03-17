@@ -456,6 +456,10 @@
           "primaryAction": "다시 시도",
           "secondaryAction": "취소"
         },
+        "SALE_AUTHORIZATION_REJECTED": {
+          "description": "죄송합니다, 구매를 완료할 수 없습니다.",
+          "secondaryAction": "닫기"
+        },
         "DEFAULT_ERROR": {
           "description": "죄송합니다, 문제가 발생했습니다. 다시 시도하세요.",
           "primaryAction": "다시 시도",

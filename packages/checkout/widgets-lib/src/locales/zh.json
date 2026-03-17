@@ -456,6 +456,10 @@
           "primaryAction": "再试一次",
           "secondaryAction": "取消"
         },
+        "SALE_AUTHORIZATION_REJECTED": {
+          "description": "抱歉，您的购买无法完成。",
+          "secondaryAction": "关闭"
+        },
         "DEFAULT_ERROR": {
           "description": "抱歉，出了点问题。请再试一次。",
           "primaryAction": "再试一次",

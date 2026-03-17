@@ -291,11 +291,16 @@ export const useSignOrder = (input: SignOrderInput) => {
 
         const { ok, status } = response;
         if (!ok) {
-          const { code } = (await response.json()) as SignApiError;
+          const { code, message } = (await response.json()) as SignApiError;
           let errorType: SaleErrorTypes;
+          let errorData: Record<string, unknown> | undefined;
+
           switch (status) {
             case 400:
-              errorType = SaleErrorTypes.SERVICE_BREAKDOWN;
+              errorType = SaleErrorTypes.SALE_AUTHORIZATION_REJECTED;
+              errorData = {
+                vendorError: { code: code || '', message: message || undefined },
+              };
               break;
             case 404:
               if (code === 'insufficient_stock') {
@@ -312,7 +317,7 @@ export const useSignOrder = (input: SignOrderInput) => {
               throw new Error('Unknown error');
           }
 
-          setSignError({ type: errorType });
+          setSignError({ type: errorType, data: errorData });
           return undefined;
         }
 

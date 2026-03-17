@@ -26,7 +26,7 @@ export const defaultOrderQuote: OrderQuote = {
 
 export type ConfigError = {
   type: SaleErrorTypes;
-  data?: Record<string, string>;
+  data?: Record<string, unknown>;
 };
 
 export const useQuoteOrder = ({
@@ -93,6 +93,16 @@ export const useQuoteOrder = ({
         });
 
         if (!response.ok) {
+          if (response.status === 400) {
+            const { code, message } = await response.json();
+            setOrderQuoteError({
+              type: SaleErrorTypes.SALE_AUTHORIZATION_REJECTED,
+              data: {
+                vendorError: { code: code || '', message: message || undefined },
+              },
+            });
+            return;
+          }
           throw new Error(`${response.status} - ${response.statusText}`);
         }
 

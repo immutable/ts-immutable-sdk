@@ -87,7 +87,7 @@ type SaleContextValues = SaleContextProps & {
     paymentMethod?: SalePaymentTypes | undefined,
     data?: Record<string, unknown>
   ) => void;
-  goToErrorView: (type: SaleErrorTypes, data?: Record<string, string>) => void;
+  goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
   goToSuccessView: (data?: Record<string, unknown>) => void;
   fundingRoutes: FundingRoute[];
   disabledPaymentTypes: SalePaymentTypes[];
@@ -284,14 +284,21 @@ export function SaleContextProvider(props: {
   );
 
   const goToErrorView = useCallback(
-    (errorType: SaleErrorTypes, data: Record<string, string> = {}) => {
+    (
+      errorType: SaleErrorTypes,
+      data: Record<string, unknown> & { vendorError?: { code: string; message?: string } } = {},
+    ) => {
       errorRetries.current += 1;
       if (errorRetries.current > MAX_ERROR_RETRIES) {
         errorRetries.current = 0;
         setPaymentMethod(undefined);
       }
 
-      trackError('commerce', 'saleError', new Error(errorType), data);
+      const { vendorError, ...errorData } = data;
+      trackError('commerce', 'saleError', new Error(errorType), {
+        ...errorData,
+        ...(vendorError ? { vendorCode: vendorError.code, vendorMessage: vendorError.message || '' } : {}),
+      });
 
       viewDispatch({
         payload: {
