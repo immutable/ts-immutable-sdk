@@ -2,7 +2,7 @@ import {
   Checkout, ItemBalance, WrappedBrowserProvider, TokenBalance, TransactionRequirement,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { compareStr } from '../../../lib/utils';
+import { compareStr, isNativeToken } from '../../../lib/utils';
 import {
   OrderQuoteCurrency,
   FundingBalance,
@@ -11,6 +11,7 @@ import {
 import {
   getAlternativeFundingSteps,
   getERC20ItemRequirement,
+  getNativeItemRequirement,
   getFnToPushAndSortFundingBalances,
   getFundingBalances,
   getGasEstimate,
@@ -75,11 +76,9 @@ export const fetchFundingBalances = async (
         return null;
       }
 
-      const itemRequirements = getERC20ItemRequirement(
-        amount,
-        spenderAddress,
-        currency.address,
-      );
+      const itemRequirements = isNativeToken(currency.address)
+        ? getNativeItemRequirement(amount)
+        : getERC20ItemRequirement(amount, spenderAddress, currency.address);
 
       const transactionOrGasAmount = getIsGasless()
         ? undefined
