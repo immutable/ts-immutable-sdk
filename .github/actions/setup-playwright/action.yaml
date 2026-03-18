@@ -20,7 +20,7 @@ runs:
         
     - name: Cache Playwright Browsers
       id: cache-playwright-browsers
-      uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f
+      uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # pin@v5.0.3
       with:
         path: ~/.cache/ms-playwright
         key: playwright-browsers-${{ runner.os }}-${{ env.PLAYWRIGHT_VERSION }}
