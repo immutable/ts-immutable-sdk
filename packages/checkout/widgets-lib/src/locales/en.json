@@ -499,6 +499,10 @@
           "primaryAction": "Try again",
           "secondaryAction": "Cancel"
         },
+        "SALE_AUTHORIZATION_REJECTED": {
+          "description": "Sorry, your purchase could not be completed.",
+          "secondaryAction": "Dismiss"
+        },
         "DEFAULT_ERROR": {
           "description": "Sorry, something went wrong. Please try again.",
           "primaryAction": "Try again",
