@@ -5,13 +5,13 @@ runs:
   using: "composite"
   steps:
     - name: Derive appropriate SHAs for base and head for `nx affected` commands
-      uses: nrwl/nx-set-shas@e2e6dc8bce4b0387a05eb687735c39c41580b792
+      uses: nrwl/nx-set-shas@3e9ad7370203c1e93d109be57f3b72eb0eb511b1 # pin@v4.4.0
 
     - name: Setup pnpm
       uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
 
     - name: Use Node.js
-      uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a
+      uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # pin@v6.3.0
       with:
         node-version-file: ".nvmrc"
         registry-url: https://registry.npmjs.org/
