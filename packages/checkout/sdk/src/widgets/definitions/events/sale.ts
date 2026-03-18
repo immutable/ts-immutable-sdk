@@ -37,6 +37,21 @@ export type SaleSuccess = {
 };
 
 /**
+ * Vendor error from custom authorization or quote webhooks.
+ * Present when the failure is due to a vendor-specific rejection.
+ */
+export type VendorError = {
+  code: string;
+  message?: string;
+};
+
+export type SaleFailedError = {
+  type?: string;
+  data?: { vendorError?: VendorError };
+  [key: string]: unknown;
+};
+
+/**
  * Type representing a Sale Widget with type FAILURE.
  * @property {string} reason
  * @property {number} timestamp
@@ -45,8 +60,8 @@ export type SaleSuccess = {
 export type SaleFailed = {
   /** The reason why sale transaction failed. */
   reason: string;
-  /** The error object. */
-  error: Record<string, unknown>;
+  /** Error details. Will include vendorError if the failure is due to a vendor-specific rejection. */
+  error: SaleFailedError;
   /** The timestamp of the failed swap. */
   timestamp: number;
   /** Chosen payment method */
