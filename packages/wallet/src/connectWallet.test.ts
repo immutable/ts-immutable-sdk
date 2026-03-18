@@ -135,6 +135,33 @@ describe('connectWallet', () => {
         expect(mockAuthInstance.getUser).toHaveBeenCalled();
       });
 
+      it('does not call getUserOrLogin during setup (silent flow avoids popup)', async () => {
+        await connectWallet({ chains: [zkEvmChain] });
+
+        // Silent flow uses getUser only; getUserOrLogin would trigger popup
+        expect(mockAuthInstance.getUserOrLogin).not.toHaveBeenCalled();
+      });
+
+      it('uses getUserOrLogin when non-silent (e.g. eth_requestAccounts triggers login)', async () => {
+        // When external getUser is provided, it may use getUserOrLogin for explicit login
+        const getUser = jest.fn()
+          .mockResolvedValueOnce(null) // setup (silent) - not used when we provide getUser
+          .mockResolvedValueOnce({ profile: { sub: 'user' }, accessToken: 'token' });
+        const getUserOrLogin = jest.fn().mockResolvedValue({ profile: { sub: 'user' }, accessToken: 'token' });
+
+        await connectWallet({
+          getUser: async (forceRefresh?, options?) => {
+            if (options?.silent) return getUser(forceRefresh, options);
+            return getUserOrLogin(forceRefresh, options);
+          },
+          chains: [zkEvmChain],
+        });
+
+        // Setup calls getUser with silent: true, so getUser (not getUserOrLogin) is used
+        expect(getUser).toHaveBeenCalledWith(undefined, { silent: true });
+        expect(getUserOrLogin).not.toHaveBeenCalled();
+      });
+
       it('derives passportDomain from chain apiUrl', async () => {
         const customChain = {
           ...zkEvmChain,

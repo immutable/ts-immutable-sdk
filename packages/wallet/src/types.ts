@@ -36,7 +36,6 @@ export type AccountsRequestedEvent = {
 };
 
 // WalletEventMap for internal wallet events
-// LOGGED_IN uses same event name as AuthEvents.LOGGED_IN (auth.eventEmitter is shared)
 export interface WalletEventMap extends Record<string, any> {
   [WalletEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
   [WalletEvents.LOGGED_IN]: [User];

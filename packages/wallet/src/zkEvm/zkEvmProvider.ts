@@ -139,7 +139,6 @@ export class ZkEvmProvider implements Provider {
       this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [
         user.zkEvm.ethAddress,
       ]);
-      this.#callSessionActivity(user.zkEvm.ethAddress);
     }
     // If user doesn't have zkEvm yet, app must call eth_requestAccounts to register
   };
