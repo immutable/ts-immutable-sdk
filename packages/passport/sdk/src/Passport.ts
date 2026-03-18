@@ -257,9 +257,11 @@ export class Passport {
 
       // Use connectWallet to create the provider (it will create WalletConfiguration internally)
       const provider = await connectWallet({
-        getUser: (forceRefresh) => (forceRefresh
-          ? this.auth.forceUserRefresh()
-          : this.auth.getUserOrLogin()),
+        getUser: (forceRefresh, getUserOptions) => {
+          if (forceRefresh) return this.auth.forceUserRefresh();
+          if (getUserOptions?.silent) return this.auth.getUser();
+          return this.auth.getUserOrLogin();
+        },
         clientId: this.passportConfig.oidcConfiguration.clientId,
         chains: [chainConfig],
         crossSdkBridgeEnabled: this.passportConfig.crossSdkBridgeEnabled,

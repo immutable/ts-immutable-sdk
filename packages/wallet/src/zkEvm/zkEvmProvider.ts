@@ -121,8 +121,9 @@ export class ZkEvmProvider implements Provider {
       this.#callSessionActivity(user.zkEvm.ethAddress);
     }
 
-    // Listen for logout events
+    // Listen for auth events
     walletEventEmitter.on(WalletEvents.LOGGED_OUT, this.#handleLogout);
+    walletEventEmitter.on(WalletEvents.LOGGED_IN, this.#handleLoggedIn);
     walletEventEmitter.on(
       WalletEvents.ACCOUNTS_REQUESTED,
       trackSessionActivity,
@@ -133,11 +134,24 @@ export class ZkEvmProvider implements Provider {
     this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
   };
 
+  #handleLoggedIn = (user: User) => {
+    if (user && isZkEvmUser(user)) {
+      this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [
+        user.zkEvm.ethAddress,
+      ]);
+    }
+    // If user doesn't have zkEvm yet, app must call eth_requestAccounts to register
+  };
+
   /**
    * Get the current user using getUser function.
+   * @param silent - When true, use getUser(undefined, { silent: true }) to avoid
+   *   triggering login popup on read-only checks (e.g. eth_accounts).
    */
-  async #getCurrentUser(): Promise<User | null> {
-    return this.#getUser();
+  async #getCurrentUser(silent = false): Promise<User | null> {
+    return silent
+      ? this.#getUser(undefined, { silent: true })
+      : this.#getUser();
   }
 
   async #callSessionActivity(zkEvmAddress: string) {
@@ -174,7 +188,7 @@ export class ZkEvmProvider implements Provider {
   // Used to get the registered zkEvm address from the User session
   async #getZkEvmAddress() {
     try {
-      const user = await this.#getCurrentUser();
+      const user = await this.#getCurrentUser(true); // silent: avoid popup on read-only checks
       if (user && isZkEvmUser(user)) {
         return user.zkEvm.ethAddress;
       }
