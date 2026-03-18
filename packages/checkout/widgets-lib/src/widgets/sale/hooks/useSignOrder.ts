@@ -293,13 +293,14 @@ export const useSignOrder = (input: SignOrderInput) => {
         if (!ok) {
           const { code, message } = (await response.json()) as SignApiError;
           let errorType: SaleErrorTypes;
-          let errorData: Record<string, unknown> | undefined;
+          let errorData: { code: string; message: string } | undefined;
 
           switch (status) {
             case 400:
               errorType = SaleErrorTypes.SALE_AUTHORIZATION_REJECTED;
               errorData = {
-                vendorError: { code: code || '', message: message || undefined },
+                code,
+                message,
               };
               break;
             case 404:
