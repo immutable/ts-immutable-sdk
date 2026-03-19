@@ -25,6 +25,7 @@ export const useFundingBalances = () => {
   >([]);
   const [loadingBalances, setLoadingBalances] = useState(false);
   const [gasFees, setGasFees] = useState<TokenBalance | undefined>();
+  const [fundingBalancesError, setFundingBalancesError] = useState<Error | null>(null);
 
   const queryFundingBalances = () => {
     if (
@@ -40,6 +41,7 @@ export const useFundingBalances = () => {
     (async () => {
       fetching.current = true;
       setLoadingBalances(true);
+      setFundingBalancesError(null);
       try {
         const results = await fetchFundingBalances({
           provider,
@@ -55,9 +57,6 @@ export const useFundingBalances = () => {
           onFundingBalance: (foundBalances) => {
             setFundingBalances([...foundBalances]);
           },
-          onComplete: () => {
-            setLoadingBalances(false);
-          },
           onFundingRequirement: (requirement) => {
             setTransactionRequirement(requirement);
           },
@@ -67,9 +66,10 @@ export const useFundingBalances = () => {
         });
 
         setFundingBalancesResult(results);
-      } catch {
-        setLoadingBalances(false);
+      } catch (err) {
+        setFundingBalancesError(err instanceof Error ? err : new Error(String(err)));
       } finally {
+        setLoadingBalances(false);
         fetching.current = false;
       }
     })();
@@ -79,6 +79,7 @@ export const useFundingBalances = () => {
     fundingBalances,
     loadingBalances,
     fundingBalancesResult,
+    fundingBalancesError,
     transactionRequirement,
     gasFees,
     queryFundingBalances,

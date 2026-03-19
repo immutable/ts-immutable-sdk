@@ -29,6 +29,35 @@ export type ConfigError = {
   data?: Record<string, unknown>;
 };
 
+/**
+ * Validates the order quote response before use. Ensures:
+ * - Currencies are non-empty (empty usually indicates wrong project config or endpoint).
+ * - Products are non-empty.
+ * - Every sale item has a matching product in the quote (no missing productIds).
+ */
+function validateOrderQuote(
+  config: OrderQuote,
+  items: SaleItem[],
+): { valid: true } | { valid: false; reason: string } {
+  if (!config.currencies?.length) {
+    return { valid: false, reason: 'Quote returned no currencies' };
+  }
+
+  const productIds = Object.keys(config.products || {});
+  if (productIds.length === 0) {
+    return { valid: false, reason: 'Quote returned no products' };
+  }
+
+  const missing = items.filter((item) => !config.products![item.productId]);
+  if (missing.length > 0) {
+    return {
+      valid: false,
+      reason: `Quote missing products for: ${missing.map((m) => m.productId).join(', ')}`,
+    };
+  }
+  return { valid: true };
+}
+
 export const useQuoteOrder = ({
   items,
   environment,
@@ -50,6 +79,13 @@ export const useQuoteOrder = ({
     setOrderQuoteError({
       type: SaleErrorTypes.SERVICE_BREAKDOWN,
       data: { reason: 'Error fetching settlement currencies', error },
+    });
+  };
+
+  const setQuoteValidationError = (reason: string) => {
+    setOrderQuoteError({
+      type: SaleErrorTypes.SERVICE_BREAKDOWN,
+      data: { reason: 'Invalid order quote response', error: reason },
     });
   };
 
@@ -110,6 +146,13 @@ export const useQuoteOrder = ({
           await response.json(),
           preferredCurrency,
         );
+
+        const validation = validateOrderQuote(config, items);
+        if (!validation.valid) {
+          setQuoteValidationError(validation.reason);
+          return;
+        }
+
         setOrderQuote(config);
       } catch (error) {
         setError(errorToString(error));
@@ -117,7 +160,7 @@ export const useQuoteOrder = ({
         fetching.current = false;
       }
     })();
-  }, [environment, environmentId, queryParams]);
+  }, [environment, environmentId, queryParams, items]);
 
   useEffect(() => {
     // Set default currency

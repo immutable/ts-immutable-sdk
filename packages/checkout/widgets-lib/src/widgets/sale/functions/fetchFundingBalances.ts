@@ -47,7 +47,6 @@ export const fetchFundingBalances = async (
     onFundingBalance,
     getAmountByCurrency,
     getIsGasless,
-    onComplete,
     onFundingRequirement,
     onUpdateGasFees,
   } = params;
@@ -85,10 +84,6 @@ export const fetchFundingBalances = async (
         ? undefined
         : getGasEstimate();
 
-      const handleOnComplete = () => {
-        onComplete?.(pushToFoundBalances([]));
-      };
-
       const handleOnFundingRoute = (route) => {
         updateFundingBalances(getAlternativeFundingSteps([route], environment));
       };
@@ -99,9 +94,6 @@ export const fetchFundingBalances = async (
         transactionOrGasAmount,
         routingOptions: { bridge: false, onRamp: false, swap: true },
         fundingRouteFullAmount: true,
-        onComplete: isBaseCurrency(currency.name)
-          ? handleOnComplete
-          : undefined,
         onFundingRoute: isBaseCurrency(currency.name)
           ? handleOnFundingRoute
           : undefined,
