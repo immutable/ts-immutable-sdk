@@ -185,10 +185,20 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     fundingBalances,
     loadingBalances,
     fundingBalancesResult,
+    fundingBalancesError,
     transactionRequirement,
     gasFees,
     queryFundingBalances,
   } = useFundingBalances();
+
+  // If funding balances failed to load, transition to error view
+  useEffect(() => {
+    if (!fundingBalancesError) return;
+    closeHandover();
+    goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, {
+      error: errorToString(fundingBalancesError),
+    });
+  }, [fundingBalancesError, goToErrorView, closeHandover]);
 
   // Initialise funding balances
   useEffect(() => {
