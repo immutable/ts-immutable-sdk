@@ -300,6 +300,9 @@ export function SaleContextProvider(props: {
         ...(vendorError ? { vendorCode: vendorError.code, vendorMessage: vendorError.message || '' } : {}),
       });
 
+      // eslint-disable-next-line no-console
+      console.error('[IMTBL]: Sale error', errorType, data);
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
