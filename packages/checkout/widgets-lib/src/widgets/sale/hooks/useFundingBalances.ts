@@ -55,9 +55,6 @@ export const useFundingBalances = () => {
           onFundingBalance: (foundBalances) => {
             setFundingBalances([...foundBalances]);
           },
-          onComplete: () => {
-            setLoadingBalances(false);
-          },
           onFundingRequirement: (requirement) => {
             setTransactionRequirement(requirement);
           },
@@ -67,9 +64,8 @@ export const useFundingBalances = () => {
         });
 
         setFundingBalancesResult(results);
-      } catch {
-        setLoadingBalances(false);
       } finally {
+        setLoadingBalances(false);
         fetching.current = false;
       }
     })();
