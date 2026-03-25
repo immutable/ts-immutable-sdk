@@ -173,16 +173,14 @@ export default class GuardianClient {
         throw new WalletError('Service unavailable', WalletErrorType.SERVICE_UNAVAILABLE_ERROR);
       }
 
-      if (isAxiosError(error) && error.response?.status === 422) {
-        if (this.crossSdkBridgeEnabled) {
-          const revertReason = (error.response?.data as any)?.message ?? 'A transaction simulation reverted';
-          throw new JsonRpcError(
-            RpcErrorCode.TRANSACTION_REVERTED,
-            `Transaction will revert: ${revertReason}`,
-          );
-        }
-
-        return { confirmationRequired: true };
+      // For native clients, throw a TRANSACTION_REVERTED error if the guardian service
+      // responds with a 422.
+      if (isAxiosError(error) && error.response?.status === 422 && this.crossSdkBridgeEnabled) {
+        const revertReason = (error.response?.data as any)?.message ?? 'A transaction simulation reverted';
+        throw new JsonRpcError(
+          RpcErrorCode.TRANSACTION_REVERTED,
+          `Transaction will revert: ${revertReason}`,
+        );
       }
 
       const errorMessage = error instanceof Error ? error.message : String(error);
