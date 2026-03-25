@@ -7,6 +7,7 @@ import {
   TransactionOrGasType,
   TokenInfo,
   ERC20ItemRequirement,
+  NativeItemRequirement,
   FundingRoute,
   RoutingOutcomeType,
   FundingStep,
@@ -37,6 +38,13 @@ export const getERC20ItemRequirement = (
     type: ItemType.ERC20,
     tokenAddress,
     spenderAddress,
+    amount,
+  },
+];
+
+export const getNativeItemRequirement = (amount: string): NativeItemRequirement[] => [
+  {
+    type: ItemType.NATIVE,
     amount,
   },
 ];
