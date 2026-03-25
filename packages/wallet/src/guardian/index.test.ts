@@ -111,16 +111,19 @@ describe('GuardianClient.evaluateEVMTransaction — 422 handling', () => {
   });
 
   describe('when Guardian returns 422 and crossSdkBridgeEnabled is false (web SDK)', () => {
-    it('returns confirmationRequired: true instead of throwing', async () => {
+    it('throws INTERNAL_ERROR; TRANSACTION_REVERTED is only used for native clients', async () => {
       mockEvaluateTransaction.mockRejectedValue(
         makeAxiosError(422, { message: 'execution reverted' }),
       );
 
       const client = makeClient(false);
 
-      const result = await (client as any).evaluateEVMTransaction(evalParams);
-
-      expect(result).toEqual({ confirmationRequired: true });
+      await expect(
+        (client as any).evaluateEVMTransaction(evalParams),
+      ).rejects.toMatchObject({
+        code: RpcErrorCode.INTERNAL_ERROR,
+        message: expect.stringContaining('Transaction failed to validate with error:'),
+      });
     });
   });
 
