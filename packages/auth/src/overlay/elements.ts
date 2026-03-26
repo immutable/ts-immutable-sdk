@@ -146,6 +146,7 @@ export const getEmbeddedLoginPromptOverlay = (): string => `
         background: rgba(247, 247, 247, 0.24);
         animation-name: passportEmbeddedLoginPromptOverlayFadeIn;
         animation-duration: 0.8s;
+        pointer-events: auto;
       "
     >
       <div

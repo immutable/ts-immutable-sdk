@@ -293,6 +293,7 @@ function createOverlayElement(): HTMLDivElement {
     background: rgba(247, 247, 247, 0.24);
     animation-name: passportEmbeddedLoginPromptOverlayFadeIn;
     animation-duration: 0.8s;
+    pointer-events: auto;
   `;
 
   const contents = document.createElement('div');
