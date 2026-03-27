@@ -1,6 +1,4 @@
 import { Environment, ModuleConfiguration } from '@imtbl/config';
-import { IMXClient } from '@imtbl/x-client';
-import { ImxApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
 
 /**
@@ -29,7 +27,6 @@ export type {
   IdTokenPayload,
 } from '@imtbl/auth';
 export { isUserZkEvm } from '@imtbl/auth';
-export type { UserImx } from './utils/imxUser';
 
 export interface OidcConfiguration {
   clientId: string;
@@ -46,14 +43,11 @@ export interface PassportOverrides {
   magicPublishableApiKey: string;
   magicProviderId: string;
   passportDomain: string;
-  imxPublicApiDomain: string;
-  immutableXClient: IMXClient;
   zkEvmRpcUrl: string;
   relayerUrl: string;
   indexerMrBasePath: string;
   orderBookMrBasePath: string;
   passportMrBasePath: string;
-  imxApiClients?: ImxApiClients; // needs to be optional because ImxApiClients is not exposed publicly
 
   /**
    * Custom chain ID for dev environments (optional)
