@@ -25,7 +25,10 @@ describe('Key generation', () => {
     );
   });
 
-  describe('Stark Key', () => {
+  // Skipped: StarkEx/IMX is deprecated. These tests make live HTTP calls to
+  // https://api.x.immutable.com which are flaky in CI. The entire x-client
+  // package is scheduled for removal as part of StarkEx cleanup.
+  describe.skip('Stark Key', () => {
     const tests = [
       {
         name: 'case 1 - Should generate Legacy Stark public key',
