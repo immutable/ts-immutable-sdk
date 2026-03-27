@@ -1584,9 +1584,6 @@ importers:
       '@imtbl/passport':
         specifier: workspace:*
         version: link:../passport/sdk
-      '@imtbl/x-client':
-        specifier: workspace:*
-        version: link:../x-client
       ethers:
         specifier: ^6.13.4
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -2132,12 +2129,6 @@ importers:
       '@imtbl/wallet':
         specifier: workspace:*
         version: link:../../wallet
-      '@imtbl/x-client':
-        specifier: workspace:*
-        version: link:../../x-client
-      '@imtbl/x-provider':
-        specifier: workspace:*
-        version: link:../../x-provider
       ethers:
         specifier: ^6.13.4
         version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
