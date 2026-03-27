@@ -2318,12 +2318,6 @@ importers:
       '@imtbl/wallet':
         specifier: workspace:*
         version: link:../../wallet
-      '@imtbl/x-client':
-        specifier: workspace:*
-        version: link:../../x-client
-      '@imtbl/x-provider':
-        specifier: workspace:*
-        version: link:../../x-provider
       '@metamask/detect-provider':
         specifier: ^2.0.0
         version: 2.0.0
