@@ -8,10 +8,6 @@ import { Flow } from '@imtbl/metrics';
  */
 export type DirectLoginMethod = string;
 
-// Re-export events from auth and wallet
-export { AuthEvents } from '@imtbl/auth';
-export { WalletEvents } from '@imtbl/wallet';
-
 export type AccountsRequestedEvent = {
   environment: Environment;
   sendTransaction: (params: Array<any>, flow: Flow) => Promise<string>;
