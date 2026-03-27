@@ -5,7 +5,6 @@ import React, {
 } from 'react';
 import {
   createImmutableXConfiguration,
-  IMXClient,
   ImmutableX,
   ImxModuleConfiguration,
 } from '@imtbl/x-client';
@@ -26,7 +25,7 @@ import {
 } from '@/config';
 import { EnvironmentNames } from '@/types';
 import useLocalStorage from '@/hooks/useLocalStorage';
-import { ImxApiClients, createConfig } from '@imtbl/generated-clients';
+
 import { BlockchainData, BlockchainDataModuleConfiguration } from '@imtbl/blockchain-data';
 
 const getSdkConfig = (environment: EnvironmentNames): ImxModuleConfiguration => {
@@ -139,11 +138,6 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
           magicPublishableApiKey: 'pk_live_4058236363130CA9',
           magicProviderId: 'd196052b-8175-4a45-ba13-838a715d370f',
           passportDomain: 'https://passport.dev.immutable.com',
-          imxPublicApiDomain: 'https://api.dev.immutable.com',
-          imxApiClients: new ImxApiClients(createConfig({
-            basePath: 'https://api.dev.immutable.com',
-          })),
-          immutableXClient: new IMXClient(getSdkConfig(EnvironmentNames.DEV)),
           zkEvmRpcUrl: 'https://rpc.dev.immutable.com',
           relayerUrl: 'https://api.dev.immutable.com/relayer-mr',
           indexerMrBasePath: 'https://api.dev.immutable.com',
