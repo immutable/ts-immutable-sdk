@@ -6,29 +6,12 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import CardStack from '@/components/CardStack';
 
 function Status() {
-  const { imxProvider, activeZkEvmProvider } = usePassportProvider();
+  const { activeZkEvmProvider } = usePassportProvider();
 
   return (
     <CardStack title="Status">
       <Container className="text-dark">
         <Row>
-          <Col>
-            {
-                imxProvider
-                  ? (
-                    <Stack direction="horizontal" gap={1}>
-                      <div className="led green-led" />
-                      <span>Connected to IMX</span>
-                    </Stack>
-                  )
-                  : (
-                    <Stack direction="horizontal" gap={1}>
-                      <div className="led red-led" />
-                      <span>Disconnected from IMX</span>
-                    </Stack>
-                  )
-              }
-          </Col>
           <Col>
             {
                 activeZkEvmProvider

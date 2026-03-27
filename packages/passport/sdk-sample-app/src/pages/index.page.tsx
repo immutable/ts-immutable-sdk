@@ -3,7 +3,6 @@ import Head from 'next/head';
 import { Container, Row } from 'react-bootstrap';
 import { useImmutableSession } from '@imtbl/auth-next-client';
 import Status from '@/components/Status';
-import ImxWorkflow from '@/components/imx/ImxWorkflow';
 import Message from '@/components/Message';
 import Environment from '@/components/Environment';
 import { usePassportProvider } from '@/context/PassportProvider';
@@ -19,7 +18,7 @@ import { EnvironmentNames } from '@/types';
  * Login flow visibility rules:
  * - DEFAULT env: only Auth NextJS (SSR) makes sense; Passport Methods hidden
  * - Logged in via SSR: Passport Methods hidden (mutually exclusive)
- * - Logged in via Passport (imx/zkEvm): Auth NextJS hidden (mutually exclusive)
+ * - Logged in via Passport (zkEvm): Auth NextJS hidden (mutually exclusive)
  *
  * Conditional rendering is deferred until after mount to avoid hydration mismatch:
  * environment (localStorage), session, and providers differ between server and client.
@@ -29,7 +28,7 @@ export default function Home() {
   const { isLoading } = useStatusProvider();
   const { environment } = useImmutableProvider();
   const {
-    imxProvider, zkEvmProvider, defaultWalletProvider,
+    zkEvmProvider, defaultWalletProvider,
   } = usePassportProvider();
   const { isAuthenticated: isAuthNextJSAuthenticated } = useImmutableSession();
 
@@ -38,7 +37,7 @@ export default function Home() {
   }, []);
 
   const isDefaultEnv = environment === EnvironmentNames.DEFAULT;
-  const isPassportConnected = !!imxProvider || !!zkEvmProvider;
+  const isPassportConnected = !!zkEvmProvider;
 
   // Before mount: show both for consistent server/client HTML (avoids hydration mismatch)
   const showAuthNextJS = !hasMounted || isDefaultEnv || !isPassportConnected;
@@ -56,7 +55,7 @@ export default function Home() {
         <Container>
           <Row className="my-3">
             <Environment
-              disabled={isLoading || !!imxProvider || !!zkEvmProvider
+              disabled={isLoading || !!zkEvmProvider
                 || !!defaultWalletProvider || isAuthNextJSAuthenticated}
             />
           </Row>
@@ -70,9 +69,6 @@ export default function Home() {
               <PassportMethods />
             </Row>
           )}
-          <Row className="my-3">
-            <ImxWorkflow />
-          </Row>
           <Row className="my-3">
             <ZkEvmWorkflow />
           </Row>
