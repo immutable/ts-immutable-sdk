@@ -1,0 +1,9 @@
+node_modules/
+
+# build folders
+dist/
+
+# sample apps
+**sample-app**/
+
+# put module specific ignore paths here

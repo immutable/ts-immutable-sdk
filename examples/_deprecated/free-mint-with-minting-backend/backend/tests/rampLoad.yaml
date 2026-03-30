@@ -1,0 +1,54 @@
+config:
+  target: "http://localhost:3001"
+  phases:
+    - duration: 120
+      arrivalRate: 10
+      rampTo: 50
+      name: "Ramp Up Load"
+    - duration: 300
+      arrivalRate: 50
+      name: "Peak Load"
+    - duration: 120
+      arrivalRate: 50
+      rampTo: 10
+      name: "Ramp Down Load"
+  payload:
+    path: "./signers.csv"
+    fields:
+      - "address"
+      - "signature"
+    skipHeader: true
+    order: random
+    cast: false
+
+scenarios:
+  - name: "EOA Mint"
+    weight: 5
+    flow:
+      - get:
+          url: "/config"
+      - think: 3
+      - get:
+          url: "/eligibility/{{ address }}"
+      - post:
+          url: "/mint/eoa"
+          json:
+            signature: "{{ signature }}"
+          headers:
+            Content-Type: "application/json"
+      - think: 2
+      - get:
+          url: "/get-mint-request/4a2b9487-2251-455b-98fc-289891528e02"
+
+  - name: "Ineligible user"
+    weight: 1
+    flow:
+      - get:
+          url: "/config"
+      - think: 1
+      - get:
+          url: "/eligibility/{{ address }}"
+
+http:
+  timeout: 120000 # Set longer timeouts for operations that might take more time
+  maxSockets: 100
