@@ -1,8 +1,6 @@
-import { IMXProvider } from '@imtbl/x-provider';
 import {
-  createConfig, ImxApiClients, imxApiConfig, MagicTeeApiClients, MultiRollupApiClients,
+  MultiRollupApiClients,
 } from '@imtbl/generated-clients';
-import { IMXClient } from '@imtbl/x-client';
 import { Environment } from '@imtbl/config';
 
 import { setPassportClientId, trackError, trackFlow } from '@imtbl/metrics';
@@ -16,11 +14,7 @@ import type { DirectLoginOptions } from '@imtbl/auth';
 import {
   connectWallet,
   ZkEvmProvider,
-  WalletConfiguration,
-  GuardianClient,
-  MagicTEESigner,
   ChainConfig,
-  ConfirmationScreen,
 } from '@imtbl/wallet';
 import type { LinkWalletParams, LinkedWallet } from '@imtbl/wallet';
 import {
@@ -28,35 +22,13 @@ import {
   ConnectEvmArguments,
   LoginArguments,
 } from './types';
-import { toUserImx } from './utils/imxUser';
-import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import { withMetricsAsync } from './utils/metrics';
 import { PassportError, PassportErrorType } from './errors/passportError';
-import { ImxGuardianClient } from './starkEx/imxGuardianClient';
 import { getHttpErrorResponse } from './utils/httpError';
-
-const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
-  if (passportModuleConfiguration.overrides) {
-    return createConfig({ basePath: passportModuleConfiguration.overrides.imxPublicApiDomain });
-  }
-  if (passportModuleConfiguration.baseConfig.environment === Environment.SANDBOX) {
-    return imxApiConfig.getSandbox();
-  }
-  return imxApiConfig.getProduction();
-};
-
-const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfiguration) => {
-  if (passportModuleConfiguration.overrides?.imxApiClients) return passportModuleConfiguration.overrides.imxApiClients;
-
-  const config = buildImxClientConfig(passportModuleConfiguration);
-  return new ImxApiClients(config);
-};
 
 export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
   const passportConfig = new PassportConfiguration(passportModuleConfiguration);
-  // Create auth configuration for confirmation screen
-  // Create Auth instance (public API)
   const auth = new Auth({
     ...passportModuleConfiguration,
     authenticationDomain: passportConfig.authenticationDomain,
@@ -65,75 +37,10 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     passportDomain: passportConfig.passportDomain,
   });
 
-  const authConfig = auth.getConfig();
-  const confirmationScreen = new ConfirmationScreen(authConfig);
-
-  // Create wallet configuration with concrete URLs (no environment)
-  // PassportConfiguration translates environment → URLs
-  const walletConfig = new WalletConfiguration({
-    passportDomain: passportConfig.passportDomain,
-    zkEvmRpcUrl: passportConfig.zkEvmRpcUrl,
-    relayerUrl: passportConfig.relayerUrl,
-    indexerMrBasePath: passportConfig.multiRollupConfig.indexer.basePath || passportConfig.passportDomain,
-    jsonRpcReferrer: passportModuleConfiguration.jsonRpcReferrer,
-    forceScwDeployBeforeMessageSignature: passportModuleConfiguration.forceScwDeployBeforeMessageSignature,
-    crossSdkBridgeEnabled: passportModuleConfiguration.crossSdkBridgeEnabled,
-  });
-
-  // Setup IMX-specific components
-  const multiRollupApiClients = new MultiRollupApiClients(passportConfig.multiRollupConfig);
-
-  const immutableXClient = passportModuleConfiguration.overrides
-    ? passportModuleConfiguration.overrides.immutableXClient
-    : new IMXClient({ baseConfig: passportModuleConfiguration.baseConfig });
-
-  // Create Guardian client for IMX provider
-  const guardianClient = new GuardianClient({
-    config: walletConfig,
-    getUser: (forceRefresh) => (forceRefresh ? auth.forceUserRefresh() : auth.getUser()),
-    guardianApi: multiRollupApiClients.guardianApi,
-    passportDomain: passportConfig.passportDomain,
-    clientId: passportConfig.oidcConfiguration.clientId,
-  });
-
-  const imxGuardianClient = new ImxGuardianClient({
-    auth,
-    guardianApi: multiRollupApiClients.guardianApi,
-    confirmationScreen,
-    crossSdkBridgeEnabled: passportModuleConfiguration.crossSdkBridgeEnabled || false,
-  });
-
-  // Create Magic TEE signer for IMX provider
-  const magicTeeApiClients = new MagicTeeApiClients({
-    basePath: passportConfig.magicTeeBasePath,
-    timeout: passportConfig.magicTeeTimeout,
-    magicPublishableApiKey: passportConfig.magicPublishableApiKey,
-    magicProviderId: passportConfig.magicProviderId,
-  });
-  const magicTEESigner = new MagicTEESigner(
-    (forceRefresh) => (forceRefresh ? auth.forceUserRefresh() : auth.getUser()),
-    magicTeeApiClients,
-  );
-
-  const imxApiClients = buildImxApiClients(passportModuleConfiguration);
-
-  const passportImxProviderFactory = new PassportImxProviderFactory({
-    auth,
-    immutableXClient,
-    magicTEESigner,
-    passportEventEmitter: auth.eventEmitter,
-    imxApiClients,
-    guardianClient,
-    imxGuardianClient,
-  });
-
   return {
     passportConfig,
     auth,
-    passportImxProviderFactory,
     environment: passportModuleConfiguration.baseConfig.environment,
-    // Keep walletConfig only for IMX GuardianClient
-    walletConfig,
   };
 };
 
@@ -142,10 +49,7 @@ export class Passport {
   // DEPENDENCIES & CONFIGURATION
   // ============================================================================
 
-  // Auth & Wallet (zkEVM uses these via public APIs)
   private readonly auth: Auth;
-
-  private readonly passportImxProviderFactory: PassportImxProviderFactory;
 
   private readonly multiRollupApiClients: MultiRollupApiClients;
 
@@ -157,7 +61,6 @@ export class Passport {
     const privateVars = buildPrivateVars(passportModuleConfiguration);
 
     this.auth = privateVars.auth;
-    this.passportImxProviderFactory = privateVars.passportImxProviderFactory;
     this.passportConfig = privateVars.passportConfig;
     this.multiRollupApiClients = new MultiRollupApiClients(this.passportConfig.multiRollupConfig);
     this.environment = privateVars.environment;
@@ -166,42 +69,11 @@ export class Passport {
   }
 
   // ============================================================================
-  // IMX-SPECIFIC METHODS
-  // ============================================================================
-
-  /**
-   * Attempts to connect to IMX silently without user interaction.
-   * @returns {Promise<IMXProvider | null>} A promise that resolves to an IMX provider if successful, or null if no cached session exists
-   * @deprecated The method `login` with an argument of `{ useCachedSession: true }` should be used in conjunction with `connectImx` instead
-   */
-  public async connectImxSilent(): Promise<IMXProvider | null> {
-    return withMetricsAsync(
-      () => this.passportImxProviderFactory.getProviderSilent(),
-      'connectImxSilent',
-      false,
-    );
-  }
-
-  /**
-   * Connects to IMX, prompting user interaction if necessary.
-   * @returns {Promise<IMXProvider>} A promise that resolves to an IMX provider
-   */
-  public async connectImx(): Promise<IMXProvider> {
-    return withMetricsAsync(
-      () => this.passportImxProviderFactory.getProvider(),
-      'connectImx',
-      false,
-    );
-  }
-
-  // ============================================================================
-  // ZKEVM-SPECIFIC METHODS
-  // Uses Auth + Wallet packages
+  // ZKEVM METHODS
   // ============================================================================
 
   /**
    * Connects to EVM and optionally announces the provider.
-   * Uses: Auth + Wallet packages
    * @param {Object} options - Configuration options
    * @param {boolean} options.announceProvider - Whether to announce the provider via EIP-6963 for wallet discovery (defaults to true)
    * @returns {Promise<Provider>} The EVM provider instance
@@ -277,14 +149,11 @@ export class Passport {
   }
 
   // ============================================================================
-  // SHARED METHODS (zkEVM + IMX)
-  // Uses Auth class (public API)
-  // Exception: forceUserRefresh for silent login (advanced operation)
+  // AUTH METHODS
   // ============================================================================
 
   /**
-   * Logs in the user (works for both zkEVM and IMX).
-   * Uses: Auth class
+   * Logs in the user.
    * @param {Object} [options] - Login options
    * @param {boolean} [options.useCachedSession] - If true, attempts to use a cached session without user interaction.
    * @param {boolean} [options.useSilentLogin] - If true, attempts silent authentication without user interaction.
@@ -313,7 +182,6 @@ export class Passport {
 
   /**
    * Handles the login callback from the authentication service.
-   * Uses: Auth class
    * @returns {Promise<void>} A promise that resolves when the login callback is handled
    */
   public async loginCallback(): Promise<void> {
@@ -321,8 +189,7 @@ export class Passport {
   }
 
   /**
-   * Logs out the user (works for both zkEVM and IMX).
-   * Uses: Auth class
+   * Logs out the user.
    * @returns {Promise<void>} A promise that resolves when the user is logged out
    */
   public async logout(): Promise<void> {
@@ -331,7 +198,6 @@ export class Passport {
 
   /**
    * Retrieves the current user's information.
-   * Uses: Auth class
    * @returns {Promise<UserProfile | undefined>} A promise that resolves to the user profile if logged in, undefined otherwise
    */
   public async getUserInfo(): Promise<UserProfile | undefined> {
@@ -433,7 +299,7 @@ export class Passport {
    * @param {LinkWalletParams} params - Parameters for linking the wallet
    * @returns {Promise<LinkedWallet>} A promise that resolves to the linked wallet information
    * @throws {PassportError} If the user is not logged in (NOT_LOGGED_IN_ERROR)
-   *  - If the user is not registered with StarkEx (USER_NOT_REGISTERED_ERROR)
+   *  - If the user is not registered (USER_NOT_REGISTERED_ERROR)
    *  - If the wallet is already linked (LINK_WALLET_ALREADY_LINKED_ERROR)
    *  - If the maximum number of wallets are linked (LINK_WALLET_MAX_WALLETS_LINKED_ERROR)
    *  - Duplicate nonce used (LINK_WALLET_DUPLICATE_NONCE_ERROR)
@@ -461,23 +327,7 @@ export class Passport {
         throw new PassportError('User is not logged in', PassportErrorType.NOT_LOGGED_IN_ERROR);
       }
 
-      const isRegisteredWithZkEvm = isUserZkEvm(user);
-      const isRegisteredWithIMX = (() => {
-        try {
-          toUserImx(user);
-          return true;
-        } catch (imxError) {
-          if (
-            imxError instanceof PassportError
-            && imxError.type === PassportErrorType.USER_NOT_REGISTERED_ERROR
-          ) {
-            return false;
-          }
-          throw imxError;
-        }
-      })();
-
-      if (!isRegisteredWithIMX && !isRegisteredWithZkEvm) {
+      if (!isUserZkEvm(user)) {
         throw new PassportError('User has not been registered', PassportErrorType.USER_NOT_REGISTERED_ERROR);
       }
 
