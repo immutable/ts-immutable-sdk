@@ -1,0 +1,48 @@
+import { Signer as EthSigner } from 'ethers';
+
+export type { EthSigner };
+
+// Lightweight signer for message-only flows (no tx/provider required)
+export type MessageSigner = {
+  getAddress(): Promise<string>;
+  signMessage(message: string | Uint8Array): Promise<string>;
+};
+
+/**
+ * An abstraction of a Stark account, which can be used to sign messages and transactions on StarkEx to execute state changing operations
+ */
+export interface StarkSigner {
+  /**
+   * Signs the prefixed-message
+   * @params message - this must be a UTF8-message
+   * @example "0x1234"
+   * @returns the signed prefixed-message
+   */
+  signMessage(message: string): Promise<string>;
+
+  /**
+   * Get the Signer address
+   * @returns the Signer's checksum address
+   */
+  getAddress(): string | Promise<string>;
+
+  /**
+   * Get the Y-coordinate of the public key
+   * @returns the Y-coordinate of the public key
+   */
+  getYCoordinate(): Promise<string>;
+}
+
+/**
+ * A pair of Signers
+ */
+export interface WalletConnection {
+  /**
+   * The L1 signer
+   */
+  ethSigner: EthSigner;
+  /**
+   * The L2 signer
+   */
+  starkSigner: StarkSigner;
+}

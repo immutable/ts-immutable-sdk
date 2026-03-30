@@ -15,7 +15,9 @@
     "@imtbl/orderbook": "workspace:*",
     "@imtbl/passport": "workspace:*",
     "@imtbl/wallet": "workspace:*",
-    "@imtbl/webhook": "workspace:*"
+    "@imtbl/webhook": "workspace:*",
+    "@imtbl/x-client": "workspace:*",
+    "@imtbl/x-provider": "workspace:*"
   },
   "devDependencies": {
     "eslint": "^8.56.0",
@@ -125,6 +127,20 @@
         "browser": "./dist/checkout.js",
         "require": "./dist/checkout.cjs",
         "default": "./dist/checkout.js"
+      }
+    },
+    "./x": {
+      "development": {
+        "types": "./src/x.ts",
+        "browser": "./dist/x.js",
+        "require": "./dist/x.cjs",
+        "default": "./dist/x.js"
+      },
+      "default": {
+        "types": "./dist/x.d.ts",
+        "browser": "./dist/x.js",
+        "require": "./dist/x.cjs",
+        "default": "./dist/x.js"
       }
     },
     "./webhook": {
