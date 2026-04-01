@@ -24,6 +24,7 @@ packages:
   - "packages/checkout/widgets-sample-app"
   - "packages/checkout/widgets-lib"
   - "packages/blockchain-data/sdk"
+  - "packages/audience/core"
   - "packages/audience/sdk"
   - "packages/game-bridge"
   - "packages/webhook/sdk"
