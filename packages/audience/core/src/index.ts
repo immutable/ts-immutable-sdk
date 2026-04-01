@@ -1,3 +1,28 @@
-// @imtbl/audience-core — shared foundation for the web SDK and pixel.
-// Source modules will be added in follow-up PRs (SDK-33, SDK-34).
-export {};
+export type {
+  Environment,
+  Surface,
+  MessageType,
+  EventContext,
+  UserTraits,
+  TrackMessage,
+  PageMessage,
+  ScreenMessage,
+  IdentifyMessage,
+  AliasMessage,
+  Message,
+  BatchPayload,
+} from './types';
+
+export { getOrCreateAnonymousId, getAnonymousId } from './cookie';
+export * as storage from './storage';
+
+export {
+  getBaseUrl,
+  INGEST_PATH,
+  CONSENT_PATH,
+  FLUSH_INTERVAL_MS,
+  FLUSH_SIZE,
+  COOKIE_NAME,
+} from './config';
+
+export { generateId, getTimestamp, isBrowser } from './utils';
