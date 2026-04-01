@@ -7,7 +7,7 @@ afterEach(() => {
 describe('storage', () => {
   it('round-trips a string value', () => {
     storage.setItem('key', 'hello');
-    expect(storage.getItem<string>('key')).toBe('hello');
+    expect(storage.getItem('key')).toBe('hello');
   });
 
   it('round-trips an object value', () => {

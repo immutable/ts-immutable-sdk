@@ -10,11 +10,11 @@ function hasLocalStorage(): boolean {
   }
 }
 
-export function getItem<T>(key: string): T | undefined {
+export function getItem(key: string): unknown | undefined {
   if (!hasLocalStorage()) return undefined;
   try {
     const raw = localStorage.getItem(`${PREFIX}${key}`);
-    return raw ? (JSON.parse(raw) as T) : undefined;
+    return raw ? JSON.parse(raw) : undefined;
   } catch {
     return undefined;
   }

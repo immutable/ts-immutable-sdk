@@ -9,7 +9,8 @@ function getCookie(name: string): string | undefined {
 
 function setCookie(name: string, value: string, maxAge: number): void {
   if (!isBrowser()) return;
-  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+  const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
 }
 
 /**
