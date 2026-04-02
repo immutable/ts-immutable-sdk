@@ -1,3 +1,4 @@
+import { track, trackError } from '@imtbl/metrics';
 import type { BatchPayload } from './types';
 
 export interface Transport {
@@ -18,8 +19,14 @@ export async function httpSend(
       },
       body: JSON.stringify(payload),
     });
+
+    if (!response.ok) {
+      track('audience', 'transport_send_failed', { status: response.status });
+    }
+
     return response.ok;
-  } catch {
+  } catch (error) {
+    trackError('audience', 'transport_send', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
