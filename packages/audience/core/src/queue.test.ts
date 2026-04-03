@@ -275,4 +275,47 @@ describe('page-unload flush', () => {
 
     queue.stop();
   });
+
+  it('falls back to async flush if sendBeacon is unavailable', async () => {
+    Object.defineProperty(navigator, 'sendBeacon', {
+      value: undefined,
+      writable: true,
+      configurable: true,
+    });
+
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+    queue.start();
+
+    queue.enqueue(makeMessage('1'));
+    window.dispatchEvent(new Event('pagehide'));
+
+    await Promise.resolve();
+    expect(send).toHaveBeenCalledTimes(1);
+
+    queue.stop();
+  });
+
+  it('skips beacon if an async flush is already in flight', async () => {
+    let resolveFlush: () => void;
+    const flushPromise = new Promise<boolean>((r) => { resolveFlush = () => r(true); });
+    const send = jest.fn().mockReturnValueOnce(flushPromise);
+
+    const queue = createQueue({ send });
+    queue.start();
+    queue.enqueue(makeMessage('1'));
+
+    // Start an async flush (sets flushing = true)
+    const pending = queue.flush();
+
+    // pagehide fires while async flush is in flight — beacon should be skipped
+    window.dispatchEvent(new Event('pagehide'));
+    expect(sendBeaconSpy).not.toHaveBeenCalled();
+
+    resolveFlush!();
+    await pending;
+    expect(queue.length).toBe(0);
+
+    queue.stop();
+  });
 });

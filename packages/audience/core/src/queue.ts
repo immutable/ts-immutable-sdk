@@ -118,7 +118,7 @@ export class MessageQueue {
    * Falls back to the normal async flush if sendBeacon is unavailable.
    */
   private flushBeacon(): void {
-    if (this.messages.length === 0) return;
+    if (this.flushing || this.messages.length === 0) return;
 
     const payload: BatchPayload = { messages: [...this.messages] };
     const body = JSON.stringify(payload);
