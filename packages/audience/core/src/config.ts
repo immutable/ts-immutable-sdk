@@ -15,4 +15,6 @@ export const FLUSH_SIZE = 20;
 export const COOKIE_NAME = 'imtbl_anon_id';
 export const COOKIE_MAX_AGE_SECONDS = 365 * 24 * 60 * 60 * 2; // 2 years
 
+export const SESSION_TIMEOUT_MS = 30 * 60 * 1_000; // 30 minutes
+
 export const getBaseUrl = (environment: Environment): string => BASE_URLS[environment];

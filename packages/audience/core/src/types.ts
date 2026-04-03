@@ -15,6 +15,7 @@ export interface EventContext {
   pagePath?: string;
   pageReferrer?: string;
   pageTitle?: string;
+  sessionId?: string;
 }
 
 export interface UserTraits {

@@ -1,5 +1,6 @@
 import type { EventContext } from './types';
 import { isBrowser } from './utils';
+import { getSessionId } from './session';
 
 // WARNING: DO NOT CHANGE THE STRING BELOW. IT GETS REPLACED AT BUILD TIME.
 const SDK_VERSION = '__SDK_VERSION__';
@@ -20,6 +21,7 @@ export function collectContext(): EventContext {
   context.pagePath = window.location.pathname;
   context.pageReferrer = document.referrer;
   context.pageTitle = document.title;
+  context.sessionId = getSessionId();
 
   return context;
 }
