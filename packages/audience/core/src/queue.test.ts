@@ -158,3 +158,121 @@ describe('MessageQueue', () => {
     expect(queue.length).toBe(1);
   });
 });
+
+describe('page-unload flush', () => {
+  let sendBeaconSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    sendBeaconSpy = jest.fn().mockReturnValue(true);
+    Object.defineProperty(navigator, 'sendBeacon', {
+      value: sendBeaconSpy,
+      writable: true,
+      configurable: true,
+    });
+  });
+
+  afterEach(() => {
+    sendBeaconSpy.mockRestore?.();
+  });
+
+  it('flushes via sendBeacon on visibilitychange to hidden', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+    queue.start();
+
+    queue.enqueue(makeMessage('1'));
+
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'hidden',
+      writable: true,
+      configurable: true,
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    expect(sendBeaconSpy).toHaveBeenCalledTimes(1);
+    expect(sendBeaconSpy).toHaveBeenCalledWith(
+      'https://api.immutable.com/v1/audience/messages',
+      expect.any(Blob),
+    );
+    expect(queue.length).toBe(0);
+
+    queue.stop();
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      writable: true,
+      configurable: true,
+    });
+  });
+
+  it('flushes via sendBeacon on pagehide', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+    queue.start();
+
+    queue.enqueue(makeMessage('1'));
+    window.dispatchEvent(new Event('pagehide'));
+
+    expect(sendBeaconSpy).toHaveBeenCalledTimes(1);
+    expect(queue.length).toBe(0);
+
+    queue.stop();
+  });
+
+  it('does not fire beacon when queue is empty', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+    queue.start();
+
+    window.dispatchEvent(new Event('pagehide'));
+
+    expect(sendBeaconSpy).not.toHaveBeenCalled();
+
+    queue.stop();
+  });
+
+  it('removes listeners on stop', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+    queue.start();
+    queue.stop();
+
+    queue.enqueue(makeMessage('1'));
+    window.dispatchEvent(new Event('pagehide'));
+
+    expect(sendBeaconSpy).not.toHaveBeenCalled();
+  });
+
+  it('destroy stops the queue and flushes remaining messages', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+    queue.start();
+
+    queue.enqueue(makeMessage('1'));
+    queue.enqueue(makeMessage('2'));
+    queue.destroy();
+
+    expect(sendBeaconSpy).toHaveBeenCalledTimes(1);
+    expect(queue.length).toBe(0);
+
+    // Listeners removed — no double flush
+    queue.enqueue(makeMessage('3'));
+    window.dispatchEvent(new Event('pagehide'));
+    expect(sendBeaconSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('falls back to async flush if sendBeacon returns false', async () => {
+    sendBeaconSpy.mockReturnValue(false);
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+    queue.start();
+
+    queue.enqueue(makeMessage('1'));
+    window.dispatchEvent(new Event('pagehide'));
+
+    // sendBeacon failed, so async flush should have been triggered
+    await Promise.resolve();
+    expect(send).toHaveBeenCalledTimes(1);
+
+    queue.stop();
+  });
+});
