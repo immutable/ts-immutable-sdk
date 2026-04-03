@@ -230,20 +230,14 @@ export function WalletList(props: WalletListProps) {
       const browserProvider = new WrappedBrowserProvider(ethereumProvider);
       selectBrowserProvider(browserProvider, 'walletconnect');
 
-      const { chainId } = await ((await browserProvider.getSigner()).provider.getNetwork());
-
       if (ethereumProvider.chainId !== targetChainId) {
-        // @ts-ignore allow protected method `switchEthereumChain` to be called
-        await ethereumProvider.switchEthereumChain(targetChainId);
-      }
-
-      if (chainId as unknown as ChainId !== targetChainId) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
             view: { type: ConnectWidgetViews.SWITCH_NETWORK },
           },
         });
+        return;
       }
 
       viewDispatch({
