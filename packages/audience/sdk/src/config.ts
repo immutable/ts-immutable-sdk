@@ -6,7 +6,7 @@ const BASE_URLS: Record<Environment, string> = {
   production: 'https://api.immutable.com',
 };
 
-export const EVENTS_ENDPOINT = '/v1/audience/events';
+export const MESSAGES_ENDPOINT = '/v1/audience/messages';
 
 export const DEFAULT_FLUSH_INTERVAL_MS = 5_000;
 export const DEFAULT_FLUSH_SIZE = 20;

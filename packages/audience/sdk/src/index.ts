@@ -6,5 +6,13 @@ export type { EventParamMap, Identity } from './events';
 export type {
   AudienceConfig,
   Environment,
+  IdentityType,
+  Surface,
   UserTraits,
+  MessageContext,
+  TrackMessage,
+  PageMessage,
+  IdentifyMessage,
+  AliasMessage,
+  Message,
 } from './types';

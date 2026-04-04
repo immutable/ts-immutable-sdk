@@ -1,5 +1,7 @@
 import type {
   AudienceConfig,
+  IdentityType,
+  Surface,
   UserTraits,
   TrackMessage,
   IdentifyMessage,
@@ -10,7 +12,7 @@ import type {
 } from './events';
 import {
   getBaseUrl,
-  EVENTS_ENDPOINT,
+  MESSAGES_ENDPOINT,
   DEFAULT_FLUSH_INTERVAL_MS,
   DEFAULT_FLUSH_SIZE,
 } from './config';
@@ -22,27 +24,32 @@ import * as storage from './utils/storage';
 
 const ANON_ID_KEY = 'anonymousId';
 const USER_ID_KEY = 'userId';
-
-const formatUserId = (provider: IdentityProvider, uid: string): string => `${provider}:${uid}`;
+const IDENTITY_TYPE_KEY = 'identityType';
 
 export class Audience {
   private readonly queue: MessageQueue;
 
   private readonly anonymousId: string;
 
+  private readonly surface: Surface | undefined;
+
   private userId: string | undefined;
+
+  private identityType: IdentityType | undefined;
 
   constructor(config: AudienceConfig) {
     const baseUrl = getBaseUrl(config.environment);
+    this.surface = config.surface;
 
     this.anonymousId = storage.getItem<string>(ANON_ID_KEY) ?? generateId();
     storage.setItem(ANON_ID_KEY, this.anonymousId);
 
     this.userId = storage.getItem<string>(USER_ID_KEY);
+    this.identityType = storage.getItem<IdentityType>(IDENTITY_TYPE_KEY);
 
     this.queue = new MessageQueue(
       httpTransport,
-      `${baseUrl}${EVENTS_ENDPOINT}`,
+      `${baseUrl}${MESSAGES_ENDPOINT}`,
       config.publishableKey,
       DEFAULT_FLUSH_INTERVAL_MS,
       DEFAULT_FLUSH_SIZE,
@@ -61,13 +68,14 @@ export class Audience {
   ): void {
     const message: TrackMessage = {
       type: 'track',
-      event,
+      eventName: event,
       properties: properties as Record<string, unknown>,
       userId: this.userId,
       anonymousId: this.anonymousId,
-      timestamp: getTimestamp(),
+      eventTimestamp: getTimestamp(),
       messageId: generateId(),
       context: collectContext(),
+      surface: this.surface,
     };
     this.queue.enqueue(message);
   }
@@ -77,18 +85,21 @@ export class Audience {
   // -------------------------------------------------------------------------
 
   identify(provider: IdentityProvider, uid: string, traits?: UserTraits): void {
-    this.userId = formatUserId(provider, uid);
+    this.userId = uid;
+    this.identityType = provider as IdentityType;
     storage.setItem(USER_ID_KEY, this.userId);
+    storage.setItem(IDENTITY_TYPE_KEY, this.identityType);
 
     const message: IdentifyMessage = {
       type: 'identify',
-      userId: this.userId,
-      provider,
+      userId: uid,
+      identityType: provider as IdentityType,
       traits,
       anonymousId: this.anonymousId,
-      timestamp: getTimestamp(),
+      eventTimestamp: getTimestamp(),
       messageId: generateId(),
       context: collectContext(),
+      surface: this.surface,
     };
     this.queue.enqueue(message);
   }
@@ -100,14 +111,15 @@ export class Audience {
   alias(from: Identity, to: Identity): void {
     const message: AliasMessage = {
       type: 'alias',
-      previousId: formatUserId(from.provider, from.uid),
-      previousProvider: from.provider,
-      userId: formatUserId(to.provider, to.uid),
-      provider: to.provider,
+      fromId: from.uid,
+      fromType: from.provider as IdentityType,
+      toId: to.uid,
+      toType: to.provider as IdentityType,
       anonymousId: this.anonymousId,
-      timestamp: getTimestamp(),
+      eventTimestamp: getTimestamp(),
       messageId: generateId(),
       context: collectContext(),
+      surface: this.surface,
     };
     this.queue.enqueue(message);
   }
@@ -124,7 +136,9 @@ export class Audience {
   /** Clear the current identity. Call on logout. */
   reset(): void {
     this.userId = undefined;
+    this.identityType = undefined;
     storage.removeItem(USER_ID_KEY);
+    storage.removeItem(IDENTITY_TYPE_KEY);
   }
 
   /** Stop the flush loop and wipe all local state. */
