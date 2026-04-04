@@ -38,7 +38,7 @@ import {
   ANON_ID_COOKIE,
 } from './cookie';
 import { generateId, getTimestamp } from './utils';
-import { isAliasValid } from './validation';
+import { isAliasValid, truncate } from './validation';
 import { DebugLogger } from './debug';
 
 const DEFAULT_CONSENT_SOURCE = 'WebSDK';
@@ -213,7 +213,7 @@ export class ImmutableWebSDK {
       anonymousId: this.anonymousId,
       surface: 'web',
       context: collectContext(),
-      eventName: event,
+      eventName: truncate(event),
       properties: properties as Record<string, unknown> | undefined,
       userId: this.consent.getLevel() === 'full' ? this.userId : undefined,
     };
@@ -267,7 +267,7 @@ export class ImmutableWebSDK {
     }
 
     // Overload: identify(uid, provider, traits?) — known user
-    this.userId = uidOrTraits;
+    this.userId = truncate(uidOrTraits);
 
     const message: IdentifyMessage = {
       type: 'identify',
@@ -276,7 +276,7 @@ export class ImmutableWebSDK {
       anonymousId: this.anonymousId,
       surface: 'web',
       context: collectContext(),
-      userId: uidOrTraits,
+      userId: truncate(uidOrTraits),
       identityType: provider as IdentityType,
       traits: traits as Record<string, unknown> | undefined,
     };
@@ -288,11 +288,17 @@ export class ImmutableWebSDK {
   /**
    * Link two identities as belonging to the same player.
    *
+   * Requires full consent (alias carries identity-bearing fields).
    * Fires an AliasMessage with fromId/fromType/toId/toType per the
    * backend schema. Does not change the current userId.
    */
   alias(from: Identity, to: Identity): void {
-    if (this.consent.getLevel() === 'none') return;
+    if (this.consent.getLevel() !== 'full') {
+      this.debug?.logWarning(
+        'alias() requires full consent — call ignored. Set consent to "full" first.',
+      );
+      return;
+    }
     if (!isAliasValid(from.uid, from.provider, to.uid, to.provider)) {
       this.debug?.logWarning('alias() from and to are identical — call ignored.');
       return;
@@ -306,9 +312,9 @@ export class ImmutableWebSDK {
       anonymousId: this.anonymousId,
       surface: 'web',
       context: collectContext(),
-      fromId: from.uid,
+      fromId: truncate(from.uid),
       fromType: from.provider as IdentityType,
-      toId: to.uid,
+      toId: truncate(to.uid),
       toType: to.provider as IdentityType,
     };
 

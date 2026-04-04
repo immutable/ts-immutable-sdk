@@ -1,10 +1,13 @@
 const MAX_FUTURE_MS = 24 * 60 * 60 * 1000; // 24 hours
 const MAX_PAST_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
+// Backend maxLength constraints from OAS
+const MAX_STRING_LENGTH = 256; // anonymousId, eventName, userId, fromId, toId
+const MAX_SOURCE_LENGTH = 128; // consent source
+
 /**
  * Validate that an event timestamp is within the backend's accepted range:
  * no more than 24 hours in the future, no more than 30 days in the past.
- * Returns true if valid.
  */
 export function isTimestampValid(eventTimestamp: string): boolean {
   const ts = new Date(eventTimestamp).getTime();
@@ -15,8 +18,24 @@ export function isTimestampValid(eventTimestamp: string): boolean {
 
 /**
  * Validate that alias from and to are not the same identity.
- * Returns true if valid (they differ).
  */
-export function isAliasValid(fromUid: string, fromProvider: string, toUid: string, toProvider: string): boolean {
+export function isAliasValid(
+  fromUid: string,
+  fromProvider: string,
+  toUid: string,
+  toProvider: string,
+): boolean {
   return fromUid !== toUid || fromProvider !== toProvider;
+}
+
+/**
+ * Truncate a string to the backend's max length for the given field.
+ * Returns the original string if within limits.
+ */
+export function truncate(value: string, maxLength = MAX_STRING_LENGTH): string {
+  return value.length > maxLength ? value.slice(0, maxLength) : value;
+}
+
+export function truncateSource(value: string): string {
+  return truncate(value, MAX_SOURCE_LENGTH);
 }
