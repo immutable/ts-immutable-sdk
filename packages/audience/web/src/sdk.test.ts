@@ -18,9 +18,13 @@ function createSDK(overrides: Record<string, unknown> = {}) {
   });
 }
 
+// Mock fetch to prevent real network requests from reconcileServerConsent
+global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
+
 beforeEach(() => {
   jest.clearAllMocks();
   jest.useFakeTimers();
+  (global.fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({}) });
   // Clear cookies
   document.cookie.split(';').forEach((c) => {
     document.cookie = `${c.trim().split('=')[0]}=;max-age=0;path=/`;
@@ -263,19 +267,24 @@ describe('ImmutableWebSDK', () => {
       sdk.shutdown();
     });
 
-    it('purges identify and strips userId on full → anonymous downgrade', async () => {
+    it('purges identify and alias, strips userId on full → anonymous downgrade', async () => {
       const sdk = createSDK({ consent: 'full' });
 
       sdk.identify('user@example.com', IdentityProvider.Email);
+      sdk.alias(
+        { uid: '76561198012345', provider: IdentityProvider.Steam },
+        { uid: 'user@example.com', provider: IdentityProvider.Email },
+      );
       sdk.track(AudienceEvent.Purchase, { currency: 'USD', value: 9.99 });
-      // Both messages queued: identify + track with userId
+      // Three messages queued: identify + alias + track
 
       sdk.setConsent('anonymous');
       await sdk.flush();
 
       const { messages } = mockSend.mock.calls[0][2];
-      // Identify should have been purged
+      // Identify and alias should have been purged (both carry PII)
       expect(messages.every((m: any) => m.type !== 'identify')).toBe(true);
+      expect(messages.every((m: any) => m.type !== 'alias')).toBe(true);
       // Track should remain but without userId
       const trackMsg = messages.find((m: any) => m.type === 'track');
       expect(trackMsg).toBeDefined();

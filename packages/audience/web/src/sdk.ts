@@ -381,11 +381,15 @@ export class ImmutableWebSDK {
    */
   reset(): void {
     this.userId = undefined;
-    // Delete existing cookies so getOrCreate generates fresh IDs
     deleteCookie(ANON_ID_COOKIE, this.cookieDomain);
     deleteCookie(SESSION_COOKIE, this.cookieDomain);
-    this.anonymousId = getOrCreateAnonymousId(this.cookieDomain);
-    getOrCreateSessionId(this.cookieDomain);
+    // Only write new cookies if consent allows (mirrors init behaviour)
+    if (this.consent.getLevel() !== 'none') {
+      this.anonymousId = getOrCreateAnonymousId(this.cookieDomain);
+      getOrCreateSessionId(this.cookieDomain);
+    } else {
+      this.anonymousId = generateId();
+    }
     this.isFirstPage = true;
   }
 
