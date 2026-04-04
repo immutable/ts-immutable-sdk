@@ -48,7 +48,7 @@ const createAudience = () => new Audience({
 
 describe('Audience', () => {
   describe('track()', () => {
-    it('enqueues a track message with event name and properties', async () => {
+    it('enqueues a track message with eventName and properties', async () => {
       const audience = createAudience();
       audience.track(AudienceEvent.Purchase, { currency: 'USD', value: 9.99 });
 
@@ -59,12 +59,12 @@ describe('Audience', () => {
       expect(payload.messages).toHaveLength(1);
       expect(payload.messages[0]).toMatchObject({
         type: 'track',
-        event: 'purchase',
+        eventName: 'purchase',
         properties: { currency: 'USD', value: 9.99 },
       });
     });
 
-    it('includes formatted userId on track messages after identify', async () => {
+    it('includes userId on track messages after identify', async () => {
       const audience = createAudience();
       audience.identify(IdentityProvider.Passport, 'abc-123');
       audience.track(AudienceEvent.SignIn, { method: 'passport' });
@@ -72,7 +72,7 @@ describe('Audience', () => {
       await audience.flush();
 
       const trackMsg = lastPayload()!.messages.find((m) => m.type === 'track');
-      expect(trackMsg).toMatchObject({ userId: 'passport:abc-123' });
+      expect(trackMsg).toMatchObject({ userId: 'abc-123' });
     });
 
     it('sends track messages without userId when not identified', async () => {
@@ -85,10 +85,43 @@ describe('Audience', () => {
       expect(msg).toMatchObject({ type: 'track' });
       expect((msg as any).userId).toBeUndefined();
     });
+
+    it('includes surface when configured', async () => {
+      const audience = new Audience({
+        publishableKey: 'pk_imx_test',
+        environment: 'sandbox',
+        surface: 'web',
+      });
+      audience.track(AudienceEvent.SessionStart, {});
+      await audience.flush();
+
+      const msg = lastPayload()!.messages[0];
+      expect((msg as any).surface).toBe('web');
+    });
+
+    it('omits surface when not configured', async () => {
+      const audience = createAudience();
+      audience.track(AudienceEvent.SessionStart, {});
+      await audience.flush();
+
+      const msg = lastPayload()!.messages[0];
+      expect((msg as any).surface).toBeUndefined();
+    });
+
+    it('uses eventTimestamp instead of timestamp', async () => {
+      const audience = createAudience();
+      audience.track(AudienceEvent.SessionStart, {});
+
+      await audience.flush();
+
+      const msg = lastPayload()!.messages[0];
+      expect(msg.eventTimestamp).toBeDefined();
+      expect((msg as any).timestamp).toBeUndefined();
+    });
   });
 
   describe('identify()', () => {
-    it('enqueues an identify message with formatted userId, provider and traits', async () => {
+    it('enqueues an identify message with userId, identityType and traits', async () => {
       const audience = createAudience();
       audience.identify(IdentityProvider.Steam, '765', { email: 'p@test.com' });
 
@@ -96,22 +129,29 @@ describe('Audience', () => {
 
       expect(lastPayload()!.messages[0]).toMatchObject({
         type: 'identify',
-        userId: 'steam:765',
-        provider: 'steam',
+        userId: '765',
+        identityType: 'steam',
         traits: { email: 'p@test.com' },
       });
     });
 
-    it('persists formatted userId to storage', () => {
+    it('persists userId to storage', () => {
       const audience = createAudience();
       audience.identify(IdentityProvider.Passport, 'abc-123');
 
-      expect(mockStorage.setItem).toHaveBeenCalledWith('userId', 'passport:abc-123');
+      expect(mockStorage.setItem).toHaveBeenCalledWith('userId', 'abc-123');
+    });
+
+    it('persists identityType to storage', () => {
+      const audience = createAudience();
+      audience.identify(IdentityProvider.Steam, '765');
+
+      expect(mockStorage.setItem).toHaveBeenCalledWith('identityType', 'steam');
     });
   });
 
   describe('alias()', () => {
-    it('enqueues an alias message linking two typed identities', async () => {
+    it('enqueues an alias message with fromId/fromType/toId/toType', async () => {
       const audience = createAudience();
       audience.alias(
         { provider: IdentityProvider.Steam, uid: '765' },
@@ -122,11 +162,25 @@ describe('Audience', () => {
 
       expect(lastPayload()!.messages[0]).toMatchObject({
         type: 'alias',
-        previousId: 'steam:765',
-        previousProvider: 'steam',
-        userId: 'passport:abc-123',
-        provider: 'passport',
+        fromId: '765',
+        fromType: 'steam',
+        toId: 'abc-123',
+        toType: 'passport',
       });
+    });
+
+    it('does not include old field names', async () => {
+      const audience = createAudience();
+      audience.alias(
+        { provider: IdentityProvider.Steam, uid: '765' },
+        { provider: IdentityProvider.Passport, uid: 'abc-123' },
+      );
+
+      await audience.flush();
+
+      const msg = lastPayload()!.messages[0] as any;
+      expect(msg.previousId).toBeUndefined();
+      expect(msg.previousProvider).toBeUndefined();
     });
   });
 
@@ -192,7 +246,7 @@ describe('Audience', () => {
       await audience.flush();
 
       expect(sendMock.mock.calls[0][0]).toBe(
-        'https://api.sandbox.immutable.com/v1/audience/events',
+        'https://api.sandbox.immutable.com/v1/audience/messages',
       );
     });
 
@@ -202,7 +256,7 @@ describe('Audience', () => {
       await audience.flush();
 
       expect(sendMock.mock.calls[0][0]).toBe(
-        'https://api.immutable.com/v1/audience/events',
+        'https://api.immutable.com/v1/audience/messages',
       );
     });
 
@@ -212,7 +266,7 @@ describe('Audience', () => {
       await audience.flush();
 
       expect(sendMock.mock.calls[0][0]).toBe(
-        'https://api.dev.immutable.com/v1/audience/events',
+        'https://api.dev.immutable.com/v1/audience/messages',
       );
     });
   });
