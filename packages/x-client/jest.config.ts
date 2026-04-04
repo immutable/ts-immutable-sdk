@@ -16,7 +16,10 @@ const config: Config = {
   moduleNameMapper: { '^@imtbl/(.*)$': '<rootDir>/../../node_modules/@imtbl/$1/src' },
   testRegex: '^.+\\.test\\.(js|ts|jsx|tsx)$',
   testPathIgnorePatterns: [
-    '/node_modules/'
+    '/node_modules/',
+    // Integration tests that hit live sandbox APIs — run separately
+    'src/imx.test.ts',
+    'src/utils/stark/starkCurve.test.ts',
   ],
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
