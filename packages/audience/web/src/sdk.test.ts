@@ -262,6 +262,57 @@ describe('ImmutableWebSDK', () => {
 
       sdk.shutdown();
     });
+
+    it('purges identify and strips userId on full → anonymous downgrade', async () => {
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.identify('user@example.com', IdentityProvider.Email);
+      sdk.track(AudienceEvent.Purchase, { currency: 'USD', value: 9.99 });
+      // Both messages queued: identify + track with userId
+
+      sdk.setConsent('anonymous');
+      await sdk.flush();
+
+      const { messages } = mockSend.mock.calls[0][2];
+      // Identify should have been purged
+      expect(messages.every((m: any) => m.type !== 'identify')).toBe(true);
+      // Track should remain but without userId
+      const trackMsg = messages.find((m: any) => m.type === 'track');
+      expect(trackMsg).toBeDefined();
+      expect((trackMsg as any).userId).toBeUndefined();
+
+      sdk.shutdown();
+    });
+
+    it('alias requires full consent, not anonymous', async () => {
+      const sdk = createSDK({ consent: 'anonymous' });
+
+      sdk.alias(
+        { uid: '76561198012345', provider: IdentityProvider.Steam },
+        { uid: 'user@example.com', provider: IdentityProvider.Email },
+      );
+      await sdk.flush();
+
+      expect(mockSend).not.toHaveBeenCalled();
+      sdk.shutdown();
+    });
+
+    it('fires initial page view on upgrade from none when trackPageViews enabled', async () => {
+      const sdk = ImmutableWebSDK.init({
+        publishableKey: 'pk_imtbl_test',
+        environment: 'sandbox',
+        consent: 'none',
+        trackPageViews: true,
+      });
+
+      sdk.setConsent('anonymous');
+      await sdk.flush();
+
+      const { messages } = mockSend.mock.calls[0][2];
+      expect(messages.some((m: any) => m.type === 'page')).toBe(true);
+
+      sdk.shutdown();
+    });
   });
 
   describe('reset', () => {
