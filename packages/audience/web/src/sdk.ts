@@ -62,6 +62,10 @@ export class ImmutableWebSDK {
 
   private isFirstPage = true;
 
+  private consentManuallySet = false;
+
+  private readonly trackPageViewsEnabled: boolean;
+
   private constructor(config: WebSDKConfig) {
     const {
       cookieDomain,
@@ -74,6 +78,7 @@ export class ImmutableWebSDK {
     const flushSize = config.flushSize ?? DEFAULT_FLUSH_SIZE;
 
     this.cookieDomain = cookieDomain;
+    this.trackPageViewsEnabled = config.trackPageViews ?? false;
 
     // Debug logger — tree-shaken in prod when debug: false
     if (config.debug) {
@@ -144,12 +149,13 @@ export class ImmutableWebSDK {
   private reconcileServerConsent(): void {
     this.consent.fetchServerConsent(this.anonymousId).then((serverStatus) => {
       if (!serverStatus || serverStatus === 'not_set') return;
+      // Skip if studio has already called setConsent() — their intent wins
+      if (this.consentManuallySet) return;
 
       const local = this.consent.getLevel();
-      // Server has a recorded consent but local is 'none' (cookie was cleared)
-      // — restore the server's consent level
       if (local === 'none' && serverStatus !== 'none') {
         this.setConsent(serverStatus as ConsentLevel);
+        this.consentManuallySet = false; // reset — this was automatic, not manual
         this.debug?.logWarning(
           `Restored consent from server: ${serverStatus} (local cookie was cleared)`,
         );
@@ -320,6 +326,7 @@ export class ImmutableWebSDK {
     const previous = this.consent.getLevel();
     if (level === previous) return;
 
+    this.consentManuallySet = true;
     this.debug?.logConsent(previous, level);
 
     this.consent.setLevel(level, this.anonymousId, {
@@ -350,6 +357,11 @@ export class ImmutableWebSDK {
       this.anonymousId = getOrCreateAnonymousId(this.cookieDomain);
       getOrCreateSessionId(this.cookieDomain);
       this.queue.start();
+
+      // Fire the initial page view that was skipped at init due to none consent
+      if (this.trackPageViewsEnabled) {
+        this.page();
+      }
     }
   }
 
