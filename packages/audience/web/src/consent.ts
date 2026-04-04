@@ -8,6 +8,7 @@ import {
 } from './cookie';
 import { CONSENT_ENDPOINT, getBaseUrl } from './config';
 import { isBrowser } from './utils';
+import { truncateSource } from './validation';
 
 /**
  * Check if the browser signals a Do Not Track or Global Privacy Control
@@ -44,12 +45,12 @@ export class ConsentManager {
     environment: Environment,
     publishableKey: string,
     initialConsent: ConsentLevel,
-    source: string,
+    rawSource: string,
     cookieDomain?: string,
   ) {
     this.baseUrl = getBaseUrl(environment);
     this.publishableKey = publishableKey;
-    this.source = source;
+    this.source = truncateSource(rawSource);
     this.cookieDomain = cookieDomain;
 
     // DNT / GPC: auto-downgrade to 'none' if browser signals tracking opt-out

@@ -319,8 +319,14 @@ describe('ImmutableWebSDK', () => {
     it('clears userId and generates new anonymousId', async () => {
       const sdk = createSDK({ consent: 'full' });
 
+      // Capture the original anonymousId
+      sdk.track(AudienceEvent.SignIn, { method: 'passport' });
+      await sdk.flush();
+      const originalAnonId = mockSend.mock.calls[0][2].messages[0].anonymousId;
+      mockSend.mockClear();
+
       sdk.identify('user@example.com', IdentityProvider.Email);
-      await sdk.flush(); // flush the identify
+      await sdk.flush();
       mockSend.mockClear();
 
       sdk.reset();
@@ -330,6 +336,9 @@ describe('ImmutableWebSDK', () => {
       const msg = mockSend.mock.calls[0][2].messages[0];
       expect(msg.type).toBe('track');
       expect((msg as any).userId).toBeUndefined();
+      // Verify anonymousId actually changed
+      expect(msg.anonymousId).toBeDefined();
+      expect(msg.anonymousId).not.toBe(originalAnonId);
 
       sdk.shutdown();
     });

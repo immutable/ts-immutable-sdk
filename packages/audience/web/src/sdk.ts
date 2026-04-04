@@ -35,7 +35,9 @@ import {
   getOrCreateSessionId,
   touchSession,
   getCookie,
+  deleteCookie,
   ANON_ID_COOKIE,
+  SESSION_COOKIE,
 } from './cookie';
 import { generateId, getTimestamp } from './utils';
 import { isAliasValid, truncate } from './validation';
@@ -342,8 +344,8 @@ export class ImmutableWebSDK {
       },
       onStripIdentity: () => {
         this.userId = undefined;
-        // Remove identify messages, strip userId from remaining
-        this.queue.purge((m) => m.type === 'identify');
+        // Remove identify and alias messages (both carry PII), strip userId from remaining
+        this.queue.purge((m) => m.type === 'identify' || m.type === 'alias');
         this.queue.transform((m) => {
           if ('userId' in m && m.userId) {
             const cleaned = { ...m };
@@ -379,6 +381,9 @@ export class ImmutableWebSDK {
    */
   reset(): void {
     this.userId = undefined;
+    // Delete existing cookies so getOrCreate generates fresh IDs
+    deleteCookie(ANON_ID_COOKIE, this.cookieDomain);
+    deleteCookie(SESSION_COOKIE, this.cookieDomain);
     this.anonymousId = getOrCreateAnonymousId(this.cookieDomain);
     getOrCreateSessionId(this.cookieDomain);
     this.isFirstPage = true;
