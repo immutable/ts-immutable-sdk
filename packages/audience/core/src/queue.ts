@@ -1,6 +1,7 @@
 import type { Message, BatchPayload } from './types';
 import type { Transport } from './transport';
 import * as storage from './storage';
+import { isBrowser } from './utils';
 
 const STORAGE_KEY = 'queue';
 
@@ -14,6 +15,10 @@ const STORAGE_KEY = 'queue';
  * localStorage is used as a write-through cache so messages survive
  * page navigations. On construction, any previously-persisted messages
  * are restored into memory.
+ *
+ * When started, the queue also listens for page-unload events
+ * (`visibilitychange` and `pagehide`) and flushes via `sendBeacon`
+ * to ensure events are not lost when the user navigates away.
  */
 export class MessageQueue {
   private messages: Message[];
@@ -21,6 +26,16 @@ export class MessageQueue {
   private timer: ReturnType<typeof setInterval> | null = null;
 
   private flushing = false;
+
+  private readonly onVisibilityChange = (): void => {
+    if (document.visibilityState === 'hidden') {
+      this.flushBeacon();
+    }
+  };
+
+  private readonly onPageHide = (): void => {
+    this.flushBeacon();
+  };
 
   constructor(
     private readonly transport: Transport,
@@ -35,12 +50,28 @@ export class MessageQueue {
   start(): void {
     if (this.timer) return;
     this.timer = setInterval(() => this.flush(), this.flushIntervalMs);
+
+    if (isBrowser()) {
+      document.addEventListener('visibilitychange', this.onVisibilityChange);
+      window.addEventListener('pagehide', this.onPageHide);
+    }
   }
 
   stop(): void {
     if (!this.timer) return;
     clearInterval(this.timer);
     this.timer = null;
+
+    if (isBrowser()) {
+      document.removeEventListener('visibilitychange', this.onVisibilityChange);
+      window.removeEventListener('pagehide', this.onPageHide);
+    }
+  }
+
+  /** Stops the queue, flushes remaining messages via beacon, and removes listeners. */
+  destroy(): void {
+    this.stop();
+    this.flushBeacon();
   }
 
   enqueue(message: Message): void {
@@ -79,6 +110,31 @@ export class MessageQueue {
   clear(): void {
     this.messages = [];
     storage.removeItem(STORAGE_KEY);
+  }
+
+  /**
+   * Synchronous flush using sendBeacon for page-unload scenarios.
+   * sendBeacon is fire-and-forget and survives page navigation.
+   * Falls back to the normal async flush if sendBeacon is unavailable.
+   */
+  private flushBeacon(): void {
+    if (this.flushing || this.messages.length === 0) return;
+
+    const payload: BatchPayload = { messages: [...this.messages] };
+    const body = JSON.stringify(payload);
+
+    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+      const blob = new Blob([body], { type: 'application/json' });
+      const sent = navigator.sendBeacon(this.endpointUrl, blob);
+      if (sent) {
+        this.messages = [];
+        this.persist();
+        return;
+      }
+    }
+
+    // Fallback: trigger async flush (best-effort, may not complete before unload)
+    this.flush();
   }
 
   private persist(): void {
