@@ -1,5 +1,6 @@
 import type { Message, MessagesRequest } from './types';
 import { sendMessages } from './transport';
+import { isTimestampValid } from './validation';
 import * as storage from './storage';
 import { isBrowser } from './utils';
 
@@ -26,8 +27,9 @@ export class MessageQueue {
     private readonly flushSize: number,
     private readonly onFlush?: (ok: boolean, count: number) => void,
   ) {
-    // Restore any persisted messages from a prior page load
-    this.messages = storage.getItem<Message[]>(QUEUE_KEY) ?? [];
+    // Restore persisted messages, filtering out stale ones (>30 days old)
+    const restored = storage.getItem<Message[]>(QUEUE_KEY) ?? [];
+    this.messages = restored.filter((m) => isTimestampValid(m.eventTimestamp));
   }
 
   start(): void {
