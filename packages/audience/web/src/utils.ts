@@ -5,7 +5,6 @@ export const generateId = (): string => {
     return crypto.randomUUID();
   }
   // Fallback: UUID v4 shape using Math.random (backend requires uuid format)
-  // eslint-disable-next-line no-bitwise
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = Math.trunc(Math.random() * 16);
     const v = c === 'x' ? r : (r % 4) + 8;
