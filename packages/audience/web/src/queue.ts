@@ -15,6 +15,10 @@ export class MessageQueue {
 
   private unloadBound = false;
 
+  private visibilityHandler?: () => void;
+
+  private pagehideHandler?: () => void;
+
   constructor(
     private readonly endpointUrl: string,
     private readonly publishableKey: string,
@@ -33,9 +37,11 @@ export class MessageQueue {
   }
 
   stop(): void {
-    if (!this.timer) return;
-    clearInterval(this.timer);
-    this.timer = null;
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+    this.removeUnload();
   }
 
   enqueue(message: Message): void {
@@ -107,10 +113,22 @@ export class MessageQueue {
     if (!isBrowser() || this.unloadBound) return;
     this.unloadBound = true;
 
-    const handler = () => this.flushUnload();
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') handler();
-    });
-    window.addEventListener('pagehide', handler);
+    this.pagehideHandler = () => this.flushUnload();
+    this.visibilityHandler = () => {
+      if (document.visibilityState === 'hidden') this.flushUnload();
+    };
+    document.addEventListener('visibilitychange', this.visibilityHandler);
+    window.addEventListener('pagehide', this.pagehideHandler);
+  }
+
+  private removeUnload(): void {
+    if (!this.unloadBound) return;
+    if (this.visibilityHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityHandler);
+    }
+    if (this.pagehideHandler) {
+      window.removeEventListener('pagehide', this.pagehideHandler);
+    }
+    this.unloadBound = false;
   }
 }
