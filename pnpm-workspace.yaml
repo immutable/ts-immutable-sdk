@@ -25,6 +25,7 @@ packages:
   - "packages/checkout/widgets-lib"
   - "packages/blockchain-data/sdk"
   - "packages/audience/sdk"
+  - "packages/audience/web"
   - "packages/game-bridge"
   - "packages/webhook/sdk"
   - "packages/minting-backend/sdk"
