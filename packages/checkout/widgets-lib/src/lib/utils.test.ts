@@ -535,6 +535,10 @@ describe('utils', () => {
       expect(isNativeToken('NATIVE')).toBeTruthy();
     });
 
+    it('should return true if address is zero address (used by some APIs for native token)', () => {
+      expect(isNativeToken('0x0000000000000000000000000000000000000000')).toBeTruthy();
+    });
+
     it('should return false if address is not NATIVE', () => {
       expect(isNativeToken('0x123')).toBeFalsy();
     });

@@ -183,9 +183,14 @@ export const isZkEvmChainId = (chainId: ChainId) => chainId === ChainId.IMTBL_ZK
 export const isL1EthChainId = (chainId: ChainId) => chainId === ChainId.SEPOLIA
   || chainId === ChainId.ETHEREUM;
 
+/** Zero address used by some APIs (e.g. primary-sales) to denote native token (e.g. tIMX on zkEVM) */
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
 export const isNativeToken = (
   address: string | undefined,
-): boolean => !address || address.toLocaleLowerCase() === NATIVE;
+): boolean => !address
+  || address.toLocaleLowerCase() === NATIVE
+  || address.toLocaleLowerCase() === ZERO_ADDRESS;
 
 export function getRemoteImage(environment: Environment | undefined, path: string) {
   return `${CHECKOUT_CDN_BASE_URL[environment ?? Environment.PRODUCTION]}/v1/blob/img${path}`;
