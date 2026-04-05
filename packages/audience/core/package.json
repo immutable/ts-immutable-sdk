@@ -1,13 +1,11 @@
 {
   "name": "@imtbl/audience-core",
-  "description": "Shared core for Immutable Audience SDKs: transport, queue, cookie, context collection",
+  "description": "Shared contract for Immutable Audience SDKs: wire-format types, configuration constants, and typed events",
   "version": "0.0.0",
   "author": "Immutable",
   "private": true,
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
-  "dependencies": {
-    "@imtbl/metrics": "workspace:*"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@swc/core": "^1.4.2",
     "@swc/jest": "^0.2.37",

@@ -1,6 +1,10 @@
+// Wire-format types
 export type {
   Environment,
+  IdentityType,
   Surface,
+  ConsentLevel,
+  ConsentStatus,
   MessageType,
   EventContext,
   UserTraits,
@@ -11,23 +15,42 @@ export type {
   AliasMessage,
   Message,
   BatchPayload,
+  BatchResponse,
+  UpdateConsentRequest,
+  ConsentResponse,
 } from './types';
 
-export { getOrCreateAnonymousId, getAnonymousId } from './cookie';
-export * as storage from './storage';
-
+// Configuration constants
 export {
-  getBaseUrl,
   INGEST_PATH,
   CONSENT_PATH,
-  FLUSH_INTERVAL_MS,
-  FLUSH_SIZE,
-  COOKIE_NAME,
+  ANON_ID_COOKIE,
+  SESSION_COOKIE,
+  CONSENT_COOKIE,
+  DEFAULT_FLUSH_INTERVAL_MS,
+  DEFAULT_FLUSH_SIZE,
+  getBaseUrl,
 } from './config';
 
-export { generateId, getTimestamp, isBrowser } from './utils';
+// Typed events and identity
+export {
+  AudienceEvent,
+  IdentityProvider,
+} from './events';
 
-export type { Transport } from './transport';
-export { httpTransport, httpSend } from './transport';
-export { MessageQueue } from './queue';
-export { collectContext } from './context';
+export type {
+  SignUpParams,
+  SignInParams,
+  WishlistAddParams,
+  WishlistRemoveParams,
+  PurchaseParams,
+  GameLaunchParams,
+  ProgressionStatus,
+  ProgressionParams,
+  ResourceFlow,
+  ResourceParams,
+  SessionStartParams,
+  SessionEndParams,
+  EventParamMap,
+  Identity,
+} from './events';
