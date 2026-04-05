@@ -1085,6 +1085,9 @@ importers:
       '@imtbl/auth-next-server':
         specifier: workspace:*
         version: link:../auth-next-server
+      fast-json-stable-stringify:
+        specifier: ^2.1.0
+        version: 2.1.0
     devDependencies:
       '@swc/core':
         specifier: ^1.4.2
