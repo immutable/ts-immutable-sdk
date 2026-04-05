@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audience Web SDK — Demo</title>
+  <style>
+    :root {
+      --bg: #050505; --card: #0f0f0f; --border: #1c1c1c; --accent: #888888;
+      --text: #c0c0c0; --text-strong: #e8e8e8; --text-muted: #606060;
+      --danger: #ef4444; --primary-bg: #e8e8e8; --primary-text: #050505;
+      --primary-hover: #c0c0c0; --btn-bg: #1a1a1a; --btn-border: #2a2a2a;
+      --btn-hover: #242424; --input-bg: #050505; --log-bg: #030303;
+      --log-border: #141414; --log-time: #444444; --log-method: #d0d0d0;
+    }
+    [data-theme="light"] {
+      --bg: #fafafa; --card: #ffffff; --border: #e4e4e7; --accent: #71717a;
+      --text: #3f3f46; --text-strong: #18181b; --text-muted: #a1a1aa;
+      --danger: #dc2626; --primary-bg: #18181b; --primary-text: #fafafa;
+      --primary-hover: #3f3f46; --btn-bg: #f4f4f5; --btn-border: #d4d4d8;
+      --btn-hover: #e4e4e7; --input-bg: #ffffff; --log-bg: #f4f4f5;
+      --log-border: #e4e4e7; --log-time: #a1a1aa; --log-method: #18181b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 32px 24px; max-width: 960px; margin: 0 auto; transition: background 0.2s, color 0.2s; }
+    h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; color: var(--text-strong); letter-spacing: -0.3px; }
+    .subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 28px; }
+    .section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 14px; }
+    .section h2 { font-size: 11px; color: var(--accent); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 600; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    button { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-family: inherit; transition: all 0.15s; }
+    button:hover { background: var(--btn-hover); border-color: var(--accent); color: var(--text-strong); }
+    button.primary { background: var(--primary-bg); border-color: var(--primary-bg); color: var(--primary-text); font-weight: 500; }
+    button.primary:hover { background: var(--primary-hover); }
+    button.danger { border-color: var(--danger); color: var(--danger); }
+    button.danger:hover { background: color-mix(in srgb, var(--danger) 10%, transparent); }
+    input, select { background: var(--input-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 8px 10px; border-radius: 6px; font-size: 13px; font-family: inherit; transition: border-color 0.15s; }
+    input:focus, select:focus { outline: none; border-color: var(--accent); }
+    input { width: 200px; }
+    select { min-width: 120px; }
+    label { font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .field { display: flex; flex-direction: column; }
+    #log { background: var(--log-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 12px; line-height: 1.7; max-height: 400px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace; }
+    .log-entry { border-bottom: 1px solid var(--log-border); padding: 4px 0; }
+    .log-time { color: var(--log-time); }
+    .log-method { color: var(--log-method); font-weight: 600; }
+    .log-ok { color: var(--accent); }
+    .log-err { color: var(--danger); }
+    .log-info { color: var(--accent); }
+    .status-bar { display: flex; gap: 16px; font-size: 12px; padding: 10px 0; }
+    .status-bar span { color: var(--text-muted); }
+    .status-bar strong { color: var(--text-strong); }
+    #consent-badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .theme-toggle { position: fixed; top: 16px; right: 16px; background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit; z-index: 10; }
+    .theme-toggle:hover { background: var(--btn-hover); border-color: var(--accent); }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()">Light / Dark</button>
+  <h1>Audience Web SDK — Demo</h1>
+  <p class="subtitle">End-to-end testing against dev/sandbox backend. Open DevTools Network tab to see requests.</p>
+
+  <div class="status-bar">
+    <span>Environment: <strong id="env-display">—</strong></span>
+    <span>Consent: <span id="consent-badge">—</span></span>
+    <span>Anonymous ID: <strong id="anon-display">—</strong></span>
+    <span>User ID: <strong id="user-display">none</strong></span>
+  </div>
+
+  <!-- Init -->
+  <div class="section">
+    <h2>1. Initialise</h2>
+    <div class="row">
+      <div class="field">
+        <label>Publishable Key</label>
+        <input id="pk" type="text" placeholder="pk_imtbl_..." value="">
+      </div>
+      <div class="field">
+        <label>Environment</label>
+        <select id="env">
+          <option value="dev">dev</option>
+          <option value="sandbox" selected>sandbox</option>
+          <option value="production">production</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Initial Consent</label>
+        <select id="init-consent">
+          <option value="none">none</option>
+          <option value="anonymous" selected>anonymous</option>
+          <option value="full">full</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text)">
+        <input type="checkbox" id="debug-mode" checked> Debug mode
+      </label>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="primary" onclick="initSDK()">Init SDK</button>
+      <button class="danger" onclick="shutdownSDK()">Shutdown</button>
+    </div>
+  </div>
+
+  <!-- Consent -->
+  <div class="section">
+    <h2>2. Consent</h2>
+    <div class="row">
+      <button onclick="setConsent('none')">Set: none</button>
+      <button onclick="setConsent('anonymous')">Set: anonymous</button>
+      <button onclick="setConsent('full')">Set: full</button>
+      <button onclick="verifyConsent()" style="margin-left:16px">Verify Server Consent</button>
+    </div>
+    <div id="consent-verify" style="margin-top:8px;font-size:13px;display:none"></div>
+  </div>
+
+  <!-- Page -->
+  <div class="section">
+    <h2>3. Page Tracking</h2>
+    <div class="row">
+      <button onclick="firePage()">page()</button>
+      <button onclick="firePage({section:'shop',category:'weapons'})">page({section, category})</button>
+    </div>
+  </div>
+
+  <!-- Track -->
+  <div class="section">
+    <h2>4. Track Events</h2>
+    <div class="row">
+      <button onclick="trackEvent('sign_up', {method:'google'})">SignUp</button>
+      <button onclick="trackEvent('sign_in', {method:'passport'})">SignIn</button>
+      <button onclick="trackEvent('purchase', {currency:'USD',value:9.99,itemId:'sword_01',itemName:'Flame Sword',quantity:1})">Purchase</button>
+      <button onclick="trackEvent('wishlist_add', {gameId:'game_123',source:'landing_page'})">WishlistAdd</button>
+      <button onclick="trackEvent('game_launch', {platform:'webgl',version:'1.0'})">GameLaunch</button>
+      <button onclick="trackEvent('progression', {status:'complete',level:5,score:12000})">Progression</button>
+      <button onclick="trackEvent('resource', {flow:'sink',currency:'gold',amount:100})">Resource</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div class="field">
+        <label>Custom Event</label>
+        <input id="custom-event" type="text" placeholder="event_name" value="beta_key_redeemed">
+      </div>
+      <button onclick="trackCustom()" style="align-self:flex-end">Track Custom</button>
+    </div>
+  </div>
+
+  <!-- Identity -->
+  <div class="section">
+    <h2>5. Identity</h2>
+    <div class="row">
+      <div class="field">
+        <label>User ID</label>
+        <input id="uid" type="text" placeholder="user@example.com" value="user@example.com">
+      </div>
+      <div class="field">
+        <label>Provider</label>
+        <select id="provider">
+          <option value="email">Email</option>
+          <option value="steam">Steam</option>
+          <option value="passport">Passport</option>
+          <option value="epic">Epic</option>
+          <option value="google">Google</option>
+          <option value="apple">Apple</option>
+          <option value="discord">Discord</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <button onclick="doIdentify()" style="align-self:flex-end" class="primary">identify()</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button onclick="doAlias()">alias(Steam → Email)</button>
+      <button onclick="doReset()" class="danger">reset()</button>
+    </div>
+  </div>
+
+  <!-- Flush -->
+  <div class="section">
+    <h2>6. Queue</h2>
+    <div class="row">
+      <button class="primary" onclick="doFlush()">Flush Now</button>
+    </div>
+  </div>
+
+  <!-- Log -->
+  <div class="section">
+    <h2>Event Log</h2>
+    <div id="log"></div>
+    <button onclick="document.getElementById('log').innerHTML=''" style="margin-top:8px">Clear Log</button>
+  </div>
+
+  <script src="../dist/cdn/imtbl-web.global.js"></script>
+  <script>
+    var ImmutableWebSDK = window.ImmutableWebSDK;
+    var sdk = null;
+
+    function log(method, detail, type = 'info') {
+      const el = document.getElementById('log');
+      const time = new Date().toISOString().slice(11, 23);
+      const cls = type === 'ok' ? 'log-ok' : type === 'err' ? 'log-err' : 'log-info';
+      const detailStr = typeof detail === 'object' ? JSON.stringify(detail, null, 2) : detail;
+      el.innerHTML += `<div class="log-entry"><span class="log-time">${time}</span> <span class="log-method">${method}</span> <span class="${cls}">${detailStr}</span></div>`;
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function updateStatus() {
+      const anonCookie = document.cookie.match(/imtbl_anon_id=([^;]*)/);
+      const consentCookie = document.cookie.match(/_imtbl_consent=([^;]*)/);
+      document.getElementById('anon-display').textContent = anonCookie ? anonCookie[1].slice(0, 12) + '...' : 'none';
+      const level = consentCookie ? consentCookie[1] : '—';
+      const badge = document.getElementById('consent-badge');
+      badge.textContent = level;
+      const isDark = !document.documentElement.hasAttribute('data-theme');
+      badge.style.background = level === 'full' ? (isDark ? '#e8e8e8' : '#18181b') : level === 'anonymous' ? '#888888' : level === 'none' ? 'var(--danger)' : '#444444';
+      badge.style.color = level === 'full' ? (isDark ? '#050505' : '#fafafa') : level === 'anonymous' ? '#fff' : '#fff';
+      badge.style.color = '#fff';
+    }
+
+    window.initSDK = function() {
+      if (sdk) { log('init', 'Already initialised — shutdown first', 'err'); return; }
+      const pk = document.getElementById('pk').value.trim();
+      if (!pk) { log('init', 'Enter a publishable key', 'err'); return; }
+      const env = document.getElementById('env').value;
+      const consent = document.getElementById('init-consent').value;
+      const debug = document.getElementById('debug-mode').checked;
+
+      sdk = ImmutableWebSDK.init({ publishableKey: pk, environment: env, consent, debug });
+      document.getElementById('env-display').textContent = env;
+      log('init', { environment: env, consent, debug }, 'ok');
+      updateStatus();
+    };
+
+    window.shutdownSDK = function() {
+      if (!sdk) { log('shutdown', 'Not initialised', 'err'); return; }
+      sdk.shutdown();
+      sdk = null;
+      document.getElementById('user-display').textContent = 'none';
+      log('shutdown', 'SDK stopped', 'ok');
+    };
+
+    window.setConsent = function(level) {
+      if (!sdk) { log('setConsent', 'Init SDK first', 'err'); return; }
+      sdk.setConsent(level);
+      log('setConsent', level, 'ok');
+      updateStatus();
+    };
+
+    window.firePage = function(props) {
+      if (!sdk) { log('page', 'Init SDK first', 'err'); return; }
+      sdk.page(props);
+      log('page', props || '(no properties)', 'ok');
+    };
+
+    window.trackEvent = function(event, properties) {
+      if (!sdk) { log('track', 'Init SDK first', 'err'); return; }
+      sdk.track(event, properties);
+      log('track', { event, properties }, 'ok');
+    };
+
+    window.trackCustom = function() {
+      const name = document.getElementById('custom-event').value.trim();
+      if (!sdk) { log('track', 'Init SDK first', 'err'); return; }
+      if (!name) { log('track', 'Enter an event name', 'err'); return; }
+      sdk.track(name, { source: 'demo' });
+      log('track', { event: name, properties: { source: 'demo' } }, 'ok');
+    };
+
+    window.doIdentify = function() {
+      if (!sdk) { log('identify', 'Init SDK first', 'err'); return; }
+      const uid = document.getElementById('uid').value.trim();
+      const provider = document.getElementById('provider').value;
+      if (!uid) { log('identify', 'Enter a user ID', 'err'); return; }
+      sdk.identify(uid, provider, { name: 'Demo User' });
+      document.getElementById('user-display').textContent = `${provider}:${uid}`;
+      log('identify', { uid, provider }, 'ok');
+    };
+
+    window.doAlias = function() {
+      if (!sdk) { log('alias', 'Init SDK first', 'err'); return; }
+      sdk.alias(
+        { uid: '76561198012345', provider: 'steam' },
+        { uid: 'user@example.com', provider: 'email' },
+      );
+      log('alias', { from: 'steam:76561198012345', to: 'email:user@example.com' }, 'ok');
+    };
+
+    window.doReset = function() {
+      if (!sdk) { log('reset', 'Init SDK first', 'err'); return; }
+      sdk.reset();
+      document.getElementById('user-display').textContent = 'none';
+      log('reset', 'Identity cleared, new anonymousId', 'ok');
+      updateStatus();
+    };
+
+    window.doFlush = function() {
+      if (!sdk) { log('flush', 'Init SDK first', 'err'); return; }
+      sdk.flush().then(() => log('flush', 'Queue flushed', 'ok'));
+    };
+
+    window.verifyConsent = function() {
+      const pk = document.getElementById('pk').value.trim();
+      const env = document.getElementById('env').value;
+      if (!pk) { log('verify', 'Enter a publishable key', 'err'); return; }
+
+      const anonCookie = document.cookie.match(/imtbl_anon_id=([^;]*)/);
+      if (!anonCookie) { log('verify', 'No anonymousId cookie — init SDK with consent first', 'err'); return; }
+      const anonId = anonCookie[1];
+
+      const baseUrls = { dev: 'https://api.dev.immutable.com', sandbox: 'https://api.sandbox.immutable.com', production: 'https://api.immutable.com' };
+      const url = `${baseUrls[env]}/v1/audience/tracking-consent?anonymousId=${encodeURIComponent(anonId)}`;
+
+      const el = document.getElementById('consent-verify');
+      el.style.display = 'block';
+      el.innerHTML = '<span style="color:#8b949e">Fetching server consent...</span>';
+
+      fetch(url, { headers: { 'x-immutable-publishable-key': pk } })
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then(data => {
+          const isLight = document.documentElement.hasAttribute('data-theme');
+          const color = data.status === 'full' ? (isLight ? '#18181b' : '#e8e8e8') : data.status === 'anonymous' ? '#888888' : data.status === 'none' ? '#ef4444' : '#888888';
+          el.innerHTML = `Server consent for <strong>${anonId.slice(0, 12)}...</strong>: <strong style="color:${color}">${data.status}</strong>`;
+          log('verify', { anonymousId: anonId, serverStatus: data.status }, 'ok');
+        })
+        .catch(err => {
+          el.innerHTML = `<span style="color:#f85149">Failed: ${err.message}</span>`;
+          log('verify', err.message, 'err');
+        });
+    };
+
+    window.toggleTheme = function() {
+      const html = document.documentElement;
+      if (html.hasAttribute('data-theme')) {
+        html.removeAttribute('data-theme');
+      } else {
+        html.setAttribute('data-theme', 'light');
+      }
+      updateStatus();
+    };
+
+    // Initial status
+    updateStatus();
+  </script>
+</body>
+</html>
