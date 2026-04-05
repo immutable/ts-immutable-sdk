@@ -36,7 +36,19 @@ describe('httpSend', () => {
         'x-immutable-publishable-key': 'pk_imx_test',
       },
       body: JSON.stringify(payload),
+      keepalive: undefined,
     });
+  });
+
+  it('passes keepalive option when specified', async () => {
+    const mockFetch = jest.fn().mockResolvedValue({ ok: true });
+    global.fetch = mockFetch;
+
+    await httpSend('https://example.com', 'pk', payload, { keepalive: true });
+
+    expect(mockFetch).toHaveBeenCalledWith('https://example.com', expect.objectContaining({
+      keepalive: true,
+    }));
   });
 
   it('returns true on success', async () => {

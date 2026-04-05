@@ -77,3 +77,7 @@ export type Message =
 export interface BatchPayload {
   messages: Message[];
 }
+
+export type ConsentLevel = 'none' | 'anonymous' | 'full';
+
+export type ConsentStatus = 'not_set' | 'none' | 'anonymous' | 'full';

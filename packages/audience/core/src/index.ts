@@ -11,9 +11,17 @@ export type {
   AliasMessage,
   Message,
   BatchPayload,
+  ConsentLevel,
+  ConsentStatus,
 } from './types';
 
-export { getOrCreateAnonymousId, getAnonymousId } from './cookie';
+export {
+  getOrCreateAnonymousId,
+  getAnonymousId,
+  getCookie,
+  setCookie,
+  deleteCookie,
+} from './cookie';
 export * as storage from './storage';
 
 export {
@@ -23,6 +31,8 @@ export {
   FLUSH_INTERVAL_MS,
   FLUSH_SIZE,
   COOKIE_NAME,
+  SESSION_COOKIE,
+  CONSENT_COOKIE,
 } from './config';
 
 export { generateId, getTimestamp, isBrowser } from './utils';
@@ -31,3 +41,9 @@ export type { Transport } from './transport';
 export { httpTransport, httpSend } from './transport';
 export { MessageQueue } from './queue';
 export { collectContext } from './context';
+export {
+  isTimestampValid,
+  isAliasValid,
+  truncate,
+  truncateSource,
+} from './validation';
