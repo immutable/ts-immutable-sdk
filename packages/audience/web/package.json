@@ -1,0 +1,61 @@
+{
+  "name": "@imtbl/audience-web-sdk",
+  "description": "Immutable Audience Web SDK — consent-aware event tracking and identity management",
+  "version": "0.0.0",
+  "author": "Immutable",
+  "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
+  "dependencies": {
+    "@imtbl/audience-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@swc/core": "^1.4.2",
+    "@swc/jest": "^0.2.37",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.10.7",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.4.3",
+    "ts-jest": "^29.1.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.2"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "exports": {
+    "development": {
+      "types": "./src/index.ts",
+      "browser": "./dist/browser/index.js",
+      "require": "./dist/node/index.cjs",
+      "default": "./dist/node/index.js"
+    },
+    "default": {
+      "types": "./dist/types/index.d.ts",
+      "browser": "./dist/browser/index.js",
+      "require": "./dist/node/index.cjs",
+      "default": "./dist/node/index.js"
+    }
+  },
+  "files": ["dist"],
+  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "main": "dist/node/index.cjs",
+  "module": "dist/node/index.js",
+  "browser": "dist/browser/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "immutable/ts-immutable-sdk.git",
+  "scripts": {
+    "build": "pnpm transpile && pnpm transpile:cdn && pnpm typegen",
+    "transpile": "tsup src/index.ts --config ../../../tsup.config.js",
+    "transpile:cdn": "tsup --config tsup.cdn.js",
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "demo": "pnpm build && npx serve -l 3456 --cors ..",
+    "typecheck": "tsc --customConditions development --noEmit --jsx preserve"
+  },
+  "type": "module",
+  "types": "./dist/types/index.d.ts"
+}
