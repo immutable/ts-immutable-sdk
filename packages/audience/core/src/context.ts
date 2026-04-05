@@ -1,13 +1,18 @@
 import type { EventContext } from './types';
 import { isBrowser } from './utils';
 
-// WARNING: DO NOT CHANGE THE STRING BELOW. IT GETS REPLACED AT BUILD TIME.
-const SDK_VERSION = '__SDK_VERSION__';
-
-export function collectContext(): EventContext {
+/**
+ * Collect browser context for event payloads.
+ *
+ * Callers pass their own library name and version because multiple surfaces
+ * (web SDK, pixel, Unity, Unreal) share this function and each must identify
+ * itself. Version strings use '__SDK_VERSION__' which the tsup build pipeline
+ * replaces at build time via esbuild-plugin-replace.
+ */
+export function collectContext(library: string, version: string): EventContext {
   const context: EventContext = {
-    library: '@imtbl/audience',
-    libraryVersion: SDK_VERSION,
+    library,
+    libraryVersion: version,
   };
 
   if (!isBrowser()) return context;
