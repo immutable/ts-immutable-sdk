@@ -77,3 +77,23 @@ export type Message =
 export interface BatchPayload {
   messages: Message[];
 }
+
+/**
+ * The consent level a studio sets via setConsent().
+ *
+ * - `'none'` — No tracking. SDK does nothing.
+ * - `'anonymous'` — Track activity but not who the user is.
+ * - `'full'` — Track everything including user identity.
+ */
+export type ConsentLevel = 'none' | 'anonymous' | 'full';
+
+/**
+ * The consent status the backend stores and returns.
+ * Includes `'not_set'` for users who haven't been asked yet.
+ *
+ * - `'not_set'` — No consent decision recorded yet.
+ * - `'none'` — User declined tracking.
+ * - `'anonymous'` — User accepted anonymous tracking.
+ * - `'full'` — User accepted full tracking.
+ */
+export type ConsentStatus = 'not_set' | 'none' | 'anonymous' | 'full';

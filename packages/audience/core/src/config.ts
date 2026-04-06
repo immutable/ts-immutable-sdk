@@ -13,6 +13,7 @@ export const FLUSH_INTERVAL_MS = 5_000;
 export const FLUSH_SIZE = 20;
 
 export const COOKIE_NAME = 'imtbl_anon_id';
+export const SESSION_COOKIE = '_imtbl_sid';
 export const COOKIE_MAX_AGE_SECONDS = 365 * 24 * 60 * 60 * 2; // 2 years
 
 export const getBaseUrl = (environment: Environment): string => BASE_URLS[environment];

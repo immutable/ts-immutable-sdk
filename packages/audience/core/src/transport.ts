@@ -1,14 +1,19 @@
 import { track, trackError } from '@imtbl/metrics';
 import type { BatchPayload } from './types';
 
+export interface TransportOptions {
+  keepalive?: boolean;
+}
+
 export interface Transport {
-  send(url: string, publishableKey: string, payload: BatchPayload): Promise<boolean>;
+  send(url: string, publishableKey: string, payload: BatchPayload, options?: TransportOptions): Promise<boolean>;
 }
 
 export async function httpSend(
   url: string,
   publishableKey: string,
   payload: BatchPayload,
+  options?: TransportOptions,
 ): Promise<boolean> {
   try {
     const response = await fetch(url, {
@@ -18,6 +23,7 @@ export async function httpSend(
         'x-immutable-publishable-key': publishableKey,
       },
       body: JSON.stringify(payload),
+      keepalive: options?.keepalive,
     });
 
     if (!response.ok) {

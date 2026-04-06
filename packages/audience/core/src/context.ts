@@ -4,10 +4,20 @@ import { isBrowser } from './utils';
 // WARNING: DO NOT CHANGE THE STRING BELOW. IT GETS REPLACED AT BUILD TIME.
 const SDK_VERSION = '__SDK_VERSION__';
 
-export function collectContext(): EventContext {
+/**
+ * Collect browser context for event payloads.
+ *
+ * Callers may pass their own library name and version when multiple surfaces
+ * (web SDK, pixel, Unity, Unreal) share this function and each must identify
+ * itself. Defaults to '@imtbl/audience' with the build-time SDK version.
+ */
+export function collectContext(
+  library = '@imtbl/audience',
+  version = SDK_VERSION,
+): EventContext {
   const context: EventContext = {
-    library: '@imtbl/audience',
-    libraryVersion: SDK_VERSION,
+    library,
+    libraryVersion: version,
   };
 
   if (!isBrowser()) return context;
