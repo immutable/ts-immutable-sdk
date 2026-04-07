@@ -8,9 +8,11 @@ const UTM_PARAMS = [
 
 const CLICK_ID_PARAMS = [
   'gclid',
+  'dclid',
   'fbclid',
   'ttclid',
   'msclkid',
+  'li_fat_id',
 ] as const;
 
 const STORAGE_KEY = '__imtbl_attribution';
@@ -22,11 +24,15 @@ export interface Attribution {
   utm_content?: string;
   utm_term?: string;
   gclid?: string;
+  dclid?: string;
   fbclid?: string;
   ttclid?: string;
   msclkid?: string;
+  li_fat_id?: string;
+  referral_code?: string;
   referrer?: string;
   landing_page?: string;
+  touchpoint_type?: string;
 }
 
 type AttributionKey = keyof Attribution;
@@ -46,6 +52,12 @@ function parseParams(url: string): Attribution {
       result[key as AttributionKey] = value;
     }
   }
+
+  const referralCode = params.get('referral_code');
+  if (referralCode) {
+    result.referral_code = referralCode;
+  }
+
   return result;
 }
 
@@ -79,10 +91,14 @@ export function collectAttribution(): Attribution {
     ? window.location.href
     : undefined;
 
+  const hasClickId = CLICK_ID_PARAMS.some((key) => key in urlParams);
+  const hasUtm = UTM_PARAMS.some((key) => key in urlParams);
+
   const attribution: Attribution = {
     ...urlParams,
     referrer,
     landing_page: landingPage,
+    touchpoint_type: hasClickId || hasUtm ? 'click' : undefined,
   };
 
   saveToStorage(attribution);
