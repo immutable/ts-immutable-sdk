@@ -24,7 +24,11 @@ import {
   createConsentManager,
 } from '@imtbl/audience-core';
 
-const PIXEL_VERSION = '0.0.0';
+// Replaced at build time by tsup `define` (see tsup.config.ts).
+// In tests the global isn't defined, so we fall back to 'unknown'.
+const PIXEL_VERSION: string = typeof PIXEL_VERSION_INJECTED !== 'undefined'
+  ? PIXEL_VERSION_INJECTED
+  : 'unknown';
 
 export interface PixelInitOptions {
   key: string;

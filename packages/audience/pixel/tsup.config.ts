@@ -1,5 +1,8 @@
 import { resolve } from 'path';
+import { readFileSync } from 'fs';
 import { defineConfig } from 'tsup';
+
+const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8'));
 
 export default defineConfig({
   entry: ['src/index.ts'],
@@ -14,6 +17,9 @@ export default defineConfig({
   sourcemap: false,
   clean: true,
   noExternal: ['@imtbl/audience-core', '@imtbl/metrics'],
+  define: {
+    PIXEL_VERSION_INJECTED: JSON.stringify(pkg.version),
+  },
   outExtension: () => ({ js: '.js' }),
   esbuildOptions(options) {
     options.outbase = 'src';

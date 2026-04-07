@@ -1,7 +1,7 @@
 {
   "name": "@imtbl/pixel",
   "description": "Immutable Tracking Pixel — drop-in JavaScript snippet for device fingerprint, page view, and attribution data",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "author": "Immutable",
   "private": true,
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
