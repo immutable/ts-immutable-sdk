@@ -5,7 +5,7 @@ import { defineConfig } from 'tsup';
 const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8'));
 
 export default defineConfig({
-  entry: ['src/index.ts'],
+  entry: ['src/iife.ts'],
   outDir: 'dist',
   format: ['iife'],
   globalName: '__imtblPixelInternal',
