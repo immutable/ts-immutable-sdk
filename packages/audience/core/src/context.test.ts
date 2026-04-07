@@ -1,10 +1,16 @@
 import { collectContext } from './context';
 
 describe('collectContext', () => {
-  it('includes library name and version', () => {
+  it('defaults to @imtbl/audience library name', () => {
     const ctx = collectContext();
     expect(ctx.library).toBe('@imtbl/audience');
     expect(ctx.libraryVersion).toBeDefined();
+  });
+
+  it('accepts custom library name and version', () => {
+    const ctx = collectContext('@imtbl/audience-web-sdk', '1.0.0');
+    expect(ctx.library).toBe('@imtbl/audience-web-sdk');
+    expect(ctx.libraryVersion).toBe('1.0.0');
   });
 
   it('collects browser signals in jsdom', () => {

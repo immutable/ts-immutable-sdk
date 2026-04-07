@@ -15,9 +15,16 @@ function makeMessage(id: string): Message {
   };
 }
 
+interface QueueOpts {
+  flushIntervalMs?: number;
+  flushSize?: number;
+  onFlush?: (ok: boolean, count: number) => void;
+  staleFilter?: (msg: Message) => boolean;
+}
+
 function createQueue(
   transport: Transport,
-  opts: { flushIntervalMs?: number; flushSize?: number } = {},
+  opts: QueueOpts = {},
 ) {
   return new MessageQueue(
     transport,
@@ -25,6 +32,7 @@ function createQueue(
     'pk_imx_test',
     opts.flushIntervalMs ?? 5_000,
     opts.flushSize ?? 20,
+    { onFlush: opts.onFlush, staleFilter: opts.staleFilter },
   );
 }
 
@@ -110,6 +118,17 @@ describe('MessageQueue', () => {
     expect(queue.length).toBe(1);
   });
 
+  it('filters stale messages on restore', () => {
+    storage.setItem('queue', [makeMessage('stale'), makeMessage('fresh')]);
+
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send }, {
+      staleFilter: (m) => m.messageId === 'fresh',
+    });
+
+    expect(queue.length).toBe(1);
+  });
+
   it('does not flush concurrently', async () => {
     let resolveFirst: () => void;
     const firstCall = new Promise<boolean>((r) => { resolveFirst = () => r(true); });
@@ -144,7 +163,6 @@ describe('MessageQueue', () => {
   it('handles messages enqueued during flush', async () => {
     let queue: ReturnType<typeof createQueue>;
     const send = jest.fn().mockImplementation(async () => {
-      // Simulate a message arriving during the network request
       queue.enqueue(makeMessage('late'));
       return true;
     });
@@ -154,28 +172,52 @@ describe('MessageQueue', () => {
 
     await queue.flush();
 
-    // The original message was sent, but the late one should remain
     expect(queue.length).toBe(1);
+  });
+
+  it('calls onFlush callback', async () => {
+    const onFlush = jest.fn();
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send }, { onFlush });
+
+    queue.enqueue(makeMessage('1'));
+    await queue.flush();
+
+    expect(onFlush).toHaveBeenCalledWith(true, 1);
+  });
+
+  it('purges messages matching a predicate', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+
+    queue.enqueue(makeMessage('1'));
+    queue.enqueue({ ...makeMessage('2'), type: 'identify' } as any);
+    queue.enqueue(makeMessage('3'));
+
+    queue.purge((m) => m.type === 'identify');
+    expect(queue.length).toBe(2);
+  });
+
+  it('transforms messages in place', async () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+
+    queue.enqueue({ ...makeMessage('1'), userId: 'should-strip' } as any);
+
+    queue.transform((m) => {
+      const cleaned = { ...m };
+      delete (cleaned as any).userId;
+      return cleaned;
+    });
+
+    await queue.flush();
+    const msg = send.mock.calls[0][2].messages[0];
+    expect((msg as any).userId).toBeUndefined();
   });
 });
 
-describe('page-unload flush', () => {
-  let sendBeaconSpy: jest.SpyInstance;
-
-  beforeEach(() => {
-    sendBeaconSpy = jest.fn().mockReturnValue(true);
-    Object.defineProperty(navigator, 'sendBeacon', {
-      value: sendBeaconSpy,
-      writable: true,
-      configurable: true,
-    });
-  });
-
-  afterEach(() => {
-    sendBeaconSpy.mockRestore?.();
-  });
-
-  it('flushes via sendBeacon on visibilitychange to hidden', () => {
+describe('page-unload flush (keepalive)', () => {
+  it('flushes via keepalive fetch on visibilitychange to hidden', () => {
     const send = jest.fn().mockResolvedValue(true);
     const queue = createQueue({ send });
     queue.start();
@@ -189,10 +231,11 @@ describe('page-unload flush', () => {
     });
     document.dispatchEvent(new Event('visibilitychange'));
 
-    expect(sendBeaconSpy).toHaveBeenCalledTimes(1);
-    expect(sendBeaconSpy).toHaveBeenCalledWith(
+    expect(send).toHaveBeenCalledWith(
       'https://api.immutable.com/v1/audience/messages',
-      expect.any(Blob),
+      'pk_imx_test',
+      expect.objectContaining({ messages: expect.any(Array) }),
+      { keepalive: true },
     );
     expect(queue.length).toBe(0);
 
@@ -204,7 +247,7 @@ describe('page-unload flush', () => {
     });
   });
 
-  it('flushes via sendBeacon on pagehide', () => {
+  it('flushes via keepalive fetch on pagehide', () => {
     const send = jest.fn().mockResolvedValue(true);
     const queue = createQueue({ send });
     queue.start();
@@ -212,20 +255,25 @@ describe('page-unload flush', () => {
     queue.enqueue(makeMessage('1'));
     window.dispatchEvent(new Event('pagehide'));
 
-    expect(sendBeaconSpy).toHaveBeenCalledTimes(1);
+    expect(send).toHaveBeenCalledWith(
+      'https://api.immutable.com/v1/audience/messages',
+      'pk_imx_test',
+      expect.objectContaining({ messages: expect.any(Array) }),
+      { keepalive: true },
+    );
     expect(queue.length).toBe(0);
 
     queue.stop();
   });
 
-  it('does not fire beacon when queue is empty', () => {
+  it('does not fire unload flush when queue is empty', () => {
     const send = jest.fn().mockResolvedValue(true);
     const queue = createQueue({ send });
     queue.start();
 
     window.dispatchEvent(new Event('pagehide'));
 
-    expect(sendBeaconSpy).not.toHaveBeenCalled();
+    expect(send).not.toHaveBeenCalled();
 
     queue.stop();
   });
@@ -239,7 +287,7 @@ describe('page-unload flush', () => {
     queue.enqueue(makeMessage('1'));
     window.dispatchEvent(new Event('pagehide'));
 
-    expect(sendBeaconSpy).not.toHaveBeenCalled();
+    expect(send).not.toHaveBeenCalled();
   });
 
   it('destroy stops the queue and flushes remaining messages', () => {
@@ -251,52 +299,21 @@ describe('page-unload flush', () => {
     queue.enqueue(makeMessage('2'));
     queue.destroy();
 
-    expect(sendBeaconSpy).toHaveBeenCalledTimes(1);
+    expect(send).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.any(String),
+      expect.objectContaining({ messages: expect.any(Array) }),
+      { keepalive: true },
+    );
     expect(queue.length).toBe(0);
 
     // Listeners removed — no double flush
     queue.enqueue(makeMessage('3'));
     window.dispatchEvent(new Event('pagehide'));
-    expect(sendBeaconSpy).toHaveBeenCalledTimes(1);
-  });
-
-  it('falls back to async flush if sendBeacon returns false', async () => {
-    sendBeaconSpy.mockReturnValue(false);
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send });
-    queue.start();
-
-    queue.enqueue(makeMessage('1'));
-    window.dispatchEvent(new Event('pagehide'));
-
-    // sendBeacon failed, so async flush should have been triggered
-    await Promise.resolve();
     expect(send).toHaveBeenCalledTimes(1);
-
-    queue.stop();
   });
 
-  it('falls back to async flush if sendBeacon is unavailable', async () => {
-    Object.defineProperty(navigator, 'sendBeacon', {
-      value: undefined,
-      writable: true,
-      configurable: true,
-    });
-
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send });
-    queue.start();
-
-    queue.enqueue(makeMessage('1'));
-    window.dispatchEvent(new Event('pagehide'));
-
-    await Promise.resolve();
-    expect(send).toHaveBeenCalledTimes(1);
-
-    queue.stop();
-  });
-
-  it('skips beacon if an async flush is already in flight', async () => {
+  it('skips unload flush if an async flush is already in flight', async () => {
     let resolveFlush: () => void;
     const flushPromise = new Promise<boolean>((r) => { resolveFlush = () => r(true); });
     const send = jest.fn().mockReturnValueOnce(flushPromise);
@@ -308,9 +325,10 @@ describe('page-unload flush', () => {
     // Start an async flush (sets flushing = true)
     const pending = queue.flush();
 
-    // pagehide fires while async flush is in flight — beacon should be skipped
+    // pagehide fires while async flush is in flight — unload flush should be skipped
     window.dispatchEvent(new Event('pagehide'));
-    expect(sendBeaconSpy).not.toHaveBeenCalled();
+    // Only 1 call (the async flush), no keepalive call
+    expect(send).toHaveBeenCalledTimes(1);
 
     resolveFlush!();
     await pending;
