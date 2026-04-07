@@ -24,6 +24,7 @@ packages:
   - "packages/audience/core"
   - "packages/audience/pixel"
   - "packages/audience/sdk"
+  - "packages/audience/web"
   - "packages/game-bridge"
   - "packages/webhook/sdk"
   - "packages/minting-backend/sdk"
