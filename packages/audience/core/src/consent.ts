@@ -30,6 +30,7 @@ export function createConsentManager(
   publishableKey: string,
   anonymousId: string,
   environment: Environment,
+  source: string,
   initialLevel?: ConsentLevel,
 ): ConsentManager {
   const dntDetected = detectDoNotTrack();
@@ -39,7 +40,10 @@ export function createConsentManager(
 
   function notifyBackend(level: ConsentLevel): void {
     const url = `${getBaseUrl(environment)}${CONSENT_PATH}`;
-    const payload = { anonymousId, consentLevel: level };
+    const payload = { anonymousId, status: level, source };
+    // Uses fetch directly rather than httpSend because this is a PUT
+    // to a different endpoint with a different payload shape than the
+    // message ingest POST that httpSend is designed for.
     fetch(url, {
       method: 'PUT',
       headers: {
