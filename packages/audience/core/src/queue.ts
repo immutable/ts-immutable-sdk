@@ -4,6 +4,19 @@ import * as storage from './storage';
 import { isBrowser } from './utils';
 
 const STORAGE_KEY = 'queue';
+const MAX_BATCH_SIZE = 100; // Backend maxItems limit per OAS
+
+export interface MessageQueueOptions {
+  onFlush?: (ok: boolean, count: number) => void;
+  staleFilter?: (msg: Message) => boolean;
+  /**
+   * Override the localStorage key prefix (default: '__imtbl_audience_').
+   * Use when multiple SDK surfaces run on the same page to prevent
+   * queue collision — e.g. web SDK uses '__imtbl_web_' so its queued
+   * messages don't interfere with the shared SDK's queue.
+   */
+  storagePrefix?: string;
+}
 
 /**
  * Batched message queue with localStorage durability.
@@ -14,11 +27,13 @@ const STORAGE_KEY = 'queue';
  *
  * localStorage is used as a write-through cache so messages survive
  * page navigations. On construction, any previously-persisted messages
- * are restored into memory.
+ * are restored into memory (optionally filtered by `staleFilter`).
  *
- * When started, the queue also listens for page-unload events
- * (`visibilitychange` and `pagehide`) and flushes via `sendBeacon`
- * to ensure events are not lost when the user navigates away.
+ * When started, the queue listens for page-unload events
+ * (`visibilitychange` and `pagehide`) and flushes via `fetch` with
+ * `keepalive: true` to ensure events are not lost when the user
+ * navigates away. sendBeacon is NOT used because the backend requires
+ * the `x-immutable-publishable-key` header which sendBeacon cannot set.
  */
 export class MessageQueue {
   private messages: Message[];
@@ -27,15 +42,15 @@ export class MessageQueue {
 
   private flushing = false;
 
-  private readonly onVisibilityChange = (): void => {
-    if (document.visibilityState === 'hidden') {
-      this.flushBeacon();
-    }
-  };
+  private unloadBound = false;
 
-  private readonly onPageHide = (): void => {
-    this.flushBeacon();
-  };
+  private visibilityHandler?: () => void;
+
+  private pagehideHandler?: () => void;
+
+  private readonly onFlush?: (ok: boolean, count: number) => void;
+
+  private readonly storagePrefix?: string;
 
   constructor(
     private readonly transport: Transport,
@@ -43,35 +58,35 @@ export class MessageQueue {
     private readonly publishableKey: string,
     private readonly flushIntervalMs: number,
     private readonly flushSize: number,
+    options?: MessageQueueOptions,
   ) {
-    this.messages = (storage.getItem(STORAGE_KEY) as Message[] | undefined) ?? [];
+    this.onFlush = options?.onFlush;
+    this.storagePrefix = options?.storagePrefix;
+
+    const restored = (storage.getItem(STORAGE_KEY, this.storagePrefix) as Message[] | undefined) ?? [];
+    this.messages = options?.staleFilter
+      ? restored.filter(options.staleFilter)
+      : restored;
   }
 
   start(): void {
     if (this.timer) return;
     this.timer = setInterval(() => this.flush(), this.flushIntervalMs);
-
-    if (isBrowser()) {
-      document.addEventListener('visibilitychange', this.onVisibilityChange);
-      window.addEventListener('pagehide', this.onPageHide);
-    }
+    this.registerUnload();
   }
 
   stop(): void {
-    if (!this.timer) return;
-    clearInterval(this.timer);
-    this.timer = null;
-
-    if (isBrowser()) {
-      document.removeEventListener('visibilitychange', this.onVisibilityChange);
-      window.removeEventListener('pagehide', this.onPageHide);
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
     }
+    this.removeUnload();
   }
 
-  /** Stops the queue, flushes remaining messages via beacon, and removes listeners. */
+  /** Stops the queue, flushes remaining messages via keepalive fetch, and removes listeners. */
   destroy(): void {
     this.stop();
-    this.flushBeacon();
+    this.flushUnload();
   }
 
   enqueue(message: Message): void {
@@ -83,24 +98,61 @@ export class MessageQueue {
     }
   }
 
-  /** Guard prevents concurrent flushes from racing on the same batch. */
+  /**
+   * Send queued messages to the backend and wait for the response.
+   * On success, sent messages are removed from the queue. On failure,
+   * messages stay queued and retry on the next flush cycle.
+   * Use this for normal operation. For page-unload scenarios, use
+   * flushUnload() instead — it's fire-and-forget and survives navigation.
+   */
   async flush(): Promise<void> {
     if (this.flushing || this.messages.length === 0) return;
 
     this.flushing = true;
     try {
-      const batch = [...this.messages];
+      const batch = this.messages.slice(0, MAX_BATCH_SIZE);
       const payload: BatchPayload = { messages: batch };
 
       const ok = await this.transport.send(this.endpointUrl, this.publishableKey, payload);
       if (ok) {
-        // Slice rather than clear — new messages may have been enqueued during the request.
         this.messages = this.messages.slice(batch.length);
         this.persist();
       }
+      this.onFlush?.(ok, batch.length);
     } finally {
       this.flushing = false;
     }
+  }
+
+  /**
+   * Fire-and-forget flush for page-unload scenarios.
+   *
+   * Uses `fetch` with `keepalive: true` so the request survives page
+   * navigation. Unlike `flush()`, this is synchronous and does not wait
+   * for the response — use it only in `visibilitychange`/`pagehide`
+   * handlers or in `shutdown()`.
+   */
+  flushUnload(): void {
+    if (this.flushing || this.messages.length === 0) return;
+
+    const batch = this.messages.slice(0, MAX_BATCH_SIZE);
+    const payload: BatchPayload = { messages: batch };
+
+    this.transport.send(this.endpointUrl, this.publishableKey, payload, { keepalive: true });
+    this.messages = this.messages.slice(batch.length);
+    this.persist();
+  }
+
+  /** Remove all messages matching a predicate. */
+  purge(predicate: (msg: Message) => boolean): void {
+    this.messages = this.messages.filter((m) => !predicate(m));
+    this.persist();
+  }
+
+  /** Transform messages in place (e.g., strip userId on consent downgrade). */
+  transform(fn: (msg: Message) => Message): void {
+    this.messages = this.messages.map(fn);
+    this.persist();
   }
 
   get length(): number {
@@ -109,35 +161,33 @@ export class MessageQueue {
 
   clear(): void {
     this.messages = [];
-    storage.removeItem(STORAGE_KEY);
+    storage.removeItem(STORAGE_KEY, this.storagePrefix);
   }
 
-  /**
-   * Synchronous flush using sendBeacon for page-unload scenarios.
-   * sendBeacon is fire-and-forget and survives page navigation.
-   * Falls back to the normal async flush if sendBeacon is unavailable.
-   */
-  private flushBeacon(): void {
-    if (this.flushing || this.messages.length === 0) return;
+  private registerUnload(): void {
+    if (!isBrowser() || this.unloadBound) return;
+    this.unloadBound = true;
 
-    const payload: BatchPayload = { messages: [...this.messages] };
-    const body = JSON.stringify(payload);
+    this.pagehideHandler = () => this.flushUnload();
+    this.visibilityHandler = () => {
+      if (document.visibilityState === 'hidden') this.flushUnload();
+    };
+    document.addEventListener('visibilitychange', this.visibilityHandler);
+    window.addEventListener('pagehide', this.pagehideHandler);
+  }
 
-    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
-      const blob = new Blob([body], { type: 'application/json' });
-      const sent = navigator.sendBeacon(this.endpointUrl, blob);
-      if (sent) {
-        this.messages = [];
-        this.persist();
-        return;
-      }
+  private removeUnload(): void {
+    if (!this.unloadBound) return;
+    if (this.visibilityHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityHandler);
     }
-
-    // Fallback: trigger async flush (best-effort, may not complete before unload)
-    this.flush();
+    if (this.pagehideHandler) {
+      window.removeEventListener('pagehide', this.pagehideHandler);
+    }
+    this.unloadBound = false;
   }
 
   private persist(): void {
-    storage.setItem(STORAGE_KEY, this.messages);
+    storage.setItem(STORAGE_KEY, this.messages, this.storagePrefix);
   }
 }
