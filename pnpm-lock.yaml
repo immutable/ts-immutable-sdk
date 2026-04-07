@@ -138,7 +138,7 @@ importers:
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@imtbl/sdk':
         specifier: latest
-        version: 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+        version: 2.12.6(typescript@5.6.2)
       next:
         specifier: 14.2.25
         version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.45.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1005,6 +1005,33 @@ importers:
       '@imtbl/metrics':
         specifier: workspace:*
         version: link:../../internal/metrics
+    devDependencies:
+      '@swc/core':
+        specifier: ^1.4.2
+        version: 1.15.3(@swc/helpers@0.5.15)
+      '@swc/jest':
+        specifier: ^0.2.37
+        version: 0.2.37(@swc/core@1.15.3(@swc/helpers@0.5.15))
+      '@types/jest':
+        specifier: ^29.5.12
+        version: 29.5.14
+      eslint:
+        specifier: ^8.56.0
+        version: 8.57.0
+      jest:
+        specifier: ^29.7.0
+        version: 29.7.0(@types/node@22.19.7)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)
+      jest-environment-jsdom:
+        specifier: ^29.4.3
+        version: 29.6.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      tsup:
+        specifier: ^8.3.0
+        version: 8.3.0(@swc/core@1.15.3(@swc/helpers@0.5.15))(jiti@1.21.0)(postcss@8.4.49)(typescript@5.6.2)(yaml@2.5.0)
+      typescript:
+        specifier: ^5.6.2
+        version: 5.6.2
+
+  packages/audience/pixel:
     devDependencies:
       '@swc/core':
         specifier: ^1.4.2
@@ -19682,7 +19709,7 @@ snapshots:
 
   '@confio/ics23@0.6.8':
     dependencies:
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.8.0
       protobufjs: 6.11.4
 
   '@cosmjs/amino@0.31.3':
@@ -19721,7 +19748,7 @@ snapshots:
       '@cosmjs/encoding': 0.31.3
       '@cosmjs/math': 0.31.3
       '@cosmjs/utils': 0.31.3
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.8.0
       bn.js: 5.2.1
       elliptic: 6.6.1
       libsodium-wrappers-sumo: 0.7.15
@@ -19731,7 +19758,7 @@ snapshots:
       '@cosmjs/encoding': 0.32.4
       '@cosmjs/math': 0.32.4
       '@cosmjs/utils': 0.32.4
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.8.0
       bn.js: 5.2.1
       elliptic: 6.6.1
       libsodium-wrappers-sumo: 0.7.15
@@ -20000,11 +20027,11 @@ snapshots:
   '@emnapi/core@1.2.0':
     dependencies:
       '@emnapi/wasi-threads': 1.0.1
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@emnapi/runtime@1.2.0':
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@emnapi/runtime@1.8.1':
     dependencies:
@@ -20013,7 +20040,7 @@ snapshots:
 
   '@emnapi/wasi-threads@1.0.1':
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@emotion/babel-plugin@11.11.0':
     dependencies:
@@ -20764,7 +20791,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/bridge-sdk@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/bridge-sdk@2.12.6':
     dependencies:
       '@imtbl/config': 2.12.6
       '@jest/globals': 29.7.0
@@ -20776,16 +20803,16 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@imtbl/checkout-sdk@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/checkout-sdk@2.12.6(typescript@5.6.2)':
     dependencies:
       '@imtbl/blockchain-data': 2.12.6
-      '@imtbl/bridge-sdk': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/bridge-sdk': 2.12.6
       '@imtbl/config': 2.12.6
-      '@imtbl/dex-sdk': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/dex-sdk': 2.12.6
       '@imtbl/generated-clients': 2.12.6
       '@imtbl/metrics': 2.12.6
-      '@imtbl/orderbook': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/passport': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/orderbook': 2.12.6
+      '@imtbl/passport': 2.12.6(typescript@5.6.2)
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -20847,7 +20874,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@imtbl/dex-sdk@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/dex-sdk@2.12.6':
     dependencies:
       '@imtbl/config': 2.12.6
       '@uniswap/sdk-core': 3.2.3
@@ -20889,7 +20916,7 @@ snapshots:
       - debug
       - pg-native
 
-  '@imtbl/orderbook@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/orderbook@2.12.6':
     dependencies:
       '@imtbl/config': 2.12.6
       '@imtbl/metrics': 2.12.6
@@ -20903,16 +20930,16 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/passport@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/passport@2.12.6(typescript@5.6.2)':
     dependencies:
       '@imtbl/auth': 2.12.6
       '@imtbl/config': 2.12.6
       '@imtbl/generated-clients': 2.12.6
       '@imtbl/metrics': 2.12.6
-      '@imtbl/toolkit': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/wallet': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
-      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-provider': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/toolkit': 2.12.6
+      '@imtbl/wallet': 2.12.6(typescript@5.6.2)
+      '@imtbl/x-client': 2.12.6
+      '@imtbl/x-provider': 2.12.6
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       localforage: 1.10.0
       oidc-client-ts: 3.4.1
@@ -20931,19 +20958,19 @@ snapshots:
       - encoding
       - supports-color
 
-  '@imtbl/sdk@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/sdk@2.12.6(typescript@5.6.2)':
     dependencies:
       '@imtbl/auth': 2.12.6
       '@imtbl/blockchain-data': 2.12.6
-      '@imtbl/checkout-sdk': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/checkout-sdk': 2.12.6(typescript@5.6.2)
       '@imtbl/config': 2.12.6
       '@imtbl/minting-backend': 2.12.6
-      '@imtbl/orderbook': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/passport': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
-      '@imtbl/wallet': 2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/orderbook': 2.12.6
+      '@imtbl/passport': 2.12.6(typescript@5.6.2)
+      '@imtbl/wallet': 2.12.6(typescript@5.6.2)
       '@imtbl/webhook': 2.12.6
-      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-provider': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-client': 2.12.6
+      '@imtbl/x-provider': 2.12.6
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -20954,9 +20981,9 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@imtbl/toolkit@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/toolkit@2.12.6':
     dependencies:
-      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/x-client': 2.12.6
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       bn.js: 5.2.1
@@ -20968,7 +20995,7 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/wallet@2.12.6(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/wallet@2.12.6(typescript@5.6.2)':
     dependencies:
       '@imtbl/auth': 2.12.6
       '@imtbl/generated-clients': 2.12.6
@@ -20989,7 +21016,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/x-client@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/x-client@2.12.6':
     dependencies:
       '@ethereumjs/wallet': 2.0.4
       '@imtbl/config': 2.12.6
@@ -21005,12 +21032,12 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/x-provider@2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/x-provider@2.12.6':
     dependencies:
       '@imtbl/config': 2.12.6
       '@imtbl/generated-clients': 2.12.6
-      '@imtbl/toolkit': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/x-client': 2.12.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/toolkit': 2.12.6
+      '@imtbl/x-client': 2.12.6
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       enc-utils: 3.0.0
@@ -21825,7 +21852,7 @@ snapshots:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.1.0
       '@noble/hashes': 1.8.0
-      '@scure/base': 1.1.7
+      '@scure/base': 1.2.6
       '@types/debug': 4.1.8
       debug: 4.3.7(supports-color@8.1.1)
       pony-cause: 2.1.11
@@ -21839,7 +21866,7 @@ snapshots:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.1.0
       '@noble/hashes': 1.8.0
-      '@scure/base': 1.1.7
+      '@scure/base': 1.2.6
       '@types/debug': 4.1.8
       debug: 4.3.7(supports-color@8.1.1)
       pony-cause: 2.1.11
@@ -21870,7 +21897,7 @@ snapshots:
       '@motionone/easing': 10.17.0
       '@motionone/types': 10.17.0
       '@motionone/utils': 10.17.0
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@motionone/dom@10.17.0':
     dependencies:
@@ -21879,23 +21906,23 @@ snapshots:
       '@motionone/types': 10.17.0
       '@motionone/utils': 10.17.0
       hey-listen: 1.0.8
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@motionone/easing@10.17.0':
     dependencies:
       '@motionone/utils': 10.17.0
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@motionone/generators@10.17.0':
     dependencies:
       '@motionone/types': 10.17.0
       '@motionone/utils': 10.17.0
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@motionone/svelte@10.16.4':
     dependencies:
       '@motionone/dom': 10.17.0
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@motionone/types@10.17.0': {}
 
@@ -21903,12 +21930,12 @@ snapshots:
     dependencies:
       '@motionone/types': 10.17.0
       hey-listen: 1.0.8
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@motionone/vue@10.16.4':
     dependencies:
       '@motionone/dom': 10.17.0
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.2':
     optional: true
@@ -23157,7 +23184,7 @@ snapshots:
       is-glob: 4.0.3
       open: 9.1.0
       picocolors: 1.1.1
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@playwright/test@1.45.3':
     dependencies:
@@ -24894,7 +24921,7 @@ snapshots:
 
   '@swc/helpers@0.5.13':
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@swc/helpers@0.5.15':
     dependencies:
@@ -25010,7 +25037,7 @@ snapshots:
 
   '@tybys/wasm-util@0.9.0':
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@typechain/ethers-v6@0.5.1(ethers@6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typechain@8.3.0(typescript@5.6.2))(typescript@5.6.2)':
     dependencies:
@@ -27243,7 +27270,7 @@ snapshots:
   camel-case@4.1.2:
     dependencies:
       pascal-case: 3.1.2
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   camelcase-css@2.0.1: {}
 
@@ -28367,7 +28394,7 @@ snapshots:
   dot-case@3.0.4:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   dotenv-expand@11.0.6:
     dependencies:
@@ -33912,7 +33939,7 @@ snapshots:
   no-case@3.0.4:
     dependencies:
       lower-case: 2.0.2
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   nocache@3.0.4: {}
 
@@ -34451,7 +34478,7 @@ snapshots:
   param-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   parcel@2.16.3(@swc/helpers@0.5.15):
     dependencies:
@@ -34511,7 +34538,7 @@ snapshots:
   pascal-case@3.1.2:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   pascalcase@0.1.1: {}
 
@@ -36749,7 +36776,7 @@ snapshots:
   snake-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   snapdragon-node@2.1.1:
     dependencies:

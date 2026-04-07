@@ -1,0 +1,43 @@
+{
+  "name": "@imtbl/pixel",
+  "description": "Immutable Tracking Pixel — drop-in JavaScript snippet for device fingerprint, page view, and attribution data",
+  "version": "0.0.0",
+  "author": "Immutable",
+  "private": true,
+  "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
+  "dependencies": {},
+  "devDependencies": {
+    "@swc/core": "^1.4.2",
+    "@swc/jest": "^0.2.37",
+    "@types/jest": "^29.5.12",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.4.3",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.2"
+  },
+  "exports": {
+    "development": {
+      "types": "./src/index.ts",
+      "default": "./dist/imtbl.js"
+    },
+    "default": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/imtbl.js"
+    }
+  },
+  "files": ["dist"],
+  "main": "dist/imtbl.js",
+  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "repository": "immutable/ts-immutable-sdk.git",
+  "scripts": {
+    "build": "pnpm transpile && pnpm typegen",
+    "transpile": "tsup",
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
+    "lint": "eslint ./src --ext .ts --max-warnings=0",
+    "test": "jest --passWithNoTests",
+    "typecheck": "tsc --customConditions default --noEmit"
+  },
+  "type": "module",
+  "types": "./dist/types/index.d.ts"
+}
