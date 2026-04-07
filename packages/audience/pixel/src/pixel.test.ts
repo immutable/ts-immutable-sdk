@@ -6,6 +6,7 @@ const mockStart = jest.fn();
 const mockDestroy = jest.fn();
 const mockPurge = jest.fn();
 const mockTransform = jest.fn();
+const mockGetOrCreateSession = jest.fn().mockReturnValue({ sessionId: 'session-abc', isNew: true });
 
 jest.mock('@imtbl/audience-core', () => ({
   MessageQueue: jest.fn().mockImplementation(() => ({
@@ -38,26 +39,24 @@ jest.mock('@imtbl/audience-core', () => ({
   isBrowser: jest.fn().mockReturnValue(true),
   getCookie: jest.fn(),
   setCookie: jest.fn(),
-}));
-
-// Mock internal modules
-jest.mock('./attribution', () => ({
   collectAttribution: jest.fn().mockReturnValue({
     utm_source: 'google',
     landing_page: 'https://example.com',
   }),
-}));
-
-jest.mock('./session', () => ({
-  getOrCreateSession: jest.fn().mockReturnValue({ sessionId: 'session-abc', isNew: true }),
-  getOrCreateSessionId: jest.fn().mockReturnValue('session-abc'),
+  getOrCreateSession: (...args: unknown[]) => mockGetOrCreateSession(...args),
+  createConsentManager: jest.fn().mockImplementation(
+    (_queue: unknown, _key: unknown, _anonId: unknown, _env: unknown, level?: string) => {
+      let current = level ?? 'none';
+      return {
+        get level() { return current; },
+        setLevel(next: string) { current = next; },
+      };
+    },
+  ),
 }));
 
 // Mock fetch globally
 global.fetch = jest.fn().mockResolvedValue({ ok: true });
-
-// Access the mock to change return values per test
-const mockGetOrCreateSession = jest.requireMock('./session').getOrCreateSession;
 
 let activePixel: Pixel | null = null;
 

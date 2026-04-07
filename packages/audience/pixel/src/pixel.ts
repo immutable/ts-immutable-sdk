@@ -5,6 +5,7 @@ import type {
   TrackMessage,
   IdentifyMessage,
   UserTraits,
+  ConsentManager,
 } from '@imtbl/audience-core';
 import {
   MessageQueue,
@@ -18,10 +19,10 @@ import {
   generateId,
   getTimestamp,
   isBrowser,
+  collectAttribution,
+  getOrCreateSession,
+  createConsentManager,
 } from '@imtbl/audience-core';
-import { collectAttribution } from './attribution';
-import { getOrCreateSession } from './session';
-import { createConsentManager, ConsentManager } from './consent';
 
 const PIXEL_VERSION = '0.0.0';
 

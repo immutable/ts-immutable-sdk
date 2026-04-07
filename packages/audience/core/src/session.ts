@@ -1,7 +1,6 @@
-import { getCookie, setCookie, generateId } from '@imtbl/audience-core';
-
-const SESSION_COOKIE_NAME = '_imtbl_sid';
-const SESSION_MAX_AGE = 30 * 60; // 30 minutes in seconds
+import { getCookie, setCookie } from './cookie';
+import { generateId } from './utils';
+import { SESSION_COOKIE, SESSION_MAX_AGE } from './config';
 
 export interface SessionResult {
   sessionId: string;
@@ -15,15 +14,15 @@ export interface SessionResult {
  * Returns whether the session is new so the caller can fire a `session_start` event.
  */
 export function getOrCreateSession(domain?: string): SessionResult {
-  const existing = getCookie(SESSION_COOKIE_NAME);
+  const existing = getCookie(SESSION_COOKIE);
   if (existing) {
     // Refresh the rolling expiry
-    setCookie(SESSION_COOKIE_NAME, existing, SESSION_MAX_AGE, domain);
+    setCookie(SESSION_COOKIE, existing, SESSION_MAX_AGE, domain);
     return { sessionId: existing, isNew: false };
   }
 
   const id = generateId();
-  setCookie(SESSION_COOKIE_NAME, id, SESSION_MAX_AGE, domain);
+  setCookie(SESSION_COOKIE, id, SESSION_MAX_AGE, domain);
   return { sessionId: id, isNew: true };
 }
 
@@ -33,5 +32,5 @@ export function getOrCreateSessionId(domain?: string): string {
 }
 
 export function getSessionId(): string | undefined {
-  return getCookie(SESSION_COOKIE_NAME);
+  return getCookie(SESSION_COOKIE);
 }

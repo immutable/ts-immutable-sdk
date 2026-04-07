@@ -1,12 +1,5 @@
 import { createConsentManager } from './consent';
 
-// Mock audience-core
-jest.mock('@imtbl/audience-core', () => ({
-  httpSend: jest.fn().mockResolvedValue(true),
-  CONSENT_PATH: '/v1/audience/tracking-consent',
-  getBaseUrl: jest.fn().mockReturnValue('https://api.dev.immutable.com'),
-}));
-
 // Mock fetch globally
 const mockFetch = jest.fn().mockResolvedValue({ ok: true });
 global.fetch = mockFetch;

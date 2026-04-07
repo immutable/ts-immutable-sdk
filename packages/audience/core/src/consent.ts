@@ -1,14 +1,13 @@
-import type {
-  ConsentLevel, Message, Environment, MessageQueue,
-} from '@imtbl/audience-core';
-import { CONSENT_PATH, getBaseUrl } from '@imtbl/audience-core';
+import type { ConsentLevel, Message, Environment } from './types';
+import type { MessageQueue } from './queue';
+import { CONSENT_PATH, getBaseUrl } from './config';
 
 export interface ConsentManager {
   level: ConsentLevel;
   setLevel(next: ConsentLevel): void;
 }
 
-function detectDoNotTrack(): boolean {
+export function detectDoNotTrack(): boolean {
   if (typeof navigator === 'undefined') return false;
   // DNT header
   if (navigator.doNotTrack === '1') return true;
@@ -22,7 +21,7 @@ function detectDoNotTrack(): boolean {
  *
  * - Default level is `'none'` (no collection).
  * - If DNT or GPC is detected and no explicit consent is provided, stays `'none'`.
- * - On downgrade (e.g. full → anonymous), strips `userId` from queued messages.
+ * - On downgrade (e.g. full -> anonymous), strips `userId` from queued messages.
  * - On downgrade to `'none'`, purges the queue entirely.
  * - Fires PUT to `/v1/audience/tracking-consent` on every state change.
  */
