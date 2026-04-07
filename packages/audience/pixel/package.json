@@ -5,7 +5,9 @@
   "author": "Immutable",
   "private": true,
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
-  "dependencies": {},
+  "dependencies": {
+    "@imtbl/audience-core": "workspace:*"
+  },
   "devDependencies": {
     "@swc/core": "^1.4.2",
     "@swc/jest": "^0.2.37",
@@ -33,10 +35,10 @@
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
     "transpile": "tsup",
-    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
+    "typegen": "tsc --customConditions development --emitDeclarationOnly --outDir dist/types",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "test": "jest --passWithNoTests",
-    "typecheck": "tsc --customConditions default --noEmit"
+    "typecheck": "tsc --customConditions development --noEmit"
   },
   "type": "module",
   "types": "./dist/types/index.d.ts"
