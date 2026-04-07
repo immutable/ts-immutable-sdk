@@ -39,10 +39,6 @@ jest.mock('@imtbl/wallet', () => {
   return {
     connectWallet: connectWalletMock,
     ZkEvmProvider: jest.fn(),
-    GuardianClient: jest.fn(),
-    MagicTEESigner: jest.fn(),
-    WalletConfiguration: jest.fn(),
-    ConfirmationScreen: jest.fn(),
     __mocked: {
       connectWalletMock,
     },
@@ -68,12 +64,6 @@ jest.mock('@imtbl/generated-clients', () => {
   return {
     ...actual,
     MultiRollupApiClients: multiRollupApiClientsFactory,
-    MagicTeeApiClients: jest.fn(),
-    createConfig: jest.fn((config) => config),
-    imxApiConfig: {
-      getSandbox: jest.fn(() => ({ basePath: 'sandbox' })),
-      getProduction: jest.fn(() => ({ basePath: 'production' })),
-    },
   };
 });
 
@@ -97,28 +87,6 @@ jest.mock('@imtbl/metrics', () => {
   };
 });
 
-jest.mock('./starkEx', () => {
-  const factoryMock = {
-    getProvider: jest.fn(),
-    getProviderSilent: jest.fn(),
-  };
-  const passportImxProviderFactory = jest.fn().mockImplementation(() => factoryMock);
-  return {
-    PassportImxProviderFactory: passportImxProviderFactory,
-  };
-});
-
-jest.mock('./starkEx/imxGuardianClient', () => ({
-  ImxGuardianClient: jest.fn().mockImplementation(() => ({
-    evaluateTransaction: jest.fn(),
-  })),
-}));
-
-jest.mock('./utils/imxUser', () => ({
-  toUserImx: jest.fn().mockReturnValue({}),
-}));
-
-const { PassportImxProviderFactory: passportImxProviderFactoryMock } = jest.requireMock('./starkEx');
 const { __mocked: metricsMocks } = jest.requireMock('@imtbl/metrics');
 const { __mocked: walletMocks } = jest.requireMock('@imtbl/wallet');
 const { trackErrorMock } = metricsMocks;
@@ -144,49 +112,11 @@ describe('Passport', () => {
 
   const getLatestAuthInstance = () => mockAuthInstances[mockAuthInstances.length - 1];
   const getLatestMultiRollupInstance = () => multiRollupInstances[multiRollupInstances.length - 1];
-  const getFactoryInstance = () => (passportImxProviderFactoryMock as jest.Mock).mock.results.slice(-1)[0]?.value;
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockAuthInstances.length = 0;
     multiRollupInstances.length = 0;
-  });
-
-  describe('connectImx', () => {
-    it('returns provider from factory', async () => {
-      const passport = createPassport();
-      const factory = getFactoryInstance();
-      const provider = { kind: 'imx' };
-      factory.getProvider.mockResolvedValue(provider);
-
-      const result = await passport.connectImx();
-
-      expect(result).toBe(provider);
-      expect(factory.getProvider).toHaveBeenCalledTimes(1);
-    });
-
-    it('tracks error when factory throws', async () => {
-      const passport = createPassport();
-      const factory = getFactoryInstance();
-      const error = new Error('boom');
-      factory.getProvider.mockRejectedValue(error);
-
-      await expect(passport.connectImx()).rejects.toThrow(error);
-      expect(trackErrorMock).toHaveBeenCalledWith('passport', 'connectImx', error, { flowId: 'flow-id' });
-    });
-  });
-
-  describe('connectImxSilent', () => {
-    it('returns null when factory resolves null', async () => {
-      const passport = createPassport();
-      const factory = getFactoryInstance();
-      factory.getProviderSilent.mockResolvedValue(null);
-
-      const result = await passport.connectImxSilent();
-
-      expect(result).toBeNull();
-      expect(factory.getProviderSilent).toHaveBeenCalledTimes(1);
-    });
   });
 
   describe('connectEvm', () => {

@@ -5,9 +5,6 @@ packages:
   - "packages/auth-next-client"
   - "packages/wallet"
   - "packages/config"
-  - "packages/x-client"
-  - "packages/x-provider"
-  - "packages/x-provider/src/sample-app"
   - "packages/passport/sdk"
   - "packages/passport/sdk-sample-app"
   - "packages/orderbook"
@@ -35,6 +32,5 @@ packages:
   - "examples/checkout/**"
   - "examples/blockchain-data"
   - "examples/contracts/**"
-  - "examples/x-to-zkevm-migration-app/**"
 
   # Setup catalog file versions for core packages like typescript/eslint

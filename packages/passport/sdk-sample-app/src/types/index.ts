@@ -5,7 +5,6 @@ import {
   ComponentType,
 } from 'react';
 import { RequestArguments } from '@imtbl/passport';
-import { imx } from '@imtbl/generated-clients';
 
 export enum EnvironmentNames {
   DEV = 'dev',
@@ -26,17 +25,6 @@ export interface EnvironmentPropsType {
 export interface ModalProps {
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
-}
-
-export interface MakeOfferModalProps extends ModalProps {
-  order?: imx.Order;
-  onClose?: () => void;
-}
-
-export interface ViewOffersModalProps extends ModalProps {
-  buyTokenAddress: string;
-  buyTokenId: string;
-  onClose?: () => void;
 }
 
 export type HandleExampleSubmitted = (

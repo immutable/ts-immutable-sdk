@@ -12,8 +12,6 @@
     "@imtbl/orderbook": "workspace:*",
     "@imtbl/wallet": "workspace:*",
     "@imtbl/passport": "workspace:*",
-    "@imtbl/x-client": "workspace:*",
-    "@imtbl/x-provider": "workspace:*",
     "@metamask/detect-provider": "^2.0.0",
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.10.3",

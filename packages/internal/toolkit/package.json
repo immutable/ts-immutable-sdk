@@ -5,7 +5,6 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@imtbl/x-client": "workspace:*",
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
     "bn.js": "^5.2.1",

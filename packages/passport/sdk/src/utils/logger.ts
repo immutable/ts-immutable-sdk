@@ -1,3 +1,5 @@
+declare const process: { env?: Record<string, string | undefined> } | undefined;
+
 const warn = (...args: any[]) => {
   if (typeof process === 'undefined') {
     return;
