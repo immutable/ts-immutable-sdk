@@ -23,6 +23,7 @@ packages:
   - "packages/blockchain-data/sdk"
   - "packages/audience/core"
   - "packages/audience/pixel"
+  - "packages/audience/sdk"
   - "packages/game-bridge"
   - "packages/webhook/sdk"
   - "packages/minting-backend/sdk"
