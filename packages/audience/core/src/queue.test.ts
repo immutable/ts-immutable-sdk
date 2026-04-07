@@ -1,0 +1,339 @@
+import { MessageQueue } from './queue';
+import type { Transport } from './transport';
+import type { Message } from './types';
+import * as storage from './storage';
+
+function makeMessage(id: string): Message {
+  return {
+    type: 'track',
+    messageId: id,
+    eventTimestamp: '2026-04-01T00:00:00.000Z',
+    anonymousId: 'anon-1',
+    surface: 'web',
+    context: { library: '@imtbl/audience', libraryVersion: '0.0.0' },
+    eventName: 'test',
+  };
+}
+
+interface QueueOpts {
+  flushIntervalMs?: number;
+  flushSize?: number;
+  onFlush?: (ok: boolean, count: number) => void;
+  staleFilter?: (msg: Message) => boolean;
+}
+
+function createQueue(
+  transport: Transport,
+  opts: QueueOpts = {},
+) {
+  return new MessageQueue(
+    transport,
+    'https://api.immutable.com/v1/audience/messages',
+    'pk_imx_test',
+    opts.flushIntervalMs ?? 5_000,
+    opts.flushSize ?? 20,
+    { onFlush: opts.onFlush, staleFilter: opts.staleFilter },
+  );
+}
+
+beforeEach(() => {
+  jest.useFakeTimers();
+  localStorage.clear();
+});
+
+afterEach(() => {
+  jest.useRealTimers();
+});
+
+describe('MessageQueue', () => {
+  it('enqueues messages and flushes them', async () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+
+    queue.enqueue(makeMessage('1'));
+    queue.enqueue(makeMessage('2'));
+
+    await queue.flush();
+
+    expect(send).toHaveBeenCalledTimes(1);
+    expect(send.mock.calls[0][2].messages).toHaveLength(2);
+    expect(queue.length).toBe(0);
+  });
+
+  it('retains messages on failed flush', async () => {
+    const send = jest.fn().mockResolvedValue(false);
+    const queue = createQueue({ send });
+
+    queue.enqueue(makeMessage('1'));
+    await queue.flush();
+
+    expect(queue.length).toBe(1);
+  });
+
+  it('flushes automatically when batch size is reached', async () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send }, { flushSize: 2 });
+
+    queue.enqueue(makeMessage('1'));
+    expect(send).not.toHaveBeenCalled();
+
+    queue.enqueue(makeMessage('2'));
+    // flush is async — await the microtask
+    await Promise.resolve();
+    expect(send).toHaveBeenCalledTimes(1);
+  });
+
+  it('flushes on timer interval', async () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send }, { flushIntervalMs: 1_000 });
+
+    queue.start();
+    queue.enqueue(makeMessage('1'));
+
+    jest.advanceTimersByTime(1_000);
+    // flush is async
+    await Promise.resolve();
+    expect(send).toHaveBeenCalledTimes(1);
+
+    queue.stop();
+  });
+
+  it('persists messages to localStorage', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+
+    queue.enqueue(makeMessage('1'));
+
+    const stored = JSON.parse(localStorage.getItem('__imtbl_audience_queue')!);
+    expect(stored).toHaveLength(1);
+    expect(stored[0].messageId).toBe('1');
+  });
+
+  it('restores messages from localStorage on construction', () => {
+    storage.setItem('queue', [makeMessage('restored')]);
+
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+
+    expect(queue.length).toBe(1);
+  });
+
+  it('filters stale messages on restore', () => {
+    storage.setItem('queue', [makeMessage('stale'), makeMessage('fresh')]);
+
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send }, {
+      staleFilter: (m) => m.messageId === 'fresh',
+    });
+
+    expect(queue.length).toBe(1);
+  });
+
+  it('does not flush concurrently', async () => {
+    let resolveFirst: () => void;
+    const firstCall = new Promise<boolean>((r) => { resolveFirst = () => r(true); });
+    const send = jest.fn()
+      .mockReturnValueOnce(firstCall)
+      .mockResolvedValue(true);
+
+    const queue = createQueue({ send });
+    queue.enqueue(makeMessage('1'));
+
+    const flush1 = queue.flush();
+    const flush2 = queue.flush(); // should no-op
+
+    resolveFirst!();
+    await flush1;
+    await flush2;
+
+    expect(send).toHaveBeenCalledTimes(1);
+  });
+
+  it('clears all messages and storage', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+
+    queue.enqueue(makeMessage('1'));
+    queue.clear();
+
+    expect(queue.length).toBe(0);
+    expect(localStorage.getItem('__imtbl_audience_queue')).toBeNull();
+  });
+
+  it('handles messages enqueued during flush', async () => {
+    let queue: ReturnType<typeof createQueue>;
+    const send = jest.fn().mockImplementation(async () => {
+      queue.enqueue(makeMessage('late'));
+      return true;
+    });
+
+    queue = createQueue({ send });
+    queue.enqueue(makeMessage('1'));
+
+    await queue.flush();
+
+    expect(queue.length).toBe(1);
+  });
+
+  it('calls onFlush callback', async () => {
+    const onFlush = jest.fn();
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send }, { onFlush });
+
+    queue.enqueue(makeMessage('1'));
+    await queue.flush();
+
+    expect(onFlush).toHaveBeenCalledWith(true, 1);
+  });
+
+  it('purges messages matching a predicate', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+
+    queue.enqueue(makeMessage('1'));
+    queue.enqueue({ ...makeMessage('2'), type: 'identify' } as any);
+    queue.enqueue(makeMessage('3'));
+
+    queue.purge((m) => m.type === 'identify');
+    expect(queue.length).toBe(2);
+  });
+
+  it('transforms messages in place', async () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+
+    queue.enqueue({ ...makeMessage('1'), userId: 'should-strip' } as any);
+
+    queue.transform((m) => {
+      const cleaned = { ...m };
+      delete (cleaned as any).userId;
+      return cleaned;
+    });
+
+    await queue.flush();
+    const msg = send.mock.calls[0][2].messages[0];
+    expect((msg as any).userId).toBeUndefined();
+  });
+});
+
+describe('page-unload flush (keepalive)', () => {
+  it('flushes via keepalive fetch on visibilitychange to hidden', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+    queue.start();
+
+    queue.enqueue(makeMessage('1'));
+
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'hidden',
+      writable: true,
+      configurable: true,
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    expect(send).toHaveBeenCalledWith(
+      'https://api.immutable.com/v1/audience/messages',
+      'pk_imx_test',
+      expect.objectContaining({ messages: expect.any(Array) }),
+      { keepalive: true },
+    );
+    expect(queue.length).toBe(0);
+
+    queue.stop();
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      writable: true,
+      configurable: true,
+    });
+  });
+
+  it('flushes via keepalive fetch on pagehide', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+    queue.start();
+
+    queue.enqueue(makeMessage('1'));
+    window.dispatchEvent(new Event('pagehide'));
+
+    expect(send).toHaveBeenCalledWith(
+      'https://api.immutable.com/v1/audience/messages',
+      'pk_imx_test',
+      expect.objectContaining({ messages: expect.any(Array) }),
+      { keepalive: true },
+    );
+    expect(queue.length).toBe(0);
+
+    queue.stop();
+  });
+
+  it('does not fire unload flush when queue is empty', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+    queue.start();
+
+    window.dispatchEvent(new Event('pagehide'));
+
+    expect(send).not.toHaveBeenCalled();
+
+    queue.stop();
+  });
+
+  it('removes listeners on stop', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+    queue.start();
+    queue.stop();
+
+    queue.enqueue(makeMessage('1'));
+    window.dispatchEvent(new Event('pagehide'));
+
+    expect(send).not.toHaveBeenCalled();
+  });
+
+  it('destroy stops the queue and flushes remaining messages', () => {
+    const send = jest.fn().mockResolvedValue(true);
+    const queue = createQueue({ send });
+    queue.start();
+
+    queue.enqueue(makeMessage('1'));
+    queue.enqueue(makeMessage('2'));
+    queue.destroy();
+
+    expect(send).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.any(String),
+      expect.objectContaining({ messages: expect.any(Array) }),
+      { keepalive: true },
+    );
+    expect(queue.length).toBe(0);
+
+    // Listeners removed — no double flush
+    queue.enqueue(makeMessage('3'));
+    window.dispatchEvent(new Event('pagehide'));
+    expect(send).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips unload flush if an async flush is already in flight', async () => {
+    let resolveFlush: () => void;
+    const flushPromise = new Promise<boolean>((r) => { resolveFlush = () => r(true); });
+    const send = jest.fn().mockReturnValueOnce(flushPromise);
+
+    const queue = createQueue({ send });
+    queue.start();
+    queue.enqueue(makeMessage('1'));
+
+    // Start an async flush (sets flushing = true)
+    const pending = queue.flush();
+
+    // pagehide fires while async flush is in flight — unload flush should be skipped
+    window.dispatchEvent(new Event('pagehide'));
+    // Only 1 call (the async flush), no keepalive call
+    expect(send).toHaveBeenCalledTimes(1);
+
+    resolveFlush!();
+    await pending;
+    expect(queue.length).toBe(0);
+
+    queue.stop();
+  });
+});

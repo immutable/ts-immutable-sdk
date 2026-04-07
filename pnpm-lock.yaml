@@ -920,6 +920,37 @@ importers:
         specifier: ^5.6.2
         version: 5.6.2
 
+  packages/audience/core:
+    dependencies:
+      '@imtbl/metrics':
+        specifier: workspace:*
+        version: link:../../internal/metrics
+    devDependencies:
+      '@swc/core':
+        specifier: ^1.4.2
+        version: 1.15.3(@swc/helpers@0.5.15)
+      '@swc/jest':
+        specifier: ^0.2.37
+        version: 0.2.37(@swc/core@1.15.3(@swc/helpers@0.5.15))
+      '@types/jest':
+        specifier: ^29.5.12
+        version: 29.5.14
+      eslint:
+        specifier: ^8.56.0
+        version: 8.57.0
+      jest:
+        specifier: ^29.7.0
+        version: 29.7.0(@types/node@22.19.7)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)
+      jest-environment-jsdom:
+        specifier: ^29.4.3
+        version: 29.6.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      tsup:
+        specifier: ^8.3.0
+        version: 8.3.0(@swc/core@1.15.3(@swc/helpers@0.5.15))(jiti@1.21.0)(postcss@8.4.49)(typescript@5.6.2)(yaml@2.5.0)
+      typescript:
+        specifier: ^5.6.2
+        version: 5.6.2
+
   packages/auth:
     dependencies:
       '@imtbl/generated-clients':
@@ -14772,7 +14803,6 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qr-code-styling@1.6.0-rc.1:
