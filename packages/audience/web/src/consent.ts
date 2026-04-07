@@ -8,9 +8,22 @@ import {
   COOKIE_NAME,
   SESSION_COOKIE,
   getBaseUrl,
+  isBrowser,
   deleteCookie,
   truncateSource,
 } from '@imtbl/audience-core';
+
+/**
+ * Check if the browser signals a Do Not Track or Global Privacy Control
+ * preference. Studios can call this before deciding what to pass to setConsent().
+ */
+export function detectPrivacySignal(): boolean {
+  if (!isBrowser()) return false;
+  const nav = navigator as any;
+  if (nav.doNotTrack === '1' || (window as any).doNotTrack === '1') return true;
+  if (nav.globalPrivacyControl === true) return true;
+  return false;
+}
 
 export interface ConsentCallbacks {
   onPurgeQueue?: () => void;
@@ -55,20 +68,16 @@ export class ConsentManager {
     const { level: previous } = this;
     this.level = level;
 
-    // Downgrade: full/anonymous -> none — purge everything
     if (level === 'none') {
       callbacks?.onPurgeQueue?.();
       callbacks?.onClearCookies?.();
     } else if (level === 'anonymous' && previous === 'full') {
-      // Downgrade: full -> anonymous — strip PII, keep anonymous events
       callbacks?.onStripIdentity?.();
     }
 
-    // Sync to server (fire-and-forget)
     this.syncToServer(anonymousId, level);
   }
 
-  /** Fetch server-side consent status for reconciliation. */
   async fetchServerConsent(anonymousId: string): Promise<ConsentStatus | undefined> {
     try {
       const url = `${this.baseUrl}${CONSENT_PATH}?anonymousId=${encodeURIComponent(anonymousId)}`;
@@ -99,7 +108,7 @@ export class ConsentManager {
         body: JSON.stringify({ anonymousId, status, source: this.source }),
       });
     } catch {
-      // Fire-and-forget — consent sync failure shouldn't break the SDK
+      // Fire-and-forget
     }
   }
 }
