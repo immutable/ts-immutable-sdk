@@ -1,6 +1,4 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { IMXClient } from '@imtbl/x-client';
-import { ImxApiClients } from '@imtbl/generated-clients';
 import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
@@ -20,14 +18,11 @@ describe('Config', () => {
 
   const overrides: PassportOverrides = {
     authenticationDomain: 'authenticationDomain123',
-    imxPublicApiDomain: 'guardianDomain123',
     magicProviderId: 'providerId123',
     magicPublishableApiKey: 'publishableKey123',
     passportDomain: 'customDomain123',
     zkEvmRpcUrl: 'rpcUrl123',
     relayerUrl: 'relayerUrl123',
-    immutableXClient: {} as IMXClient,
-    imxApiClients: {} as ImxApiClients,
     indexerMrBasePath: 'indexerMrBasePath123',
     orderBookMrBasePath: 'orderBookMrBasePath123',
     passportMrBasePath: 'passportMrBasePath123',

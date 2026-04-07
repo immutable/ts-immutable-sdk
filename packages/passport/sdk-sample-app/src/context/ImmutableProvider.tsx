@@ -3,12 +3,6 @@
 import React, {
   createContext, useContext, useEffect, useMemo, useState,
 } from 'react';
-import {
-  createImmutableXConfiguration,
-  IMXClient,
-  ImmutableX,
-  ImxModuleConfiguration,
-} from '@imtbl/x-client';
 import { Orderbook, OrderbookOverrides } from '@imtbl/orderbook';
 import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
@@ -26,44 +20,8 @@ import {
 } from '@/config';
 import { EnvironmentNames } from '@/types';
 import useLocalStorage from '@/hooks/useLocalStorage';
-import { ImxApiClients, createConfig } from '@imtbl/generated-clients';
-import { BlockchainData, BlockchainDataModuleConfiguration } from '@imtbl/blockchain-data';
 
-const getSdkConfig = (environment: EnvironmentNames): ImxModuleConfiguration => {
-  switch (environment) {
-    case EnvironmentNames.PRODUCTION: {
-      const baseConfig = new ImmutableConfiguration({ environment: Environment.PRODUCTION });
-      return {
-        baseConfig,
-      };
-    }
-    case EnvironmentNames.SANDBOX:
-    case EnvironmentNames.DEFAULT: {
-      const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
-      return {
-        baseConfig,
-      };
-    }
-    case EnvironmentNames.DEV: {
-      const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
-      return {
-        baseConfig,
-        overrides: {
-          immutableXConfig: createImmutableXConfiguration({
-            baseConfig,
-            basePath: 'https://api.dev.x.immutable.com',
-            chainID: 5,
-            coreContractAddress: '0xd05323731807A35599BF9798a1DE15e89d6D6eF1',
-            registrationContractAddress: '0x7EB840223a3b1E0e8D54bF8A6cd83df5AFfC88B2',
-          }),
-        },
-      };
-    }
-    default: {
-      throw new Error('Invalid environment');
-    }
-  }
-};
+import { BlockchainData, BlockchainDataModuleConfiguration } from '@imtbl/blockchain-data';
 
 const getBlockchainDataConfig = (environment: EnvironmentNames): BlockchainDataModuleConfiguration => {
   switch (environment) {
@@ -139,11 +97,6 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
           magicPublishableApiKey: 'pk_live_4058236363130CA9',
           magicProviderId: 'd196052b-8175-4a45-ba13-838a715d370f',
           passportDomain: 'https://passport.dev.immutable.com',
-          imxPublicApiDomain: 'https://api.dev.immutable.com',
-          imxApiClients: new ImxApiClients(createConfig({
-            basePath: 'https://api.dev.immutable.com',
-          })),
-          immutableXClient: new IMXClient(getSdkConfig(EnvironmentNames.DEV)),
           zkEvmRpcUrl: 'https://rpc.dev.immutable.com',
           relayerUrl: 'https://api.dev.immutable.com/relayer-mr',
           indexerMrBasePath: 'https://api.dev.immutable.com',
@@ -195,13 +148,11 @@ const getOrderbookConfig = (environment: EnvironmentNames): ModuleConfiguration<
 
 const ImmutableContext = createContext<{
   passportClient: Passport,
-  sdkClient: ImmutableX,
   orderbookClient: Orderbook,
   blockchainData: BlockchainData,
   environment: EnvironmentNames,
   setEnvironment?:(environment: EnvironmentNames) => void;
 }>({
-      sdkClient: new ImmutableX(getSdkConfig(EnvironmentNames.DEV)),
       orderbookClient: new Orderbook(getOrderbookConfig(EnvironmentNames.DEV)),
       passportClient: new Passport(getPassportConfig(EnvironmentNames.DEV)),
       environment: EnvironmentNames.DEV,
@@ -215,9 +166,6 @@ export function ImmutableProvider({
   const [environment, setEnvironment] = useLocalStorage(
     'IMX_PASSPORT_SAMPLE_ENVIRONMENT',
     useContext(ImmutableContext).environment,
-  );
-  const [sdkClient, setSdkClient] = useState<ImmutableX>(
-    useContext(ImmutableContext).sdkClient,
   );
   const [orderbookClient, setOrderbookClient] = useState<Orderbook>(
     useContext(ImmutableContext).orderbookClient,
@@ -236,20 +184,18 @@ export function ImmutableProvider({
       configurable: true,
       value: passportInstance,
     });
-    setSdkClient(new ImmutableX(getSdkConfig(environment)));
     setOrderbookClient(new Orderbook(getOrderbookConfig(environment)));
     setPassportClient(passportInstance);
     setBlockchainData(new BlockchainData(getBlockchainDataConfig(environment)));
   }, [environment]);
 
   const providerValues = useMemo(() => ({
-    sdkClient,
     orderbookClient,
     passportClient,
     blockchainData,
     environment,
     setEnvironment,
-  }), [sdkClient, orderbookClient, passportClient, blockchainData, environment, setEnvironment]);
+  }), [orderbookClient, passportClient, blockchainData, environment, setEnvironment]);
 
   // Get the NextAuth base path for the current environment
   const authBasePath = useMemo(() => {
@@ -276,7 +222,6 @@ export function ImmutableProvider({
 
 export function useImmutableProvider() {
   const {
-    sdkClient,
     orderbookClient,
     passportClient,
     blockchainData,
@@ -284,7 +229,6 @@ export function useImmutableProvider() {
     setEnvironment,
   } = useContext(ImmutableContext);
   return {
-    sdkClient,
     orderbookClient,
     passportClient,
     blockchainData,

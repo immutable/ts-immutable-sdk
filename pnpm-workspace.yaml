@@ -34,6 +34,5 @@ packages:
   - "examples/checkout/**"
   - "examples/blockchain-data"
   - "examples/contracts/**"
-  - "examples/x-to-zkevm-migration-app/**"
 
   # Setup catalog file versions for core packages like typescript/eslint

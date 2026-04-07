@@ -1,6 +1,4 @@
 import { Environment, ModuleConfiguration } from '@imtbl/config';
-import { IMXClient } from '@imtbl/x-client';
-import { ImxApiClients } from '@imtbl/generated-clients';
 import { Flow } from '@imtbl/metrics';
 
 /**
@@ -9,10 +7,6 @@ import { Flow } from '@imtbl/metrics';
  * Additional providers may be supported server-side
  */
 export type DirectLoginMethod = string;
-
-// Re-export events from auth and wallet
-export { AuthEvents } from '@imtbl/auth';
-export { WalletEvents } from '@imtbl/wallet';
 
 export type AccountsRequestedEvent = {
   environment: Environment;
@@ -29,7 +23,6 @@ export type {
   IdTokenPayload,
 } from '@imtbl/auth';
 export { isUserZkEvm } from '@imtbl/auth';
-export type { UserImx } from './utils/imxUser';
 
 export interface OidcConfiguration {
   clientId: string;
@@ -46,14 +39,11 @@ export interface PassportOverrides {
   magicPublishableApiKey: string;
   magicProviderId: string;
   passportDomain: string;
-  imxPublicApiDomain: string;
-  immutableXClient: IMXClient;
   zkEvmRpcUrl: string;
   relayerUrl: string;
   indexerMrBasePath: string;
   orderBookMrBasePath: string;
   passportMrBasePath: string;
-  imxApiClients?: ImxApiClients; // needs to be optional because ImxApiClients is not exposed publicly
 
   /**
    * Custom chain ID for dev environments (optional)

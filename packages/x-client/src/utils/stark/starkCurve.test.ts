@@ -25,7 +25,9 @@ describe('Key generation', () => {
     );
   });
 
-  describe('Stark Key', () => {
+  // Skipped: these tests make live HTTP calls to api.x.immutable.com with no mocking.
+  // StarkEx/IMX is deprecated — these will be removed when x-client is deleted.
+  describe.skip('Stark Key', () => {
     const tests = [
       {
         name: 'case 1 - Should generate Legacy Stark public key',
