@@ -2,6 +2,7 @@ import type {
   Environment,
   ConsentLevel,
   PageMessage,
+  TrackMessage,
   IdentifyMessage,
   UserTraits,
 } from '@imtbl/audience-core';
@@ -16,9 +17,10 @@ import {
   collectContext,
   generateId,
   getTimestamp,
+  isBrowser,
 } from '@imtbl/audience-core';
 import { collectAttribution } from './attribution';
-import { getOrCreateSessionId } from './session';
+import { getOrCreateSession } from './session';
 import { createConsentManager, ConsentManager } from './consent';
 
 const PIXEL_VERSION = '0.0.0';
@@ -39,6 +41,10 @@ export class Pixel {
 
   private userId: string | undefined;
 
+  private sessionId: string | undefined;
+
+  private sessionStartTime: number | undefined;
+
   private environment: Environment = 'production';
 
   private publishableKey = '';
@@ -46,6 +52,8 @@ export class Pixel {
   private domain: string | undefined;
 
   private initialized = false;
+
+  private unloadHandler?: () => void;
 
   init(options: PixelInitOptions): void {
     if (this.initialized) return;
@@ -89,12 +97,15 @@ export class Pixel {
     if (this.consent.level !== 'none') {
       this.page();
     }
+
+    this.registerSessionEnd();
   }
 
   page(properties?: Record<string, unknown>): void {
     if (!this.canTrack()) return;
 
-    const sessionId = getOrCreateSessionId(this.domain);
+    const { sessionId, isNew } = getOrCreateSession(this.domain);
+    this.refreshSession(sessionId, isNew);
     const attribution = collectAttribution();
     const context = collectContext('@imtbl/pixel', PIXEL_VERSION);
 
@@ -102,7 +113,7 @@ export class Pixel {
       type: 'page',
       messageId: generateId(),
       eventTimestamp: getTimestamp(),
-      anonymousId: this.anonymousId!,
+      anonymousId: this.anonymousId,
       surface: 'pixel',
       context,
       properties: {
@@ -120,14 +131,15 @@ export class Pixel {
     if (!this.isReady() || this.consent!.level !== 'full') return;
 
     this.userId = userId;
-    const sessionId = getOrCreateSessionId(this.domain);
+    const { sessionId, isNew } = getOrCreateSession(this.domain);
+    this.refreshSession(sessionId, isNew);
     const context = collectContext('@imtbl/pixel', PIXEL_VERSION);
 
     const message: IdentifyMessage = {
       type: 'identify',
       messageId: generateId(),
       eventTimestamp: getTimestamp(),
-      anonymousId: this.anonymousId!,
+      anonymousId: this.anonymousId,
       surface: 'pixel',
       context,
       userId,
@@ -146,6 +158,7 @@ export class Pixel {
   }
 
   destroy(): void {
+    this.removeSessionEnd();
     if (this.queue) {
       this.queue.destroy();
       this.queue = null;
@@ -153,6 +166,83 @@ export class Pixel {
     this.consent = null;
     this.initialized = false;
   }
+
+  // -- Session lifecycle --------------------------------------------------
+
+  private refreshSession(sessionId: string, isNew: boolean): void {
+    this.sessionId = sessionId;
+    if (isNew) {
+      this.sessionStartTime = Date.now();
+      this.fireSessionStart(sessionId);
+    }
+  }
+
+  private fireSessionStart(sessionId: string): void {
+    if (!this.canTrack()) return;
+
+    const message: TrackMessage = {
+      type: 'track',
+      eventName: 'session_start',
+      messageId: generateId(),
+      eventTimestamp: getTimestamp(),
+      anonymousId: this.anonymousId,
+      surface: 'pixel',
+      context: collectContext('@imtbl/pixel', PIXEL_VERSION),
+      properties: { sessionId },
+      userId: this.consent!.level === 'full' ? this.userId : undefined,
+    };
+
+    this.queue!.enqueue(message);
+  }
+
+  private fireSessionEnd(): void {
+    if (!this.canTrack() || !this.sessionId) return;
+
+    const duration = this.sessionStartTime
+      ? Math.round((Date.now() - this.sessionStartTime) / 1000)
+      : undefined;
+
+    const message: TrackMessage = {
+      type: 'track',
+      eventName: 'session_end',
+      messageId: generateId(),
+      eventTimestamp: getTimestamp(),
+      anonymousId: this.anonymousId,
+      surface: 'pixel',
+      context: collectContext('@imtbl/pixel', PIXEL_VERSION),
+      properties: {
+        sessionId: this.sessionId,
+        duration,
+      },
+      userId: this.consent!.level === 'full' ? this.userId : undefined,
+    };
+
+    this.queue!.enqueue(message);
+  }
+
+  private registerSessionEnd(): void {
+    if (!isBrowser()) return;
+
+    this.unloadHandler = () => {
+      this.fireSessionEnd();
+    };
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        this.unloadHandler?.();
+      }
+    });
+    window.addEventListener('pagehide', this.unloadHandler);
+  }
+
+  private removeSessionEnd(): void {
+    if (this.unloadHandler) {
+      window.removeEventListener('pagehide', this.unloadHandler);
+      this.unloadHandler = undefined;
+    }
+  }
+
+  // -- Guards -------------------------------------------------------------
 
   private canTrack(): boolean {
     return this.isReady() && this.consent!.level !== 'none';

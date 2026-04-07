@@ -4,7 +4,8 @@ export type { PixelInitOptions } from './pixel';
 export { createConsentManager } from './consent';
 export type { ConsentManager } from './consent';
 
-export { getOrCreateSessionId, getSessionId } from './session';
+export { getOrCreateSession, getOrCreateSessionId, getSessionId } from './session';
+export type { SessionResult } from './session';
 
 export { collectAttribution, clearAttribution } from './attribution';
 export type { Attribution } from './attribution';

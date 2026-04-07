@@ -3,23 +3,33 @@ import { getCookie, setCookie, generateId } from '@imtbl/audience-core';
 const SESSION_COOKIE_NAME = '_imtbl_sid';
 const SESSION_MAX_AGE = 30 * 60; // 30 minutes in seconds
 
+export interface SessionResult {
+  sessionId: string;
+  isNew: boolean;
+}
+
 /**
  * Get or create a session ID.
  *
  * The session cookie has a 30-minute rolling expiry — each call refreshes it.
- * This gives us session-scoped grouping of pixel events.
+ * Returns whether the session is new so the caller can fire a `session_start` event.
  */
-export function getOrCreateSessionId(domain?: string): string {
+export function getOrCreateSession(domain?: string): SessionResult {
   const existing = getCookie(SESSION_COOKIE_NAME);
   if (existing) {
     // Refresh the rolling expiry
     setCookie(SESSION_COOKIE_NAME, existing, SESSION_MAX_AGE, domain);
-    return existing;
+    return { sessionId: existing, isNew: false };
   }
 
   const id = generateId();
   setCookie(SESSION_COOKIE_NAME, id, SESSION_MAX_AGE, domain);
-  return id;
+  return { sessionId: id, isNew: true };
+}
+
+/** Convenience wrapper that returns just the session ID string. */
+export function getOrCreateSessionId(domain?: string): string {
+  return getOrCreateSession(domain).sessionId;
 }
 
 export function getSessionId(): string | undefined {

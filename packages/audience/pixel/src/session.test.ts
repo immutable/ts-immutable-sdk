@@ -1,4 +1,4 @@
-import { getOrCreateSessionId, getSessionId } from './session';
+import { getOrCreateSession, getOrCreateSessionId, getSessionId } from './session';
 
 const SESSION_COOKIE_NAME = '_imtbl_sid';
 
@@ -18,20 +18,22 @@ beforeEach(() => {
   mockGenerateId.mockReturnValue('new-session-id');
 });
 
-describe('getOrCreateSessionId', () => {
-  it('creates a new session ID when no cookie exists', () => {
+describe('getOrCreateSession', () => {
+  it('creates a new session when no cookie exists', () => {
     mockGetCookie.mockReturnValue(undefined);
 
-    const id = getOrCreateSessionId();
-    expect(id).toBe('new-session-id');
+    const result = getOrCreateSession();
+    expect(result.sessionId).toBe('new-session-id');
+    expect(result.isNew).toBe(true);
     expect(mockSetCookie).toHaveBeenCalledWith(SESSION_COOKIE_NAME, 'new-session-id', 1800, undefined);
   });
 
-  it('returns existing session ID and refreshes expiry', () => {
+  it('returns existing session and refreshes expiry', () => {
     mockGetCookie.mockReturnValue('existing-sid');
 
-    const id = getOrCreateSessionId();
-    expect(id).toBe('existing-sid');
+    const result = getOrCreateSession();
+    expect(result.sessionId).toBe('existing-sid');
+    expect(result.isNew).toBe(false);
     expect(mockSetCookie).toHaveBeenCalledWith(SESSION_COOKIE_NAME, 'existing-sid', 1800, undefined);
     expect(mockGenerateId).not.toHaveBeenCalled();
   });
@@ -39,8 +41,22 @@ describe('getOrCreateSessionId', () => {
   it('passes domain to setCookie', () => {
     mockGetCookie.mockReturnValue(undefined);
 
-    getOrCreateSessionId('.example.com');
+    getOrCreateSession('.example.com');
     expect(mockSetCookie).toHaveBeenCalledWith(SESSION_COOKIE_NAME, 'new-session-id', 1800, '.example.com');
+  });
+});
+
+describe('getOrCreateSessionId', () => {
+  it('returns the session ID string', () => {
+    mockGetCookie.mockReturnValue(undefined);
+
+    const id = getOrCreateSessionId();
+    expect(id).toBe('new-session-id');
+  });
+
+  it('returns existing session ID', () => {
+    mockGetCookie.mockReturnValue('existing-sid');
+    expect(getOrCreateSessionId()).toBe('existing-sid');
   });
 });
 
