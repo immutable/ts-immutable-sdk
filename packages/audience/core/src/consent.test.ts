@@ -1,8 +1,11 @@
 import { createConsentManager } from './consent';
+import { httpSend } from './transport';
 
-// Mock fetch globally
-const mockFetch = jest.fn().mockResolvedValue({ ok: true });
-global.fetch = mockFetch;
+jest.mock('./transport', () => ({
+  httpSend: jest.fn().mockResolvedValue(true),
+}));
+
+const mockHttpSend = httpSend as jest.MockedFunction<typeof httpSend>;
 
 function createMockQueue() {
   return {
@@ -81,16 +84,11 @@ describe('createConsentManager', () => {
 
     manager.setLevel('anonymous');
 
-    expect(mockFetch).toHaveBeenCalledWith(
+    expect(mockHttpSend).toHaveBeenCalledWith(
       'https://api.dev.immutable.com/v1/audience/tracking-consent',
-      expect.objectContaining({
-        method: 'PUT',
-        headers: expect.objectContaining({
-          'Content-Type': 'application/json',
-          'x-immutable-publishable-key': 'pk_test',
-        }),
-        body: JSON.stringify({ anonymousId: 'anon-1', status: 'anonymous', source: 'pixel' }),
-      }),
+      'pk_test',
+      { anonymousId: 'anon-1', status: 'anonymous', source: 'pixel' },
+      { method: 'PUT', keepalive: true },
     );
   });
 
@@ -101,7 +99,7 @@ describe('createConsentManager', () => {
     manager.setLevel('anonymous');
     expect(queue.purge).not.toHaveBeenCalled();
     expect(queue.transform).not.toHaveBeenCalled();
-    expect(mockFetch).not.toHaveBeenCalled();
+    expect(mockHttpSend).not.toHaveBeenCalled();
   });
 
   it('respects DNT by defaulting to none', () => {

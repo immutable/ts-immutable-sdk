@@ -13,6 +13,7 @@ export type {
   BatchPayload,
   ConsentLevel,
   ConsentStatus,
+  ConsentUpdatePayload,
 } from './types';
 
 export {
@@ -37,7 +38,7 @@ export {
 
 export { generateId, getTimestamp, isBrowser } from './utils';
 
-export type { Transport } from './transport';
+export type { Transport, TransportOptions } from './transport';
 export { httpTransport, httpSend } from './transport';
 export { MessageQueue } from './queue';
 export { collectContext } from './context';

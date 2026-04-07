@@ -97,3 +97,12 @@ export type ConsentLevel = 'none' | 'anonymous' | 'full';
  * - `'full'` — User accepted full tracking.
  */
 export type ConsentStatus = 'not_set' | 'none' | 'anonymous' | 'full';
+
+/**
+ * PUT body for `/v1/audience/tracking-consent`.
+ */
+export interface ConsentUpdatePayload {
+  anonymousId: string;
+  status: ConsentLevel;
+  source: string;
+}
