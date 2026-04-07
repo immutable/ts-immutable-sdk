@@ -37,14 +37,22 @@ describe('IMXClient', () => {
   });
 
   it('should instantiate a PRODUCTION IMXClient', async () => {
+    let axiosRequest: AxiosRequestConfig = {};
+    const adapter = jest.fn().mockImplementation(
+      async (request: AxiosRequestConfig) => {
+        axiosRequest = request;
+        return { status: 200 };
+      },
+    );
+
     const config = new ImxConfiguration({
       baseConfig: { environment: Environment.PRODUCTION },
     });
     const { assetApi } = new IMXClient(config);
-    const assetsResponse = await assetApi.listAssets();
+    const assetsResponse = await assetApi.listAssets({}, { adapter });
 
     expect(assetsResponse.status).toEqual(200);
-    expect(assetsResponse.config.headers?.['x-sdk-version']).toContain(
+    expect(axiosRequest.headers?.['x-sdk-version']).toContain(
       'ts-immutable-sdk',
     );
   });

@@ -9,6 +9,9 @@ import {
 } from './starkCurve';
 import { grindKey } from './legacy/crypto';
 import { createStarkSigner } from './starkSigner';
+import { getStarkPublicKeyFromImx } from './getStarkPublicKeyFromImx';
+
+jest.mock('./getStarkPublicKeyFromImx');
 
 describe('Key generation', () => {
   it('should generate random Stark key', async () => {
@@ -114,6 +117,13 @@ describe('Key generation', () => {
     ];
     tests.forEach((test) => {
       it(test.name, async () => {
+        const isAccountNotFound = test.name.includes('account not found');
+        (getStarkPublicKeyFromImx as jest.Mock).mockResolvedValue(
+          isAccountNotFound
+            ? { starkPublicKey: '', accountNotFound: true }
+            : { starkPublicKey: test.wantPublicKey, accountNotFound: false },
+        );
+
         const expectedStarkPubKeyBN = new BN(
           encUtils.removeHexPrefix(test.wantPublicKey),
           16,
