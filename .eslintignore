@@ -21,3 +21,5 @@ packages/internal/generated-clients/src/
 
 # put module specific ignore paths here
 packages/game-bridge/scripts/**/*.js
+packages/audience/sdk/rollup.dts.config.js
+packages/audience/sdk/tsup.config.js
