@@ -13,11 +13,13 @@
 import { AudienceError, IdentityType } from '@imtbl/audience-core';
 
 import { Audience } from './sdk';
+import { LIBRARY_VERSION } from './config';
 
 type GlobalShape = {
   Audience: typeof Audience;
   AudienceError: typeof AudienceError;
   IdentityType: typeof IdentityType;
+  version: string;
 };
 
 // globalThis is ES2020; tsup targets es2018, so provide a runtime fallback
@@ -36,5 +38,6 @@ if (globalObj.ImmutableAudience) {
     Audience,
     AudienceError,
     IdentityType,
+    version: LIBRARY_VERSION,
   };
 }

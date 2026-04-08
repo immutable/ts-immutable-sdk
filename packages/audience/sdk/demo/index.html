@@ -144,7 +144,6 @@
     </div>
   </section>
 
-      <div id="panel-slot"></div>
     </div>
   <div class="demo-gutter" id="demo-gutter" role="separator" aria-orientation="vertical" aria-label="Resize columns" tabindex="0"></div>
     <div class="log-column">
@@ -154,12 +153,20 @@
       <span class="log-count" id="log-count">0 entries</span>
     </div>
     <div class="button-row compact">
+      <button class="secondary" id="btn-copy-log">Copy</button>
       <button class="secondary" id="btn-clear-log">Clear</button>
     </div>
-    <div class="log" id="log"></div>
+    <div class="log" id="log" role="log" aria-live="polite" aria-label="SDK event log"></div>
   </section>
     </div>
   </div>
+  <footer>
+    <span>@imtbl/audience <span id="sdk-version">0.0.0</span></span>
+    <span class="footer-sep">·</span>
+    <a href="./README.md">Demo README</a>
+    <span class="footer-sep">·</span>
+    <a href="../README.md">SDK README</a>
+  </footer>
 </main>
 
 <script src="../dist/cdn/imtbl-audience.global.js"></script>

@@ -16,6 +16,7 @@
 
   var Audience = window.ImmutableAudience.Audience;
   var IdentityType = window.ImmutableAudience.IdentityType;
+  var SDK_VERSION = (window.ImmutableAudience && window.ImmutableAudience.version) || 'unknown';
 
   // State
   var audience = null;
@@ -23,6 +24,12 @@
   var currentConsent = null;
   var logEntries = [];
   var MAX_LOG_ENTRIES = 500;
+
+  // Track whether the user has scrolled up inside the event log. When true,
+  // renderLog stops auto-pinning to the bottom so new entries don't yank the
+  // user away from whatever they were reading.
+  var logAutoScroll = true;
+  var LOG_BOTTOM_THRESHOLD = 20; // px from bottom still counts as "at the bottom"
 
   // DOM helpers
   function $(id) { return document.getElementById(id); }
@@ -33,6 +40,12 @@
     var el = document.createElement(tag);
     if (className) el.className = className;
     return el;
+  }
+
+  function isLogAtBottom() {
+    var el = $('log');
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight <= LOG_BOTTOM_THRESHOLD;
   }
 
   function getRadio(name) {
@@ -211,7 +224,9 @@
 
       container.appendChild(entry);
     }
-    container.scrollTop = container.scrollHeight;
+    if (logAutoScroll) {
+      container.scrollTop = container.scrollHeight;
+    }
     var countText = logEntries.length + ' entries';
     if (logEntries.length >= MAX_LOG_ENTRIES) {
       countText += ' (capped at ' + MAX_LOG_ENTRIES + ')';
@@ -219,8 +234,43 @@
     text($('log-count'), countText);
   }
 
+  function onCopyLog() {
+    var btn = $('btn-copy-log');
+    if (!btn) return;
+    var originalText = btn.textContent;
+    function flashLabel(msg) {
+      btn.textContent = msg;
+      setTimeout(function () {
+        btn.textContent = originalText;
+      }, 1500);
+    }
+
+    var payload;
+    try {
+      payload = JSON.stringify(logEntries, null, 2);
+    } catch (err) {
+      log('WARN', 'Copy session failed: ' + String(err && err.message || err), 'warn');
+      flashLabel('Copy failed');
+      return;
+    }
+
+    if (!navigator.clipboard || !navigator.clipboard.writeText) {
+      log('WARN', 'Clipboard API unavailable in this browser', 'warn');
+      flashLabel('Not supported');
+      return;
+    }
+
+    navigator.clipboard.writeText(payload).then(function () {
+      flashLabel('Copied!');
+    }).catch(function (err) {
+      log('WARN', 'Copy session failed: ' + String(err && err.message || err), 'warn');
+      flashLabel('Copy failed');
+    });
+  }
+
   function clearLog() {
     logEntries = [];
+    logAutoScroll = true;
     renderLog();
   }
 
@@ -260,6 +310,21 @@
     initBtn.disabled = pkInput.value.trim().length === 0;
   }
 
+  // Sync the Alias button's enabled state based on from/to inputs.
+  // Mirrors core's isAliasValid: button is disabled if the SDK is not initialised,
+  // if either ID is empty, or if (fromId, fromType) === (toId, toType).
+  function syncAliasButton() {
+    var btn = $('btn-alias');
+    if (!audience) { btn.disabled = true; return; }
+    var fromId = $('alias-from-id').value.trim();
+    var toId = $('alias-to-id').value.trim();
+    var fromType = $('alias-from-type').value;
+    var toType = $('alias-to-type').value;
+    if (!fromId || !toId) { btn.disabled = true; return; }
+    if (fromId === toId && fromType === toType) { btn.disabled = true; return; }
+    btn.disabled = false;
+  }
+
   // Enable/disable controls based on init state
   function setInitState(on) {
     $('btn-init').disabled = on;
@@ -279,6 +344,10 @@
     var consentRadios = document.querySelectorAll('input[name="initial-consent"]');
     for (var j = 0; j < consentRadios.length; j++) consentRadios[j].disabled = on;
     if (!on) syncInitEnabled();
+    // Alias button needs the finer-grained check (inputs + equality). Called
+    // unconditionally because syncAliasButton handles both the enabled and
+    // disabled cases internally.
+    syncAliasButton();
   }
 
   // onError handler passed to Audience.init
@@ -518,7 +587,11 @@
     $('btn-shutdown').addEventListener('click', onShutdown);
     $('btn-reset').addEventListener('click', onReset);
     $('btn-flush').addEventListener('click', onFlush);
+    $('btn-copy-log').addEventListener('click', onCopyLog);
     $('btn-clear-log').addEventListener('click', clearLog);
+    $('log').addEventListener('scroll', function () {
+      logAutoScroll = isLogAtBottom();
+    });
 
     $('btn-consent-none').addEventListener('click', function () { onSetConsent('none'); });
     $('btn-consent-anon').addEventListener('click', function () { onSetConsent('anonymous'); });
@@ -527,11 +600,23 @@
     $('btn-page').addEventListener('click', onPage);
     $('btn-track').addEventListener('click', onTrack);
 
+    var versionEl = $('sdk-version');
+    if (versionEl) versionEl.textContent = SDK_VERSION;
+
     populateIdentityDropdowns();
     initDemoGutter();
     $('btn-identify').addEventListener('click', onIdentify);
     $('btn-identify-traits').addEventListener('click', onIdentifyTraits);
     $('btn-alias').addEventListener('click', onAlias);
+
+    // Real-time alias validity: disable the button when either ID is empty or
+    // when (fromId, fromType) === (toId, toType). Matches the design spec and
+    // mirrors the SDK's isAliasValid() — user gets immediate feedback instead
+    // of discovering the problem only after clicking.
+    $('alias-from-id').addEventListener('input', syncAliasButton);
+    $('alias-to-id').addEventListener('input', syncAliasButton);
+    $('alias-from-type').addEventListener('change', syncAliasButton);
+    $('alias-to-type').addEventListener('change', syncAliasButton);
 
     // Enable Init only when the publishable key input has non-whitespace content.
     $('pk').addEventListener('input', syncInitEnabled);

@@ -24,12 +24,15 @@ describe('cdn entry point', () => {
         Audience: { init: Function };
         AudienceError: typeof Error;
         IdentityType: Record<string, string>;
+        version: string;
       };
     }).ImmutableAudience;
 
     expect(g).toBeDefined();
     expect(typeof g!.Audience.init).toBe('function');
     expect(g!.IdentityType.Passport).toBe('passport');
+    expect(typeof g!.version).toBe('string');
+    expect(g!.version.length).toBeGreaterThan(0);
     expect(g!.IdentityType.Steam).toBe('steam');
     expect(g!.IdentityType.Custom).toBe('custom');
 

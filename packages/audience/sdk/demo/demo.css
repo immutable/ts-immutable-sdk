@@ -340,13 +340,11 @@ button.active {
     background: var(--accent);
   }
 
-  .controls > .panel,
-  .controls > #panel-slot {
+  .controls > .panel {
     margin-bottom: 16px;
   }
 
-  .controls > .panel:last-child,
-  .controls > #panel-slot:last-child {
+  .controls > .panel:last-child {
     margin-bottom: 0;
   }
 
@@ -370,4 +368,29 @@ button.active {
     max-height: calc(100vh - 80px);
     resize: vertical;
   }
+}
+
+footer {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 24px 0 8px;
+  font-family: var(--mono);
+}
+
+footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--text-muted);
+  transition: color 0.12s ease, border-color 0.12s ease;
+}
+
+footer a:hover {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+footer .footer-sep {
+  margin: 0 8px;
+  color: var(--text-dim);
 }
