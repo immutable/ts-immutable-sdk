@@ -84,11 +84,18 @@ export function setupAutocapture(
       if (consent === 'full') {
         const email = findEmail(form);
         if (email) {
-          // Hash before enqueuing — raw email never enters the queue
-          hashSHA256(email).then((hash) => {
-            properties.emailHash = hash;
-            enqueue('form_submitted', properties);
-          });
+          // Hash before enqueuing — raw email never enters the queue.
+          // If crypto.subtle is unavailable (HTTP pages, older browsers),
+          // enqueue without emailHash rather than losing the event entirely.
+          hashSHA256(email).then(
+            (hash) => {
+              properties.emailHash = hash;
+              enqueue('form_submitted', properties);
+            },
+            () => {
+              enqueue('form_submitted', properties);
+            },
+          );
           return;
         }
       }

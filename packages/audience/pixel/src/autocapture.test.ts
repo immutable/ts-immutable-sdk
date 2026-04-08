@@ -241,6 +241,41 @@ describe('autocapture', () => {
       expect(enqueue.mock.calls[0][1].emailHash).toBeUndefined();
     });
 
+    it('enqueues without emailHash when crypto.subtle is unavailable', async () => {
+      consent = 'full';
+
+      // Temporarily break crypto.subtle
+      const saved = global.crypto;
+      Object.defineProperty(global, 'crypto', {
+        value: { subtle: undefined },
+        configurable: true,
+      });
+
+      setup();
+
+      const form = document.createElement('form');
+      form.action = '/signup';
+      const input = document.createElement('input');
+      input.type = 'email';
+      input.name = 'email';
+      input.value = 'test@example.com';
+      form.appendChild(input);
+      document.body.appendChild(form);
+
+      form.dispatchEvent(new Event('submit', { bubbles: true }));
+      await new Promise((r) => { setTimeout(r, 0); });
+
+      // Event should still be enqueued, just without emailHash
+      expect(enqueue).toHaveBeenCalledWith(
+        'form_submitted',
+        expect.objectContaining({ formAction: expect.stringContaining('/signup') }),
+      );
+      expect(enqueue.mock.calls[0][1].emailHash).toBeUndefined();
+
+      // Restore crypto
+      Object.defineProperty(global, 'crypto', { value: saved, configurable: true });
+    });
+
     it('ignores email inputs without @ sign', () => {
       consent = 'full';
       setup();
