@@ -64,4 +64,4 @@ demo/
   README.md    # this file
 ```
 
-Security: all user-controlled inputs (event names, traits, publishable keys) are rendered via `textContent` / `createElement`. No `innerHTML` anywhere on user data. CSP meta tag restricts `connect-src` to the dev and sandbox API origins.
+Security: all user-controlled inputs (event names, traits, publishable keys) are rendered via `textContent` / `createElement`. No `innerHTML` anywhere on user data. The CSP meta tag restricts `connect-src` to the dev and sandbox audience API origins only (`api.dev.immutable.com`, `api.sandbox.immutable.com`). `@imtbl/metrics` SDK telemetry is bundled into the CDN and posts to `api.immutable.com`; those calls will be blocked by the browser with a CSP violation log, which is intentional and does not affect demo behavior.
