@@ -64,6 +64,8 @@ export class Audience {
 
   private isFirstPage = true;
 
+  private destroyed = false;
+
   private constructor(config: AudienceConfig) {
     const {
       cookieDomain,
@@ -419,6 +421,8 @@ export class Audience {
    * unmounts or the player leaves.
    */
   shutdown(): void {
+    if (this.destroyed) return;
+    this.destroyed = true;
     if (!this.isTrackingDisabled()) this.trackSessionEnd();
     this.queue.destroy();
     Audience.liveInstances = Math.max(0, Audience.liveInstances - 1);

@@ -655,6 +655,24 @@ describe('Audience', () => {
       expect(msg.properties.duration).toBe(5);
     });
 
+    it('is safe to call twice (React strict mode)', async () => {
+      const sdk = createSDK({ consent: 'full' });
+      sdk.shutdown();
+
+      await Promise.resolve();
+      await Promise.resolve();
+      fetchCalls.length = 0;
+
+      sdk.shutdown();
+      await Promise.resolve();
+      await Promise.resolve();
+
+      const sessionEnds = sentMessages().filter(
+        (m: any) => m.eventName === SESSION_END,
+      );
+      expect(sessionEnds).toHaveLength(0);
+    });
+
     it('does not emit session_end at none consent', async () => {
       const sdk = createSDK({ consent: 'none' });
       sdk.shutdown();
