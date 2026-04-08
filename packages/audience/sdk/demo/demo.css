@@ -271,3 +271,7 @@ button.active {
   font-size: 11px;
   font-family: var(--mono);
 }
+
+.status-value.consent-none     { color: var(--err); }
+.status-value.consent-anonymous { color: var(--warn); }
+.status-value.consent-full     { color: var(--ok); }

@@ -152,8 +152,16 @@
     $('status-env').className = 'status-value' + (audience ? '' : ' dim');
 
     var consent = audience ? (currentConsent || '—') : '—';
-    text($('status-consent'), consent);
-    $('status-consent').className = 'status-value' + (audience && currentConsent ? '' : ' dim');
+    var consentEl = $('status-consent');
+    text(consentEl, consent);
+    // Rebuild className fresh each update so we don't accumulate stale state classes.
+    var consentClass = 'status-value';
+    if (!audience || !currentConsent) {
+      consentClass += ' dim';
+    } else {
+      consentClass += ' consent-' + currentConsent;
+    }
+    consentEl.className = consentClass;
 
     var anonCookie = document.cookie.match(/imtbl_anon_id=([^;]*)/);
     text($('status-anon'), anonCookie ? decodeURIComponent(anonCookie[1]) : '—');
@@ -161,6 +169,16 @@
 
     text($('status-user'), currentUserId || '—');
     $('status-user').className = 'status-value' + (currentUserId ? '' : ' dim');
+  }
+
+  // Sync the Init button's enabled state based on the publishable key field content.
+  // Declared as a function declaration so it is hoisted and can be called from
+  // setInitState below without a forward-reference guard.
+  function syncInitEnabled() {
+    if (audience) return;
+    var initBtn = $('btn-init');
+    var pkInput = $('pk');
+    initBtn.disabled = pkInput.value.trim().length === 0;
   }
 
   // Enable/disable controls based on init state
@@ -175,10 +193,13 @@
     $('btn-identify-traits').disabled = !on;
     $('btn-alias').disabled = !on;
     $('pk').disabled = on;
+    $('flush-interval').disabled = on;
+    $('flush-size').disabled = on;
     var envRadios = document.querySelectorAll('input[name="env"]');
     for (var i = 0; i < envRadios.length; i++) envRadios[i].disabled = on;
     var consentRadios = document.querySelectorAll('input[name="initial-consent"]');
     for (var j = 0; j < consentRadios.length; j++) consentRadios[j].disabled = on;
+    if (!on) syncInitEnabled();
   }
 
   // onError handler passed to Audience.init
@@ -191,25 +212,53 @@
   // Button handlers
   function onInit() {
     var pk = $('pk').value.trim();
-    if (!pk) {
-      log('WARN', 'Publishable key is required.', 'warn');
-      return;
-    }
     var env = getRadio('env');
     var consent = getRadio('initial-consent');
     var debug = $('debug').checked;
 
+    // Optional advanced config: flushInterval / flushSize.
+    // Empty input → omit → SDK uses its defaults (5000ms / 20 items).
+    var flushIntervalRaw = $('flush-interval').value.trim();
+    var flushSizeRaw = $('flush-size').value.trim();
+    var flushInterval;
+    var flushSize;
+
+    if (flushIntervalRaw) {
+      flushInterval = parseInt(flushIntervalRaw, 10);
+      if (isNaN(flushInterval) || flushInterval <= 0) {
+        log('WARN', 'Flush interval must be a positive integer in milliseconds', 'warn');
+        return;
+      }
+    }
+    if (flushSizeRaw) {
+      flushSize = parseInt(flushSizeRaw, 10);
+      if (isNaN(flushSize) || flushSize <= 0) {
+        log('WARN', 'Flush batch size must be a positive integer', 'warn');
+        return;
+      }
+    }
+
+    var config = {
+      publishableKey: pk,
+      environment: env,
+      consent: consent,
+      debug: debug,
+      onError: handleError,
+    };
+    if (flushInterval !== undefined) config.flushInterval = flushInterval;
+    if (flushSize !== undefined) config.flushSize = flushSize;
+
     try {
-      audience = Audience.init({
-        publishableKey: pk,
+      audience = Audience.init(config);
+      setInitState(true);
+      currentConsent = consent;
+      log('INIT', {
         environment: env,
         consent: consent,
         debug: debug,
-        onError: handleError,
-      });
-      setInitState(true);
-      currentConsent = consent;
-      log('INIT', { environment: env, consent: consent, debug: debug }, 'ok');
+        flushInterval: flushInterval,
+        flushSize: flushSize,
+      }, 'ok');
     } catch (err) {
       log('INIT', String(err && err.message || err), 'err');
       return;
@@ -403,6 +452,10 @@
     $('btn-identify').addEventListener('click', onIdentify);
     $('btn-identify-traits').addEventListener('click', onIdentifyTraits);
     $('btn-alias').addEventListener('click', onAlias);
+
+    // Enable Init only when the publishable key input has non-whitespace content.
+    $('pk').addEventListener('input', syncInitEnabled);
+    syncInitEnabled();
 
     setInterval(updateStatus, 1000);
     updateStatus();

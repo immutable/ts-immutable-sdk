@@ -49,8 +49,16 @@
         Debug — log SDK internals to browser console
       </label>
     </div>
+    <div class="field">
+      <label for="flush-interval">Flush interval (ms) — optional, default 5000</label>
+      <input id="flush-interval" type="number" min="100" step="100" placeholder="5000" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="flush-size">Flush batch size — optional, default 20</label>
+      <input id="flush-size" type="number" min="1" step="1" placeholder="20" spellcheck="false">
+    </div>
     <div class="button-row">
-      <button id="btn-init">Init</button>
+      <button id="btn-init" disabled>Init</button>
       <button id="btn-shutdown" disabled>Shutdown</button>
       <button id="btn-reset" class="secondary" disabled>Reset</button>
       <button id="btn-flush" class="secondary" disabled>Flush</button>
