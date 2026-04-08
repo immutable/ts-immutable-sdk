@@ -1,5 +1,5 @@
 * @immutable/blockchain-services
-package.json @immutable/blockchain-services
+package.json @immutable/blockchain-services @immutable/ped-stream-sdk-integrations-list
 .github @immutable/security @immutable/blockchain-services
 /.husky @immutable/blockchain-services
 /.nvmrc @immutable/blockchain-services
@@ -25,3 +25,7 @@ package.json @immutable/blockchain-services
 /packages/game-bridge @immutable/gamesdk @immutable/blockchain-services
 /examples @immutable/devgrowth
 **/package.json @immutable/blockchain-services
+/pnpm-lock.yaml @immutable/blockchain-services @immutable/ped-stream-sdk-integrations-list
+/pnpm-workspace.yaml @immutable/blockchain-services @immutable/ped-stream-sdk-integrations-list
+/tsconfig.base.json @immutable/blockchain-services @immutable/ped-stream-sdk-integrations-list
+/tsup.config.js @immutable/blockchain-services @immutable/ped-stream-sdk-integrations-list

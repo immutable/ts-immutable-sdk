@@ -33,8 +33,6 @@ export class PassportConfiguration {
 
   readonly passportDomain: string;
 
-  readonly imxPublicApiDomain: string;
-
   readonly magicPublishableApiKey: string;
 
   readonly magicProviderId: string;
@@ -98,7 +96,6 @@ export class PassportConfiguration {
           'magicProviderId',
           'zkEvmRpcUrl',
           'relayerUrl',
-          'imxPublicApiDomain',
           'indexerMrBasePath',
           'orderBookMrBasePath',
           'passportMrBasePath',
@@ -107,7 +104,6 @@ export class PassportConfiguration {
       );
       this.authenticationDomain = overrides.authenticationDomain;
       this.passportDomain = overrides.passportDomain;
-      this.imxPublicApiDomain = overrides.imxPublicApiDomain;
       this.magicPublishableApiKey = overrides.magicPublishableApiKey;
       this.magicProviderId = overrides.magicProviderId;
       this.zkEvmRpcUrl = overrides.zkEvmRpcUrl;
@@ -130,7 +126,7 @@ export class PassportConfiguration {
           this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
           this.magicProviderId = 'aa80b860-8869-4f13-9000-6a6ad3d20017';
           this.passportDomain = 'https://passport.immutable.com';
-          this.imxPublicApiDomain = 'https://api.immutable.com';
+
           this.zkEvmRpcUrl = 'https://rpc.immutable.com';
           this.relayerUrl = 'https://api.immutable.com/relayer-mr';
           this.multiRollupConfig = multiRollupConfig.getProduction();
@@ -142,7 +138,6 @@ export class PassportConfiguration {
           this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
           this.magicProviderId = 'aa80b860-8869-4f13-9000-6a6ad3d20017';
           this.passportDomain = 'https://passport.sandbox.immutable.com';
-          this.imxPublicApiDomain = 'https://api.sandbox.immutable.com';
           this.zkEvmRpcUrl = 'https://rpc.testnet.immutable.com';
           this.relayerUrl = 'https://api.sandbox.immutable.com/relayer-mr';
           this.multiRollupConfig = multiRollupConfig.getSandbox();

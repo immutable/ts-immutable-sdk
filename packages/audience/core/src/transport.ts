@@ -1,7 +1,8 @@
 import { track, trackError } from '@imtbl/metrics';
-import type { BatchPayload } from './types';
+import type { BatchPayload, ConsentUpdatePayload } from './types';
 
 export interface TransportOptions {
+  method?: string;
   keepalive?: boolean;
 }
 
@@ -12,12 +13,12 @@ export interface Transport {
 export async function httpSend(
   url: string,
   publishableKey: string,
-  payload: BatchPayload,
+  payload: BatchPayload | ConsentUpdatePayload,
   options?: TransportOptions,
 ): Promise<boolean> {
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method: options?.method ?? 'POST',
       headers: {
         'Content-Type': 'application/json',
         'x-immutable-publishable-key': publishableKey,

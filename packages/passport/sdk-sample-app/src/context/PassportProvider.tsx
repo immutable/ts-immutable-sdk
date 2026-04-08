@@ -1,7 +1,6 @@
 import React, {
   createContext, useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
-import { IMXProvider } from '@imtbl/x-provider';
 import {
   LinkedWallet, LinkWalletParams, Provider, UserProfile, MarketingConsentStatus,
 } from '@imtbl/passport';
@@ -10,14 +9,12 @@ import { useStatusProvider } from '@/context/StatusProvider';
 import { EnvironmentNames } from '@/types';
 
 const PassportContext = createContext<{
-  imxProvider: IMXProvider | undefined;
   zkEvmProvider: Provider | undefined;
   defaultWalletProvider: Provider | undefined;
   activeZkEvmProvider: Provider | undefined;
   activeZkEvmAccount: string;
   isSandboxEnvironment: boolean;
   setDefaultWalletProvider: (provider?: Provider) => void;
-  connectImx:() => void;
   connectZkEvm: () => void;
   logout: () => void;
   login: () => void;
@@ -34,14 +31,12 @@ const PassportContext = createContext<{
   loginApple: () => void;
   loginFacebook: () => void;
 }>({
-      imxProvider: undefined,
       zkEvmProvider: undefined,
       defaultWalletProvider: undefined,
       activeZkEvmProvider: undefined,
       activeZkEvmAccount: '',
       setDefaultWalletProvider: () => undefined,
       isSandboxEnvironment: false,
-      connectImx: () => undefined,
       connectZkEvm: () => undefined,
       logout: () => undefined,
       login: () => Promise.resolve(undefined),
@@ -62,7 +57,6 @@ const PassportContext = createContext<{
 export function PassportProvider({
   children,
 }: { children: JSX.Element | JSX.Element[] }) {
-  const [imxProvider, setImxProvider] = useState<IMXProvider | undefined>();
   const [zkEvmProvider, setZkEvmProvider] = useState<Provider | undefined>();
   const [defaultWalletProvider, setDefaultWalletProvider] = useState<Provider | undefined>();
   const [activeZkEvmAccount, setActiveZkEvmAccount] = useState<string>('');
@@ -74,23 +68,6 @@ export function PassportProvider({
   // `defaultWalletProvider` is created by connectWallet() with getUser from NextAuth or default auth.
   // Both providers can be used for zkEVM operations in any environment.
   const activeZkEvmProvider = defaultWalletProvider || zkEvmProvider;
-
-  const connectImx = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const provider = await passportClient.connectImx();
-      if (provider) {
-        setImxProvider(provider);
-        addMessage('ConnectImx', 'Connected');
-      } else {
-        addMessage('ConnectImx', 'Failed to connect');
-      }
-    } catch (err) {
-      addMessage('ConnectImx', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [passportClient, setIsLoading, addMessage]);
 
   const connectZkEvm = useCallback(async () => {
     setIsLoading(true);
@@ -169,7 +146,6 @@ export function PassportProvider({
     try {
       setIsLoading(true);
       await passportClient.logout();
-      setImxProvider(undefined);
       setZkEvmProvider(undefined);
       setDefaultWalletProvider(undefined);
     } catch (err) {
@@ -369,13 +345,11 @@ export function PassportProvider({
   }, [activeZkEvmProvider]);
 
   const providerValues = useMemo(() => ({
-    imxProvider,
     zkEvmProvider,
     defaultWalletProvider,
     activeZkEvmProvider,
     activeZkEvmAccount,
     setDefaultWalletProvider,
-    connectImx,
     connectZkEvm,
     logout,
     popupRedirect,
@@ -393,13 +367,11 @@ export function PassportProvider({
     linkWallet,
     isSandboxEnvironment,
   }), [
-    imxProvider,
     zkEvmProvider,
     defaultWalletProvider,
     activeZkEvmProvider,
     activeZkEvmAccount,
     isSandboxEnvironment,
-    connectImx,
     connectZkEvm,
     logout,
     popupRedirect,
@@ -427,14 +399,12 @@ export function PassportProvider({
 
 export function usePassportProvider() {
   const {
-    imxProvider,
     zkEvmProvider,
     defaultWalletProvider,
     activeZkEvmProvider,
     activeZkEvmAccount,
     isSandboxEnvironment,
     setDefaultWalletProvider,
-    connectImx,
     connectZkEvm,
     logout,
     popupRedirect,
@@ -452,14 +422,12 @@ export function usePassportProvider() {
     linkWallet,
   } = useContext(PassportContext);
   return {
-    imxProvider,
     zkEvmProvider,
     defaultWalletProvider,
     activeZkEvmProvider,
     activeZkEvmAccount,
     isSandboxEnvironment,
     setDefaultWalletProvider,
-    connectImx,
     connectZkEvm,
     logout,
     popupRedirect,

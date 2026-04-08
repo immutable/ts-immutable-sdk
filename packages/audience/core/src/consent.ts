@@ -1,6 +1,9 @@
-import type { ConsentLevel, Message, Environment } from './types';
+import type {
+  ConsentLevel, ConsentUpdatePayload, Message, Environment,
+} from './types';
 import type { MessageQueue } from './queue';
 import { CONSENT_PATH, getBaseUrl } from './config';
+import { httpSend } from './transport';
 
 export interface ConsentManager {
   level: ConsentLevel;
@@ -30,6 +33,7 @@ export function createConsentManager(
   publishableKey: string,
   anonymousId: string,
   environment: Environment,
+  source: string,
   initialLevel?: ConsentLevel,
 ): ConsentManager {
   const dntDetected = detectDoNotTrack();
@@ -39,16 +43,8 @@ export function createConsentManager(
 
   function notifyBackend(level: ConsentLevel): void {
     const url = `${getBaseUrl(environment)}${CONSENT_PATH}`;
-    const payload = { anonymousId, consentLevel: level };
-    fetch(url, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-immutable-publishable-key': publishableKey,
-      },
-      body: JSON.stringify(payload),
-      keepalive: true,
-    }).catch(() => {});
+    const payload: ConsentUpdatePayload = { anonymousId, status: level, source };
+    httpSend(url, publishableKey, payload, { method: 'PUT', keepalive: true });
   }
 
   const manager: ConsentManager = {

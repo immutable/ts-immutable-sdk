@@ -93,6 +93,7 @@ export class Pixel {
       key,
       this.anonymousId,
       environment,
+      'pixel',
       consentLevel,
     );
 
@@ -117,15 +118,10 @@ export class Pixel {
     this.refreshSession(sessionId, isNew);
     const attribution = collectAttribution();
     const thirdPartyIds = this.collectThirdPartyIds();
-    const context = collectContext('@imtbl/pixel', PIXEL_VERSION);
 
     const message: PageMessage = {
+      ...this.buildBase(),
       type: 'page',
-      messageId: generateId(),
-      eventTimestamp: getTimestamp(),
-      anonymousId: this.anonymousId,
-      surface: 'pixel',
-      context,
       properties: {
         ...attribution,
         ...thirdPartyIds,
@@ -144,15 +140,10 @@ export class Pixel {
     this.userId = userId;
     const { sessionId, isNew } = getOrCreateSession(this.domain);
     this.refreshSession(sessionId, isNew);
-    const context = collectContext('@imtbl/pixel', PIXEL_VERSION);
 
     const message: IdentifyMessage = {
+      ...this.buildBase(),
       type: 'identify',
-      messageId: generateId(),
-      eventTimestamp: getTimestamp(),
-      anonymousId: this.anonymousId,
-      surface: 'pixel',
-      context,
       userId,
       traits: {
         ...traits,
@@ -192,13 +183,9 @@ export class Pixel {
     if (!this.canTrack()) return;
 
     const message: TrackMessage = {
+      ...this.buildBase(),
       type: 'track',
       eventName: 'session_start',
-      messageId: generateId(),
-      eventTimestamp: getTimestamp(),
-      anonymousId: this.anonymousId,
-      surface: 'pixel',
-      context: collectContext('@imtbl/pixel', PIXEL_VERSION),
       properties: { sessionId },
       userId: this.consent!.level === 'full' ? this.userId : undefined,
     };
@@ -214,13 +201,9 @@ export class Pixel {
       : undefined;
 
     const message: TrackMessage = {
+      ...this.buildBase(),
       type: 'track',
       eventName: 'session_end',
-      messageId: generateId(),
-      eventTimestamp: getTimestamp(),
-      anonymousId: this.anonymousId,
-      surface: 'pixel',
-      context: collectContext('@imtbl/pixel', PIXEL_VERSION),
       properties: {
         sessionId: this.sessionId,
         duration,
@@ -270,6 +253,19 @@ export class Pixel {
     const fbp = getCookie('_fbp');
     if (fbp) ids.fbBrowserId = fbp;
     return ids;
+  }
+
+  // -- Helpers ------------------------------------------------------------
+
+  // eslint-disable-next-line class-methods-use-this
+  private buildBase() {
+    return {
+      messageId: generateId(),
+      eventTimestamp: getTimestamp(),
+      anonymousId: this.anonymousId,
+      surface: 'pixel' as const,
+      context: collectContext('@imtbl/pixel', PIXEL_VERSION),
+    };
   }
 
   // -- Guards -------------------------------------------------------------
