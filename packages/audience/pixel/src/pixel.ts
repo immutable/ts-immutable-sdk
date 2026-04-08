@@ -19,6 +19,7 @@ import {
   generateId,
   getTimestamp,
   isBrowser,
+  getCookie,
   collectAttribution,
   getOrCreateSession,
   createConsentManager,
@@ -96,15 +97,18 @@ export class Pixel {
       consentLevel,
     );
 
-    this.queue.start();
     this.initialized = true;
+
+    // Register session_end listener BEFORE starting the queue so that
+    // on page unload, session_end is enqueued before the queue flushes.
+    // DOM event listeners fire in registration order.
+    this.registerSessionEnd();
+    this.queue.start();
 
     // Auto-fire page view if consent allows
     if (this.consent.level !== 'none') {
       this.page();
     }
-
-    this.registerSessionEnd();
   }
 
   page(properties?: Record<string, unknown>): void {
@@ -113,12 +117,14 @@ export class Pixel {
     const { sessionId, isNew } = getOrCreateSession(this.domain);
     this.refreshSession(sessionId, isNew);
     const attribution = collectAttribution();
+    const thirdPartyIds = this.collectThirdPartyIds();
 
     const message: PageMessage = {
       ...this.buildBase(),
       type: 'page',
       properties: {
         ...attribution,
+        ...thirdPartyIds,
         sessionId,
         ...properties,
       },
@@ -228,6 +234,25 @@ export class Pixel {
       window.removeEventListener('pagehide', this.unloadHandler);
       this.unloadHandler = undefined;
     }
+  }
+
+  // -- Third-party identity signals ----------------------------------------
+
+  /**
+   * Read GA Client ID and Meta Pixel cookies when present.
+   * These are set by Google Analytics / Meta Pixel scripts and allow
+   * cross-platform identity stitching without requiring full consent.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  private collectThirdPartyIds(): Record<string, string> {
+    const ids: Record<string, string> = {};
+    const ga = getCookie('_ga');
+    if (ga) ids.gaClientId = ga;
+    const fbc = getCookie('_fbc');
+    if (fbc) ids.fbClickId = fbc;
+    const fbp = getCookie('_fbp');
+    if (fbp) ids.fbBrowserId = fbp;
+    return ids;
   }
 
   // -- Helpers ------------------------------------------------------------

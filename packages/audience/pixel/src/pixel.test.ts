@@ -58,6 +58,8 @@ jest.mock('@imtbl/audience-core', () => ({
 // Mock fetch globally
 global.fetch = jest.fn().mockResolvedValue({ ok: true });
 
+const mockGetCookie = jest.requireMock('@imtbl/audience-core').getCookie as jest.Mock;
+
 let activePixel: Pixel | null = null;
 
 beforeEach(() => {
@@ -165,6 +167,47 @@ describe('Pixel', () => {
 
       pixel.page();
       expect(mockEnqueue).not.toHaveBeenCalled();
+    });
+
+    it('includes GA and Meta cookies in page properties when present', () => {
+      mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-abc', isNew: false });
+      mockGetCookie.mockImplementation((name: string) => {
+        const cookies: Record<string, string> = {
+          _ga: 'GA1.2.123456.789012',
+          _fbc: 'fb.1.1234567890.AbCdEf',
+          _fbp: 'fb.1.1234567890.987654321',
+        };
+        return cookies[name];
+      });
+
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+
+      const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
+      const pageCall = calls.find((c) => c.type === 'page');
+      const props = pageCall!.properties as Record<string, unknown>;
+
+      expect(props.gaClientId).toBe('GA1.2.123456.789012');
+      expect(props.fbClickId).toBe('fb.1.1234567890.AbCdEf');
+      expect(props.fbBrowserId).toBe('fb.1.1234567890.987654321');
+    });
+
+    it('omits third-party IDs when cookies are not set', () => {
+      mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-abc', isNew: false });
+      mockGetCookie.mockReturnValue(undefined);
+
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+
+      const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
+      const pageCall = calls.find((c) => c.type === 'page');
+      const props = pageCall!.properties as Record<string, unknown>;
+
+      expect(props.gaClientId).toBeUndefined();
+      expect(props.fbClickId).toBeUndefined();
+      expect(props.fbBrowserId).toBeUndefined();
     });
   });
 
