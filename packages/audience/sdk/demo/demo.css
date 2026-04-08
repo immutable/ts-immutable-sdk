@@ -1,21 +1,32 @@
 :root {
-  --bg: #0b0d10;
-  --panel-bg: #13171c;
-  --panel-border: #1f2630;
-  --panel-border-hover: #2a3440;
-  --text: #e4e7eb;
-  --text-muted: #8b96a4;
-  --text-dim: #5c6876;
-  --accent: #4b8eff;
-  --accent-hover: #6aa1ff;
-  --accent-active: #3573dc;
-  --ok: #3cc48a;
-  --warn: #f5b13b;
-  --err: #ef5c6e;
-  --input-bg: #0b0e13;
-  --input-border: #24303e;
-  --mono: ui-monospace, 'SF Mono', Menlo, Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
-  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  /* Palette from @biom3/design-tokens base-onLight.global.css */
+  --bg: #f7f8fa;             /* was #ffffff — subtle cool off-white so panels can float */
+  --panel-bg: #ffffff;       /* was #f1f1f1 — panels are pure white to pop against bg */
+  --panel-border: #e6e8ec;   /* was #e7e7e7 — slightly cooler */
+  --panel-border-hover: #0d0d0d1a; /* translucent-standard-200 */
+  --text: #131313;           /* brand-1 */
+  --text-muted: #868686;     /* brand-4 */
+  --text-dim: #a8a8a8;       /* mid-gray — brand-3 (#E0E0E0) is illegible on white */
+  --accent: #131313;         /* near-black, matches biom3 brand-1 / Button primary */
+  --accent-hover: #2a2a2a;   /* slightly lighter black on hover */
+  --accent-active: #000000;  /* pure black on active */
+  --ok: #148530;             /* status-success-bright (onLight) */
+  --warn: #a07a00;           /* attention amber — FBFF6D is illegible on white; dark amber for legibility */
+  --err: #bb3049;            /* status-fatal-bright (onLight) */
+  --input-bg: #ffffff;       /* was dark — inputs are white like cards */
+  --input-border: #d4d7dd;   /* was dark — light gray border */
+  --mono: 'Roboto Mono', ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  --sans: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+
+  /* Elevation / shadow — synthesized to match biom3 light-mode aesthetic.
+     biom3 exposes these via component props, not design tokens, so we
+     approximate them with the conventional material-design-esque
+     subtle-light-blur values. */
+  --shadow-panel: 0 1px 3px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.04);
+  --shadow-panel-hover: 0 4px 12px rgba(17, 24, 39, 0.08);
+  --shadow-button: 0 1px 2px rgba(17, 24, 39, 0.06);
+  --shadow-button-hover: 0 2px 6px rgba(17, 24, 39, 0.1);
+  --shadow-input-inset: inset 0 1px 2px rgba(17, 24, 39, 0.03);
 }
 
 * { box-sizing: border-box; }
@@ -41,28 +52,24 @@ header {
 }
 
 h1 {
-  font-size: 22px;
-  font-weight: 600;
-  margin: 0 0 4px;
-}
-
-.subtitle {
-  color: var(--text-muted);
-  font-size: 12px;
-  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
 }
 
 .status-bar {
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
-  border-radius: 8px;
-  padding: 12px 16px;
+  border-radius: 12px;
+  padding: 14px 20px;
   margin-bottom: 16px;
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 20px;
   font-size: 13px;
   font-family: var(--mono);
+  box-shadow: var(--shadow-panel);
 }
 
 .status-bar > div {
@@ -90,18 +97,19 @@ h1 {
 .panel {
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 12px;
+  padding: 20px 24px;
   margin-bottom: 16px;
+  box-shadow: var(--shadow-panel);
 }
 
 .panel-title {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
-  margin: 0 0 12px;
+  margin: 0 0 16px;
 }
 
 .field {
@@ -114,26 +122,34 @@ h1 {
 .field label {
   font-size: 12px;
   color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 
 .field input[type="text"],
+.field input[type="number"],
 .field textarea,
 .field select {
   background: var(--input-bg);
   border: 1px solid var(--input-border);
   color: var(--text);
-  padding: 8px 10px;
-  border-radius: 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
   font-family: var(--mono);
   font-size: 13px;
+  box-shadow: var(--shadow-input-inset);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
   resize: vertical;
 }
 
 .field input[type="text"]:focus,
+.field input[type="number"]:focus,
 .field textarea:focus,
 .field select:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(19, 19, 19, 0.1);
 }
 
 .field textarea {
@@ -174,57 +190,67 @@ h1 {
 
 button {
   background: var(--accent);
-  color: #fff;
+  color: #ffffff;
   border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 9px 18px;
+  border-radius: 8px;
   font-family: var(--sans);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.12s ease;
+  box-shadow: var(--shadow-button);
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
 }
 
 button:hover:not(:disabled) {
   background: var(--accent-hover);
+  box-shadow: var(--shadow-button-hover);
 }
 
 button:active:not(:disabled) {
   background: var(--accent-active);
+  box-shadow: var(--shadow-button);
+  transform: translateY(1px);
 }
 
 button:disabled {
   background: var(--panel-border);
   color: var(--text-dim);
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 button.secondary {
-  background: transparent;
-  border: 1px solid var(--panel-border-hover);
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
   color: var(--text);
+  box-shadow: var(--shadow-button);
 }
 
 button.secondary:hover:not(:disabled) {
-  background: var(--panel-border);
+  background: #f3f4f6;
+  border-color: #d4d7dd;
+  box-shadow: var(--shadow-button-hover);
 }
 
 button.active {
   background: var(--accent-active);
-  box-shadow: 0 0 0 2px var(--accent) inset;
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25) inset, var(--shadow-button);
 }
 
 .log {
   background: var(--input-bg);
-  border: 1px solid var(--input-border);
-  border-radius: 6px;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
   font-family: var(--mono);
   font-size: 12px;
   height: 360px;
   min-height: 120px;
   overflow: auto;
-  padding: 12px;
+  padding: 14px 16px;
   resize: vertical;
+  box-shadow: var(--shadow-input-inset);
 }
 
 .log-entry {
