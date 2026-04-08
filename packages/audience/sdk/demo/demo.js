@@ -78,6 +78,85 @@
     $('alias-to-type').value = IdentityType.Passport;
   }
 
+  function initDemoGutter() {
+    var gutter = $('demo-gutter');
+    if (!gutter) return;
+    var grid = document.querySelector('.demo-grid');
+    if (!grid) return;
+
+    var STORAGE_KEY = '__imtbl_demo_split';
+    var MIN_PCT = 25;
+    var MAX_PCT = 75;
+
+    function applySplit(leftPct) {
+      var clamped = Math.max(MIN_PCT, Math.min(MAX_PCT, leftPct));
+      grid.style.gridTemplateColumns = clamped + 'fr 8px ' + (100 - clamped) + 'fr';
+    }
+
+    // Restore saved split if any.
+    try {
+      var saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        var pct = parseFloat(saved);
+        if (!isNaN(pct)) applySplit(pct);
+      }
+    } catch (_err) {
+      // localStorage may be unavailable — ignore
+    }
+
+    var dragging = false;
+
+    gutter.addEventListener('mousedown', function (e) {
+      dragging = true;
+      gutter.classList.add('active');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', function (e) {
+      if (!dragging) return;
+      var rect = grid.getBoundingClientRect();
+      var leftPx = e.clientX - rect.left;
+      var pct = (leftPx / rect.width) * 100;
+      applySplit(pct);
+    });
+
+    document.addEventListener('mouseup', function () {
+      if (!dragging) return;
+      dragging = false;
+      gutter.classList.remove('active');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+
+      // Persist the current split ratio (recomputed from actual layout).
+      var rect = grid.getBoundingClientRect();
+      var controlsEl = document.querySelector('.demo-grid > .controls');
+      if (!controlsEl) return;
+      var controlsRect = controlsEl.getBoundingClientRect();
+      var currentPct = (controlsRect.width / rect.width) * 100;
+      try {
+        localStorage.setItem(STORAGE_KEY, currentPct.toFixed(2));
+      } catch (_err) {
+        // noop
+      }
+    });
+
+    // Keyboard support: left/right arrow when focused.
+    gutter.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      var rect = grid.getBoundingClientRect();
+      var controlsEl = document.querySelector('.demo-grid > .controls');
+      if (!controlsEl) return;
+      var currentPct = (controlsEl.getBoundingClientRect().width / rect.width) * 100;
+      var delta = e.key === 'ArrowLeft' ? -2 : 2;
+      var next = currentPct + delta;
+      applySplit(next);
+      try { localStorage.setItem(STORAGE_KEY, next.toFixed(2)); } catch (_err) {}
+      e.preventDefault();
+    });
+  }
+
   // Log
   function log(method, detail, type) {
     type = type || 'info';
@@ -449,6 +528,7 @@
     $('btn-track').addEventListener('click', onTrack);
 
     populateIdentityDropdowns();
+    initDemoGutter();
     $('btn-identify').addEventListener('click', onIdentify);
     $('btn-identify-traits').addEventListener('click', onIdentifyTraits);
     $('btn-alias').addEventListener('click', onAlias);

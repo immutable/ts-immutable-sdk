@@ -220,9 +220,11 @@ button.active {
   border-radius: 6px;
   font-family: var(--mono);
   font-size: 12px;
-  max-height: 360px;
-  overflow-y: auto;
+  height: 360px;
+  min-height: 120px;
+  overflow: auto;
   padding: 12px;
+  resize: vertical;
 }
 
 .log-entry {
@@ -275,3 +277,71 @@ button.active {
 .status-value.consent-none     { color: var(--err); }
 .status-value.consent-anonymous { color: var(--warn); }
 .status-value.consent-full     { color: var(--ok); }
+
+.demo-gutter {
+  display: none;
+}
+
+/* Wide-viewport two-column layout: controls left, sticky event log right.
+   On narrow viewports (< 1024px) the default block layout applies and the
+   panels stack vertically as before. */
+@media (min-width: 1024px) {
+  main {
+    max-width: 1360px;
+  }
+
+  .demo-grid {
+    display: grid;
+    grid-template-columns: 1fr 8px 1fr;
+    gap: 0;
+    align-items: start;
+    column-gap: 16px;
+  }
+
+  .demo-gutter {
+    display: block;
+    width: 8px;
+    cursor: col-resize;
+    background: var(--panel-border);
+    border-radius: 4px;
+    align-self: stretch;
+    min-height: 100px;
+    transition: background 0.12s ease;
+  }
+
+  .demo-gutter:hover,
+  .demo-gutter.active {
+    background: var(--accent);
+  }
+
+  .controls > .panel,
+  .controls > #panel-slot {
+    margin-bottom: 16px;
+  }
+
+  .controls > .panel:last-child,
+  .controls > #panel-slot:last-child {
+    margin-bottom: 0;
+  }
+
+  .log-column {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 32px);
+  }
+
+  .log-column > .panel {
+    margin-bottom: 0;
+  }
+
+  .log-column .log {
+    /* User-resizable at wide viewports too. Default height fills most of
+       the viewport; drag the bottom-right corner to shrink or grow.
+       max-height clamps the grow direction so the log can't push off the
+       bottom of the screen. */
+    height: calc(100vh - 220px);
+    min-height: 120px;
+    max-height: calc(100vh - 80px);
+    resize: vertical;
+  }
+}
