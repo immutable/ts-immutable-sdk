@@ -1,5 +1,12 @@
 import { Pixel } from './pixel';
 
+// Mock autocapture module
+const mockTeardownAutocapture = jest.fn();
+const mockSetupAutocapture = jest.fn().mockReturnValue(mockTeardownAutocapture);
+jest.mock('./autocapture', () => ({
+  setupAutocapture: (...args: unknown[]) => mockSetupAutocapture(...args),
+}));
+
 // Mock audience-core
 const mockEnqueue = jest.fn();
 const mockStart = jest.fn();
@@ -328,6 +335,86 @@ describe('Pixel', () => {
       mockEnqueue.mockClear();
       pixel.page();
       expect(mockEnqueue).not.toHaveBeenCalled();
+    });
+
+    it('tears down autocapture listeners', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+
+      pixel.destroy();
+      expect(mockTeardownAutocapture).toHaveBeenCalled();
+    });
+  });
+
+  describe('autocapture integration', () => {
+    it('sets up autocapture with default options on init', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+
+      expect(mockSetupAutocapture).toHaveBeenCalledWith(
+        { forms: undefined, clicks: undefined },
+        expect.any(Function),
+        expect.any(Function),
+      );
+    });
+
+    it('passes autocapture options to setupAutocapture', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({
+        key: 'pk_test',
+        environment: 'dev',
+        consent: 'anonymous',
+        autocapture: { forms: false, clicks: true },
+      });
+
+      expect(mockSetupAutocapture).toHaveBeenCalledWith(
+        { forms: false, clicks: true },
+        expect.any(Function),
+        expect.any(Function),
+      );
+    });
+
+    it('enqueue callback fires TrackMessage with session', () => {
+      mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-xyz', isNew: false });
+
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      mockEnqueue.mockClear();
+
+      // Call the enqueue callback that was passed to setupAutocapture
+      const enqueueCallback = mockSetupAutocapture.mock.calls[0][1] as (
+        eventName: string,
+        properties: Record<string, unknown>,
+      ) => void;
+      enqueueCallback('form_submitted', { formAction: '/signup' });
+
+      expect(mockEnqueue).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'track',
+          eventName: 'form_submitted',
+          surface: 'pixel',
+          properties: expect.objectContaining({
+            formAction: '/signup',
+            sessionId: 'session-xyz',
+          }),
+        }),
+      );
+    });
+
+    it('consent callback returns current consent level', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+
+      const getConsent = mockSetupAutocapture.mock.calls[0][2] as () => string;
+      expect(getConsent()).toBe('anonymous');
+
+      pixel.setConsent('full');
+      expect(getConsent()).toBe('full');
     });
   });
 });
