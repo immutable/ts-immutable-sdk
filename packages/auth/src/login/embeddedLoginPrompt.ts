@@ -23,7 +23,8 @@ export default class EmbeddedLoginPrompt {
   private getHref = () => {
     const href = `${this.config.authenticationDomain}/im-embedded-login-prompt`
     + `?client_id=${this.config.oidcConfiguration.clientId}`
-    + `&rid=${getDetail(Detail.RUNTIME_ID)}`;
+    + `&rid=${getDetail(Detail.RUNTIME_ID)}`
+    + `&parent_origin=${encodeURIComponent(window.location.origin)}`;
 
     return href;
   };
