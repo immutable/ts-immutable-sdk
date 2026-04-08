@@ -15,6 +15,7 @@ export type {
   ConsentStatus,
   ConsentUpdatePayload,
 } from './types';
+export { IdentityType } from './types';
 
 export {
   getOrCreateAnonymousId,

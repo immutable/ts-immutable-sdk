@@ -106,3 +106,25 @@ export interface ConsentUpdatePayload {
   status: ConsentLevel;
   source: string;
 }
+
+/**
+ * Identity providers supported by the backend (matches the OAS `IdentityType`
+ * enum exactly). Pass one of these values to `audience.identify()` or
+ * `audience.alias()` to tell the backend which identity system the ID comes from.
+ *
+ * Keep in sync with:
+ * `platform-services/services/audience/src/openapi/oas.yml` → `IdentityType`.
+ */
+export const IdentityType = {
+  Passport: 'passport',
+  Steam: 'steam',
+  Epic: 'epic',
+  Google: 'google',
+  Apple: 'apple',
+  Discord: 'discord',
+  Email: 'email',
+  Custom: 'custom',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export type IdentityType = typeof IdentityType[keyof typeof IdentityType];
