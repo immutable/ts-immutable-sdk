@@ -1,5 +1,6 @@
 import type { Message } from '@imtbl/audience-core';
 import { DebugLogger } from './debug';
+import { LOG_PREFIX } from './config';
 
 describe('DebugLogger', () => {
   let logSpy: jest.SpyInstance;
@@ -22,7 +23,7 @@ describe('DebugLogger', () => {
     anonymousId: 'anon-1',
     surface: 'web',
     context: { library: 'test', libraryVersion: '0.0.0' },
-    event: 'click',
+    eventName: 'click',
     properties: {},
   };
 
@@ -42,7 +43,7 @@ describe('DebugLogger', () => {
     logger.logEvent('track', stubMessage);
 
     expect(logSpy).toHaveBeenCalledWith(
-      '[Immutable Audience] track',
+      `${LOG_PREFIX} track`,
       stubMessage,
     );
   });
@@ -52,12 +53,12 @@ describe('DebugLogger', () => {
 
     logger.logFlush(true, 5);
     expect(logSpy).toHaveBeenCalledWith(
-      '[Immutable Audience] flush ok (5 messages)',
+      `${LOG_PREFIX} flush ok (5 messages)`,
     );
 
     logger.logFlush(false, 3);
     expect(logSpy).toHaveBeenCalledWith(
-      '[Immutable Audience] flush failed (3 messages)',
+      `${LOG_PREFIX} flush failed (3 messages)`,
     );
   });
 
@@ -66,7 +67,7 @@ describe('DebugLogger', () => {
     logger.logConsent('none', 'full');
 
     expect(logSpy).toHaveBeenCalledWith(
-      '[Immutable Audience] consent none → full',
+      `${LOG_PREFIX} consent none \u2192 full`,
     );
   });
 
@@ -75,7 +76,7 @@ describe('DebugLogger', () => {
     logger.logWarning('something went wrong');
 
     expect(warnSpy).toHaveBeenCalledWith(
-      '[Immutable Audience] something went wrong',
+      `${LOG_PREFIX} something went wrong`,
     );
   });
 });
