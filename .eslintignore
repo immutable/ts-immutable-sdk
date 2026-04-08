@@ -23,3 +23,4 @@ packages/internal/generated-clients/src/
 packages/game-bridge/scripts/**/*.js
 packages/audience/sdk/rollup.dts.config.js
 packages/audience/sdk/tsup.config.js
+packages/audience/sdk/demo/

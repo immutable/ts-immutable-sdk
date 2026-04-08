@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src https://api.dev.immutable.com https://api.sandbox.immutable.com">
+  <title>Immutable Audience SDK — Demo</title>
+  <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Immutable Audience SDK — Demo</h1>
+    <div class="subtitle">Interactive harness for every public method of @imtbl/audience</div>
+  </header>
+
+  <div class="status-bar" id="status-bar">
+    <div><span class="status-label">Env</span> <span class="status-value dim" id="status-env">—</span></div>
+    <div><span class="status-label">Consent</span> <span class="status-value dim" id="status-consent">—</span></div>
+    <div><span class="status-label">Anon ID</span> <span class="status-value dim" id="status-anon">—</span></div>
+    <div><span class="status-label">User ID</span> <span class="status-value dim" id="status-user">—</span></div>
+  </div>
+
+  <section class="panel">
+    <h2 class="panel-title">Setup</h2>
+    <div class="field">
+      <label for="pk">Publishable Key</label>
+      <input id="pk" type="text" placeholder="pk_imapik-test-yourkey" spellcheck="false">
+    </div>
+    <div class="field">
+      <label>Environment</label>
+      <div class="radio-row">
+        <label><input type="radio" name="env" value="dev"> dev</label>
+        <label><input type="radio" name="env" value="sandbox" checked> sandbox</label>
+      </div>
+    </div>
+    <div class="field">
+      <label>Initial Consent</label>
+      <div class="radio-row">
+        <label><input type="radio" name="initial-consent" value="none"> none</label>
+        <label><input type="radio" name="initial-consent" value="anonymous" checked> anonymous</label>
+        <label><input type="radio" name="initial-consent" value="full"> full</label>
+      </div>
+    </div>
+    <div class="field">
+      <label>
+        <input type="checkbox" id="debug" checked>
+        Debug — log SDK internals to browser console
+      </label>
+    </div>
+    <div class="button-row">
+      <button id="btn-init">Init</button>
+      <button id="btn-shutdown" disabled>Shutdown</button>
+      <button id="btn-reset" class="secondary" disabled>Reset</button>
+      <button id="btn-flush" class="secondary" disabled>Flush</button>
+    </div>
+  </section>
+
+  <div id="panel-slot"></div>
+
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Event Log</h2>
+      <span class="log-count" id="log-count">0 entries</span>
+    </div>
+    <div class="button-row compact">
+      <button class="secondary" id="btn-clear-log">Clear</button>
+    </div>
+    <div class="log" id="log"></div>
+  </section>
+</main>
+
+<script src="../dist/cdn/imtbl-audience.global.js"></script>
+<script src="demo.js"></script>
+</body>
+</html>
