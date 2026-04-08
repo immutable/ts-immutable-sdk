@@ -24,6 +24,8 @@ import {
   getOrCreateSession,
   createConsentManager,
 } from '@imtbl/audience-core';
+import { setupAutocapture } from './autocapture';
+import type { AutocaptureOptions } from './autocapture';
 
 // Replaced at build time by tsup `define` (see tsup.config.ts).
 // In tests the global isn't defined, so we fall back to 'unknown'.
@@ -36,6 +38,7 @@ export interface PixelInitOptions {
   environment?: Environment;
   consent?: ConsentLevel;
   domain?: string;
+  autocapture?: AutocaptureOptions;
 }
 
 export class Pixel {
@@ -61,6 +64,8 @@ export class Pixel {
 
   private unloadHandler?: () => void;
 
+  private teardownAutocapture?: () => void;
+
   init(options: PixelInitOptions): void {
     if (this.initialized) return;
 
@@ -69,6 +74,7 @@ export class Pixel {
       environment = 'production',
       consent: consentLevel,
       domain,
+      autocapture,
     } = options;
 
     this.publishableKey = key;
@@ -109,6 +115,13 @@ export class Pixel {
     if (this.consent.level !== 'none') {
       this.page();
     }
+
+    // Attach autocapture listeners (forms + outbound clicks)
+    this.teardownAutocapture = setupAutocapture(
+      { forms: autocapture?.forms, clicks: autocapture?.clicks },
+      (eventName, properties) => this.track(eventName, properties),
+      () => this.consent!.level,
+    );
   }
 
   page(properties?: Record<string, unknown>): void {
@@ -161,12 +174,35 @@ export class Pixel {
 
   destroy(): void {
     this.removeSessionEnd();
+    if (this.teardownAutocapture) {
+      this.teardownAutocapture();
+      this.teardownAutocapture = undefined;
+    }
     if (this.queue) {
       this.queue.destroy();
       this.queue = null;
     }
     this.consent = null;
     this.initialized = false;
+  }
+
+  // -- Auto-capture helper --------------------------------------------------
+
+  private track(eventName: string, properties: Record<string, unknown>): void {
+    if (!this.canTrack()) return;
+
+    const { sessionId, isNew } = getOrCreateSession(this.domain);
+    this.refreshSession(sessionId, isNew);
+
+    const message: TrackMessage = {
+      ...this.buildBase(),
+      type: 'track',
+      eventName,
+      properties: { ...properties, sessionId },
+      userId: this.consent!.level === 'full' ? this.userId : undefined,
+    };
+
+    this.queue!.enqueue(message);
   }
 
   // -- Session lifecycle --------------------------------------------------
