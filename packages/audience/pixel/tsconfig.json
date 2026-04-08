@@ -3,7 +3,10 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDirs": ["src"],
-    "customConditions": ["development"]
+    "customConditions": ["development"],
+    "paths": {
+      "@imtbl/metrics": ["./src/stubs/metrics.ts"]
+    }
   },
   "include": ["src"],
   "exclude": ["dist", "node_modules", "src/**/*.test.ts"]

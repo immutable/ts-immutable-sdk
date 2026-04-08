@@ -51,6 +51,20 @@ describe('httpSend', () => {
     }));
   });
 
+  it('uses specified method from options', async () => {
+    const mockFetch = jest.fn().mockResolvedValue({ ok: true });
+    global.fetch = mockFetch;
+
+    const consentPayload = { anonymousId: 'anon-1', status: 'anonymous' as const, source: 'pixel' };
+    await httpSend('https://example.com/consent', 'pk', consentPayload, { method: 'PUT', keepalive: true });
+
+    expect(mockFetch).toHaveBeenCalledWith('https://example.com/consent', expect.objectContaining({
+      method: 'PUT',
+      keepalive: true,
+      body: JSON.stringify(consentPayload),
+    }));
+  });
+
   it('returns true on success', async () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: true });
     expect(await httpSend('https://example.com', 'pk', payload)).toBe(true);

@@ -1,5 +1,5 @@
-export { collectAttribution, clearAttribution } from './attribution';
-export type { Attribution } from './attribution';
+export { Pixel } from './pixel';
+export type { PixelInitOptions } from './pixel';
 
 export { createLoader } from './loader';
 export type { Command, ImtblGlobal } from './loader';
