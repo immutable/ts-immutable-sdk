@@ -26,11 +26,13 @@ import {
   collectAttribution,
   getOrCreateSession,
   createConsentManager,
+  SESSION_START,
+  SESSION_END,
 } from '@imtbl/audience-core';
 import { DebugLogger } from './debug';
 import type { AudienceConfig } from './types';
 import {
-  LIBRARY_NAME, LIBRARY_VERSION, LOG_PREFIX, DEFAULT_CONSENT_SOURCE, SESSION_START, SESSION_END,
+  LIBRARY_NAME, LIBRARY_VERSION, LOG_PREFIX, DEFAULT_CONSENT_SOURCE,
 } from './config';
 
 /**

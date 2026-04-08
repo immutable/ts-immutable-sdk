@@ -1,8 +1,8 @@
 import {
-  COOKIE_NAME, SESSION_COOKIE, INGEST_PATH, CONSENT_PATH,
+  COOKIE_NAME, SESSION_COOKIE, INGEST_PATH, CONSENT_PATH, SESSION_START, SESSION_END,
 } from '@imtbl/audience-core';
 import { Audience } from './sdk';
-import { LIBRARY_NAME, SESSION_START, SESSION_END } from './config';
+import { LIBRARY_NAME } from './config';
 
 // --- Test fixtures ---
 const TEST_USER = { uid: 'user@example.com', provider: 'email' } as const;

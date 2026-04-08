@@ -10,11 +10,3 @@ export const LOG_PREFIX = '[audience]';
 
 /** Default consent source when consentSource is not provided in config. */
 export const DEFAULT_CONSENT_SOURCE = 'WebSDK';
-
-// --- Auto-tracked event names ---
-// These are fired by the SDK lifecycle, not by studio code.
-
-/** Fired on init (or consent upgrade from none) when no active session cookie exists. */
-export const SESSION_START = 'session_start';
-/** Fired on explicit shutdown(). Not fired on tab close or consent revocation. */
-export const SESSION_END = 'session_end';

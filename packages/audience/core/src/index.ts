@@ -34,6 +34,8 @@ export {
   COOKIE_NAME,
   SESSION_COOKIE,
   SESSION_MAX_AGE,
+  SESSION_START,
+  SESSION_END,
 } from './config';
 
 export { generateId, getTimestamp, isBrowser } from './utils';
