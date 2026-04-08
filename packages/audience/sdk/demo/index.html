@@ -57,6 +57,84 @@
     </div>
   </section>
 
+  <section class="panel" id="consent-panel">
+    <h2 class="panel-title">Consent</h2>
+    <div class="button-row">
+      <button class="secondary" id="btn-consent-none" disabled>Set none</button>
+      <button class="secondary" id="btn-consent-anon" disabled>Set anonymous</button>
+      <button class="secondary" id="btn-consent-full" disabled>Set full</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">Page</h2>
+    <div class="field">
+      <label for="page-props">Properties (JSON, optional)</label>
+      <textarea id="page-props" placeholder='{"section":"marketplace"}' spellcheck="false"></textarea>
+    </div>
+    <div class="button-row">
+      <button id="btn-page" disabled>Call page()</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">Track</h2>
+    <div class="field">
+      <label for="track-name">Event name</label>
+      <input id="track-name" type="text" placeholder="purchase_completed" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="track-props">Properties (JSON, optional)</label>
+      <textarea id="track-props" placeholder='{"sku":"pack-1","usd":9.99}' spellcheck="false"></textarea>
+    </div>
+    <div class="button-row">
+      <button id="btn-track" disabled>Call track()</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">Identify</h2>
+    <div class="field">
+      <label for="identify-id">ID</label>
+      <input id="identify-id" type="text" placeholder="player-7721" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="identify-type">Identity type</label>
+      <select id="identify-type"></select>
+    </div>
+    <div class="field">
+      <label for="identify-traits">Traits (JSON, optional)</label>
+      <textarea id="identify-traits" placeholder='{"plan":"premium"}' spellcheck="false"></textarea>
+    </div>
+    <div class="button-row">
+      <button id="btn-identify" disabled>Call identify()</button>
+      <button id="btn-identify-traits" class="secondary" disabled>Traits-only identify</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">Alias</h2>
+    <div class="field">
+      <label for="alias-from-id">From ID</label>
+      <input id="alias-from-id" type="text" placeholder="76561198012345" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="alias-from-type">From identity type</label>
+      <select id="alias-from-type"></select>
+    </div>
+    <div class="field">
+      <label for="alias-to-id">To ID</label>
+      <input id="alias-to-id" type="text" placeholder="player-7721" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="alias-to-type">To identity type</label>
+      <select id="alias-to-type"></select>
+    </div>
+    <div class="button-row">
+      <button id="btn-alias" disabled>Call alias()</button>
+    </div>
+  </section>
+
   <div id="panel-slot"></div>
 
   <section class="panel">

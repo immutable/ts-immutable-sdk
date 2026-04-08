@@ -15,6 +15,7 @@
   }
 
   var Audience = window.ImmutableAudience.Audience;
+  var IdentityType = window.ImmutableAudience.IdentityType;
 
   // State
   var audience = null;
@@ -42,6 +43,41 @@
     return null;
   }
 
+  function parseJsonOrWarn(txt, label) {
+    var trimmed = (txt || '').trim();
+    if (!trimmed) return undefined;
+    try {
+      var parsed = JSON.parse(trimmed);
+      if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+        log('WARN', label + ': JSON must be an object', 'warn');
+        return null;
+      }
+      return parsed;
+    } catch (err) {
+      log('WARN', label + ': invalid JSON — ' + String(err && err.message || err), 'warn');
+      return null;
+    }
+  }
+
+  function populateIdentityDropdowns() {
+    var selectIds = ['identify-type', 'alias-from-type', 'alias-to-type'];
+    var values = Object.keys(IdentityType).map(function (key) {
+      return { key: key, value: IdentityType[key] };
+    });
+
+    for (var i = 0; i < selectIds.length; i++) {
+      var sel = $(selectIds[i]);
+      if (!sel || sel.options.length > 0) continue;
+      for (var j = 0; j < values.length; j++) {
+        var opt = document.createElement('option');
+        opt.value = values[j].value;
+        opt.textContent = values[j].value;
+        sel.appendChild(opt);
+      }
+    }
+    $('alias-to-type').value = IdentityType.Passport;
+  }
+
   // Log
   function log(method, detail, type) {
     type = type || 'info';
@@ -64,17 +100,44 @@
       var methodEl = create('span', 'log-method');
       text(methodEl, e.method);
 
-      var detailStr = typeof e.detail === 'object' ? JSON.stringify(e.detail, null, 2) : String(e.detail);
-      var detailEl = create('span', 'log-detail');
-      text(detailEl, detailStr);
+      var detailStr;
+      if (e.detail == null) {
+        detailStr = '';
+      } else if (typeof e.detail === 'object') {
+        try {
+          detailStr = JSON.stringify(e.detail, null, 2);
+        } catch (err) {
+          detailStr = '[unserializable detail: ' + String(err && err.message) + ']';
+        }
+      } else {
+        detailStr = String(e.detail);
+      }
 
       entry.appendChild(timeEl);
       entry.appendChild(methodEl);
-      entry.appendChild(detailEl);
+
+      // For error entries with multi-line JSON, render a block; otherwise inline span.
+      var isMultiline = detailStr.indexOf('\n') !== -1;
+      if (isMultiline || e.type === 'err') {
+        var br = document.createElement('br');
+        entry.appendChild(br);
+        var pre = create('span', 'log-detail');
+        text(pre, detailStr);
+        entry.appendChild(pre);
+      } else {
+        var detailEl = create('span', 'log-detail');
+        text(detailEl, detailStr);
+        entry.appendChild(detailEl);
+      }
+
       container.appendChild(entry);
     }
     container.scrollTop = container.scrollHeight;
-    text($('log-count'), logEntries.length + ' entries');
+    var countText = logEntries.length + ' entries';
+    if (logEntries.length >= MAX_LOG_ENTRIES) {
+      countText += ' (capped at ' + MAX_LOG_ENTRIES + ')';
+    }
+    text($('log-count'), countText);
   }
 
   function clearLog() {
@@ -106,6 +169,11 @@
     $('btn-shutdown').disabled = !on;
     $('btn-reset').disabled = !on;
     $('btn-flush').disabled = !on;
+    $('btn-page').disabled = !on;
+    $('btn-track').disabled = !on;
+    $('btn-identify').disabled = !on;
+    $('btn-identify-traits').disabled = !on;
+    $('btn-alias').disabled = !on;
     $('pk').disabled = on;
     var envRadios = document.querySelectorAll('input[name="env"]');
     for (var i = 0; i < envRadios.length; i++) envRadios[i].disabled = on;
@@ -146,6 +214,7 @@
       log('INIT', String(err && err.message || err), 'err');
       return;
     }
+    updateConsentButtons();
     updateStatus();
   }
 
@@ -161,6 +230,7 @@
     currentUserId = null;
     currentConsent = null;
     setInitState(false);
+    updateConsentButtons();
     updateStatus();
   }
 
@@ -186,6 +256,134 @@
     });
   }
 
+  function onSetConsent(level) {
+    if (!audience) return;
+    try {
+      audience.setConsent(level);
+      currentConsent = level;
+      log('CONSENT', 'set to ' + level, 'ok');
+      if (level === 'none') currentUserId = null;
+    } catch (err) {
+      log('CONSENT', String(err && err.message || err), 'err');
+    }
+    updateConsentButtons();
+    updateStatus();
+  }
+
+  function onPage() {
+    if (!audience) return;
+    var props = parseJsonOrWarn($('page-props').value, 'page properties');
+    if (props === null) return;
+
+    try {
+      audience.page(props);
+      log('PAGE', props || '(no properties)', 'ok');
+    } catch (err) {
+      log('PAGE', String(err && err.message || err), 'err');
+    }
+  }
+
+  function onTrack() {
+    if (!audience) return;
+    var name = $('track-name').value.trim();
+    if (!name) {
+      log('WARN', 'Track: event name is required', 'warn');
+      return;
+    }
+    var props = parseJsonOrWarn($('track-props').value, 'track properties');
+    if (props === null) return;
+
+    try {
+      audience.track(name, props);
+      log('TRACK', { eventName: name, properties: props }, 'ok');
+    } catch (err) {
+      log('TRACK', String(err && err.message || err), 'err');
+    }
+  }
+
+  function onIdentify() {
+    if (!audience) return;
+    var id = $('identify-id').value.trim();
+    if (!id) {
+      log('WARN', 'Identify: ID is required', 'warn');
+      return;
+    }
+    var identityType = $('identify-type').value;
+    var traits = parseJsonOrWarn($('identify-traits').value, 'identify traits');
+    if (traits === null) return;
+
+    try {
+      if (traits !== undefined) {
+        audience.identify(id, identityType, traits);
+      } else {
+        audience.identify(id, identityType);
+      }
+      currentUserId = id;
+      log('IDENTIFY', { id: id, identityType: identityType, traits: traits }, 'ok');
+    } catch (err) {
+      log('IDENTIFY', String(err && err.message || err), 'err');
+    }
+    updateStatus();
+  }
+
+  function onIdentifyTraits() {
+    if (!audience) return;
+    var traits = parseJsonOrWarn($('identify-traits').value, 'identify traits');
+    if (traits === null || traits === undefined) {
+      log('WARN', 'Traits-only identify: traits are required', 'warn');
+      return;
+    }
+    try {
+      audience.identify(traits);
+      log('IDENTIFY', { traitsOnly: traits }, 'ok');
+    } catch (err) {
+      log('IDENTIFY', String(err && err.message || err), 'err');
+    }
+  }
+
+  function onAlias() {
+    if (!audience) return;
+    var fromId = $('alias-from-id').value.trim();
+    var toId = $('alias-to-id').value.trim();
+    var fromType = $('alias-from-type').value;
+    var toType = $('alias-to-type').value;
+
+    if (!fromId || !toId) {
+      log('WARN', 'Alias: both IDs are required', 'warn');
+      return;
+    }
+    if (fromId === toId && fromType === toType) {
+      log('WARN', 'Alias: from and to are identical', 'warn');
+      return;
+    }
+
+    try {
+      audience.alias(
+        { id: fromId, identityType: fromType },
+        { id: toId, identityType: toType },
+      );
+      log('ALIAS', { from: { id: fromId, type: fromType }, to: { id: toId, type: toType } }, 'ok');
+    } catch (err) {
+      log('ALIAS', String(err && err.message || err), 'err');
+    }
+  }
+
+  function updateConsentButtons() {
+    var btns = [
+      { el: $('btn-consent-none'), level: 'none' },
+      { el: $('btn-consent-anon'), level: 'anonymous' },
+      { el: $('btn-consent-full'), level: 'full' },
+    ];
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].el.disabled = !audience;
+      if (audience && currentConsent === btns[i].level) {
+        btns[i].el.classList.add('active');
+      } else {
+        btns[i].el.classList.remove('active');
+      }
+    }
+  }
+
   // Wire up
   document.addEventListener('DOMContentLoaded', function () {
     $('btn-init').addEventListener('click', onInit);
@@ -193,6 +391,18 @@
     $('btn-reset').addEventListener('click', onReset);
     $('btn-flush').addEventListener('click', onFlush);
     $('btn-clear-log').addEventListener('click', clearLog);
+
+    $('btn-consent-none').addEventListener('click', function () { onSetConsent('none'); });
+    $('btn-consent-anon').addEventListener('click', function () { onSetConsent('anonymous'); });
+    $('btn-consent-full').addEventListener('click', function () { onSetConsent('full'); });
+
+    $('btn-page').addEventListener('click', onPage);
+    $('btn-track').addEventListener('click', onTrack);
+
+    populateIdentityDropdowns();
+    $('btn-identify').addEventListener('click', onIdentify);
+    $('btn-identify-traits').addEventListener('click', onIdentifyTraits);
+    $('btn-alias').addEventListener('click', onAlias);
 
     setInterval(updateStatus, 1000);
     updateStatus();
