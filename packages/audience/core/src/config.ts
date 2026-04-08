@@ -17,4 +17,7 @@ export const SESSION_COOKIE = '_imtbl_sid';
 export const COOKIE_MAX_AGE_SECONDS = 365 * 24 * 60 * 60 * 2; // 2 years
 export const SESSION_MAX_AGE = 30 * 60; // 30 minutes in seconds
 
+export const SESSION_START = 'session_start';
+export const SESSION_END = 'session_end';
+
 export const getBaseUrl = (environment: Environment): string => BASE_URLS[environment];

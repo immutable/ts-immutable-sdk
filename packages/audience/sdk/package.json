@@ -1,6 +1,6 @@
 {
-  "name": "@imtbl/audience-sdk",
-  "description": "Immutable Audience SDK — consent-aware event tracking and identity management",
+  "name": "@imtbl/audience",
+  "description": "Immutable Audience — consent-aware event tracking and identity management",
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
