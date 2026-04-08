@@ -62,7 +62,8 @@ export function createConsentManager(
           // Purge all queued messages
           queue.purge(() => true);
         } else if (next === 'anonymous') {
-          // Strip userId from queued messages
+          // Remove identify/alias messages and strip userId from the rest
+          queue.purge((msg: Message) => msg.type === 'identify' || msg.type === 'alias');
           queue.transform((msg: Message) => {
             if ('userId' in msg) {
               const { userId, ...rest } = msg;

@@ -362,7 +362,8 @@ export class Audience {
       this.queue.stop();
     }
 
-    // Core handles: queue purge on →none, userId strip on →anonymous, server sync.
+    // Core handles: queue purge on →none, identify/alias purge + userId strip
+    // on →anonymous, server sync.
     this.consent.setLevel(level);
 
     // Web-specific cleanup after core's transition.
@@ -371,9 +372,6 @@ export class Audience {
       deleteCookie(SESSION_COOKIE, this.cookieDomain);
     } else if (level === 'anonymous' && previous === 'full') {
       this.userId = undefined;
-      this.queue.purge(
-        (m) => m.type === 'identify' || m.type === 'alias',
-      );
     }
 
     if (isUpgradeFromNone) {
