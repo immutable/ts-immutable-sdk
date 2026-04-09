@@ -130,14 +130,26 @@ export class MessageQueue {
       const payload: BatchPayload = { messages: batch };
 
       const result = await this.send(this.endpointUrl, this.publishableKey, payload);
-      if (result.ok) {
+
+      let audienceErr: AudienceError | undefined;
+      if (!result.ok && result.error) {
+        audienceErr = toAudienceError(result.error, 'flush', batch.length);
+      }
+
+      // Drop the batch on success OR on a terminal validation failure.
+      // VALIDATION_REJECTED means the backend deterministically rejected
+      // some messages — retrying won't help, so we drop them rather than
+      // accumulate stale data forever.
+      const isTerminal = audienceErr?.code === 'VALIDATION_REJECTED';
+      if (result.ok || isTerminal) {
         this.messages = this.messages.slice(batch.length);
         this.persist();
       }
+
       this.onFlush?.(result.ok, batch.length);
-      if (!result.ok && result.error && this.onError) {
+      if (audienceErr && this.onError) {
         try {
-          this.onError(toAudienceError(result.error, 'flush', batch.length));
+          this.onError(audienceErr);
         } catch {
           // Swallow callback errors — the queue must not wedge on a throwing handler.
         }

@@ -95,4 +95,34 @@ describe('toAudienceError', () => {
       expect(err.cause).toBe(networkError.cause);
     });
   });
+
+  describe('partial-rejection (2xx with rejected > 0)', () => {
+    it('maps to VALIDATION_REJECTED with backend body preserved', () => {
+      const partialError: TransportError = {
+        status: 200,
+        endpoint: 'https://api.dev.immutable.com/v1/audience/messages',
+        body: { accepted: 50, rejected: 50 },
+      };
+
+      const err = toAudienceError(partialError, 'flush', 100);
+
+      expect(err.code).toBe('VALIDATION_REJECTED');
+      expect(err.status).toBe(200);
+      expect(err.message).toBe('Backend rejected 50 of 100 messages');
+      expect(err.responseBody).toEqual({ accepted: 50, rejected: 50 });
+    });
+
+    it('handles missing accepted/rejected fields gracefully', () => {
+      const partialError: TransportError = {
+        status: 200,
+        endpoint: 'https://api.dev.immutable.com/v1/audience/messages',
+        body: {},
+      };
+
+      const err = toAudienceError(partialError, 'flush');
+
+      expect(err.code).toBe('VALIDATION_REJECTED');
+      expect(err.message).toBe('Backend rejected 0 of 0 messages');
+    });
+  });
 });

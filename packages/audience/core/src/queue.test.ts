@@ -265,6 +265,36 @@ describe('MessageQueue', () => {
     expect(onError).toHaveBeenCalled();
   });
 
+  it('drops batch and fires VALIDATION_REJECTED when backend reports partial rejection', async () => {
+    // Backend rejected one message in a batch of two. The 200 OK response
+    // body says { accepted: 1, rejected: 1 }. Expected behaviour:
+    //   - Queue clears the batch (retrying validation failures won't help).
+    //   - onError fires with code 'VALIDATION_REJECTED' so studios are aware.
+    //   - Bug fix: previously the queue checked only result.ok and dropped
+    //     the entire batch silently, losing rejected messages with no signal.
+    const onError = jest.fn();
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
+      ok: false,
+      error: {
+        status: 200,
+        endpoint: 'https://api.immutable.com/v1/audience/messages',
+        body: { accepted: 1, rejected: 1 },
+      },
+    });
+    const queue = createQueue(send, { onError });
+
+    queue.enqueue(makeMessage('1'));
+    queue.enqueue(makeMessage('2'));
+    await queue.flush();
+
+    expect(queue.length).toBe(0);
+    expect(onError).toHaveBeenCalledTimes(1);
+    const err = onError.mock.calls[0][0];
+    expect(err.code).toBe('VALIDATION_REJECTED');
+    expect(err.status).toBe(200);
+    expect(err.responseBody).toEqual({ accepted: 1, rejected: 1 });
+  });
+
   it('purges messages matching a predicate', () => {
     const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
     const queue = createQueue(send);

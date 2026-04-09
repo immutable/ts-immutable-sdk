@@ -63,11 +63,17 @@ export interface TransportResult {
  * - `'CONSENT_SYNC_FAILED'` — PUT to `/v1/audience/tracking-consent` returned non-2xx.
  * - `'NETWORK_ERROR'` — fetch rejected before a response was received
  *                       (network failure, CORS, DNS, etc.).
+ * - `'VALIDATION_REJECTED'` — backend returned 2xx but the body reported
+ *                       `rejected > 0`. Terminal: retrying won't help, the
+ *                       messages were dropped from the queue. Inspect
+ *                       `responseBody` for the per-message detail when the
+ *                       backend provides it.
  */
 export type AudienceErrorCode =
   | 'FLUSH_FAILED'
   | 'CONSENT_SYNC_FAILED'
-  | 'NETWORK_ERROR';
+  | 'NETWORK_ERROR'
+  | 'VALIDATION_REJECTED';
 
 /**
  * Public error type passed to the SDK's `onError` callback. Wraps the
@@ -131,6 +137,7 @@ export function toAudienceError(
   source: 'flush' | 'consent',
   count?: number,
 ): AudienceError {
+  // Network failure — no HTTP response received.
   if (err.status === 0) {
     return new AudienceError({
       code: 'NETWORK_ERROR',
@@ -143,6 +150,23 @@ export function toAudienceError(
     });
   }
 
+  // 2xx response with backend-rejected messages. Terminal, do not retry —
+  // the only way ok:false comes back with a 2xx status is when httpSend
+  // detected `rejected > 0` in the parsed response body.
+  if (err.status >= 200 && err.status < 300) {
+    const body = err.body as { accepted?: number; rejected?: number } | undefined;
+    const rejected = body?.rejected ?? 0;
+    const accepted = body?.accepted ?? 0;
+    return new AudienceError({
+      code: 'VALIDATION_REJECTED',
+      message: `Backend rejected ${rejected} of ${rejected + accepted} messages`,
+      status: err.status,
+      endpoint: err.endpoint,
+      responseBody: err.body,
+    });
+  }
+
+  // Generic HTTP failure (4xx / 5xx).
   return new AudienceError({
     code: source === 'flush' ? 'FLUSH_FAILED' : 'CONSENT_SYNC_FAILED',
     message: source === 'flush'

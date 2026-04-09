@@ -67,6 +67,29 @@ export const httpSend: HttpSend = async (
       };
     }
 
+    // Successful HTTP, but the backend MessagesResponse may report
+    // per-message validation failures via { accepted, rejected }. Treat
+    // any rejection as a non-retryable failure so the queue surfaces it
+    // through onError instead of silently dropping the rejected items.
+    const body = await parseBody(response);
+    const bodyObj = (typeof body === 'object' && body !== null)
+      ? body as { accepted?: number; rejected?: number }
+      : undefined;
+    if ((bodyObj?.rejected ?? 0) > 0) {
+      track('audience', 'transport_partial_rejected', {
+        status: response.status,
+        rejected: bodyObj?.rejected ?? 0,
+      });
+      return {
+        ok: false,
+        error: {
+          status: response.status,
+          endpoint: url,
+          body: bodyObj,
+        },
+      };
+    }
+
     return { ok: true };
   } catch (err) {
     const error = new TransportError({
