@@ -56,7 +56,6 @@
     "transpile": "tsup --config tsup.config.js",
     "transpile:cdn": "tsup --config ./tsup.cdn.js",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types && rollup -c rollup.dts.config.js && find dist/types -name '*.d.ts' ! -name 'index.d.ts' -delete",
-    "demo": "pnpm build && npx -y serve -l 3456 --cors .",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
     "prepack": "node scripts/prepack.mjs",

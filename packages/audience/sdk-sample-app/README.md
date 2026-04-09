@@ -1,19 +1,15 @@
-# @imtbl/audience — Demo
+# @imtbl/audience-sdk-sample-app
 
 Single-page interactive harness that exercises every public method on the `Audience` class against the real Immutable backend.
 
 ## Run
 
 ```sh
-cd packages/audience/sdk
-pnpm demo
+cd packages/audience/sdk-sample-app
+pnpm dev
 ```
 
-This runs `pnpm build` (ESM + CDN bundle + types) then serves the package root on `http://localhost:3456`. Open:
-
-```
-http://localhost:3456/demo/
-```
+This builds `@imtbl/audience` (ESM + CDN bundle + types) and then serves this sample app on `http://localhost:3456`. Open that URL directly — `index.html` is the entry point. The sample-app's local `serve.mjs` routes `/vendor/imtbl-audience.global.js` to the CDN bundle in `../sdk/dist/cdn/`, so the sdk's build output stays the single source of truth.
 
 Stop the server with `Ctrl+C`.
 
@@ -48,7 +44,7 @@ These are test-only keys registered for audience tracking. Safe to commit and sh
 
 ## Troubleshooting
 
-- **`window.ImmutableAudience is undefined`** in the demo page: the CDN bundle failed to load. Re-run `pnpm build` from `packages/audience/sdk` and confirm `dist/cdn/imtbl-audience.global.js` exists.
+- **`window.ImmutableAudience is undefined`** in the demo page: the CDN bundle failed to load. Re-run `pnpm dev` from `packages/audience/sdk-sample-app` and confirm `../sdk/dist/cdn/imtbl-audience.global.js` exists.
 - **`POST /v1/audience/messages` returns 400**: the publishable key format is wrong. Must start with `pk_imapik-`.
 - **`POST /v1/audience/messages` returns 403**: the key isn't registered for audience tracking on the backend. Use one of the keys in the table above.
 - **Identify button is a no-op**: consent is not `full`. Click **Set full** first.
@@ -57,10 +53,12 @@ These are test-only keys registered for audience tracking. Safe to commit and sh
 ## Files
 
 ```
-demo/
-  index.html   # single page, loads ../dist/cdn/imtbl-audience.global.js
+sdk-sample-app/
+  index.html   # single page, loads /vendor/imtbl-audience.global.js
   demo.js      # vanilla ES2020, no modules; reads window.ImmutableAudience
   demo.css     # light theme, hand-written CSS, no external deps
+  serve.mjs    # tiny Node static server; routes /vendor/ to ../sdk/dist/cdn/
+  package.json # private workspace package; @imtbl/audience as workspace dep
   README.md    # this file
 ```
 

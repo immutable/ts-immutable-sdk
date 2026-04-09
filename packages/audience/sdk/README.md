@@ -28,7 +28,7 @@ Once published to npm, you'll be able to load the package via CDN (no bundler re
 </script>
 ```
 
-Until the first npm release, you can build the CDN bundle locally from this repo: `cd packages/audience/sdk && pnpm build`. The output is at `dist/cdn/imtbl-audience.global.js`. See `demo/README.md` for the interactive demo that loads it.
+Until the first npm release, you can build the CDN bundle locally from this repo: `pnpm --filter @imtbl/audience run build`. The output is at `dist/cdn/imtbl-audience.global.js`. See `../sdk-sample-app/README.md` for the interactive demo that loads it.
 
 ## Quickstart
 
@@ -138,7 +138,7 @@ Errors are delivered asynchronously (after the failing flush completes). Throwin
 
 ## Demo
 
-There's an interactive demo under `demo/` that exercises every public method against the real backend. See `demo/README.md` for instructions.
+There's an interactive demo in the sibling workspace package `@imtbl/audience-sdk-sample-app` that exercises every public method against the real backend. See `../sdk-sample-app/README.md` for instructions.
 
 ## License
 
