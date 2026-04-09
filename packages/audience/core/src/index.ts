@@ -43,7 +43,12 @@ export { generateId, getTimestamp, isBrowser } from './utils';
 
 export type { HttpSend, TransportOptions } from './transport';
 export { httpSend } from './transport';
-export type { TransportError, TransportResult } from './errors';
+export type {
+  TransportError,
+  TransportResult,
+  AudienceErrorCode,
+} from './errors';
+export { AudienceError, toAudienceError } from './errors';
 export { MessageQueue } from './queue';
 export { collectContext } from './context';
 export {

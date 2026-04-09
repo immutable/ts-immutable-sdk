@@ -3,6 +3,7 @@ import type {
 } from './types';
 import type { MessageQueue } from './queue';
 import type { HttpSend } from './transport';
+import { type AudienceError, toAudienceError } from './errors';
 import { CONSENT_PATH, getBaseUrl } from './config';
 
 export interface ConsentManager {
@@ -29,6 +30,10 @@ export function detectDoNotTrack(): boolean {
  * - Fires PUT to `/v1/audience/tracking-consent` on every state change via
  *   the injected `send`. Sharing the same `HttpSend` instance with the queue
  *   keeps the transport layer uniform — no module-level mocking required.
+ * - On consent sync failure, fires `onError` with a public {@link AudienceError}
+ *   mapped via {@link toAudienceError}, so callers don't have to repeat the
+ *   `status === 0 → NETWORK_ERROR` mapping themselves. Exceptions thrown
+ *   from the callback are swallowed.
  */
 export function createConsentManager(
   queue: MessageQueue,
@@ -38,6 +43,7 @@ export function createConsentManager(
   environment: Environment,
   source: string,
   initialLevel?: ConsentLevel,
+  onError?: (err: AudienceError) => void,
 ): ConsentManager {
   const dntDetected = detectDoNotTrack();
   let current: ConsentLevel = initialLevel ?? (dntDetected ? 'none' : 'none');
@@ -47,8 +53,18 @@ export function createConsentManager(
   function notifyBackend(level: ConsentLevel): void {
     const url = `${getBaseUrl(environment)}${CONSENT_PATH}`;
     const payload: ConsentUpdatePayload = { anonymousId, status: level, source };
-    // Fire-and-forget. HttpSend never rejects, so a floating promise is safe.
-    send(url, publishableKey, payload, { method: 'PUT', keepalive: true });
+    // Fire-and-forget. HttpSend never rejects, so the floating chain is safe.
+    send(url, publishableKey, payload, { method: 'PUT', keepalive: true })
+      .then((result) => {
+        if (!result.ok && result.error && onError) {
+          try {
+            onError(toAudienceError(result.error, 'consent'));
+          } catch {
+            // Swallow callback errors — the consent state machine must not
+            // wedge on a throwing handler.
+          }
+        }
+      });
   }
 
   const manager: ConsentManager = {

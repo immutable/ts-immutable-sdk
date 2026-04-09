@@ -1,6 +1,6 @@
 import { MessageQueue } from './queue';
 import type { HttpSend } from './transport';
-import { TransportError, type TransportResult } from './errors';
+import type { AudienceError, TransportResult } from './errors';
 import type { Message } from './types';
 import * as storage from './storage';
 
@@ -30,6 +30,7 @@ interface QueueOpts {
   flushIntervalMs?: number;
   flushSize?: number;
   onFlush?: (ok: boolean, count: number) => void;
+  onError?: (err: AudienceError) => void;
   staleFilter?: (msg: Message) => boolean;
 }
 
@@ -43,7 +44,11 @@ function createQueue(
     'pk_imx_test',
     opts.flushIntervalMs ?? 5_000,
     opts.flushSize ?? 20,
-    { onFlush: opts.onFlush, staleFilter: opts.staleFilter },
+    {
+      onFlush: opts.onFlush,
+      onError: opts.onError,
+      staleFilter: opts.staleFilter,
+    },
   );
 }
 
@@ -195,6 +200,69 @@ describe('MessageQueue', () => {
     await queue.flush();
 
     expect(onFlush).toHaveBeenCalledWith(true, 1);
+  });
+
+  it('fires onError with mapped AudienceError on flush failure', async () => {
+    const onError = jest.fn();
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
+      ok: false,
+      error: { status: 500, endpoint: 'https://api.immutable.com/v1/audience/messages', body: null },
+    });
+    const queue = createQueue(send, { onError });
+
+    queue.enqueue(makeMessage('1'));
+    queue.enqueue(makeMessage('2'));
+    await queue.flush();
+
+    expect(onError).toHaveBeenCalledTimes(1);
+    const err = onError.mock.calls[0][0];
+    expect(err.code).toBe('FLUSH_FAILED');
+    expect(err.status).toBe(500);
+    expect(err.message).toBe('Flush failed with status 500');
+  });
+
+  it('fires onError with NETWORK_ERROR on network failure', async () => {
+    const onError = jest.fn();
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
+      ok: false,
+      error: {
+        status: 0,
+        endpoint: 'https://api.immutable.com/v1/audience/messages',
+        cause: new TypeError('Failed to fetch'),
+      },
+    });
+    const queue = createQueue(send, { onError });
+
+    queue.enqueue(makeMessage('1'));
+    queue.enqueue(makeMessage('2'));
+    queue.enqueue(makeMessage('3'));
+    await queue.flush();
+
+    expect(onError).toHaveBeenCalledTimes(1);
+    const err = onError.mock.calls[0][0];
+    expect(err.code).toBe('NETWORK_ERROR');
+    expect(err.message).toBe('Network error sending 3 messages');
+  });
+
+  it('does not fire onError on successful flush', async () => {
+    const onError = jest.fn();
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send, { onError });
+
+    queue.enqueue(makeMessage('1'));
+    await queue.flush();
+
+    expect(onError).not.toHaveBeenCalled();
+  });
+
+  it('swallows exceptions thrown from the onError callback', async () => {
+    const onError = jest.fn().mockImplementation(() => { throw new Error('callback boom'); });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(failResult);
+    const queue = createQueue(send, { onError });
+
+    queue.enqueue(makeMessage('1'));
+    await expect(queue.flush()).resolves.toBeUndefined();
+    expect(onError).toHaveBeenCalled();
   });
 
   it('purges messages matching a predicate', () => {
