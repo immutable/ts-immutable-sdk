@@ -1,5 +1,6 @@
 import { MessageQueue } from './queue';
-import type { Transport } from './transport';
+import type { HttpSend } from './transport';
+import type { TransportResult } from './errors';
 import type { Message } from './types';
 import * as storage from './storage';
 
@@ -15,6 +16,12 @@ function makeMessage(id: string): Message {
   };
 }
 
+const okResult: TransportResult = { ok: true };
+const failResult: TransportResult = {
+  ok: false,
+  error: { status: 500, endpoint: 'https://example.com', body: null },
+};
+
 interface QueueOpts {
   flushIntervalMs?: number;
   flushSize?: number;
@@ -23,11 +30,11 @@ interface QueueOpts {
 }
 
 function createQueue(
-  transport: Transport,
+  send: HttpSend,
   opts: QueueOpts = {},
 ) {
   return new MessageQueue(
-    transport,
+    send,
     'https://api.immutable.com/v1/audience/messages',
     'pk_imx_test',
     opts.flushIntervalMs ?? 5_000,
@@ -47,8 +54,8 @@ afterEach(() => {
 
 describe('MessageQueue', () => {
   it('enqueues messages and flushes them', async () => {
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send);
 
     queue.enqueue(makeMessage('1'));
     queue.enqueue(makeMessage('2'));
@@ -56,13 +63,13 @@ describe('MessageQueue', () => {
     await queue.flush();
 
     expect(send).toHaveBeenCalledTimes(1);
-    expect(send.mock.calls[0][2].messages).toHaveLength(2);
+    expect((send.mock.calls[0][2] as { messages: Message[] }).messages).toHaveLength(2);
     expect(queue.length).toBe(0);
   });
 
   it('retains messages on failed flush', async () => {
-    const send = jest.fn().mockResolvedValue(false);
-    const queue = createQueue({ send });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(failResult);
+    const queue = createQueue(send);
 
     queue.enqueue(makeMessage('1'));
     await queue.flush();
@@ -71,8 +78,8 @@ describe('MessageQueue', () => {
   });
 
   it('flushes automatically when batch size is reached', async () => {
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send }, { flushSize: 2 });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send, { flushSize: 2 });
 
     queue.enqueue(makeMessage('1'));
     expect(send).not.toHaveBeenCalled();
@@ -84,8 +91,8 @@ describe('MessageQueue', () => {
   });
 
   it('flushes on timer interval', async () => {
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send }, { flushIntervalMs: 1_000 });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send, { flushIntervalMs: 1_000 });
 
     queue.start();
     queue.enqueue(makeMessage('1'));
@@ -99,8 +106,8 @@ describe('MessageQueue', () => {
   });
 
   it('persists messages to localStorage', () => {
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send);
 
     queue.enqueue(makeMessage('1'));
 
@@ -112,8 +119,8 @@ describe('MessageQueue', () => {
   it('restores messages from localStorage on construction', () => {
     storage.setItem('queue', [makeMessage('restored')]);
 
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send);
 
     expect(queue.length).toBe(1);
   });
@@ -121,8 +128,8 @@ describe('MessageQueue', () => {
   it('filters stale messages on restore', () => {
     storage.setItem('queue', [makeMessage('stale'), makeMessage('fresh')]);
 
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send }, {
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send, {
       staleFilter: (m) => m.messageId === 'fresh',
     });
 
@@ -131,12 +138,12 @@ describe('MessageQueue', () => {
 
   it('does not flush concurrently', async () => {
     let resolveFirst: () => void;
-    const firstCall = new Promise<boolean>((r) => { resolveFirst = () => r(true); });
-    const send = jest.fn()
+    const firstCall = new Promise<TransportResult>((r) => { resolveFirst = () => r(okResult); });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>()
       .mockReturnValueOnce(firstCall)
-      .mockResolvedValue(true);
+      .mockResolvedValue(okResult);
 
-    const queue = createQueue({ send });
+    const queue = createQueue(send);
     queue.enqueue(makeMessage('1'));
 
     const flush1 = queue.flush();
@@ -150,8 +157,8 @@ describe('MessageQueue', () => {
   });
 
   it('clears all messages and storage', () => {
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send);
 
     queue.enqueue(makeMessage('1'));
     queue.clear();
@@ -162,12 +169,12 @@ describe('MessageQueue', () => {
 
   it('handles messages enqueued during flush', async () => {
     let queue: ReturnType<typeof createQueue>;
-    const send = jest.fn().mockImplementation(async () => {
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockImplementation(async () => {
       queue.enqueue(makeMessage('late'));
-      return true;
+      return okResult;
     });
 
-    queue = createQueue({ send });
+    queue = createQueue(send);
     queue.enqueue(makeMessage('1'));
 
     await queue.flush();
@@ -177,8 +184,8 @@ describe('MessageQueue', () => {
 
   it('calls onFlush callback', async () => {
     const onFlush = jest.fn();
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send }, { onFlush });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send, { onFlush });
 
     queue.enqueue(makeMessage('1'));
     await queue.flush();
@@ -187,8 +194,8 @@ describe('MessageQueue', () => {
   });
 
   it('purges messages matching a predicate', () => {
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send);
 
     queue.enqueue(makeMessage('1'));
     queue.enqueue({ ...makeMessage('2'), type: 'identify' } as any);
@@ -199,8 +206,8 @@ describe('MessageQueue', () => {
   });
 
   it('transforms messages in place', async () => {
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send);
 
     queue.enqueue({ ...makeMessage('1'), userId: 'should-strip' } as any);
 
@@ -211,15 +218,15 @@ describe('MessageQueue', () => {
     });
 
     await queue.flush();
-    const msg = send.mock.calls[0][2].messages[0];
+    const msg = (send.mock.calls[0][2] as { messages: Message[] }).messages[0];
     expect((msg as any).userId).toBeUndefined();
   });
 });
 
 describe('page-unload flush (keepalive)', () => {
   it('flushes via keepalive fetch on visibilitychange to hidden', () => {
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send);
     queue.start();
 
     queue.enqueue(makeMessage('1'));
@@ -248,8 +255,8 @@ describe('page-unload flush (keepalive)', () => {
   });
 
   it('flushes via keepalive fetch on pagehide', () => {
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send);
     queue.start();
 
     queue.enqueue(makeMessage('1'));
@@ -267,8 +274,8 @@ describe('page-unload flush (keepalive)', () => {
   });
 
   it('does not fire unload flush when queue is empty', () => {
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send);
     queue.start();
 
     window.dispatchEvent(new Event('pagehide'));
@@ -279,8 +286,8 @@ describe('page-unload flush (keepalive)', () => {
   });
 
   it('removes listeners on stop', () => {
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send);
     queue.start();
     queue.stop();
 
@@ -291,8 +298,8 @@ describe('page-unload flush (keepalive)', () => {
   });
 
   it('destroy stops the queue and flushes remaining messages', () => {
-    const send = jest.fn().mockResolvedValue(true);
-    const queue = createQueue({ send });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send);
     queue.start();
 
     queue.enqueue(makeMessage('1'));
@@ -315,10 +322,10 @@ describe('page-unload flush (keepalive)', () => {
 
   it('skips unload flush if an async flush is already in flight', async () => {
     let resolveFlush: () => void;
-    const flushPromise = new Promise<boolean>((r) => { resolveFlush = () => r(true); });
-    const send = jest.fn().mockReturnValueOnce(flushPromise);
+    const flushPromise = new Promise<TransportResult>((r) => { resolveFlush = () => r(okResult); });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockReturnValueOnce(flushPromise);
 
-    const queue = createQueue({ send });
+    const queue = createQueue(send);
     queue.start();
     queue.enqueue(makeMessage('1'));
 

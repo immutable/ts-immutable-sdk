@@ -2,8 +2,8 @@ import type {
   ConsentLevel, ConsentUpdatePayload, Message, Environment,
 } from './types';
 import type { MessageQueue } from './queue';
+import type { HttpSend } from './transport';
 import { CONSENT_PATH, getBaseUrl } from './config';
-import { httpSend } from './transport';
 
 export interface ConsentManager {
   level: ConsentLevel;
@@ -26,10 +26,13 @@ export function detectDoNotTrack(): boolean {
  * - If DNT or GPC is detected and no explicit consent is provided, stays `'none'`.
  * - On downgrade (e.g. full -> anonymous), strips `userId` from queued messages.
  * - On downgrade to `'none'`, purges the queue entirely.
- * - Fires PUT to `/v1/audience/tracking-consent` on every state change.
+ * - Fires PUT to `/v1/audience/tracking-consent` on every state change via
+ *   the injected `send`. Sharing the same `HttpSend` instance with the queue
+ *   keeps the transport layer uniform — no module-level mocking required.
  */
 export function createConsentManager(
   queue: MessageQueue,
+  send: HttpSend,
   publishableKey: string,
   anonymousId: string,
   environment: Environment,
@@ -44,7 +47,8 @@ export function createConsentManager(
   function notifyBackend(level: ConsentLevel): void {
     const url = `${getBaseUrl(environment)}${CONSENT_PATH}`;
     const payload: ConsentUpdatePayload = { anonymousId, status: level, source };
-    httpSend(url, publishableKey, payload, { method: 'PUT', keepalive: true });
+    // Fire-and-forget. HttpSend never rejects, so a floating promise is safe.
+    send(url, publishableKey, payload, { method: 'PUT', keepalive: true });
   }
 
   const manager: ConsentManager = {

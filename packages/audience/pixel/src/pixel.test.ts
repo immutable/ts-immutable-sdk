@@ -28,8 +28,7 @@ jest.mock('@imtbl/audience-core', () => ({
     clear: jest.fn(),
     get length() { return 0; },
   })),
-  httpTransport: { send: jest.fn().mockResolvedValue(true) },
-  httpSend: jest.fn().mockResolvedValue(true),
+  httpSend: jest.fn().mockResolvedValue({ ok: true }),
   getBaseUrl: jest.fn().mockReturnValue('https://api.dev.immutable.com'),
   INGEST_PATH: '/v1/audience/messages',
   CONSENT_PATH: '/v1/audience/tracking-consent',
@@ -52,7 +51,15 @@ jest.mock('@imtbl/audience-core', () => ({
   }),
   getOrCreateSession: (...args: unknown[]) => mockGetOrCreateSession(...args),
   createConsentManager: jest.fn().mockImplementation(
-    (_queue: unknown, _key: unknown, _anonId: unknown, _env: unknown, _source: unknown, level?: string) => {
+    (
+      _queue: unknown,
+      _send: unknown,
+      _key: unknown,
+      _anonId: unknown,
+      _env: unknown,
+      _source: unknown,
+      level?: string,
+    ) => {
       let current = level ?? 'none';
       return {
         get level() { return current; },

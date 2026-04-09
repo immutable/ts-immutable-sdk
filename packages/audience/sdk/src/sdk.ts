@@ -13,7 +13,7 @@ import {
   COOKIE_NAME,
   SESSION_COOKIE,
   MessageQueue,
-  httpTransport,
+  httpSend,
   getBaseUrl,
   getOrCreateAnonymousId,
   getCookie,
@@ -91,7 +91,7 @@ export class Audience {
 
     const endpointUrl = `${getBaseUrl(environment)}${INGEST_PATH}`;
     this.queue = new MessageQueue(
-      httpTransport,
+      httpSend,
       endpointUrl,
       publishableKey,
       flushInterval,
@@ -105,6 +105,7 @@ export class Audience {
 
     this.consent = createConsentManager(
       this.queue,
+      httpSend,
       publishableKey,
       this.anonymousId,
       environment,

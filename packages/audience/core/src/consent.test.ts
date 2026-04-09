@@ -1,11 +1,9 @@
 import { createConsentManager } from './consent';
-import { httpSend } from './transport';
+import type { HttpSend } from './transport';
 
-jest.mock('./transport', () => ({
-  httpSend: jest.fn().mockResolvedValue(true),
-}));
-
-const mockHttpSend = httpSend as jest.MockedFunction<typeof httpSend>;
+function createMockSend(): jest.MockedFunction<HttpSend> {
+  return jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({ ok: true });
+}
 
 function createMockQueue() {
   return {
@@ -29,19 +27,22 @@ beforeEach(() => {
 describe('createConsentManager', () => {
   it('defaults to none when no initial level provided', () => {
     const queue = createMockQueue();
-    const manager = createConsentManager(queue, 'pk_test', 'anon-1', 'dev', 'pixel');
+    const send = createMockSend();
+    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel');
     expect(manager.level).toBe('none');
   });
 
   it('uses the initial level when provided', () => {
     const queue = createMockQueue();
-    const manager = createConsentManager(queue, 'pk_test', 'anon-1', 'dev', 'pixel', 'anonymous');
+    const send = createMockSend();
+    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'anonymous');
     expect(manager.level).toBe('anonymous');
   });
 
   it('upgrades consent without modifying queue', () => {
     const queue = createMockQueue();
-    const manager = createConsentManager(queue, 'pk_test', 'anon-1', 'dev', 'pixel', 'none');
+    const send = createMockSend();
+    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none');
 
     manager.setLevel('anonymous');
     expect(manager.level).toBe('anonymous');
@@ -51,7 +52,8 @@ describe('createConsentManager', () => {
 
   it('purges queue on downgrade to none', () => {
     const queue = createMockQueue();
-    const manager = createConsentManager(queue, 'pk_test', 'anon-1', 'dev', 'pixel', 'full');
+    const send = createMockSend();
+    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'full');
 
     manager.setLevel('none');
     expect(manager.level).toBe('none');
@@ -64,7 +66,8 @@ describe('createConsentManager', () => {
 
   it('strips userId on downgrade from full to anonymous', () => {
     const queue = createMockQueue();
-    const manager = createConsentManager(queue, 'pk_test', 'anon-1', 'dev', 'pixel', 'full');
+    const send = createMockSend();
+    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'full');
 
     manager.setLevel('anonymous');
     expect(manager.level).toBe('anonymous');
@@ -78,13 +81,14 @@ describe('createConsentManager', () => {
     expect(result.anonymousId).toBe('a-1');
   });
 
-  it('fires PUT to consent endpoint on level change', () => {
+  it('fires PUT to consent endpoint on level change via the injected send', () => {
     const queue = createMockQueue();
-    const manager = createConsentManager(queue, 'pk_test', 'anon-1', 'dev', 'pixel', 'none');
+    const send = createMockSend();
+    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none');
 
     manager.setLevel('anonymous');
 
-    expect(mockHttpSend).toHaveBeenCalledWith(
+    expect(send).toHaveBeenCalledWith(
       'https://api.dev.immutable.com/v1/audience/tracking-consent',
       'pk_test',
       { anonymousId: 'anon-1', status: 'anonymous', source: 'pixel' },
@@ -94,19 +98,21 @@ describe('createConsentManager', () => {
 
   it('does nothing when setting the same level', () => {
     const queue = createMockQueue();
-    const manager = createConsentManager(queue, 'pk_test', 'anon-1', 'dev', 'pixel', 'anonymous');
+    const send = createMockSend();
+    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'anonymous');
 
     manager.setLevel('anonymous');
     expect(queue.purge).not.toHaveBeenCalled();
     expect(queue.transform).not.toHaveBeenCalled();
-    expect(mockHttpSend).not.toHaveBeenCalled();
+    expect(send).not.toHaveBeenCalled();
   });
 
   it('respects DNT by defaulting to none', () => {
     Object.defineProperty(navigator, 'doNotTrack', { value: '1', configurable: true });
 
     const queue = createMockQueue();
-    const manager = createConsentManager(queue, 'pk_test', 'anon-1', 'dev', 'pixel');
+    const send = createMockSend();
+    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel');
     expect(manager.level).toBe('none');
 
     Object.defineProperty(navigator, 'doNotTrack', { value: '0', configurable: true });

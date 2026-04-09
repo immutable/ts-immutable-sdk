@@ -1,5 +1,5 @@
 import type { Message, BatchPayload } from './types';
-import type { Transport } from './transport';
+import type { HttpSend } from './transport';
 import * as storage from './storage';
 import { isBrowser } from './utils';
 
@@ -53,7 +53,7 @@ export class MessageQueue {
   private readonly storagePrefix?: string;
 
   constructor(
-    private readonly transport: Transport,
+    private readonly send: HttpSend,
     private readonly endpointUrl: string,
     private readonly publishableKey: string,
     private readonly flushIntervalMs: number,
@@ -113,12 +113,12 @@ export class MessageQueue {
       const batch = this.messages.slice(0, MAX_BATCH_SIZE);
       const payload: BatchPayload = { messages: batch };
 
-      const ok = await this.transport.send(this.endpointUrl, this.publishableKey, payload);
-      if (ok) {
+      const result = await this.send(this.endpointUrl, this.publishableKey, payload);
+      if (result.ok) {
         this.messages = this.messages.slice(batch.length);
         this.persist();
       }
-      this.onFlush?.(ok, batch.length);
+      this.onFlush?.(result.ok, batch.length);
     } finally {
       this.flushing = false;
     }
@@ -138,7 +138,11 @@ export class MessageQueue {
     const batch = this.messages.slice(0, MAX_BATCH_SIZE);
     const payload: BatchPayload = { messages: batch };
 
-    this.transport.send(this.endpointUrl, this.publishableKey, payload, { keepalive: true });
+    // Fire-and-forget — `keepalive: true` lets the request survive page
+    // navigation. We optimistically drop the batch because the page is
+    // going away and can't retry. The HttpSend contract guarantees this
+    // promise never rejects, so the floating call is safe.
+    this.send(this.endpointUrl, this.publishableKey, payload, { keepalive: true });
     this.messages = this.messages.slice(batch.length);
     this.persist();
   }

@@ -21,7 +21,7 @@ jest.mock('./pixel', () => ({
 
 jest.mock('@imtbl/audience-core', () => ({
   MessageQueue: jest.fn(),
-  httpTransport: {},
+  httpSend: jest.fn(),
   getBaseUrl: jest.fn(),
   INGEST_PATH: '',
   FLUSH_INTERVAL_MS: 5000,
