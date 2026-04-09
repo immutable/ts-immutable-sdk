@@ -27,6 +27,7 @@ function handleCommand(command: Command): void {
       pixel.identify(
         args[0] as string,
         args[1] as Parameters<Pixel['identify']>[1],
+        args[2] as Parameters<Pixel['identify']>[2],
       );
       break;
     case 'consent':
