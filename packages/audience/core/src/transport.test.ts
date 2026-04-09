@@ -1,4 +1,5 @@
 import { httpSend } from './transport';
+import { TransportError } from './errors';
 import type { BatchPayload } from './types';
 
 const payload: BatchPayload = {
@@ -65,18 +66,79 @@ describe('httpSend', () => {
     }));
   });
 
-  it('returns true on success', async () => {
+  it('returns ok on 2xx response', async () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: true });
-    expect(await httpSend('https://example.com', 'pk', payload)).toBe(true);
+    const result = await httpSend('https://example.com', 'pk', payload);
+    expect(result.ok).toBe(true);
+    expect(result.error).toBeUndefined();
   });
 
-  it('returns false on HTTP error', async () => {
-    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500 });
-    expect(await httpSend('https://example.com', 'pk', payload)).toBe(false);
+  it('returns structured error on HTTP failure with parsed JSON body', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 422,
+      headers: { get: () => 'application/json' },
+      json: async () => ({ code: 'INVALID_PAYLOAD' }),
+    });
+
+    const result = await httpSend('https://example.com', 'pk', payload);
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toBeInstanceOf(TransportError);
+    expect(result.error).toMatchObject({
+      status: 422,
+      endpoint: 'https://example.com',
+      body: { code: 'INVALID_PAYLOAD' },
+    });
   });
 
-  it('returns false on network error', async () => {
-    global.fetch = jest.fn().mockRejectedValue(new TypeError('Failed to fetch'));
-    expect(await httpSend('https://example.com', 'pk', payload)).toBe(false);
+  it('TransportError is a real Error with a stack trace', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      headers: { get: () => 'text/plain' },
+      text: async () => 'boom',
+    });
+
+    const result = await httpSend('https://example.com', 'pk', payload);
+
+    expect(result.error).toBeInstanceOf(Error);
+    expect(result.error?.name).toBe('TransportError');
+    expect(typeof result.error?.stack).toBe('string');
+  });
+
+  it('returns structured error on HTTP failure with text body', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      headers: { get: () => 'text/plain' },
+      text: async () => 'Internal Server Error',
+    });
+
+    const result = await httpSend('https://example.com', 'pk', payload);
+
+    expect(result.ok).toBe(false);
+    expect(result.error?.status).toBe(500);
+    expect(result.error?.body).toBe('Internal Server Error');
+  });
+
+  it('returns structured error with status 0 and cause on network failure', async () => {
+    const networkError = new TypeError('Failed to fetch');
+    global.fetch = jest.fn().mockRejectedValue(networkError);
+
+    const result = await httpSend('https://example.com', 'pk', payload);
+
+    expect(result.ok).toBe(false);
+    expect(result.error?.status).toBe(0);
+    expect(result.error?.endpoint).toBe('https://example.com');
+    expect(result.error?.cause).toBe(networkError);
+  });
+
+  it('never rejects — even when fetch throws synchronously', async () => {
+    global.fetch = jest.fn().mockImplementation(() => {
+      throw new Error('synchronous boom');
+    });
+
+    await expect(httpSend('https://example.com', 'pk', payload)).resolves.toBeDefined();
   });
 });

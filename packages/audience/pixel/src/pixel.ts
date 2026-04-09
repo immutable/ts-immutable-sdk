@@ -9,7 +9,7 @@ import type {
 } from '@imtbl/audience-core';
 import {
   MessageQueue,
-  httpTransport,
+  httpSend,
   getBaseUrl,
   INGEST_PATH,
   FLUSH_INTERVAL_MS,
@@ -84,7 +84,7 @@ export class Pixel {
     const endpointUrl = `${getBaseUrl(environment)}${INGEST_PATH}`;
 
     this.queue = new MessageQueue(
-      httpTransport,
+      httpSend,
       endpointUrl,
       key,
       FLUSH_INTERVAL_MS,
@@ -96,6 +96,7 @@ export class Pixel {
 
     this.consent = createConsentManager(
       this.queue,
+      httpSend,
       key,
       this.anonymousId,
       environment,

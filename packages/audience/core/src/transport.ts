@@ -1,21 +1,48 @@
 import { track, trackError } from '@imtbl/metrics';
 import type { BatchPayload, ConsentUpdatePayload } from './types';
+import { TransportError, type TransportResult } from './errors';
 
 export interface TransportOptions {
   method?: string;
   keepalive?: boolean;
 }
 
-export interface Transport {
-  send(url: string, publishableKey: string, payload: BatchPayload, options?: TransportOptions): Promise<boolean>;
-}
-
-export async function httpSend(
+/**
+ * Function type for sending payloads to the audience backend.
+ *
+ * The single production implementation is {@link httpSend}. Inject this
+ * type into `MessageQueue` and `createConsentManager` so tests can
+ * substitute a fake by passing `jest.fn<HttpSend>()` directly.
+ *
+ * Implementations MUST NOT reject — failures are returned via
+ * {@link TransportResult}. Callers rely on this contract for
+ * fire-and-forget code paths (page-unload flush).
+ */
+export type HttpSend = (
   url: string,
   publishableKey: string,
   payload: BatchPayload | ConsentUpdatePayload,
   options?: TransportOptions,
-): Promise<boolean> {
+) => Promise<TransportResult>;
+
+async function parseBody(response: Response): Promise<unknown> {
+  const contentType = response.headers?.get?.('content-type') ?? '';
+  try {
+    if (contentType.includes('application/json')) {
+      return await response.json();
+    }
+    return await response.text();
+  } catch {
+    return undefined;
+  }
+}
+
+export const httpSend: HttpSend = async (
+  url,
+  publishableKey,
+  payload,
+  options,
+) => {
   try {
     const response = await fetch(url, {
       method: options?.method ?? 'POST',
@@ -28,14 +55,26 @@ export async function httpSend(
     });
 
     if (!response.ok) {
+      const body = await parseBody(response);
       track('audience', 'transport_send_failed', { status: response.status });
+      return {
+        ok: false,
+        error: new TransportError({
+          status: response.status,
+          endpoint: url,
+          body,
+        }),
+      };
     }
 
-    return response.ok;
-  } catch (error) {
-    trackError('audience', 'transport_send', error instanceof Error ? error : new Error(String(error)));
-    return false;
+    return { ok: true };
+  } catch (err) {
+    const error = new TransportError({
+      status: 0,
+      endpoint: url,
+      cause: err,
+    });
+    trackError('audience', 'transport_send', error);
+    return { ok: false, error };
   }
-}
-
-export const httpTransport: Transport = { send: httpSend };
+};
