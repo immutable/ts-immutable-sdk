@@ -1,5 +1,6 @@
 import { createConsentManager } from './consent';
 import type { HttpSend } from './transport';
+import { TransportError } from './errors';
 
 function createMockSend() {
   return jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({ ok: true });
@@ -123,11 +124,11 @@ describe('createConsentManager', () => {
       const queue = createMockQueue();
       const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
         ok: false,
-        error: {
+        error: new TransportError({
           status: 503,
           endpoint: 'https://api.dev.immutable.com/v1/audience/tracking-consent',
           body: { code: 'SERVICE_UNAVAILABLE' },
-        },
+        }),
       });
       const onError = jest.fn();
       const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none', onError);
@@ -149,11 +150,11 @@ describe('createConsentManager', () => {
       const queue = createMockQueue();
       const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
         ok: false,
-        error: {
+        error: new TransportError({
           status: 0,
           endpoint: 'https://api.dev.immutable.com/v1/audience/tracking-consent',
           cause: new TypeError('Failed to fetch'),
-        },
+        }),
       });
       const onError = jest.fn();
       const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none', onError);
@@ -185,7 +186,7 @@ describe('createConsentManager', () => {
       const queue = createMockQueue();
       const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
         ok: false,
-        error: { status: 500, endpoint: 'x', body: null },
+        error: new TransportError({ status: 500, endpoint: 'x', body: null }),
       });
       const onError = jest.fn().mockImplementation(() => { throw new Error('callback boom'); });
       const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none', onError);

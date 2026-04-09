@@ -82,11 +82,11 @@ export const httpSend: HttpSend = async (
       });
       return {
         ok: false,
-        error: {
+        error: new TransportError({
           status: response.status,
           endpoint: url,
           body: bodyObj,
-        },
+        }),
       };
     }
 

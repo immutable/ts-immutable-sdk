@@ -1,6 +1,6 @@
 import { MessageQueue } from './queue';
 import type { HttpSend } from './transport';
-import type { AudienceError, TransportResult } from './errors';
+import { TransportError, type AudienceError, type TransportResult } from './errors';
 import type { Message } from './types';
 import * as storage from './storage';
 
@@ -206,7 +206,9 @@ describe('MessageQueue', () => {
     const onError = jest.fn();
     const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
       ok: false,
-      error: { status: 500, endpoint: 'https://api.immutable.com/v1/audience/messages', body: null },
+      error: new TransportError({
+        status: 500, endpoint: 'https://api.immutable.com/v1/audience/messages', body: null,
+      }),
     });
     const queue = createQueue(send, { onError });
 
@@ -225,11 +227,11 @@ describe('MessageQueue', () => {
     const onError = jest.fn();
     const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
       ok: false,
-      error: {
+      error: new TransportError({
         status: 0,
         endpoint: 'https://api.immutable.com/v1/audience/messages',
         cause: new TypeError('Failed to fetch'),
-      },
+      }),
     });
     const queue = createQueue(send, { onError });
 
@@ -275,11 +277,11 @@ describe('MessageQueue', () => {
     const onError = jest.fn();
     const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
       ok: false,
-      error: {
+      error: new TransportError({
         status: 200,
         endpoint: 'https://api.immutable.com/v1/audience/messages',
         body: { accepted: 1, rejected: 1 },
-      },
+      }),
     });
     const queue = createQueue(send, { onError });
 

@@ -1,5 +1,5 @@
 import {
-  AudienceError, toAudienceError, type TransportError,
+  AudienceError, TransportError, toAudienceError,
 } from './errors';
 
 describe('AudienceError', () => {
@@ -37,17 +37,17 @@ describe('AudienceError', () => {
 });
 
 describe('toAudienceError', () => {
-  const httpError: TransportError = {
+  const httpError = new TransportError({
     status: 500,
     endpoint: 'https://api.dev.immutable.com/v1/audience/messages',
     body: { code: 'INTERNAL_ERROR' },
-  };
+  });
 
-  const networkError: TransportError = {
+  const networkError = new TransportError({
     status: 0,
     endpoint: 'https://api.dev.immutable.com/v1/audience/messages',
     cause: new TypeError('Failed to fetch'),
-  };
+  });
 
   describe('flush source', () => {
     it('maps HTTP error to FLUSH_FAILED with status in message', () => {
@@ -98,11 +98,11 @@ describe('toAudienceError', () => {
 
   describe('partial-rejection (2xx with rejected > 0)', () => {
     it('maps to VALIDATION_REJECTED with backend body preserved', () => {
-      const partialError: TransportError = {
+      const partialError = new TransportError({
         status: 200,
         endpoint: 'https://api.dev.immutable.com/v1/audience/messages',
         body: { accepted: 50, rejected: 50 },
-      };
+      });
 
       const err = toAudienceError(partialError, 'flush', 100);
 
@@ -113,11 +113,11 @@ describe('toAudienceError', () => {
     });
 
     it('handles missing accepted/rejected fields gracefully', () => {
-      const partialError: TransportError = {
+      const partialError = new TransportError({
         status: 200,
         endpoint: 'https://api.dev.immutable.com/v1/audience/messages',
         body: {},
-      };
+      });
 
       const err = toAudienceError(partialError, 'flush');
 
