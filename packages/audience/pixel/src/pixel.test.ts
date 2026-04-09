@@ -7,6 +7,10 @@ jest.mock('./autocapture', () => ({
   setupAutocapture: (...args: unknown[]) => mockSetupAutocapture(...args),
 }));
 
+// CMP detection mock — defined here, wired into the audience-core mock below
+const mockTeardownCmp = jest.fn();
+const mockStartCmpDetection = jest.fn().mockReturnValue(mockTeardownCmp);
+
 // Mock audience-core
 const mockEnqueue = jest.fn();
 const mockStart = jest.fn();
@@ -51,6 +55,7 @@ jest.mock('@imtbl/audience-core', () => ({
     landing_page: 'https://example.com',
   }),
   getOrCreateSession: (...args: unknown[]) => mockGetOrCreateSession(...args),
+  startCmpDetection: (...args: unknown[]) => mockStartCmpDetection(...args),
   createConsentManager: jest.fn().mockImplementation(
     (_queue: unknown, _key: unknown, _anonId: unknown, _env: unknown, _source: unknown, level?: string) => {
       let current = level ?? 'none';
@@ -344,6 +349,127 @@ describe('Pixel', () => {
 
       pixel.destroy();
       expect(mockTeardownAutocapture).toHaveBeenCalled();
+    });
+  });
+
+  describe('consentMode: auto', () => {
+    it('starts CMP detection when consentMode is auto', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+
+      expect(mockStartCmpDetection).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+      );
+    });
+
+    it('does not start CMP detection when consentMode is not auto', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+
+      expect(mockStartCmpDetection).not.toHaveBeenCalled();
+    });
+
+    it('starts at consent none and does not fire page view', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+
+      // No events should be enqueued — waiting for CMP detection
+      expect(mockEnqueue).not.toHaveBeenCalled();
+    });
+
+    it('fires page view when CMP detection upgrades consent', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+      mockEnqueue.mockClear();
+
+      // Simulate CMP detected with anonymous consent
+      const onDetected = mockStartCmpDetection.mock.calls[0][1];
+      onDetected({ source: 'gcm', level: 'anonymous', destroy: jest.fn() });
+
+      const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
+      expect(calls.find((c) => c.type === 'page')).toBeDefined();
+    });
+
+    it('fires page view when CMP update callback upgrades from none', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+      mockEnqueue.mockClear();
+
+      // Simulate CMP update callback (ongoing consent change)
+      const onUpdate = mockStartCmpDetection.mock.calls[0][0];
+      onUpdate('anonymous', 'gcm');
+
+      const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
+      expect(calls.find((c) => c.type === 'page')).toBeDefined();
+    });
+
+    it('does not fire duplicate page view on subsequent CMP updates', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+
+      // First upgrade — fires page view
+      const onUpdate = mockStartCmpDetection.mock.calls[0][0];
+      onUpdate('anonymous', 'gcm');
+      mockEnqueue.mockClear();
+
+      // Second update (anonymous → full) — should NOT fire another page view
+      onUpdate('full', 'gcm');
+      const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
+      expect(calls.find((c) => c.type === 'page')).toBeUndefined();
+    });
+
+    it('does not fire page view when CMP detects consent as none', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+      mockEnqueue.mockClear();
+
+      const onDetected = mockStartCmpDetection.mock.calls[0][1];
+      onDetected({ source: 'gcm', level: 'none', destroy: jest.fn() });
+
+      expect(mockEnqueue).not.toHaveBeenCalled();
+    });
+
+    it('tears down CMP detection on destroy', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+
+      pixel.destroy();
+      expect(mockTeardownCmp).toHaveBeenCalled();
+    });
+
+    it('consentMode static level takes precedence over consent param', () => {
+      const { createConsentManager } = jest.requireMock('@imtbl/audience-core') as {
+        createConsentManager: jest.Mock;
+      };
+      createConsentManager.mockClear();
+
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({
+        key: 'pk_test',
+        environment: 'dev',
+        consent: 'anonymous',
+        consentMode: 'full',
+      });
+
+      // consentMode: 'full' should win over consent: 'anonymous'
+      expect(createConsentManager).toHaveBeenCalledWith(
+        expect.anything(),
+        'pk_test',
+        'anon-123',
+        'dev',
+        'pixel',
+        'full',
+      );
     });
   });
 

@@ -6,6 +6,7 @@ import type {
   IdentifyMessage,
   UserTraits,
   ConsentManager,
+  CmpDetector,
 } from '@imtbl/audience-core';
 import {
   MessageQueue,
@@ -23,6 +24,7 @@ import {
   collectAttribution,
   getOrCreateSession,
   createConsentManager,
+  startCmpDetection,
 } from '@imtbl/audience-core';
 import { setupAutocapture } from './autocapture';
 import type { AutocaptureOptions } from './autocapture';
@@ -37,6 +39,8 @@ export interface PixelInitOptions {
   key: string;
   environment?: Environment;
   consent?: ConsentLevel;
+  /** Set to 'auto' to auto-detect consent from CMPs (Google Consent Mode, IAB TCF). */
+  consentMode?: 'auto' | ConsentLevel;
   domain?: string;
   autocapture?: AutocaptureOptions;
 }
@@ -66,6 +70,8 @@ export class Pixel {
 
   private teardownAutocapture?: () => void;
 
+  private teardownCmp?: () => void;
+
   init(options: PixelInitOptions): void {
     if (this.initialized) return;
 
@@ -73,6 +79,7 @@ export class Pixel {
       key,
       environment = 'production',
       consent: consentLevel,
+      consentMode,
       domain,
       autocapture,
     } = options;
@@ -94,13 +101,21 @@ export class Pixel {
 
     this.anonymousId = getOrCreateAnonymousId(domain);
 
+    // Resolve initial consent level.
+    // consentMode takes precedence over consent when set to a static level.
+    // 'auto' starts at 'none' until a CMP is detected.
+    const isAutoConsent = consentMode === 'auto';
+    const staticLevel: ConsentLevel | undefined = isAutoConsent
+      ? undefined
+      : (consentMode as ConsentLevel | undefined) ?? consentLevel;
+
     this.consent = createConsentManager(
       this.queue,
       key,
       this.anonymousId,
       environment,
       'pixel',
-      consentLevel,
+      isAutoConsent ? 'none' : staticLevel,
     );
 
     this.initialized = true;
@@ -110,6 +125,12 @@ export class Pixel {
     // DOM event listeners fire in registration order.
     this.registerSessionEnd();
     this.queue.start();
+
+    // If consentMode is 'auto', start CMP detection.
+    // The pixel begins at 'none' and upgrades when a CMP is found.
+    if (isAutoConsent) {
+      this.startCmpDetection();
+    }
 
     // Auto-fire page view if consent allows
     if (this.consent.level !== 'none') {
@@ -174,6 +195,10 @@ export class Pixel {
 
   destroy(): void {
     this.removeSessionEnd();
+    if (this.teardownCmp) {
+      this.teardownCmp();
+      this.teardownCmp = undefined;
+    }
     if (this.teardownAutocapture) {
       this.teardownAutocapture();
       this.teardownAutocapture = undefined;
@@ -184,6 +209,31 @@ export class Pixel {
     }
     this.consent = null;
     this.initialized = false;
+  }
+
+  // -- CMP auto-detection ---------------------------------------------------
+
+  private startCmpDetection(): void {
+    const onCmpUpdate = (level: ConsentLevel): void => {
+      if (!this.isReady()) return;
+      this.consent!.setLevel(level);
+
+      // If this is the first consent upgrade from 'none', fire the initial
+      // page view that was deferred at init.
+      if (level !== 'none' && !this.sessionId) {
+        this.page();
+      }
+    };
+
+    this.teardownCmp = startCmpDetection(
+      onCmpUpdate,
+      (detector: CmpDetector) => {
+        // CMP found — apply the initial consent level it reported.
+        if (detector.level !== 'none') {
+          onCmpUpdate(detector.level);
+        }
+      },
+    );
   }
 
   // -- Auto-capture helper --------------------------------------------------
