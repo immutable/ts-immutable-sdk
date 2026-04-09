@@ -1,7 +1,8 @@
 import { createConsentManager } from './consent';
 import type { HttpSend } from './transport';
+import { TransportError } from './errors';
 
-function createMockSend(): jest.MockedFunction<HttpSend> {
+function createMockSend() {
   return jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({ ok: true });
 }
 
@@ -116,5 +117,86 @@ describe('createConsentManager', () => {
     expect(manager.level).toBe('none');
 
     Object.defineProperty(navigator, 'doNotTrack', { value: '0', configurable: true });
+  });
+
+  describe('onError callback', () => {
+    it('fires onError with mapped CONSENT_SYNC_FAILED on consent PUT failure', async () => {
+      const queue = createMockQueue();
+      const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
+        ok: false,
+        error: new TransportError({
+          status: 503,
+          endpoint: 'https://api.dev.immutable.com/v1/audience/tracking-consent',
+          body: { code: 'SERVICE_UNAVAILABLE' },
+        }),
+      });
+      const onError = jest.fn();
+      const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none', onError);
+
+      manager.setLevel('anonymous');
+
+      // notifyBackend's .then() runs on the microtask queue.
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(onError).toHaveBeenCalledTimes(1);
+      const err = onError.mock.calls[0][0];
+      expect(err.code).toBe('CONSENT_SYNC_FAILED');
+      expect(err.status).toBe(503);
+      expect(err.message).toBe('Consent sync failed with status 503');
+    });
+
+    it('fires onError with NETWORK_ERROR on network failure', async () => {
+      const queue = createMockQueue();
+      const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
+        ok: false,
+        error: new TransportError({
+          status: 0,
+          endpoint: 'https://api.dev.immutable.com/v1/audience/tracking-consent',
+          cause: new TypeError('Failed to fetch'),
+        }),
+      });
+      const onError = jest.fn();
+      const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none', onError);
+
+      manager.setLevel('anonymous');
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(onError).toHaveBeenCalledTimes(1);
+      const err = onError.mock.calls[0][0];
+      expect(err.code).toBe('NETWORK_ERROR');
+      expect(err.message).toBe('Network error syncing consent');
+    });
+
+    it('does not fire onError on successful consent sync', async () => {
+      const queue = createMockQueue();
+      const send = createMockSend();
+      const onError = jest.fn();
+      const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none', onError);
+
+      manager.setLevel('anonymous');
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(onError).not.toHaveBeenCalled();
+    });
+
+    it('swallows exceptions thrown from the onError callback', async () => {
+      const queue = createMockQueue();
+      const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
+        ok: false,
+        error: new TransportError({ status: 500, endpoint: 'x', body: null }),
+      });
+      const onError = jest.fn().mockImplementation(() => { throw new Error('callback boom'); });
+      const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none', onError);
+
+      // Synchronous call must not throw even though the .then() handler will.
+      expect(() => manager.setLevel('anonymous')).not.toThrow();
+
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(onError).toHaveBeenCalled();
+    });
   });
 });
