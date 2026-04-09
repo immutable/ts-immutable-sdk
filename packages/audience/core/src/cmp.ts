@@ -168,6 +168,7 @@ function mapTcfConsent(data: TcfData): ConsentLevel {
  */
 function detectTcf(onUpdate: ConsentCallback): CmpDetector | null {
   const win = window as unknown as Record<string, unknown>;
+  // eslint-disable-next-line no-underscore-dangle
   const tcfapi = win.__tcfapi as TcfApi | undefined;
   if (typeof tcfapi !== 'function') return null;
 

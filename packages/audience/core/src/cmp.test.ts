@@ -32,7 +32,9 @@ function setupTcf(
       listeners.push({ id, cb: callback });
       // Fire immediately with current state (simulates CMP already loaded)
       callback(
-        { gdprApplies, purpose: { consents: purposes }, listenerId: id, eventStatus: 'tcloaded' },
+        {
+          gdprApplies, purpose: { consents: purposes }, listenerId: id, eventStatus: 'tcloaded',
+        },
         true,
       );
     }
@@ -42,13 +44,16 @@ function setupTcf(
     }
   };
 
+  // eslint-disable-next-line no-underscore-dangle
   (window as unknown as Record<string, unknown>).__tcfapi = tcfapi;
 
   return {
     fire(newPurposes: Record<number, boolean>) {
       for (const l of listeners) {
         l.cb(
-          { gdprApplies, purpose: { consents: newPurposes }, listenerId: l.id, eventStatus: 'useractioncomplete' },
+          {
+            gdprApplies, purpose: { consents: newPurposes }, listenerId: l.id, eventStatus: 'useractioncomplete',
+          },
           true,
         );
       }
@@ -58,6 +63,7 @@ function setupTcf(
 
 function cleanup(): void {
   delete (window as unknown as Record<string, unknown>).dataLayer;
+  // eslint-disable-next-line no-underscore-dangle
   delete (window as unknown as Record<string, unknown>).__tcfapi;
 }
 
@@ -193,7 +199,9 @@ describe('CMP detection', () => {
     });
 
     it('maps purpose 1 only to anonymous', () => {
-      setupTcf({ 1: true, 3: false, 4: false, 5: false });
+      setupTcf({
+        1: true, 3: false, 4: false, 5: false,
+      });
       const detector = detectCmp(jest.fn());
 
       expect(detector!.level).toBe('anonymous');
