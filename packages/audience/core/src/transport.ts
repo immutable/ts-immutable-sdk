@@ -1,6 +1,6 @@
 import { track, trackError } from '@imtbl/metrics';
 import type { BatchPayload, ConsentUpdatePayload } from './types';
-import type { TransportError, TransportResult } from './errors';
+import { TransportError, type TransportResult } from './errors';
 
 export interface TransportOptions {
   method?: string;
@@ -57,26 +57,24 @@ export const httpSend: HttpSend = async (
     if (!response.ok) {
       const body = await parseBody(response);
       track('audience', 'transport_send_failed', { status: response.status });
-      const error: TransportError = {
-        status: response.status,
-        endpoint: url,
-        body,
+      return {
+        ok: false,
+        error: new TransportError({
+          status: response.status,
+          endpoint: url,
+          body,
+        }),
       };
-      return { ok: false, error };
     }
 
     return { ok: true };
   } catch (err) {
-    const causeError = err instanceof Error ? err : new Error(String(err));
-    trackError('audience', 'transport_send', causeError);
-    return {
-      ok: false,
-      error: {
-        status: 0,
-        endpoint: url,
-        body: undefined,
-        cause: err,
-      },
-    };
+    const error = new TransportError({
+      status: 0,
+      endpoint: url,
+      cause: err,
+    });
+    trackError('audience', 'transport_send', error);
+    return { ok: false, error };
   }
 };

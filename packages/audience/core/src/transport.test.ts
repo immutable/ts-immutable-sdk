@@ -1,4 +1,5 @@
 import { httpSend } from './transport';
+import { TransportError } from './errors';
 import type { BatchPayload } from './types';
 
 const payload: BatchPayload = {
@@ -83,11 +84,27 @@ describe('httpSend', () => {
     const result = await httpSend('https://example.com', 'pk', payload);
 
     expect(result.ok).toBe(false);
-    expect(result.error).toEqual({
+    expect(result.error).toBeInstanceOf(TransportError);
+    expect(result.error).toMatchObject({
       status: 422,
       endpoint: 'https://example.com',
       body: { code: 'INVALID_PAYLOAD' },
     });
+  });
+
+  it('TransportError is a real Error with a stack trace', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      headers: { get: () => 'text/plain' },
+      text: async () => 'boom',
+    });
+
+    const result = await httpSend('https://example.com', 'pk', payload);
+
+    expect(result.error).toBeInstanceOf(Error);
+    expect(result.error?.name).toBe('TransportError');
+    expect(typeof result.error?.stack).toBe('string');
   });
 
   it('returns structured error on HTTP failure with text body', async () => {

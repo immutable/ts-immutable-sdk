@@ -1,6 +1,6 @@
 import { MessageQueue } from './queue';
 import type { HttpSend } from './transport';
-import type { TransportResult } from './errors';
+import { TransportError, type TransportResult } from './errors';
 import type { Message } from './types';
 import * as storage from './storage';
 
@@ -19,7 +19,11 @@ function makeMessage(id: string): Message {
 const okResult: TransportResult = { ok: true };
 const failResult: TransportResult = {
   ok: false,
-  error: { status: 500, endpoint: 'https://example.com', body: null },
+  error: new TransportError({
+    status: 500,
+    endpoint: 'https://example.com',
+    body: null,
+  }),
 };
 
 interface QueueOpts {
