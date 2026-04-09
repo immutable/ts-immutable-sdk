@@ -11,6 +11,7 @@
  * is written, so the developer's working tree is never left modified.
  */
 import { readFileSync, writeFileSync, copyFileSync } from 'node:fs';
+import { BUNDLED_WORKSPACE_DEPS } from './bundled-workspace-deps.mjs';
 
 const pkgPath = new URL('../package.json', import.meta.url);
 const backupPath = new URL('../package.json.prepack-backup', import.meta.url);
@@ -18,9 +19,10 @@ const backupPath = new URL('../package.json.prepack-backup', import.meta.url);
 copyFileSync(pkgPath, backupPath);
 const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
 
-// Deps bundled into dist/: remove from published metadata.
-const bundledWorkspaceDeps = ['@imtbl/audience-core', '@imtbl/metrics'];
-for (const name of bundledWorkspaceDeps) {
+// Deps bundled into dist/ by tsup: remove from published metadata so
+// `npm install @imtbl/audience` doesn't try to resolve them from the
+// registry (audience-core is private and never published).
+for (const name of BUNDLED_WORKSPACE_DEPS) {
   if (pkg.dependencies) delete pkg.dependencies[name];
 }
 // Clean up empty dependencies object.

@@ -1,16 +1,17 @@
 // @ts-check
 // Local tsup config for @imtbl/audience.
 //
-// Extends the monorepo's root tsup config but overrides `noExternal` so that
-// every `@imtbl/*` workspace dep (audience-core, its transitive metrics dep)
-// is inlined into the built bundle. This makes the package installable as a
-// standalone tarball without the pnpm `workspace:*` protocol.
+// Overrides the monorepo's root tsup config by setting `noExternal` to the
+// explicit list of `@imtbl/*` workspace deps that should be inlined into the
+// built bundle. The same list is used by scripts/prepack.mjs to strip those
+// deps from the published package.json. Keeping the two in sync via a shared
+// module prevents the "tsup silently bundles a new dep but prepack leaves
+// workspace:* in package.json" class of bugs.
 import { defineConfig } from 'tsup';
 import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill';
 import { replace } from 'esbuild-plugin-replace';
 import pkg from './package.json' with { type: 'json' };
-
-const IMTBL_WORKSPACE = /^@imtbl\//;
+import { BUNDLED_WORKSPACE_DEPS } from './scripts/bundled-workspace-deps.mjs';
 
 export default defineConfig((options) => {
   if (options.watch) {
@@ -21,7 +22,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       platform: 'browser',
       bundle: true,
-      noExternal: [IMTBL_WORKSPACE],
+      noExternal: BUNDLED_WORKSPACE_DEPS,
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({
           globals: { Buffer: true, process: true },
@@ -44,7 +45,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       minify: true,
       bundle: true,
-      noExternal: [IMTBL_WORKSPACE],
+      noExternal: BUNDLED_WORKSPACE_DEPS,
       treeshake: true,
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({
@@ -64,7 +65,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       minify: true,
       bundle: true,
-      noExternal: [IMTBL_WORKSPACE],
+      noExternal: BUNDLED_WORKSPACE_DEPS,
       treeshake: true,
       esbuildPlugins: [
         replace({ __SDK_VERSION__: pkg.version }),
