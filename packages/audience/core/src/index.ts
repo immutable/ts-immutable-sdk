@@ -13,18 +13,14 @@ export type {
   BatchPayload,
   ConsentLevel,
   ConsentStatus,
-  ConsentUpdatePayload,
 } from './types';
 export { IdentityType } from './types';
 
 export {
   getOrCreateAnonymousId,
-  getAnonymousId,
   getCookie,
-  setCookie,
   deleteCookie,
 } from './cookie';
-export * as storage from './storage';
 
 export {
   getBaseUrl,
@@ -34,7 +30,6 @@ export {
   FLUSH_SIZE,
   COOKIE_NAME,
   SESSION_COOKIE,
-  SESSION_MAX_AGE,
   SESSION_START,
   SESSION_END,
 } from './config';
@@ -43,25 +38,16 @@ export { generateId, getTimestamp, isBrowser } from './utils';
 
 export type { HttpSend, TransportOptions } from './transport';
 export { httpSend } from './transport';
-export type {
-  TransportError,
-  TransportResult,
-  AudienceErrorCode,
-} from './errors';
-export { AudienceError, toAudienceError } from './errors';
+export type { TransportResult, AudienceErrorCode } from './errors';
+export { TransportError, AudienceError, toAudienceError } from './errors';
 export { MessageQueue } from './queue';
 export { collectContext } from './context';
-export {
-  isTimestampValid,
-  isAliasValid,
-  truncate,
-  truncateSource,
-} from './validation';
+export { isTimestampValid, isAliasValid, truncate } from './validation';
 
-export { getOrCreateSession, getOrCreateSessionId, getSessionId } from './session';
+export { getOrCreateSession } from './session';
 export type { SessionResult } from './session';
 
-export { collectAttribution, clearAttribution } from './attribution';
+export { collectAttribution } from './attribution';
 export type { Attribution } from './attribution';
 
 export { createConsentManager, detectDoNotTrack } from './consent';
