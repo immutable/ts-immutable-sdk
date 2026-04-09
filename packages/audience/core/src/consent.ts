@@ -3,7 +3,7 @@ import type {
 } from './types';
 import type { MessageQueue } from './queue';
 import type { HttpSend } from './transport';
-import { type AudienceError, toAudienceError } from './errors';
+import { type AudienceError, invokeOnError, toAudienceError } from './errors';
 import { CONSENT_PATH, getBaseUrl } from './config';
 
 export interface ConsentManager {
@@ -56,13 +56,8 @@ export function createConsentManager(
     // Fire-and-forget. HttpSend never rejects, so the floating chain is safe.
     send(url, publishableKey, payload, { method: 'PUT', keepalive: true })
       .then((result) => {
-        if (!result.ok && result.error && onError) {
-          try {
-            onError(toAudienceError(result.error, 'consent'));
-          } catch {
-            // Swallow callback errors — the consent state machine must not
-            // wedge on a throwing handler.
-          }
+        if (!result.ok && result.error) {
+          invokeOnError(onError, toAudienceError(result.error, 'consent'));
         }
       });
   }

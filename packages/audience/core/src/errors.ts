@@ -178,3 +178,28 @@ export function toAudienceError(
     cause: err.cause,
   });
 }
+
+/**
+ * Invoke a studio-supplied `onError` callback, swallowing any exception
+ * it throws.
+ *
+ * Used by {@link MessageQueue} and {@link createConsentManager} — both
+ * must not wedge their internal state machines on a badly-written handler.
+ * Centralised here to keep the swallow-and-continue semantics identical
+ * across every audience surface and avoid duplicating the try/catch at
+ * each call site.
+ *
+ * Intentionally not re-exported from `index.ts` — this is an internal
+ * helper, not public API.
+ */
+export function invokeOnError(
+  onError: ((err: AudienceError) => void) | undefined,
+  err: AudienceError,
+): void {
+  if (!onError) return;
+  try {
+    onError(err);
+  } catch {
+    // Swallow — handler must not crash the state machine.
+  }
+}

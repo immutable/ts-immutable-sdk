@@ -1,6 +1,6 @@
 import type { Message, BatchPayload } from './types';
 import type { HttpSend } from './transport';
-import { type AudienceError, toAudienceError } from './errors';
+import { type AudienceError, invokeOnError, toAudienceError } from './errors';
 import * as storage from './storage';
 import { isBrowser } from './utils';
 
@@ -147,12 +147,8 @@ export class MessageQueue {
       }
 
       this.onFlush?.(result.ok, batch.length);
-      if (audienceErr && this.onError) {
-        try {
-          this.onError(audienceErr);
-        } catch {
-          // Swallow callback errors — the queue must not wedge on a throwing handler.
-        }
+      if (audienceErr) {
+        invokeOnError(this.onError, audienceErr);
       }
     } finally {
       this.flushing = false;
