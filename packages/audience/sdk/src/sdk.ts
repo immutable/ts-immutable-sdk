@@ -2,6 +2,7 @@ import type {
   Attribution,
   ConsentLevel,
   ConsentManager,
+  IdentityType,
   Message,
   UserTraits,
 } from '@imtbl/audience-core';
@@ -263,13 +264,13 @@ export class Audience {
    *
    * Requires 'full' consent.
    */
-  identify(uid: string, provider: string, traits?: UserTraits): void;
+  identify(id: string, identityType: IdentityType, traits?: UserTraits): void;
 
   identify(traits: UserTraits): void;
 
   identify(
-    uidOrTraits: string | UserTraits,
-    provider?: string,
+    idOrTraits: string | UserTraits,
+    identityType?: IdentityType,
     traits?: UserTraits,
   ): void {
     if (this.consent.level !== 'full') {
@@ -278,24 +279,24 @@ export class Audience {
     }
     getOrCreateSession(this.cookieDomain);
 
-    if (uidOrTraits !== null && typeof uidOrTraits === 'object' && !Array.isArray(uidOrTraits)) {
+    if (idOrTraits !== null && typeof idOrTraits === 'object' && !Array.isArray(idOrTraits)) {
       this.enqueue('identify', {
         ...this.baseMessage(),
         type: 'identify',
-        traits: uidOrTraits,
+        traits: idOrTraits,
       });
       return;
     }
 
-    if (typeof uidOrTraits !== 'string') return;
+    if (typeof idOrTraits !== 'string') return;
 
-    const uid = truncate(uidOrTraits);
-    this.userId = uid;
+    const id = truncate(idOrTraits);
+    this.userId = id;
     this.enqueue('identify', {
       ...this.baseMessage(),
       type: 'identify',
-      userId: uid,
-      identityType: provider,
+      userId: id,
+      identityType,
       traits,
     });
   }
@@ -309,14 +310,14 @@ export class Audience {
    * Requires 'full' consent. `from` and `to` must differ.
    */
   alias(
-    from: { uid: string; provider: string },
-    to: { uid: string; provider: string },
+    from: { id: string; identityType: IdentityType },
+    to: { id: string; identityType: IdentityType },
   ): void {
     if (this.consent.level !== 'full') {
       this.debug.logWarning('alias() requires full consent — call ignored.');
       return;
     }
-    if (!isAliasValid(from.uid, from.provider, to.uid, to.provider)) {
+    if (!isAliasValid(from.id, from.identityType, to.id, to.identityType)) {
       this.debug.logWarning('alias() from and to are identical — call ignored.');
       return;
     }
@@ -325,10 +326,10 @@ export class Audience {
     this.enqueue('alias', {
       ...this.baseMessage(),
       type: 'alias',
-      fromId: truncate(from.uid),
-      fromType: from.provider,
-      toId: truncate(to.uid),
-      toType: to.provider,
+      fromId: truncate(from.id),
+      fromType: from.identityType,
+      toId: truncate(to.id),
+      toType: to.identityType,
     });
   }
 

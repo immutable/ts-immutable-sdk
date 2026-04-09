@@ -5,12 +5,12 @@ import { Audience } from './sdk';
 import { LIBRARY_NAME } from './config';
 
 // --- Test fixtures ---
-const TEST_USER = { uid: 'user@example.com', provider: 'email' } as const;
-const TEST_STEAM = { uid: '76561198012345', provider: 'steam' } as const;
+const TEST_USER = { id: 'user@example.com', identityType: 'email' } as const;
+const TEST_STEAM = { id: '76561198012345', identityType: 'steam' } as const;
 
 function createSDK(overrides: Record<string, unknown> = {}) {
   return Audience.init({
-    publishableKey: 'pk_imtbl_test',
+    publishableKey: 'pk_imapik-test-local',
     environment: 'sandbox',
     consent: 'full',
     ...overrides,
@@ -94,7 +94,7 @@ describe('Audience', () => {
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
       const first = createSDK();
       const second = Audience.init({
-        publishableKey: 'pk_imtbl_other',
+        publishableKey: 'pk_imapik-test-other',
         environment: 'production',
         consent: 'none',
       });
@@ -223,7 +223,7 @@ describe('Audience', () => {
     it('includes userId at full consent after identify', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.identify(TEST_USER.uid, TEST_USER.provider);
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
       sdk.track('level_up', { level: 5 });
       await sdk.flush();
 
@@ -231,7 +231,7 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'level_up',
       );
       expect(msg).toBeDefined();
-      expect(msg.userId).toBe(TEST_USER.uid);
+      expect(msg.userId).toBe(TEST_USER.id);
 
       sdk.shutdown();
     });
@@ -279,13 +279,13 @@ describe('Audience', () => {
     it('includes userId at full consent after identify', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.identify(TEST_USER.uid, TEST_USER.provider);
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
       sdk.page({ section: 'shop' });
       await sdk.flush();
 
       const msg = sentMessages().find((m: any) => m.type === 'page');
       expect(msg).toBeDefined();
-      expect(msg.userId).toBe(TEST_USER.uid);
+      expect(msg.userId).toBe(TEST_USER.id);
 
       sdk.shutdown();
     });
@@ -328,7 +328,7 @@ describe('Audience', () => {
     it('sends an identify message at full consent', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.identify(TEST_USER.uid, TEST_USER.provider, {
+      sdk.identify(TEST_USER.id, TEST_USER.identityType, {
         name: 'Player One',
       });
       await sdk.flush();
@@ -337,8 +337,8 @@ describe('Audience', () => {
         (m: any) => m.type === 'identify',
       );
       expect(msg).toBeDefined();
-      expect(msg.userId).toBe(TEST_USER.uid);
-      expect(msg.identityType).toBe(TEST_USER.provider);
+      expect(msg.userId).toBe(TEST_USER.id);
+      expect(msg.identityType).toBe(TEST_USER.identityType);
       expect(msg.traits).toEqual({ name: 'Player One' });
 
       sdk.shutdown();
@@ -347,7 +347,7 @@ describe('Audience', () => {
     it('is a no-op at none consent', async () => {
       const sdk = createSDK({ consent: 'none' });
 
-      sdk.identify(TEST_USER.uid, TEST_USER.provider);
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
       await sdk.flush();
 
       const ids = sentMessages().filter((m: any) => m.type === 'identify');
@@ -359,7 +359,7 @@ describe('Audience', () => {
     it('is a no-op at anonymous consent', async () => {
       const sdk = createSDK({ consent: 'anonymous' });
 
-      sdk.identify(TEST_USER.uid, TEST_USER.provider);
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
       await sdk.flush();
 
       const ids = sentMessages().filter(
@@ -399,7 +399,7 @@ describe('Audience', () => {
 
       sdk.identify({
         source: 'steam',
-        steamId: TEST_STEAM.uid,
+        steamId: TEST_STEAM.id,
       });
       await sdk.flush();
 
@@ -410,7 +410,7 @@ describe('Audience', () => {
       expect(msg.userId).toBeUndefined();
       expect(msg.traits).toEqual({
         source: 'steam',
-        steamId: TEST_STEAM.uid,
+        steamId: TEST_STEAM.id,
       });
 
       sdk.shutdown();
@@ -428,10 +428,10 @@ describe('Audience', () => {
         (m: any) => m.type === 'alias',
       );
       expect(msg).toBeDefined();
-      expect(msg.fromId).toBe(TEST_STEAM.uid);
-      expect(msg.fromType).toBe(TEST_STEAM.provider);
-      expect(msg.toId).toBe(TEST_USER.uid);
-      expect(msg.toType).toBe(TEST_USER.provider);
+      expect(msg.fromId).toBe(TEST_STEAM.id);
+      expect(msg.fromType).toBe(TEST_STEAM.identityType);
+      expect(msg.toId).toBe(TEST_USER.id);
+      expect(msg.toType).toBe(TEST_USER.identityType);
 
       sdk.shutdown();
     });
@@ -440,8 +440,8 @@ describe('Audience', () => {
       const sdk = createSDK({ consent: 'full' });
 
       sdk.alias(
-        { uid: 'same_id', provider: 'steam' },
-        { uid: 'same_id', provider: 'steam' },
+        { id: 'same_id', identityType: 'steam' },
+        { id: 'same_id', identityType: 'steam' },
       );
       await sdk.flush();
 
@@ -476,6 +476,41 @@ describe('Audience', () => {
     });
   });
 
+  describe('identify and alias type narrowing', () => {
+    it('rejects invalid identityType at compile time', () => {
+      const sdk = createSDK({ consent: 'full' });
+
+      // Valid — should type-check.
+      sdk.identify('player-1', 'passport', { plan: 'premium' });
+
+      // @ts-expect-error — 'facebook' is not a valid IdentityType literal.
+      sdk.identify('player-2', 'facebook');
+
+      // @ts-expect-error — arbitrary strings are rejected.
+      sdk.identify('player-3', 'not-a-real-type' as string);
+
+      sdk.shutdown();
+    });
+
+    it('rejects invalid identityType in alias at compile time', () => {
+      const sdk = createSDK({ consent: 'full' });
+
+      // Valid.
+      sdk.alias(
+        { id: 'steam-id', identityType: 'steam' },
+        { id: 'passport-id', identityType: 'passport' },
+      );
+
+      // @ts-expect-error — 'facebook' is not a valid IdentityType.
+      sdk.alias(
+        { id: 'fb-id', identityType: 'facebook' },
+        { id: 'passport-id', identityType: 'passport' },
+      );
+
+      sdk.shutdown();
+    });
+  });
+
   describe('setConsent', () => {
     it('is a no-op when setting the same level', async () => {
       const sdk = createSDK({ consent: 'full' });
@@ -501,7 +536,7 @@ describe('Audience', () => {
       sdk.setConsent('full');
       expect(document.cookie).toContain(`${COOKIE_NAME}=`);
 
-      sdk.identify(TEST_USER.uid, TEST_USER.provider);
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
       sdk.track('purchase', { value: 9.99 });
       await sdk.flush();
 
@@ -509,7 +544,7 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'purchase',
       );
       expect(trackMsg).toBeDefined();
-      expect(trackMsg.userId).toBe(TEST_USER.uid);
+      expect(trackMsg.userId).toBe(TEST_USER.id);
 
       sdk.shutdown();
     });
@@ -543,7 +578,7 @@ describe('Audience', () => {
     it('purges identify/alias, strips userId on downgrade', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.identify(TEST_USER.uid, TEST_USER.provider);
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
       sdk.alias(TEST_STEAM, TEST_USER);
       sdk.track('purchase', { currency: 'USD', value: 9.99 });
 
@@ -709,7 +744,7 @@ describe('Audience', () => {
       )?.anonymousId;
       fetchCalls.length = 0;
 
-      sdk.identify(TEST_USER.uid, TEST_USER.provider);
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
       await sdk.flush();
       fetchCalls.length = 0;
 
