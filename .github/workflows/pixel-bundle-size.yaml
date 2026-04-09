@@ -1,0 +1,148 @@
+name: Pixel Bundle Size
+
+on:
+  pull_request:
+    branches:
+      - "**"
+    paths:
+      - "packages/audience/pixel/**"
+      - "packages/audience/core/**"
+
+permissions:
+  pull-requests: write
+  contents: read
+
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
+
+jobs:
+  bundle-size:
+    name: Pixel Bundle Size Check
+    runs-on: ubuntu-latest-4-cores
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Read budget config
+        id: budget
+        run: |
+          BUDGET_FILE="packages/audience/pixel/bundlebudget.json"
+          MAX_GZIP=$(jq '.budgets[0].maxSizeGzip' "$BUDGET_FILE")
+          WARN_GZIP=$(jq '.budgets[0].warnSizeGzip' "$BUDGET_FILE")
+          echo "max_gzip=$MAX_GZIP" >> "$GITHUB_OUTPUT"
+          echo "warn_gzip=$WARN_GZIP" >> "$GITHUB_OUTPUT"
+
+      - name: Build pixel (PR)
+        run: pnpm --filter @imtbl/pixel build
+
+      - name: Measure PR bundle size
+        id: pr_size
+        run: |
+          BUNDLE="packages/audience/pixel/dist/imtbl.js"
+          RAW_SIZE=$(stat --format=%s "$BUNDLE")
+          GZIP_SIZE=$(gzip -c "$BUNDLE" | wc -c)
+          echo "raw=$RAW_SIZE" >> "$GITHUB_OUTPUT"
+          echo "gzip=$GZIP_SIZE" >> "$GITHUB_OUTPUT"
+          echo "PR bundle: raw=${RAW_SIZE} bytes, gzip=${GZIP_SIZE} bytes"
+
+      - name: Build pixel (base) and measure
+        id: base_size
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+
+          git checkout "$BASE_SHA"
+          pnpm install --frozen-lockfile
+          pnpm --filter @imtbl/pixel build 2>/dev/null || true
+
+          BUNDLE="packages/audience/pixel/dist/imtbl.js"
+          if [ -f "$BUNDLE" ]; then
+            RAW_SIZE=$(stat --format=%s "$BUNDLE")
+            GZIP_SIZE=$(gzip -c "$BUNDLE" | wc -c)
+          else
+            RAW_SIZE=0
+            GZIP_SIZE=0
+          fi
+          echo "raw=$RAW_SIZE" >> "$GITHUB_OUTPUT"
+          echo "gzip=$GZIP_SIZE" >> "$GITHUB_OUTPUT"
+          echo "Base bundle: raw=${RAW_SIZE} bytes, gzip=${GZIP_SIZE} bytes"
+
+          git checkout "${{ github.event.pull_request.head.sha }}"
+          pnpm install --frozen-lockfile
+
+      - name: Evaluate bundle size
+        id: evaluate
+        run: |
+          PR_GZIP=${{ steps.pr_size.outputs.gzip }}
+          PR_RAW=${{ steps.pr_size.outputs.raw }}
+          BASE_GZIP=${{ steps.base_size.outputs.gzip }}
+          BASE_RAW=${{ steps.base_size.outputs.raw }}
+          MAX_GZIP=${{ steps.budget.outputs.max_gzip }}
+          WARN_GZIP=${{ steps.budget.outputs.warn_gzip }}
+
+          DELTA_GZIP=$((PR_GZIP - BASE_GZIP))
+          DELTA_RAW=$((PR_RAW - BASE_RAW))
+
+          if [ $DELTA_GZIP -gt 0 ]; then DELTA_GZIP_FMT="+${DELTA_GZIP}"; else DELTA_GZIP_FMT="${DELTA_GZIP}"; fi
+          if [ $DELTA_RAW -gt 0 ]; then DELTA_RAW_FMT="+${DELTA_RAW}"; else DELTA_RAW_FMT="${DELTA_RAW}"; fi
+
+          STATUS="pass"
+          STATUS_ICON="white_check_mark"
+          if [ $PR_GZIP -gt $MAX_GZIP ]; then
+            STATUS="fail"
+            STATUS_ICON="x"
+          elif [ $PR_GZIP -gt $WARN_GZIP ]; then
+            STATUS="warn"
+            STATUS_ICON="warning"
+          fi
+
+          PR_GZIP_KB=$(echo "scale=2; $PR_GZIP / 1024" | bc)
+          MAX_GZIP_KB=$(echo "scale=2; $MAX_GZIP / 1024" | bc)
+          WARN_GZIP_KB=$(echo "scale=2; $WARN_GZIP / 1024" | bc)
+
+          {
+            echo "## :${STATUS_ICON}: Pixel Bundle Size — @imtbl/pixel"
+            echo ""
+            echo "| Metric | Size | Delta vs main |"
+            echo "|--------|------|---------------|"
+            echo "| **Gzipped** | ${PR_GZIP} bytes (${PR_GZIP_KB} KB) | ${DELTA_GZIP_FMT} bytes |"
+            echo "| Raw (minified) | ${PR_RAW} bytes | ${DELTA_RAW_FMT} bytes |"
+            echo ""
+            echo "**Budget:** ${MAX_GZIP_KB} KB gzipped (warn at ${WARN_GZIP_KB} KB)"
+          } > /tmp/comment-body.md
+
+          if [ "$STATUS" = "warn" ]; then
+            echo "" >> /tmp/comment-body.md
+            echo "> :warning: **Approaching budget** — gzipped size exceeds ${WARN_GZIP_KB} KB warning threshold." >> /tmp/comment-body.md
+          fi
+
+          if [ "$STATUS" = "fail" ]; then
+            echo "" >> /tmp/comment-body.md
+            echo "> :x: **Over budget** — gzipped size exceeds ${MAX_GZIP_KB} KB limit. Reduce bundle size before merging." >> /tmp/comment-body.md
+          fi
+
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+
+          EOF_MARKER=$(head -c 20 /dev/urandom | base64 | tr -d '/+=' | head -c 20)
+          {
+            echo "comment<<${EOF_MARKER}"
+            cat /tmp/comment-body.md
+            echo "${EOF_MARKER}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Post PR comment
+        uses: marocchino/sticky-pull-request-comment@67d0dec7b07ed060a405f9b2a64b8ab319fdd7db # pin@v2.9.2
+        with:
+          header: pixel-bundle-size
+          message: ${{ steps.evaluate.outputs.comment }}
+
+      - name: Fail if over budget
+        if: steps.evaluate.outputs.status == 'fail'
+        run: |
+          echo "::error::Pixel bundle gzipped size (${{ steps.pr_size.outputs.gzip }} bytes) exceeds budget (${{ steps.budget.outputs.max_gzip }} bytes)"
+          exit 1

@@ -1,0 +1,9 @@
+{
+  "budgets": [
+    {
+      "file": "dist/imtbl.js",
+      "maxSizeGzip": 10240,
+      "warnSizeGzip": 8192
+    }
+  ]
+}
