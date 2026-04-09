@@ -6,6 +6,7 @@ import type {
   IdentifyMessage,
   UserTraits,
   ConsentManager,
+  IdentityType,
 } from '@imtbl/audience-core';
 import {
   MessageQueue,
@@ -147,7 +148,7 @@ export class Pixel {
     this.queue!.enqueue(message);
   }
 
-  identify(userId: string, traits?: UserTraits): void {
+  identify(userId: string, identityType: IdentityType, traits?: UserTraits): void {
     if (!this.isReady() || this.consent!.level !== 'full') return;
 
     this.userId = userId;
@@ -158,6 +159,7 @@ export class Pixel {
       ...this.buildBase(),
       type: 'identify',
       userId,
+      identityType,
       traits: {
         ...traits,
         sessionId,
