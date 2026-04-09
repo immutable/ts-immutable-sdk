@@ -65,14 +65,14 @@ describe('bootstrap', () => {
     (window as Record<string, unknown>).__imtbl = [
       ['init', { key: 'pk_test' }],
       ['consent', 'full'],
-      ['identify', 'user-1', { email: 'a@b.com' }],
+      ['identify', 'user-1', 'passport', { email: 'a@b.com' }],
     ];
 
     require('./bootstrap');
 
     expect(mockInit).toHaveBeenCalledWith({ key: 'pk_test' });
     expect(mockSetConsent).toHaveBeenCalledWith('full');
-    expect(mockIdentify).toHaveBeenCalledWith('user-1', { email: 'a@b.com' });
+    expect(mockIdentify).toHaveBeenCalledWith('user-1', 'passport', { email: 'a@b.com' });
   });
 
   it('installs loader and handles new commands after load', () => {
