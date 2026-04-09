@@ -8,7 +8,7 @@
 import { defineConfig } from 'tsup';
 import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill';
 import { replace } from 'esbuild-plugin-replace';
-import pkg from './package.json' assert { type: 'json' };
+import pkg from './package.json' with { type: 'json' };
 
 const IMTBL_WORKSPACE = /^@imtbl\//;
 
@@ -44,7 +44,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       minify: true,
       bundle: true,
-      noExternal: [IMTBL_WORKSPACE, '@uniswap/swap-router-contracts'],
+      noExternal: [IMTBL_WORKSPACE],
       treeshake: true,
       esbuildPlugins: [
         nodeModulesPolyfillPlugin({
@@ -64,7 +64,7 @@ export default defineConfig((options) => {
       target: 'es2022',
       minify: true,
       bundle: true,
-      noExternal: [IMTBL_WORKSPACE, '@uniswap/swap-router-contracts'],
+      noExternal: [IMTBL_WORKSPACE],
       treeshake: true,
       esbuildPlugins: [
         replace({ __SDK_VERSION__: pkg.version }),
