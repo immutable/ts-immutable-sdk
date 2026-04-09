@@ -41,8 +41,9 @@ export {
 
 export { generateId, getTimestamp, isBrowser } from './utils';
 
-export type { Transport, TransportOptions } from './transport';
-export { httpTransport, httpSend } from './transport';
+export type { HttpSend, TransportOptions } from './transport';
+export { httpSend } from './transport';
+export type { TransportError, TransportResult } from './errors';
 export { MessageQueue } from './queue';
 export { collectContext } from './context';
 export {

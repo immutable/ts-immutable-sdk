@@ -32,8 +32,7 @@ jest.mock('@imtbl/audience-core', () => ({
     clear: jest.fn(),
     get length() { return 0; },
   })),
-  httpTransport: { send: jest.fn().mockResolvedValue(true) },
-  httpSend: jest.fn().mockResolvedValue(true),
+  httpSend: jest.fn().mockResolvedValue({ ok: true }),
   getBaseUrl: jest.fn().mockReturnValue('https://api.dev.immutable.com'),
   INGEST_PATH: '/v1/audience/messages',
   CONSENT_PATH: '/v1/audience/tracking-consent',
@@ -57,7 +56,15 @@ jest.mock('@imtbl/audience-core', () => ({
   getOrCreateSession: (...args: unknown[]) => mockGetOrCreateSession(...args),
   startCmpDetection: (...args: unknown[]) => mockStartCmpDetection(...args),
   createConsentManager: jest.fn().mockImplementation(
-    (_queue: unknown, _key: unknown, _anonId: unknown, _env: unknown, _source: unknown, level?: string) => {
+    (
+      _queue: unknown,
+      _send: unknown,
+      _key: unknown,
+      _anonId: unknown,
+      _env: unknown,
+      _source: unknown,
+      level?: string,
+    ) => {
       let current = level ?? 'none';
       return {
         get level() { return current; },
@@ -224,7 +231,7 @@ describe('Pixel', () => {
   });
 
   describe('identify', () => {
-    it('enqueues identify message at full consent', () => {
+    it('enqueues identify message with identityType at full consent', () => {
       mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-abc', isNew: false });
 
       const pixel = new Pixel();
@@ -232,12 +239,13 @@ describe('Pixel', () => {
       pixel.init({ key: 'pk_test', environment: 'dev', consent: 'full' });
       mockEnqueue.mockClear();
 
-      pixel.identify('user-1', { email: 'test@example.com' });
+      pixel.identify('user-1', 'passport', { email: 'test@example.com' });
 
       expect(mockEnqueue).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'identify',
           userId: 'user-1',
+          identityType: 'passport',
           surface: 'pixel',
           traits: expect.objectContaining({
             email: 'test@example.com',
@@ -247,12 +255,31 @@ describe('Pixel', () => {
       );
     });
 
+    it('enqueues identify message without traits', () => {
+      mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-abc', isNew: false });
+
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'full' });
+      mockEnqueue.mockClear();
+
+      pixel.identify('steam-id-123', 'steam');
+
+      expect(mockEnqueue).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'identify',
+          userId: 'steam-id-123',
+          identityType: 'steam',
+        }),
+      );
+    });
+
     it('does not enqueue identify at anonymous consent', () => {
       const pixel = new Pixel();
       activePixel = pixel;
       pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
 
-      pixel.identify('user-1');
+      pixel.identify('user-1', 'passport');
       // Only the auto page view + session_start, no identify
       const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
       expect(calls.find((c) => c.type === 'identify')).toBeUndefined();
@@ -463,6 +490,7 @@ describe('Pixel', () => {
 
       // consentMode: 'full' should win over consent: 'anonymous'
       expect(createConsentManager).toHaveBeenCalledWith(
+        expect.anything(),
         expect.anything(),
         'pk_test',
         'anon-123',
