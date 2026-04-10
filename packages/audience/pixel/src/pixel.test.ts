@@ -341,16 +341,30 @@ describe('Pixel', () => {
   });
 
   describe('setConsent', () => {
-    it('updates consent level', () => {
+    it('updates consent level and allows tracking', () => {
       const pixel = new Pixel();
       activePixel = pixel;
       pixel.init({ key: 'pk_test', environment: 'dev', consent: 'none' });
 
       pixel.setConsent('anonymous');
 
-      mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-xyz', isNew: false });
-      pixel.page();
-      expect(mockEnqueue).toHaveBeenCalledWith(expect.objectContaining({ type: 'page' }));
+      // setConsent should have auto-fired the deferred initial page view
+      const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
+      expect(calls.find((c) => c.type === 'page')).toBeDefined();
+    });
+
+    it('fires deferred page view only once on repeated setConsent calls', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'none' });
+
+      pixel.setConsent('anonymous');
+      mockEnqueue.mockClear();
+
+      // Second setConsent should NOT fire another page view
+      pixel.setConsent('full');
+      const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
+      expect(calls.find((c) => c.type === 'page')).toBeUndefined();
     });
   });
 
