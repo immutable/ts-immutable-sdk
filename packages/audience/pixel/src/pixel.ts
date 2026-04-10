@@ -50,8 +50,6 @@ export class Pixel {
 
   private anonymousId = '';
 
-  private userId: string | undefined;
-
   private sessionId: string | undefined;
 
   private sessionStartTime: number | undefined;
@@ -157,7 +155,7 @@ export class Pixel {
         sessionId,
         ...properties,
       },
-      userId: this.consent!.level === 'full' ? this.userId : undefined,
+      userId: undefined,
     };
 
     this.queue!.enqueue(message);
@@ -232,7 +230,7 @@ export class Pixel {
       type: 'track',
       eventName,
       properties: { ...properties, sessionId },
-      userId: this.consent!.level === 'full' ? this.userId : undefined,
+      userId: undefined,
     };
 
     this.queue!.enqueue(message);
@@ -256,7 +254,7 @@ export class Pixel {
       type: 'track',
       eventName: 'session_start',
       properties: { sessionId },
-      userId: this.consent!.level === 'full' ? this.userId : undefined,
+      userId: undefined,
     };
 
     this.queue!.enqueue(message);
@@ -277,7 +275,7 @@ export class Pixel {
         sessionId: this.sessionId,
         duration,
       },
-      userId: this.consent!.level === 'full' ? this.userId : undefined,
+      userId: undefined,
     };
 
     this.queue!.enqueue(message);
