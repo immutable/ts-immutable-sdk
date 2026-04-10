@@ -52,3 +52,6 @@ export type { Attribution } from './attribution';
 
 export { createConsentManager, detectDoNotTrack } from './consent';
 export type { ConsentManager } from './consent';
+
+export { detectCmp, startCmpDetection } from './cmp';
+export type { CmpSource, ConsentCallback, CmpDetector } from './cmp';
