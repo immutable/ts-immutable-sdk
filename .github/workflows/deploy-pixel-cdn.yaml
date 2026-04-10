@@ -54,7 +54,7 @@ jobs:
         run: |
           aws s3 cp packages/audience/pixel/dist/imtbl.js \
             s3://${{ env.S3_BUCKET }}/${{ env.S3_KEY }} \
-            --cache-control "public, max-age=3600" \
+            --cache-control "public, max-age=86400" \
             --content-type "application/javascript"
 
       - name: Verify S3 upload
