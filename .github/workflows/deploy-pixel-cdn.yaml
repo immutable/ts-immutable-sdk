@@ -1,0 +1,76 @@
+name: Deploy Pixel to CDN
+
+on:
+  push:
+    paths:
+      - "packages/audience/pixel/**"
+      - "packages/audience/core/**"
+    branches:
+      - main
+  workflow_dispatch:
+
+# Required for GitHub OIDC to assume the AWS role
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-pixel-cdn
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1
+      S3_BUCKET: audience-pixel-prod
+      S3_KEY: pixel/v1/imtbl.js
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.1
+
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Build pixel bundle
+        run: pnpm --filter @imtbl/pixel build
+
+      - name: Verify bundle exists
+        run: |
+          if [ ! -f packages/audience/pixel/dist/imtbl.js ]; then
+            echo "::error::Build output not found at packages/audience/pixel/dist/imtbl.js"
+            exit 1
+          fi
+          echo "Bundle size: $(wc -c < packages/audience/pixel/dist/imtbl.js) bytes"
+          echo "Gzipped size: $(gzip -c packages/audience/pixel/dist/imtbl.js | wc -c) bytes"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722 # pin@v4.1.0
+        with:
+          role-to-assume: ${{ secrets.AWS_IMMUTABLE_PROD_ADMIN_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload to S3
+        run: |
+          aws s3 cp packages/audience/pixel/dist/imtbl.js \
+            s3://${{ env.S3_BUCKET }}/${{ env.S3_KEY }} \
+            --cache-control "public, max-age=86400" \
+            --content-type "application/javascript"
+
+      - name: Verify S3 upload
+        run: |
+          aws s3api head-object \
+            --bucket ${{ env.S3_BUCKET }} \
+            --key ${{ env.S3_KEY }} \
+            --query '{ContentType: ContentType, ContentLength: ContentLength, CacheControl: CacheControl}' \
+            --output table
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CF_PIXEL_PROD_DISTRIBUTION_ID }} \
+            --paths "/${{ env.S3_KEY }}"
+
+      - name: Log deployment
+        run: |
+          echo "Deployed to: https://cdn.immutable.com/${{ env.S3_KEY }}"
