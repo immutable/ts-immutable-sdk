@@ -232,11 +232,15 @@ export function detectCmp(onUpdate: ConsentCallback): CmpDetector | null {
  * This function tries detection immediately, then polls up to MAX_POLLS times.
  * Once a CMP is found, polling stops and the callback is invoked for future changes.
  *
+ * If no CMP is found after all polling attempts, `onTimeout` is called so callers
+ * can distinguish "CMP said none" from "no CMP found at all".
+ *
  * Returns a cleanup function that stops polling and tears down CMP listeners.
  */
 export function startCmpDetection(
   onUpdate: ConsentCallback,
   onDetected: (detector: CmpDetector) => void,
+  onTimeout?: () => void,
 ): () => void {
   // Try immediately
   let detector = detectCmp(onUpdate);
@@ -259,6 +263,7 @@ export function startCmpDetection(
 
     if (pollCount >= MAX_POLLS) {
       clearInterval(timer);
+      onTimeout?.();
     }
   }, POLL_INTERVAL);
 

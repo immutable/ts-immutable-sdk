@@ -41,7 +41,7 @@ export interface PixelInitOptions {
   environment?: Environment;
   consent?: ConsentLevel;
   /** Set to 'auto' to auto-detect consent from CMPs (Google Consent Mode, IAB TCF). */
-  consentMode?: 'auto' | ConsentLevel;
+  consentMode?: 'auto';
   domain?: string;
   autocapture?: AutocaptureOptions;
 }
@@ -73,6 +73,8 @@ export class Pixel {
 
   private teardownCmp?: () => void;
 
+  private initialPageViewFired = false;
+
   init(options: PixelInitOptions): void {
     if (this.initialized) return;
 
@@ -103,12 +105,8 @@ export class Pixel {
     this.anonymousId = getOrCreateAnonymousId(domain);
 
     // Resolve initial consent level.
-    // consentMode takes precedence over consent when set to a static level.
     // 'auto' starts at 'none' until a CMP is detected.
     const isAutoConsent = consentMode === 'auto';
-    const staticLevel: ConsentLevel | undefined = isAutoConsent
-      ? undefined
-      : (consentMode as ConsentLevel | undefined) ?? consentLevel;
 
     this.consent = createConsentManager(
       this.queue,
@@ -117,7 +115,7 @@ export class Pixel {
       this.anonymousId,
       environment,
       'pixel',
-      isAutoConsent ? 'none' : staticLevel,
+      isAutoConsent ? 'none' : consentLevel,
     );
 
     this.initialized = true;
@@ -128,14 +126,12 @@ export class Pixel {
     this.registerSessionEnd();
     this.queue.start();
 
-    // If consentMode is 'auto', start CMP detection.
-    // The pixel begins at 'none' and upgrades when a CMP is found.
     if (isAutoConsent) {
+      // CMP detection will fire the deferred page view when consent upgrades.
       this.startCmpDetection();
-    }
-
-    // Auto-fire page view if consent allows
-    if (this.consent.level !== 'none') {
+    } else if (this.consent.level !== 'none') {
+      // Static consent — fire page view immediately.
+      this.initialPageViewFired = true;
       this.page();
     }
 
@@ -194,6 +190,14 @@ export class Pixel {
   setConsent(level: ConsentLevel): void {
     if (!this.isReady()) return;
     this.consent!.setLevel(level);
+
+    // Fire the deferred page view if consent was upgraded from 'none'
+    // (covers the case where CMP detection failed and the caller
+    // manually sets consent as a fallback).
+    if (level !== 'none' && !this.initialPageViewFired) {
+      this.initialPageViewFired = true;
+      this.page();
+    }
   }
 
   destroy(): void {
@@ -221,9 +225,9 @@ export class Pixel {
       if (!this.isReady()) return;
       this.consent!.setLevel(level);
 
-      // If this is the first consent upgrade from 'none', fire the initial
-      // page view that was deferred at init.
-      if (level !== 'none' && !this.sessionId) {
+      // Fire the deferred page view on first consent upgrade from 'none'.
+      if (level !== 'none' && !this.initialPageViewFired) {
+        this.initialPageViewFired = true;
         this.page();
       }
     };

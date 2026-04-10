@@ -473,7 +473,7 @@ describe('Pixel', () => {
       expect(mockTeardownCmp).toHaveBeenCalled();
     });
 
-    it('consentMode static level takes precedence over consent param', () => {
+    it('consentMode auto starts consent at none regardless of consent param', () => {
       const { createConsentManager } = jest.requireMock('@imtbl/audience-core') as {
         createConsentManager: jest.Mock;
       };
@@ -485,10 +485,10 @@ describe('Pixel', () => {
         key: 'pk_test',
         environment: 'dev',
         consent: 'anonymous',
-        consentMode: 'full',
+        consentMode: 'auto',
       });
 
-      // consentMode: 'full' should win over consent: 'anonymous'
+      // consentMode: 'auto' should start at 'none' regardless of consent param
       expect(createConsentManager).toHaveBeenCalledWith(
         expect.anything(),
         expect.anything(),
@@ -496,8 +496,40 @@ describe('Pixel', () => {
         'anon-123',
         'dev',
         'pixel',
-        'full',
+        'none',
       );
+    });
+
+    it('setConsent fires deferred page view when CMP detection has not upgraded consent', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+
+      // No page view yet — waiting for CMP
+      expect(mockEnqueue).not.toHaveBeenCalled();
+      mockEnqueue.mockClear();
+
+      // Manually set consent as a fallback (e.g. CMP detection timed out)
+      pixel.setConsent('anonymous');
+
+      const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
+      expect(calls.find((c) => c.type === 'page')).toBeDefined();
+    });
+
+    it('setConsent does not fire duplicate page view after CMP already upgraded', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+
+      // CMP upgrades consent first
+      const onUpdate = mockStartCmpDetection.mock.calls[0][0];
+      onUpdate('anonymous', 'gcm');
+      mockEnqueue.mockClear();
+
+      // Manual setConsent should NOT fire another page view
+      pixel.setConsent('full');
+      const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
+      expect(calls.find((c) => c.type === 'page')).toBeUndefined();
     });
   });
 

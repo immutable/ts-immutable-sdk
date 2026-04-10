@@ -347,6 +347,39 @@ describe('CMP detection', () => {
       expect(onDetected).not.toHaveBeenCalled();
     });
 
+    it('calls onTimeout when no CMP is found after all polls', () => {
+      const onUpdate = jest.fn();
+      const onDetected = jest.fn();
+      const onTimeout = jest.fn();
+
+      startCmpDetection(onUpdate, onDetected, onTimeout);
+
+      // Advance past all 3 poll attempts
+      jest.advanceTimersByTime(3000);
+
+      expect(onDetected).not.toHaveBeenCalled();
+      expect(onTimeout).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not call onTimeout when CMP is detected', () => {
+      const onUpdate = jest.fn();
+      const onDetected = jest.fn();
+      const onTimeout = jest.fn();
+
+      startCmpDetection(onUpdate, onDetected, onTimeout);
+
+      // CMP loads after 1 poll
+      setupGcm('granted', 'denied');
+      jest.advanceTimersByTime(800);
+
+      expect(onDetected).toHaveBeenCalled();
+      expect(onTimeout).not.toHaveBeenCalled();
+
+      // Advance past remaining polls — onTimeout should still not fire
+      jest.advanceTimersByTime(3000);
+      expect(onTimeout).not.toHaveBeenCalled();
+    });
+
     it('cleanup function destroys detected CMP listener', () => {
       const dataLayer = setupGcm('granted', 'denied');
       const onUpdate = jest.fn();
