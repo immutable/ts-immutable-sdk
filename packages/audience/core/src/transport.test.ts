@@ -66,11 +66,43 @@ describe('httpSend', () => {
     }));
   });
 
-  it('returns ok on 2xx response', async () => {
+  it('returns ok on 2xx response with no body', async () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: true });
     const result = await httpSend('https://example.com', 'pk', payload);
     expect(result.ok).toBe(true);
     expect(result.error).toBeUndefined();
+  });
+
+  it('returns ok on 2xx response when body reports zero rejected', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => 'application/json' },
+      json: async () => ({ success: true, accepted: 1, rejected: 0 }),
+    });
+
+    const result = await httpSend('https://example.com', 'pk', payload);
+
+    expect(result.ok).toBe(true);
+    expect(result.error).toBeUndefined();
+  });
+
+  it('returns ok:false with status 200 when backend reports partial rejection', async () => {
+    // The silent-drop bug: backend returns 200 with { accepted: 1, rejected: 1 }
+    // and the queue used to clear the entire batch without surfacing the
+    // rejection. After this fix httpSend treats it as a structured failure.
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => 'application/json' },
+      json: async () => ({ success: true, accepted: 1, rejected: 1 }),
+    });
+
+    const result = await httpSend('https://example.com', 'pk', payload);
+
+    expect(result.ok).toBe(false);
+    expect(result.error?.status).toBe(200);
+    expect(result.error?.body).toEqual({ success: true, accepted: 1, rejected: 1 });
   });
 
   it('returns structured error on HTTP failure with parsed JSON body', async () => {

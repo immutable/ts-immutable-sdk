@@ -1,5 +1,6 @@
 import type { Message, BatchPayload } from './types';
 import type { HttpSend } from './transport';
+import { type AudienceError, invokeOnError, toAudienceError } from './errors';
 import * as storage from './storage';
 import { isBrowser } from './utils';
 
@@ -7,7 +8,19 @@ const STORAGE_KEY = 'queue';
 const MAX_BATCH_SIZE = 100; // Backend maxItems limit per OAS
 
 export interface MessageQueueOptions {
+  /**
+   * Fired after every flush, success or failure. Used for debug
+   * logging / metrics. Errors are reported separately via `onError`.
+   */
   onFlush?: (ok: boolean, count: number) => void;
+  /**
+   * Fired when a flush fails. The error has been mapped from the raw
+   * transport-level failure into a public {@link AudienceError} via
+   * {@link toAudienceError}, so the same shape comes out of every
+   * audience surface (web, pixel, ...). Exceptions thrown from the
+   * callback are swallowed so the queue can't wedge on a bad handler.
+   */
+  onError?: (err: AudienceError) => void;
   staleFilter?: (msg: Message) => boolean;
   /**
    * Override the localStorage key prefix (default: '__imtbl_audience_').
@@ -50,6 +63,8 @@ export class MessageQueue {
 
   private readonly onFlush?: (ok: boolean, count: number) => void;
 
+  private readonly onError?: (err: AudienceError) => void;
+
   private readonly storagePrefix?: string;
 
   constructor(
@@ -61,6 +76,7 @@ export class MessageQueue {
     options?: MessageQueueOptions,
   ) {
     this.onFlush = options?.onFlush;
+    this.onError = options?.onError;
     this.storagePrefix = options?.storagePrefix;
 
     const restored = (storage.getItem(STORAGE_KEY, this.storagePrefix) as Message[] | undefined) ?? [];
@@ -114,11 +130,26 @@ export class MessageQueue {
       const payload: BatchPayload = { messages: batch };
 
       const result = await this.send(this.endpointUrl, this.publishableKey, payload);
-      if (result.ok) {
+
+      let audienceErr: AudienceError | undefined;
+      if (!result.ok && result.error) {
+        audienceErr = toAudienceError(result.error, 'flush', batch.length);
+      }
+
+      // Drop the batch on success OR on a terminal validation failure.
+      // VALIDATION_REJECTED means the backend deterministically rejected
+      // some messages — retrying won't help, so we drop them rather than
+      // accumulate stale data forever.
+      const isTerminal = audienceErr?.code === 'VALIDATION_REJECTED';
+      if (result.ok || isTerminal) {
         this.messages = this.messages.slice(batch.length);
         this.persist();
       }
+
       this.onFlush?.(result.ok, batch.length);
+      if (audienceErr) {
+        invokeOnError(this.onError, audienceErr);
+      }
     } finally {
       this.flushing = false;
     }
