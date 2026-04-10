@@ -18,11 +18,11 @@ describe('createLoader', () => {
     const loader = createLoader(handler);
 
     loader.push(['init', { key: 'pk_123' }]);
-    loader.push(['identify', 'user-1']);
+    loader.push(['page', { url: '/home' }]);
 
     expect(handler).toHaveBeenCalledTimes(2);
     expect(handler).toHaveBeenCalledWith(['init', { key: 'pk_123' }]);
-    expect(handler).toHaveBeenCalledWith(['identify', 'user-1']);
+    expect(handler).toHaveBeenCalledWith(['page', { url: '/home' }]);
   });
 
   it('replays queued commands from the stub array', () => {
@@ -51,9 +51,9 @@ describe('createLoader', () => {
     expect(handler).toHaveBeenCalledTimes(1);
 
     // New command via push
-    loader.push(['identify', 'user-2']);
+    loader.push(['page', { url: '/about' }]);
     expect(handler).toHaveBeenCalledTimes(2);
-    expect(handler).toHaveBeenLastCalledWith(['identify', 'user-2']);
+    expect(handler).toHaveBeenLastCalledWith(['page', { url: '/about' }]);
   });
 
   it('handles empty window.__imtbl gracefully', () => {

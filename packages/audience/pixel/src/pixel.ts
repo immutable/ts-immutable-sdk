@@ -3,11 +3,8 @@ import type {
   ConsentLevel,
   PageMessage,
   TrackMessage,
-  IdentifyMessage,
-  UserTraits,
   ConsentManager,
   CmpDetector,
-  IdentityType,
 } from '@imtbl/audience-core';
 import {
   MessageQueue,
@@ -161,27 +158,6 @@ export class Pixel {
         ...properties,
       },
       userId: this.consent!.level === 'full' ? this.userId : undefined,
-    };
-
-    this.queue!.enqueue(message);
-  }
-
-  identify(userId: string, identityType: IdentityType, traits?: UserTraits): void {
-    if (!this.isReady() || this.consent!.level !== 'full') return;
-
-    this.userId = userId;
-    const { sessionId, isNew } = getOrCreateSession(this.domain);
-    this.refreshSession(sessionId, isNew);
-
-    const message: IdentifyMessage = {
-      ...this.buildBase(),
-      type: 'identify',
-      userId,
-      identityType,
-      traits: {
-        ...traits,
-        sessionId,
-      } as UserTraits,
     };
 
     this.queue!.enqueue(message);
