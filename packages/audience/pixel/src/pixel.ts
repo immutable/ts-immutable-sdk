@@ -3,11 +3,8 @@ import type {
   ConsentLevel,
   PageMessage,
   TrackMessage,
-  IdentifyMessage,
-  UserTraits,
   ConsentManager,
   CmpDetector,
-  IdentityType,
 } from '@imtbl/audience-core';
 import {
   MessageQueue,
@@ -52,8 +49,6 @@ export class Pixel {
   private consent: ConsentManager | null = null;
 
   private anonymousId = '';
-
-  private userId: string | undefined;
 
   private sessionId: string | undefined;
 
@@ -160,28 +155,7 @@ export class Pixel {
         sessionId,
         ...properties,
       },
-      userId: this.consent!.level === 'full' ? this.userId : undefined,
-    };
-
-    this.queue!.enqueue(message);
-  }
-
-  identify(userId: string, identityType: IdentityType, traits?: UserTraits): void {
-    if (!this.isReady() || this.consent!.level !== 'full') return;
-
-    this.userId = userId;
-    const { sessionId, isNew } = getOrCreateSession(this.domain);
-    this.refreshSession(sessionId, isNew);
-
-    const message: IdentifyMessage = {
-      ...this.buildBase(),
-      type: 'identify',
-      userId,
-      identityType,
-      traits: {
-        ...traits,
-        sessionId,
-      } as UserTraits,
+      userId: undefined,
     };
 
     this.queue!.enqueue(message);
@@ -256,7 +230,7 @@ export class Pixel {
       type: 'track',
       eventName,
       properties: { ...properties, sessionId },
-      userId: this.consent!.level === 'full' ? this.userId : undefined,
+      userId: undefined,
     };
 
     this.queue!.enqueue(message);
@@ -280,7 +254,7 @@ export class Pixel {
       type: 'track',
       eventName: 'session_start',
       properties: { sessionId },
-      userId: this.consent!.level === 'full' ? this.userId : undefined,
+      userId: undefined,
     };
 
     this.queue!.enqueue(message);
@@ -301,7 +275,7 @@ export class Pixel {
         sessionId: this.sessionId,
         duration,
       },
-      userId: this.consent!.level === 'full' ? this.userId : undefined,
+      userId: undefined,
     };
 
     this.queue!.enqueue(message);

@@ -5,7 +5,6 @@
 
 const mockInit = jest.fn();
 const mockPage = jest.fn();
-const mockIdentify = jest.fn();
 const mockSetConsent = jest.fn();
 const mockDestroy = jest.fn();
 
@@ -13,7 +12,6 @@ jest.mock('./pixel', () => ({
   Pixel: jest.fn().mockImplementation(() => ({
     init: mockInit,
     page: mockPage,
-    identify: mockIdentify,
     setConsent: mockSetConsent,
     destroy: mockDestroy,
   })),
@@ -65,14 +63,12 @@ describe('bootstrap', () => {
     (window as Record<string, unknown>).__imtbl = [
       ['init', { key: 'pk_test' }],
       ['consent', 'full'],
-      ['identify', 'user-1', 'passport', { email: 'a@b.com' }],
     ];
 
     require('./bootstrap');
 
     expect(mockInit).toHaveBeenCalledWith({ key: 'pk_test' });
     expect(mockSetConsent).toHaveBeenCalledWith('full');
-    expect(mockIdentify).toHaveBeenCalledWith('user-1', 'passport', { email: 'a@b.com' });
   });
 
   it('installs loader and handles new commands after load', () => {
