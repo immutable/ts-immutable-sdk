@@ -104,10 +104,10 @@ jobs:
       - name: Setup new package versions
         run: pnpm nx release version --specifier ${{ env.RELEASE_TYPE }} $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "")
 
-      - name: Build SDK & Checkout Widgets
+      - name: Build SDK, Checkout Widgets & Audience
         run: pnpm build
 
-      - name: Pack SDK & Checkout Widgets packages and dependencies
+      - name: Pack SDK, Checkout Widgets & Audience packages and dependencies
         run: pnpm pack-npm-packages
 
       # ! Do NOT remove any of these attestation subject paths - this will cause a Sev 0 incident !
