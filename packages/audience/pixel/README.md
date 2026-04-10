@@ -31,7 +31,7 @@ The `consent` option controls what the pixel collects. **Default is `none`** (no
 |-------|-----------------|-------------|----------|
 | `none` | Nothing — pixel loads but is inert | None | Before consent banner interaction |
 | `anonymous` | Device signals, attribution, page views, form submissions, link clicks (no PII) | `imtbl_anon_id`, `_imtbl_sid` | Anonymous analytics without PII |
-| `full` | Everything in `anonymous` + user identity (email hash, userId) | `imtbl_anon_id`, `_imtbl_sid` | After explicit user consent |
+| `full` | Everything in `anonymous` + email hash from form submissions | `imtbl_anon_id`, `_imtbl_sid` | After explicit user consent |
 
 ### Updating consent at runtime
 
@@ -73,16 +73,6 @@ document.head.appendChild(s);
 })();
 </script>
 ```
-
-## Identity (Optional)
-
-For sites with user accounts, identify known users at `full` consent:
-
-```javascript
-window.__imtbl.push(['identify', 'user-123', 'passport', { email: 'player@example.com' }]);
-```
-
-Note: traits passed via `identify` are sent as-is. Email values are only automatically SHA-256 hashed when captured from form submissions via auto-capture (see [Auto-Tracked Events](#auto-tracked-events)). If you pass an email in identify traits, hash it yourself before calling identify if that is required for your use case.
 
 ## Cookies
 
