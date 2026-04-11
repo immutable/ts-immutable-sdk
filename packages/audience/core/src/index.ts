@@ -50,7 +50,10 @@ export type { SessionResult } from './session';
 export { collectAttribution } from './attribution';
 export type { Attribution } from './attribution';
 
-export { createConsentManager, detectDoNotTrack } from './consent';
+export {
+  createConsentManager, detectDoNotTrack,
+  canTrack, canIdentify,
+} from './consent';
 export type { ConsentManager } from './consent';
 
 export { detectCmp, startCmpDetection } from './cmp';

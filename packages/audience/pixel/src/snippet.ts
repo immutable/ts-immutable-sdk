@@ -1,9 +1,11 @@
+import type { ConsentLevel } from '@imtbl/audience-core';
+
 const DEFAULT_CDN_URL = 'https://cdn.immutable.com/pixel/v1/imtbl.js';
 
 export interface SnippetOptions {
   key: string;
   cdnUrl?: string;
-  consent?: 'none' | 'anonymous' | 'full';
+  consent?: ConsentLevel;
 }
 
 export function generateSnippet(options: SnippetOptions): string {

@@ -27,6 +27,8 @@ import {
   collectAttribution,
   getOrCreateSession,
   createConsentManager,
+  canTrack,
+  canIdentify,
   SESSION_START,
   SESSION_END,
 } from '@imtbl/audience-core';
@@ -82,7 +84,7 @@ export class Audience {
     this.debug = new DebugLogger(config.debug ?? false);
 
     let isNewSession = false;
-    if (consentLevel !== 'none') {
+    if (canTrack(consentLevel)) {
       this.anonymousId = getOrCreateAnonymousId(cookieDomain);
       isNewSession = this.startSession();
     } else {
@@ -144,12 +146,12 @@ export class Audience {
 
   /** True when consent is 'none' — SDK should not enqueue anything. */
   private isTrackingDisabled(): boolean {
-    return this.consent.level === 'none';
+    return !canTrack(this.consent.level);
   }
 
   /** Returns userId if consent is full, undefined otherwise. */
   private effectiveUserId(): string | undefined {
-    return this.consent.level === 'full' ? this.userId : undefined;
+    return canIdentify(this.consent.level) ? this.userId : undefined;
   }
 
   /** Create or resume a session, returning whether it's new. */
@@ -274,7 +276,7 @@ export class Audience {
     identityType?: IdentityType,
     traits?: UserTraits,
   ): void {
-    if (this.consent.level !== 'full') {
+    if (!canIdentify(this.consent.level)) {
       this.debug.logWarning('identify() requires full consent — call ignored.');
       return;
     }
@@ -314,7 +316,7 @@ export class Audience {
     from: { id: string; identityType: IdentityType },
     to: { id: string; identityType: IdentityType },
   ): void {
-    if (this.consent.level !== 'full') {
+    if (!canIdentify(this.consent.level)) {
       this.debug.logWarning('alias() requires full consent — call ignored.');
       return;
     }
@@ -350,7 +352,7 @@ export class Audience {
 
     this.debug.logConsent(previous, level);
 
-    const isUpgradeFromNone = previous === 'none' && level !== 'none';
+    const isUpgradeFromNone = !canTrack(previous) && canTrack(level);
 
     // When upgrading from none, create the persisted anonymousId first
     // so the consent sync sends the correct ID to the server.
@@ -360,7 +362,7 @@ export class Audience {
 
     // Web-specific cleanup before core handles queue purge/transform and server sync.
     // session_end is intentionally not emitted — no events should be sent after opt-out.
-    if (level === 'none') {
+    if (!canTrack(level)) {
       this.queue.stop();
     }
 
@@ -369,10 +371,10 @@ export class Audience {
     this.consent.setLevel(level);
 
     // Web-specific cleanup after core's transition.
-    if (level === 'none') {
+    if (!canTrack(level)) {
       deleteCookie(COOKIE_NAME, this.cookieDomain);
       deleteCookie(SESSION_COOKIE, this.cookieDomain);
-    } else if (level === 'anonymous' && previous === 'full') {
+    } else if (canIdentify(previous) && !canIdentify(level)) {
       this.userId = undefined;
     }
 
