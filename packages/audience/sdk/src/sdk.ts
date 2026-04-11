@@ -362,7 +362,7 @@ export class Audience {
 
     // Web-specific cleanup before core handles queue purge/transform and server sync.
     // session_end is intentionally not emitted — no events should be sent after opt-out.
-    if (level === 'none') {
+    if (!canTrack(level)) {
       this.queue.stop();
     }
 
@@ -371,10 +371,10 @@ export class Audience {
     this.consent.setLevel(level);
 
     // Web-specific cleanup after core's transition.
-    if (level === 'none') {
+    if (!canTrack(level)) {
       deleteCookie(COOKIE_NAME, this.cookieDomain);
       deleteCookie(SESSION_COOKIE, this.cookieDomain);
-    } else if (level === 'anonymous' && previous === 'full') {
+    } else if (canIdentify(previous) && !canIdentify(level)) {
       this.userId = undefined;
     }
 
