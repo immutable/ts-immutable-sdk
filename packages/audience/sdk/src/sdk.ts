@@ -29,7 +29,6 @@ import {
   createConsentManager,
   canTrack,
   canIdentify,
-  includesUserId,
   SESSION_START,
   SESSION_END,
 } from '@imtbl/audience-core';
@@ -152,7 +151,7 @@ export class Audience {
 
   /** Returns userId if consent is full, undefined otherwise. */
   private effectiveUserId(): string | undefined {
-    return includesUserId(this.consent.level) ? this.userId : undefined;
+    return canIdentify(this.consent.level) ? this.userId : undefined;
   }
 
   /** Create or resume a session, returning whether it's new. */

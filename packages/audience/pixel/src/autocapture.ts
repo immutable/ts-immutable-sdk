@@ -1,5 +1,5 @@
 import type { ConsentLevel } from '@imtbl/audience-core';
-import { canTrack, includesUserId } from '@imtbl/audience-core';
+import { canTrack, canIdentify } from '@imtbl/audience-core';
 
 export interface AutocaptureOptions {
   /** Enable form submission auto-capture. Default: true */
@@ -82,7 +82,7 @@ export function setupAutocapture(
       };
 
       const consent = getConsent();
-      if (includesUserId(consent)) {
+      if (canIdentify(consent)) {
         const email = findEmail(form);
         if (email) {
           // Hash before enqueuing — raw email never enters the queue.
