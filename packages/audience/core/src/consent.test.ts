@@ -1,4 +1,6 @@
-import { createConsentManager } from './consent';
+import {
+  createConsentManager, canTrack, canIdentify, includesUserId,
+} from './consent';
 import type { HttpSend } from './transport';
 import { TransportError } from './errors';
 
@@ -23,6 +25,32 @@ function createMockQueue() {
 
 beforeEach(() => {
   jest.clearAllMocks();
+});
+
+describe('consent capability queries', () => {
+  it.each([
+    ['none', false],
+    ['anonymous', true],
+    ['full', true],
+  ] as const)('canTrack(%s) returns %s', (level, expected) => {
+    expect(canTrack(level)).toBe(expected);
+  });
+
+  it.each([
+    ['none', false],
+    ['anonymous', false],
+    ['full', true],
+  ] as const)('canIdentify(%s) returns %s', (level, expected) => {
+    expect(canIdentify(level)).toBe(expected);
+  });
+
+  it.each([
+    ['none', false],
+    ['anonymous', false],
+    ['full', true],
+  ] as const)('includesUserId(%s) returns %s', (level, expected) => {
+    expect(includesUserId(level)).toBe(expected);
+  });
 });
 
 describe('createConsentManager', () => {
