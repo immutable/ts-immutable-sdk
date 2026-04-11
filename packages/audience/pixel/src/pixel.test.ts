@@ -72,6 +72,7 @@ jest.mock('@imtbl/audience-core', () => ({
       };
     },
   ),
+  canTrack: (level: string) => level !== 'none',
 }));
 
 // Mock fetch globally

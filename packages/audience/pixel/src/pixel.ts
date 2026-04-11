@@ -22,6 +22,7 @@ import {
   collectAttribution,
   getOrCreateSession,
   createConsentManager,
+  canTrack as consentAllowsTracking,
   startCmpDetection,
 } from '@imtbl/audience-core';
 import { setupAutocapture } from './autocapture';
@@ -124,7 +125,7 @@ export class Pixel {
     if (isAutoConsent) {
       // CMP detection will fire the deferred page view when consent upgrades.
       this.startCmpDetection();
-    } else if (this.consent.level !== 'none') {
+    } else if (consentAllowsTracking(this.consent.level)) {
       // Static consent — fire page view immediately.
       this.initialPageViewFired = true;
       this.page();
@@ -168,7 +169,7 @@ export class Pixel {
     // Fire the deferred page view if consent was upgraded from 'none'
     // (covers the case where CMP detection failed and the caller
     // manually sets consent as a fallback).
-    if (level !== 'none' && !this.initialPageViewFired) {
+    if (consentAllowsTracking(level) && !this.initialPageViewFired) {
       this.initialPageViewFired = true;
       this.page();
     }
@@ -200,7 +201,7 @@ export class Pixel {
       this.consent!.setLevel(level);
 
       // Fire the deferred page view on first consent upgrade from 'none'.
-      if (level !== 'none' && !this.initialPageViewFired) {
+      if (consentAllowsTracking(level) && !this.initialPageViewFired) {
         this.initialPageViewFired = true;
         this.page();
       }
@@ -210,7 +211,7 @@ export class Pixel {
       onCmpUpdate,
       (detector: CmpDetector) => {
         // CMP found — apply the initial consent level it reported.
-        if (detector.level !== 'none') {
+        if (consentAllowsTracking(detector.level)) {
           onCmpUpdate(detector.level);
         }
       },
@@ -338,7 +339,7 @@ export class Pixel {
   // -- Guards -------------------------------------------------------------
 
   private canTrack(): boolean {
-    return this.isReady() && this.consent!.level !== 'none';
+    return this.isReady() && consentAllowsTracking(this.consent!.level);
   }
 
   private isReady(): boolean {
