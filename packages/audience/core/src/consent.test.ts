@@ -1,5 +1,5 @@
 import {
-  createConsentManager, canTrack, canIdentify, includesUserId,
+  createConsentManager, canTrack, canIdentify,
 } from './consent';
 import type { HttpSend } from './transport';
 import { TransportError } from './errors';
@@ -42,14 +42,6 @@ describe('consent capability queries', () => {
     ['full', true],
   ] as const)('canIdentify(%s) returns %s', (level, expected) => {
     expect(canIdentify(level)).toBe(expected);
-  });
-
-  it.each([
-    ['none', false],
-    ['anonymous', false],
-    ['full', true],
-  ] as const)('includesUserId(%s) returns %s', (level, expected) => {
-    expect(includesUserId(level)).toBe(expected);
   });
 });
 

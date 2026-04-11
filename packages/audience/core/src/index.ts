@@ -52,7 +52,7 @@ export type { Attribution } from './attribution';
 
 export {
   createConsentManager, detectDoNotTrack,
-  canTrack, canIdentify, includesUserId,
+  canTrack, canIdentify,
 } from './consent';
 export type { ConsentManager } from './consent';
 

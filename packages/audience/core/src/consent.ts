@@ -15,18 +15,13 @@ export interface ConsentManager {
 // Single source of truth for what each consent level permits. Use these
 // instead of raw string comparisons so rule changes only touch this file.
 
-/** Can this consent level record anonymous page/track events? */
+/** Can this consent level record events (page views, track calls)? */
 export function canTrack(level: ConsentLevel): boolean {
   return level !== 'none';
 }
 
-/** Can this consent level bind events to a named identity (identify/alias)? */
+/** Can this consent level use identity features (identify, alias, userId, email hash)? */
 export function canIdentify(level: ConsentLevel): boolean {
-  return level === 'full';
-}
-
-/** Should the userId field be attached to outgoing messages? */
-export function includesUserId(level: ConsentLevel): boolean {
   return level === 'full';
 }
 
