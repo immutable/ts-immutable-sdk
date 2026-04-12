@@ -1,4 +1,4 @@
-import type { Environment, ConsentLevel } from '@imtbl/audience-core';
+import type { Environment, ConsentLevel, AudienceError } from '@imtbl/audience-core';
 
 /** Configuration for the Immutable Web SDK. */
 export interface AudienceConfig {
@@ -16,4 +16,6 @@ export interface AudienceConfig {
   flushInterval?: number;
   /** Number of queued messages that triggers an automatic flush. Defaults to 20. */
   flushSize?: number;
+  /** Called when a flush or consent sync fails. Exceptions thrown from this callback are swallowed. */
+  onError?: (err: AudienceError) => void;
 }

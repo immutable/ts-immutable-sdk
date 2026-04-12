@@ -98,6 +98,7 @@ export class Audience {
       flushSize,
       {
         onFlush: (ok, count) => this.debug.logFlush(ok, count),
+        onError: config.onError,
         staleFilter: (m) => isTimestampValid(m.eventTimestamp),
         storagePrefix: '__imtbl_web_',
       },
@@ -111,6 +112,7 @@ export class Audience {
       environment,
       consentSource,
       consentLevel,
+      config.onError,
     );
 
     this.attribution = collectAttribution();
