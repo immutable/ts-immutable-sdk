@@ -27,9 +27,8 @@ import {
   collectAttribution,
   getOrCreateSession,
   createConsentManager,
-  SESSION_START,
-  SESSION_END,
 } from '@imtbl/audience-core';
+import { AudienceEvents } from './events';
 import { DebugLogger } from './debug';
 import type { AudienceConfig } from './types';
 import {
@@ -187,7 +186,7 @@ export class Audience {
     this.enqueue('track(session_start)', {
       ...this.baseMessage(),
       type: 'track',
-      eventName: SESSION_START,
+      eventName: AudienceEvents.SESSION_START,
       properties: {
         sessionId: this.sessionId,
         ...this.attribution,
@@ -200,7 +199,7 @@ export class Audience {
     this.enqueue('track(session_end)', {
       ...this.baseMessage(),
       type: 'track',
-      eventName: SESSION_END,
+      eventName: AudienceEvents.SESSION_END,
       properties: {
         sessionId: this.sessionId,
         ...(this.sessionStartTime && {
