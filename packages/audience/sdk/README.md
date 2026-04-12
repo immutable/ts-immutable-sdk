@@ -33,7 +33,7 @@ Until the first npm release, you can build the CDN bundle locally from this repo
 ## Quickstart
 
 ```ts
-import { Audience, IdentityType } from '@imtbl/audience';
+import { Audience, AudienceEvents, IdentityType } from '@imtbl/audience';
 
 const audience = Audience.init({
   publishableKey: 'pk_imapik-...',
@@ -50,6 +50,14 @@ audience.page({ section: 'marketplace' });
 
 // Track a custom event
 audience.track('purchase_completed', { sku: 'pack-1', usd: 9.99 });
+
+// Use the predefined event vocabulary for standard actions
+audience.track(AudienceEvents.LINK_CLICKED, {
+  url: 'https://store.example.com',
+  label: 'play_now',
+  source: 'game_page',
+  isLoggedIn: true,
+});
 
 // Upgrade consent and identify the user
 audience.setConsent('full');
