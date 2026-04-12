@@ -33,6 +33,7 @@ const MIME = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.json': 'application/json; charset=utf-8',
+  '.md': 'text/plain; charset=utf-8',
 };
 
 /**
