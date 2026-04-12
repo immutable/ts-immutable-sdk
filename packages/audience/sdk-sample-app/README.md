@@ -29,11 +29,14 @@ These are test-only keys registered for audience tracking. Safe to commit and sh
 3. Click **Call page()** with no properties → `PAGE` entry + 200 response.
 4. Enter `{"section":"marketplace"}` in the page properties textarea → `PAGE {section: marketplace}`.
 5. Track a custom event with properties → `TRACK`.
-6. Set consent to `full` → `PUT /v1/audience/tracking-consent` returns 204.
-7. Identify a user (any made-up ID, type `passport`, optional traits) → status bar's User ID updates.
-8. Try Alias with a Steam ID → Passport ID → `ALIAS` entry.
-9. Click **Reset** → anonymous ID rotates, session end + start fire.
-10. Click **Shutdown** → session end fires, buttons flip off.
+6. In **Studio Events**, click **game_page_viewed** → fires with demo gameId, gameName, slug, isLoggedIn.
+7. Click **link_clicked** → fires with a demo URL, label, source, and gameId.
+8. Click **email_acquired**, **sign_in**, **wishlist_add**, **wishlist_remove** → each fires with realistic demo properties matching the Play integration.
+9. Set consent to `full` → `PUT /v1/audience/tracking-consent` returns 204.
+10. Identify a user (any made-up ID, type `passport`, optional traits) → status bar's User ID updates.
+11. Try Alias with a Steam ID → Passport ID → `ALIAS` entry.
+12. Click **Reset** → anonymous ID rotates, session end + start fire.
+13. Click **Shutdown** → session end fires, buttons flip off.
 
 ## Environments
 

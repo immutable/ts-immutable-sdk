@@ -336,6 +336,12 @@
     $('btn-identify').disabled = !on;
     $('btn-identify-traits').disabled = !on;
     $('btn-alias').disabled = !on;
+    $('btn-ev-game-page-viewed').disabled = !on;
+    $('btn-ev-link-clicked').disabled = !on;
+    $('btn-ev-email-acquired').disabled = !on;
+    $('btn-ev-sign-in').disabled = !on;
+    $('btn-ev-wishlist-add').disabled = !on;
+    $('btn-ev-wishlist-remove').disabled = !on;
     $('pk').disabled = on;
     $('flush-interval').disabled = on;
     $('flush-size').disabled = on;
@@ -498,6 +504,98 @@
     }
   }
 
+  // --- Studio event quick-fire buttons ---
+  // Each fires audience.track() with the recommended event name and realistic
+  // demo properties matching the shapes defined in events.ts.
+
+  function studioGameId() {
+    return ($('studio-game-id').value || '').trim() || 'game-demo-001';
+  }
+
+  function onGamePageViewed() {
+    if (!audience) return;
+    var gameId = studioGameId();
+    var props = {
+      gameId: gameId,
+      gameName: 'Demo Game',
+      slug: 'demo-game',
+      isLoggedIn: !!currentUserId,
+    };
+    try {
+      audience.track('game_page_viewed', props);
+      log('TRACK', { eventName: 'game_page_viewed', properties: props }, 'ok');
+    } catch (err) {
+      log('TRACK', String(err && err.message || err), 'err');
+    }
+  }
+
+  function onLinkClicked() {
+    if (!audience) return;
+    var gameId = studioGameId();
+    var props = {
+      url: 'https://store.example.com/demo-game',
+      label: 'play_now',
+      source: 'game_page',
+      isLoggedIn: !!currentUserId,
+      gameId: gameId,
+    };
+    try {
+      audience.track('link_clicked', props);
+      log('TRACK', { eventName: 'link_clicked', properties: props }, 'ok');
+    } catch (err) {
+      log('TRACK', String(err && err.message || err), 'err');
+    }
+  }
+
+  function onEmailAcquired() {
+    if (!audience) return;
+    var props = {
+      isLoggedIn: !!currentUserId,
+      source: 'linked_account_steam',
+    };
+    try {
+      audience.track('email_acquired', props);
+      log('TRACK', { eventName: 'email_acquired', properties: props }, 'ok');
+    } catch (err) {
+      log('TRACK', String(err && err.message || err), 'err');
+    }
+  }
+
+  function onSignIn() {
+    if (!audience) return;
+    var props = { method: 'passport' };
+    try {
+      audience.track('sign_in', props);
+      log('TRACK', { eventName: 'sign_in', properties: props }, 'ok');
+    } catch (err) {
+      log('TRACK', String(err && err.message || err), 'err');
+    }
+  }
+
+  function onWishlistAdd() {
+    if (!audience) return;
+    var gameId = studioGameId();
+    var props = { gameId: gameId };
+    try {
+      audience.track('wishlist_add', props);
+      log('TRACK', { eventName: 'wishlist_add', properties: props }, 'ok');
+    } catch (err) {
+      log('TRACK', String(err && err.message || err), 'err');
+    }
+  }
+
+  function onWishlistRemove() {
+    if (!audience) return;
+    var gameId = studioGameId();
+    var props = { gameId: gameId };
+    try {
+      audience.track('wishlist_remove', props);
+      log('TRACK', { eventName: 'wishlist_remove', properties: props }, 'ok');
+    } catch (err) {
+      log('TRACK', String(err && err.message || err), 'err');
+    }
+  }
+
   function onIdentify() {
     if (!audience) return;
     var id = $('identify-id').value.trim();
@@ -599,6 +697,13 @@
 
     $('btn-page').addEventListener('click', onPage);
     $('btn-track').addEventListener('click', onTrack);
+
+    $('btn-ev-game-page-viewed').addEventListener('click', onGamePageViewed);
+    $('btn-ev-link-clicked').addEventListener('click', onLinkClicked);
+    $('btn-ev-email-acquired').addEventListener('click', onEmailAcquired);
+    $('btn-ev-sign-in').addEventListener('click', onSignIn);
+    $('btn-ev-wishlist-add').addEventListener('click', onWishlistAdd);
+    $('btn-ev-wishlist-remove').addEventListener('click', onWishlistRemove);
 
     var versionEl = $('sdk-version');
     if (versionEl) versionEl.textContent = SDK_VERSION;
