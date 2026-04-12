@@ -6,15 +6,7 @@
  * itself is exercised by running `pnpm build` and loading the built file in
  * the demo page.
  */
-import type { AudienceError, IdentityType } from '@imtbl/audience-core';
-import type { Audience } from './sdk';
-
-type GlobalShape = {
-  Audience: typeof Audience;
-  AudienceError: typeof AudienceError;
-  IdentityType: typeof IdentityType;
-  version: string;
-};
+import type { ImmutableAudienceGlobal } from './cdn';
 
 describe('cdn entry point', () => {
   beforeEach(() => {
@@ -29,7 +21,7 @@ describe('cdn entry point', () => {
   it('attaches the SDK surface to window.ImmutableAudience', async () => {
     await import('./cdn');
     const g = (globalThis as unknown as {
-      ImmutableAudience?: GlobalShape;
+      ImmutableAudience?: ImmutableAudienceGlobal;
     }).ImmutableAudience;
 
     expect(g).toBeDefined();

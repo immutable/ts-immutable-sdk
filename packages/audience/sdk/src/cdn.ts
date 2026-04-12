@@ -15,7 +15,15 @@ import { AudienceError, IdentityType } from '@imtbl/audience-core';
 import { Audience } from './sdk';
 import { LIBRARY_VERSION } from './config';
 
-type GlobalShape = {
+/**
+ * The shape of `window.ImmutableAudience` attached by the CDN bundle.
+ * Type-only export — importing this module otherwise has runtime side effects,
+ * which is why the file's `DO NOT import this` warning above only applies to
+ * value imports. The CDN smoke test imports this type to keep its assertions
+ * in lockstep with the real surface, eliminating the need for a duplicate
+ * definition.
+ */
+export type ImmutableAudienceGlobal = {
   Audience: typeof Audience;
   AudienceError: typeof AudienceError;
   IdentityType: typeof IdentityType;
@@ -26,7 +34,7 @@ type GlobalShape = {
 // to `window` for browsers that predate globalThis (Safari < 12.1).
 const globalObj = (
   typeof globalThis !== 'undefined' ? globalThis : window
-) as unknown as { ImmutableAudience?: GlobalShape };
+) as unknown as { ImmutableAudience?: ImmutableAudienceGlobal };
 
 if (globalObj.ImmutableAudience) {
   // eslint-disable-next-line no-console
