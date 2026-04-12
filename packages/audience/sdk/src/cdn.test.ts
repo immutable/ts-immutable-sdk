@@ -6,6 +6,15 @@
  * itself is exercised by running `pnpm build` and loading the built file in
  * the demo page.
  */
+import type { AudienceError, IdentityType } from '@imtbl/audience-core';
+import type { Audience } from './sdk';
+
+type GlobalShape = {
+  Audience: typeof Audience;
+  AudienceError: typeof AudienceError;
+  IdentityType: typeof IdentityType;
+  version: string;
+};
 
 describe('cdn entry point', () => {
   beforeEach(() => {
@@ -20,12 +29,7 @@ describe('cdn entry point', () => {
   it('attaches the SDK surface to window.ImmutableAudience', async () => {
     await import('./cdn');
     const g = (globalThis as unknown as {
-      ImmutableAudience?: {
-        Audience: { init: Function };
-        AudienceError: typeof Error;
-        IdentityType: Record<string, string>;
-        version: string;
-      };
+      ImmutableAudience?: GlobalShape;
     }).ImmutableAudience;
 
     expect(g).toBeDefined();
@@ -37,7 +41,7 @@ describe('cdn entry point', () => {
     expect(g!.IdentityType.Custom).toBe('custom');
 
     // AudienceError should be constructable and extend Error
-    const err = new (g!.AudienceError as any)({
+    const err = new g!.AudienceError({
       code: 'NETWORK_ERROR',
       message: 'test',
       status: 0,
