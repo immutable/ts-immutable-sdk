@@ -35,11 +35,6 @@ const PIXEL_VERSION: string = typeof PIXEL_VERSION_INJECTED !== 'undefined'
 
 export interface PixelInitOptions {
   key: string;
-  /**
-   * Target environment for the API endpoint. Defaults to `'production'`.
-   * Only set this for internal Immutable pages that need to target
-   * non-production backends (e.g. dev, sandbox).
-   */
   environment?: Environment;
   consent?: ConsentLevel;
   /** Set to 'auto' to auto-detect consent from CMPs (Google Consent Mode, IAB TCF). */
