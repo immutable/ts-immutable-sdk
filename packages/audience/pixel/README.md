@@ -1,6 +1,6 @@
 # @imtbl/pixel — Immutable Tracking Pixel
 
-A drop-in JavaScript snippet that captures device signals, page views, and attribution data for Immutable's events pipeline. Zero configuration beyond a publishable key.
+A drop-in JavaScript snippet that captures device signals, page views, and attribution data for Immutable's events pipeline. Use it to measure campaign performance and attribute player acquisition across your marketing sites, landing pages, and web shops. Zero configuration beyond a publishable key.
 
 ## Quick Start
 
@@ -21,7 +21,12 @@ document.head.appendChild(s);
 
 Replace `YOUR_PUBLISHABLE_KEY` with your project's publishable key from [Immutable Hub](https://hub.immutable.com/).
 
-The script loads asynchronously and does not block page rendering. The default consent level is `none` — the pixel loads but does not collect until consent is explicitly set (see [Consent Modes](#consent-modes)). To start collecting anonymous device signals immediately, add `"consent":"anonymous"` to the init object.
+The script loads asynchronously and does not block page rendering. The default consent level is `none` — the pixel loads but does not collect until consent is explicitly set (see [Consent Modes](#consent-modes)). To start collecting anonymous device signals immediately, add `"consent":"anonymous"` to the init options:
+
+```diff
+- w[i].push(["init",{"key":"YOUR_PUBLISHABLE_KEY"}]);
++ w[i].push(["init",{"key":"YOUR_PUBLISHABLE_KEY","consent":"anonymous"}]);
+```
 
 ## Consent Modes
 
@@ -31,15 +36,18 @@ The `consent` option controls what the pixel collects. **Default is `none`** (no
 |-------|-----------------|-------------|----------|
 | `none` | Nothing — pixel loads but is inert | None | Before consent banner interaction |
 | `anonymous` | Device signals, attribution, page views, form submissions, link clicks (no PII) | `imtbl_anon_id`, `_imtbl_sid` | Anonymous analytics without PII |
-| `full` | Everything in `anonymous` + email hash from form submissions | `imtbl_anon_id`, `_imtbl_sid` | After explicit user consent |
+| `full` | Everything in `anonymous` + hashed email capture from form submissions (for identity matching) | `imtbl_anon_id`, `_imtbl_sid` | After explicit user consent for marketing/ads |
 
 ### Automatic consent detection
 
-If your site uses a Consent Management Platform (CMP), the pixel can auto-detect consent state by setting `consentMode` to `'auto'`:
+If your site uses a Consent Management Platform (CMP), the pixel can auto-detect consent state. Set `consentMode` to `'auto'` instead of setting `consent` directly:
 
-```html
-w[i].push(["init",{"key":"YOUR_KEY","consentMode":"auto"}]);
+```diff
+- w[i].push(["init",{"key":"YOUR_KEY","consent":"anonymous"}]);
++ w[i].push(["init",{"key":"YOUR_KEY","consentMode":"auto"}]);
 ```
+
+> **Note:** `consentMode` and `consent` are mutually exclusive. When `consentMode` is `'auto'`, the pixel ignores the `consent` option and starts in `none` until a CMP is detected.
 
 The pixel checks for these CMP standards (in priority order):
 
@@ -143,4 +151,3 @@ Note: the nonce covers the inline snippet only. The CDN-loaded script (`imtbl.js
 | Firefox | 78+ |
 | Safari | 14+ |
 | Edge | 80+ |
-
