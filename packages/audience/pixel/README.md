@@ -43,8 +43,8 @@ w[i].push(["init",{"key":"YOUR_KEY","consentMode":"auto"}]);
 
 The pixel checks for these CMP standards (in priority order):
 
-1. **Google Consent Mode v2** — reads `analytics_storage` and `ad_storage` from `window.dataLayer`
-2. **IAB TCF v2** — reads purpose consents via `window.__tcfapi`
+1. [**Google Consent Mode v2**](https://developers.google.com/tag-platform/security/guides/consent?consentmode=advanced) — reads `analytics_storage` and `ad_storage` from `window.dataLayer`
+2. [**IAB TCF v2**](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md) — reads purpose consents via `window.__tcfapi`
 
 When `consentMode` is `'auto'`, the pixel starts in `none` and upgrades automatically once a CMP is detected. It also listens for ongoing consent changes (e.g. when a user updates their cookie preferences).
 
