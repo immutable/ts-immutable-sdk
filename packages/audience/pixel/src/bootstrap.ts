@@ -23,13 +23,6 @@ function handleCommand(command: Command): void {
     case 'page':
       pixel.page(args[0] as Parameters<Pixel['page']>[0]);
       break;
-    case 'identify':
-      pixel.identify(
-        args[0] as string,
-        args[1] as Parameters<Pixel['identify']>[1],
-        args[2] as Parameters<Pixel['identify']>[2],
-      );
-      break;
     case 'consent':
       pixel.setConsent(args[0] as Parameters<Pixel['setConsent']>[0]);
       break;

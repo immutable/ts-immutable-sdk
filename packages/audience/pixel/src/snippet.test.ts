@@ -45,4 +45,28 @@ describe('generateSnippet', () => {
     expect(html).toContain('s.async=1');
     expect(html).toContain('document.head.appendChild(s)');
   });
+
+  it('includes environment in init args when not production', () => {
+    const html = generateSnippet({ key: 'pk_test_123', environment: 'dev' });
+
+    expect(html).toContain('"environment":"dev"');
+  });
+
+  it('includes sandbox environment in init args', () => {
+    const html = generateSnippet({ key: 'pk_test_123', environment: 'sandbox' });
+
+    expect(html).toContain('"environment":"sandbox"');
+  });
+
+  it('omits environment from init args when set to production', () => {
+    const html = generateSnippet({ key: 'pk_test_123', environment: 'production' });
+
+    expect(html).not.toContain('environment');
+  });
+
+  it('omits environment from init args when not provided', () => {
+    const html = generateSnippet({ key: 'pk_test_123' });
+
+    expect(html).not.toContain('environment');
+  });
 });
