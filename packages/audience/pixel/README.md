@@ -54,11 +54,12 @@ The pixel starts in `none` and checks for these CMP standards (in priority order
 1. [**Google Consent Mode v2**](https://developers.google.com/tag-platform/security/guides/consent?consentmode=advanced) — reads `analytics_storage` and `ad_storage` from `window.dataLayer`
 2. [**IAB TCF v2**](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md) — reads purpose consents via `window.__tcfapi`
 
-Once a CMP is detected, the pixel upgrades consent automatically and continues listening for changes (e.g. when a user updates their cookie preferences). If no CMP is detected after a few seconds, the pixel remains in `none`. You can provide a manual fallback:
+Once a CMP is detected, the pixel upgrades consent automatically and continues listening for changes (e.g. when a user updates their cookie preferences). If no CMP is detected after ~2.5 seconds, the pixel remains in `none` silently (there is no failure callback). If your CMP may not be present on every page, push a manual fallback on your own timeout:
 
 ```javascript
-// Manual fallback if no CMP is present
-window.__imtbl.push(['consent', 'anonymous']);
+setTimeout(function() {
+  window.__imtbl.push(['consent', 'anonymous']);
+}, 3000);
 ```
 
 ### Updating consent at runtime
