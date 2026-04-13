@@ -19,7 +19,7 @@ document.head.appendChild(s);
 </script>
 ```
 
-Replace `YOUR_PUBLISHABLE_KEY` with your project's publishable key.
+Replace `YOUR_PUBLISHABLE_KEY` with your project's publishable key from [Immutable Hub](https://hub.immutable.com/).
 
 The script loads asynchronously and does not block page rendering. The default consent level is `none` — the pixel loads but does not collect until consent is explicitly set (see [Consent Modes](#consent-modes)). To start collecting anonymous device signals immediately, add `"consent":"anonymous"` to the init object.
 
@@ -33,7 +33,31 @@ The `consent` option controls what the pixel collects. **Default is `none`** (no
 | `anonymous` | Device signals, attribution, page views, form submissions, link clicks (no PII) | `imtbl_anon_id`, `_imtbl_sid` | Anonymous analytics without PII |
 | `full` | Everything in `anonymous` + email hash from form submissions | `imtbl_anon_id`, `_imtbl_sid` | After explicit user consent |
 
+### Automatic consent detection
+
+If your site uses a Consent Management Platform (CMP), the pixel can auto-detect consent state by setting `consentMode` to `'auto'`:
+
+```html
+w[i].push(["init",{"key":"YOUR_KEY","consentMode":"auto"}]);
+```
+
+The pixel checks for these CMP standards (in priority order):
+
+1. **Google Consent Mode v2** — reads `analytics_storage` and `ad_storage` from `window.dataLayer`
+2. **IAB TCF v2** — reads purpose consents via `window.__tcfapi`
+
+When `consentMode` is `'auto'`, the pixel starts in `none` and upgrades automatically once a CMP is detected. It also listens for ongoing consent changes (e.g. when a user updates their cookie preferences).
+
+If no CMP is detected after a few seconds, the pixel remains in `none`. You can provide a manual fallback by pushing a `consent` command:
+
+```javascript
+// Manual fallback if no CMP is present
+window.__imtbl.push(['consent', 'anonymous']);
+```
+
 ### Updating consent at runtime
+
+If you are not using `consentMode: 'auto'`, you can set consent manually at any time:
 
 ```javascript
 // After cookie banner interaction — upgrade to full
