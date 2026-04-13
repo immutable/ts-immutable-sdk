@@ -8,11 +8,13 @@ import type { ChainName } from '../models/ChainName';
 import type { CollectionBidResult } from '../models/CollectionBidResult';
 import type { CreateBidRequestBody } from '../models/CreateBidRequestBody';
 import type { CreateCollectionBidRequestBody } from '../models/CreateCollectionBidRequestBody';
+import type { CreateTraitBidRequestBody } from '../models/CreateTraitBidRequestBody';
 import type { CreateListingRequestBody } from '../models/CreateListingRequestBody';
 import type { FulfillableOrder } from '../models/FulfillableOrder';
 import type { FulfillmentDataRequest } from '../models/FulfillmentDataRequest';
 import type { ListBidsResult } from '../models/ListBidsResult';
 import type { ListCollectionBidsResult } from '../models/ListCollectionBidsResult';
+import type { ListTraitBidsResult } from '../models/ListTraitBidsResult';
 import type { ListingResult } from '../models/ListingResult';
 import type { ListListingsResult } from '../models/ListListingsResult';
 import type { ListTradeResult } from '../models/ListTradeResult';
@@ -20,6 +22,7 @@ import type { OrderStatusName } from '../models/OrderStatusName';
 import type { PageCursor } from '../models/PageCursor';
 import type { PageSize } from '../models/PageSize';
 import type { TradeResult } from '../models/TradeResult';
+import type { TraitBidResult } from '../models/TraitBidResult';
 import type { UnfulfillableOrder } from '../models/UnfulfillableOrder';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -424,6 +427,117 @@ export class OrdersService {
   }
 
   /**
+   * List all trait bids
+   * List all trait bids
+   * @returns ListTraitBidsResult OK response.
+   * @throws ApiError
+   */
+  public listTraitBids({
+    chainName,
+    status,
+    buyItemContractAddress,
+    sellItemContractAddress,
+    accountAddress,
+    fromUpdatedAt,
+    pageSize,
+    sortBy,
+    sortDirection,
+    pageCursor,
+  }: {
+    chainName: ChainName,
+    /**
+     * Order status to filter by
+     */
+    status?: OrderStatusName,
+    /**
+     * Buy item contract address to filter by
+     */
+    buyItemContractAddress?: string,
+    /**
+     * Sell item contract address to filter by
+     */
+    sellItemContractAddress?: string,
+    /**
+     * The account address of the user who created the bid
+     */
+    accountAddress?: string,
+    /**
+     * From updated at including given date
+     */
+    fromUpdatedAt?: string,
+    /**
+     * Maximum number of orders to return per page
+     */
+    pageSize?: PageSize,
+    /**
+     * Order field to sort by. `sell_item_amount` sorts by per token price, for example if 10eth is offered for 5 ERC1155 items, it’s sorted as 2eth for `sell_item_amount`.
+     */
+    sortBy?: 'created_at' | 'updated_at' | 'sell_item_amount',
+    /**
+     * Ascending or descending direction for sort
+     */
+    sortDirection?: 'asc' | 'desc',
+    /**
+     * Page cursor to retrieve previous or next page. Use the value returned in the response.
+     */
+    pageCursor?: PageCursor,
+  }): CancelablePromise<ListTraitBidsResult> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/v1/chains/{chain_name}/orders/trait-bids',
+      path: {
+        'chain_name': chainName,
+      },
+      query: {
+        'status': status,
+        'buy_item_contract_address': buyItemContractAddress,
+        'sell_item_contract_address': sellItemContractAddress,
+        'account_address': accountAddress,
+        'from_updated_at': fromUpdatedAt,
+        'page_size': pageSize,
+        'sort_by': sortBy,
+        'sort_direction': sortDirection,
+        'page_cursor': pageCursor,
+      },
+      errors: {
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
+      },
+    });
+  }
+
+  /**
+   * Create a trait bid
+   * Create a trait bid
+   * @returns TraitBidResult Created response.
+   * @throws ApiError
+   */
+  public createTraitBid({
+    chainName,
+    requestBody,
+  }: {
+    chainName: ChainName,
+    requestBody: CreateTraitBidRequestBody,
+  }): CancelablePromise<TraitBidResult> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/v1/chains/{chain_name}/orders/trait-bids',
+      path: {
+        'chain_name': chainName,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
+        501: `Not Implemented Error (501)`,
+      },
+    });
+  }
+
+  /**
    * Get a single listing by ID
    * Get a single listing by ID
    * @returns ListingResult OK response.
@@ -507,6 +621,37 @@ export class OrdersService {
       path: {
         'chain_name': chainName,
         'collection_bid_id': collectionBidId,
+      },
+      errors: {
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
+      },
+    });
+  }
+
+  /**
+   * Get a single trait bid by ID
+   * Get a single trait bid by ID
+   * @returns TraitBidResult OK response.
+   * @throws ApiError
+   */
+  public getTraitBid({
+    chainName,
+    traitBidId,
+  }: {
+    chainName: ChainName,
+    /**
+     * Global Trait Bid identifier
+     */
+    traitBidId: string,
+  }): CancelablePromise<TraitBidResult> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/v1/chains/{chain_name}/orders/trait-bids/{trait_bid_id}',
+      path: {
+        'chain_name': chainName,
+        'trait_bid_id': traitBidId,
       },
       errors: {
         400: `Bad Request (400)`,

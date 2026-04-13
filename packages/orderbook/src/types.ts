@@ -45,7 +45,7 @@ export interface ERC1155CollectionItem {
 
 /* Orders */
 
-export type Order = Listing | Bid | CollectionBid;
+export type Order = Listing | Bid | CollectionBid | TraitBid;
 
 export interface Listing extends OrderFields {
   type: 'LISTING';
@@ -63,6 +63,24 @@ export interface CollectionBid extends OrderFields {
   type: 'COLLECTION_BID';
   sell: ERC20Item[];
   buy: (ERC721CollectionItem | ERC1155CollectionItem)[];
+}
+
+/**
+ * A single trait filter (attribute name + acceptable values).
+ */
+export interface TraitFilter {
+  traitType: string;
+  values: string[];
+}
+
+export interface TraitBid extends OrderFields {
+  type: 'TRAIT_BID';
+  sell: ERC20Item[];
+  buy: (ERC721CollectionItem | ERC1155CollectionItem)[];
+  /**
+   * Trait criteria for this bid. Empty if the API response omits criteria.
+   */
+  traitCriteria: TraitFilter[];
 }
 
 interface OrderFields {
@@ -327,6 +345,30 @@ export interface BulkCollectionBidsResult {
     orderHash: string;
     order?: CollectionBid;
   }[];
+}
+
+/* Trait bid ops */
+
+export type ListTraitBidsParams = Omit<
+Parameters<typeof OrdersService.prototype.listTraitBids>[0],
+'chainName'
+>;
+
+export interface TraitBidResult {
+  result: TraitBid;
+}
+
+export interface ListTraitBidsResult {
+  page: Page;
+  result: TraitBid[];
+}
+
+export type PrepareTraitBidParams = PrepareCollectionBidParams;
+
+export type PrepareTraitBidResponse = PrepareOrderResponse;
+
+export interface CreateTraitBidParams extends CreateCollectionBidParams {
+  traitCriteria: TraitFilter[];
 }
 
 /* Fulfilment Ops */

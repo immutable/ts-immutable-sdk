@@ -8,6 +8,7 @@ import type { FillStatus } from './FillStatus';
 import type { Item } from './Item';
 import type { OrderStatus } from './OrderStatus';
 import type { ProtocolData } from './ProtocolData';
+import type { TraitFilter } from './TraitFilter';
 
 export type Order = {
   account_address: string;
@@ -51,6 +52,10 @@ export type Order = {
    */
   updated_at: string;
   fill_status: FillStatus;
+  /**
+   * Trait criteria for trait bids when returned by the API
+   */
+  trait_criteria?: Array<TraitFilter>;
 };
 
 export namespace Order {
@@ -62,6 +67,7 @@ export namespace Order {
     LISTING = 'LISTING',
     BID = 'BID',
     COLLECTION_BID = 'COLLECTION_BID',
+    TRAIT_BID = 'TRAIT_BID',
   }
 
 
