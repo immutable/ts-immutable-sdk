@@ -1,0 +1,396 @@
+:root {
+  /* Palette from @biom3/design-tokens base-onLight.global.css */
+  --bg: #f7f8fa;             /* was #ffffff — subtle cool off-white so panels can float */
+  --panel-bg: #ffffff;       /* was #f1f1f1 — panels are pure white to pop against bg */
+  --panel-border: #e6e8ec;   /* was #e7e7e7 — slightly cooler */
+  --panel-border-hover: #0d0d0d1a; /* translucent-standard-200 */
+  --text: #131313;           /* brand-1 */
+  --text-muted: #868686;     /* brand-4 */
+  --text-dim: #a8a8a8;       /* mid-gray — brand-3 (#E0E0E0) is illegible on white */
+  --accent: #131313;         /* near-black, matches biom3 brand-1 / Button primary */
+  --accent-hover: #2a2a2a;   /* slightly lighter black on hover */
+  --accent-active: #000000;  /* pure black on active */
+  --ok: #148530;             /* status-success-bright (onLight) */
+  --warn: #a07a00;           /* attention amber — FBFF6D is illegible on white; dark amber for legibility */
+  --err: #bb3049;            /* status-fatal-bright (onLight) */
+  --input-bg: #ffffff;       /* was dark — inputs are white like cards */
+  --input-border: #d4d7dd;   /* was dark — light gray border */
+  --mono: 'Roboto Mono', ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  --sans: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+
+  /* Elevation / shadow — synthesized to match biom3 light-mode aesthetic.
+     biom3 exposes these via component props, not design tokens, so we
+     approximate them with the conventional material-design-esque
+     subtle-light-blur values. */
+  --shadow-panel: 0 1px 3px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.04);
+  --shadow-panel-hover: 0 4px 12px rgba(17, 24, 39, 0.08);
+  --shadow-button: 0 1px 2px rgba(17, 24, 39, 0.06);
+  --shadow-button-hover: 0 2px 6px rgba(17, 24, 39, 0.1);
+  --shadow-input-inset: inset 0 1px 2px rgba(17, 24, 39, 0.03);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+main {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+header {
+  margin-bottom: 16px;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+}
+
+.status-bar {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-size: 13px;
+  font-family: var(--mono);
+  box-shadow: var(--shadow-panel);
+}
+
+.status-bar > div {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.status-label {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.status-value {
+  color: var(--text);
+  word-break: break-all;
+}
+
+.status-value.dim {
+  color: var(--text-dim);
+}
+
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-panel);
+}
+
+.panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 0 0 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.field label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.field input[type="text"],
+.field input[type="number"],
+.field textarea,
+.field select {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 13px;
+  box-shadow: var(--shadow-input-inset);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  resize: vertical;
+}
+
+.field input[type="text"]:focus,
+.field input[type="number"]:focus,
+.field textarea:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(19, 19, 19, 0.1);
+}
+
+.field textarea {
+  min-height: 60px;
+}
+
+.radio-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.radio-row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.radio-row input[type="radio"],
+.radio-row input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+.button-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.button-row.compact {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+button {
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-button);
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
+}
+
+button:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: var(--shadow-button-hover);
+}
+
+button:active:not(:disabled) {
+  background: var(--accent-active);
+  box-shadow: var(--shadow-button);
+  transform: translateY(1px);
+}
+
+button:disabled {
+  background: var(--panel-border);
+  color: var(--text-dim);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+button.secondary {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+  box-shadow: var(--shadow-button);
+}
+
+button.secondary:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #d4d7dd;
+  box-shadow: var(--shadow-button-hover);
+}
+
+button.active {
+  background: var(--accent-active);
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25) inset, var(--shadow-button);
+}
+
+.log {
+  background: var(--input-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  height: 360px;
+  min-height: 120px;
+  overflow: auto;
+  padding: 14px 16px;
+  resize: vertical;
+  box-shadow: var(--shadow-input-inset);
+}
+
+.log-entry {
+  margin-bottom: 8px;
+  word-break: break-all;
+}
+
+.log-entry:last-child {
+  margin-bottom: 0;
+}
+
+.log-time {
+  color: var(--text-dim);
+  margin-right: 8px;
+}
+
+.log-method {
+  color: var(--accent);
+  font-weight: 600;
+  margin-right: 8px;
+  text-transform: uppercase;
+}
+
+.log-detail {
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.log-entry.ok .log-method { color: var(--ok); }
+.log-entry.warn .log-method { color: var(--warn); }
+.log-entry.err .log-method { color: var(--err); }
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.panel-header .panel-title {
+  margin: 0;
+}
+
+.log-count {
+  color: var(--text-dim);
+  font-size: 11px;
+  font-family: var(--mono);
+}
+
+.status-value.consent-none     { color: var(--err); }
+.status-value.consent-anonymous { color: var(--warn); }
+.status-value.consent-full     { color: var(--ok); }
+
+.demo-gutter {
+  display: none;
+}
+
+/* Wide-viewport two-column layout: controls left, sticky event log right.
+   On narrow viewports (< 1024px) the default block layout applies and the
+   panels stack vertically as before. */
+@media (min-width: 1024px) {
+  main {
+    max-width: 1360px;
+  }
+
+  .demo-grid {
+    display: grid;
+    grid-template-columns: 1fr 8px 1fr;
+    gap: 0;
+    align-items: start;
+    column-gap: 16px;
+  }
+
+  .demo-gutter {
+    display: block;
+    width: 8px;
+    cursor: col-resize;
+    background: var(--panel-border);
+    border-radius: 4px;
+    align-self: stretch;
+    min-height: 100px;
+    transition: background 0.12s ease;
+  }
+
+  .demo-gutter:hover,
+  .demo-gutter.active {
+    background: var(--accent);
+  }
+
+  .controls > .panel {
+    margin-bottom: 16px;
+  }
+
+  .controls > .panel:last-child {
+    margin-bottom: 0;
+  }
+
+  .log-column {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 32px);
+  }
+
+  .log-column > .panel {
+    margin-bottom: 0;
+  }
+
+  .log-column .log {
+    /* User-resizable at wide viewports too. Default height fills most of
+       the viewport; drag the bottom-right corner to shrink or grow.
+       max-height clamps the grow direction so the log can't push off the
+       bottom of the screen. */
+    height: calc(100vh - 220px);
+    min-height: 120px;
+    max-height: calc(100vh - 80px);
+    resize: vertical;
+  }
+}
+
+footer {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 24px 0 8px;
+  font-family: var(--mono);
+}
+
+footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--text-muted);
+  transition: color 0.12s ease, border-color 0.12s ease;
+}
+
+footer a:hover {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+footer .footer-sep {
+  margin: 0 8px;
+  color: var(--text-dim);
+}

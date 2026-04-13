@@ -789,4 +789,91 @@ describe('Audience', () => {
       sdk.shutdown();
     });
   });
+
+  describe('onError', () => {
+    function failResponse(status: number) {
+      return {
+        ok: false,
+        status,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => ({ error: 'test failure' }),
+        text: async () => '{"error":"test failure"}',
+      };
+    }
+
+    it('fires onError with FLUSH_FAILED when flush returns 500', async () => {
+      const onError = jest.fn();
+      const sdk = createSDK({ onError });
+
+      // Queue a message, then make the next fetch fail.
+      sdk.track('test_event');
+      mockFetch.mockImplementationOnce(async (url: string, init?: RequestInit) => {
+        fetchCalls.push({ url, init: init ?? {} });
+        return failResponse(500);
+      });
+      await sdk.flush();
+
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(onError.mock.calls[0][0].code).toBe('FLUSH_FAILED');
+      expect(onError.mock.calls[0][0].status).toBe(500);
+
+      sdk.shutdown();
+    });
+
+    it('fires onError with CONSENT_SYNC_FAILED when consent PUT fails', async () => {
+      const onError = jest.fn();
+      // Start at none so setConsent triggers a consent sync.
+      mockFetch.mockImplementationOnce(async (url: string, init?: RequestInit) => {
+        fetchCalls.push({ url, init: init ?? {} });
+        return failResponse(503);
+      });
+      const sdk = createSDK({ consent: 'none', onError });
+
+      sdk.setConsent('anonymous');
+      // notifyBackend is fire-and-forget; httpSend has two internal awaits
+      // (fetch + parseBody) plus the .then() that fires invokeOnError,
+      // so we need enough microtask yields for the full chain to settle.
+      await Promise.resolve(); // fetch resolves
+      await Promise.resolve(); // parseBody resolves
+      await Promise.resolve(); // httpSend returns
+      await Promise.resolve(); // .then() fires invokeOnError
+
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(onError.mock.calls[0][0].code).toBe('CONSENT_SYNC_FAILED');
+      expect(onError.mock.calls[0][0].status).toBe(503);
+
+      sdk.shutdown();
+    });
+
+    it('does not fire onError on successful operations', async () => {
+      const onError = jest.fn();
+      const sdk = createSDK({ onError });
+
+      sdk.track('purchase', { value: 9.99 });
+      await sdk.flush();
+
+      expect(onError).not.toHaveBeenCalled();
+
+      sdk.shutdown();
+    });
+
+    it('swallows exceptions thrown by the onError callback', async () => {
+      const onError = jest.fn().mockImplementation(() => {
+        throw new Error('callback crashed');
+      });
+      const sdk = createSDK({ onError });
+
+      sdk.track('test_event');
+      mockFetch.mockImplementationOnce(async (url: string, init?: RequestInit) => {
+        fetchCalls.push({ url, init: init ?? {} });
+        return failResponse(500);
+      });
+
+      // Should not throw even though onError throws internally.
+      await expect(sdk.flush()).resolves.toBeUndefined();
+      expect(onError).toHaveBeenCalledTimes(1);
+
+      sdk.shutdown();
+    });
+  });
 });

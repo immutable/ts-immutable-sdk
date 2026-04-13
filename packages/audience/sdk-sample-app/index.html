@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src https://api.dev.immutable.com https://api.sandbox.immutable.com">
+  <title>Immutable Audience SDK — Demo</title>
+  <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Immutable Audience SDK — Demo</h1>
+  </header>
+
+  <div class="status-bar" id="status-bar">
+    <div><span class="status-label">Env</span> <span class="status-value dim" id="status-env">—</span></div>
+    <div><span class="status-label">Consent</span> <span class="status-value dim" id="status-consent">—</span></div>
+    <div><span class="status-label">Anon ID</span> <span class="status-value dim" id="status-anon">—</span></div>
+    <div><span class="status-label">User ID</span> <span class="status-value dim" id="status-user">—</span></div>
+  </div>
+
+  <div class="demo-grid">
+    <div class="controls">
+  <section class="panel">
+    <h2 class="panel-title">Setup</h2>
+    <div class="field">
+      <label for="pk">Publishable Key</label>
+      <input id="pk" type="text" placeholder="pk_imapik-test-yourkey" spellcheck="false">
+    </div>
+    <div class="field">
+      <label>Environment</label>
+      <div class="radio-row">
+        <label><input type="radio" name="env" value="dev"> dev</label>
+        <label><input type="radio" name="env" value="sandbox" checked> sandbox</label>
+      </div>
+    </div>
+    <div class="field">
+      <label>Initial Consent</label>
+      <div class="radio-row">
+        <label><input type="radio" name="initial-consent" value="none"> none</label>
+        <label><input type="radio" name="initial-consent" value="anonymous" checked> anonymous</label>
+        <label><input type="radio" name="initial-consent" value="full"> full</label>
+      </div>
+    </div>
+    <div class="field">
+      <label>
+        <input type="checkbox" id="debug" checked>
+        Debug — log SDK internals to browser console
+      </label>
+    </div>
+    <div class="field">
+      <label for="flush-interval">Flush interval (ms) — optional, default 5000</label>
+      <input id="flush-interval" type="number" min="100" step="100" placeholder="5000" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="flush-size">Flush batch size — optional, default 20</label>
+      <input id="flush-size" type="number" min="1" step="1" placeholder="20" spellcheck="false">
+    </div>
+    <div class="button-row">
+      <button id="btn-init" disabled>Init</button>
+      <button id="btn-shutdown" disabled>Shutdown</button>
+      <button id="btn-reset" class="secondary" disabled>Reset</button>
+      <button id="btn-flush" class="secondary" disabled>Flush</button>
+    </div>
+  </section>
+
+  <section class="panel" id="consent-panel">
+    <h2 class="panel-title">Consent</h2>
+    <div class="button-row">
+      <button class="secondary" id="btn-consent-none" disabled>Set none</button>
+      <button class="secondary" id="btn-consent-anon" disabled>Set anonymous</button>
+      <button class="secondary" id="btn-consent-full" disabled>Set full</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">Page</h2>
+    <div class="field">
+      <label for="page-props">Properties (JSON, optional)</label>
+      <textarea id="page-props" placeholder='{"section":"marketplace"}' spellcheck="false"></textarea>
+    </div>
+    <div class="button-row">
+      <button id="btn-page" disabled>Call page()</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">Track</h2>
+    <div class="field">
+      <label for="track-name">Event name</label>
+      <input id="track-name" type="text" placeholder="purchase_completed" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="track-props">Properties (JSON, optional)</label>
+      <textarea id="track-props" placeholder='{"sku":"pack-1","usd":9.99}' spellcheck="false"></textarea>
+    </div>
+    <div class="button-row">
+      <button id="btn-track" disabled>Call track()</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">Studio Events</h2>
+    <div class="field">
+      <label for="studio-game-id">Game ID (shared across events below)</label>
+      <input id="studio-game-id" type="text" value="game-demo-001" spellcheck="false">
+    </div>
+    <div class="button-row">
+      <button id="btn-ev-game-page-viewed" disabled>game_page_viewed</button>
+      <button id="btn-ev-link-clicked" disabled>link_clicked</button>
+      <button id="btn-ev-email-acquired" disabled>email_acquired</button>
+      <button id="btn-ev-sign-in" disabled>sign_in</button>
+      <button id="btn-ev-wishlist-add" disabled>wishlist_add</button>
+      <button id="btn-ev-wishlist-remove" disabled>wishlist_remove</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">Identify</h2>
+    <div class="field">
+      <label for="identify-id">ID</label>
+      <input id="identify-id" type="text" placeholder="player-7721" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="identify-type">Identity type</label>
+      <select id="identify-type"></select>
+    </div>
+    <div class="field">
+      <label for="identify-traits">Traits (JSON, optional)</label>
+      <textarea id="identify-traits" placeholder='{"plan":"premium"}' spellcheck="false"></textarea>
+    </div>
+    <div class="button-row">
+      <button id="btn-identify" disabled>Call identify()</button>
+      <button id="btn-identify-traits" class="secondary" disabled>Traits-only identify</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">Alias</h2>
+    <div class="field">
+      <label for="alias-from-id">From ID</label>
+      <input id="alias-from-id" type="text" placeholder="76561198012345" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="alias-from-type">From identity type</label>
+      <select id="alias-from-type"></select>
+    </div>
+    <div class="field">
+      <label for="alias-to-id">To ID</label>
+      <input id="alias-to-id" type="text" placeholder="player-7721" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="alias-to-type">To identity type</label>
+      <select id="alias-to-type"></select>
+    </div>
+    <div class="button-row">
+      <button id="btn-alias" disabled>Call alias()</button>
+    </div>
+  </section>
+
+    </div>
+  <div class="demo-gutter" id="demo-gutter" role="separator" aria-orientation="vertical" aria-label="Resize columns" tabindex="0"></div>
+    <div class="log-column">
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Event Log</h2>
+      <span class="log-count" id="log-count">0 entries</span>
+    </div>
+    <div class="button-row compact">
+      <button class="secondary" id="btn-copy-log">Copy</button>
+      <button class="secondary" id="btn-clear-log">Clear</button>
+    </div>
+    <div class="log" id="log" role="log" aria-live="polite" aria-label="SDK event log"></div>
+  </section>
+    </div>
+  </div>
+  <footer>
+    <span>@imtbl/audience <span id="sdk-version">0.0.0</span></span>
+    <span class="footer-sep">·</span>
+    <a href="./README.md">Demo README</a>
+  </footer>
+</main>
+
+<script src="vendor/imtbl-audience.global.js"></script>
+<script src="demo.js"></script>
+</body>
+</html>
