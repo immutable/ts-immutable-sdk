@@ -22,7 +22,7 @@ import {
   collectAttribution,
   getOrCreateSession,
   createConsentManager,
-  canTrack as consentAllowsTracking,
+  canTrack,
   startCmpDetection,
 } from '@imtbl/audience-core';
 import { setupAutocapture } from './autocapture';
@@ -125,7 +125,7 @@ export class Pixel {
     if (isAutoConsent) {
       // CMP detection will fire the deferred page view when consent upgrades.
       this.startCmpDetection();
-    } else if (consentAllowsTracking(this.consent.level)) {
+    } else if (canTrack(this.consent.level)) {
       // Static consent — fire page view immediately.
       this.initialPageViewFired = true;
       this.page();
@@ -140,7 +140,7 @@ export class Pixel {
   }
 
   page(properties?: Record<string, unknown>): void {
-    if (!this.canTrack()) return;
+    if (!this.isTrackingAllowed()) return;
 
     const { sessionId, isNew } = getOrCreateSession(this.domain);
     this.refreshSession(sessionId, isNew);
@@ -169,7 +169,7 @@ export class Pixel {
     // Fire the deferred page view if consent was upgraded from 'none'
     // (covers the case where CMP detection failed and the caller
     // manually sets consent as a fallback).
-    if (consentAllowsTracking(level) && !this.initialPageViewFired) {
+    if (canTrack(level) && !this.initialPageViewFired) {
       this.initialPageViewFired = true;
       this.page();
     }
@@ -201,7 +201,7 @@ export class Pixel {
       this.consent!.setLevel(level);
 
       // Fire the deferred page view on first consent upgrade from 'none'.
-      if (consentAllowsTracking(level) && !this.initialPageViewFired) {
+      if (canTrack(level) && !this.initialPageViewFired) {
         this.initialPageViewFired = true;
         this.page();
       }
@@ -211,7 +211,7 @@ export class Pixel {
       onCmpUpdate,
       (detector: CmpDetector) => {
         // CMP found — apply the initial consent level it reported.
-        if (consentAllowsTracking(detector.level)) {
+        if (canTrack(detector.level)) {
           onCmpUpdate(detector.level);
         }
       },
@@ -221,7 +221,7 @@ export class Pixel {
   // -- Auto-capture helper --------------------------------------------------
 
   private track(eventName: string, properties: Record<string, unknown>): void {
-    if (!this.canTrack()) return;
+    if (!this.isTrackingAllowed()) return;
 
     const { sessionId, isNew } = getOrCreateSession(this.domain);
     this.refreshSession(sessionId, isNew);
@@ -248,7 +248,7 @@ export class Pixel {
   }
 
   private fireSessionStart(sessionId: string): void {
-    if (!this.canTrack()) return;
+    if (!this.isTrackingAllowed()) return;
 
     const message: TrackMessage = {
       ...this.buildBase(),
@@ -262,7 +262,7 @@ export class Pixel {
   }
 
   private fireSessionEnd(): void {
-    if (!this.canTrack() || !this.sessionId) return;
+    if (!this.isTrackingAllowed() || !this.sessionId) return;
 
     const duration = this.sessionStartTime
       ? Math.round((Date.now() - this.sessionStartTime) / 1000)
@@ -338,8 +338,8 @@ export class Pixel {
 
   // -- Guards -------------------------------------------------------------
 
-  private canTrack(): boolean {
-    return this.isReady() && consentAllowsTracking(this.consent!.level);
+  private isTrackingAllowed(): boolean {
+    return this.isReady() && canTrack(this.consent!.level);
   }
 
   private isReady(): boolean {
