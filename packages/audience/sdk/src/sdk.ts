@@ -144,7 +144,7 @@ export class Audience {
 
   // --- Helpers ---
 
-  /** True when consent is 'none' — SDK should not enqueue anything. */
+  /** True when the current consent level does not permit tracking. */
   private isTrackingDisabled(): boolean {
     return !canTrack(this.consent.level);
   }
