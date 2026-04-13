@@ -11,16 +11,10 @@ export interface ConsentManager {
   setLevel(next: ConsentLevel): void;
 }
 
-// --- Consent capability queries ---
-// Single source of truth for what each consent level permits. Use these
-// instead of raw string comparisons so rule changes only touch this file.
-
-/** Can this consent level record events (page views, track calls)? */
 export function canTrack(level: ConsentLevel): boolean {
   return level !== 'none';
 }
 
-/** Can this consent level use identity features (identify, alias, userId, email hash)? */
 export function canIdentify(level: ConsentLevel): boolean {
   return level === 'full';
 }
