@@ -47,16 +47,14 @@ If your site uses a Consent Management Platform (CMP), the pixel can auto-detect
 + w[i].push(["init",{"key":"YOUR_KEY","consentMode":"auto"}]);
 ```
 
-> **Note:** `consentMode` and `consent` are mutually exclusive. When `consentMode` is `'auto'`, the pixel ignores the `consent` option and starts in `none` until a CMP is detected.
+> **Note:** `consentMode` and `consent` are mutually exclusive — do not set both.
 
-The pixel checks for these CMP standards (in priority order):
+The pixel starts in `none` and checks for these CMP standards (in priority order):
 
 1. [**Google Consent Mode v2**](https://developers.google.com/tag-platform/security/guides/consent?consentmode=advanced) — reads `analytics_storage` and `ad_storage` from `window.dataLayer`
 2. [**IAB TCF v2**](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md) — reads purpose consents via `window.__tcfapi`
 
-When `consentMode` is `'auto'`, the pixel starts in `none` and upgrades automatically once a CMP is detected. It also listens for ongoing consent changes (e.g. when a user updates their cookie preferences).
-
-If no CMP is detected after a few seconds, the pixel remains in `none`. You can provide a manual fallback by pushing a `consent` command:
+Once a CMP is detected, the pixel upgrades consent automatically and continues listening for changes (e.g. when a user updates their cookie preferences). If no CMP is detected after a few seconds, the pixel remains in `none`. You can provide a manual fallback:
 
 ```javascript
 // Manual fallback if no CMP is present
