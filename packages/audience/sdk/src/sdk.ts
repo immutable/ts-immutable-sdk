@@ -70,7 +70,6 @@ export class Audience {
   private constructor(config: AudienceConfig) {
     const {
       cookieDomain,
-      environment,
       publishableKey,
     } = config;
     const consentLevel = config.consent ?? 'none';
@@ -89,7 +88,7 @@ export class Audience {
       this.anonymousId = getCookie(COOKIE_NAME) ?? generateId();
     }
 
-    const endpointUrl = `${getBaseUrl(environment)}${INGEST_PATH}`;
+    const endpointUrl = `${getBaseUrl(publishableKey)}${INGEST_PATH}`;
     this.queue = new MessageQueue(
       httpSend,
       endpointUrl,
@@ -108,7 +107,6 @@ export class Audience {
       httpSend,
       publishableKey,
       this.anonymousId,
-      environment,
       consentSource,
       consentLevel,
     );

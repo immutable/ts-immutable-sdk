@@ -1,5 +1,4 @@
 import type {
-  Environment,
   ConsentLevel,
   PageMessage,
   TrackMessage,
@@ -35,7 +34,6 @@ const PIXEL_VERSION: string = typeof PIXEL_VERSION_INJECTED !== 'undefined'
 
 export interface PixelInitOptions {
   key: string;
-  environment?: Environment;
   consent?: ConsentLevel;
   /** Set to 'auto' to auto-detect consent from CMPs (Google Consent Mode, IAB TCF). */
   consentMode?: 'auto';
@@ -53,8 +51,6 @@ export class Pixel {
   private sessionId: string | undefined;
 
   private sessionStartTime: number | undefined;
-
-  private environment: Environment = 'production';
 
   private publishableKey = '';
 
@@ -75,7 +71,6 @@ export class Pixel {
 
     const {
       key,
-      environment = 'production',
       consent: consentLevel,
       consentMode,
       domain,
@@ -83,10 +78,9 @@ export class Pixel {
     } = options;
 
     this.publishableKey = key;
-    this.environment = environment;
     this.domain = domain;
 
-    const endpointUrl = `${getBaseUrl(environment)}${INGEST_PATH}`;
+    const endpointUrl = `${getBaseUrl(key)}${INGEST_PATH}`;
 
     this.queue = new MessageQueue(
       httpSend,
@@ -108,7 +102,6 @@ export class Pixel {
       httpSend,
       key,
       this.anonymousId,
-      environment,
       'pixel',
       isAutoConsent ? 'none' : consentLevel,
     );

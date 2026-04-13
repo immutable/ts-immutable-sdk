@@ -1,11 +1,9 @@
-import type { Environment, ConsentLevel } from '@imtbl/audience-core';
+import type { ConsentLevel } from '@imtbl/audience-core';
 
 /** Configuration for the Immutable Web SDK. */
 export interface AudienceConfig {
   /** Publishable API key from Immutable Hub (pk_imapik-...). */
   publishableKey: string;
-  /** Target environment — controls which backend receives events. */
-  environment: Environment;
   /** Initial consent level. Defaults to 'none' (no tracking until opted in). */
   consent?: ConsentLevel;
   /** Enable console logging of all events, flushes, and consent changes. */

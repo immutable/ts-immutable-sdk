@@ -1,5 +1,3 @@
-export type Environment = 'dev' | 'sandbox' | 'production';
-
 export type Surface = 'web' | 'pixel' | 'unity' | 'unreal';
 
 export type MessageType = 'track' | 'page' | 'screen' | 'identify' | 'alias';

@@ -61,7 +61,6 @@ jest.mock('@imtbl/audience-core', () => ({
       _send: unknown,
       _key: unknown,
       _anonId: unknown,
-      _env: unknown,
       _source: unknown,
       level?: string,
     ) => {
@@ -99,7 +98,7 @@ describe('Pixel', () => {
     it('creates queue, starts it, and fires page view + session_start when consent is anonymous', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
 
       expect(mockStart).toHaveBeenCalled();
 
@@ -122,7 +121,7 @@ describe('Pixel', () => {
     it('does not fire page view or session_start when consent is none', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'none' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'none' });
 
       expect(mockStart).toHaveBeenCalled();
       expect(mockEnqueue).not.toHaveBeenCalled();
@@ -133,7 +132,7 @@ describe('Pixel', () => {
 
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
 
       const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
       const sessionStartCall = calls.find(
@@ -148,8 +147,8 @@ describe('Pixel', () => {
     it('only initializes once', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
-      pixel.init({ key: 'pk_other', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-other', consent: 'anonymous' });
 
       expect(mockStart).toHaveBeenCalledTimes(1);
     });
@@ -161,7 +160,7 @@ describe('Pixel', () => {
 
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
       mockEnqueue.mockClear();
 
       pixel.page({ custom: 'prop' });
@@ -182,7 +181,7 @@ describe('Pixel', () => {
     it('does not enqueue when consent is none', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'none' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'none' });
 
       pixel.page();
       expect(mockEnqueue).not.toHaveBeenCalled();
@@ -201,7 +200,7 @@ describe('Pixel', () => {
 
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
 
       const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
       const pageCall = calls.find((c) => c.type === 'page');
@@ -218,7 +217,7 @@ describe('Pixel', () => {
 
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
 
       const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
       const pageCall = calls.find((c) => c.type === 'page');
@@ -234,7 +233,7 @@ describe('Pixel', () => {
     it('fires session_end on pagehide when session is active', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
       mockEnqueue.mockClear();
 
       // Simulate pagehide
@@ -256,7 +255,7 @@ describe('Pixel', () => {
 
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
       mockEnqueue.mockClear();
 
       // Advance time by 15 seconds before triggering pagehide
@@ -277,7 +276,7 @@ describe('Pixel', () => {
     it('does not fire session_end when consent is none', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'none' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'none' });
 
       window.dispatchEvent(new Event('pagehide'));
       expect(mockEnqueue).not.toHaveBeenCalled();
@@ -288,7 +287,7 @@ describe('Pixel', () => {
     it('updates consent level and allows tracking', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'none' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'none' });
 
       pixel.setConsent('anonymous');
 
@@ -300,7 +299,7 @@ describe('Pixel', () => {
     it('fires deferred page view only once on repeated setConsent calls', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'none' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'none' });
 
       pixel.setConsent('anonymous');
       mockEnqueue.mockClear();
@@ -316,7 +315,7 @@ describe('Pixel', () => {
     it('destroys the queue and resets state', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
 
       pixel.destroy();
       expect(mockDestroy).toHaveBeenCalled();
@@ -330,7 +329,7 @@ describe('Pixel', () => {
     it('tears down autocapture listeners', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
 
       pixel.destroy();
       expect(mockTeardownAutocapture).toHaveBeenCalled();
@@ -341,7 +340,7 @@ describe('Pixel', () => {
     it('starts CMP detection when consentMode is auto', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+      pixel.init({ key: 'pk_imapik-test-local', consentMode: 'auto' });
 
       expect(mockStartCmpDetection).toHaveBeenCalledWith(
         expect.any(Function),
@@ -352,7 +351,7 @@ describe('Pixel', () => {
     it('does not start CMP detection when consentMode is not auto', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
 
       expect(mockStartCmpDetection).not.toHaveBeenCalled();
     });
@@ -360,7 +359,7 @@ describe('Pixel', () => {
     it('starts at consent none and does not fire page view', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+      pixel.init({ key: 'pk_imapik-test-local', consentMode: 'auto' });
 
       // No events should be enqueued — waiting for CMP detection
       expect(mockEnqueue).not.toHaveBeenCalled();
@@ -369,7 +368,7 @@ describe('Pixel', () => {
     it('fires page view when CMP detection upgrades consent', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+      pixel.init({ key: 'pk_imapik-test-local', consentMode: 'auto' });
       mockEnqueue.mockClear();
 
       // Simulate CMP detected with anonymous consent
@@ -383,7 +382,7 @@ describe('Pixel', () => {
     it('fires page view when CMP update callback upgrades from none', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+      pixel.init({ key: 'pk_imapik-test-local', consentMode: 'auto' });
       mockEnqueue.mockClear();
 
       // Simulate CMP update callback (ongoing consent change)
@@ -397,7 +396,7 @@ describe('Pixel', () => {
     it('does not fire duplicate page view on subsequent CMP updates', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+      pixel.init({ key: 'pk_imapik-test-local', consentMode: 'auto' });
 
       // First upgrade — fires page view
       const onUpdate = mockStartCmpDetection.mock.calls[0][0];
@@ -413,7 +412,7 @@ describe('Pixel', () => {
     it('does not fire page view when CMP detects consent as none', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+      pixel.init({ key: 'pk_imapik-test-local', consentMode: 'auto' });
       mockEnqueue.mockClear();
 
       const onDetected = mockStartCmpDetection.mock.calls[0][1];
@@ -425,7 +424,7 @@ describe('Pixel', () => {
     it('tears down CMP detection on destroy', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+      pixel.init({ key: 'pk_imapik-test-local', consentMode: 'auto' });
 
       pixel.destroy();
       expect(mockTeardownCmp).toHaveBeenCalled();
@@ -440,8 +439,7 @@ describe('Pixel', () => {
       const pixel = new Pixel();
       activePixel = pixel;
       pixel.init({
-        key: 'pk_test',
-        environment: 'dev',
+        key: 'pk_imapik-test-local',
         consent: 'anonymous',
         consentMode: 'auto',
       });
@@ -450,9 +448,8 @@ describe('Pixel', () => {
       expect(createConsentManager).toHaveBeenCalledWith(
         expect.anything(),
         expect.anything(),
-        'pk_test',
+        'pk_imapik-test-local',
         'anon-123',
-        'dev',
         'pixel',
         'none',
       );
@@ -461,7 +458,7 @@ describe('Pixel', () => {
     it('setConsent fires deferred page view when CMP detection has not upgraded consent', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+      pixel.init({ key: 'pk_imapik-test-local', consentMode: 'auto' });
 
       // No page view yet — waiting for CMP
       expect(mockEnqueue).not.toHaveBeenCalled();
@@ -477,7 +474,7 @@ describe('Pixel', () => {
     it('setConsent does not fire duplicate page view after CMP already upgraded', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consentMode: 'auto' });
+      pixel.init({ key: 'pk_imapik-test-local', consentMode: 'auto' });
 
       // CMP upgrades consent first
       const onUpdate = mockStartCmpDetection.mock.calls[0][0];
@@ -495,7 +492,7 @@ describe('Pixel', () => {
     it('sets up autocapture with default options on init', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
 
       expect(mockSetupAutocapture).toHaveBeenCalledWith(
         { forms: undefined, clicks: undefined },
@@ -508,8 +505,7 @@ describe('Pixel', () => {
       const pixel = new Pixel();
       activePixel = pixel;
       pixel.init({
-        key: 'pk_test',
-        environment: 'dev',
+        key: 'pk_imapik-test-local',
         consent: 'anonymous',
         autocapture: { forms: false, clicks: true },
       });
@@ -526,7 +522,7 @@ describe('Pixel', () => {
 
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
       mockEnqueue.mockClear();
 
       // Call the enqueue callback that was passed to setupAutocapture
@@ -552,7 +548,7 @@ describe('Pixel', () => {
     it('consent callback returns current consent level', () => {
       const pixel = new Pixel();
       activePixel = pixel;
-      pixel.init({ key: 'pk_test', environment: 'dev', consent: 'anonymous' });
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
 
       const getConsent = mockSetupAutocapture.mock.calls[0][2] as () => string;
       expect(getConsent()).toBe('anonymous');

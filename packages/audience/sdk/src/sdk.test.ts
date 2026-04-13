@@ -11,7 +11,6 @@ const TEST_STEAM = { id: '76561198012345', identityType: 'steam' } as const;
 function createSDK(overrides: Record<string, unknown> = {}) {
   return Audience.init({
     publishableKey: 'pk_imapik-test-local',
-    environment: 'sandbox',
     consent: 'full',
     ...overrides,
   });
@@ -79,14 +78,12 @@ describe('Audience', () => {
     it('throws if publishableKey is empty', () => {
       expect(() => Audience.init({
         publishableKey: '',
-        environment: 'sandbox',
       })).toThrow('publishableKey is required');
     });
 
     it('throws if publishableKey is whitespace only', () => {
       expect(() => Audience.init({
         publishableKey: '  ',
-        environment: 'sandbox',
       })).toThrow('publishableKey is required');
     });
 
@@ -95,7 +92,6 @@ describe('Audience', () => {
       const first = createSDK();
       const second = Audience.init({
         publishableKey: 'pk_imapik-test-other',
-        environment: 'production',
         consent: 'none',
       });
 

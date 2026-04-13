@@ -47,14 +47,13 @@ describe('bootstrap', () => {
   it('replays queued init command from snippet stub', () => {
     // Simulate snippet having queued an init command
     (window as Record<string, unknown>).__imtbl = [
-      ['init', { key: 'pk_test', environment: 'dev', consent: 'anonymous' }],
+      ['init', { key: 'pk_imapik-test-local', consent: 'anonymous' }],
     ];
 
     require('./bootstrap');
 
     expect(mockInit).toHaveBeenCalledWith({
-      key: 'pk_test',
-      environment: 'dev',
+      key: 'pk_imapik-test-local',
       consent: 'anonymous',
     });
   });

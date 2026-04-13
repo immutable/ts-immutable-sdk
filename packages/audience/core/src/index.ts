@@ -1,5 +1,4 @@
 export type {
-  Environment,
   Surface,
   MessageType,
   EventContext,
