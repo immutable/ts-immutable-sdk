@@ -31,6 +31,7 @@ import {
   SESSION_END,
 } from '@imtbl/audience-core';
 import { DebugLogger } from './debug';
+import type { PropsFor } from './events';
 import type { AudienceConfig } from './types';
 import {
   LIBRARY_NAME, LIBRARY_VERSION, LOG_PREFIX, DEFAULT_CONSENT_SOURCE,
@@ -240,15 +241,21 @@ export class Audience {
    * Pass the event name and any properties you want to analyse later.
    * No-op when consent is 'none'.
    */
-  track(event: string, properties?: Record<string, unknown>): void {
+  track<E extends string>(
+    event: E,
+    ...args: {} extends PropsFor<E>
+      ? [properties?: PropsFor<E>]
+      : [properties: PropsFor<E>]
+  ): void {
     if (this.isTrackingDisabled()) return;
     getOrCreateSession(this.cookieDomain);
 
+    const [properties] = args;
     this.enqueue('track', {
       ...this.baseMessage(),
       type: 'track',
       eventName: truncate(event),
-      properties,
+      properties: properties as Record<string, unknown> | undefined,
       userId: this.effectiveUserId(),
     });
   }
