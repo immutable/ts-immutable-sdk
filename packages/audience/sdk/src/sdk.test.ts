@@ -235,6 +235,123 @@ describe('Audience', () => {
 
       sdk.shutdown();
     });
+
+    it('enqueues sign_up with method property', async () => {
+      const sdk = createSDK();
+
+      sdk.track('sign_up', { method: 'email' });
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'sign_up',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.properties).toEqual({ method: 'email' });
+
+      sdk.shutdown();
+    });
+
+    it('enqueues game_launch with optional fields', async () => {
+      const sdk = createSDK();
+
+      sdk.track('game_launch', {
+        platform: 'webgl',
+        version: '1.2.0',
+        buildId: 'ci-42',
+      });
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'game_launch',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.properties).toEqual({
+        platform: 'webgl',
+        version: '1.2.0',
+        buildId: 'ci-42',
+      });
+
+      sdk.shutdown();
+    });
+
+    it('enqueues progression with status and optional gameplay fields', async () => {
+      const sdk = createSDK();
+
+      sdk.track('progression', {
+        status: 'complete',
+        world: 'forest',
+        level: '5',
+        stage: 'boss',
+        score: 420,
+        durationSec: 87,
+      });
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'progression',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.properties).toEqual({
+        status: 'complete',
+        world: 'forest',
+        level: '5',
+        stage: 'boss',
+        score: 420,
+        durationSec: 87,
+      });
+
+      sdk.shutdown();
+    });
+
+    it('enqueues resource with flow, currency, and amount', async () => {
+      const sdk = createSDK();
+
+      sdk.track('resource', {
+        flow: 'source',
+        currency: 'gold',
+        amount: 50,
+        itemType: 'quest_reward',
+        itemId: 'quest_42',
+      });
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'resource',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.properties).toEqual({
+        flow: 'source',
+        currency: 'gold',
+        amount: 50,
+        itemType: 'quest_reward',
+        itemId: 'quest_42',
+      });
+
+      sdk.shutdown();
+    });
+
+    it('enqueues wishlist_add with gameId and optional fields', async () => {
+      const sdk = createSDK();
+
+      sdk.track('wishlist_add', {
+        gameId: 'devilfish',
+        source: 'game_page',
+        platform: 'steam',
+      });
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'wishlist_add',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.properties).toEqual({
+        gameId: 'devilfish',
+        source: 'game_page',
+        platform: 'steam',
+      });
+
+      sdk.shutdown();
+    });
   });
 
   describe('page', () => {
@@ -537,7 +654,7 @@ describe('Audience', () => {
       expect(document.cookie).toContain(`${COOKIE_NAME}=`);
 
       sdk.identify(TEST_USER.id, TEST_USER.identityType);
-      sdk.track('purchase', { value: 9.99 });
+      sdk.track('purchase', { currency: 'USD', value: 9.99 });
       await sdk.flush();
 
       const trackMsg = sentMessages().find(
