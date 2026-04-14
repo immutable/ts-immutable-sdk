@@ -1,5 +1,4 @@
 export type {
-  Environment,
   Surface,
   MessageType,
   EventContext,
@@ -23,11 +22,6 @@ export {
 } from './cookie';
 
 export {
-  getBaseUrl,
-  INGEST_PATH,
-  CONSENT_PATH,
-  FLUSH_INTERVAL_MS,
-  FLUSH_SIZE,
   COOKIE_NAME,
   SESSION_COOKIE,
   SESSION_START,
@@ -50,7 +44,10 @@ export type { SessionResult } from './session';
 export { collectAttribution } from './attribution';
 export type { Attribution } from './attribution';
 
-export { createConsentManager, detectDoNotTrack } from './consent';
+export {
+  createConsentManager, detectDoNotTrack,
+  canTrack, canIdentify,
+} from './consent';
 export type { ConsentManager } from './consent';
 
 export { detectCmp, startCmpDetection } from './cmp';

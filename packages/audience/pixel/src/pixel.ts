@@ -1,5 +1,4 @@
 import type {
-  Environment,
   ConsentLevel,
   PageMessage,
   TrackMessage,
@@ -9,10 +8,6 @@ import type {
 import {
   MessageQueue,
   httpSend,
-  getBaseUrl,
-  INGEST_PATH,
-  FLUSH_INTERVAL_MS,
-  FLUSH_SIZE,
   getOrCreateAnonymousId,
   collectContext,
   generateId,
@@ -22,6 +17,7 @@ import {
   collectAttribution,
   getOrCreateSession,
   createConsentManager,
+  canTrack,
   startCmpDetection,
 } from '@imtbl/audience-core';
 import { setupAutocapture } from './autocapture';
@@ -35,12 +31,13 @@ const PIXEL_VERSION: string = typeof PIXEL_VERSION_INJECTED !== 'undefined'
 
 export interface PixelInitOptions {
   key: string;
-  environment?: Environment;
   consent?: ConsentLevel;
   /** Set to 'auto' to auto-detect consent from CMPs (Google Consent Mode, IAB TCF). */
   consentMode?: 'auto';
   domain?: string;
   autocapture?: AutocaptureOptions;
+  /** Override the default API base URL. */
+  baseUrl?: string;
 }
 
 export class Pixel {
@@ -53,8 +50,6 @@ export class Pixel {
   private sessionId: string | undefined;
 
   private sessionStartTime: number | undefined;
-
-  private environment: Environment = 'production';
 
   private publishableKey = '';
 
@@ -75,7 +70,6 @@ export class Pixel {
 
     const {
       key,
-      environment = 'production',
       consent: consentLevel,
       consentMode,
       domain,
@@ -83,18 +77,12 @@ export class Pixel {
     } = options;
 
     this.publishableKey = key;
-    this.environment = environment;
     this.domain = domain;
-
-    const endpointUrl = `${getBaseUrl(environment)}${INGEST_PATH}`;
 
     this.queue = new MessageQueue(
       httpSend,
-      endpointUrl,
       key,
-      FLUSH_INTERVAL_MS,
-      FLUSH_SIZE,
-      { storagePrefix: '__imtbl_pixel_' },
+      { baseUrl: options.baseUrl, storagePrefix: '__imtbl_pixel_' },
     );
 
     this.anonymousId = getOrCreateAnonymousId(domain);
@@ -108,9 +96,10 @@ export class Pixel {
       httpSend,
       key,
       this.anonymousId,
-      environment,
       'pixel',
       isAutoConsent ? 'none' : consentLevel,
+      undefined,
+      options.baseUrl,
     );
 
     this.initialized = true;
@@ -124,7 +113,7 @@ export class Pixel {
     if (isAutoConsent) {
       // CMP detection will fire the deferred page view when consent upgrades.
       this.startCmpDetection();
-    } else if (this.consent.level !== 'none') {
+    } else if (canTrack(this.consent.level)) {
       // Static consent — fire page view immediately.
       this.initialPageViewFired = true;
       this.page();
@@ -139,7 +128,7 @@ export class Pixel {
   }
 
   page(properties?: Record<string, unknown>): void {
-    if (!this.canTrack()) return;
+    if (!this.isTrackingAllowed()) return;
 
     const { sessionId, isNew } = getOrCreateSession(this.domain);
     this.refreshSession(sessionId, isNew);
@@ -168,7 +157,7 @@ export class Pixel {
     // Fire the deferred page view if consent was upgraded from 'none'
     // (covers the case where CMP detection failed and the caller
     // manually sets consent as a fallback).
-    if (level !== 'none' && !this.initialPageViewFired) {
+    if (canTrack(level) && !this.initialPageViewFired) {
       this.initialPageViewFired = true;
       this.page();
     }
@@ -200,7 +189,7 @@ export class Pixel {
       this.consent!.setLevel(level);
 
       // Fire the deferred page view on first consent upgrade from 'none'.
-      if (level !== 'none' && !this.initialPageViewFired) {
+      if (canTrack(level) && !this.initialPageViewFired) {
         this.initialPageViewFired = true;
         this.page();
       }
@@ -210,7 +199,7 @@ export class Pixel {
       onCmpUpdate,
       (detector: CmpDetector) => {
         // CMP found — apply the initial consent level it reported.
-        if (detector.level !== 'none') {
+        if (canTrack(detector.level)) {
           onCmpUpdate(detector.level);
         }
       },
@@ -220,7 +209,7 @@ export class Pixel {
   // -- Auto-capture helper --------------------------------------------------
 
   private track(eventName: string, properties: Record<string, unknown>): void {
-    if (!this.canTrack()) return;
+    if (!this.isTrackingAllowed()) return;
 
     const { sessionId, isNew } = getOrCreateSession(this.domain);
     this.refreshSession(sessionId, isNew);
@@ -247,7 +236,7 @@ export class Pixel {
   }
 
   private fireSessionStart(sessionId: string): void {
-    if (!this.canTrack()) return;
+    if (!this.isTrackingAllowed()) return;
 
     const message: TrackMessage = {
       ...this.buildBase(),
@@ -261,7 +250,7 @@ export class Pixel {
   }
 
   private fireSessionEnd(): void {
-    if (!this.canTrack() || !this.sessionId) return;
+    if (!this.isTrackingAllowed() || !this.sessionId) return;
 
     const duration = this.sessionStartTime
       ? Math.round((Date.now() - this.sessionStartTime) / 1000)
@@ -337,8 +326,8 @@ export class Pixel {
 
   // -- Guards -------------------------------------------------------------
 
-  private canTrack(): boolean {
-    return this.isReady() && this.consent!.level !== 'none';
+  private isTrackingAllowed(): boolean {
+    return this.isReady() && canTrack(this.consent!.level);
   }
 
   private isReady(): boolean {

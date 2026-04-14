@@ -1,8 +1,11 @@
 import {
-  COOKIE_NAME, SESSION_COOKIE, INGEST_PATH, CONSENT_PATH, SESSION_START, SESSION_END,
+  COOKIE_NAME, SESSION_COOKIE, SESSION_START, SESSION_END,
 } from '@imtbl/audience-core';
 import { Audience } from './sdk';
 import { LIBRARY_NAME } from './config';
+
+const INGEST_PATH = '/v1/audience/messages';
+const CONSENT_PATH = '/v1/audience/tracking-consent';
 
 // --- Test fixtures ---
 const TEST_USER = { id: 'user@example.com', identityType: 'email' } as const;
@@ -11,7 +14,6 @@ const TEST_STEAM = { id: '76561198012345', identityType: 'steam' } as const;
 function createSDK(overrides: Record<string, unknown> = {}) {
   return Audience.init({
     publishableKey: 'pk_imapik-test-local',
-    environment: 'sandbox',
     consent: 'full',
     ...overrides,
   });
@@ -79,14 +81,12 @@ describe('Audience', () => {
     it('throws if publishableKey is empty', () => {
       expect(() => Audience.init({
         publishableKey: '',
-        environment: 'sandbox',
       })).toThrow('publishableKey is required');
     });
 
     it('throws if publishableKey is whitespace only', () => {
       expect(() => Audience.init({
         publishableKey: '  ',
-        environment: 'sandbox',
       })).toThrow('publishableKey is required');
     });
 
@@ -95,7 +95,6 @@ describe('Audience', () => {
       const first = createSDK();
       const second = Audience.init({
         publishableKey: 'pk_imapik-test-other',
-        environment: 'production',
         consent: 'none',
       });
 

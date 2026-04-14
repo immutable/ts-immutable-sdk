@@ -1,5 +1,5 @@
 import type {
-  ConsentLevel, ConsentUpdatePayload, Message, Environment,
+  ConsentLevel, ConsentUpdatePayload, Message,
 } from './types';
 import type { MessageQueue } from './queue';
 import type { HttpSend } from './transport';
@@ -9,6 +9,14 @@ import { CONSENT_PATH, getBaseUrl } from './config';
 export interface ConsentManager {
   level: ConsentLevel;
   setLevel(next: ConsentLevel): void;
+}
+
+export function canTrack(level: ConsentLevel): boolean {
+  return level !== 'none';
+}
+
+export function canIdentify(level: ConsentLevel): boolean {
+  return level === 'full';
 }
 
 export function detectDoNotTrack(): boolean {
@@ -40,10 +48,10 @@ export function createConsentManager(
   send: HttpSend,
   publishableKey: string,
   anonymousId: string,
-  environment: Environment,
   source: string,
   initialLevel?: ConsentLevel,
   onError?: (err: AudienceError) => void,
+  baseUrl?: string,
 ): ConsentManager {
   const dntDetected = detectDoNotTrack();
   let current: ConsentLevel = initialLevel ?? (dntDetected ? 'none' : 'none');
@@ -51,7 +59,7 @@ export function createConsentManager(
   const LEVELS: Record<ConsentLevel, number> = { none: 0, anonymous: 1, full: 2 };
 
   function notifyBackend(level: ConsentLevel): void {
-    const url = `${getBaseUrl(environment)}${CONSENT_PATH}`;
+    const url = `${baseUrl ?? getBaseUrl(publishableKey)}${CONSENT_PATH}`;
     const payload: ConsentUpdatePayload = { anonymousId, status: level, source };
     // Fire-and-forget. HttpSend never rejects, so the floating chain is safe.
     send(url, publishableKey, payload, { method: 'PUT', keepalive: true })
