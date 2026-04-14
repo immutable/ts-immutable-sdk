@@ -59,7 +59,7 @@ export function createConsentManager(
   const LEVELS: Record<ConsentLevel, number> = { none: 0, anonymous: 1, full: 2 };
 
   function notifyBackend(level: ConsentLevel): void {
-    const url = `${getBaseUrl(publishableKey, baseUrl)}${CONSENT_PATH}`;
+    const url = `${baseUrl ?? getBaseUrl(publishableKey)}${CONSENT_PATH}`;
     const payload: ConsentUpdatePayload = { anonymousId, status: level, source };
     // Fire-and-forget. HttpSend never rejects, so the floating chain is safe.
     send(url, publishableKey, payload, { method: 'PUT', keepalive: true })

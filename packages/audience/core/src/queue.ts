@@ -87,7 +87,7 @@ export class MessageQueue {
     private readonly publishableKey: string,
     options?: MessageQueueOptions,
   ) {
-    this.endpointUrl = `${getBaseUrl(publishableKey, options?.baseUrl)}${INGEST_PATH}`;
+    this.endpointUrl = `${options?.baseUrl ?? getBaseUrl(publishableKey)}${INGEST_PATH}`;
     this.flushIntervalMs = options?.flushIntervalMs ?? FLUSH_INTERVAL_MS;
     this.flushSize = options?.flushSize ?? FLUSH_SIZE;
     this.onFlush = options?.onFlush;

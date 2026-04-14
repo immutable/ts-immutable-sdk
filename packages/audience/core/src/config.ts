@@ -14,9 +14,8 @@ export const SESSION_MAX_AGE = 30 * 60; // 30 minutes in seconds
 export const SESSION_START = 'session_start';
 export const SESSION_END = 'session_end';
 
-export const getBaseUrl = (publishableKey: string, baseUrl?: string): string => {
-  if (baseUrl) return baseUrl;
-  return publishableKey.startsWith(TEST_KEY_PREFIX)
+export const getBaseUrl = (publishableKey: string): string => (
+  publishableKey.startsWith(TEST_KEY_PREFIX)
     ? 'https://api.sandbox.immutable.com'
-    : 'https://api.immutable.com';
-};
+    : 'https://api.immutable.com'
+);
