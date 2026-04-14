@@ -11,6 +11,14 @@ export interface ConsentManager {
   setLevel(next: ConsentLevel): void;
 }
 
+export function canTrack(level: ConsentLevel): boolean {
+  return level !== 'none';
+}
+
+export function canIdentify(level: ConsentLevel): boolean {
+  return level === 'full';
+}
+
 export function detectDoNotTrack(): boolean {
   if (typeof navigator === 'undefined') return false;
   // DNT header
