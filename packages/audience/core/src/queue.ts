@@ -1,6 +1,9 @@
 import type { Message, BatchPayload } from './types';
 import type { HttpSend } from './transport';
 import { type AudienceError, invokeOnError, toAudienceError } from './errors';
+import {
+  getBaseUrl, INGEST_PATH, FLUSH_INTERVAL_MS, FLUSH_SIZE,
+} from './config';
 import * as storage from './storage';
 import { isBrowser } from './utils';
 
@@ -8,6 +11,12 @@ const STORAGE_KEY = 'queue';
 const MAX_BATCH_SIZE = 100; // Backend maxItems limit per OAS
 
 export interface MessageQueueOptions {
+  /** Override the default API base URL for the ingest endpoint. */
+  baseUrl?: string;
+  /** Queue flush interval in milliseconds. Defaults to 5 000. */
+  flushIntervalMs?: number;
+  /** Number of queued messages that triggers an automatic flush. Defaults to 20. */
+  flushSize?: number;
   /**
    * Fired after every flush, success or failure. Used for debug
    * logging / metrics. Errors are reported separately via `onError`.
@@ -67,14 +76,20 @@ export class MessageQueue {
 
   private readonly storagePrefix?: string;
 
+  private readonly endpointUrl: string;
+
+  private readonly flushIntervalMs: number;
+
+  private readonly flushSize: number;
+
   constructor(
     private readonly send: HttpSend,
-    private readonly endpointUrl: string,
     private readonly publishableKey: string,
-    private readonly flushIntervalMs: number,
-    private readonly flushSize: number,
     options?: MessageQueueOptions,
   ) {
+    this.endpointUrl = `${options?.baseUrl ?? getBaseUrl(publishableKey)}${INGEST_PATH}`;
+    this.flushIntervalMs = options?.flushIntervalMs ?? FLUSH_INTERVAL_MS;
+    this.flushSize = options?.flushSize ?? FLUSH_SIZE;
     this.onFlush = options?.onFlush;
     this.onError = options?.onError;
     this.storagePrefix = options?.storagePrefix;

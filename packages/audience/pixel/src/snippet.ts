@@ -1,4 +1,4 @@
-import type { ConsentLevel, Environment } from '@imtbl/audience-core';
+import type { ConsentLevel } from '@imtbl/audience-core';
 
 const DEFAULT_CDN_URL = 'https://cdn.immutable.com/pixel/v1/imtbl.js';
 
@@ -6,18 +6,14 @@ export interface SnippetOptions {
   key: string;
   cdnUrl?: string;
   consent?: ConsentLevel;
-  environment?: Environment;
 }
 
 export function generateSnippet(options: SnippetOptions): string {
   const {
-    key, cdnUrl = DEFAULT_CDN_URL, consent, environment,
+    key, cdnUrl = DEFAULT_CDN_URL, consent,
   } = options;
 
   const initArgs: Record<string, string> = { key };
-  if (environment && environment !== 'production') {
-    initArgs.environment = environment;
-  }
   if (consent) {
     initArgs.consent = consent;
   }

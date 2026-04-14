@@ -1,5 +1,4 @@
 import type {
-  Environment,
   ConsentLevel,
   PageMessage,
   TrackMessage,
@@ -9,10 +8,6 @@ import type {
 import {
   MessageQueue,
   httpSend,
-  getBaseUrl,
-  INGEST_PATH,
-  FLUSH_INTERVAL_MS,
-  FLUSH_SIZE,
   getOrCreateAnonymousId,
   collectContext,
   generateId,
@@ -36,12 +31,13 @@ const PIXEL_VERSION: string = typeof PIXEL_VERSION_INJECTED !== 'undefined'
 
 export interface PixelInitOptions {
   key: string;
-  environment?: Environment;
   consent?: ConsentLevel;
   /** Set to 'auto' to auto-detect consent from CMPs (Google Consent Mode, IAB TCF). */
   consentMode?: 'auto';
   domain?: string;
   autocapture?: AutocaptureOptions;
+  /** Override the default API base URL. */
+  baseUrl?: string;
 }
 
 export class Pixel {
@@ -54,8 +50,6 @@ export class Pixel {
   private sessionId: string | undefined;
 
   private sessionStartTime: number | undefined;
-
-  private environment: Environment = 'production';
 
   private publishableKey = '';
 
@@ -76,7 +70,6 @@ export class Pixel {
 
     const {
       key,
-      environment = 'production',
       consent: consentLevel,
       consentMode,
       domain,
@@ -84,18 +77,12 @@ export class Pixel {
     } = options;
 
     this.publishableKey = key;
-    this.environment = environment;
     this.domain = domain;
-
-    const endpointUrl = `${getBaseUrl(environment)}${INGEST_PATH}`;
 
     this.queue = new MessageQueue(
       httpSend,
-      endpointUrl,
       key,
-      FLUSH_INTERVAL_MS,
-      FLUSH_SIZE,
-      { storagePrefix: '__imtbl_pixel_' },
+      { baseUrl: options.baseUrl, storagePrefix: '__imtbl_pixel_' },
     );
 
     this.anonymousId = getOrCreateAnonymousId(domain);
@@ -109,9 +96,10 @@ export class Pixel {
       httpSend,
       key,
       this.anonymousId,
-      environment,
       'pixel',
       isAutoConsent ? 'none' : consentLevel,
+      undefined,
+      options.baseUrl,
     );
 
     this.initialized = true;

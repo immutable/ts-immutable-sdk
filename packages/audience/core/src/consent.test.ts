@@ -49,21 +49,21 @@ describe('createConsentManager', () => {
   it('defaults to none when no initial level provided', () => {
     const queue = createMockQueue();
     const send = createMockSend();
-    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel');
+    const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel');
     expect(manager.level).toBe('none');
   });
 
   it('uses the initial level when provided', () => {
     const queue = createMockQueue();
     const send = createMockSend();
-    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'anonymous');
+    const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'anonymous');
     expect(manager.level).toBe('anonymous');
   });
 
   it('upgrades consent without modifying queue', () => {
     const queue = createMockQueue();
     const send = createMockSend();
-    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none');
+    const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'none');
 
     manager.setLevel('anonymous');
     expect(manager.level).toBe('anonymous');
@@ -74,7 +74,7 @@ describe('createConsentManager', () => {
   it('purges queue on downgrade to none', () => {
     const queue = createMockQueue();
     const send = createMockSend();
-    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'full');
+    const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'full');
 
     manager.setLevel('none');
     expect(manager.level).toBe('none');
@@ -88,7 +88,7 @@ describe('createConsentManager', () => {
   it('strips userId on downgrade from full to anonymous', () => {
     const queue = createMockQueue();
     const send = createMockSend();
-    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'full');
+    const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'full');
 
     manager.setLevel('anonymous');
     expect(manager.level).toBe('anonymous');
@@ -105,13 +105,13 @@ describe('createConsentManager', () => {
   it('fires PUT to consent endpoint on level change via the injected send', () => {
     const queue = createMockQueue();
     const send = createMockSend();
-    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none');
+    const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'none');
 
     manager.setLevel('anonymous');
 
     expect(send).toHaveBeenCalledWith(
-      'https://api.dev.immutable.com/v1/audience/tracking-consent',
-      'pk_test',
+      'https://api.sandbox.immutable.com/v1/audience/tracking-consent',
+      'pk_imapik-test-local',
       { anonymousId: 'anon-1', status: 'anonymous', source: 'pixel' },
       { method: 'PUT', keepalive: true },
     );
@@ -120,7 +120,7 @@ describe('createConsentManager', () => {
   it('does nothing when setting the same level', () => {
     const queue = createMockQueue();
     const send = createMockSend();
-    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'anonymous');
+    const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'anonymous');
 
     manager.setLevel('anonymous');
     expect(queue.purge).not.toHaveBeenCalled();
@@ -133,7 +133,7 @@ describe('createConsentManager', () => {
 
     const queue = createMockQueue();
     const send = createMockSend();
-    const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel');
+    const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel');
     expect(manager.level).toBe('none');
 
     Object.defineProperty(navigator, 'doNotTrack', { value: '0', configurable: true });
@@ -146,12 +146,12 @@ describe('createConsentManager', () => {
         ok: false,
         error: new TransportError({
           status: 503,
-          endpoint: 'https://api.dev.immutable.com/v1/audience/tracking-consent',
+          endpoint: 'https://api.sandbox.immutable.com/v1/audience/tracking-consent',
           body: { code: 'SERVICE_UNAVAILABLE' },
         }),
       });
       const onError = jest.fn();
-      const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none', onError);
+      const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'none', onError);
 
       manager.setLevel('anonymous');
 
@@ -172,12 +172,12 @@ describe('createConsentManager', () => {
         ok: false,
         error: new TransportError({
           status: 0,
-          endpoint: 'https://api.dev.immutable.com/v1/audience/tracking-consent',
+          endpoint: 'https://api.sandbox.immutable.com/v1/audience/tracking-consent',
           cause: new TypeError('Failed to fetch'),
         }),
       });
       const onError = jest.fn();
-      const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none', onError);
+      const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'none', onError);
 
       manager.setLevel('anonymous');
       await Promise.resolve();
@@ -193,7 +193,7 @@ describe('createConsentManager', () => {
       const queue = createMockQueue();
       const send = createMockSend();
       const onError = jest.fn();
-      const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none', onError);
+      const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'none', onError);
 
       manager.setLevel('anonymous');
       await Promise.resolve();
@@ -209,7 +209,7 @@ describe('createConsentManager', () => {
         error: new TransportError({ status: 500, endpoint: 'x', body: null }),
       });
       const onError = jest.fn().mockImplementation(() => { throw new Error('callback boom'); });
-      const manager = createConsentManager(queue, send, 'pk_test', 'anon-1', 'dev', 'pixel', 'none', onError);
+      const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'none', onError);
 
       // Synchronous call must not throw even though the .then() handler will.
       expect(() => manager.setLevel('anonymous')).not.toThrow();

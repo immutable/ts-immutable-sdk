@@ -20,10 +20,6 @@ jest.mock('./pixel', () => ({
 jest.mock('@imtbl/audience-core', () => ({
   MessageQueue: jest.fn(),
   httpSend: jest.fn(),
-  getBaseUrl: jest.fn(),
-  INGEST_PATH: '',
-  FLUSH_INTERVAL_MS: 5000,
-  FLUSH_SIZE: 20,
   getOrCreateAnonymousId: jest.fn(),
   collectContext: jest.fn(),
   generateId: jest.fn(),
@@ -47,14 +43,13 @@ describe('bootstrap', () => {
   it('replays queued init command from snippet stub', () => {
     // Simulate snippet having queued an init command
     (window as Record<string, unknown>).__imtbl = [
-      ['init', { key: 'pk_test', environment: 'dev', consent: 'anonymous' }],
+      ['init', { key: 'pk_imapik-test-local', consent: 'anonymous' }],
     ];
 
     require('./bootstrap');
 
     expect(mockInit).toHaveBeenCalledWith({
-      key: 'pk_test',
-      environment: 'dev',
+      key: 'pk_imapik-test-local',
       consent: 'anonymous',
     });
   });
