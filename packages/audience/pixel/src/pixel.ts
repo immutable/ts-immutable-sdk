@@ -8,8 +8,6 @@ import type {
 import {
   MessageQueue,
   httpSend,
-  FLUSH_INTERVAL_MS,
-  FLUSH_SIZE,
   getOrCreateAnonymousId,
   collectContext,
   generateId,
@@ -81,8 +79,6 @@ export class Pixel {
     this.queue = new MessageQueue(
       httpSend,
       key,
-      FLUSH_INTERVAL_MS,
-      FLUSH_SIZE,
       { storagePrefix: '__imtbl_pixel_' },
     );
 

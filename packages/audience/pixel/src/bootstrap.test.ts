@@ -20,8 +20,6 @@ jest.mock('./pixel', () => ({
 jest.mock('@imtbl/audience-core', () => ({
   MessageQueue: jest.fn(),
   httpSend: jest.fn(),
-  FLUSH_INTERVAL_MS: 5000,
-  FLUSH_SIZE: 20,
   getOrCreateAnonymousId: jest.fn(),
   collectContext: jest.fn(),
   generateId: jest.fn(),

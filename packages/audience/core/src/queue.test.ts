@@ -41,9 +41,9 @@ function createQueue(
   return new MessageQueue(
     send,
     'pk_imapik-test-local',
-    opts.flushIntervalMs ?? 5_000,
-    opts.flushSize ?? 20,
     {
+      flushIntervalMs: opts.flushIntervalMs,
+      flushSize: opts.flushSize,
       onFlush: opts.onFlush,
       onError: opts.onError,
       staleFilter: opts.staleFilter,

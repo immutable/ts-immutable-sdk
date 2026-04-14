@@ -1,8 +1,11 @@
 import {
-  COOKIE_NAME, SESSION_COOKIE, INGEST_PATH, CONSENT_PATH, SESSION_START, SESSION_END,
+  COOKIE_NAME, SESSION_COOKIE, SESSION_START, SESSION_END,
 } from '@imtbl/audience-core';
 import { Audience } from './sdk';
 import { LIBRARY_NAME } from './config';
+
+const INGEST_PATH = '/v1/audience/messages';
+const CONSENT_PATH = '/v1/audience/tracking-consent';
 
 // --- Test fixtures ---
 const TEST_USER = { id: 'user@example.com', identityType: 'email' } as const;

@@ -7,8 +7,6 @@ import type {
   UserTraits,
 } from '@imtbl/audience-core';
 import {
-  FLUSH_INTERVAL_MS,
-  FLUSH_SIZE,
   COOKIE_NAME,
   SESSION_COOKIE,
   MessageQueue,
@@ -72,8 +70,6 @@ export class Audience {
     } = config;
     const consentLevel = config.consent ?? 'none';
     const consentSource = DEFAULT_CONSENT_SOURCE;
-    const flushInterval = config.flushInterval ?? FLUSH_INTERVAL_MS;
-    const flushSize = config.flushSize ?? FLUSH_SIZE;
 
     this.cookieDomain = cookieDomain;
     this.debug = new DebugLogger(config.debug ?? false);
@@ -89,9 +85,9 @@ export class Audience {
     this.queue = new MessageQueue(
       httpSend,
       publishableKey,
-      flushInterval,
-      flushSize,
       {
+        flushIntervalMs: config.flushInterval,
+        flushSize: config.flushSize,
         onFlush: (ok, count) => this.debug.logFlush(ok, count),
         staleFilter: (m) => isTimestampValid(m.eventTimestamp),
         storagePrefix: '__imtbl_web_',

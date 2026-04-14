@@ -22,10 +22,6 @@ export {
 } from './cookie';
 
 export {
-  INGEST_PATH,
-  CONSENT_PATH,
-  FLUSH_INTERVAL_MS,
-  FLUSH_SIZE,
   COOKIE_NAME,
   SESSION_COOKIE,
   SESSION_START,

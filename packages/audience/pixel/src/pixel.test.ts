@@ -33,8 +33,6 @@ jest.mock('@imtbl/audience-core', () => ({
     get length() { return 0; },
   })),
   httpSend: jest.fn().mockResolvedValue({ ok: true }),
-  FLUSH_INTERVAL_MS: 5000,
-  FLUSH_SIZE: 20,
   getOrCreateAnonymousId: jest.fn().mockReturnValue('anon-123'),
   collectContext: jest.fn().mockReturnValue({
     library: '@imtbl/pixel',
