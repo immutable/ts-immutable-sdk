@@ -133,6 +133,8 @@ interface EventPropsMap {
   link_clicked: LinkClickedProperties;
 }
 
+export type AudienceEventName = keyof EventPropsMap;
+
 /**
  * Event name → property type. Falls back to `Record<string, unknown>` for
  * unknown names. Used by `sdk.track()` to type-check property shapes at the

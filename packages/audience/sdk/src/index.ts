@@ -3,12 +3,14 @@ export { AudienceEvents } from './events';
 export { IdentityType, canTrack, canIdentify } from '@imtbl/audience-core';
 export type { AudienceConfig } from './types';
 export type {
+  AudienceEventName,
   EmailAcquiredProperties,
   GameLaunchProperties,
   GamePageViewedProperties,
   LinkClickedProperties,
   ProgressionProperties,
   ProgressionStatus,
+  PropsFor,
   PurchaseProperties,
   ResourceFlow,
   ResourceProperties,

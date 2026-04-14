@@ -29,7 +29,7 @@ import {
   SESSION_END,
 } from '@imtbl/audience-core';
 import { DebugLogger } from './debug';
-import type { PropsFor } from './events';
+import type { AudienceEventName, PropsFor } from './events';
 import type { AudienceConfig } from './types';
 import {
   LIBRARY_NAME, LIBRARY_VERSION, LOG_PREFIX, DEFAULT_CONSENT_SOURCE,
@@ -234,9 +234,11 @@ export class Audience {
   /**
    * Record a player action like a purchase, sign-up, or game launch.
    * Pass the event name and any properties you want to analyse later.
+   * For the predefined event names (`sign_up`, `purchase`, etc.),
+   * TypeScript enforces the property shape at the call site.
    * No-op when consent is 'none'.
    */
-  track<E extends string>(
+  track<E extends AudienceEventName | string & {}>(
     event: E,
     ...args: {} extends PropsFor<E>
       ? [properties?: PropsFor<E>]
