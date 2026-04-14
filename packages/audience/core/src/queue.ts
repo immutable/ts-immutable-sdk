@@ -11,6 +11,8 @@ const STORAGE_KEY = 'queue';
 const MAX_BATCH_SIZE = 100; // Backend maxItems limit per OAS
 
 export interface MessageQueueOptions {
+  /** Override the base URL for the ingest endpoint (e.g. 'https://api.dev.immutable.com'). */
+  baseUrl?: string;
   /** Queue flush interval in milliseconds. Defaults to 5 000. */
   flushIntervalMs?: number;
   /** Number of queued messages that triggers an automatic flush. Defaults to 20. */
@@ -85,7 +87,7 @@ export class MessageQueue {
     private readonly publishableKey: string,
     options?: MessageQueueOptions,
   ) {
-    this.endpointUrl = `${getBaseUrl(publishableKey)}${INGEST_PATH}`;
+    this.endpointUrl = `${getBaseUrl(publishableKey, options?.baseUrl)}${INGEST_PATH}`;
     this.flushIntervalMs = options?.flushIntervalMs ?? FLUSH_INTERVAL_MS;
     this.flushSize = options?.flushSize ?? FLUSH_SIZE;
     this.onFlush = options?.onFlush;

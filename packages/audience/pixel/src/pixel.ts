@@ -35,6 +35,8 @@ export interface PixelInitOptions {
   consentMode?: 'auto';
   domain?: string;
   autocapture?: AutocaptureOptions;
+  /** Override the API base URL. For internal use only (e.g. dev environments behind VPN). */
+  baseUrl?: string;
 }
 
 export class Pixel {
@@ -79,7 +81,7 @@ export class Pixel {
     this.queue = new MessageQueue(
       httpSend,
       key,
-      { storagePrefix: '__imtbl_pixel_' },
+      { baseUrl: options.baseUrl, storagePrefix: '__imtbl_pixel_' },
     );
 
     this.anonymousId = getOrCreateAnonymousId(domain);
@@ -95,6 +97,8 @@ export class Pixel {
       this.anonymousId,
       'pixel',
       isAutoConsent ? 'none' : consentLevel,
+      undefined,
+      options.baseUrl,
     );
 
     this.initialized = true;

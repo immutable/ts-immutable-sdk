@@ -86,6 +86,7 @@ export class Audience {
       httpSend,
       publishableKey,
       {
+        baseUrl: config.baseUrl,
         flushIntervalMs: config.flushInterval,
         flushSize: config.flushSize,
         onFlush: (ok, count) => this.debug.logFlush(ok, count),
@@ -101,6 +102,8 @@ export class Audience {
       this.anonymousId,
       consentSource,
       consentLevel,
+      undefined,
+      config.baseUrl,
     );
 
     this.attribution = collectAttribution();

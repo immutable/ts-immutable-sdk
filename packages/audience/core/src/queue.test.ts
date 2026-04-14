@@ -206,7 +206,7 @@ describe('MessageQueue', () => {
     const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
       ok: false,
       error: new TransportError({
-        status: 500, endpoint: 'https://api.dev.immutable.com/v1/audience/messages', body: null,
+        status: 500, endpoint: 'https://api.sandbox.immutable.com/v1/audience/messages', body: null,
       }),
     });
     const queue = createQueue(send, { onError });
@@ -228,7 +228,7 @@ describe('MessageQueue', () => {
       ok: false,
       error: new TransportError({
         status: 0,
-        endpoint: 'https://api.dev.immutable.com/v1/audience/messages',
+        endpoint: 'https://api.sandbox.immutable.com/v1/audience/messages',
         cause: new TypeError('Failed to fetch'),
       }),
     });
@@ -278,7 +278,7 @@ describe('MessageQueue', () => {
       ok: false,
       error: new TransportError({
         status: 200,
-        endpoint: 'https://api.dev.immutable.com/v1/audience/messages',
+        endpoint: 'https://api.sandbox.immutable.com/v1/audience/messages',
         body: { accepted: 1, rejected: 1 },
       }),
     });
@@ -342,7 +342,7 @@ describe('page-unload flush (keepalive)', () => {
     document.dispatchEvent(new Event('visibilitychange'));
 
     expect(send).toHaveBeenCalledWith(
-      'https://api.dev.immutable.com/v1/audience/messages',
+      'https://api.sandbox.immutable.com/v1/audience/messages',
       'pk_imapik-test-local',
       expect.objectContaining({ messages: expect.any(Array) }),
       { keepalive: true },
@@ -366,7 +366,7 @@ describe('page-unload flush (keepalive)', () => {
     window.dispatchEvent(new Event('pagehide'));
 
     expect(send).toHaveBeenCalledWith(
-      'https://api.dev.immutable.com/v1/audience/messages',
+      'https://api.sandbox.immutable.com/v1/audience/messages',
       'pk_imapik-test-local',
       expect.objectContaining({ messages: expect.any(Array) }),
       { keepalive: true },

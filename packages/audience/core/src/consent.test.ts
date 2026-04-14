@@ -90,7 +90,7 @@ describe('createConsentManager', () => {
     manager.setLevel('anonymous');
 
     expect(send).toHaveBeenCalledWith(
-      'https://api.dev.immutable.com/v1/audience/tracking-consent',
+      'https://api.sandbox.immutable.com/v1/audience/tracking-consent',
       'pk_imapik-test-local',
       { anonymousId: 'anon-1', status: 'anonymous', source: 'pixel' },
       { method: 'PUT', keepalive: true },
@@ -126,7 +126,7 @@ describe('createConsentManager', () => {
         ok: false,
         error: new TransportError({
           status: 503,
-          endpoint: 'https://api.dev.immutable.com/v1/audience/tracking-consent',
+          endpoint: 'https://api.sandbox.immutable.com/v1/audience/tracking-consent',
           body: { code: 'SERVICE_UNAVAILABLE' },
         }),
       });
@@ -152,7 +152,7 @@ describe('createConsentManager', () => {
         ok: false,
         error: new TransportError({
           status: 0,
-          endpoint: 'https://api.dev.immutable.com/v1/audience/tracking-consent',
+          endpoint: 'https://api.sandbox.immutable.com/v1/audience/tracking-consent',
           cause: new TypeError('Failed to fetch'),
         }),
       });

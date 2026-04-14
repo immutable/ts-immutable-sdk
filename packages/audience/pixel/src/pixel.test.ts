@@ -447,6 +447,8 @@ describe('Pixel', () => {
         'anon-123',
         'pixel',
         'none',
+        undefined,
+        undefined,
       );
     });
 

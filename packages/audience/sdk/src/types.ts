@@ -14,4 +14,6 @@ export interface AudienceConfig {
   flushInterval?: number;
   /** Number of queued messages that triggers an automatic flush. Defaults to 20. */
   flushSize?: number;
+  /** Override the API base URL. For internal use only (e.g. dev environments behind VPN). */
+  baseUrl?: string;
 }
