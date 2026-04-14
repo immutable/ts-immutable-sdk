@@ -36,7 +36,7 @@ export interface PixelInitOptions {
   consentMode?: 'auto';
   domain?: string;
   autocapture?: AutocaptureOptions;
-  /** Override the API base URL. For internal use only (e.g. dev environments behind VPN). */
+  /** Override the default API base URL. */
   baseUrl?: string;
 }
 

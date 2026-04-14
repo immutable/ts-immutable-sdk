@@ -11,7 +11,7 @@ const STORAGE_KEY = 'queue';
 const MAX_BATCH_SIZE = 100; // Backend maxItems limit per OAS
 
 export interface MessageQueueOptions {
-  /** Override the base URL for the ingest endpoint (e.g. 'https://api.dev.immutable.com'). */
+  /** Override the default API base URL for the ingest endpoint. */
   baseUrl?: string;
   /** Queue flush interval in milliseconds. Defaults to 5 000. */
   flushIntervalMs?: number;
