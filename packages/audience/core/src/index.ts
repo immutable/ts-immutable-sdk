@@ -22,7 +22,6 @@ export {
 } from './cookie';
 
 export {
-  getBaseUrl,
   INGEST_PATH,
   CONSENT_PATH,
   FLUSH_INTERVAL_MS,

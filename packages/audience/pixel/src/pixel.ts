@@ -8,8 +8,6 @@ import type {
 import {
   MessageQueue,
   httpSend,
-  getBaseUrl,
-  INGEST_PATH,
   FLUSH_INTERVAL_MS,
   FLUSH_SIZE,
   getOrCreateAnonymousId,
@@ -80,11 +78,8 @@ export class Pixel {
     this.publishableKey = key;
     this.domain = domain;
 
-    const endpointUrl = `${getBaseUrl(key)}${INGEST_PATH}`;
-
     this.queue = new MessageQueue(
       httpSend,
-      endpointUrl,
       key,
       FLUSH_INTERVAL_MS,
       FLUSH_SIZE,

@@ -1,6 +1,7 @@
 import type { Message, BatchPayload } from './types';
 import type { HttpSend } from './transport';
 import { type AudienceError, invokeOnError, toAudienceError } from './errors';
+import { getBaseUrl, INGEST_PATH } from './config';
 import * as storage from './storage';
 import { isBrowser } from './utils';
 
@@ -67,14 +68,16 @@ export class MessageQueue {
 
   private readonly storagePrefix?: string;
 
+  private readonly endpointUrl: string;
+
   constructor(
     private readonly send: HttpSend,
-    private readonly endpointUrl: string,
     private readonly publishableKey: string,
     private readonly flushIntervalMs: number,
     private readonly flushSize: number,
     options?: MessageQueueOptions,
   ) {
+    this.endpointUrl = `${getBaseUrl(publishableKey)}${INGEST_PATH}`;
     this.onFlush = options?.onFlush;
     this.onError = options?.onError;
     this.storagePrefix = options?.storagePrefix;

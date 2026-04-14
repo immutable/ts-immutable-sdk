@@ -7,14 +7,12 @@ import type {
   UserTraits,
 } from '@imtbl/audience-core';
 import {
-  INGEST_PATH,
   FLUSH_INTERVAL_MS,
   FLUSH_SIZE,
   COOKIE_NAME,
   SESSION_COOKIE,
   MessageQueue,
   httpSend,
-  getBaseUrl,
   getOrCreateAnonymousId,
   getCookie,
   deleteCookie,
@@ -88,10 +86,8 @@ export class Audience {
       this.anonymousId = getCookie(COOKIE_NAME) ?? generateId();
     }
 
-    const endpointUrl = `${getBaseUrl(publishableKey)}${INGEST_PATH}`;
     this.queue = new MessageQueue(
       httpSend,
-      endpointUrl,
       publishableKey,
       flushInterval,
       flushSize,
