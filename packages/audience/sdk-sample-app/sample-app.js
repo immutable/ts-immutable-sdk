@@ -79,10 +79,22 @@
   // State
   var audience = null;
   var currentConsent = null;
+  var currentUserId = null;
   var logEntries = [];
   var logAutoScroll = true;
   var MAX_LOG_ENTRIES = 500;
   var LOG_BOTTOM_THRESHOLD = 20;
+
+  // SDK-writable first-party cookie. Shared with @imtbl/pixel. Kept in
+  // sync here by reading document.cookie inside updateStatus so the
+  // status bar reflects the SDK's current anon id even after reset().
+  var ANON_COOKIE_NAME = 'imtbl_anon_id';
+
+  function readAnonCookie() {
+    var pattern = new RegExp('(?:^|;\\s*)' + ANON_COOKIE_NAME + '=([^;]+)');
+    var match = document.cookie.match(pattern);
+    return match ? decodeURIComponent(match[1]) : null;
+  }
 
   // DOM helpers
   function $(id) { return document.getElementById(id); }
@@ -264,10 +276,23 @@
   }
 
   function updateStatus() {
+    // Anon id comes from document.cookie — the SDK writes imtbl_anon_id
+    // (a first-party cookie shared with @imtbl/pixel) whenever tracking
+    // consent allows, and deletes it on downgrade to consent='none'.
+    // It's not exposed via a public getter on the Audience instance, so
+    // the sample app reads the cookie directly.
+    var anonId = audience ? readAnonCookie() : null;
+
     text($('status-endpoint'), deriveEndpoint());
     text($('status-consent'), currentConsent || '—');
-    $('status-endpoint').className = 'status-value' + (audience ? '' : ' dim');
-    $('status-consent').className = 'status-value' + (audience ? '' : ' dim');
+    text($('status-anon'), anonId || '—');
+    text($('status-user'), currentUserId || '—');
+
+    var baseDim = audience ? '' : ' dim';
+    $('status-endpoint').className = 'status-value' + baseDim;
+    $('status-consent').className = 'status-value' + baseDim;
+    $('status-anon').className = 'status-value' + (audience && anonId ? '' : ' dim');
+    $('status-user').className = 'status-value' + (audience && currentUserId ? '' : ' dim');
   }
 
   // --- Setup panel: Init ---
@@ -428,6 +453,7 @@
   function onReset() {
     if (!audience) return;
     audience.reset();
+    currentUserId = null;
     log('reset()', 'anonymous ID regenerated, queue cleared', 'ok');
     updateStatus();
   }
@@ -437,6 +463,7 @@
     audience.shutdown();
     audience = null;
     currentConsent = null;
+    currentUserId = null;
     setInitState(false);
     updateStatus();
     log('shutdown()', 'SDK stopped', 'ok');
@@ -450,6 +477,10 @@
     try {
       audience.setConsent(level);
       currentConsent = level;
+      // SDK strips userId when consent drops below 'full' (queue.purge
+      // + userId clear on full→anonymous, full purge on →none). Mirror
+      // that here so the status bar doesn't show a stale player id.
+      if (!canIdentify(level)) currentUserId = null;
       log('setConsent()', { from: previous, to: level }, 'ok');
       updateStatus();
     } catch (err) {
@@ -606,7 +637,9 @@
     catch (err) { log('identify()', 'invalid traits JSON: ' + err.message, 'err'); return; }
     try {
       audience.identify(id, type, traits);
+      currentUserId = id;
       log('identify()', { id: id, identityType: type, traits: traits }, 'ok');
+      updateStatus();
     } catch (err) {
       log('identify()', String(err && err.message || err), 'err');
     }
@@ -698,6 +731,7 @@
       audience.shutdown();
       audience = null;
     }
+    currentUserId = null;
     try {
       audience = Audience.init(readConfig());
       currentConsent = $('initial-consent').value;
@@ -718,6 +752,7 @@
     forceErrorBusy = true;
     audience.shutdown();
     audience = null;
+    currentUserId = null;
     try {
       audience = Audience.init(withLiveConfig({
         baseUrl: DEAD_BASE_URL,
@@ -745,6 +780,7 @@
     forceErrorBusy = true;
     audience.shutdown();
     audience = null;
+    currentUserId = null;
     try {
       audience = Audience.init(withLiveConfig({
         publishableKey: 'pk_imapik-test-revoked-0000000000000000',
@@ -772,6 +808,7 @@
     forceErrorBusy = true;
     audience.shutdown();
     audience = null;
+    currentUserId = null;
     try {
       audience = Audience.init(withLiveConfig({
         baseUrl: DEAD_BASE_URL,
