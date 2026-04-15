@@ -13,6 +13,7 @@
   --ok: #148530;             /* status-success-bright (onLight) */
   --warn: #a07a00;           /* attention amber — FBFF6D is illegible on white; dark amber for legibility */
   --err: #bb3049;            /* status-fatal-bright (onLight) */
+  --debug: #6366f1;          /* indigo-500 — distinct from the four status colours so SDK debug rows don't visually blend with ok/info */
   --input-bg: #ffffff;       /* was dark — inputs are white like cards */
   --input-border: #d4d7dd;   /* was dark — light gray border */
   --mono: 'Roboto Mono', ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
@@ -279,10 +280,11 @@ button.active {
   white-space: pre-wrap;
 }
 
-.log-row.log-ok .log-label   { color: var(--ok); }
-.log-row.log-warn .log-label { color: var(--warn); }
-.log-row.log-err .log-label  { color: var(--err); }
-.log-row.log-info .log-label { color: var(--text-muted); }
+.log-row.log-ok .log-label    { color: var(--ok); }
+.log-row.log-warn .log-label  { color: var(--warn); }
+.log-row.log-err .log-label   { color: var(--err); }
+.log-row.log-info .log-label  { color: var(--text-muted); }
+.log-row.log-debug .log-label { color: var(--debug); font-style: italic; }
 
 .panel-header {
   display: flex;

@@ -136,6 +136,46 @@
     navigator.clipboard.writeText(text).catch(function () { /* ignore */ });
   }
 
+  // --- SDK debug console mirror ---
+  //
+  // DebugLogger in @imtbl/audience writes to console.log and console.warn
+  // tagged with the '[audience]' prefix. When the user ticks the SDK debug
+  // logging checkbox in Setup, we want that output to land in the sample
+  // app's in-page event log too — not just in the browser devtools — so
+  // studios can see what debug:true actually does without leaving the page.
+  //
+  // Install once at bootstrap. The original console methods stay active so
+  // devtools still receives the same output; this wrapper is strictly
+  // additive. Only messages whose first argument is a string starting with
+  // SDK_LOG_PREFIX are mirrored.
+
+  var SDK_LOG_PREFIX = '[audience]';
+  var consoleMirrorInstalled = false;
+
+  function installConsoleMirror() {
+    if (consoleMirrorInstalled) return;
+    consoleMirrorInstalled = true;
+    var originalLog = console.log.bind(console);
+    var originalWarn = console.warn.bind(console);
+
+    function tryMirror(args, level) {
+      if (args.length === 0 || typeof args[0] !== 'string') return;
+      if (args[0].indexOf(SDK_LOG_PREFIX + ' ') !== 0) return;
+      var msg = args[0].slice(SDK_LOG_PREFIX.length + 1);
+      var payload = args.length > 1 ? args[1] : undefined;
+      log('SDK', payload !== undefined ? { msg: msg, payload: payload } : msg, level);
+    }
+
+    console.log = function () {
+      originalLog.apply(null, arguments);
+      tryMirror(arguments, 'debug');
+    };
+    console.warn = function () {
+      originalWarn.apply(null, arguments);
+      tryMirror(arguments, 'warn');
+    };
+  }
+
   // --- Derived endpoint ---
 
   var TEST_KEY_PREFIX = 'pk_imapik-test';
@@ -266,6 +306,10 @@
   // --- Bootstrap ---
 
   function bootstrap() {
+    // Install the SDK console mirror before any SDK code runs so we don't
+    // miss early debug output.
+    installConsoleMirror();
+
     // Populate IdentityType dropdowns
     var identityTypeOptions = Object.keys(IdentityType || {});
     ['id-type', 'alias-from-type', 'alias-to-type'].forEach(function (selectId) {
