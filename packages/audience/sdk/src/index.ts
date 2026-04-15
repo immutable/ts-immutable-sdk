@@ -1,6 +1,7 @@
 export { Audience } from './sdk';
 export { AudienceEvents } from './events';
 export { IdentityType, canTrack, canIdentify } from '@imtbl/audience-core';
+export type { ImmutableAudienceGlobal } from './cdn';
 export type { AudienceConfig } from './types';
 export type {
   AudienceEventName,
