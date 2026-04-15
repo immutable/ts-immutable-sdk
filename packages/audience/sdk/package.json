@@ -52,14 +52,16 @@
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "pnpm transpile && pnpm typegen",
+    "build": "pnpm transpile && pnpm transpile:cdn && pnpm typegen",
     "transpile": "tsup --config tsup.config.js",
+    "transpile:cdn": "tsup --config ./tsup.cdn.js",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types && rollup -c rollup.dts.config.js && find dist/types -name '*.d.ts' ! -name 'index.d.ts' -delete",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
     "prepack": "node scripts/prepack.mjs",
     "postpack": "node scripts/postpack.mjs",
-    "test": "jest --passWithNoTests",
+    "test": "jest --passWithNoTests && pnpm test:cdn-artifact",
+    "test:cdn-artifact": "pnpm transpile:cdn && jest --config jest.cdn-artifact.config.ts",
     "test:watch": "jest --watch",
     "typecheck": "tsc --customConditions development --noEmit --jsx preserve"
   },
