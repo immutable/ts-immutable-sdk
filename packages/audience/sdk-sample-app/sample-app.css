@@ -494,14 +494,18 @@ footer .footer-sep {
   cursor: pointer;
   font-family: var(--sans);
   font-size: 0.9em;
+  font-weight: 500;
   color: var(--text-muted);
   white-space: nowrap;
-  transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+  transition: color 0.12s ease, border-color 0.12s ease;
 }
 
-.tab:hover {
+/* Hover only changes the text colour and hints at the underline, never
+   the background. A background swap conflicts with the active tab's
+   own white background and makes the letters feel muddy. */
+.tab:hover:not(.active) {
   color: var(--text);
-  background: rgba(17, 24, 39, 0.03);
+  border-bottom-color: var(--text-dim);
 }
 
 .tab.active {
