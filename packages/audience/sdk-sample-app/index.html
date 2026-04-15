@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src https://api.dev.immutable.com https://api.sandbox.immutable.com https://api.immutable.com">
+  <title>Immutable Audience SDK — Sample App</title>
+  <link rel="stylesheet" href="sample-app.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Immutable Audience SDK — Sample App</h1>
+  </header>
+
+  <div class="status-bar" id="status-bar">
+    <div><span class="status-label">Endpoint</span> <span class="status-value dim" id="status-endpoint">—</span></div>
+    <div><span class="status-label">Consent</span> <span class="status-value dim" id="status-consent">—</span></div>
+    <div><span class="status-label">Anon ID</span> <span class="status-value dim" id="status-anon">—</span></div>
+    <div><span class="status-label">User ID</span> <span class="status-value dim" id="status-user">—</span></div>
+  </div>
+
+  <div class="sample-app-grid">
+    <div class="controls">
+
+      <section class="panel" id="panel-setup">
+        <h2 class="panel-title">Setup</h2>
+        <div class="field">
+          <label for="pk">Publishable Key</label>
+          <input id="pk" type="text" placeholder="pk_imapik-test-yourkey" spellcheck="false">
+        </div>
+        <div class="field">
+          <label for="initial-consent">Initial Consent</label>
+          <select id="initial-consent">
+            <option value="none" selected>none</option>
+            <option value="anonymous">anonymous</option>
+            <option value="full">full</option>
+          </select>
+        </div>
+        <details class="advanced">
+          <summary>Advanced options</summary>
+          <div class="field">
+            <label><input id="debug" type="checkbox"> Debug logging</label>
+          </div>
+          <div class="field">
+            <label for="cookie-domain">Cookie domain</label>
+            <input id="cookie-domain" type="text" placeholder=".studio.com">
+          </div>
+          <div class="field">
+            <label for="flush-interval">Flush interval (ms)</label>
+            <input id="flush-interval" type="number" placeholder="5000" min="100">
+          </div>
+          <div class="field">
+            <label for="flush-size">Flush size</label>
+            <input id="flush-size" type="number" placeholder="20" min="1">
+          </div>
+          <div class="field">
+            <label for="base-url">Base URL override</label>
+            <input id="base-url" type="text" placeholder="(derived from key)">
+          </div>
+        </details>
+        <div class="field">
+          <span class="status-label">Derived endpoint</span>
+          <span class="status-value dim" id="derived-endpoint">—</span>
+        </div>
+        <div class="actions">
+          <button id="btn-init" disabled>Init</button>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-lifecycle">
+        <h2 class="panel-title">Lifecycle</h2>
+        <div class="actions">
+          <button id="btn-page" disabled>page()</button>
+          <button id="btn-flush" disabled>flush()</button>
+          <button id="btn-reset" disabled>reset()</button>
+          <button id="btn-shutdown" disabled>shutdown()</button>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-consent">
+        <h2 class="panel-title">Consent</h2>
+        <div class="actions">
+          <button id="btn-consent-none" disabled>none</button>
+          <button id="btn-consent-anon" disabled>anonymous</button>
+          <button id="btn-consent-full" disabled>full</button>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-typed-events">
+        <h2 class="panel-title">Typed Events</h2>
+        <div id="typed-events-accordion"></div>
+        <details class="custom-event">
+          <summary>Custom event (escape hatch)</summary>
+          <div class="field">
+            <label for="custom-event-name">Event name</label>
+            <input id="custom-event-name" type="text" placeholder="my_custom_event">
+          </div>
+          <div class="field">
+            <label for="custom-event-props">Properties (JSON)</label>
+            <textarea id="custom-event-props" rows="3" placeholder='{"foo": "bar"}'></textarea>
+          </div>
+          <div class="actions">
+            <button id="btn-custom-event" disabled>Send</button>
+          </div>
+        </details>
+      </section>
+
+      <section class="panel" id="panel-identity">
+        <h2 class="panel-title">Identity</h2>
+
+        <details open>
+          <summary>Named identify</summary>
+          <div class="field">
+            <label for="id-id">ID</label>
+            <input id="id-id" type="text" placeholder="user@example.com">
+          </div>
+          <div class="field">
+            <label for="id-type">Identity type</label>
+            <select id="id-type"></select>
+          </div>
+          <div class="field">
+            <label for="id-traits">Traits (JSON, optional)</label>
+            <textarea id="id-traits" rows="3" placeholder='{"name": "Jane"}'></textarea>
+          </div>
+          <div class="actions">
+            <button id="btn-identify" disabled>identify(id, type, traits)</button>
+          </div>
+        </details>
+
+        <details>
+          <summary>Traits-only identify</summary>
+          <div class="field">
+            <label for="traits-json">Traits (JSON)</label>
+            <textarea id="traits-json" rows="3" placeholder='{"plan": "pro"}'></textarea>
+          </div>
+          <div class="actions">
+            <button id="btn-identify-traits" disabled>identify(traits)</button>
+          </div>
+        </details>
+
+        <details>
+          <summary>Alias</summary>
+          <div class="field">
+            <label for="alias-from-id">From ID</label>
+            <input id="alias-from-id" type="text">
+          </div>
+          <div class="field">
+            <label for="alias-from-type">From type</label>
+            <select id="alias-from-type"></select>
+          </div>
+          <div class="field">
+            <label for="alias-to-id">To ID</label>
+            <input id="alias-to-id" type="text">
+          </div>
+          <div class="field">
+            <label for="alias-to-type">To type</label>
+            <select id="alias-to-type"></select>
+          </div>
+          <div class="actions">
+            <button id="btn-alias" disabled>alias(from, to)</button>
+          </div>
+        </details>
+      </section>
+
+      <section class="panel" id="panel-errors">
+        <h2 class="panel-title">Error Handling</h2>
+        <div class="actions">
+          <button id="btn-init-empty-key">Init with empty key</button>
+          <button id="btn-force-network" disabled>Force NETWORK_ERROR</button>
+          <button id="btn-force-flush-failed" disabled>Force FLUSH_FAILED</button>
+          <button id="btn-force-consent-failed" disabled>Force CONSENT_SYNC_FAILED</button>
+        </div>
+        <p class="note">
+          VALIDATION_REJECTED fires when the backend returns 2xx with
+          rejected &gt; 0. Not predictably triggerable from the browser;
+          see the README for the expected shape.
+        </p>
+      </section>
+
+    </div>
+
+    <div class="gutter" id="gutter"></div>
+
+    <div class="log-pane">
+      <div class="log-header">
+        <span class="panel-title">Event log</span>
+        <span class="log-actions">
+          <button id="btn-copy-log">Copy</button>
+          <button id="btn-clear-log">Clear</button>
+        </span>
+      </div>
+      <div id="log" class="log"></div>
+    </div>
+  </div>
+
+  <footer>
+    <span id="sdk-version">SDK version: —</span>
+  </footer>
+</main>
+
+<script src="vendor/imtbl-audience.global.js"></script>
+<script src="sample-app.js"></script>
+</body>
+</html>
