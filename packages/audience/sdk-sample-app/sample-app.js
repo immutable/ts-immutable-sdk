@@ -12,7 +12,7 @@
     return;
   }
 
-  var Audience = window.ImmutableAudience.Audience;
+  var audienceInit = window.ImmutableAudience.init;
   var AudienceError = window.ImmutableAudience.AudienceError;
   var IdentityType = window.ImmutableAudience.IdentityType;
   var SdkAudienceEvents = window.ImmutableAudience.AudienceEvents;
@@ -335,7 +335,7 @@
       return;
     }
     try {
-      audience = Audience.init(config);
+      audience = audienceInit(config);
       setInitState(true);
       currentConsent = config.consent;
       log('INIT', {
@@ -742,7 +742,7 @@
 
   function onInitEmptyKey() {
     try {
-      Audience.init({ publishableKey: '' });
+      audienceInit({ publishableKey: '' });
       log('Init with empty key', 'unexpected: init did not throw', 'err');
     } catch (err) {
       log('Init with empty key', {
@@ -768,7 +768,7 @@
     currentUserId = null;
     currentAnonId = null;
     try {
-      audience = Audience.init(readConfig());
+      audience = audienceInit(readConfig());
       currentConsent = $('initial-consent').value;
       setInitState(true);
       updateStatus();
@@ -790,7 +790,7 @@
     currentUserId = null;
     currentAnonId = null;
     try {
-      audience = Audience.init(withLiveConfig({
+      audience = audienceInit(withLiveConfig({
         baseUrl: DEAD_BASE_URL,
         consent: 'anonymous',
       }));
@@ -819,7 +819,7 @@
     currentUserId = null;
     currentAnonId = null;
     try {
-      audience = Audience.init(withLiveConfig({
+      audience = audienceInit(withLiveConfig({
         publishableKey: 'pk_imapik-test-revoked-0000000000000000',
         consent: 'anonymous',
       }));
@@ -848,7 +848,7 @@
     currentUserId = null;
     currentAnonId = null;
     try {
-      audience = Audience.init(withLiveConfig({
+      audience = audienceInit(withLiveConfig({
         baseUrl: DEAD_BASE_URL,
         consent: 'none',
       }));

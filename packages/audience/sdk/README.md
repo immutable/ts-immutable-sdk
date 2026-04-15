@@ -40,7 +40,7 @@ yarn add @imtbl/audience
 ```
 
 For the CDN build, drop one `<script>` tag into your HTML and call
-`ImmutableAudience.Audience.init({...})` — no bundler, no `npm install`.
+`ImmutableAudience.init({...})` — no bundler, no `npm install`.
 Once `@imtbl/audience` is published, the bundle URL will be
 `https://cdn.jsdelivr.net/npm/@imtbl/audience@<version>/dist/cdn/imtbl-audience.global.js`
 (replace `<version>` with a specific release tag).
@@ -71,10 +71,10 @@ audience.shutdown();
 <script src="https://cdn.jsdelivr.net/npm/@imtbl/audience@<version>/dist/cdn/imtbl-audience.global.js"></script>
 <script>
   const {
-    Audience, AudienceError, AudienceEvents,
+    init, AudienceError, AudienceEvents,
     IdentityType, canTrack, canIdentify,
   } = window.ImmutableAudience;
-  const audience = Audience.init({
+  const audience = init({
     publishableKey: 'pk_imapik-test-...',
     consent: 'anonymous',
     onError: (err) => console.error(err.code, err.message),
@@ -84,10 +84,11 @@ audience.shutdown();
 </script>
 ```
 
-The CDN bundle attaches the same runtime symbols that ESM consumers
-import — `Audience`, `AudienceError`, `AudienceEvents`, `IdentityType`,
-`canTrack`, `canIdentify`, and `version` — so no snippet is reachable
-on one path but not the other.
+The CDN bundle attaches `init` (the same static factory ESM consumers
+call as `Audience.init({...})`) alongside `AudienceError`,
+`AudienceEvents`, `IdentityType`, `canTrack`, `canIdentify`, and
+`version`, so every runtime helper an ESM consumer needs is reachable
+from the CDN global too.
 
 ## Error handling
 

@@ -141,8 +141,8 @@ avoids a misleading "ok" log entry for a call that did nothing.
 `'CONSENT_SYNC_FAILED'`, `'NETWORK_ERROR'`, `'VALIDATION_REJECTED'`.
 Handle them in an `onError` callback passed at init time:
 
-```ts
-audience = Audience.init({
+```js
+const audience = window.ImmutableAudience.init({
   publishableKey: 'pk_imapik-test-...',
   onError: (err) => {
     switch (err.code) {
