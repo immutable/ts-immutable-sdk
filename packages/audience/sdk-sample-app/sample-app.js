@@ -167,17 +167,42 @@
   var SDK_LOG_PREFIX = '[audience]';
   var consoleMirrorInstalled = false;
 
+  // Canonical anonymous-id source. Populated from two places:
+  //   1. document.cookie via readAnonCookie() (best-effort; may fail on
+  //      some localhost-cookie-rejection edge cases)
+  //   2. The SDK's own debug log payload — every message the SDK enqueues
+  //      carries an anonymousId field, and the console mirror reads it
+  //      out whenever debug logging is enabled.
+  // The second path is the reliable one for this sample app because the
+  // SDK's in-memory id always matches what it sends to the backend,
+  // regardless of whether the cookie was written successfully.
+  var currentAnonId = null;
+
   function installConsoleMirror() {
     if (consoleMirrorInstalled) return;
     consoleMirrorInstalled = true;
     var originalLog = console.log.bind(console);
     var originalWarn = console.warn.bind(console);
 
+    function harvestAnonId(payload) {
+      if (!payload || typeof payload !== 'object') return;
+      // The SDK's debug logger prints the full message object for every
+      // enqueue — track/page/identify/alias — all of which carry an
+      // anonymousId field from baseMessage().
+      if (typeof payload.anonymousId === 'string' && payload.anonymousId) {
+        if (currentAnonId !== payload.anonymousId) {
+          currentAnonId = payload.anonymousId;
+          updateStatus();
+        }
+      }
+    }
+
     function tryMirror(args, level) {
       if (args.length === 0 || typeof args[0] !== 'string') return;
       if (args[0].indexOf(SDK_LOG_PREFIX + ' ') !== 0) return;
       var msg = args[0].slice(SDK_LOG_PREFIX.length + 1);
       var payload = args.length > 1 ? args[1] : undefined;
+      harvestAnonId(payload);
       log('SDK', payload !== undefined ? { msg: msg, payload: payload } : msg, level);
     }
 
@@ -276,12 +301,16 @@
   }
 
   function updateStatus() {
-    // Anon id comes from document.cookie — the SDK writes imtbl_anon_id
-    // (a first-party cookie shared with @imtbl/pixel) whenever tracking
-    // consent allows, and deletes it on downgrade to consent='none'.
-    // It's not exposed via a public getter on the Audience instance, so
-    // the sample app reads the cookie directly.
-    var anonId = audience ? readAnonCookie() : null;
+    // Anon id: prefer whatever the debug mirror has most recently seen
+    // on an SDK message (harvestAnonId). Fall back to document.cookie
+    // for the debug-off case. This covers both paths: debug on gives
+    // us the SDK's actual in-memory id from its own logging, debug off
+    // gives us the persisted cookie value (when localhost doesn't
+    // silently reject the write).
+    var anonId = null;
+    if (audience) {
+      anonId = currentAnonId || readAnonCookie();
+    }
 
     text($('status-endpoint'), deriveEndpoint());
     text($('status-consent'), currentConsent || '—');
@@ -454,6 +483,10 @@
     if (!audience) return;
     audience.reset();
     currentUserId = null;
+    // Clear the cached anon id so updateStatus doesn't show the stale
+    // pre-reset value until the next SDK message fires and the debug
+    // mirror harvests the new one.
+    currentAnonId = null;
     log('reset()', 'anonymous ID regenerated, queue cleared', 'ok');
     updateStatus();
   }
@@ -464,6 +497,7 @@
     audience = null;
     currentConsent = null;
     currentUserId = null;
+    currentAnonId = null;
     setInitState(false);
     updateStatus();
     log('shutdown()', 'SDK stopped', 'ok');
@@ -732,6 +766,7 @@
       audience = null;
     }
     currentUserId = null;
+    currentAnonId = null;
     try {
       audience = Audience.init(readConfig());
       currentConsent = $('initial-consent').value;
@@ -753,6 +788,7 @@
     audience.shutdown();
     audience = null;
     currentUserId = null;
+    currentAnonId = null;
     try {
       audience = Audience.init(withLiveConfig({
         baseUrl: DEAD_BASE_URL,
@@ -781,6 +817,7 @@
     audience.shutdown();
     audience = null;
     currentUserId = null;
+    currentAnonId = null;
     try {
       audience = Audience.init(withLiveConfig({
         publishableKey: 'pk_imapik-test-revoked-0000000000000000',
@@ -809,6 +846,7 @@
     audience.shutdown();
     audience = null;
     currentUserId = null;
+    currentAnonId = null;
     try {
       audience = Audience.init(withLiveConfig({
         baseUrl: DEAD_BASE_URL,
