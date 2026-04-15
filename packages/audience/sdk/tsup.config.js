@@ -29,7 +29,7 @@ export default defineConfig((options) => {
           modules: ['crypto', 'buffer', 'process'],
         }),
         replace({
-          __SDK_VERSION__: pkg.version === '0.0.0' ? '2.0.0' : pkg.version,
+          __SDK_VERSION__: pkg.version === '0.0.0' ? '0.0.0-local' : pkg.version,
         }),
       ],
     };

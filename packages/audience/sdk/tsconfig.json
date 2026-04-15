@@ -6,5 +6,12 @@
     "customConditions": ["development"]
   },
   "include": ["src"],
-  "exclude": ["dist", "jest.config.ts", "node_modules", "src/**/*.test.ts"]
+  "exclude": [
+    "dist",
+    "jest.config.ts",
+    "jest.cdn-artifact.config.ts",
+    "node_modules",
+    "src/**/*.test.ts",
+    "test"
+  ]
 }
