@@ -1,4 +1,4 @@
-import type { ConsentLevel } from '@imtbl/audience-core';
+import type { AudienceError, ConsentLevel } from '@imtbl/audience-core';
 
 /** Configuration for the Immutable Web SDK. */
 export interface AudienceConfig {
@@ -16,4 +16,12 @@ export interface AudienceConfig {
   flushSize?: number;
   /** Override the default API base URL. */
   baseUrl?: string;
+  /**
+   * Called when the SDK fails to reach the backend. Receives a structured
+   * {@link AudienceError} with a machine-readable `code` so studios can
+   * branch on the failure mode (FLUSH_FAILED, CONSENT_SYNC_FAILED,
+   * NETWORK_ERROR, VALIDATION_REJECTED). Exceptions thrown from this
+   * callback are swallowed so a bad handler can't wedge the SDK.
+   */
+  onError?: (err: AudienceError) => void;
 }
