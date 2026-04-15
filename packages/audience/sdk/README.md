@@ -1,12 +1,33 @@
 # @imtbl/audience
 
-Consent-aware event tracking and identity resolution for Immutable
-studios. Ships as an ESM/CJS package for bundled apps and as a single-file
-CDN IIFE for `<script>`-tag loading.
+Consent-aware event tracking and player identity for Immutable studios.
+Ships as an ESM/CJS package for bundled apps and as a single-file CDN
+IIFE for `<script>`-tag loading.
 
 > **Pre-release.** This package is at version `0.0.0`. The API is
 > stabilising but breaking changes may still land before the first
 > published release.
+
+## Which Immutable event-tracking product is this?
+
+Immutable ships two complementary event-tracking products in this
+monorepo. Pick based on your integration shape:
+
+- **`@imtbl/audience`** (this package) — the programmatic SDK. You call
+  `Audience.init()` from your app code and explicitly track events
+  (`track('purchase', {...})`, `identify()`, `setConsent()`, etc.).
+  Pick this when you need fine-grained control, typed events, player
+  identity, or explicit consent state machines.
+- **`@imtbl/pixel`** ([sibling package](../pixel/README.md)) — a drop-in
+  `<script>` snippet that captures page views, device signals, and
+  attribution data passively. Zero configuration beyond a publishable
+  key. Pick this for marketing sites, landing pages, and web shops
+  where you want to measure campaign performance without writing
+  tracking code.
+
+The two share the same backend pipeline, the same anonymous-id cookie
+(`imtbl_anon_id`), and the same publishable-key format — they're
+designed to coexist on a single site if you need both at once.
 
 ## Install
 
@@ -49,15 +70,24 @@ audience.shutdown();
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@imtbl/audience@<version>/dist/cdn/imtbl-audience.global.js"></script>
 <script>
-  const { Audience, AudienceError, IdentityType } = window.ImmutableAudience;
+  const {
+    Audience, AudienceError, AudienceEvents,
+    IdentityType, canTrack, canIdentify,
+  } = window.ImmutableAudience;
   const audience = Audience.init({
     publishableKey: 'pk_imapik-test-...',
     consent: 'anonymous',
     onError: (err) => console.error(err.code, err.message),
   });
   audience.page();
+  audience.track(AudienceEvents.PURCHASE, { currency: 'USD', value: 9.99 });
 </script>
 ```
+
+The CDN bundle attaches the same runtime symbols that ESM consumers
+import — `Audience`, `AudienceError`, `AudienceEvents`, `IdentityType`,
+`canTrack`, `canIdentify`, and `version` — so no snippet is reachable
+on one path but not the other.
 
 ## Error handling
 
@@ -90,8 +120,8 @@ bad handler can't wedge the queue.
 
 For a live harness that exercises every public method, every typed
 `track()` event, and every reachable `AudienceErrorCode` against the
-real sandbox backend, see
-[`packages/audience/sdk-sample-app`](../sdk-sample-app/README.md).
+real sandbox backend, see [`packages/audience/sdk-sample-app`](https://github.com/immutable/ts-immutable-sdk/tree/main/packages/audience/sdk-sample-app)
+in the `ts-immutable-sdk` monorepo.
 
 ## License
 

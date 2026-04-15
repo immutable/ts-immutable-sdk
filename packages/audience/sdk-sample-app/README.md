@@ -5,6 +5,24 @@ typed `track()` event, and every reachable `AudienceErrorCode` has a
 dedicated UI control so you can sanity-check SDK changes end-to-end
 against the real sandbox backend and copy working call sites.
 
+> **Pre-release.** Depends on `@imtbl/audience@0.0.0`. The SDK API is
+> stabilising but breaking changes may still land before the first
+> published release.
+
+## Why vanilla JavaScript?
+
+Every other sample app in this monorepo (`packages/passport/sdk-sample-app`,
+`packages/checkout/sdk-sample-app`, `packages/internal/dex/sdk-sample-app`,
+`packages/internal/bridge/bridge-sample-app`) is React + Next.js with the
+`@biom3` design system. This one is plain ES2020 served by a ~90-line Node
+stdlib HTTP server. Intentional: the whole point is to demonstrate how
+`@imtbl/audience` loads via a plain `<script>` tag — the pattern real
+studios use when they drop the SDK into existing pages. A React wrapper
+would hide `window.ImmutableAudience` behind JSX abstractions and require
+a build step, obscuring the loading pattern we're demonstrating. The SDK
+itself is framework-agnostic — wrap these calls in your framework of
+choice when you ship.
+
 ## Run it
 
 ```sh
@@ -15,16 +33,16 @@ Open http://localhost:3456/. The `dev` script builds `@imtbl/audience`
 first (which produces `dist/cdn/imtbl-audience.global.js`), then serves
 this package's files plus the CDN bundle over a small Node server.
 
-## Test keys
+## Publishable keys
 
-These are publishable-key fixtures safe for local use:
-
-- **Sandbox (default):** `pk_imapik-test-sample` — talks to `api.sandbox.immutable.com`
-- **Prod:** any non-`pk_imapik-test-` key — talks to `api.immutable.com`
+You need a real publishable key from [Immutable Hub](https://hub.immutable.com/) —
+there is no shared fixture key. Test keys start with `pk_imapik-test-` and
+route to `api.sandbox.immutable.com`; any other prefix routes to
+`api.immutable.com` (prod).
 
 For dev-environment access, leave the key as a test key and set
-**Advanced → Base URL override** to `https://api.dev.immutable.com`.
-The SDK auto-derives sandbox vs prod from the key prefix; dev is not a
+**Advanced → Base URL override** to `https://api.dev.immutable.com`. The
+SDK auto-derives sandbox vs prod from the key prefix; dev is not a
 first-class environment and must be reached via explicit override.
 
 ## Ten-step walkthrough
@@ -32,7 +50,7 @@ first-class environment and must be reached via explicit override.
 1. Paste a test key into **Setup**, leave Initial Consent at `none`, click **Init**.
 2. Open the **Consent** panel, click **anonymous**. Status bar updates.
 3. Click **Lifecycle → page()**. A page message is queued.
-4. Expand **Typed Events → purchase**, fill in `currency=USD`, `value=9.99`, click **Send**. Watch the live TS snippet mirror the form as you type.
+4. Expand **Typed Events → purchase** (5th row in the accordion), fill in `currency=USD`, `value=9.99`, click **Send**. Watch the live TS snippet mirror the form as you type.
 5. Set Consent to **full**.
 6. In **Identity → Named identify**, enter `user@example.com`, type `email`, traits `{"name":"Jane"}`, click.
 7. In **Identity → Traits-only identify**, enter `{"plan":"pro"}`, click.
@@ -43,12 +61,14 @@ first-class environment and must be reached via explicit override.
 ## `AudienceEvents` catalogue
 
 These are the 11 predefined event names and their typed property shapes.
-Because `AudienceEvents` is not attached to `window.ImmutableAudience` by
-the CDN bundle, the sample app hardcodes the names as a string array in
-`sample-app.js`. For TypeScript projects, import the constant instead:
+Both the CDN bundle and the ESM package expose them:
 
 ```ts
+// ESM
 import { AudienceEvents } from '@imtbl/audience';
+
+// CDN
+const { AudienceEvents } = window.ImmutableAudience;
 
 audience.track(AudienceEvents.PURCHASE, {
   currency: 'USD',
@@ -57,6 +77,11 @@ audience.track(AudienceEvents.PURCHASE, {
   transactionId: 'tx_123',
 });
 ```
+
+The sample app reads event NAMES from `window.ImmutableAudience.AudienceEvents`
+at bootstrap and cross-checks them against the field-metadata array in
+`sample-app.js`. If the SDK grows a new event that the sample app hasn't
+picked up yet, the event log shows a `drift warn` entry.
 
 | Event | Required props | Optional props |
 |---|---|---|
@@ -80,12 +105,15 @@ audience.track('my_custom_event', { foo: 'bar' });
 
 ## Consent-aware UIs with `canTrack` / `canIdentify`
 
-The helpers `canTrack(level)` and `canIdentify(level)` are exported from
-`@imtbl/audience` but not attached to `window.ImmutableAudience`. TypeScript
-projects can import them:
+`canTrack(level)` and `canIdentify(level)` are the SDK's canonical consent
+predicates. Both the CDN bundle and the ESM package expose them:
 
 ```ts
+// ESM
 import { canTrack, canIdentify } from '@imtbl/audience';
+
+// CDN
+const { canTrack, canIdentify } = window.ImmutableAudience;
 
 if (canTrack(currentConsent)) {
   renderAnalyticsDashboard();
@@ -95,12 +123,17 @@ if (canIdentify(currentConsent)) {
 }
 ```
 
-From a plain-JavaScript CDN-only context, the rules are:
+The rules themselves are simple:
+- `canTrack(level)` returns `true` iff `level !== 'none'`
+- `canIdentify(level)` returns `true` iff `level === 'full'`
 
-- `canTrack(level)` is true iff `level !== 'none'`
-- `canIdentify(level)` is true iff `level === 'full'`
-
-The sample app gates its Identity and Alias buttons on this rule locally.
+The sample app's Identity and Alias buttons stay enabled whenever the SDK
+is initialised, but the handlers call `canIdentify(currentConsent)` before
+invoking `identify()` / `alias()`. When it returns `false`, the handler
+logs a `skipped — canIdentify(...) is false` line and returns without
+calling the SDK. This mirrors how the SDK itself handles these calls at
+lower consent levels: it no-ops rather than throwing, so the sample app
+avoids a misleading "ok" log entry for a call that did nothing.
 
 ## Error codes
 

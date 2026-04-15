@@ -15,13 +15,16 @@
   var Audience = window.ImmutableAudience.Audience;
   var AudienceError = window.ImmutableAudience.AudienceError;
   var IdentityType = window.ImmutableAudience.IdentityType;
+  var SdkAudienceEvents = window.ImmutableAudience.AudienceEvents;
+  var canTrack = window.ImmutableAudience.canTrack;
+  var canIdentify = window.ImmutableAudience.canIdentify;
   var SDK_VERSION = window.ImmutableAudience.version || 'unknown';
 
-  // Hardcoded event catalogue. AudienceEvents is exported from @imtbl/audience
-  // but not attached to window.ImmutableAudience by the CDN bundle, so sample
-  // apps that load via <script> tag can't reach it at runtime. These strings
-  // are the canonical values from events.ts; see the README for the typed
-  // property shape of each one.
+  // Field metadata for the Typed Events accordion. The event NAMES come
+  // from window.ImmutableAudience.AudienceEvents (the SDK's canonical
+  // constant — cross-checked at bootstrap via validateEventCatalogue).
+  // The field shapes below are not exposed by the SDK at runtime, so they
+  // stay here as the sample app's own form-generation source of truth.
   var AUDIENCE_EVENTS = [
     { name: 'sign_up',          fields: [{ key: 'method', type: 'string', optional: true }] },
     { name: 'sign_in',          fields: [{ key: 'method', type: 'string', optional: true }] },
@@ -303,12 +306,42 @@
     text($('sdk-version'), 'SDK version: ' + SDK_VERSION);
   }
 
+  // --- Event catalogue drift check ---
+  //
+  // The sample app keeps field metadata locally because the SDK doesn't
+  // expose field shapes at runtime — but the event NAMES are authoritative
+  // on window.ImmutableAudience.AudienceEvents. Compare the two at bootstrap
+  // and log a warning if they diverge, so a new SDK event doesn't silently
+  // disappear from the Typed Events panel.
+
+  function validateEventCatalogue() {
+    if (!SdkAudienceEvents) return;
+    var sdkNames = Object.keys(SdkAudienceEvents).map(function (k) {
+      return SdkAudienceEvents[k];
+    });
+    var localNames = AUDIENCE_EVENTS.map(function (e) { return e.name; });
+    var missingLocally = sdkNames.filter(function (n) {
+      return localNames.indexOf(n) === -1;
+    });
+    var extraLocally = localNames.filter(function (n) {
+      return sdkNames.indexOf(n) === -1;
+    });
+    if (missingLocally.length > 0 || extraLocally.length > 0) {
+      log('drift', {
+        sdkHasButSampleAppMissing: missingLocally,
+        sampleAppHasButSdkMissing: extraLocally,
+      }, 'warn');
+    }
+  }
+
   // --- Bootstrap ---
 
   function bootstrap() {
     // Install the SDK console mirror before any SDK code runs so we don't
     // miss early debug output.
     installConsoleMirror();
+
+    validateEventCatalogue();
 
     // Populate IdentityType dropdowns
     var identityTypeOptions = Object.keys(IdentityType || {});
@@ -558,8 +591,8 @@
 
   function onIdentify() {
     if (!audience) return;
-    if (currentConsent !== 'full') {
-      log('identify()', 'skipped — requires consent: full (current: ' + currentConsent + ')', 'info');
+    if (!canIdentify(currentConsent)) {
+      log('identify()', 'skipped — canIdentify(' + currentConsent + ') is false; requires consent: full', 'info');
       return;
     }
     var id = $('id-id').value.trim();
@@ -581,8 +614,8 @@
 
   function onIdentifyTraits() {
     if (!audience) return;
-    if (currentConsent !== 'full') {
-      log('identify()', 'skipped — requires consent: full (current: ' + currentConsent + ')', 'info');
+    if (!canIdentify(currentConsent)) {
+      log('identify()', 'skipped — canIdentify(' + currentConsent + ') is false; requires consent: full', 'info');
       return;
     }
     var traits;
@@ -602,8 +635,8 @@
 
   function onAlias() {
     if (!audience) return;
-    if (currentConsent !== 'full') {
-      log('alias()', 'skipped — requires consent: full (current: ' + currentConsent + ')', 'info');
+    if (!canIdentify(currentConsent)) {
+      log('alias()', 'skipped — canIdentify(' + currentConsent + ') is false; requires consent: full', 'info');
       return;
     }
     var fromId = $('alias-from-id').value.trim();
