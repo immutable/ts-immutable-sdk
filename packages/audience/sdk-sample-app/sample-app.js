@@ -388,6 +388,61 @@
     }
   }
 
+  // --- Tab switching ---
+  //
+  // The sample app's six control panels live in the .controls column as
+  // siblings, but only one is visible at a time thanks to a `.panel {
+  // display: none }` / `.panel.active { display: block }` pair in the CSS.
+  // The tab bar above the panels selects which one is active.
+  //
+  // Each tab button has a data-panel="panel-<id>" attribute pointing at
+  // its matching <section class="panel" id="panel-<id>">. Clicking a tab
+  // removes .active from every tab + panel, then re-adds it to the pair
+  // that belongs to the clicked tab. ARIA aria-selected is kept in sync
+  // so screen readers announce the tablist correctly.
+  //
+  // This is bootstrap-time wiring — once installed, the tab bar handles
+  // its own state and doesn't need to interact with SDK state at all.
+
+  function installTabSwitching() {
+    var tabs = document.querySelectorAll('.tab-bar .tab');
+    if (tabs.length === 0) return;
+
+    function activate(targetPanelId) {
+      for (var i = 0; i < tabs.length; i++) {
+        var tab = tabs[i];
+        var isActive = tab.getAttribute('data-panel') === targetPanelId;
+        if (isActive) {
+          tab.classList.add('active');
+          tab.setAttribute('aria-selected', 'true');
+        } else {
+          tab.classList.remove('active');
+          tab.setAttribute('aria-selected', 'false');
+        }
+      }
+
+      // Only toggle panels inside the .controls column, so the event log
+      // panel in the right pane is untouched.
+      var panels = document.querySelectorAll('.controls .panel');
+      for (var j = 0; j < panels.length; j++) {
+        var panel = panels[j];
+        if (panel.id === targetPanelId) {
+          panel.classList.add('active');
+        } else {
+          panel.classList.remove('active');
+        }
+      }
+    }
+
+    for (var k = 0; k < tabs.length; k++) {
+      (function (tab) {
+        tab.addEventListener('click', function () {
+          activate(tab.getAttribute('data-panel'));
+        });
+      }(tabs[k]));
+    }
+  }
+
   // --- Bootstrap ---
 
   function bootstrap() {
@@ -396,6 +451,8 @@
     installConsoleMirror();
 
     validateEventCatalogue();
+
+    installTabSwitching();
 
     // Populate IdentityType dropdowns
     var identityTypeOptions = Object.keys(IdentityType || {});

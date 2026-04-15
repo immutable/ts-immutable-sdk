@@ -10,21 +10,32 @@
 </head>
 <body>
 <main>
-  <header>
-    <h1>Immutable Audience SDK — Sample App</h1>
-  </header>
+  <div class="sticky-top">
+    <header>
+      <h1>Immutable Audience SDK — Sample App</h1>
+    </header>
 
-  <div class="status-bar" id="status-bar">
-    <div><span class="status-label">Endpoint</span> <span class="status-value dim" id="status-endpoint">—</span></div>
-    <div><span class="status-label">Consent</span> <span class="status-value dim" id="status-consent">—</span></div>
-    <div><span class="status-label">Anon ID</span> <span class="status-value dim" id="status-anon">—</span></div>
-    <div><span class="status-label">User ID</span> <span class="status-value dim" id="status-user">—</span></div>
+    <div class="status-bar" id="status-bar">
+      <div><span class="status-label">Endpoint</span> <span class="status-value dim" id="status-endpoint">—</span></div>
+      <div><span class="status-label">Consent</span> <span class="status-value dim" id="status-consent">—</span></div>
+      <div><span class="status-label">Anon ID</span> <span class="status-value dim" id="status-anon">—</span></div>
+      <div><span class="status-label">User ID</span> <span class="status-value dim" id="status-user">—</span></div>
+    </div>
   </div>
 
   <div class="sample-app-grid">
     <div class="controls">
 
-      <section class="panel" id="panel-setup">
+      <nav class="tab-bar" role="tablist" aria-label="Sample app panels">
+        <button type="button" class="tab active" data-panel="panel-setup"          role="tab" aria-selected="true"  aria-controls="panel-setup">Setup</button>
+        <button type="button" class="tab"        data-panel="panel-lifecycle"      role="tab" aria-selected="false" aria-controls="panel-lifecycle">Lifecycle</button>
+        <button type="button" class="tab"        data-panel="panel-consent"        role="tab" aria-selected="false" aria-controls="panel-consent">Consent</button>
+        <button type="button" class="tab"        data-panel="panel-typed-events"   role="tab" aria-selected="false" aria-controls="panel-typed-events">Events</button>
+        <button type="button" class="tab"        data-panel="panel-identity"       role="tab" aria-selected="false" aria-controls="panel-identity">Identity</button>
+        <button type="button" class="tab"        data-panel="panel-errors"         role="tab" aria-selected="false" aria-controls="panel-errors">Errors</button>
+      </nav>
+
+      <section class="panel active" role="tabpanel" id="panel-setup">
         <h2 class="panel-title">Setup</h2>
         <div class="field">
           <label for="pk">Publishable Key</label>
@@ -69,7 +80,7 @@
         </div>
       </section>
 
-      <section class="panel" id="panel-lifecycle">
+      <section class="panel" role="tabpanel" id="panel-lifecycle">
         <h2 class="panel-title">Lifecycle</h2>
         <div class="actions">
           <button id="btn-page" disabled>page()</button>
@@ -79,7 +90,7 @@
         </div>
       </section>
 
-      <section class="panel" id="panel-consent">
+      <section class="panel" role="tabpanel" id="panel-consent">
         <h2 class="panel-title">Consent</h2>
         <div class="actions">
           <button id="btn-consent-none" disabled>none</button>
@@ -88,7 +99,7 @@
         </div>
       </section>
 
-      <section class="panel" id="panel-typed-events">
+      <section class="panel" role="tabpanel" id="panel-typed-events">
         <h2 class="panel-title">Typed Events</h2>
         <div id="typed-events-accordion"></div>
         <details class="custom-event">
@@ -107,7 +118,7 @@
         </details>
       </section>
 
-      <section class="panel" id="panel-identity">
+      <section class="panel" role="tabpanel" id="panel-identity">
         <h2 class="panel-title">Identity</h2>
 
         <details open>
@@ -164,7 +175,7 @@
         </details>
       </section>
 
-      <section class="panel" id="panel-errors">
+      <section class="panel" role="tabpanel" id="panel-errors">
         <h2 class="panel-title">Error Handling</h2>
         <div class="actions">
           <button id="btn-init-empty-key">Init with empty key</button>

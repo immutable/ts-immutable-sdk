@@ -353,8 +353,10 @@ button.active {
 
   .log-pane {
     position: sticky;
-    top: 16px;
-    max-height: calc(100vh - 32px);
+    /* Sits below the sticky-top chrome (header + status bar).
+       ~110px covers header padding + h1 + status bar + margins. */
+    top: 120px;
+    max-height: calc(100vh - 136px);
   }
 
   .log-pane > .panel {
@@ -453,4 +455,76 @@ footer .footer-sep {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.85em;
   word-break: break-all;
+}
+
+/* ========================================================================
+   Tier 3: tabbed panel interface
+   ========================================================================
+   Only one control panel is visible at a time; the tab bar across the top
+   of the controls column selects which one. Status bar and event log stay
+   sticky so they're always in view regardless of which tab is active. */
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  /* Subtle separator so the sticky chrome reads as distinct from the
+     scrolling content underneath. */
+  box-shadow: 0 2px 4px rgba(17, 24, 39, 0.04);
+}
+
+.tab-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 2px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--panel-border);
+  /* Let the active tab's bottom border meet the bar border cleanly. */
+  padding: 0;
+}
+
+.tab {
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 0.9em;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.tab:hover {
+  color: var(--text);
+  background: rgba(17, 24, 39, 0.03);
+}
+
+.tab.active {
+  color: var(--text);
+  font-weight: 600;
+  /* Underline the active tab with the brand accent colour so the
+     selection is obvious at a glance. */
+  border-bottom-color: var(--accent);
+  background: var(--panel-bg);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Only the .active panel renders; the rest are hidden entirely so they
+   don't take up layout space. Scoped to .controls .panel so the event-log
+   panel in the right pane isn't affected. */
+.controls .panel {
+  display: none;
+}
+
+.controls .panel.active {
+  display: block;
 }
