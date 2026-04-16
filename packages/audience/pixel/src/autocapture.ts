@@ -62,8 +62,7 @@ const SCROLL_MILESTONES = [25, 50, 75, 90, 100];
 /**
  * Minimum dwell time (ms) before firing `scroll_depth: 100` on pages where
  * all content is visible without scrolling (above-the-fold). Filters out
- * immediate bounces while still capturing genuine engagement. GA4/GTM fire
- * instantly in this scenario — the dwell check is deliberately better.
+ * immediate bounces while still capturing genuine engagement.
  */
 const ABOVE_FOLD_DWELL_MS = 2000;
 
