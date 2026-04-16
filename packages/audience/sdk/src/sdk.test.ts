@@ -905,4 +905,65 @@ describe('Audience', () => {
       sdk.shutdown();
     });
   });
+
+  describe('onError wire-through', () => {
+    it('invokes config.onError with an AudienceError when a flush fails', async () => {
+      mockFetch.mockImplementationOnce(
+        async (url: string, init?: RequestInit) => {
+          fetchCalls.push({ url, init: init ?? {} });
+          return { ok: false, status: 500, json: async () => ({}) };
+        },
+      );
+
+      const errors: any[] = [];
+      const sdk = createSDK({
+        consent: 'anonymous',
+        onError: (err: any) => errors.push(err),
+      });
+
+      sdk.page();
+      await sdk.flush();
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].name).toBe('AudienceError');
+      expect(errors[0].code).toBe('FLUSH_FAILED');
+      expect(errors[0].status).toBe(500);
+      expect(errors[0].endpoint).toContain(INGEST_PATH);
+
+      sdk.shutdown();
+    });
+
+    it('invokes config.onError with an AudienceError when consent sync fails', async () => {
+      mockFetch.mockImplementation(
+        async (url: string, init?: RequestInit) => {
+          fetchCalls.push({ url, init: init ?? {} });
+          if (url.includes(CONSENT_PATH)) {
+            return { ok: false, status: 503, json: async () => ({}) };
+          }
+          return { ok: true, json: async () => ({}) };
+        },
+      );
+
+      const errors: any[] = [];
+      const sdk = createSDK({
+        consent: 'none',
+        onError: (err: any) => errors.push(err),
+      });
+
+      sdk.setConsent('anonymous');
+
+      // Yield for the fire-and-forget consent PUT to resolve
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].name).toBe('AudienceError');
+      expect(errors[0].code).toBe('CONSENT_SYNC_FAILED');
+      expect(errors[0].status).toBe(503);
+      expect(errors[0].endpoint).toContain(CONSENT_PATH);
+
+      sdk.shutdown();
+    });
+  });
 });

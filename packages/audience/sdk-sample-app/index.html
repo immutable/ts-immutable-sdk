@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src https://api.dev.immutable.com https://api.sandbox.immutable.com https://api.immutable.com">
+  <title>Immutable Audience SDK — Sample App</title>
+  <link rel="stylesheet" href="sample-app.css">
+</head>
+<body>
+<div class="prod-warning" id="prod-warning" hidden>⚠ Using prod endpoint — actions here affect prod data ⚠</div>
+<main>
+  <div class="sticky-top">
+    <header>
+      <h1>
+        Immutable Audience SDK — Sample App
+        <span class="sdk-version" id="sdk-version">—</span>
+      </h1>
+    </header>
+
+    <div class="surface status-bar">
+      <div class="status-group">
+        <div><span class="status-label">Endpoint</span> <span class="status-value dim" id="status-endpoint">—</span></div>
+        <div><span class="status-label">Consent</span>  <span class="status-value dim" id="status-consent">—</span></div>
+      </div>
+      <div class="status-group">
+        <div><span class="status-label">Anon ID</span>    <span class="status-value dim" id="status-anon">—</span></div>
+        <div><span class="status-label">User ID</span>    <span class="status-value dim" id="status-user">—</span></div>
+        <div><span class="status-label">Session ID</span> <span class="status-value dim" id="status-session">—</span></div>
+        <div><span class="status-label">Queue</span>     <span class="status-value dim" id="status-queue">—</span></div>
+      </div>
+      <div class="status-cookies">
+        <span class="status-label">Cookies</span>
+        <div><span class="status-label">imtbl_anon_id</span> <span class="status-value dim" id="status-cookie-anon">—</span></div>
+        <div><span class="status-label">_imtbl_sid</span>    <span class="status-value dim" id="status-cookie-sid">—</span></div>
+        <button type="button" class="secondary" id="btn-clear-cookies">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sample-app-grid">
+    <div class="controls">
+
+      <nav class="tab-bar" role="tablist" aria-label="Sample app panels">
+        <button type="button" class="tab active" id="tab-setup"        data-panel="panel-setup"          role="tab" tabindex="0"  aria-selected="true"  aria-controls="panel-setup">Setup</button>
+        <button type="button" class="tab"        id="tab-consent"     data-panel="panel-consent"        role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-consent">Consent</button>
+        <button type="button" class="tab"        id="tab-typed-events" data-panel="panel-typed-events"   role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-typed-events">Events</button>
+        <button type="button" class="tab"        id="tab-identity"    data-panel="panel-identity"       role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-identity">Identity</button>
+      </nav>
+
+      <section class="surface panel active" role="tabpanel" id="panel-setup" aria-labelledby="tab-setup">
+        <div class="field">
+          <label for="pk">Publishable Key</label>
+          <input id="pk" type="text" placeholder="pk_imapik-test-yourkey" spellcheck="false">
+        </div>
+        <div class="field">
+          <label for="environment">Environment</label>
+          <select id="environment">
+            <option value="https://api.dev.immutable.com" selected>Dev</option>
+            <option value="https://api.sandbox.immutable.com">Sandbox</option>
+            <option value="https://api.immutable.com">Production</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="initial-consent">Initial consent</label>
+          <select id="initial-consent">
+            <option value="none" selected>none</option>
+            <option value="anonymous">anonymous</option>
+            <option value="full">full</option>
+          </select>
+          <p class="helper-text">Passed to <code>init()</code>. Use the Consent tab to transition live after init.</p>
+        </div>
+
+        <div class="section-label">Advanced</div>
+
+        <div class="field">
+          <label><input id="debug" type="checkbox" checked> debug</label>
+          <p class="helper-text">Mirror SDK internal log output into the in-page event log below.</p>
+        </div>
+
+        <div class="advanced-grid">
+          <div class="field">
+            <label for="cookie-domain">Cookie domain</label>
+            <input id="cookie-domain" type="text" placeholder=".studio.com">
+          </div>
+          <div class="field">
+            <label for="flush-interval">Flush interval (ms)</label>
+            <input id="flush-interval" type="number" placeholder="5000" min="100">
+          </div>
+          <div class="field">
+            <label for="flush-size">Flush size</label>
+            <input id="flush-size" type="number" placeholder="20" min="1">
+          </div>
+        </div>
+
+        <div class="section-label">Init / Teardown</div>
+
+        <div class="actions">
+          <button id="btn-init" disabled>Init</button>
+          <button id="btn-page" disabled>
+            Page
+            <small class="btn-sig">page()</small>
+          </button>
+          <button id="btn-flush" disabled>
+            Flush
+            <small class="btn-sig">flush()</small>
+          </button>
+          <button id="btn-reset" disabled>
+            Reset
+            <small class="btn-sig">reset()</small>
+          </button>
+          <button id="btn-shutdown" disabled>
+            Shutdown
+            <small class="btn-sig">shutdown()</small>
+          </button>
+        </div>
+      </section>
+
+      <section class="surface panel" role="tabpanel" id="panel-consent" aria-labelledby="tab-consent">
+        <div class="consent-grid">
+          <div class="consent-choice">
+            <button id="btn-consent-none" disabled>
+              None
+              <small class="btn-sig">setConsent('none')</small>
+            </button>
+            <p class="helper-text">No tracking. Anonymous ID cookie is not written; queued events are purged.</p>
+          </div>
+          <div class="consent-choice">
+            <button id="btn-consent-anon" disabled>
+              Anonymous
+              <small class="btn-sig">setConsent('anonymous')</small>
+            </button>
+            <p class="helper-text">Page views and events without a player identity. No <code>identify()</code>.</p>
+          </div>
+          <div class="consent-choice">
+            <button id="btn-consent-full" disabled>
+              Full
+              <small class="btn-sig">setConsent('full')</small>
+            </button>
+            <p class="helper-text">Everything, including <code>identify()</code> and <code>alias()</code>.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="surface panel" role="tabpanel" id="panel-typed-events" aria-labelledby="tab-typed-events">
+        <div id="typed-events-accordion"></div>
+        <details class="accordion-item">
+          <summary class="accordion-header">
+            <span class="accordion-title">Custom event</span>
+          </summary>
+          <div class="accordion-content">
+            <div class="field">
+              <label for="custom-event-name">Event name</label>
+              <input id="custom-event-name" type="text" placeholder="my_custom_event">
+            </div>
+            <div class="field">
+              <label for="custom-event-props">Properties (JSON)</label>
+              <textarea id="custom-event-props" rows="3" placeholder='{"foo": "bar"}'></textarea>
+            </div>
+            <div class="actions">
+              <button id="btn-custom-event" disabled>Send</button>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section class="surface panel" role="tabpanel" id="panel-identity" aria-labelledby="tab-identity">
+        <div class="section-label">Identity state</div>
+        <dl class="identity-state-list">
+          <div class="identity-state-row" data-key="userId">
+            <dt>userId</dt><dd>—</dd>
+          </div>
+          <div class="identity-state-row" data-key="identityType">
+            <dt>identityType</dt><dd>—</dd>
+          </div>
+          <div class="identity-state-row" data-key="traits">
+            <dt>traits</dt><dd>—</dd>
+          </div>
+          <div class="identity-state-row" data-key="aliases">
+            <dt>aliases</dt><dd>—</dd>
+          </div>
+        </dl>
+
+        <details class="accordion-item" open>
+          <summary class="accordion-header">
+            <span class="accordion-title">Identify</span>
+          </summary>
+          <div class="accordion-content">
+            <p class="helper-text">Use when a player signs up or logs in with a known ID.</p>
+            <div class="field">
+              <label for="id-id">ID</label>
+              <input id="id-id" type="text" placeholder="player_12345">
+            </div>
+            <div class="field">
+              <label for="id-type">Identity type</label>
+              <select id="id-type"></select>
+            </div>
+            <div class="field">
+              <label for="id-traits">Traits (JSON, optional)</label>
+              <textarea id="id-traits" rows="3" placeholder='{"name":"Jane","plan":"pro","signupMonth":"2026-03"}'></textarea>
+            </div>
+            <div class="actions">
+              <button id="btn-identify" disabled>
+                Identify user
+                <small class="btn-sig">identify(id, type, traits)</small>
+              </button>
+            </div>
+          </div>
+        </details>
+
+        <details class="accordion-item">
+          <summary class="accordion-header">
+            <span class="accordion-title">Update traits</span>
+          </summary>
+          <div class="accordion-content">
+            <p class="helper-text">Update an existing player's traits without re-identifying.</p>
+            <div class="field">
+              <label for="traits-json">Traits (JSON)</label>
+              <textarea id="traits-json" rows="3" placeholder='{"plan":"pro","region":"AU"}'></textarea>
+            </div>
+            <div class="actions">
+              <button id="btn-identify-traits" disabled>
+                Update traits only
+                <small class="btn-sig">identify(traits)</small>
+              </button>
+            </div>
+          </div>
+        </details>
+
+        <details class="accordion-item">
+          <summary class="accordion-header">
+            <span class="accordion-title">Alias</span>
+          </summary>
+          <div class="accordion-content">
+            <p class="helper-text">Link two identities together — e.g. merge guest into registered.</p>
+            <div class="alias-grid">
+              <div class="alias-side">
+                <div class="field">
+                  <label for="alias-from-id">From ID</label>
+                  <input id="alias-from-id" type="text">
+                </div>
+                <div class="field">
+                  <label for="alias-from-type">From type</label>
+                  <select id="alias-from-type"></select>
+                </div>
+              </div>
+              <div class="alias-arrow" aria-hidden="true">→</div>
+              <div class="alias-side">
+                <div class="field">
+                  <label for="alias-to-id">To ID</label>
+                  <input id="alias-to-id" type="text">
+                </div>
+                <div class="field">
+                  <label for="alias-to-type">To type</label>
+                  <select id="alias-to-type"></select>
+                </div>
+              </div>
+            </div>
+            <div class="actions">
+              <button id="btn-alias" disabled>
+                Link identities
+                <small class="btn-sig">alias(from, to)</small>
+              </button>
+            </div>
+          </div>
+        </details>
+      </section>
+    </div>
+
+    <div class="log-pane">
+      <div class="log-header">
+        <span class="panel-title">Event log <span class="log-count" id="log-count">0</span></span>
+        <span class="log-actions">
+          <button type="button" class="secondary" id="btn-copy-log">Copy</button>
+          <button type="button" class="secondary" id="btn-clear-log">Clear</button>
+        </span>
+      </div>
+      <div id="log" class="surface log" role="log" aria-live="polite" aria-label="SDK event log"></div>
+    </div>
+  </div>
+</main>
+
+<script src="vendor/imtbl-audience.global.js"></script>
+<script src="sample-app.js"></script>
+</body>
+</html>

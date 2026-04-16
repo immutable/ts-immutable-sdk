@@ -93,6 +93,7 @@ export class Audience {
         flushIntervalMs: config.flushInterval,
         flushSize: config.flushSize,
         onFlush: (ok, count) => this.debug.logFlush(ok, count),
+        onError: config.onError,
         staleFilter: (m) => isTimestampValid(m.eventTimestamp),
         storagePrefix: '__imtbl_web_',
       },
@@ -105,7 +106,7 @@ export class Audience {
       this.anonymousId,
       consentSource,
       consentLevel,
-      undefined,
+      config.onError,
       config.baseUrl,
     );
 
