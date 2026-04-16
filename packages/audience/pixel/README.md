@@ -151,3 +151,10 @@ Note: the nonce covers the inline snippet only. The CDN-loaded script (`imtbl.js
 | Firefox | 78+ |
 | Safari | 14+ |
 | Edge | 80+ |
+
+## Documentation
+
+- [Tracking Pixel](https://docs.immutable.com/docs/products/audience/tracking-pixel) — this package (setup, consent modes, auto-tracked events)
+- [Web SDK](https://docs.immutable.com/docs/products/audience/web-sdk) — sibling `@imtbl/audience` package for typed event tracking and identity management
+- [REST API](https://docs.immutable.com/docs/products/audience/rest-api) — backend reference for direct integration
+- [Data dictionary](https://docs.immutable.com/docs/products/audience/data-dictionary) — predefined event names and property schemas
