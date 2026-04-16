@@ -14,7 +14,7 @@ import {
   getTimestamp,
   isBrowser,
   getCookie,
-  collectAttribution,
+  collectSessionAttribution,
   getOrCreateSession,
   createConsentManager,
   canTrack,
@@ -132,7 +132,7 @@ export class Pixel {
 
     const { sessionId, isNew } = getOrCreateSession(this.domain);
     this.refreshSession(sessionId, isNew);
-    const attribution = collectAttribution();
+    const attribution = collectSessionAttribution();
     const thirdPartyIds = this.collectThirdPartyIds();
 
     const message: PageMessage = {

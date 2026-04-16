@@ -184,6 +184,7 @@ describe('Audience', () => {
 
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
+        sessionId: expect.any(String),
         currency: 'USD',
         value: 9.99,
         itemId: 'sword_01',
@@ -235,7 +236,7 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
-    it('enqueues sign_up with method property', async () => {
+    it('enqueues sign_up with method property and sessionId', async () => {
       const sdk = createSDK();
 
       sdk.track('sign_up', { method: 'email' });
@@ -245,7 +246,10 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'sign_up',
       );
       expect(msg).toBeDefined();
-      expect(msg.properties).toEqual({ method: 'email' });
+      expect(msg.properties).toEqual({
+        sessionId: expect.any(String),
+        method: 'email',
+      });
 
       sdk.shutdown();
     });
@@ -265,6 +269,7 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
+        sessionId: expect.any(String),
         platform: 'webgl',
         version: '1.2.0',
         buildId: 'ci-42',
@@ -291,6 +296,7 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
+        sessionId: expect.any(String),
         status: 'complete',
         world: 'forest',
         level: '5',
@@ -319,6 +325,7 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
+        sessionId: expect.any(String),
         flow: 'source',
         currency: 'gold',
         amount: 50,
@@ -344,9 +351,125 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
+        sessionId: expect.any(String),
         gameId: 'devilfish',
         source: 'game_page',
         platform: 'steam',
+      });
+
+      sdk.shutdown();
+    });
+
+    it('attaches UTM attribution to sign_up events', async () => {
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?utm_source=google&utm_campaign=spring',
+          href: 'https://studio.com/?utm_source=google&utm_campaign=spring',
+          protocol: 'https:',
+          pathname: '/',
+        },
+        writable: true,
+        configurable: true,
+      });
+      sessionStorage.clear();
+
+      const sdk = createSDK();
+      sdk.track('sign_up', { method: 'passport' });
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'sign_up',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.properties).toEqual({
+        sessionId: expect.any(String),
+        utm_source: 'google',
+        utm_campaign: 'spring',
+        touchpoint_type: 'click',
+        method: 'passport',
+      });
+
+      sdk.shutdown();
+    });
+
+    it('attaches UTM attribution to link_clicked events', async () => {
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?utm_source=twitter',
+          href: 'https://studio.com/?utm_source=twitter',
+          protocol: 'https:',
+          pathname: '/',
+        },
+        writable: true,
+        configurable: true,
+      });
+      sessionStorage.clear();
+
+      const sdk = createSDK();
+      sdk.track('link_clicked', { url: 'https://store.com', label: 'Buy' });
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'link_clicked',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.properties).toEqual({
+        sessionId: expect.any(String),
+        utm_source: 'twitter',
+        touchpoint_type: 'click',
+        url: 'https://store.com',
+        label: 'Buy',
+      });
+
+      sdk.shutdown();
+    });
+
+    it('does not attach UTM attribution to other track events', async () => {
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?utm_source=google',
+          href: 'https://studio.com/?utm_source=google',
+          protocol: 'https:',
+          pathname: '/',
+        },
+        writable: true,
+        configurable: true,
+      });
+      sessionStorage.clear();
+
+      const sdk = createSDK();
+      sdk.track('purchase', { currency: 'USD', value: 9.99 });
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'purchase',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.properties).toEqual({
+        sessionId: expect.any(String),
+        currency: 'USD',
+        value: 9.99,
+      });
+
+      sdk.shutdown();
+    });
+
+    it('includes sessionId on all track events', async () => {
+      const sdk = createSDK();
+
+      sdk.track('game_launch', { platform: 'webgl' });
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'game_launch',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.properties).toEqual({
+        sessionId: expect.any(String),
+        platform: 'webgl',
       });
 
       sdk.shutdown();
@@ -362,7 +485,12 @@ describe('Audience', () => {
 
       const msg = sentMessages().find((m: any) => m.type === 'page');
       expect(msg).toBeDefined();
-      expect(msg.properties).toMatchObject({ section: 'shop' });
+      // First page merges session-cached attribution (includes landing_page)
+      expect(msg.properties).toEqual({
+        sessionId: expect.any(String),
+        landing_page: expect.any(String),
+        section: 'shop',
+      });
 
       sdk.shutdown();
     });
@@ -406,7 +534,7 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
-    it('attaches attribution to the first page view', async () => {
+    it('attaches attribution to the first page view only', async () => {
       Object.defineProperty(window, 'location', {
         value: {
           ...window.location,
@@ -435,6 +563,22 @@ describe('Audience', () => {
       if (pages[1]) {
         expect(pages[1].properties?.utm_source).toBeUndefined();
       }
+
+      sdk.shutdown();
+    });
+
+    it('includes sessionId in page properties', async () => {
+      const sdk = createSDK();
+
+      sdk.page();
+      await sdk.flush();
+
+      const msg = sentMessages().find((m: any) => m.type === 'page');
+      expect(msg).toBeDefined();
+      expect(msg.properties).toEqual({
+        sessionId: expect.any(String),
+        landing_page: expect.any(String),
+      });
 
       sdk.shutdown();
     });

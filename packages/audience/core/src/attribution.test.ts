@@ -1,4 +1,4 @@
-import { collectAttribution, clearAttribution } from './attribution';
+import { collectSessionAttribution, collectPageAttribution, clearAttribution } from './attribution';
 
 const STORAGE_KEY = '__imtbl_attribution';
 
@@ -15,13 +15,13 @@ function setLocation(url: string) {
   });
 }
 
-describe('collectAttribution', () => {
+describe('collectSessionAttribution', () => {
   it('parses UTM parameters from the URL', () => {
     setLocation(
       'https://example.com/?utm_source=google&utm_medium=cpc&utm_campaign=spring&utm_content=banner&utm_term=nft',
     );
 
-    const result = collectAttribution();
+    const result = collectSessionAttribution();
     expect(result.utm_source).toBe('google');
     expect(result.utm_medium).toBe('cpc');
     expect(result.utm_campaign).toBe('spring');
@@ -34,7 +34,7 @@ describe('collectAttribution', () => {
       'https://example.com/?gclid=abc&dclid=dc1&fbclid=fb2&ttclid=tt3&msclkid=ms4&li_fat_id=li5',
     );
 
-    const result = collectAttribution();
+    const result = collectSessionAttribution();
     expect(result.gclid).toBe('abc');
     expect(result.dclid).toBe('dc1');
     expect(result.fbclid).toBe('fb2');
@@ -50,7 +50,7 @@ describe('collectAttribution', () => {
       configurable: true,
     });
 
-    const result = collectAttribution();
+    const result = collectSessionAttribution();
     expect(result.referrer).toBe('https://google.com/search?q=nft');
     expect(result.landing_page).toBe('https://game.example.com/landing');
   });
@@ -58,33 +58,33 @@ describe('collectAttribution', () => {
   it('caches in sessionStorage and returns cached on second call', () => {
     setLocation('https://example.com/?utm_source=google');
 
-    const first = collectAttribution();
+    const first = collectSessionAttribution();
     expect(first.utm_source).toBe('google');
 
     // Change URL — should still return cached value
     setLocation('https://example.com/?utm_source=facebook');
-    const second = collectAttribution();
+    const second = collectSessionAttribution();
     expect(second.utm_source).toBe('google');
   });
 
   it('parses referral_code from the URL', () => {
     setLocation('https://example.com/?referral_code=PARTNER42');
 
-    const result = collectAttribution();
+    const result = collectSessionAttribution();
     expect(result.referral_code).toBe('PARTNER42');
   });
 
   it('sets touchpoint_type to click when UTMs are present', () => {
     setLocation('https://example.com/?utm_source=google');
 
-    const result = collectAttribution();
+    const result = collectSessionAttribution();
     expect(result.touchpoint_type).toBe('click');
   });
 
   it('sets touchpoint_type to click when a click ID is present', () => {
     setLocation('https://example.com/?gclid=abc123');
 
-    const result = collectAttribution();
+    const result = collectSessionAttribution();
     expect(result.touchpoint_type).toBe('click');
   });
 
@@ -92,7 +92,7 @@ describe('collectAttribution', () => {
     setLocation('https://example.com/');
     Object.defineProperty(document, 'referrer', { value: 'https://other.com', configurable: true });
 
-    const result = collectAttribution();
+    const result = collectSessionAttribution();
     expect(result.touchpoint_type).toBeUndefined();
   });
 
@@ -100,7 +100,7 @@ describe('collectAttribution', () => {
     setLocation('https://example.com/');
     Object.defineProperty(document, 'referrer', { value: '', configurable: true });
 
-    const result = collectAttribution();
+    const result = collectSessionAttribution();
     expect(result.utm_source).toBeUndefined();
     expect(result.gclid).toBeUndefined();
     expect(result.referrer).toBeUndefined();
@@ -115,15 +115,61 @@ describe('collectAttribution', () => {
       throw new Error('storage disabled');
     });
 
-    const result = collectAttribution();
+    const result = collectSessionAttribution();
     expect(result.utm_source).toBe('twitter');
+  });
+});
+
+describe('collectPageAttribution', () => {
+  it('always parses from the current URL, ignoring sessionStorage', () => {
+    setLocation('https://example.com/?utm_source=google');
+    collectSessionAttribution(); // seeds sessionStorage
+
+    // Change URL — collectSessionAttribution would return cached 'google',
+    // but collectPageAttribution reads the new URL.
+    setLocation('https://example.com/?utm_source=facebook');
+    const result = collectPageAttribution();
+    expect(result.utm_source).toBe('facebook');
+  });
+
+  it('does not write to sessionStorage', () => {
+    setLocation('https://example.com/?utm_source=twitter');
+
+    collectPageAttribution();
+    expect(sessionStorage.getItem(STORAGE_KEY)).toBeNull();
+  });
+
+  it('does not include landing_page', () => {
+    setLocation('https://example.com/?utm_source=google');
+
+    const result = collectPageAttribution();
+    expect(result.utm_source).toBe('google');
+    expect(result.landing_page).toBeUndefined();
+  });
+
+  it('sets touchpoint_type to click when UTMs are present', () => {
+    setLocation('https://example.com/?utm_source=google');
+
+    const result = collectPageAttribution();
+    expect(result.touchpoint_type).toBe('click');
+  });
+
+  it('captures referrer', () => {
+    setLocation('https://example.com/');
+    Object.defineProperty(document, 'referrer', {
+      value: 'https://google.com/',
+      configurable: true,
+    });
+
+    const result = collectPageAttribution();
+    expect(result.referrer).toBe('https://google.com/');
   });
 });
 
 describe('clearAttribution', () => {
   it('removes cached attribution from sessionStorage', () => {
     setLocation('https://example.com/?utm_source=google');
-    collectAttribution();
+    collectSessionAttribution();
     expect(sessionStorage.getItem(STORAGE_KEY)).not.toBeNull();
 
     clearAttribution();

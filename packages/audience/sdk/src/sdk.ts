@@ -20,7 +20,8 @@ import {
   isTimestampValid,
   truncate,
   collectContext,
-  collectAttribution,
+  collectSessionAttribution,
+  collectPageAttribution,
   getOrCreateSession,
   createConsentManager,
   canTrack,
@@ -34,6 +35,11 @@ import type { AudienceConfig } from './types';
 import {
   LIBRARY_NAME, LIBRARY_VERSION, LOG_PREFIX, DEFAULT_CONSENT_SOURCE,
 } from './config';
+
+/** Track events that carry UTM attribution from the current page URL. */
+const UTM_EVENTS: ReadonlySet<string> = new Set([
+  'sign_up', 'link_clicked',
+]);
 
 /**
  * Track player activity on your website — page views, purchases, sign-ups —
@@ -110,7 +116,7 @@ export class Audience {
       config.baseUrl,
     );
 
-    this.attribution = collectAttribution();
+    this.attribution = collectSessionAttribution();
 
     if (!this.isTrackingDisabled()) {
       this.queue.start();
@@ -209,14 +215,18 @@ export class Audience {
 
   /**
    * Record a page view. Call this on every route change in your app.
-   * The first call automatically captures how the player arrived
-   * (UTM params, ad click IDs, referrer). No-op when consent is 'none'.
+   * The first call captures how the player arrived (UTM params, ad click
+   * IDs, referrer). Every call includes the session ID.
+   * No-op when consent is 'none'.
    */
   page(properties?: Record<string, unknown>): void {
     if (this.isTrackingDisabled()) return;
     getOrCreateSession(this.cookieDomain);
 
-    const mergedProps: Record<string, unknown> = { ...properties };
+    const mergedProps: Record<string, unknown> = {
+      sessionId: this.sessionId,
+      ...properties,
+    };
     if (this.isFirstPage) {
       Object.assign(mergedProps, this.attribution);
       this.isFirstPage = false;
@@ -225,7 +235,7 @@ export class Audience {
     this.enqueue('page', {
       ...this.baseMessage(),
       type: 'page',
-      properties: Object.keys(mergedProps).length > 0 ? mergedProps : undefined,
+      properties: mergedProps,
       userId: this.effectiveUserId(),
     });
   }
@@ -237,6 +247,10 @@ export class Audience {
    * Pass the event name and any properties you want to analyse later.
    * For the predefined event names (`sign_up`, `purchase`, etc.),
    * TypeScript enforces the property shape at the call site.
+   *
+   * `sign_up` and `link_clicked` events automatically include UTM
+   * attribution from the current page URL. All events include `sessionId`.
+   *
    * No-op when consent is 'none'.
    */
   track<E extends AudienceEventName | string & {}>(
@@ -249,11 +263,17 @@ export class Audience {
     getOrCreateSession(this.cookieDomain);
 
     const [properties] = args;
+    const mergedProps: Record<string, unknown> = {
+      sessionId: this.sessionId,
+      ...(UTM_EVENTS.has(event) ? collectPageAttribution() : {}),
+      ...properties as Record<string, unknown> | undefined,
+    };
+
     this.enqueue('track', {
       ...this.baseMessage(),
       type: 'track',
       eventName: truncate(event),
-      properties: properties as Record<string, unknown> | undefined,
+      properties: mergedProps,
       userId: this.effectiveUserId(),
     });
   }
