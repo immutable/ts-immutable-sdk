@@ -1,0 +1,195 @@
+name: Audience Bundle Size
+
+on:
+  pull_request:
+    branches:
+      - "**"
+    # Do not add as a required check — PRs that don't touch these
+    # paths would be blocked forever (GitHub skips the check entirely
+    # instead of reporting it as passed).
+    paths:
+      - "packages/audience/sdk/**"
+      - "packages/audience/core/**"
+      - "packages/internal/metrics/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/audience-bundle-size.yaml"
+
+permissions:
+  pull-requests: write
+  contents: read
+
+concurrency:
+  group: audience-bundle-size-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
+
+jobs:
+  bundle-size:
+    name: Audience Bundle Size Check
+    runs-on: ubuntu-latest-4-cores
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          # Full history needed — we check out the base commit later to measure its size.
+          fetch-depth: 0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Read budget config
+        id: budget
+        run: |
+          BUDGET_DIR="packages/audience/sdk"
+          BUDGET_FILE="${BUDGET_DIR}/bundlebudget.json"
+          MAX_GZIP=$(jq -e '.budgets[0].maxSizeGzip | numbers' "$BUDGET_FILE") \
+            || { echo "::error file=${BUDGET_FILE}::.budgets[0].maxSizeGzip must be a number"; exit 1; }
+          WARN_GZIP=$(jq -e '.budgets[0].warnSizeGzip | numbers' "$BUDGET_FILE") \
+            || { echo "::error file=${BUDGET_FILE}::.budgets[0].warnSizeGzip must be a number"; exit 1; }
+          BUNDLE_REL=$(jq -er '.budgets[0].file | strings' "$BUDGET_FILE") \
+            || { echo "::error file=${BUDGET_FILE}::.budgets[0].file must be a string"; exit 1; }
+          {
+            echo "max_gzip=$MAX_GZIP"
+            echo "warn_gzip=$WARN_GZIP"
+            echo "bundle_path=${BUDGET_DIR}/${BUNDLE_REL}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build audience SDK (PR)
+        # The `...` suffix also builds audience-core and metrics, which get bundled in.
+        run: pnpm --filter @imtbl/audience... build
+
+      - name: Measure PR bundle size
+        id: pr_size
+        env:
+          BUNDLE: ${{ steps.budget.outputs.bundle_path }}
+        run: |
+          RAW_SIZE=$(stat --format=%s "$BUNDLE")
+          GZIP_SIZE=$(gzip -c "$BUNDLE" | wc -c)
+          echo "raw=$RAW_SIZE" >> "$GITHUB_OUTPUT"
+          echo "gzip=$GZIP_SIZE" >> "$GITHUB_OUTPUT"
+          echo "PR bundle: raw=${RAW_SIZE} bytes, gzip=${GZIP_SIZE} bytes"
+
+      - name: Build audience SDK (base) and measure
+        id: base_size
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BUNDLE: ${{ steps.budget.outputs.bundle_path }}
+        run: |
+          if git checkout "$BASE_SHA" \
+             && pnpm install --frozen-lockfile \
+             && pnpm --filter @imtbl/audience... build \
+             && [ -f "$BUNDLE" ]; then
+            RAW_SIZE=$(stat --format=%s "$BUNDLE")
+            GZIP_SIZE=$(gzip -c "$BUNDLE" | wc -c)
+            {
+              echo "ok=true"
+              echo "raw=$RAW_SIZE"
+              echo "gzip=$GZIP_SIZE"
+            } >> "$GITHUB_OUTPUT"
+            echo "Base bundle: ok=true, raw=${RAW_SIZE} bytes, gzip=${GZIP_SIZE} bytes"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Base build at ${BASE_SHA} unavailable — delta vs ${BASE_REF} will be reported as n/a"
+          fi
+
+          # Switch back to the PR code so later steps run against the right version.
+          git checkout "$HEAD_SHA"
+          pnpm install --frozen-lockfile
+
+      - name: Evaluate bundle size
+        id: evaluate
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          PR_GZIP: ${{ steps.pr_size.outputs.gzip }}
+          PR_RAW: ${{ steps.pr_size.outputs.raw }}
+          BASE_GZIP: ${{ steps.base_size.outputs.gzip }}
+          BASE_RAW: ${{ steps.base_size.outputs.raw }}
+          BASE_OK: ${{ steps.base_size.outputs.ok }}
+          MAX_GZIP: ${{ steps.budget.outputs.max_gzip }}
+          WARN_GZIP: ${{ steps.budget.outputs.warn_gzip }}
+        run: |
+          BASE_SHA_SHORT="${BASE_SHA:0:7}"
+
+          if [ "$BASE_OK" = "true" ]; then
+            DELTA_GZIP=$((PR_GZIP - BASE_GZIP))
+            DELTA_RAW=$((PR_RAW - BASE_RAW))
+            if [ $DELTA_GZIP -gt 0 ]; then DELTA_GZIP_FMT="+${DELTA_GZIP} bytes"; else DELTA_GZIP_FMT="${DELTA_GZIP} bytes"; fi
+            if [ $DELTA_RAW -gt 0 ]; then DELTA_RAW_FMT="+${DELTA_RAW} bytes"; else DELTA_RAW_FMT="${DELTA_RAW} bytes"; fi
+          else
+            DELTA_GZIP_FMT="n/a (base build unavailable)"
+            DELTA_RAW_FMT="n/a"
+          fi
+
+          STATUS="pass"
+          STATUS_ICON="white_check_mark"
+          if [ "$PR_GZIP" -gt "$MAX_GZIP" ]; then
+            STATUS="fail"
+            STATUS_ICON="x"
+          elif [ "$PR_GZIP" -gt "$WARN_GZIP" ]; then
+            STATUS="warn"
+            STATUS_ICON="warning"
+          fi
+
+          PR_GZIP_KB=$(echo "scale=2; $PR_GZIP / 1024" | bc)
+          MAX_GZIP_KB=$(echo "scale=2; $MAX_GZIP / 1024" | bc)
+          WARN_GZIP_KB=$(echo "scale=2; $WARN_GZIP / 1024" | bc)
+
+          {
+            echo "## :${STATUS_ICON}: Audience Bundle Size — @imtbl/audience"
+            echo ""
+            echo "| Metric | Size | Delta vs \`${BASE_REF}\` (${BASE_SHA_SHORT}) |"
+            echo "|--------|------|---------------|"
+            echo "| **Gzipped** | ${PR_GZIP} bytes (${PR_GZIP_KB} KB) | ${DELTA_GZIP_FMT} |"
+            echo "| Raw (minified) | ${PR_RAW} bytes | ${DELTA_RAW_FMT} |"
+            echo ""
+            echo "**Budget:** ${MAX_GZIP_KB} KB gzipped (warn at ${WARN_GZIP_KB} KB)"
+          } > /tmp/comment-body.md
+
+          if [ "$BASE_OK" != "true" ]; then
+            echo "" >> /tmp/comment-body.md
+            echo "> :information_source: Base build at \`${BASE_SHA_SHORT}\` (\`${BASE_REF}\`) was unavailable; delta could not be computed. Gate still enforces the absolute budget." >> /tmp/comment-body.md
+          fi
+
+          if [ "$STATUS" = "warn" ]; then
+            echo "" >> /tmp/comment-body.md
+            echo "> :warning: **Approaching budget** — gzipped size exceeds ${WARN_GZIP_KB} KB warning threshold." >> /tmp/comment-body.md
+          fi
+
+          if [ "$STATUS" = "fail" ]; then
+            echo "" >> /tmp/comment-body.md
+            echo "> :x: **Over budget** — gzipped size exceeds ${MAX_GZIP_KB} KB limit. Reduce bundle size before merging." >> /tmp/comment-body.md
+          fi
+
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+
+          EOF_MARKER=$(head -c 20 /dev/urandom | base64 | tr -d '/+=' | head -c 20)
+          {
+            echo "comment<<${EOF_MARKER}"
+            cat /tmp/comment-body.md
+            echo "${EOF_MARKER}"
+          } >> "$GITHUB_OUTPUT"
+
+          cat /tmp/comment-body.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Post PR comment
+        # Without this guard, fork PRs fail the whole job on a permission error.
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: marocchino/sticky-pull-request-comment@67d0dec7b07ed060a405f9b2a64b8ab319fdd7db # pin@v2.9.2
+        with:
+          header: audience-bundle-size
+          message: ${{ steps.evaluate.outputs.comment }}
+
+      - name: Fail if over budget
+        if: steps.evaluate.outputs.status == 'fail'
+        env:
+          PR_GZIP: ${{ steps.pr_size.outputs.gzip }}
+          MAX_GZIP: ${{ steps.budget.outputs.max_gzip }}
+        run: |
+          echo "::error::Audience bundle gzipped size (${PR_GZIP} bytes) exceeds budget (${MAX_GZIP} bytes)"
+          exit 1
