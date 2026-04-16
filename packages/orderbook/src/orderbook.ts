@@ -10,6 +10,7 @@ import {
 import {
   mapBidFromOpenApiOrder,
   mapCollectionBidFromOpenApiOrder,
+  mapTraitBidFromOpenApiOrder,
   mapFromOpenApiPage,
   mapFromOpenApiTrade,
   mapListingFromOpenApiOrder,
@@ -29,6 +30,7 @@ import {
   CollectionBidResult,
   CreateBidParams,
   CreateCollectionBidParams,
+  CreateTraitBidParams,
   CreateListingParams,
   FeeValue,
   FulfillBulkOrdersResponse,
@@ -39,6 +41,8 @@ import {
   ListBidsResult,
   ListCollectionBidsParams,
   ListCollectionBidsResult,
+  ListTraitBidsParams,
+  ListTraitBidsResult,
   ListingResult,
   ListListingsParams,
   ListListingsResult,
@@ -52,6 +56,9 @@ import {
   PrepareCancelOrdersResponse,
   PrepareCollectionBidParams,
   PrepareCollectionBidResponse,
+  PrepareTraitBidParams,
+  PrepareTraitBidResponse,
+  TraitBidResult,
   PrepareListingParams,
   PrepareListingResponse,
   SignablePurpose,
@@ -171,6 +178,18 @@ export class Orderbook {
   }
 
   /**
+   * Get a trait bid by ID
+   * @param {string} traitBidId - The trait bid id to find.
+   * @return {TraitBidResult} The returned trait bid result.
+   */
+  async getTraitBid(traitBidId: string): Promise<TraitBidResult> {
+    const apiTraitBid = await this.apiClient.getTraitBid(traitBidId);
+    return {
+      result: mapTraitBidFromOpenApiOrder(apiTraitBid.result),
+    };
+  }
+
+  /**
    * Get a trade by ID
    * @param {string} tradeId - The tradeId to find.
    * @return {TradeResult} The returned trade result.
@@ -227,6 +246,22 @@ export class Orderbook {
     return {
       page: mapFromOpenApiPage(apiCollectionBids.page),
       result: apiCollectionBids.result.map(mapCollectionBidFromOpenApiOrder),
+    };
+  }
+
+  /**
+   * List trait bids. This method is used to get a list of trait bids filtered
+   * by conditions specified in the params object.
+   * @param {ListTraitBidsParams} listOrderParams - Filtering, ordering and page parameters.
+   * @return {ListTraitBidsResult} The paged trait bids.
+   */
+  async listTraitBids(
+    listOrderParams: ListTraitBidsParams,
+  ): Promise<ListTraitBidsResult> {
+    const apiTraitBids = await this.apiClient.listTraitBids(listOrderParams);
+    return {
+      page: mapFromOpenApiPage(apiTraitBids.page),
+      result: apiTraitBids.result.map(mapTraitBidFromOpenApiOrder),
     };
   }
 
@@ -567,6 +602,48 @@ export class Orderbook {
   }
 
   /**
+   * Get required transactions and messages for signing prior to creating a trait bid
+   * through the {@linkcode createTraitBid} method. Uses the same Seaport criteria-based
+   * order shape as collection bids.
+   * @param {PrepareTraitBidParams} params - Details about the trait bid to be created.
+   * @return {PrepareTraitBidResponse} Unsigned approval (if any), typed order message, and
+   * order components for {@linkcode createTraitBid}.
+   */
+  async prepareTraitBid({
+    makerAddress,
+    sell,
+    buy,
+    orderStart,
+    orderExpiry,
+  }: PrepareTraitBidParams): Promise<PrepareTraitBidResponse> {
+    return this.seaport.prepareSeaportOrder(
+      makerAddress,
+      sell,
+      buy,
+      true,
+      orderStart || new Date(),
+      orderExpiry || Orderbook.defaultOrderExpiry(),
+    );
+  }
+
+  /**
+   * Create a trait bid (collection criteria offer plus trait filters submitted to the API).
+   * @param {CreateTraitBidParams} createTraitBidParams - Signed order and trait criteria.
+   * @return {TraitBidResult} The created trait bid.
+   */
+  async createTraitBid(
+    createTraitBidParams: CreateTraitBidParams,
+  ): Promise<TraitBidResult> {
+    const apiTraitBidResponse = await this.apiClient.createTraitBid(
+      createTraitBidParams,
+    );
+
+    return {
+      result: mapTraitBidFromOpenApiOrder(apiTraitBidResponse.result),
+    };
+  }
+
+  /**
    * Get unsigned transactions that can be submitted to fulfil an open order. If the approval
    * transaction exists it must be signed and submitted to the chain before the fulfilment
    * transaction can be submitted or it will be reverted.
@@ -848,8 +925,22 @@ export class Orderbook {
       })),
     );
 
+    const traitBidResultsPromises = Promise.all(
+      orderIds.map((id) => this.apiClient.getTraitBid(id).catch((e: ApiError) => {
+        if (e.status === 404) {
+          return undefined;
+        }
+        throw e;
+      })),
+    );
+
     const orders = [
-      await Promise.all([listingResultsPromises, bidResultsPromises, collectionBidResultsPromises]),
+      await Promise.all([
+        listingResultsPromises,
+        bidResultsPromises,
+        collectionBidResultsPromises,
+        traitBidResultsPromises,
+      ]),
     ].flat(2).filter((r) => r !== undefined).map((f) => f.result);
 
     if (orders.length !== orderIds.length) {

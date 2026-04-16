@@ -8,8 +8,10 @@ import {
   ListingResult,
   ListListingsResult,
   ListTradeResult,
+  ListTraitBidsResult,
   OrdersService,
   TradeResult,
+  TraitBidResult,
 } from '../openapi/sdk';
 import { FulfillableOrder } from '../openapi/sdk/models/FulfillableOrder';
 import { FulfillmentDataRequest } from '../openapi/sdk/models/FulfillmentDataRequest';
@@ -23,10 +25,13 @@ import {
 } from '../seaport/map-to-immutable-order';
 import {
   CreateBidParams,
+  CreateCollectionBidParams,
   CreateListingParams,
+  CreateTraitBidParams,
   ListBidsParams,
   ListCollectionBidsParams,
   ListListingsParams,
+  ListTraitBidsParams,
   ListTradesParams,
 } from '../types';
 
@@ -72,6 +77,13 @@ export class ImmutableApiClient {
     });
   }
 
+  async getTraitBid(traitBidId: string): Promise<TraitBidResult> {
+    return this.orderbookService.getTraitBid({
+      chainName: this.chainName,
+      traitBidId,
+    });
+  }
+
   async getTrade(tradeId: string): Promise<TradeResult> {
     return this.orderbookService.getTrade({
       chainName: this.chainName,
@@ -101,6 +113,15 @@ export class ImmutableApiClient {
     listOrderParams: ListCollectionBidsParams,
   ): Promise<ListCollectionBidsResult> {
     return this.orderbookService.listCollectionBids({
+      chainName: this.chainName,
+      ...listOrderParams,
+    });
+  }
+
+  async listTraitBids(
+    listOrderParams: ListTraitBidsParams,
+  ): Promise<ListTraitBidsResult> {
+    return this.orderbookService.listTraitBids({
       chainName: this.chainName,
       ...listOrderParams,
     });
@@ -243,7 +264,7 @@ export class ImmutableApiClient {
     orderComponents,
     orderSignature,
     makerFees,
-  }: CreateBidParams): Promise<CollectionBidResult> {
+  }: CreateCollectionBidParams): Promise<CollectionBidResult> {
     if (orderComponents.offer.length !== 1) {
       throw new Error('Only one item can be listed for a collection bid');
     }
@@ -290,6 +311,71 @@ export class ImmutableApiClient {
         start_at: new Date(
           parseInt(`${orderComponents.startTime.toString()}000`, 10),
         ).toISOString(),
+      },
+    });
+  }
+
+  async createTraitBid({
+    orderHash,
+    orderComponents,
+    orderSignature,
+    makerFees,
+    traitCriteria,
+  }: CreateTraitBidParams): Promise<TraitBidResult> {
+    if (orderComponents.offer.length !== 1) {
+      throw new Error('Only one item can be listed for a trait bid');
+    }
+
+    if (orderComponents.consideration.length !== 1) {
+      throw new Error('Only one item can be used as currency for a trait bid');
+    }
+
+    if (ItemType.ERC20 !== orderComponents.offer[0].itemType) {
+      throw new Error('Only ERC20 tokens can be used as the currency item in a trait bid');
+    }
+
+    if (![ItemType.ERC721_WITH_CRITERIA, ItemType.ERC1155_WITH_CRITERIA]
+      .includes(orderComponents.consideration[0].itemType)
+    ) {
+      throw new Error('Only ERC721 / ERC1155 collection based tokens can be bid against');
+    }
+
+    if (!traitCriteria?.length) {
+      throw new Error('At least one trait criterion is required for a trait bid');
+    }
+
+    return this.orderbookService.createTraitBid({
+      chainName: this.chainName,
+      requestBody: {
+        account_address: orderComponents.offerer,
+        buy: orderComponents.consideration.map(mapSeaportItemToImmutableAssetCollectionItem),
+        fees: makerFees.map((f) => ({
+          type: Fee.type.MAKER_ECOSYSTEM,
+          amount: f.amount,
+          recipient_address: f.recipientAddress,
+        })),
+        end_at: new Date(
+          parseInt(`${orderComponents.endTime.toString()}000`, 10),
+        ).toISOString(),
+        order_hash: orderHash,
+        protocol_data: {
+          order_type:
+            mapSeaportOrderTypeToImmutableProtocolDataOrderType(orderComponents.orderType),
+          zone_address: orderComponents.zone,
+          seaport_address: this.seaportAddress,
+          seaport_version: SEAPORT_CONTRACT_VERSION_V1_5,
+          counter: orderComponents.counter.toString(),
+        },
+        salt: orderComponents.salt,
+        sell: orderComponents.offer.map(mapSeaportItemToImmutableERC20Item),
+        signature: orderSignature,
+        start_at: new Date(
+          parseInt(`${orderComponents.startTime.toString()}000`, 10),
+        ).toISOString(),
+        trait_criteria: traitCriteria.map((c) => ({
+          trait_type: c.traitType,
+          values: c.values,
+        })),
       },
     });
   }
