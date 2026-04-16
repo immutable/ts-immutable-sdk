@@ -55,6 +55,14 @@
           <input id="pk" type="text" placeholder="pk_imapik-test-yourkey" spellcheck="false">
         </div>
         <div class="field">
+          <label for="environment">Environment</label>
+          <select id="environment">
+            <option value="https://api.dev.immutable.com" selected>Dev</option>
+            <option value="https://api.sandbox.immutable.com">Sandbox</option>
+            <option value="https://api.immutable.com">Production</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="initial-consent">Initial consent</label>
           <select id="initial-consent">
             <option value="none" selected>none</option>
@@ -67,7 +75,7 @@
         <div class="section-label">Advanced</div>
 
         <div class="field">
-          <label><input id="debug" type="checkbox"> debug</label>
+          <label><input id="debug" type="checkbox" checked> debug</label>
           <p class="helper-text">Mirror SDK internal log output into the in-page event log below.</p>
         </div>
 
@@ -75,10 +83,6 @@
           <div class="field">
             <label for="cookie-domain">Cookie domain</label>
             <input id="cookie-domain" type="text" placeholder=".studio.com">
-          </div>
-          <div class="field">
-            <label for="base-url">Base URL override</label>
-            <input id="base-url" type="text" placeholder="(derived from key)">
           </div>
           <div class="field">
             <label for="flush-interval">Flush interval (ms)</label>

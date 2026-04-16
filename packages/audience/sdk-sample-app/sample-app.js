@@ -226,7 +226,7 @@
     ['cookie-domain', 'value', 'cookieDomain'],
     ['flush-interval', 'value', 'flushInterval'],
     ['flush-size', 'value', 'flushSize'],
-    ['base-url', 'value', 'baseUrl'],
+    ['environment', 'value', 'environment'],
   ];
 
   function saveUiState() {
@@ -243,6 +243,7 @@
       if (!raw) return;
       var state = JSON.parse(raw);
       UI_FIELDS.forEach(function (f) { if (state[f[2]] !== undefined) $(f[0])[f[1]] = state[f[2]]; });
+      if ($('environment').selectedIndex === -1) $('environment').selectedIndex = 0;
       return state;
     } catch (err) { /* ignore */ }
   }
@@ -283,6 +284,7 @@
       harvestIds(payload);
       // Promote flush outcomes to ok/err so they stand out in the log.
       var flushMatch = msg.match(/^flush (ok|failed)/);
+      if (flushMatch && flushMatch[1] === 'ok') { pendingQueueCount = 0; updateStatus(); }
       var effectiveLevel = flushMatch ? (flushMatch[1] === 'ok' ? 'ok' : 'err') : level;
       log(msg, payload, effectiveLevel, 'sdk');
     }
@@ -297,14 +299,19 @@
     };
   }
 
-  function deriveEndpoint() {
-    var override = $('base-url').value.trim();
-    if (override) return override;
+  function isTestKey(key) { return key.indexOf('pk_imapik-test') === 0; }
+
+  var DEV_URL = 'https://api.dev.immutable.com';
+  var PROD_URL = 'https://api.immutable.com';
+
+  var lastKeyType = null; // 'test' | 'prod' | null
+  function syncEnvironment() {
     var key = $('pk').value.trim();
-    if (!key) return '—';
-    return key.indexOf('pk_imapik-test') === 0
-      ? 'https://api.sandbox.immutable.com'
-      : 'https://api.immutable.com';
+    if (!key) { lastKeyType = null; return; }
+    var type = isTestKey(key) ? 'test' : 'prod';
+    if (type === lastKeyType) return;
+    lastKeyType = type;
+    $('environment').value = type === 'test' ? DEV_URL : PROD_URL;
   }
 
   function handleError(err) {
@@ -323,7 +330,7 @@
       onError: handleError,
     };
     var cd = $('cookie-domain').value.trim(); if (cd) config.cookieDomain = cd;
-    var bu = $('base-url').value.trim(); if (bu) config.baseUrl = bu;
+    config.baseUrl = $('environment').value;
     var fi = parseInt($('flush-interval').value, 10); if (!Number.isNaN(fi)) config.flushInterval = fi;
     var fs = parseInt($('flush-size').value, 10); if (!Number.isNaN(fs)) config.flushSize = fs;
     return config;
@@ -375,12 +382,10 @@
       if (initialConsent) displayConsent = initialConsent;
     }
 
-    var ep = deriveEndpoint();
+    var ep = $('environment').value;
+    var isProd = ep === PROD_URL;
     var consentTint = { none: ' state-err', anonymous: ' state-warn', full: ' state-ok' }[displayConsent] || '';
-    var endpointTint = (ep && ep !== '—')
-      ? ((ep.indexOf('sandbox') !== -1 || ep.indexOf('dev') !== -1) ? ' state-ok' : ' state-warn')
-      : '';
-    var isProd = ep && ep !== '—' && ep.indexOf('sandbox') === -1 && ep.indexOf('dev') === -1;
+    var endpointTint = isProd ? ' state-warn' : ' state-ok';
     $('prod-warning').hidden = !isProd;
     var anonCookie = readCookie(ANON_COOKIE_NAME);
     var sidCookie = readCookie('_imtbl_sid');
@@ -416,7 +421,6 @@
         flushInterval: config.flushInterval,
         flushSize: config.flushSize,
         baseUrl: config.baseUrl,
-        derivedEndpoint: deriveEndpoint(),
       }, 'ok');
       updateStatus();
     } catch (err) {
@@ -528,14 +532,18 @@
     validateEventCatalogue();
     installTabSwitching();
     var restored = restoreUiState();
+    var restoredKey = $('pk').value.trim();
+    if (restoredKey) lastKeyType = isTestKey(restoredKey) ? 'test' : 'prod';
 
     var identityTypes = Object.values(IdentityType || {});
     ['id-type', 'alias-from-type', 'alias-to-type'].forEach(function (id) {
       identityTypes.forEach(function (val) { addOption($(id), val, val); });
     });
 
-    $('pk').addEventListener('input', function () { syncInitEnabled(); updateStatus(); saveUiState(); });
-    $('base-url').addEventListener('input', function () { updateStatus(); saveUiState(); });
+    $('pk').addEventListener('input', function () {
+      syncEnvironment(); syncInitEnabled(); updateStatus(); saveUiState();
+    });
+    $('environment').addEventListener('change', function () { updateStatus(); saveUiState(); });
     $('initial-consent').addEventListener('change', function () { saveUiState(); updateStatus(); });
     ['debug', 'cookie-domain', 'flush-interval', 'flush-size'].forEach(function (id) {
       var el = $(id);
