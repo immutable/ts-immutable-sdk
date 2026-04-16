@@ -126,10 +126,15 @@ h1 {
 .status-value {
   color: var(--text);
   word-break: break-all;
+  cursor: pointer;
 }
 
 .status-value.dim {
   color: var(--text-dim);
+}
+
+.status-value.copied {
+  color: var(--ok);
 }
 
 .panel {

@@ -565,6 +565,16 @@
       $(id).addEventListener('input', syncAliasButton);
     });
     $('btn-clear-cookies').addEventListener('click', clearSdkCookies);
+    document.querySelector('.status-bar').addEventListener('click', function (e) {
+      var val = e.target.closest('.status-value');
+      if (!val || val.textContent === '—') return;
+      var original = val.textContent;
+      navigator.clipboard.writeText(original).then(function () {
+        val.textContent = 'Copied';
+        val.classList.add('copied');
+        setTimeout(function () { val.textContent = original; val.classList.remove('copied'); }, 800);
+      }).catch(function () {});
+    });
 
     $('btn-copy-log').addEventListener('click', function () {
       var s = logEntries.map(function (e) {
