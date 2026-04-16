@@ -680,7 +680,7 @@ describe('autocapture', () => {
         expect(enqueue).toHaveBeenCalledTimes(5);
       });
 
-      it('does not include above_fold property on scrollable pages', () => {
+      it('does not include aboveFold property on scrollable pages', () => {
         setup({ scroll: true });
 
         (window as Record<string, unknown>).scrollY = 375;
@@ -688,7 +688,7 @@ describe('autocapture', () => {
         flushRAF();
 
         expect(enqueue.mock.calls[0][1]).toEqual({ depth: 25 });
-        expect(enqueue.mock.calls[0][1]).not.toHaveProperty('above_fold');
+        expect(enqueue.mock.calls[0][1]).not.toHaveProperty('aboveFold');
       });
 
       it('does not fire at consent none', () => {
@@ -740,7 +740,7 @@ describe('autocapture', () => {
         jest.useRealTimers();
       });
 
-      it('fires scroll_depth 100 with above_fold after dwell time', () => {
+      it('fires scroll_depth 100 with aboveFold after dwell time', () => {
         setup({ scroll: true });
 
         // Should NOT fire immediately
@@ -751,7 +751,7 @@ describe('autocapture', () => {
 
         expect(enqueue).toHaveBeenCalledWith('scroll_depth', {
           depth: 100,
-          above_fold: true,
+          aboveFold: true,
         });
         expect(enqueue).toHaveBeenCalledTimes(1);
       });

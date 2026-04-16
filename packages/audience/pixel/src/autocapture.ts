@@ -71,7 +71,7 @@ function getScrollPercent(): number {
   const { scrollHeight, clientHeight } = document.documentElement;
   if (scrollHeight <= clientHeight) return 100;
   const scrollable = scrollHeight - clientHeight;
-  return Math.min(100, Math.round(((window.scrollY || window.pageYOffset) / scrollable) * 100));
+  return Math.min(100, Math.round((window.scrollY / scrollable) * 100));
 }
 
 /**
@@ -91,7 +91,7 @@ function setupScrollTracking(
   let rafId = 0;
   let dwellTimer: ReturnType<typeof setTimeout> | null = null;
 
-  const checkAndFire = (aboveFold: boolean): void => {
+  const checkAndFire = (): void => {
     if (!canTrack(getConsent())) return;
 
     const pct = getScrollPercent();
@@ -99,9 +99,7 @@ function setupScrollTracking(
       const milestone = SCROLL_MILESTONES[i];
       if (pct >= milestone && !fired.has(milestone)) {
         fired.add(milestone);
-        const properties: Record<string, unknown> = { depth: milestone };
-        if (aboveFold) properties.above_fold = true;
-        enqueue('scroll_depth', properties);
+        enqueue('scroll_depth', { depth: milestone });
       }
     }
   };
@@ -117,12 +115,12 @@ function setupScrollTracking(
       if (!canTrack(getConsent())) return;
       if (!fired.has(100)) {
         fired.add(100);
-        enqueue('scroll_depth', { depth: 100, above_fold: true });
+        enqueue('scroll_depth', { depth: 100, aboveFold: true });
       }
     }, ABOVE_FOLD_DWELL_MS);
   } else {
     // Check initial scroll position (e.g. anchor links, restored scroll).
-    checkAndFire(false);
+    checkAndFire();
   }
 
   // Scroll listener (handles both scrollable pages and pages that become
@@ -131,7 +129,7 @@ function setupScrollTracking(
     if (rafId) return; // Already scheduled
     rafId = requestAnimationFrame(() => {
       rafId = 0;
-      checkAndFire(false);
+      checkAndFire();
     });
   };
 

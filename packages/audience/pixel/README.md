@@ -85,7 +85,7 @@ All events fire automatically with no instrumentation required.
 | `session_end` | Page unload (`visibilitychange` / `pagehide`) | `sessionId`, `duration` (seconds) |
 | `form_submitted` | HTML form submission | `formAction`, `formId`, `formName`, `fieldNames`. `emailHash` at `full` consent only. |
 | `link_clicked` | Outbound link click (external domains only) | `linkUrl`, `linkText`, `elementId`, `outbound: true` |
-| `scroll_depth` | Scroll milestone reached (25%, 50%, 75%, 90%, 100%) | `depth` (integer). On above-the-fold pages (no scroll possible), fires `depth: 100` with `above_fold: true` after a 2-second dwell. |
+| `scroll_depth` | Scroll milestone reached (25%, 50%, 75%, 90%, 100%) | `depth` (integer). On above-the-fold pages (no scroll possible), fires `depth: 100` with `aboveFold: true` after a 2-second dwell. |
 
 ### Disabling specific auto-capture
 
