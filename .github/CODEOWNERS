@@ -1,31 +1,34 @@
 * @immutable/blockchain-services
-package.json @immutable/blockchain-services @immutable/ped-stream-sdk-integrations-list
-.github @immutable/security @immutable/blockchain-services
-/.husky @immutable/blockchain-services
-/.nvmrc @immutable/blockchain-services
-/sdk @immutable/blockchain-services
-/packages/x-client @immutable/blockchain-services
-/packages/config @immutable/blockchain-services
-/packages/internal/metrics @immutable/blockchain-services
-/packages/internal/generated-clients @immutable/blockchain-services
-/packages/internal/generated-clients/src/blockchain-data @immutable/activation
-/packages/internal/toolkit @immutable/blockchain-services
-/packages/internal/cryptofiat @immutable/blockchain-services
-/packages/internal/dex @immutable/gamefi
-/packages/internal/bridge @immutable/rollups
-/packages/orderbook @immutable/blockchain-services
-/packages/passport @immutable/blockchain-services
-/packages/x-provider @immutable/blockchain-services
-/packages/checkout @immutable/blockchain-services
-/packages/checkout/widgets-lib @immutable/blockchain-services
-/packages/blockchain-data @immutable/activation
-/packages/minting-backend @shineli1984
-/packages/webhook @shineli1984
-/packages/audience @immutable/ped-stream-sdk-integrations-list
-/packages/game-bridge @immutable/gamesdk @immutable/blockchain-services
-/examples @immutable/devgrowth
-**/package.json @immutable/blockchain-services
+
+# Shared Files
+/package.json @immutable/blockchain-services @immutable/ped-stream-sdk-integrations-list
+/.github/ @immutable/security @immutable/blockchain-services @immutable/ped-stream-sdk-integrations-list
+/.husky/ @immutable/blockchain-services
+/.nvmrc/ @immutable/blockchain-services
 /pnpm-lock.yaml @immutable/blockchain-services @immutable/ped-stream-sdk-integrations-list
 /pnpm-workspace.yaml @immutable/blockchain-services @immutable/ped-stream-sdk-integrations-list
 /tsconfig.base.json @immutable/blockchain-services @immutable/ped-stream-sdk-integrations-list
 /tsup.config.js @immutable/blockchain-services @immutable/ped-stream-sdk-integrations-list
+/examples/ @immutable/devgrowth
+/packages/config/ @immutable/blockchain-services @immutable/ped-stream-sdk-integrations-list
+
+# Blockchain Services
+/packages/internal/metrics/ @immutable/blockchain-services
+/packages/internal/generated-clients/ @immutable/blockchain-services
+/packages/internal/generated-clients/src/blockchain-data/ @immutable/activation
+/packages/internal/toolkit/ @immutable/blockchain-services
+/packages/internal/cryptofiat/ @immutable/blockchain-services
+/packages/internal/dex/ @immutable/gamefi
+/packages/internal/bridge/ @immutable/rollups
+/packages/orderbook/ @immutable/blockchain-services
+/packages/passport/ @immutable/blockchain-services
+/packages/x-provider/ @immutable/blockchain-services
+/packages/checkout/ @immutable/blockchain-services
+/packages/checkout/widgets-lib/ @immutable/blockchain-services
+/packages/blockchain-data/ @immutable/blockchain-services
+/packages/minting-backend/ @shineli1984 @immutable/blockchain-services
+/packages/webhook/ @shineli1984 @immutable/blockchain-services
+/packages/game-bridge/ @immutable/gamesdk @immutable/blockchain-services
+
+# Ped Stream SDK Integrations List
+/packages/audience/ @immutable/ped-stream-sdk-integrations-list
