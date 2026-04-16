@@ -44,7 +44,7 @@ jest.mock('@imtbl/audience-core', () => ({
   isBrowser: jest.fn().mockReturnValue(true),
   getCookie: jest.fn(),
   setCookie: jest.fn(),
-  collectAttribution: jest.fn().mockReturnValue({
+  collectSessionAttribution: jest.fn().mockReturnValue({
     utm_source: 'google',
     landing_page: 'https://example.com',
   }),

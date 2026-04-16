@@ -9,6 +9,10 @@ const config: Config = {
   },
   moduleNameMapper: {
     '^@imtbl/audience-core$': '<rootDir>/../core/src/index.ts',
+    // The core source code imports other @imtbl packages (e.g. metrics).
+    // This tells jest where to find them so we can run tests without
+    // building the whole monorepo first.
+    '^@imtbl/(.*)$': '<rootDir>/../../../node_modules/@imtbl/$1/src',
   },
 };
 

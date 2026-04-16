@@ -27,7 +27,7 @@ jest.mock('@imtbl/audience-core', () => ({
   isBrowser: jest.fn().mockReturnValue(true),
   getCookie: jest.fn(),
   setCookie: jest.fn(),
-  collectAttribution: jest.fn().mockReturnValue({}),
+  collectSessionAttribution: jest.fn().mockReturnValue({}),
   getOrCreateSession: jest.fn().mockReturnValue({ sessionId: 's', isNew: false }),
   createConsentManager: jest.fn().mockReturnValue({ level: 'none', setLevel: jest.fn() }),
 }));

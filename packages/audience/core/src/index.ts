@@ -41,7 +41,7 @@ export { isTimestampValid, isAliasValid, truncate } from './validation';
 export { getOrCreateSession } from './session';
 export type { SessionResult } from './session';
 
-export { collectAttribution } from './attribution';
+export { collectSessionAttribution, collectPageAttribution } from './attribution';
 export type { Attribution } from './attribution';
 
 export {

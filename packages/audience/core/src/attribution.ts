@@ -78,31 +78,47 @@ function saveToStorage(attribution: Attribution): void {
   }
 }
 
-export function collectAttribution(): Attribution {
-  const cached = loadFromStorage();
-  if (cached) return cached;
-
+function buildAttribution(): Attribution {
   const urlParams = typeof window !== 'undefined' && window.location
     ? parseParams(window.location.href)
     : {};
 
   const referrer = typeof document !== 'undefined' ? document.referrer || undefined : undefined;
-  const landingPage = typeof window !== 'undefined' && window.location
-    ? window.location.href
-    : undefined;
 
   const hasClickId = CLICK_ID_PARAMS.some((key) => key in urlParams);
   const hasUtm = UTM_PARAMS.some((key) => key in urlParams);
 
-  const attribution: Attribution = {
+  return {
     ...urlParams,
     referrer,
-    landing_page: landingPage,
     touchpoint_type: hasClickId || hasUtm ? 'click' : undefined,
+  };
+}
+
+export function collectSessionAttribution(): Attribution {
+  const cached = loadFromStorage();
+  if (cached) return cached;
+
+  const landingPage = typeof window !== 'undefined' && window.location
+    ? window.location.href
+    : undefined;
+
+  const attribution: Attribution = {
+    ...buildAttribution(),
+    landing_page: landingPage,
   };
 
   saveToStorage(attribution);
   return attribution;
+}
+
+/**
+ * Parse attribution from the current URL without reading or writing
+ * sessionStorage. Returns the UTM / click-ID params on the URL right
+ * now, not the ones cached at session start.
+ */
+export function collectPageAttribution(): Attribution {
+  return buildAttribution();
 }
 
 export function clearAttribution(): void {
