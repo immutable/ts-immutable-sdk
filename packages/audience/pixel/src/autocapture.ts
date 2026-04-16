@@ -6,6 +6,8 @@ export interface AutocaptureOptions {
   forms?: boolean;
   /** Enable outbound link click auto-capture. Default: true */
   clicks?: boolean;
+  /** Enable scroll depth milestone auto-capture. Default: true */
+  scroll?: boolean;
 }
 
 type EnqueueFn = (eventName: string, properties: Record<string, unknown>) => void;
@@ -52,8 +54,99 @@ function getFieldNames(form: HTMLFormElement): string[] {
   return names;
 }
 
+// -- Scroll depth tracking --------------------------------------------------
+
+/** Milestones that fire exactly once per page load. */
+const SCROLL_MILESTONES = [25, 50, 75, 90, 100];
+
 /**
- * Attach document-level listeners for form submissions and outbound link clicks.
+ * Minimum dwell time (ms) before firing `scroll_depth: 100` on pages where
+ * all content is visible without scrolling (above-the-fold). Filters out
+ * immediate bounces while still capturing genuine engagement. GA4/GTM fire
+ * instantly in this scenario — the dwell check is deliberately better.
+ */
+const ABOVE_FOLD_DWELL_MS = 2000;
+
+function getScrollPercent(): number {
+  const { scrollHeight, clientHeight } = document.documentElement;
+  if (scrollHeight <= clientHeight) return 100;
+  const scrollable = scrollHeight - clientHeight;
+  return Math.min(100, Math.round(((window.scrollY || window.pageYOffset) / scrollable) * 100));
+}
+
+/**
+ * Setup scroll depth milestone tracking.
+ *
+ * - Scrollable pages: passive `scroll` listener, throttled via `requestAnimationFrame`,
+ *   fires `scroll_depth` once per milestone (25 / 50 / 75 / 90 / 100).
+ * - Above-the-fold pages (no scroll possible): fires `scroll_depth` with
+ *   `depth: 100, above_fold: true` after a short dwell to filter bounces.
+ * - Consent is checked at fire time, not at attach time.
+ */
+function setupScrollTracking(
+  enqueue: EnqueueFn,
+  getConsent: ConsentFn,
+): () => void {
+  const fired = new Set<number>();
+  let rafId = 0;
+  let dwellTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const checkAndFire = (aboveFold: boolean): void => {
+    if (!canTrack(getConsent())) return;
+
+    const pct = getScrollPercent();
+    for (let i = 0; i < SCROLL_MILESTONES.length; i++) {
+      const milestone = SCROLL_MILESTONES[i];
+      if (pct >= milestone && !fired.has(milestone)) {
+        fired.add(milestone);
+        const properties: Record<string, unknown> = { depth: milestone };
+        if (aboveFold) properties.above_fold = true;
+        enqueue('scroll_depth', properties);
+      }
+    }
+  };
+
+  const isAboveFold = document.documentElement.scrollHeight <= window.innerHeight;
+
+  if (isAboveFold) {
+    // All content visible — fire a single depth: 100 after dwell time.
+    // We deliberately skip intermediate milestones: the user didn't scroll
+    // to 25/50/75, the content was simply short enough to fit.
+    dwellTimer = setTimeout(() => {
+      dwellTimer = null;
+      if (!canTrack(getConsent())) return;
+      if (!fired.has(100)) {
+        fired.add(100);
+        enqueue('scroll_depth', { depth: 100, above_fold: true });
+      }
+    }, ABOVE_FOLD_DWELL_MS);
+  } else {
+    // Check initial scroll position (e.g. anchor links, restored scroll).
+    checkAndFire(false);
+  }
+
+  // Scroll listener (handles both scrollable pages and pages that become
+  // scrollable after dynamic content loads).
+  const onScroll = (): void => {
+    if (rafId) return; // Already scheduled
+    rafId = requestAnimationFrame(() => {
+      rafId = 0;
+      checkAndFire(false);
+    });
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  return () => {
+    window.removeEventListener('scroll', onScroll);
+    if (rafId) cancelAnimationFrame(rafId);
+    if (dwellTimer !== null) clearTimeout(dwellTimer);
+  };
+}
+
+/**
+ * Attach document-level listeners for form submissions, outbound link clicks,
+ * and scroll depth milestones.
  * Returns a teardown function that removes all listeners.
  *
  * - Single document-level listener per event type (event delegation).
@@ -133,6 +226,10 @@ export function setupAutocapture(
 
     document.addEventListener('click', onClick, true);
     teardowns.push(() => document.removeEventListener('click', onClick, true));
+  }
+
+  if (options.scroll !== false) {
+    teardowns.push(setupScrollTracking(enqueue, getConsent));
   }
 
   return () => teardowns.forEach((fn) => fn());

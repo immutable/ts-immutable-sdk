@@ -47,9 +47,11 @@ describe('autocapture', () => {
     teardown?.();
   });
 
-  function setup(options = {}) {
+  function setup(options: Record<string, unknown> = {}) {
     teardown = setupAutocapture(
-      { forms: true, clicks: true, ...options },
+      {
+        forms: true, clicks: true, scroll: false, ...options,
+      },
       enqueue,
       () => consent,
     );
@@ -540,6 +542,288 @@ describe('autocapture', () => {
 
       expect(enqueue).toHaveBeenCalledTimes(1);
       expect(enqueue.mock.calls[0][0]).toBe('form_submitted');
+    });
+  });
+
+  // ---------- Scroll depth tracking ----------
+
+  describe('scroll depth tracking', () => {
+    let rafCallbacks: Array<() => void>;
+    let originalRAF: typeof requestAnimationFrame;
+    let originalCAF: typeof cancelAnimationFrame;
+
+    beforeEach(() => {
+      rafCallbacks = [];
+      originalRAF = window.requestAnimationFrame;
+      originalCAF = window.cancelAnimationFrame;
+
+      // Mock rAF: collect callbacks, flush manually
+      let nextId = 1;
+      window.requestAnimationFrame = jest.fn((cb: FrameRequestCallback) => {
+        const id = nextId++;
+        rafCallbacks.push(() => cb(0));
+        return id;
+      });
+      window.cancelAnimationFrame = jest.fn();
+    });
+
+    afterEach(() => {
+      window.requestAnimationFrame = originalRAF;
+      window.cancelAnimationFrame = originalCAF;
+    });
+
+    function flushRAF() {
+      const cbs = [...rafCallbacks];
+      rafCallbacks = [];
+      cbs.forEach((cb) => cb());
+    }
+
+    /**
+     * Configure jsdom's document dimensions and scroll position.
+     * jsdom doesn't support layout, so we stub the relevant properties.
+     */
+    function setScrollGeometry(
+      scrollHeight: number,
+      clientHeight: number,
+      scrollY: number,
+    ) {
+      Object.defineProperty(document.documentElement, 'scrollHeight', {
+        value: scrollHeight, configurable: true,
+      });
+      Object.defineProperty(document.documentElement, 'clientHeight', {
+        value: clientHeight, configurable: true,
+      });
+      Object.defineProperty(window, 'innerHeight', {
+        value: clientHeight, configurable: true,
+      });
+      Object.defineProperty(window, 'scrollY', {
+        value: scrollY, configurable: true, writable: true,
+      });
+    }
+
+    describe('scrollable pages', () => {
+      beforeEach(() => {
+        // 2000px tall page in a 500px viewport → scrollable
+        setScrollGeometry(2000, 500, 0);
+      });
+
+      it('fires scroll_depth at each milestone exactly once', () => {
+        setup({ scroll: true });
+
+        // Scroll to 25% → scrollY = (2000-500) * 0.25 = 375
+        (window as Record<string, unknown>).scrollY = 375;
+        window.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
+        expect(enqueue).toHaveBeenCalledTimes(1);
+
+        // Scroll to 55% → should fire 50 (25 already fired)
+        (window as Record<string, unknown>).scrollY = 825;
+        window.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        expect(enqueue).toHaveBeenCalledTimes(2);
+        expect(enqueue).toHaveBeenLastCalledWith('scroll_depth', { depth: 50 });
+      });
+
+      it('fires multiple milestones in a single scroll if jumped past', () => {
+        setup({ scroll: true });
+
+        // Jump straight to 80% → should fire 25, 50, 75
+        (window as Record<string, unknown>).scrollY = 1200;
+        window.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 50 });
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 75 });
+        expect(enqueue).toHaveBeenCalledTimes(3);
+      });
+
+      it('does not re-fire milestones already reached', () => {
+        setup({ scroll: true });
+
+        // Scroll to 60%
+        (window as Record<string, unknown>).scrollY = 900;
+        window.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        const countAfterFirst = enqueue.mock.calls.length;
+
+        // Scroll back up to 30%, then to 60% again
+        (window as Record<string, unknown>).scrollY = 450;
+        window.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        (window as Record<string, unknown>).scrollY = 900;
+        window.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        // No new milestones should have fired
+        expect(enqueue).toHaveBeenCalledTimes(countAfterFirst);
+      });
+
+      it('fires 90 and 100 milestones', () => {
+        setup({ scroll: true });
+
+        // Scroll to 100%
+        (window as Record<string, unknown>).scrollY = 1500;
+        window.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 50 });
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 75 });
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 90 });
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 100 });
+        expect(enqueue).toHaveBeenCalledTimes(5);
+      });
+
+      it('does not include above_fold property on scrollable pages', () => {
+        setup({ scroll: true });
+
+        (window as Record<string, unknown>).scrollY = 375;
+        window.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        expect(enqueue.mock.calls[0][1]).toEqual({ depth: 25 });
+        expect(enqueue.mock.calls[0][1]).not.toHaveProperty('above_fold');
+      });
+
+      it('does not fire at consent none', () => {
+        consent = 'none';
+        setup({ scroll: true });
+
+        (window as Record<string, unknown>).scrollY = 1500;
+        window.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        expect(enqueue).not.toHaveBeenCalled();
+      });
+
+      it('throttles via requestAnimationFrame', () => {
+        setup({ scroll: true });
+
+        // Fire multiple scroll events without flushing rAF
+        (window as Record<string, unknown>).scrollY = 375;
+        window.dispatchEvent(new Event('scroll'));
+        window.dispatchEvent(new Event('scroll'));
+        window.dispatchEvent(new Event('scroll'));
+
+        // Only one rAF should have been scheduled
+        expect(window.requestAnimationFrame).toHaveBeenCalledTimes(1);
+
+        flushRAF();
+
+        expect(enqueue).toHaveBeenCalledTimes(1);
+      });
+
+      it('checks initial scroll position on setup', () => {
+        // Page already scrolled to 30% before setup
+        (window as Record<string, unknown>).scrollY = 450;
+        setup({ scroll: true });
+
+        // Should fire 25% immediately (no scroll event needed)
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
+      });
+    });
+
+    describe('above-the-fold pages', () => {
+      beforeEach(() => {
+        // 400px content in a 600px viewport → no scroll
+        setScrollGeometry(400, 600, 0);
+        jest.useFakeTimers();
+      });
+
+      afterEach(() => {
+        jest.useRealTimers();
+      });
+
+      it('fires scroll_depth 100 with above_fold after dwell time', () => {
+        setup({ scroll: true });
+
+        // Should NOT fire immediately
+        expect(enqueue).not.toHaveBeenCalled();
+
+        // Advance past dwell time
+        jest.advanceTimersByTime(2000);
+
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', {
+          depth: 100,
+          above_fold: true,
+        });
+        expect(enqueue).toHaveBeenCalledTimes(1);
+      });
+
+      it('does not fire before dwell time elapses', () => {
+        setup({ scroll: true });
+
+        jest.advanceTimersByTime(1999);
+        expect(enqueue).not.toHaveBeenCalled();
+      });
+
+      it('does not fire if consent is none when dwell timer triggers', () => {
+        setup({ scroll: true });
+
+        consent = 'none';
+        jest.advanceTimersByTime(2000);
+
+        expect(enqueue).not.toHaveBeenCalled();
+      });
+
+      it('cancels dwell timer on teardown', () => {
+        setup({ scroll: true });
+
+        teardown();
+        jest.advanceTimersByTime(2000);
+
+        expect(enqueue).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('configuration', () => {
+      beforeEach(() => {
+        setScrollGeometry(2000, 500, 0);
+      });
+
+      it('does not track scroll when scroll option is false', () => {
+        setup({ scroll: false });
+
+        (window as Record<string, unknown>).scrollY = 1500;
+        window.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        expect(enqueue).not.toHaveBeenCalled();
+      });
+
+      it('enables scroll tracking by default', () => {
+        // Call setupAutocapture directly to verify production defaults
+        teardown = setupAutocapture({}, enqueue, () => consent);
+
+        (window as Record<string, unknown>).scrollY = 375;
+        window.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
+      });
+    });
+
+    describe('teardown', () => {
+      beforeEach(() => {
+        setScrollGeometry(2000, 500, 0);
+      });
+
+      it('removes scroll listener on teardown', () => {
+        setup({ scroll: true });
+        teardown();
+
+        (window as Record<string, unknown>).scrollY = 1500;
+        window.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        expect(enqueue).not.toHaveBeenCalled();
+      });
     });
   });
 
