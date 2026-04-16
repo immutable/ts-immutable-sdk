@@ -97,7 +97,7 @@ w[i]=w[i]||[];
 w[i].push(["init",{
   "key":"YOUR_KEY",
   "consent":"anonymous",
-  "autocapture":{"forms":false,"clicks":true,"scroll":true}
+  "autocapture":{"forms":false}
 }]);
 var s=document.createElement("script");s.async=1;
 s.src="https://cdn.immutable.com/pixel/v1/imtbl.js";
