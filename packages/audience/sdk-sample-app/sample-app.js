@@ -346,7 +346,7 @@
     'btn-page', 'btn-flush', 'btn-reset', 'btn-shutdown',
     'btn-consent-none', 'btn-consent-anon', 'btn-consent-full',
     'btn-custom-event',
-    'btn-identify', 'btn-identify-traits',
+    'btn-identify',
   ];
 
   function setInitState(on) {
@@ -559,7 +559,6 @@
     $('btn-consent-anon').addEventListener('click', function () { onSetConsent('anonymous'); });
     $('btn-consent-full').addEventListener('click', function () { onSetConsent('full'); });
     $('btn-identify').addEventListener('click', onIdentify);
-    $('btn-identify-traits').addEventListener('click', onIdentifyTraits);
     $('btn-alias').addEventListener('click', onAlias);
     ['alias-from-id', 'alias-to-id', 'alias-from-type', 'alias-to-type'].forEach(function (id) {
       $(id).addEventListener('input', syncAliasButton);
@@ -819,27 +818,6 @@
       updateStatus();
     } catch (err) {
       log('identify()', errMsg(err), 'err');
-    }
-  }
-
-  function onIdentifyTraits() {
-    if (!audience) return;
-    if (!requiresFullConsent('identify()')) return;
-    var traits;
-    try { traits = parseTraits($('traits-json').value); }
-    catch (err) { log('identify()', 'invalid JSON: ' + err.message, 'err'); return; }
-    if (!traits) {
-      log('identify()', 'traits required', 'err');
-      return;
-    }
-    try {
-      audience.identify(traits);
-      enqueued();
-      identityMirror.traits = traits;
-      renderIdentityState();
-      log('identify(traits)', traits, 'ok');
-    } catch (err) {
-      log('identify(traits)', errMsg(err), 'err');
     }
   }
 

@@ -45,7 +45,7 @@ For dev-environment access, leave the key as a test key and set
 SDK auto-derives sandbox vs prod from the key prefix; dev is not a
 first-class environment and must be reached via explicit override.
 
-## Ten-step walkthrough
+## Nine-step walkthrough
 
 1. Paste a test key into **Setup**, leave Initial Consent at `none`, click **Init**.
 2. Open the **Consent** panel, click **anonymous**. Status bar updates.
@@ -53,10 +53,9 @@ first-class environment and must be reached via explicit override.
 4. Expand **Typed Events → purchase** (6th row in the accordion), fill in `currency=USD`, `value=9.99`, click **Send**. Watch the live TS snippet mirror the form as you type.
 5. Set Consent to **full**.
 6. In **Identity → Named identify**, enter `user@example.com`, type `email`, traits `{"name":"Jane"}`, click.
-7. In **Identity → Traits-only identify**, enter `{"plan":"pro"}`, click.
-8. In **Identity → Alias**, connect a Steam ID to the email above.
-9. Set Consent back to **none**. Notice the queue purge in the event log.
-10. In **Lifecycle → Simulate error**, pick `NETWORK_ERROR` from the dropdown and click **Fire onError**. The `onError` entry lands in the event log with the documented shape.
+7. In **Identity → Alias**, connect a Steam ID to the email above.
+8. Set Consent back to **none**. Notice the queue purge in the event log.
+9. In **Lifecycle → Simulate error**, pick `NETWORK_ERROR` from the dropdown and click **Fire onError**. The `onError` entry lands in the event log with the documented shape.
 
 ## `AudienceEvents` catalogue
 

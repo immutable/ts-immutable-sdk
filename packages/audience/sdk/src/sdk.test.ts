@@ -628,53 +628,6 @@ describe('Audience', () => {
       expect(ids).toHaveLength(0);
       sdk.shutdown();
     });
-
-    it('ignores null passed as traits', async () => {
-      const sdk = createSDK({ consent: 'full' });
-
-      sdk.identify(null as any);
-      await sdk.flush();
-
-      const ids = sentMessages().filter((m: any) => m.type === 'identify');
-      // null is not a valid traits object — should not enqueue
-      expect(ids).toHaveLength(0);
-
-      sdk.shutdown();
-    });
-
-    it('ignores array passed as traits', async () => {
-      const sdk = createSDK({ consent: 'full' });
-
-      sdk.identify(['not', 'traits'] as any);
-      await sdk.flush();
-
-      const ids = sentMessages().filter((m: any) => m.type === 'identify');
-      expect(ids).toHaveLength(0);
-
-      sdk.shutdown();
-    });
-
-    it('sends anonymous identify with traits only', async () => {
-      const sdk = createSDK({ consent: 'full' });
-
-      sdk.identify({
-        source: 'steam',
-        steamId: TEST_STEAM.id,
-      });
-      await sdk.flush();
-
-      const msg = sentMessages().find(
-        (m: any) => m.type === 'identify',
-      );
-      expect(msg).toBeDefined();
-      expect(msg.userId).toBeUndefined();
-      expect(msg.traits).toEqual({
-        source: 'steam',
-        steamId: TEST_STEAM.id,
-      });
-
-      sdk.shutdown();
-    });
   });
 
   describe('alias', () => {
