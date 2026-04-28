@@ -285,43 +285,23 @@ export class Audience {
    * an account. Before identify(), the SDK only knows an anonymous cookie ID.
    * After, all future events are tied to this player.
    *
-   * Named: `sdk.identify('user@example.com', 'email', { name: 'Jane' })`
-   * Traits only: `sdk.identify({ source: 'steam', steamId: '765...' })`
+   * `sdk.identify('user@example.com', 'email', { name: 'Jane' })`
    *
    * Requires 'full' consent.
    */
-  identify(id: string, identityType: IdentityType, traits?: UserTraits): void;
-
-  identify(traits: UserTraits): void;
-
-  identify(
-    idOrTraits: string | UserTraits,
-    identityType?: IdentityType,
-    traits?: UserTraits,
-  ): void {
+  identify(id: string, identityType: IdentityType, traits?: UserTraits): void {
     if (!canIdentify(this.consent.level)) {
       this.debug.logWarning('identify() requires full consent — call ignored.');
       return;
     }
     getOrCreateSession(this.cookieDomain);
 
-    if (idOrTraits !== null && typeof idOrTraits === 'object' && !Array.isArray(idOrTraits)) {
-      this.enqueue('identify', {
-        ...this.baseMessage(),
-        type: 'identify',
-        traits: idOrTraits,
-      });
-      return;
-    }
-
-    if (typeof idOrTraits !== 'string') return;
-
-    const id = truncate(idOrTraits);
-    this.userId = id;
+    const resolvedId = truncate(id);
+    this.userId = resolvedId;
     this.enqueue('identify', {
       ...this.baseMessage(),
       type: 'identify',
-      userId: id,
+      userId: resolvedId,
       identityType,
       traits,
     });
