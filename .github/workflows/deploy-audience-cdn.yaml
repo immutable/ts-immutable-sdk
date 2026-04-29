@@ -33,7 +33,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build audience SDK bundle
-        run: pnpm --filter @imtbl/audience build
+        run: pnpm --filter @imtbl/audience... build
 
       - name: Verify bundle exists
         run: |
