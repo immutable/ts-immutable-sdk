@@ -32,6 +32,9 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
+      - name: Build metrics
+        run: pnpm --filter @imtbl/metrics build
+
       - name: Build audience-core
         run: pnpm --filter @imtbl/audience-core build
 
