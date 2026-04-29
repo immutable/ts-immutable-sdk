@@ -32,6 +32,9 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
+      - name: Build audience-core
+        run: pnpm --filter @imtbl/audience-core build
+
       - name: Build audience SDK bundle
         run: pnpm --filter @imtbl/audience build
 
