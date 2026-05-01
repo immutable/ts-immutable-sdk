@@ -60,14 +60,9 @@ function getFieldNames(form: HTMLFormElement): string[] {
 const SCROLL_MILESTONES = [25, 50, 75, 90, 100];
 
 /**
- * Setup scroll depth milestone tracking.
- *
- * Listens for scroll events on `window` and fires `scroll_depth` once per
- * milestone (25 / 50 / 75 / 90 / 100). On pages where the document does not
- * scroll — short pages, but also SPAs and pages with internal scroll
- * containers — no milestones fire. This matches PostHog / Segment / GTM
- * behaviour and avoids the false positives we previously emitted via the
- * `aboveFold` synthetic event (see SDK-275).
+ * Fires `scroll_depth` once per milestone (25/50/75/90/100) as the user
+ * scrolls. No milestone fires on pages where the document doesn't scroll —
+ * short pages and SPAs with internal scroll containers behave the same way.
  *
  * Consent is checked at fire time, not at attach time.
  */

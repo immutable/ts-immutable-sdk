@@ -680,17 +680,6 @@ describe('autocapture', () => {
         expect(enqueue).toHaveBeenCalledTimes(5);
       });
 
-      it('does not include aboveFold property on scrollable pages', () => {
-        setup({ scroll: true });
-
-        (window as Record<string, unknown>).scrollY = 375;
-        window.dispatchEvent(new Event('scroll'));
-        flushRAF();
-
-        expect(enqueue.mock.calls[0][1]).toEqual({ depth: 25 });
-        expect(enqueue.mock.calls[0][1]).not.toHaveProperty('aboveFold');
-      });
-
       it('does not fire at consent none', () => {
         consent = 'none';
         setup({ scroll: true });
