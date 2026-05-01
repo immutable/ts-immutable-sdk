@@ -32,6 +32,17 @@ afterAll(() => {
   });
 });
 
+// jsdom doesn't implement ResizeObserver — provide a minimal no-op stub so any
+// test that calls setupAutocapture without a specialised mock still works.
+// The scroll depth describe block overrides this with a controllable mock.
+(global as Record<string, unknown>).ResizeObserver = class {
+  // eslint-disable-next-line class-methods-use-this
+  observe() { /* no-op */ }
+
+  // eslint-disable-next-line class-methods-use-this
+  disconnect() { /* no-op */ }
+};
+
 describe('autocapture', () => {
   let enqueue: jest.Mock;
   let consent: ConsentLevel;
@@ -551,11 +562,19 @@ describe('autocapture', () => {
     let rafCallbacks: Array<() => void>;
     let originalRAF: typeof requestAnimationFrame;
     let originalCAF: typeof cancelAnimationFrame;
+    let resizeCallback: (() => void) | null;
+    let originalResizeObserver: typeof ResizeObserver;
+
+    function fireResizeObserver() {
+      resizeCallback?.();
+    }
 
     beforeEach(() => {
       rafCallbacks = [];
       originalRAF = window.requestAnimationFrame;
       originalCAF = window.cancelAnimationFrame;
+      resizeCallback = null;
+      originalResizeObserver = (global as Record<string, unknown>).ResizeObserver as typeof ResizeObserver;
 
       // Mock rAF: collect callbacks, flush manually
       let nextId = 1;
@@ -565,11 +584,26 @@ describe('autocapture', () => {
         return id;
       });
       window.cancelAnimationFrame = jest.fn();
+
+      // Mock ResizeObserver. Real RO delivers entries on a microtask/rAF; this
+      // mock fires synchronously inside observe() and via fireResizeObserver()
+      // for subsequent triggers. Outcome is equivalent for all current cases,
+      // but tests won't catch ordering bugs that depend on the async boundary.
+      (global as Record<string, unknown>).ResizeObserver = class MockResizeObserver {
+        constructor(cb: () => void) { resizeCallback = cb; }
+
+        // eslint-disable-next-line class-methods-use-this
+        observe() { resizeCallback?.(); }
+
+        // eslint-disable-next-line class-methods-use-this
+        disconnect() { /* no-op */ }
+      };
     });
 
     afterEach(() => {
       window.requestAnimationFrame = originalRAF;
       window.cancelAnimationFrame = originalCAF;
+      (global as Record<string, unknown>).ResizeObserver = originalResizeObserver;
     });
 
     function flushRAF() {
@@ -779,6 +813,37 @@ describe('autocapture', () => {
         jest.advanceTimersByTime(2000);
 
         expect(enqueue).not.toHaveBeenCalled();
+      });
+
+      it('cancels dwell timer when page grows beyond viewport', () => {
+        setup({ scroll: true });
+
+        // Sanity check: the dwell timer was actually scheduled (otherwise the
+        // assertion below passes vacuously). Advance partway, no fire yet.
+        jest.advanceTimersByTime(1000);
+        expect(enqueue).not.toHaveBeenCalled();
+
+        // Simulate content loading and page growing.
+        setScrollGeometry(2000, 600, 0);
+        fireResizeObserver();
+
+        // Advance well past dwell time — no above-fold event should fire.
+        jest.advanceTimersByTime(5000);
+        expect(enqueue).not.toHaveBeenCalled();
+      });
+
+      it('does not throw or attach observer when ResizeObserver is unavailable', () => {
+        const original = (global as Record<string, unknown>).ResizeObserver;
+        delete (global as Record<string, unknown>).ResizeObserver;
+
+        try {
+          expect(() => setup({ scroll: true })).not.toThrow();
+          // No above-fold event ever fires (no observer to start the timer).
+          jest.advanceTimersByTime(2000);
+          expect(enqueue).not.toHaveBeenCalled();
+        } finally {
+          (global as Record<string, unknown>).ResizeObserver = original;
+        }
       });
     });
 

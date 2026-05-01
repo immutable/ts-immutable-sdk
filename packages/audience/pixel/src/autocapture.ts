@@ -89,6 +89,7 @@ function setupScrollTracking(
   const fired = new Set<number>();
   let rafId = 0;
   let dwellTimer: ReturnType<typeof setTimeout> | null = null;
+  let ro: ResizeObserver | null = null;
 
   const checkAndFire = (): void => {
     if (!canTrack(getConsent())) return;
@@ -103,27 +104,56 @@ function setupScrollTracking(
     }
   };
 
-  const isAboveFold = document.documentElement.scrollHeight <= window.innerHeight;
-
-  if (isAboveFold) {
-    // All content visible — fire a single depth: 100 after dwell time.
-    // We deliberately skip intermediate milestones: the user didn't scroll
-    // to 25/50/75, the content was simply short enough to fit.
-    dwellTimer = setTimeout(() => {
-      dwellTimer = null;
-      if (!canTrack(getConsent())) return;
-      if (!fired.has(100)) {
-        fired.add(100);
-        enqueue('scroll_depth', { depth: 100, aboveFold: true });
+  // ResizeObserver manages the above-fold dwell timer reactively, so the
+  // "is this page above-fold?" decision is never locked in at init time.
+  // It fires on initial observe() and again whenever the document height
+  // changes (images load, JS renders content, fonts swap, etc.).
+  // Feature-detected: ~3% of supported browsers lack ResizeObserver. On those
+  // we skip the synthetic above-fold event entirely rather than throwing and
+  // breaking the rest of autocapture (forms, clicks).
+  if (typeof ResizeObserver !== 'undefined') {
+    ro = new ResizeObserver(() => {
+      const nowAboveFold = document.documentElement.scrollHeight <= window.innerHeight;
+      if (nowAboveFold) {
+        if (dwellTimer === null && !fired.has(100)) {
+          // All content fits in the viewport — start the dwell timer.
+          // We deliberately skip intermediate milestones: the user didn't scroll
+          // to 25/50/75, the content was simply short enough to fit.
+          dwellTimer = setTimeout(() => {
+            dwellTimer = null;
+            if (!canTrack(getConsent())) return;
+            if (fired.has(100)) return;
+            // Defense-in-depth: real ResizeObserver delivery is batched to a
+            // microtask, so a height change racing with the timer firing is
+            // theoretically possible. Re-check before emitting.
+            if (document.documentElement.scrollHeight > window.innerHeight) return;
+            fired.add(100);
+            enqueue('scroll_depth', { depth: 100, aboveFold: true });
+            // After the synthetic event fires we deliberately leave the scroll
+            // listener attached. If the page later grows and the user scrolls,
+            // intermediate milestones (25/50/75/90) may also fire — we treat
+            // that as legitimate engagement signal rather than suppressing it.
+            ro?.disconnect();
+            ro = null;
+          }, ABOVE_FOLD_DWELL_MS);
+        }
+      } else if (dwellTimer !== null) {
+        // Page grew beyond the viewport — cancel the above-fold path and let
+        // the scroll listener fire milestones naturally as the user scrolls.
+        clearTimeout(dwellTimer);
+        dwellTimer = null;
       }
-    }, ABOVE_FOLD_DWELL_MS);
-  } else {
-    // Check initial scroll position (e.g. anchor links, restored scroll).
+    });
+
+    ro.observe(document.documentElement);
+  }
+
+  // For scrollable pages: check if the user already scrolled past a milestone
+  // before our listener attached (e.g. anchor links, restored scroll position).
+  if (document.documentElement.scrollHeight > window.innerHeight) {
     checkAndFire();
   }
 
-  // Scroll listener (handles both scrollable pages and pages that become
-  // scrollable after dynamic content loads).
   const onScroll = (): void => {
     if (rafId) return; // Already scheduled
     rafId = requestAnimationFrame(() => {
@@ -138,6 +168,10 @@ function setupScrollTracking(
     window.removeEventListener('scroll', onScroll);
     if (rafId) cancelAnimationFrame(rafId);
     if (dwellTimer !== null) clearTimeout(dwellTimer);
+    if (ro) {
+      ro.disconnect();
+      ro = null;
+    }
   };
 }
 
