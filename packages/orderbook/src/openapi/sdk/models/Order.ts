@@ -56,6 +56,10 @@ export type Order = {
    * Trait criteria for trait bids when returned by the API
    */
   trait_criteria?: Array<TraitFilter>;
+  /**
+   * Metadata ID (stack ID) for metadata bids when returned by the API
+   */
+  metadata_id?: string;
 };
 
 export namespace Order {
@@ -68,6 +72,7 @@ export namespace Order {
     BID = 'BID',
     COLLECTION_BID = 'COLLECTION_BID',
     TRAIT_BID = 'TRAIT_BID',
+    METADATA_BID = 'METADATA_BID',
   }
 
 

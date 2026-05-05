@@ -125,6 +125,7 @@ export function mapImmutableOrderToSeaportOrderComponents(
       case Order.type.BID:
       case Order.type.COLLECTION_BID:
       case Order.type.TRAIT_BID:
+      case Order.type.METADATA_BID:
         return offerItems[0];
       default:
         return exhaustiveSwitch(ot);

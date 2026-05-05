@@ -45,7 +45,7 @@ export interface ERC1155CollectionItem {
 
 /* Orders */
 
-export type Order = Listing | Bid | CollectionBid | TraitBid;
+export type Order = Listing | Bid | CollectionBid | TraitBid | MetadataBid;
 
 export interface Listing extends OrderFields {
   type: 'LISTING';
@@ -81,6 +81,16 @@ export interface TraitBid extends OrderFields {
    * Trait criteria for this bid. Empty if the API response omits criteria.
    */
   traitCriteria: TraitFilter[];
+}
+
+export interface MetadataBid extends OrderFields {
+  type: 'METADATA_BID';
+  sell: ERC20Item[];
+  buy: (ERC721CollectionItem | ERC1155CollectionItem)[];
+  /**
+   * The metadata ID (stack ID) that NFTs must match to fulfil this bid.
+   */
+  metadataId: string;
 }
 
 interface OrderFields {
@@ -369,6 +379,30 @@ export type PrepareTraitBidResponse = PrepareOrderResponse;
 
 export interface CreateTraitBidParams extends CreateCollectionBidParams {
   traitCriteria: TraitFilter[];
+}
+
+/* Metadata bid ops */
+
+export type ListMetadataBidsParams = Omit<
+Parameters<typeof OrdersService.prototype.listMetadataBids>[0],
+'chainName'
+>;
+
+export interface MetadataBidResult {
+  result: MetadataBid;
+}
+
+export interface ListMetadataBidsResult {
+  page: Page;
+  result: MetadataBid[];
+}
+
+export type PrepareMetadataBidParams = PrepareCollectionBidParams;
+
+export type PrepareMetadataBidResponse = PrepareOrderResponse;
+
+export interface CreateMetadataBidParams extends CreateCollectionBidParams {
+  metadataId: string;
 }
 
 /* Fulfilment Ops */
