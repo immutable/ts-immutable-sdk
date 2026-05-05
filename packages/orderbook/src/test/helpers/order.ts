@@ -1,5 +1,5 @@
 import { Orderbook } from '../../orderbook';
-import { Order, OrderStatusName } from '../../types';
+import { MetadataBid, Order, OrderStatusName } from '../../types';
 
 export async function waitForOrderToBeOfStatus(
   sdk: Orderbook,
@@ -19,4 +19,24 @@ export async function waitForOrderToBeOfStatus(
   // eslint-disable-next-line
   await new Promise((resolve) => setTimeout(resolve, 1000));
   return waitForOrderToBeOfStatus(sdk, orderId, status, attemps + 1);
+}
+
+export async function waitForMetadataBidToBeOfStatus(
+  sdk: Orderbook,
+  metadataBidId: string,
+  status: OrderStatusName,
+  attempts = 0,
+): Promise<MetadataBid> {
+  if (attempts > 50) {
+    throw new Error(`Metadata bid ${metadataBidId} never reached status ${status}`);
+  }
+
+  const { result: bid } = await sdk.getMetadataBid(metadataBidId);
+  if (bid.status.name === status) {
+    return bid;
+  }
+
+  // eslint-disable-next-line
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return waitForMetadataBidToBeOfStatus(sdk, metadataBidId, status, attempts + 1);
 }
