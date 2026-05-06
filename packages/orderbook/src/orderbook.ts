@@ -10,6 +10,7 @@ import {
 import {
   mapBidFromOpenApiOrder,
   mapCollectionBidFromOpenApiOrder,
+  mapMetadataBidFromOpenApiOrder,
   mapTraitBidFromOpenApiOrder,
   mapFromOpenApiPage,
   mapFromOpenApiTrade,
@@ -30,6 +31,7 @@ import {
   CollectionBidResult,
   CreateBidParams,
   CreateCollectionBidParams,
+  CreateMetadataBidParams,
   CreateTraitBidParams,
   CreateListingParams,
   FeeValue,
@@ -41,6 +43,8 @@ import {
   ListBidsResult,
   ListCollectionBidsParams,
   ListCollectionBidsResult,
+  ListMetadataBidsParams,
+  ListMetadataBidsResult,
   ListTraitBidsParams,
   ListTraitBidsResult,
   ListingResult,
@@ -56,8 +60,11 @@ import {
   PrepareCancelOrdersResponse,
   PrepareCollectionBidParams,
   PrepareCollectionBidResponse,
+  PrepareMetadataBidParams,
+  PrepareMetadataBidResponse,
   PrepareTraitBidParams,
   PrepareTraitBidResponse,
+  MetadataBidResult,
   TraitBidResult,
   PrepareListingParams,
   PrepareListingResponse,
@@ -190,6 +197,18 @@ export class Orderbook {
   }
 
   /**
+   * Get a metadata bid by ID
+   * @param {string} metadataBidId - The metadata bid id to find.
+   * @return {MetadataBidResult} The returned metadata bid result.
+   */
+  async getMetadataBid(metadataBidId: string): Promise<MetadataBidResult> {
+    const apiMetadataBid = await this.apiClient.getMetadataBid(metadataBidId);
+    return {
+      result: mapMetadataBidFromOpenApiOrder(apiMetadataBid.result),
+    };
+  }
+
+  /**
    * Get a trade by ID
    * @param {string} tradeId - The tradeId to find.
    * @return {TradeResult} The returned trade result.
@@ -262,6 +281,22 @@ export class Orderbook {
     return {
       page: mapFromOpenApiPage(apiTraitBids.page),
       result: apiTraitBids.result.map(mapTraitBidFromOpenApiOrder),
+    };
+  }
+
+  /**
+   * List metadata bids. This method is used to get a list of metadata bids filtered
+   * by conditions specified in the params object.
+   * @param {ListMetadataBidsParams} listOrderParams - Filtering, ordering and page parameters.
+   * @return {ListMetadataBidsResult} The paged metadata bids.
+   */
+  async listMetadataBids(
+    listOrderParams: ListMetadataBidsParams,
+  ): Promise<ListMetadataBidsResult> {
+    const apiMetadataBids = await this.apiClient.listMetadataBids(listOrderParams);
+    return {
+      page: mapFromOpenApiPage(apiMetadataBids.page),
+      result: apiMetadataBids.result.map(mapMetadataBidFromOpenApiOrder),
     };
   }
 
@@ -644,6 +679,48 @@ export class Orderbook {
   }
 
   /**
+   * Get required transactions and messages for signing prior to creating a metadata bid
+   * through the {@linkcode createMetadataBid} method. Uses the same Seaport criteria-based
+   * order shape as collection bids.
+   * @param {PrepareMetadataBidParams} params - Details about the metadata bid to be created.
+   * @return {PrepareMetadataBidResponse} Unsigned approval (if any), typed order message, and
+   * order components for {@linkcode createMetadataBid}.
+   */
+  async prepareMetadataBid({
+    makerAddress,
+    sell,
+    buy,
+    orderStart,
+    orderExpiry,
+  }: PrepareMetadataBidParams): Promise<PrepareMetadataBidResponse> {
+    return this.seaport.prepareSeaportOrder(
+      makerAddress,
+      sell,
+      buy,
+      true,
+      orderStart || new Date(),
+      orderExpiry || Orderbook.defaultOrderExpiry(),
+    );
+  }
+
+  /**
+   * Create a metadata bid (collection criteria offer plus metadata ID submitted to the API).
+   * @param {CreateMetadataBidParams} createMetadataBidParams - Signed order and metadata ID.
+   * @return {MetadataBidResult} The created metadata bid.
+   */
+  async createMetadataBid(
+    createMetadataBidParams: CreateMetadataBidParams,
+  ): Promise<MetadataBidResult> {
+    const apiMetadataBidResponse = await this.apiClient.createMetadataBid(
+      createMetadataBidParams,
+    );
+
+    return {
+      result: mapMetadataBidFromOpenApiOrder(apiMetadataBidResponse.result),
+    };
+  }
+
+  /**
    * Get unsigned transactions that can be submitted to fulfil an open order. If the approval
    * transaction exists it must be signed and submitted to the chain before the fulfilment
    * transaction can be submitted or it will be reverted.
@@ -934,12 +1011,22 @@ export class Orderbook {
       })),
     );
 
+    const metadataBidResultsPromises = Promise.all(
+      orderIds.map((id) => this.apiClient.getMetadataBid(id).catch((e: ApiError) => {
+        if (e.status === 404) {
+          return undefined;
+        }
+        throw e;
+      })),
+    );
+
     const orders = [
       await Promise.all([
         listingResultsPromises,
         bidResultsPromises,
         collectionBidResultsPromises,
         traitBidResultsPromises,
+        metadataBidResultsPromises,
       ]),
     ].flat(2).filter((r) => r !== undefined).map((f) => f.result);
 

@@ -9,12 +9,14 @@ import type { CollectionBidResult } from '../models/CollectionBidResult';
 import type { CreateBidRequestBody } from '../models/CreateBidRequestBody';
 import type { CreateCollectionBidRequestBody } from '../models/CreateCollectionBidRequestBody';
 import type { CreateTraitBidRequestBody } from '../models/CreateTraitBidRequestBody';
+import type { CreateMetadataBidRequestBody } from '../models/CreateMetadataBidRequestBody';
 import type { CreateListingRequestBody } from '../models/CreateListingRequestBody';
 import type { FulfillableOrder } from '../models/FulfillableOrder';
 import type { FulfillmentDataRequest } from '../models/FulfillmentDataRequest';
 import type { ListBidsResult } from '../models/ListBidsResult';
 import type { ListCollectionBidsResult } from '../models/ListCollectionBidsResult';
 import type { ListTraitBidsResult } from '../models/ListTraitBidsResult';
+import type { ListMetadataBidsResult } from '../models/ListMetadataBidsResult';
 import type { ListingResult } from '../models/ListingResult';
 import type { ListListingsResult } from '../models/ListListingsResult';
 import type { ListTradeResult } from '../models/ListTradeResult';
@@ -23,6 +25,7 @@ import type { PageCursor } from '../models/PageCursor';
 import type { PageSize } from '../models/PageSize';
 import type { TradeResult } from '../models/TradeResult';
 import type { TraitBidResult } from '../models/TraitBidResult';
+import type { MetadataBidResult } from '../models/MetadataBidResult';
 import type { UnfulfillableOrder } from '../models/UnfulfillableOrder';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -533,6 +536,154 @@ export class OrdersService {
         404: `The specified resource was not found (404)`,
         500: `Internal Server Error (500)`,
         501: `Not Implemented Error (501)`,
+      },
+    });
+  }
+
+  /**
+   * List all metadata bids
+   * List all metadata bids
+   * @returns ListMetadataBidsResult OK response.
+   * @throws ApiError
+   */
+  public listMetadataBids({
+    chainName,
+    status,
+    buyItemContractAddress,
+    sellItemContractAddress,
+    accountAddress,
+    metadataId,
+    fromUpdatedAt,
+    pageSize,
+    sortBy,
+    sortDirection,
+    pageCursor,
+  }: {
+    chainName: ChainName,
+    /**
+     * Order status to filter by
+     */
+    status?: OrderStatusName,
+    /**
+     * Buy item contract address to filter by
+     */
+    buyItemContractAddress?: string,
+    /**
+     * Sell item contract address to filter by
+     */
+    sellItemContractAddress?: string,
+    /**
+     * The account address of the user who created the bid
+     */
+    accountAddress?: string,
+    /**
+     * The metadata_id to filter by
+     */
+    metadataId?: string,
+    /**
+     * From updated at including given date
+     */
+    fromUpdatedAt?: string,
+    /**
+     * Maximum number of orders to return per page
+     */
+    pageSize?: PageSize,
+    /**
+     * Order field to sort by. `sell_item_amount` sorts by per token price, for example if 10eth is offered for 5 ERC1155 items, it's sorted as 2eth for `sell_item_amount`.
+     */
+    sortBy?: 'created_at' | 'updated_at' | 'sell_item_amount',
+    /**
+     * Ascending or descending direction for sort
+     */
+    sortDirection?: 'asc' | 'desc',
+    /**
+     * Page cursor to retrieve previous or next page. Use the value returned in the response.
+     */
+    pageCursor?: PageCursor,
+  }): CancelablePromise<ListMetadataBidsResult> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/v1/chains/{chain_name}/orders/metadata-bids',
+      path: {
+        'chain_name': chainName,
+      },
+      query: {
+        'status': status,
+        'buy_item_contract_address': buyItemContractAddress,
+        'sell_item_contract_address': sellItemContractAddress,
+        'account_address': accountAddress,
+        'metadata_id': metadataId,
+        'from_updated_at': fromUpdatedAt,
+        'page_size': pageSize,
+        'sort_by': sortBy,
+        'sort_direction': sortDirection,
+        'page_cursor': pageCursor,
+      },
+      errors: {
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
+      },
+    });
+  }
+
+  /**
+   * Create a metadata bid
+   * Create a metadata bid
+   * @returns MetadataBidResult Created response.
+   * @throws ApiError
+   */
+  public createMetadataBid({
+    chainName,
+    requestBody,
+  }: {
+    chainName: ChainName,
+    requestBody: CreateMetadataBidRequestBody,
+  }): CancelablePromise<MetadataBidResult> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/v1/chains/{chain_name}/orders/metadata-bids',
+      path: {
+        'chain_name': chainName,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
+        501: `Not Implemented Error (501)`,
+      },
+    });
+  }
+
+  /**
+   * Get a single metadata bid by ID
+   * Get a single metadata bid by ID
+   * @returns MetadataBidResult OK response.
+   * @throws ApiError
+   */
+  public getMetadataBid({
+    chainName,
+    metadataBidId,
+  }: {
+    chainName: ChainName,
+    /**
+     * Global Metadata Bid identifier
+     */
+    metadataBidId: string,
+  }): CancelablePromise<MetadataBidResult> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/v1/chains/{chain_name}/orders/metadata-bids/{metadata_bid_id}',
+      path: {
+        'chain_name': chainName,
+        'metadata_bid_id': metadataBidId,
+      },
+      errors: {
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
       },
     });
   }

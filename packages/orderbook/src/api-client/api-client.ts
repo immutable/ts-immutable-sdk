@@ -7,8 +7,10 @@ import {
   ListCollectionBidsResult,
   ListingResult,
   ListListingsResult,
+  ListMetadataBidsResult,
   ListTradeResult,
   ListTraitBidsResult,
+  MetadataBidResult,
   OrdersService,
   TradeResult,
   TraitBidResult,
@@ -27,10 +29,12 @@ import {
   CreateBidParams,
   CreateCollectionBidParams,
   CreateListingParams,
+  CreateMetadataBidParams,
   CreateTraitBidParams,
   ListBidsParams,
   ListCollectionBidsParams,
   ListListingsParams,
+  ListMetadataBidsParams,
   ListTraitBidsParams,
   ListTradesParams,
 } from '../types';
@@ -122,6 +126,22 @@ export class ImmutableApiClient {
     listOrderParams: ListTraitBidsParams,
   ): Promise<ListTraitBidsResult> {
     return this.orderbookService.listTraitBids({
+      chainName: this.chainName,
+      ...listOrderParams,
+    });
+  }
+
+  async getMetadataBid(metadataBidId: string): Promise<MetadataBidResult> {
+    return this.orderbookService.getMetadataBid({
+      chainName: this.chainName,
+      metadataBidId,
+    });
+  }
+
+  async listMetadataBids(
+    listOrderParams: ListMetadataBidsParams,
+  ): Promise<ListMetadataBidsResult> {
+    return this.orderbookService.listMetadataBids({
       chainName: this.chainName,
       ...listOrderParams,
     });
@@ -311,6 +331,68 @@ export class ImmutableApiClient {
         start_at: new Date(
           parseInt(`${orderComponents.startTime.toString()}000`, 10),
         ).toISOString(),
+      },
+    });
+  }
+
+  async createMetadataBid({
+    orderHash,
+    orderComponents,
+    orderSignature,
+    makerFees,
+    metadataId,
+  }: CreateMetadataBidParams): Promise<MetadataBidResult> {
+    if (orderComponents.offer.length !== 1) {
+      throw new Error('Only one item can be listed for a metadata bid');
+    }
+
+    if (orderComponents.consideration.length !== 1) {
+      throw new Error('Only one item can be used as currency for a metadata bid');
+    }
+
+    if (ItemType.ERC20 !== orderComponents.offer[0].itemType) {
+      throw new Error('Only ERC20 tokens can be used as the currency item in a metadata bid');
+    }
+
+    if (![ItemType.ERC721_WITH_CRITERIA, ItemType.ERC1155_WITH_CRITERIA]
+      .includes(orderComponents.consideration[0].itemType)
+    ) {
+      throw new Error('Only ERC721 / ERC1155 collection based tokens can be bid against');
+    }
+
+    if (!metadataId) {
+      throw new Error('A metadata_id is required for a metadata bid');
+    }
+
+    return this.orderbookService.createMetadataBid({
+      chainName: this.chainName,
+      requestBody: {
+        account_address: orderComponents.offerer,
+        buy: orderComponents.consideration.map(mapSeaportItemToImmutableAssetCollectionItem),
+        fees: makerFees.map((f) => ({
+          type: Fee.type.MAKER_ECOSYSTEM,
+          amount: f.amount,
+          recipient_address: f.recipientAddress,
+        })),
+        end_at: new Date(
+          parseInt(`${orderComponents.endTime.toString()}000`, 10),
+        ).toISOString(),
+        order_hash: orderHash,
+        protocol_data: {
+          order_type:
+            mapSeaportOrderTypeToImmutableProtocolDataOrderType(orderComponents.orderType),
+          zone_address: orderComponents.zone,
+          seaport_address: this.seaportAddress,
+          seaport_version: SEAPORT_CONTRACT_VERSION_V1_5,
+          counter: orderComponents.counter.toString(),
+        },
+        salt: orderComponents.salt,
+        sell: orderComponents.offer.map(mapSeaportItemToImmutableERC20Item),
+        signature: orderSignature,
+        start_at: new Date(
+          parseInt(`${orderComponents.startTime.toString()}000`, 10),
+        ).toISOString(),
+        metadata_id: metadataId,
       },
     });
   }
