@@ -519,6 +519,33 @@ describe('Pixel', () => {
       );
     });
 
+    it('forwards scroll: false to setupAutocapture', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({
+        key: 'pk_imapik-test-local',
+        consent: 'anonymous',
+        autocapture: { scroll: false },
+      });
+
+      expect(mockSetupAutocapture).toHaveBeenCalledWith(
+        expect.objectContaining({ scroll: false }),
+        expect.any(Function),
+        expect.any(Function),
+      );
+    });
+
+    it('calls resetScroll when page() is called', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
+
+      mockResetScrollDepth.mockClear();
+      pixel.page();
+
+      expect(mockResetScrollDepth).toHaveBeenCalledTimes(1);
+    });
+
     it('enqueue callback fires TrackMessage with session', () => {
       mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-xyz', isNew: false });
 
