@@ -117,7 +117,7 @@ function setupScrollTracking(
       if (!el) return;
       const scrollPos = el === document.documentElement
         ? window.scrollY
-        : (el as HTMLElement).scrollTop;
+        : el.scrollTop;
       checkAndFire(el, scrollPos);
     });
   };
@@ -140,10 +140,8 @@ function setupScrollTracking(
 
 /**
  * Attach document-level listeners for form submissions, outbound link clicks,
- * and scroll depth milestones.
- * Returns `{ teardown, resetScroll }` — call `teardown()` to remove all
- * listeners, and `resetScroll()` to clear fired milestones (e.g. on SPA
- * route changes).
+ * and scroll depth milestones. `resetScroll()` clears fired scroll milestones
+ * (call from `Pixel.page()` on SPA route changes).
  *
  * - Single document-level listener per event type (event delegation).
  * - Consent is checked at fire time, not at attach time.
