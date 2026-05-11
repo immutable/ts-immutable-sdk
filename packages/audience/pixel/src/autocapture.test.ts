@@ -928,6 +928,70 @@ describe('autocapture', () => {
         expect(enqueue).toHaveBeenCalledTimes(2);
         expect(enqueue).toHaveBeenLastCalledWith('scroll_depth', { depth: 25 });
       });
+
+      it('cancels pending rAF so stale scroll position cannot fire against new page', () => {
+        const result = setupAutocapture({ scroll: true }, enqueue, () => consent);
+        teardown = result.teardown;
+
+        // User has scrolled to 50% — rAF is scheduled but has not yet fired.
+        (window as Record<string, unknown>).scrollY = 750;
+        document.dispatchEvent(new Event('scroll'));
+        expect(enqueue).not.toHaveBeenCalled(); // rAF not flushed yet
+
+        // SPA navigates: pixel.page() calls resetScroll() before the rAF fires.
+        // The reused container still reports scrollY = 750 momentarily.
+        result.resetScroll();
+
+        // Flushing the (now-cancelled) rAF must not fire any milestone against
+        // the new page view.
+        flushRAF();
+        expect(enqueue).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('concurrent containers', () => {
+      function setContainerGeometry(
+        el: HTMLElement,
+        scrollHeight: number,
+        clientHeight: number,
+        scrollTop: number,
+      ) {
+        Object.defineProperty(el, 'scrollHeight', { value: scrollHeight, configurable: true });
+        Object.defineProperty(el, 'clientHeight', { value: clientHeight, configurable: true });
+        Object.defineProperty(el, 'scrollTop', { value: scrollTop, configurable: true, writable: true });
+      }
+
+      beforeEach(() => {
+        setScrollGeometry(600, 600, 0);
+      });
+
+      it('processes every container that scrolled within a single rAF', () => {
+        setup({ scroll: true });
+
+        const main = document.createElement('div');
+        const sidebar = document.createElement('div');
+        setContainerGeometry(main, 2000, 500, 0);
+        setContainerGeometry(sidebar, 1000, 500, 0);
+        document.body.appendChild(main);
+        document.body.appendChild(sidebar);
+
+        // Two large containers scroll in the same frame (before rAF flush).
+        // main → 30% (450/1500), sidebar → 60% (300/500).
+        // Without per-container queueing, only the second target would be
+        // checked and main's milestone would be lost.
+        (main as Record<string, unknown>).scrollTop = 450;
+        main.dispatchEvent(new Event('scroll'));
+        (sidebar as Record<string, unknown>).scrollTop = 300;
+        sidebar.dispatchEvent(new Event('scroll'));
+
+        flushRAF();
+
+        // Both 25 (from main) and 50 (from sidebar) should fire — global dedup
+        // applies across all containers processed in the frame.
+        expect(enqueue).toHaveBeenCalledTimes(2);
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 50 });
+      });
     });
   });
 

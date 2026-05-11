@@ -77,8 +77,8 @@ function setupScrollTracking(
   getConsent: ConsentFn,
 ): { teardown: () => void; reset: () => void } {
   const fired = new Set<number>();
+  const pending = new Set<Element>();
   let rafId = 0;
-  let pendingEl: Element | null = null;
 
   const checkAndFire = (el: Element, scrollPos: number): void => {
     if (!canTrack(getConsent())) return;
@@ -97,6 +97,14 @@ function setupScrollTracking(
     }
   };
 
+  const cancelPending = (): void => {
+    pending.clear();
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
+  };
+
   const onScroll = (e: Event): void => {
     if (fired.size === SCROLL_MILESTONES.length) return;
 
@@ -107,18 +115,18 @@ function setupScrollTracking(
     // Ignore small containers (dropdowns, tooltips, autocompletes).
     if (target.clientHeight <= window.innerHeight * 0.5) return;
 
-    pendingEl = target;
+    pending.add(target);
 
     if (rafId) return;
     rafId = requestAnimationFrame(() => {
       rafId = 0;
-      const el = pendingEl;
-      pendingEl = null;
-      if (!el) return;
-      const scrollPos = el === document.documentElement
-        ? window.scrollY
-        : el.scrollTop;
-      checkAndFire(el, scrollPos);
+      pending.forEach((el) => {
+        const scrollPos = el === document.documentElement
+          ? window.scrollY
+          : el.scrollTop;
+        checkAndFire(el, scrollPos);
+      });
+      pending.clear();
     });
   };
 
@@ -130,10 +138,13 @@ function setupScrollTracking(
   return {
     teardown: () => {
       document.removeEventListener('scroll', onScroll, { capture: true });
-      if (rafId) cancelAnimationFrame(rafId);
+      cancelPending();
     },
+    // Cancel any pending rAF so a stale scroll position from the previous
+    // page view can't fire milestones against the freshly-cleared set.
     reset: () => {
       fired.clear();
+      cancelPending();
     },
   };
 }
