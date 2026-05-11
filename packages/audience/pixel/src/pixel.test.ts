@@ -2,7 +2,11 @@ import { Pixel } from './pixel';
 
 // Mock autocapture module
 const mockTeardownAutocapture = jest.fn();
-const mockSetupAutocapture = jest.fn().mockReturnValue(mockTeardownAutocapture);
+const mockResetScrollDepth = jest.fn();
+const mockSetupAutocapture = jest.fn().mockReturnValue({
+  teardown: mockTeardownAutocapture,
+  resetScroll: mockResetScrollDepth,
+});
 jest.mock('./autocapture', () => ({
   setupAutocapture: (...args: unknown[]) => mockSetupAutocapture(...args),
 }));

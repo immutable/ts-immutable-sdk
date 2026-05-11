@@ -85,7 +85,7 @@ All events fire automatically with no instrumentation required.
 | `session_end` | Page unload (`visibilitychange` / `pagehide`) | `sessionId`, `duration` (seconds) |
 | `form_submitted` | HTML form submission | `formAction`, `formId`, `formName`, `fieldNames`. `emailHash` at `full` consent only. |
 | `link_clicked` | Outbound link click (external domains only) | `linkUrl`, `linkText`, `elementId`, `outbound: true` |
-| `scroll_depth` | Scroll milestone reached (25%, 50%, 75%, 90%, 100%) | `depth` (integer). No event fires on pages where the document does not scroll. |
+| `scroll_depth` | Scroll milestone reached (25%, 50%, 75%, 90%, 100%) | `depth` (integer). Fires on both standard document scroll and SPA internal scroll containers (e.g. `overflow: auto` divs) larger than 50% of the viewport. Milestones reset on each `page` call so SPA route changes start fresh. No event fires on pages with no scrollable area at all. **iframe limitation:** a cross-origin iframe cannot be observed from the parent page — install the pixel inside the iframe itself for those integrations. |
 
 ### Disabling specific auto-capture
 
