@@ -48,13 +48,14 @@ describe('autocapture', () => {
   });
 
   function setup(options: Record<string, unknown> = {}) {
-    teardown = setupAutocapture(
+    const result = setupAutocapture(
       {
         forms: true, clicks: true, scroll: false, ...options,
       },
       enqueue,
       () => consent,
     );
+    teardown = result.teardown;
   }
 
   // ---------- Form submissions ----------
@@ -494,7 +495,7 @@ describe('autocapture', () => {
 
   describe('config defaults', () => {
     it('enables both listeners when no options specified', () => {
-      teardown = setupAutocapture({}, enqueue, () => consent);
+      teardown = setupAutocapture({}, enqueue, () => consent).teardown;
 
       const form = document.createElement('form');
       form.action = '/signup';
@@ -612,7 +613,7 @@ describe('autocapture', () => {
 
         // Scroll to 25% → scrollY = (2000-500) * 0.25 = 375
         (window as Record<string, unknown>).scrollY = 375;
-        window.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
         flushRAF();
 
         expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
@@ -620,7 +621,7 @@ describe('autocapture', () => {
 
         // Scroll to 55% → should fire 50 (25 already fired)
         (window as Record<string, unknown>).scrollY = 825;
-        window.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
         flushRAF();
 
         expect(enqueue).toHaveBeenCalledTimes(2);
@@ -632,7 +633,7 @@ describe('autocapture', () => {
 
         // Jump straight to 80% → should fire 25, 50, 75
         (window as Record<string, unknown>).scrollY = 1200;
-        window.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
         flushRAF();
 
         expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
@@ -646,18 +647,18 @@ describe('autocapture', () => {
 
         // Scroll to 60%
         (window as Record<string, unknown>).scrollY = 900;
-        window.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
         flushRAF();
 
         const countAfterFirst = enqueue.mock.calls.length;
 
         // Scroll back up to 30%, then to 60% again
         (window as Record<string, unknown>).scrollY = 450;
-        window.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
         flushRAF();
 
         (window as Record<string, unknown>).scrollY = 900;
-        window.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
         flushRAF();
 
         // No new milestones should have fired
@@ -669,7 +670,7 @@ describe('autocapture', () => {
 
         // Scroll to 100%
         (window as Record<string, unknown>).scrollY = 1500;
-        window.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
         flushRAF();
 
         expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
@@ -685,7 +686,7 @@ describe('autocapture', () => {
         setup({ scroll: true });
 
         (window as Record<string, unknown>).scrollY = 1500;
-        window.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
         flushRAF();
 
         expect(enqueue).not.toHaveBeenCalled();
@@ -696,9 +697,9 @@ describe('autocapture', () => {
 
         // Fire multiple scroll events without flushing rAF
         (window as Record<string, unknown>).scrollY = 375;
-        window.dispatchEvent(new Event('scroll'));
-        window.dispatchEvent(new Event('scroll'));
-        window.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
 
         // Only one rAF should have been scheduled
         expect(window.requestAnimationFrame).toHaveBeenCalledTimes(1);
@@ -736,7 +737,7 @@ describe('autocapture', () => {
 
         // Even if a scroll event fires (e.g. iOS overscroll bounce), there is
         // nothing to scroll past, so no milestone should fire.
-        window.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
         flushRAF();
 
         expect(enqueue).not.toHaveBeenCalled();
@@ -752,7 +753,7 @@ describe('autocapture', () => {
         setup({ scroll: false });
 
         (window as Record<string, unknown>).scrollY = 1500;
-        window.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
         flushRAF();
 
         expect(enqueue).not.toHaveBeenCalled();
@@ -760,10 +761,10 @@ describe('autocapture', () => {
 
       it('enables scroll tracking by default', () => {
         // Call setupAutocapture directly to verify production defaults
-        teardown = setupAutocapture({}, enqueue, () => consent);
+        teardown = setupAutocapture({}, enqueue, () => consent).teardown;
 
         (window as Record<string, unknown>).scrollY = 375;
-        window.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
         flushRAF();
 
         expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
@@ -780,10 +781,216 @@ describe('autocapture', () => {
         teardown();
 
         (window as Record<string, unknown>).scrollY = 1500;
-        window.dispatchEvent(new Event('scroll'));
+        document.dispatchEvent(new Event('scroll'));
         flushRAF();
 
         expect(enqueue).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('SPA internal scroll containers', () => {
+      /**
+       * Stub an internal element's scroll geometry. The element must be
+       * appended to document.body so the capture-phase listener on `document`
+       * receives events dispatched on it.
+       */
+      function setContainerGeometry(
+        el: HTMLElement,
+        scrollHeight: number,
+        clientHeight: number,
+        scrollTop: number,
+      ) {
+        Object.defineProperty(el, 'scrollHeight', { value: scrollHeight, configurable: true });
+        Object.defineProperty(el, 'clientHeight', { value: clientHeight, configurable: true });
+        Object.defineProperty(el, 'scrollTop', { value: scrollTop, configurable: true, writable: true });
+      }
+
+      beforeEach(() => {
+        // Document itself does not scroll (SPA pattern).
+        setScrollGeometry(600, 600, 0);
+      });
+
+      it('fires milestones when an internal container scrolls', () => {
+        setup({ scroll: true });
+
+        const container = document.createElement('div');
+        // 500px container in a 600px viewport → clientHeight/innerHeight = 83% → passes filter
+        setContainerGeometry(container, 2000, 500, 0);
+        document.body.appendChild(container);
+
+        // Scroll to 26% → scrollTop = (2000-500)*0.26 = 390
+        (container as Record<string, unknown>).scrollTop = 390;
+        container.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
+        expect(enqueue).toHaveBeenCalledTimes(1);
+      });
+
+      it('fires all five milestones when container is scrolled to 100%', () => {
+        setup({ scroll: true });
+
+        const container = document.createElement('div');
+        setContainerGeometry(container, 2000, 500, 0);
+        document.body.appendChild(container);
+
+        // 100% → scrollTop = 2000-500 = 1500
+        (container as Record<string, unknown>).scrollTop = 1500;
+        container.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 50 });
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 75 });
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 90 });
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 100 });
+        expect(enqueue).toHaveBeenCalledTimes(5);
+      });
+
+      it('ignores containers smaller than 50% of viewport height', () => {
+        setup({ scroll: true });
+
+        const small = document.createElement('div');
+        // clientHeight = 200 px, innerHeight = 600 → 200 ≤ 300 → filtered out
+        setContainerGeometry(small, 2000, 200, 0);
+        document.body.appendChild(small);
+
+        (small as Record<string, unknown>).scrollTop = 1500;
+        small.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        expect(enqueue).not.toHaveBeenCalled();
+      });
+
+      it('fires each milestone only once across multiple large containers (global dedup)', () => {
+        setup({ scroll: true });
+
+        const main = document.createElement('div');
+        const sidebar = document.createElement('div');
+        setContainerGeometry(main, 2000, 500, 0);
+        setContainerGeometry(sidebar, 1000, 500, 0);
+        document.body.appendChild(main);
+        document.body.appendChild(sidebar);
+
+        // Scroll main to 30% → fires 25
+        (main as Record<string, unknown>).scrollTop = 450;
+        main.dispatchEvent(new Event('scroll'));
+        flushRAF();
+        expect(enqueue).toHaveBeenCalledTimes(1);
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
+
+        // Scroll sidebar to 60% → 25 already fired, should only fire 50
+        (sidebar as Record<string, unknown>).scrollTop = 300;
+        sidebar.dispatchEvent(new Event('scroll'));
+        flushRAF();
+        expect(enqueue).toHaveBeenCalledTimes(2);
+        expect(enqueue).toHaveBeenLastCalledWith('scroll_depth', { depth: 50 });
+      });
+
+      it('does not fire for a detached element not in the document', () => {
+        setup({ scroll: true });
+
+        const detached = document.createElement('div');
+        setContainerGeometry(detached, 2000, 500, 0);
+        // Not appended to body — capture phase won't reach document.
+        (detached as Record<string, unknown>).scrollTop = 1500;
+        detached.dispatchEvent(new Event('scroll'));
+        flushRAF();
+
+        expect(enqueue).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('reset', () => {
+      beforeEach(() => {
+        setScrollGeometry(2000, 500, 0);
+      });
+
+      it('allows milestones to re-fire after resetScroll() (SPA route change)', () => {
+        const result = setupAutocapture({ scroll: true }, enqueue, () => consent);
+        teardown = result.teardown;
+
+        // Fire 25 milestone.
+        (window as Record<string, unknown>).scrollY = 375;
+        document.dispatchEvent(new Event('scroll'));
+        flushRAF();
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
+        expect(enqueue).toHaveBeenCalledTimes(1);
+
+        // Simulate SPA route change: scroll back to top, then call resetScroll.
+        (window as Record<string, unknown>).scrollY = 0;
+        result.resetScroll();
+
+        // Scrolling to 25% again should re-fire the milestone.
+        (window as Record<string, unknown>).scrollY = 375;
+        document.dispatchEvent(new Event('scroll'));
+        flushRAF();
+        expect(enqueue).toHaveBeenCalledTimes(2);
+        expect(enqueue).toHaveBeenLastCalledWith('scroll_depth', { depth: 25 });
+      });
+
+      it('cancels pending rAF so stale scroll position cannot fire against new page', () => {
+        const result = setupAutocapture({ scroll: true }, enqueue, () => consent);
+        teardown = result.teardown;
+
+        // User has scrolled to 50% — rAF is scheduled but has not yet fired.
+        (window as Record<string, unknown>).scrollY = 750;
+        document.dispatchEvent(new Event('scroll'));
+        expect(enqueue).not.toHaveBeenCalled(); // rAF not flushed yet
+
+        // SPA navigates: pixel.page() calls resetScroll() before the rAF fires.
+        // The reused container still reports scrollY = 750 momentarily.
+        result.resetScroll();
+
+        // Flushing the (now-cancelled) rAF must not fire any milestone against
+        // the new page view.
+        flushRAF();
+        expect(enqueue).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('concurrent containers', () => {
+      function setContainerGeometry(
+        el: HTMLElement,
+        scrollHeight: number,
+        clientHeight: number,
+        scrollTop: number,
+      ) {
+        Object.defineProperty(el, 'scrollHeight', { value: scrollHeight, configurable: true });
+        Object.defineProperty(el, 'clientHeight', { value: clientHeight, configurable: true });
+        Object.defineProperty(el, 'scrollTop', { value: scrollTop, configurable: true, writable: true });
+      }
+
+      beforeEach(() => {
+        setScrollGeometry(600, 600, 0);
+      });
+
+      it('processes every container that scrolled within a single rAF', () => {
+        setup({ scroll: true });
+
+        const main = document.createElement('div');
+        const sidebar = document.createElement('div');
+        setContainerGeometry(main, 2000, 500, 0);
+        setContainerGeometry(sidebar, 1000, 500, 0);
+        document.body.appendChild(main);
+        document.body.appendChild(sidebar);
+
+        // Two large containers scroll in the same frame (before rAF flush).
+        // main → 30% (450/1500), sidebar → 60% (300/500).
+        // Without per-container queueing, only the second target would be
+        // checked and main's milestone would be lost.
+        (main as Record<string, unknown>).scrollTop = 450;
+        main.dispatchEvent(new Event('scroll'));
+        (sidebar as Record<string, unknown>).scrollTop = 300;
+        sidebar.dispatchEvent(new Event('scroll'));
+
+        flushRAF();
+
+        // Both 25 (from main) and 50 (from sidebar) should fire — global dedup
+        // applies across all containers processed in the frame.
+        expect(enqueue).toHaveBeenCalledTimes(2);
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 25 });
+        expect(enqueue).toHaveBeenCalledWith('scroll_depth', { depth: 50 });
       });
     });
   });

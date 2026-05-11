@@ -61,6 +61,8 @@ export class Pixel {
 
   private teardownAutocapture?: () => void;
 
+  private resetScrollDepth?: () => void;
+
   private teardownCmp?: () => void;
 
   private initialPageViewFired = false;
@@ -119,16 +121,20 @@ export class Pixel {
       this.page();
     }
 
-    // Attach autocapture listeners (forms + outbound clicks)
-    this.teardownAutocapture = setupAutocapture(
-      { forms: autocapture?.forms, clicks: autocapture?.clicks },
+    const autocaptureResult = setupAutocapture(
+      { forms: autocapture?.forms, clicks: autocapture?.clicks, scroll: autocapture?.scroll },
       (eventName, properties) => this.track(eventName, properties),
       () => this.consent!.level,
     );
+    this.teardownAutocapture = autocaptureResult.teardown;
+    this.resetScrollDepth = autocaptureResult.resetScroll;
   }
 
   page(properties?: Record<string, unknown>): void {
     if (!this.isTrackingAllowed()) return;
+
+    // Reset scroll milestones so each page view starts from 0.
+    this.resetScrollDepth?.();
 
     const { sessionId, isNew } = getOrCreateSession(this.domain);
     this.refreshSession(sessionId, isNew);
@@ -173,6 +179,7 @@ export class Pixel {
       this.teardownAutocapture();
       this.teardownAutocapture = undefined;
     }
+    this.resetScrollDepth = undefined;
     if (this.queue) {
       this.queue.destroy();
       this.queue = null;

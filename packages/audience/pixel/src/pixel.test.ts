@@ -2,7 +2,11 @@ import { Pixel } from './pixel';
 
 // Mock autocapture module
 const mockTeardownAutocapture = jest.fn();
-const mockSetupAutocapture = jest.fn().mockReturnValue(mockTeardownAutocapture);
+const mockResetScrollDepth = jest.fn();
+const mockSetupAutocapture = jest.fn().mockReturnValue({
+  teardown: mockTeardownAutocapture,
+  resetScroll: mockResetScrollDepth,
+});
 jest.mock('./autocapture', () => ({
   setupAutocapture: (...args: unknown[]) => mockSetupAutocapture(...args),
 }));
@@ -513,6 +517,33 @@ describe('Pixel', () => {
         expect.any(Function),
         expect.any(Function),
       );
+    });
+
+    it('forwards scroll: false to setupAutocapture', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({
+        key: 'pk_imapik-test-local',
+        consent: 'anonymous',
+        autocapture: { scroll: false },
+      });
+
+      expect(mockSetupAutocapture).toHaveBeenCalledWith(
+        expect.objectContaining({ scroll: false }),
+        expect.any(Function),
+        expect.any(Function),
+      );
+    });
+
+    it('calls resetScroll when page() is called', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
+
+      mockResetScrollDepth.mockClear();
+      pixel.page();
+
+      expect(mockResetScrollDepth).toHaveBeenCalledTimes(1);
     });
 
     it('enqueue callback fires TrackMessage with session', () => {

@@ -56,31 +56,37 @@ function getFieldNames(form: HTMLFormElement): string[] {
 
 // -- Scroll depth tracking --------------------------------------------------
 
-/** Milestones that fire exactly once per page load. */
+/** Milestones that fire exactly once per page view. */
 const SCROLL_MILESTONES = [25, 50, 75, 90, 100];
 
 /**
  * Fires `scroll_depth` once per milestone (25/50/75/90/100) as the user
- * scrolls. No milestone fires on pages where the document doesn't scroll —
- * short pages and SPAs with internal scroll containers behave the same way.
+ * scrolls. Works for both standard document scroll and SPA internal scroll
+ * containers. Milestones reset when `reset()` is called (e.g. on SPA route
+ * changes via `pixel.page()`).
+ *
+ * Uses a capture-phase listener on `document` so scroll events on any
+ * descendant element are caught without enumerating containers upfront.
+ * Small containers (clientHeight ≤ 50% of viewport) are ignored to avoid
+ * noise from dropdowns, tooltips, and autocomplete lists.
  *
  * Consent is checked at fire time, not at attach time.
  */
 function setupScrollTracking(
   enqueue: EnqueueFn,
   getConsent: ConsentFn,
-): () => void {
+): { teardown: () => void; reset: () => void } {
   const fired = new Set<number>();
+  const pending = new Set<Element>();
   let rafId = 0;
 
-  const checkAndFire = (): void => {
+  const checkAndFire = (el: Element, scrollPos: number): void => {
     if (!canTrack(getConsent())) return;
 
-    const { scrollHeight, clientHeight } = document.documentElement;
-    if (scrollHeight <= clientHeight) return; // Page is not scrollable.
+    const scrollable = el.scrollHeight - el.clientHeight;
+    if (scrollable <= 0) return;
 
-    const scrollable = scrollHeight - clientHeight;
-    const pct = Math.min(100, Math.round((window.scrollY / scrollable) * 100));
+    const pct = Math.min(100, Math.round((scrollPos / scrollable) * 100));
 
     for (let i = 0; i < SCROLL_MILESTONES.length; i++) {
       const milestone = SCROLL_MILESTONES[i];
@@ -91,29 +97,62 @@ function setupScrollTracking(
     }
   };
 
-  // Check initial scroll position (e.g. anchor links, restored scroll).
-  checkAndFire();
+  const cancelPending = (): void => {
+    pending.clear();
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
+  };
 
-  const onScroll = (): void => {
-    if (rafId) return; // Already scheduled
+  const onScroll = (e: Event): void => {
+    if (fired.size === SCROLL_MILESTONES.length) return;
+
+    const target = e.target === document
+      ? document.documentElement
+      : e.target as Element;
+
+    // Ignore small containers (dropdowns, tooltips, autocompletes).
+    if (target.clientHeight <= window.innerHeight * 0.5) return;
+
+    pending.add(target);
+
+    if (rafId) return;
     rafId = requestAnimationFrame(() => {
       rafId = 0;
-      checkAndFire();
+      pending.forEach((el) => {
+        const scrollPos = el === document.documentElement
+          ? window.scrollY
+          : el.scrollTop;
+        checkAndFire(el, scrollPos);
+      });
+      pending.clear();
     });
   };
 
-  window.addEventListener('scroll', onScroll, { passive: true });
+  // Check initial scroll position (e.g. anchor links, restored scroll).
+  checkAndFire(document.documentElement, window.scrollY);
 
-  return () => {
-    window.removeEventListener('scroll', onScroll);
-    if (rafId) cancelAnimationFrame(rafId);
+  document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+
+  return {
+    teardown: () => {
+      document.removeEventListener('scroll', onScroll, { capture: true });
+      cancelPending();
+    },
+    // Cancel any pending rAF so a stale scroll position from the previous
+    // page view can't fire milestones against the freshly-cleared set.
+    reset: () => {
+      fired.clear();
+      cancelPending();
+    },
   };
 }
 
 /**
  * Attach document-level listeners for form submissions, outbound link clicks,
- * and scroll depth milestones.
- * Returns a teardown function that removes all listeners.
+ * and scroll depth milestones. `resetScroll()` clears fired scroll milestones
+ * (call from `Pixel.page()` on SPA route changes).
  *
  * - Single document-level listener per event type (event delegation).
  * - Consent is checked at fire time, not at attach time.
@@ -123,8 +162,9 @@ export function setupAutocapture(
   options: AutocaptureOptions,
   enqueue: EnqueueFn,
   getConsent: ConsentFn,
-): () => void {
+): { teardown: () => void; resetScroll: () => void } {
   const teardowns: Array<() => void> = [];
+  let scrollReset: () => void = () => undefined;
 
   if (options.forms !== false) {
     const onSubmit = (e: Event): void => {
@@ -195,8 +235,13 @@ export function setupAutocapture(
   }
 
   if (options.scroll !== false) {
-    teardowns.push(setupScrollTracking(enqueue, getConsent));
+    const scroll = setupScrollTracking(enqueue, getConsent);
+    teardowns.push(scroll.teardown);
+    scrollReset = scroll.reset;
   }
 
-  return () => teardowns.forEach((fn) => fn());
+  return {
+    teardown: () => teardowns.forEach((fn) => fn()),
+    resetScroll: scrollReset,
+  };
 }

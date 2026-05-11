@@ -85,7 +85,7 @@ All events fire automatically with no instrumentation required.
 | `session_end` | Page unload (`visibilitychange` / `pagehide`) | `sessionId`, `duration` (seconds) |
 | `form_submitted` | HTML form submission | `formAction`, `formId`, `formName`, `fieldNames`. `emailHash` at `full` consent only. |
 | `link_clicked` | Outbound link click (external domains only) | `linkUrl`, `linkText`, `elementId`, `outbound: true` |
-| `scroll_depth` | Scroll milestone reached (25%, 50%, 75%, 90%, 100%) | `depth` (integer). No event fires on pages where the document does not scroll. |
+| `scroll_depth` | Scroll milestone reached (25%, 50%, 75%, 90%, 100%) | `depth` (integer). Fires on standard document scroll or on any internal scroll container larger than half the viewport. Milestones reset on each `page` call. |
 
 ### Disabling specific auto-capture
 
