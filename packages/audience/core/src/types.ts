@@ -28,6 +28,8 @@ interface BaseMessage {
   anonymousId: string;
   surface: Surface;
   context: EventContext;
+  /** Present when the SDK/pixel is initialised with testMode: true. */
+  test?: true;
 }
 
 export interface TrackMessage extends BaseMessage {

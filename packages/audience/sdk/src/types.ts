@@ -16,6 +16,8 @@ export interface AudienceConfig {
   flushSize?: number;
   /** Override the default API base URL. */
   baseUrl?: string;
+  /** When true, all events are marked test: true and can be filtered from production analytics. */
+  testMode?: boolean;
   /**
    * Called when the SDK fails to reach the backend. Receives a structured
    * {@link AudienceError} with a machine-readable `code` so studios can

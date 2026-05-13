@@ -38,6 +38,8 @@ export interface PixelInitOptions {
   autocapture?: AutocaptureOptions;
   /** Override the default API base URL. */
   baseUrl?: string;
+  /** When true, all events are marked test: true and can be filtered from production analytics. */
+  testMode?: boolean;
 }
 
 export class Pixel {
@@ -54,6 +56,8 @@ export class Pixel {
   private publishableKey = '';
 
   private domain: string | undefined;
+
+  private testMode = false;
 
   private initialized = false;
 
@@ -80,6 +84,7 @@ export class Pixel {
 
     this.publishableKey = key;
     this.domain = domain;
+    this.testMode = options.testMode ?? false;
 
     this.queue = new MessageQueue(
       httpSend,
@@ -320,7 +325,6 @@ export class Pixel {
 
   // -- Helpers ------------------------------------------------------------
 
-  // eslint-disable-next-line class-methods-use-this
   private buildBase() {
     return {
       messageId: generateId(),
@@ -328,6 +332,7 @@ export class Pixel {
       anonymousId: this.anonymousId,
       surface: 'pixel' as const,
       context: collectContext('@imtbl/pixel', PIXEL_VERSION),
+      ...(this.testMode && { test: true as const }),
     };
   }
 

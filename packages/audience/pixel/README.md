@@ -115,6 +115,23 @@ document.head.appendChild(s);
 
 Both cookies are first-party (`SameSite=Lax`, `Secure` on HTTPS).
 
+## Test Mode
+
+Set `testMode: true` when initialising the pixel in non-production environments (dev, staging). All events will include a top-level `test: true` field so they can be filtered from production analytics.
+
+```html
+<script>
+(function(){
+var w=window,i="__imtbl";
+w[i]=w[i]||[];
+w[i].push(["init",{"key":"YOUR_KEY","consent":"anonymous","testMode":true}]);
+var s=document.createElement("script");s.async=1;
+s.src="https://cdn.immutable.com/pixel/v1/imtbl.js";
+document.head.appendChild(s);
+})();
+</script>
+```
+
 ## Content Security Policy (CSP)
 
 If your site uses a Content-Security-Policy header, add these origins to the relevant directives:

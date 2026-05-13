@@ -61,6 +61,18 @@ audience.shutdown();
 </script>
 ```
 
+## Test Mode
+
+Pass `testMode: true` when initialising the SDK in non-production environments (dev, staging). All events will include a top-level `test: true` field so they can be filtered from production analytics.
+
+```ts
+const audience = Audience.init({
+  publishableKey: 'YOUR_PUBLISHABLE_KEY',
+  consent: 'anonymous',
+  testMode: true,
+});
+```
+
 ## Documentation
 
 - [Web SDK](https://docs.immutable.com/docs/products/audience/web-sdk) — API reference, usage, integration walkthrough
