@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src https://api.dev.immutable.com https://api.sandbox.immutable.com https://api.immutable.com">
+    content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src https://api.dev.immutable.com https://api.immutable.com">
   <title>Immutable Audience SDK — Sample App</title>
   <link rel="stylesheet" href="sample-app.css">
 </head>
@@ -58,7 +58,6 @@
           <label for="environment">Environment</label>
           <select id="environment">
             <option value="https://api.dev.immutable.com" selected>Dev</option>
-            <option value="https://api.sandbox.immutable.com">Sandbox</option>
             <option value="https://api.immutable.com">Production</option>
           </select>
         </div>
@@ -77,6 +76,10 @@
         <div class="field">
           <label><input id="debug" type="checkbox" checked> debug</label>
           <p class="helper-text">Mirror SDK internal log output into the in-page event log below.</p>
+        </div>
+        <div class="field">
+          <label><input id="test-mode" type="checkbox"> testMode</label>
+          <p class="helper-text">Mark all events with <code>test: true</code> so they can be filtered from production analytics.</p>
         </div>
 
         <div class="advanced-grid">

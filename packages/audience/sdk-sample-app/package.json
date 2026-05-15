@@ -1,6 +1,6 @@
 {
   "name": "@imtbl/audience-sdk-sample-app",
-  "description": "Interactive sample app for @imtbl/audience. Exercises every public method on the Audience class, every typed track() event, and every reachable AudienceErrorCode against the sandbox backend.",
+  "description": "Interactive sample app for @imtbl/audience. Exercises every public method on the Audience class, every typed track() event, and every reachable AudienceErrorCode.",
   "version": "0.0.0",
   "author": "Immutable",
   "private": true,

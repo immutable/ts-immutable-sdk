@@ -223,6 +223,7 @@
     ['pk', 'value', 'pk'],
     ['initial-consent', 'value', 'initialConsent'],
     ['debug', 'checked', 'debug'],
+    ['test-mode', 'checked', 'testMode'],
     ['cookie-domain', 'value', 'cookieDomain'],
     ['flush-interval', 'value', 'flushInterval'],
     ['flush-size', 'value', 'flushSize'],
@@ -329,6 +330,7 @@
       debug: $('debug').checked,
       onError: handleError,
     };
+    if ($('test-mode').checked) config.testMode = true;
     var cd = $('cookie-domain').value.trim(); if (cd) config.cookieDomain = cd;
     config.baseUrl = $('environment').value;
     var fi = parseInt($('flush-interval').value, 10); if (!Number.isNaN(fi)) config.flushInterval = fi;
@@ -417,6 +419,7 @@
       log('INIT', {
         consent: config.consent,
         debug: config.debug,
+        testMode: config.testMode || false,
         cookieDomain: config.cookieDomain,
         flushInterval: config.flushInterval,
         flushSize: config.flushSize,
@@ -545,7 +548,7 @@
     });
     $('environment').addEventListener('change', function () { updateStatus(); saveUiState(); });
     $('initial-consent').addEventListener('change', function () { saveUiState(); updateStatus(); });
-    ['debug', 'cookie-domain', 'flush-interval', 'flush-size'].forEach(function (id) {
+    ['debug', 'test-mode', 'cookie-domain', 'flush-interval', 'flush-size'].forEach(function (id) {
       var el = $(id);
       if (!el) return;
       el.addEventListener('input', saveUiState);
