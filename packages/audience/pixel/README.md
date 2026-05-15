@@ -106,6 +106,18 @@ document.head.appendChild(s);
 </script>
 ```
 
+## Test mode
+
+Set `"testMode": true` in the init options to mark every event with a
+top-level `test: true` flag. Useful for development, staging, or QA —
+events still flow through the production endpoint, but can be filtered
+out of production analytics downstream.
+
+```diff
+- w[i].push(["init",{"key":"YOUR_KEY","consent":"anonymous"}]);
++ w[i].push(["init",{"key":"YOUR_KEY","consent":"anonymous","testMode":true}]);
+```
+
 ## Cookies
 
 | Cookie | Lifetime | Purpose |
@@ -151,18 +163,6 @@ Note: the nonce covers the inline snippet only. The CDN-loaded script (`imtbl.js
 | Firefox | 78+ |
 | Safari | 14+ |
 | Edge | 80+ |
-
-## Test mode
-
-Set `"testMode": true` in the init options to mark every event with a
-top-level `test: true` flag. Useful for development, staging, or QA —
-events still flow through the production endpoint, but can be filtered
-out of production analytics downstream.
-
-```diff
-- w[i].push(["init",{"key":"YOUR_KEY","consent":"anonymous"}]);
-+ w[i].push(["init",{"key":"YOUR_KEY","consent":"anonymous","testMode":true}]);
-```
 
 ## Documentation
 
