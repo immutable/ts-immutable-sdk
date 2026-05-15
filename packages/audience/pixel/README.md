@@ -152,6 +152,8 @@ Note: the nonce covers the inline snippet only. The CDN-loaded script (`imtbl.js
 | Safari | 14+ |
 | Edge | 80+ |
 
+Pass `"testMode": true` in the init options to mark all events with `test: true`, which lets you filter test traffic from production analytics.
+
 ## Documentation
 
 - [Tracking Pixel](https://docs.immutable.com/docs/products/audience/tracking-pixel) — this package (setup, consent modes, auto-tracked events)

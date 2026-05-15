@@ -61,6 +61,8 @@ audience.shutdown();
 </script>
 ```
 
+Pass `testMode: true` in the config to mark all events with `test: true`, which lets you filter test traffic from production analytics.
+
 ## Documentation
 
 - [Web SDK](https://docs.immutable.com/docs/products/audience/web-sdk) — API reference, usage, integration walkthrough
