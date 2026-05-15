@@ -152,7 +152,17 @@ Note: the nonce covers the inline snippet only. The CDN-loaded script (`imtbl.js
 | Safari | 14+ |
 | Edge | 80+ |
 
-Pass `"testMode": true` in the init options to mark all events with `test: true`, which lets you filter test traffic from production analytics.
+## Test mode
+
+Set `"testMode": true` in the init options to mark every event with a
+top-level `test: true` flag. Useful for development, staging, or QA —
+events still flow through the production endpoint, but can be filtered
+out of production analytics downstream.
+
+```diff
+- w[i].push(["init",{"key":"YOUR_KEY","consent":"anonymous"}]);
++ w[i].push(["init",{"key":"YOUR_KEY","consent":"anonymous","testMode":true}]);
+```
 
 ## Documentation
 

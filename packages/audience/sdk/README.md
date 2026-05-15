@@ -61,7 +61,19 @@ audience.shutdown();
 </script>
 ```
 
-Pass `testMode: true` in the config to mark all events with `test: true`, which lets you filter test traffic from production analytics.
+## Test mode
+
+Pass `testMode: true` in the config to mark every event with a top-level
+`test: true` flag. Useful for development, staging, or QA — events still
+flow through the production endpoint, but can be filtered out of
+production analytics downstream.
+
+```ts
+Audience.init({
+  publishableKey: 'YOUR_PUBLISHABLE_KEY',
+  testMode: true,
+});
+```
 
 ## Documentation
 
