@@ -2,7 +2,7 @@ import type { Message, BatchPayload } from './types';
 import type { HttpSend } from './transport';
 import { type AudienceError, invokeOnError, toAudienceError } from './errors';
 import {
-  getBaseUrl, INGEST_PATH, FLUSH_INTERVAL_MS, FLUSH_SIZE,
+  BASE_URL, INGEST_PATH, FLUSH_INTERVAL_MS, FLUSH_SIZE,
 } from './config';
 import * as storage from './storage';
 import { isBrowser } from './utils';
@@ -87,7 +87,7 @@ export class MessageQueue {
     private readonly publishableKey: string,
     options?: MessageQueueOptions,
   ) {
-    this.endpointUrl = `${options?.baseUrl ?? getBaseUrl(publishableKey)}${INGEST_PATH}`;
+    this.endpointUrl = `${options?.baseUrl ?? BASE_URL}${INGEST_PATH}`;
     this.flushIntervalMs = options?.flushIntervalMs ?? FLUSH_INTERVAL_MS;
     this.flushSize = options?.flushSize ?? FLUSH_SIZE;
     this.onFlush = options?.onFlush;

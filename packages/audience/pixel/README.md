@@ -1,4 +1,4 @@
-# @imtbl/pixel — Immutable Tracking Pixel
+# @imtbl/pixel
 
 A drop-in JavaScript snippet that captures device signals, page views, and attribution data for Immutable's events pipeline. Use it to measure campaign performance and attribute player acquisition across your marketing sites, landing pages, and web shops. Zero configuration beyond a publishable key.
 
@@ -21,7 +21,7 @@ document.head.appendChild(s);
 
 Replace `YOUR_PUBLISHABLE_KEY` with your project's publishable key from [Immutable Hub](https://hub.immutable.com/).
 
-The script loads asynchronously and does not block page rendering. The default consent level is `none` — the pixel loads but does not collect until consent is explicitly set (see [Consent Modes](#consent-modes)). To start collecting anonymous device signals immediately, add `"consent":"anonymous"` to the init options:
+The script loads asynchronously and does not block page rendering. The default consent level is `none`: the pixel loads but does not collect until consent is explicitly set (see [Consent Modes](#consent-modes)). To start collecting anonymous device signals immediately, add `"consent":"anonymous"` to the init options:
 
 ```diff
 - w[i].push(["init",{"key":"YOUR_PUBLISHABLE_KEY"}]);
@@ -34,7 +34,7 @@ The `consent` option controls what the pixel collects. **Default is `none`** (no
 
 | Level | What's collected | Cookies set | Use case |
 |-------|-----------------|-------------|----------|
-| `none` | Nothing — pixel loads but is inert | None | Before consent banner interaction |
+| `none` | Nothing (pixel loads but is inert) | None | Before consent banner interaction |
 | `anonymous` | Device signals, attribution, page views, form submissions, link clicks (no PII) | `imtbl_anon_id`, `_imtbl_sid` | Anonymous analytics without PII |
 | `full` | Everything in `anonymous` + hashed email capture from form submissions (for identity matching) | `imtbl_anon_id`, `_imtbl_sid` | After explicit user consent for marketing/ads |
 
@@ -47,12 +47,12 @@ If your site uses a Consent Management Platform (CMP), the pixel can auto-detect
 + w[i].push(["init",{"key":"YOUR_KEY","consentMode":"auto"}]);
 ```
 
-> **Note:** `consentMode` and `consent` are mutually exclusive — do not set both.
+> **Note:** `consentMode` and `consent` are mutually exclusive. Do not set both.
 
 The pixel starts in `none` and checks for these CMP standards (in priority order):
 
-1. [**Google Consent Mode v2**](https://developers.google.com/tag-platform/security/guides/consent?consentmode=advanced) — reads `analytics_storage` and `ad_storage` from `window.dataLayer`
-2. [**IAB TCF v2**](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md) — reads purpose consents via `window.__tcfapi`
+1. [**Google Consent Mode v2**](https://developers.google.com/tag-platform/security/guides/consent?consentmode=advanced): reads `analytics_storage` and `ad_storage` from `window.dataLayer`
+2. [**IAB TCF v2**](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md): reads purpose consents via `window.__tcfapi`
 
 Once a CMP is detected, the pixel upgrades consent automatically and continues listening for changes (e.g. when a user updates their cookie preferences). If no CMP is detected after ~2.5 seconds, the pixel remains in `none` silently (there is no failure callback). If your CMP may not be present on every page, push a manual fallback on your own timeout:
 
@@ -67,7 +67,7 @@ setTimeout(function() {
 If you are not using `consentMode: 'auto'`, you can set consent manually at any time:
 
 ```javascript
-// After cookie banner interaction — upgrade to full
+// After cookie banner interaction, upgrade to full
 window.__imtbl.push(['consent', 'full']);
 
 // Or downgrade (purges PII from queue)
@@ -106,12 +106,23 @@ document.head.appendChild(s);
 </script>
 ```
 
+## Test mode
+
+Set `"testMode": true` in the init options to mark every event with a
+top-level `test: true` flag. Test events still flow through the
+production endpoint, but can be filtered out of production analytics.
+
+```diff
+- w[i].push(["init",{"key":"YOUR_KEY","consent":"anonymous"}]);
++ w[i].push(["init",{"key":"YOUR_KEY","consent":"anonymous","testMode":true}]);
+```
+
 ## Cookies
 
 | Cookie | Lifetime | Purpose |
 |--------|----------|---------|
 | `imtbl_anon_id` | 2 years | Anonymous device ID (shared with web SDK) |
-| `_imtbl_sid` | 30 minutes (rolling) | Session ID — resets on inactivity |
+| `_imtbl_sid` | 30 minutes (rolling) | Session ID (resets on inactivity) |
 
 Both cookies are first-party (`SameSite=Lax`, `Secure` on HTTPS).
 
@@ -154,7 +165,7 @@ Note: the nonce covers the inline snippet only. The CDN-loaded script (`imtbl.js
 
 ## Documentation
 
-- [Tracking Pixel](https://docs.immutable.com/docs/products/audience/tracking-pixel) — this package (setup, consent modes, auto-tracked events)
-- [Web SDK](https://docs.immutable.com/docs/products/audience/web-sdk) — sibling `@imtbl/audience` package for typed event tracking and identity management
-- [REST API](https://docs.immutable.com/docs/products/audience/rest-api) — backend reference for direct integration
-- [Data dictionary](https://docs.immutable.com/docs/products/audience/data-dictionary) — predefined event names and property schemas
+- [Tracking Pixel](https://docs.immutable.com/docs/products/audience/tracking-pixel): this package (setup, consent modes, auto-tracked events)
+- [Web SDK](https://docs.immutable.com/docs/products/audience/web-sdk): sibling `@imtbl/audience` package for typed event tracking and identity management
+- [REST API](https://docs.immutable.com/docs/products/audience/rest-api): backend reference for direct integration
+- [Data dictionary](https://docs.immutable.com/docs/products/audience/data-dictionary): predefined event names and property schemas

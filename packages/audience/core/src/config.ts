@@ -1,4 +1,4 @@
-const TEST_KEY_PREFIX = 'pk_imapik-test-';
+export const BASE_URL = 'https://api.immutable.com';
 
 export const INGEST_PATH = '/v1/audience/messages';
 export const CONSENT_PATH = '/v1/audience/tracking-consent';
@@ -13,9 +13,3 @@ export const SESSION_MAX_AGE = 30 * 60; // 30 minutes in seconds
 
 export const SESSION_START = 'session_start';
 export const SESSION_END = 'session_end';
-
-export const getBaseUrl = (publishableKey: string): string => (
-  publishableKey.startsWith(TEST_KEY_PREFIX)
-    ? 'https://api.sandbox.immutable.com'
-    : 'https://api.immutable.com'
-);

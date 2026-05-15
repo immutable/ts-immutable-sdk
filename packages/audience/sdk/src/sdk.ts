@@ -60,6 +60,8 @@ export class Audience {
 
   private readonly cookieDomain?: string;
 
+  private readonly testMode: boolean;
+
   private anonymousId: string;
 
   private sessionId: string | undefined;
@@ -81,6 +83,7 @@ export class Audience {
     const consentSource = DEFAULT_CONSENT_SOURCE;
 
     this.cookieDomain = cookieDomain;
+    this.testMode = config.testMode ?? false;
     this.debug = new DebugLogger(config.debug ?? false);
 
     let isNewSession = false;
@@ -173,6 +176,7 @@ export class Audience {
       anonymousId: this.anonymousId,
       surface: 'web' as const,
       context: collectContext(LIBRARY_NAME, LIBRARY_VERSION),
+      ...(this.testMode && { test: true as const }),
     };
   }
 
