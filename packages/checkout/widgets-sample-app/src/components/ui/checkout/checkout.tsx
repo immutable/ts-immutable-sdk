@@ -240,7 +240,15 @@ function CheckoutUI() {
   // setup widgets factory
   // ignore language or theme changes
   const widgetsFactory = useAsyncMemo(
-    async () => new WidgetsFactory(checkoutSdk, { theme, language }),
+    async () => new WidgetsFactory(checkoutSdk, { theme, language, walletConnect: {
+      projectId: "938b553484e344b1e0b4bb80edf8c362",
+      metadata: {
+        url: 'http://localhost:3000/checkout',
+        name: 'Widgets Sample App',
+        description: 'Checkout',
+        icons: [],
+      },
+    } }),
     [checkoutSdk]
   );
 
