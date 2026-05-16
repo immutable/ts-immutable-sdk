@@ -12,8 +12,9 @@ export async function identifyUser(
   provider: WrappedBrowserProvider,
   options?: Record<string, any>,
 ) {
-  // WT-1698 Analytics - Identify user here then progress to widget
-  const walletAddress = (await (await provider.getSigner()).getAddress()).toLowerCase();
+  const signer = await provider.getSigner();
+  const address = await signer.getAddress();
+  const walletAddress = address.toLowerCase();
   const isMetaMask = isMetaMaskProvider(provider);
   const isPassport = isPassportProvider(provider);
   try {

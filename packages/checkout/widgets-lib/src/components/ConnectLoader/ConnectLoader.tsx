@@ -146,7 +146,7 @@ export function ConnectLoader({
 
   const isWalletConnected = async (localProvider: WrappedBrowserProvider): Promise<boolean> => {
     const { isConnected } = await checkout.checkIsWalletConnected({
-      provider: localProvider!,
+      provider: localProvider,
     });
     if (!isConnected) {
       connectLoaderDispatch({
@@ -209,6 +209,8 @@ export function ConnectLoader({
             return;
           }
         } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error(err);
           return;
         }
 
@@ -219,6 +221,8 @@ export function ConnectLoader({
           const anonymousId = userData?.anonymousId();
           await identifyUser(identify, browserProvider!, { anonymousId });
         } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error(err);
           return;
         }
 
