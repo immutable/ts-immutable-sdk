@@ -14,7 +14,7 @@ export interface TransportOptions {
  * type into `MessageQueue` and `createConsentManager` so tests can
  * substitute a fake by passing `jest.fn<HttpSend>()` directly.
  *
- * Implementations MUST NOT reject — failures are returned via
+ * Implementations MUST NOT reject; failures are returned via
  * {@link TransportResult}. Callers rely on this contract for
  * fire-and-forget code paths (page-unload flush).
  */
@@ -24,6 +24,24 @@ export type HttpSend = (
   payload: BatchPayload | ConsentUpdatePayload,
   options?: TransportOptions,
 ) => Promise<TransportResult>;
+
+const HTTP_TIMEOUT_MS = 30_000;
+
+function parseRetryAfterMs(headers: Headers): number | null {
+  const value = headers.get?.('retry-after');
+  if (!value) return null;
+
+  const seconds = Number(value.trim());
+  if (!Number.isNaN(seconds) && seconds >= 0) return Math.round(seconds * 1000);
+
+  const date = new Date(value);
+  if (!Number.isNaN(date.getTime())) {
+    const ms = date.getTime() - Date.now();
+    return ms > 0 ? ms : null;
+  }
+
+  return null;
+}
 
 async function parseBody(response: Response): Promise<unknown> {
   const contentType = response.headers?.get?.('content-type') ?? '';
@@ -43,6 +61,9 @@ export const httpSend: HttpSend = async (
   payload,
   options,
 ) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), HTTP_TIMEOUT_MS);
+
   try {
     const response = await fetch(url, {
       method: options?.method ?? 'POST',
@@ -52,7 +73,21 @@ export const httpSend: HttpSend = async (
       },
       body: JSON.stringify(payload),
       keepalive: options?.keepalive,
+      signal: controller.signal,
     });
+
+    if (response.status === 429) {
+      track('audience', 'transport_send_failed', { status: 429 });
+      const retryAfterMs = parseRetryAfterMs(response.headers);
+      return {
+        ok: false,
+        error: new TransportError({
+          status: 429,
+          endpoint: url,
+        }),
+        ...(retryAfterMs !== null ? { retryAfterMs } : {}),
+      };
+    }
 
     if (!response.ok) {
       const body = await parseBody(response);
@@ -108,5 +143,7 @@ export const httpSend: HttpSend = async (
     });
     trackError('audience', 'transport_send', error);
     return { ok: false, error };
+  } finally {
+    clearTimeout(timeoutId);
   }
 };

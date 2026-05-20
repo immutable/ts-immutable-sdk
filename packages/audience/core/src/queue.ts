@@ -34,7 +34,7 @@ export interface MessageQueueOptions {
   /**
    * Override the localStorage key prefix (default: '__imtbl_audience_').
    * Use when multiple SDK surfaces run on the same page to prevent
-   * queue collision — e.g. web SDK uses '__imtbl_web_' so its queued
+   * queue collision, e.g. web SDK uses '__imtbl_web_' so its queued
    * messages don't interfere with the shared SDK's queue.
    */
   storagePrefix?: string;
@@ -81,6 +81,11 @@ export class MessageQueue {
   private readonly flushIntervalMs: number;
 
   private readonly flushSize: number;
+
+  private consecutiveFailures = 0;
+
+  // Epoch ms before which flush() is a no-op. Zero = no active backoff.
+  private nextAttemptAt = 0;
 
   constructor(
     private readonly send: HttpSend,
@@ -134,10 +139,11 @@ export class MessageQueue {
    * On success, sent messages are removed from the queue. On failure,
    * messages stay queued and retry on the next flush cycle.
    * Use this for normal operation. For page-unload scenarios, use
-   * flushUnload() instead — it's fire-and-forget and survives navigation.
+   * flushUnload() instead; it's fire-and-forget and survives navigation.
    */
   async flush(): Promise<void> {
     if (this.flushing || this.messages.length === 0) return;
+    if (Date.now() < this.nextAttemptAt) return;
 
     this.flushing = true;
     try {
@@ -153,12 +159,20 @@ export class MessageQueue {
 
       // Drop the batch on success OR on a terminal validation failure.
       // VALIDATION_REJECTED means the backend deterministically rejected
-      // some messages — retrying won't help, so we drop them rather than
+      // some messages - retrying won't help, so we drop them rather than
       // accumulate stale data forever.
       const isTerminal = audienceErr?.code === 'VALIDATION_REJECTED';
       if (result.ok || isTerminal) {
         this.messages = this.messages.slice(batch.length);
         this.persist();
+        this.resetBackoff();
+      } else if (audienceErr) {
+        // 429 with Retry-After overrides the exponential schedule.
+        if (result.retryAfterMs !== undefined) {
+          this.setBackoffUntil(Date.now() + result.retryAfterMs);
+        } else {
+          this.recordFailure();
+        }
       }
 
       this.onFlush?.(result.ok, batch.length);
@@ -175,7 +189,7 @@ export class MessageQueue {
    *
    * Uses `fetch` with `keepalive: true` so the request survives page
    * navigation. Unlike `flush()`, this is synchronous and does not wait
-   * for the response — use it only in `visibilitychange`/`pagehide`
+   * for the response; use it only in `visibilitychange`/`pagehide`
    * handlers or in `shutdown()`.
    */
   flushUnload(): void {
@@ -184,7 +198,7 @@ export class MessageQueue {
     const batch = this.messages.slice(0, MAX_BATCH_SIZE);
     const payload: BatchPayload = { messages: batch };
 
-    // Fire-and-forget — `keepalive: true` lets the request survive page
+    // Fire-and-forget: `keepalive: true` lets the request survive page
     // navigation. We optimistically drop the batch because the page is
     // going away and can't retry. The HttpSend contract guarantees this
     // promise never rejects, so the floating call is safe.
@@ -235,6 +249,35 @@ export class MessageQueue {
       window.removeEventListener('pagehide', this.pagehideHandler);
     }
     this.unloadBound = false;
+  }
+
+  private backoffDelayMs(): number {
+    switch (this.consecutiveFailures) {
+      case 0: return 0;
+      case 1: return 5_000;
+      case 2: return 10_000;
+      case 3: return 20_000;
+      case 4: return 40_000;
+      default: return 60_000;
+    }
+  }
+
+  private recordFailure(): void {
+    const now = Date.now();
+    // Don't compound backoff if we're already inside a prior window.
+    if (now < this.nextAttemptAt) return;
+    this.consecutiveFailures++;
+    this.nextAttemptAt = now + this.backoffDelayMs();
+  }
+
+  private setBackoffUntil(untilMs: number): void {
+    this.consecutiveFailures++;
+    this.nextAttemptAt = untilMs;
+  }
+
+  private resetBackoff(): void {
+    this.consecutiveFailures = 0;
+    this.nextAttemptAt = 0;
   }
 
   private persist(): void {

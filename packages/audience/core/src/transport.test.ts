@@ -38,6 +38,7 @@ describe('httpSend', () => {
       },
       body: JSON.stringify(payload),
       keepalive: undefined,
+      signal: expect.any(AbortSignal),
     });
   });
 
@@ -166,11 +167,96 @@ describe('httpSend', () => {
     expect(result.error?.cause).toBe(networkError);
   });
 
-  it('never rejects — even when fetch throws synchronously', async () => {
+  it('never rejects, even when fetch throws synchronously', async () => {
     global.fetch = jest.fn().mockImplementation(() => {
       throw new Error('synchronous boom');
     });
 
     await expect(httpSend('https://example.com', 'pk', payload)).resolves.toBeDefined();
+  });
+
+  it('returns status 0 NETWORK_ERROR when the 30s timeout fires', async () => {
+    jest.useFakeTimers();
+    global.fetch = jest.fn().mockImplementation(
+      (_url: string, init: RequestInit) => new Promise<Response>((_resolve, reject) => {
+        (init.signal as AbortSignal).addEventListener('abort', () => {
+          reject(new DOMException('The operation was aborted.', 'AbortError'));
+        });
+      }),
+    );
+
+    const sendPromise = httpSend('https://example.com', 'pk', payload);
+    jest.advanceTimersByTime(30_000);
+    const result = await sendPromise;
+
+    expect(result.ok).toBe(false);
+    expect(result.error?.status).toBe(0);
+
+    jest.useRealTimers();
+  });
+
+  it('returns ok:false with status 429 on rate limit response', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 429,
+      headers: { get: () => null },
+    });
+
+    const result = await httpSend('https://example.com', 'pk', payload);
+
+    expect(result.ok).toBe(false);
+    expect(result.error?.status).toBe(429);
+    expect(result.retryAfterMs).toBeUndefined();
+  });
+
+  it('attaches retryAfterMs (seconds) when 429 includes Retry-After delta-seconds', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 429,
+      headers: { get: (name: string) => (name === 'retry-after' ? '60' : null) },
+    });
+
+    const result = await httpSend('https://example.com', 'pk', payload);
+
+    expect(result.ok).toBe(false);
+    expect(result.retryAfterMs).toBe(60_000);
+  });
+
+  it('attaches retryAfterMs (HTTP-date) when 429 includes a future Retry-After date', async () => {
+    const futureDate = new Date(Date.now() + 45_000).toUTCString();
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 429,
+      headers: { get: (name: string) => (name === 'retry-after' ? futureDate : null) },
+    });
+
+    const result = await httpSend('https://example.com', 'pk', payload);
+
+    expect(result.ok).toBe(false);
+    expect(result.retryAfterMs).toBeGreaterThan(0);
+    expect(result.retryAfterMs).toBeLessThanOrEqual(45_000);
+  });
+
+  it('omits retryAfterMs when the Retry-After date is in the past', async () => {
+    const pastDate = new Date(Date.now() - 1_000).toUTCString();
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 429,
+      headers: { get: (name: string) => (name === 'retry-after' ? pastDate : null) },
+    });
+
+    const result = await httpSend('https://example.com', 'pk', payload);
+
+    expect(result.ok).toBe(false);
+    expect(result.retryAfterMs).toBeUndefined();
+  });
+
+  it('passes the AbortSignal to fetch', async () => {
+    const mockFetch = jest.fn().mockResolvedValue({ ok: true });
+    global.fetch = mockFetch;
+
+    await httpSend('https://api.immutable.com/v1/audience/messages', 'pk_imx_test', payload);
+
+    expect(mockFetch.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
   });
 });
