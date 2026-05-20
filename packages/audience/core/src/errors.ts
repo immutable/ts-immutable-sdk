@@ -49,10 +49,15 @@ export class TransportError extends Error {
  * Implementations of `HttpSend` MUST NOT reject — failures travel
  * through this result type. Callers (notably `MessageQueue.flushUnload`)
  * rely on this contract for fire-and-forget paths.
+ *
+ * `retryAfterMs` is set when the server returned 429 with a parseable
+ * `Retry-After` header. The queue uses this to override the exponential
+ * backoff schedule with the server-supplied delay.
  */
 export interface TransportResult {
   ok: boolean;
   error?: TransportError;
+  retryAfterMs?: number;
 }
 
 /**
@@ -64,16 +69,20 @@ export interface TransportResult {
  * - `'NETWORK_ERROR'` — fetch rejected before a response was received
  *                       (network failure, CORS, DNS, etc.).
  * - `'VALIDATION_REJECTED'` — backend returned 2xx but the body reported
- *                       `rejected > 0`. Terminal: retrying won't help, the
- *                       messages were dropped from the queue. Inspect
- *                       `responseBody` for the per-message detail when the
- *                       backend provides it.
+ *                       `rejected > 0`, or the server returned a 4xx (non-429)
+ *                       indicating the payload was malformed or unauthorised.
+ *                       Terminal: retrying won't help, the messages were dropped
+ *                       from the queue.
+ * - `'RATE_LIMITED'` — server returned 429. The batch is retained and will
+ *                       be retried after the backoff window (honoring
+ *                       `Retry-After` when present).
  */
 export type AudienceErrorCode =
   | 'FLUSH_FAILED'
   | 'CONSENT_SYNC_FAILED'
   | 'NETWORK_ERROR'
-  | 'VALIDATION_REJECTED';
+  | 'VALIDATION_REJECTED'
+  | 'RATE_LIMITED';
 
 /**
  * Public error type passed to the SDK's `onError` callback. Wraps the
@@ -166,7 +175,34 @@ export function toAudienceError(
     });
   }
 
-  // Generic HTTP failure (4xx / 5xx).
+  // 429 — rate limited, retryable. Batch is kept; queue applies backoff.
+  if (err.status === 429) {
+    return new AudienceError({
+      code: 'RATE_LIMITED',
+      message: source === 'flush'
+        ? 'Flush rate limited (429)'
+        : 'Consent sync rate limited (429)',
+      status: err.status,
+      endpoint: err.endpoint,
+      responseBody: err.body,
+    });
+  }
+
+  // 4xx (non-429) — server deterministically rejected the payload. Terminal:
+  // a bad publishable key or malformed body won't be fixed by retrying.
+  if (err.status >= 400 && err.status < 500) {
+    return new AudienceError({
+      code: source === 'flush' ? 'VALIDATION_REJECTED' : 'CONSENT_SYNC_FAILED',
+      message: source === 'flush'
+        ? `Flush rejected with status ${err.status}`
+        : `Consent sync failed with status ${err.status}`,
+      status: err.status,
+      endpoint: err.endpoint,
+      responseBody: err.body,
+    });
+  }
+
+  // 5xx or other non-2xx/4xx — server unhealthy. Keep batch, apply backoff.
   return new AudienceError({
     code: source === 'flush' ? 'FLUSH_FAILED' : 'CONSENT_SYNC_FAILED',
     message: source === 'flush'

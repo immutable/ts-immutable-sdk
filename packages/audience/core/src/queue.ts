@@ -82,6 +82,11 @@ export class MessageQueue {
 
   private readonly flushSize: number;
 
+  private consecutiveFailures = 0;
+
+  // Epoch ms before which flush() is a no-op. Zero = no active backoff.
+  private nextAttemptAt = 0;
+
   constructor(
     private readonly send: HttpSend,
     private readonly publishableKey: string,
@@ -138,6 +143,7 @@ export class MessageQueue {
    */
   async flush(): Promise<void> {
     if (this.flushing || this.messages.length === 0) return;
+    if (Date.now() < this.nextAttemptAt) return;
 
     this.flushing = true;
     try {
@@ -159,6 +165,14 @@ export class MessageQueue {
       if (result.ok || isTerminal) {
         this.messages = this.messages.slice(batch.length);
         this.persist();
+        this.resetBackoff();
+      } else if (audienceErr) {
+        // 429 with Retry-After overrides the exponential schedule.
+        if (result.retryAfterMs !== undefined) {
+          this.setBackoffUntil(Date.now() + result.retryAfterMs);
+        } else {
+          this.recordFailure();
+        }
       }
 
       this.onFlush?.(result.ok, batch.length);
@@ -235,6 +249,35 @@ export class MessageQueue {
       window.removeEventListener('pagehide', this.pagehideHandler);
     }
     this.unloadBound = false;
+  }
+
+  private backoffDelayMs(): number {
+    switch (this.consecutiveFailures) {
+      case 0: return 0;
+      case 1: return 5_000;
+      case 2: return 10_000;
+      case 3: return 20_000;
+      case 4: return 40_000;
+      default: return 60_000;
+    }
+  }
+
+  private recordFailure(): void {
+    const now = Date.now();
+    // Don't compound backoff if we're already inside a prior window.
+    if (now < this.nextAttemptAt) return;
+    this.consecutiveFailures++;
+    this.nextAttemptAt = now + this.backoffDelayMs();
+  }
+
+  private setBackoffUntil(untilMs: number): void {
+    this.consecutiveFailures++;
+    this.nextAttemptAt = untilMs;
+  }
+
+  private resetBackoff(): void {
+    this.consecutiveFailures = 0;
+    this.nextAttemptAt = 0;
   }
 
   private persist(): void {

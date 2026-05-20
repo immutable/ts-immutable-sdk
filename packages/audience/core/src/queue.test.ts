@@ -326,6 +326,180 @@ describe('MessageQueue', () => {
   });
 });
 
+describe('exponential backoff', () => {
+  it('skips flush while inside the backoff window', async () => {
+    const start = 1_000_000;
+    jest.setSystemTime(start);
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(failResult);
+    const queue = createQueue(send);
+
+    queue.enqueue(makeMessage('1'));
+
+    // First flush — records failure, sets backoff to start+5000
+    await queue.flush();
+    expect(send).toHaveBeenCalledTimes(1);
+
+    // Still inside backoff window — flush is a no-op
+    jest.setSystemTime(start + 4_999);
+    await queue.flush();
+    expect(send).toHaveBeenCalledTimes(1);
+
+    // Past backoff window — flush proceeds
+    jest.setSystemTime(start + 5_001);
+    await queue.flush();
+    expect(send).toHaveBeenCalledTimes(2);
+  });
+
+  it('escalates backoff: 5s → 10s → 20s → 40s → 60s', async () => {
+    // Each step: trigger a failure, assert blocked before window, assert unblocked after.
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(failResult);
+    const queue = createQueue(send);
+    queue.enqueue(makeMessage('1'));
+
+    let now = 1_000_000;
+    let calls = 0;
+
+    const step = async (delay: number) => {
+      jest.setSystemTime(now);
+      await queue.flush();
+      calls++;
+      expect(send).toHaveBeenCalledTimes(calls);
+
+      jest.setSystemTime(now + delay - 1);
+      await queue.flush();
+      expect(send).toHaveBeenCalledTimes(calls); // still blocked
+
+      now += delay + 1;
+      jest.setSystemTime(now);
+    };
+
+    await step(5_000);
+    await step(10_000);
+    await step(20_000);
+    await step(40_000);
+    await step(60_000);
+  });
+
+  it('resets backoff on a successful flush', async () => {
+    const start = 1_000_000;
+    jest.setSystemTime(start);
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>()
+      .mockResolvedValueOnce(failResult)
+      .mockResolvedValue(okResult);
+    const queue = createQueue(send);
+
+    queue.enqueue(makeMessage('1'));
+    queue.enqueue(makeMessage('2'));
+
+    // First flush fails — backoff starts
+    await queue.flush();
+    expect(send).toHaveBeenCalledTimes(1);
+
+    // Advance past the 5s window; second flush succeeds — backoff resets
+    jest.setSystemTime(start + 5_001);
+    await queue.flush();
+    expect(send).toHaveBeenCalledTimes(2);
+
+    // Should be able to flush immediately after reset
+    queue.enqueue(makeMessage('3'));
+    await queue.flush();
+    expect(send).toHaveBeenCalledTimes(3);
+  });
+
+  it('uses Retry-After delay when server supplies it on 429', async () => {
+    const start = 1_000_000;
+    jest.setSystemTime(start);
+    const rateLimitResult: TransportResult = {
+      ok: false,
+      error: new TransportError({ status: 429, endpoint: 'https://api.immutable.com/v1/audience/messages' }),
+      retryAfterMs: 30_000,
+    };
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>()
+      .mockResolvedValueOnce(rateLimitResult)
+      .mockResolvedValue(okResult);
+    const queue = createQueue(send);
+
+    queue.enqueue(makeMessage('1'));
+
+    await queue.flush();
+    expect(send).toHaveBeenCalledTimes(1);
+
+    // 29s — still inside Retry-After window
+    jest.setSystemTime(start + 29_000);
+    await queue.flush();
+    expect(send).toHaveBeenCalledTimes(1);
+
+    // Past the window
+    jest.setSystemTime(start + 30_001);
+    await queue.flush();
+    expect(send).toHaveBeenCalledTimes(2);
+    expect(queue.length).toBe(0);
+  });
+
+  it('fires RATE_LIMITED via onError on 429 and keeps the batch', async () => {
+    const onError = jest.fn();
+    const rateLimitResult: TransportResult = {
+      ok: false,
+      error: new TransportError({ status: 429, endpoint: 'https://api.immutable.com/v1/audience/messages' }),
+    };
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(rateLimitResult);
+    const queue = createQueue(send, { onError });
+
+    queue.enqueue(makeMessage('1'));
+    await queue.flush();
+
+    expect(queue.length).toBe(1);
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onError.mock.calls[0][0].code).toBe('RATE_LIMITED');
+    expect(onError.mock.calls[0][0].status).toBe(429);
+  });
+});
+
+describe('4xx drop', () => {
+  it('drops batch and fires VALIDATION_REJECTED on non-retryable 4xx', async () => {
+    const onError = jest.fn();
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
+      ok: false,
+      error: new TransportError({
+        status: 401,
+        endpoint: 'https://api.immutable.com/v1/audience/messages',
+        body: 'Unauthorized',
+      }),
+    });
+    const queue = createQueue(send, { onError });
+
+    queue.enqueue(makeMessage('1'));
+    queue.enqueue(makeMessage('2'));
+    await queue.flush();
+
+    expect(queue.length).toBe(0);
+    expect(onError).toHaveBeenCalledTimes(1);
+    const err = onError.mock.calls[0][0];
+    expect(err.code).toBe('VALIDATION_REJECTED');
+    expect(err.status).toBe(401);
+  });
+
+  it('drops batch and fires VALIDATION_REJECTED on 400', async () => {
+    const onError = jest.fn();
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
+      ok: false,
+      error: new TransportError({
+        status: 400,
+        endpoint: 'https://api.immutable.com/v1/audience/messages',
+        body: { error: 'bad request' },
+      }),
+    });
+    const queue = createQueue(send, { onError });
+
+    queue.enqueue(makeMessage('1'));
+    await queue.flush();
+
+    expect(queue.length).toBe(0);
+    expect(onError.mock.calls[0][0].code).toBe('VALIDATION_REJECTED');
+    expect(onError.mock.calls[0][0].status).toBe(400);
+  });
+});
+
 describe('page-unload flush (keepalive)', () => {
   it('flushes via keepalive fetch on visibilitychange to hidden', () => {
     const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
