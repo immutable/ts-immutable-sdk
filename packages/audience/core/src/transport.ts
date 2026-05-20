@@ -14,7 +14,7 @@ export interface TransportOptions {
  * type into `MessageQueue` and `createConsentManager` so tests can
  * substitute a fake by passing `jest.fn<HttpSend>()` directly.
  *
- * Implementations MUST NOT reject — failures are returned via
+ * Implementations MUST NOT reject; failures are returned via
  * {@link TransportResult}. Callers rely on this contract for
  * fire-and-forget code paths (page-unload flush).
  */

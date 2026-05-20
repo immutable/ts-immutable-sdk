@@ -167,7 +167,7 @@ describe('httpSend', () => {
     expect(result.error?.cause).toBe(networkError);
   });
 
-  it('never rejects — even when fetch throws synchronously', async () => {
+  it('never rejects, even when fetch throws synchronously', async () => {
     global.fetch = jest.fn().mockImplementation(() => {
       throw new Error('synchronous boom');
     });

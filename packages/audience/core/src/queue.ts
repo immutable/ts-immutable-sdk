@@ -34,7 +34,7 @@ export interface MessageQueueOptions {
   /**
    * Override the localStorage key prefix (default: '__imtbl_audience_').
    * Use when multiple SDK surfaces run on the same page to prevent
-   * queue collision — e.g. web SDK uses '__imtbl_web_' so its queued
+   * queue collision, e.g. web SDK uses '__imtbl_web_' so its queued
    * messages don't interfere with the shared SDK's queue.
    */
   storagePrefix?: string;
@@ -139,7 +139,7 @@ export class MessageQueue {
    * On success, sent messages are removed from the queue. On failure,
    * messages stay queued and retry on the next flush cycle.
    * Use this for normal operation. For page-unload scenarios, use
-   * flushUnload() instead — it's fire-and-forget and survives navigation.
+   * flushUnload() instead; it's fire-and-forget and survives navigation.
    */
   async flush(): Promise<void> {
     if (this.flushing || this.messages.length === 0) return;
@@ -159,7 +159,7 @@ export class MessageQueue {
 
       // Drop the batch on success OR on a terminal validation failure.
       // VALIDATION_REJECTED means the backend deterministically rejected
-      // some messages — retrying won't help, so we drop them rather than
+      // some messages - retrying won't help, so we drop them rather than
       // accumulate stale data forever.
       const isTerminal = audienceErr?.code === 'VALIDATION_REJECTED';
       if (result.ok || isTerminal) {
@@ -189,7 +189,7 @@ export class MessageQueue {
    *
    * Uses `fetch` with `keepalive: true` so the request survives page
    * navigation. Unlike `flush()`, this is synchronous and does not wait
-   * for the response — use it only in `visibilitychange`/`pagehide`
+   * for the response; use it only in `visibilitychange`/`pagehide`
    * handlers or in `shutdown()`.
    */
   flushUnload(): void {
@@ -198,7 +198,7 @@ export class MessageQueue {
     const batch = this.messages.slice(0, MAX_BATCH_SIZE);
     const payload: BatchPayload = { messages: batch };
 
-    // Fire-and-forget — `keepalive: true` lets the request survive page
+    // Fire-and-forget: `keepalive: true` lets the request survive page
     // navigation. We optimistically drop the batch because the page is
     // going away and can't retry. The HttpSend contract guarantees this
     // promise never rejects, so the floating call is safe.

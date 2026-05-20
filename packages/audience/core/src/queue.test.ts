@@ -93,7 +93,7 @@ describe('MessageQueue', () => {
     expect(send).not.toHaveBeenCalled();
 
     queue.enqueue(makeMessage('2'));
-    // flush is async — await the microtask
+    // flush is async, await the microtask
     await Promise.resolve();
     expect(send).toHaveBeenCalledTimes(1);
   });
@@ -335,16 +335,16 @@ describe('exponential backoff', () => {
 
     queue.enqueue(makeMessage('1'));
 
-    // First flush — records failure, sets backoff to start+5000
+    // First flush: records failure, sets backoff to start+5000
     await queue.flush();
     expect(send).toHaveBeenCalledTimes(1);
 
-    // Still inside backoff window — flush is a no-op
+    // Still inside backoff window: flush is a no-op
     jest.setSystemTime(start + 4_999);
     await queue.flush();
     expect(send).toHaveBeenCalledTimes(1);
 
-    // Past backoff window — flush proceeds
+    // Past backoff window: flush proceeds
     jest.setSystemTime(start + 5_001);
     await queue.flush();
     expect(send).toHaveBeenCalledTimes(2);
@@ -391,11 +391,11 @@ describe('exponential backoff', () => {
     queue.enqueue(makeMessage('1'));
     queue.enqueue(makeMessage('2'));
 
-    // First flush fails — backoff starts
+    // First flush fails; backoff starts
     await queue.flush();
     expect(send).toHaveBeenCalledTimes(1);
 
-    // Advance past the 5s window; second flush succeeds — backoff resets
+    // Advance past the 5s window; second flush succeeds, backoff resets
     jest.setSystemTime(start + 5_001);
     await queue.flush();
     expect(send).toHaveBeenCalledTimes(2);
@@ -424,7 +424,7 @@ describe('exponential backoff', () => {
     await queue.flush();
     expect(send).toHaveBeenCalledTimes(1);
 
-    // 29s — still inside Retry-After window
+    // 29s: still inside Retry-After window
     jest.setSystemTime(start + 29_000);
     await queue.flush();
     expect(send).toHaveBeenCalledTimes(1);
@@ -591,7 +591,7 @@ describe('page-unload flush (keepalive)', () => {
     );
     expect(queue.length).toBe(0);
 
-    // Listeners removed — no double flush
+    // Listeners removed - no double flush
     queue.enqueue(makeMessage('3'));
     window.dispatchEvent(new Event('pagehide'));
     expect(send).toHaveBeenCalledTimes(1);
@@ -609,7 +609,7 @@ describe('page-unload flush (keepalive)', () => {
     // Start an async flush (sets flushing = true)
     const pending = queue.flush();
 
-    // pagehide fires while async flush is in flight — unload flush should be skipped
+    // pagehide fires while async flush is in flight; unload flush should be skipped
     window.dispatchEvent(new Event('pagehide'));
     // Only 1 call (the async flush), no keepalive call
     expect(send).toHaveBeenCalledTimes(1);
