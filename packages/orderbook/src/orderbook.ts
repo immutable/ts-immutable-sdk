@@ -704,8 +704,14 @@ export class Orderbook {
   }
 
   /**
-   * Create a metadata bid (collection criteria offer plus metadata ID submitted to the API).
-   * @param {CreateMetadataBidParams} createMetadataBidParams - Signed order and metadata ID.
+   * Create a metadata bid (collection criteria offer plus a metadata matching
+   * spec submitted to the API). The matching spec is either a single
+   * `metadataId` (NFTs whose indexed metadata stack ID equals this UUID) or
+   * a `metadataCriteria` array of field-level filters (NFTs whose metadata
+   * satisfies every filter; AND across filters, OR within a filter's
+   * `values`, case-insensitive). Exactly one of the two must be provided.
+   * @param {CreateMetadataBidParams} createMetadataBidParams - Signed order and
+   *   metadata ID or criteria.
    * @return {MetadataBidResult} The created metadata bid.
    */
   async createMetadataBid(

@@ -1,7 +1,11 @@
 import { Fee } from './sdk';
 import { Order as OpenApiOrder } from './sdk/models/Order';
 import { ProtocolData } from './sdk/models/ProtocolData';
-import { mapOrderFromOpenApiOrder, mapTraitBidFromOpenApiOrder } from './mapper';
+import {
+  mapMetadataBidFromOpenApiOrder,
+  mapOrderFromOpenApiOrder,
+  mapTraitBidFromOpenApiOrder,
+} from './mapper';
 
 describe('mapTraitBidFromOpenApiOrder', () => {
   const baseOrder: OpenApiOrder = {
@@ -83,6 +87,94 @@ describe('mapTraitBidFromOpenApiOrder', () => {
     expect(mapped.type).toBe('TRAIT_BID');
     if (mapped.type === 'TRAIT_BID') {
       expect(mapped.traitCriteria).toEqual([{ traitType: 'Rarity', values: ['Legendary'] }]);
+    }
+  });
+});
+
+describe('mapMetadataBidFromOpenApiOrder', () => {
+  const baseOrder: OpenApiOrder = {
+    id: '018792c9-4ad7-8ec4-4038-9e05c598534a',
+    type: OpenApiOrder.type.METADATA_BID,
+    account_address: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+    chain: { id: 'eip155:11155111', name: 'imtbl-zkevm-testnet' },
+    created_at: '2022-03-07T07:20:50.52Z',
+    updated_at: '2022-03-07T07:20:50.52Z',
+    start_at: '2022-03-09T05:00:50.52Z',
+    end_at: '2022-03-10T05:00:50.52Z',
+    order_hash: '0xabc',
+    salt: '1',
+    signature: '0x',
+    status: { name: 'ACTIVE' },
+    fill_status: { numerator: '0', denominator: '1' },
+    fees: [],
+    protocol_data: {
+      order_type: ProtocolData.order_type.PARTIAL_RESTRICTED,
+      counter: '0',
+      zone_address: '0x12',
+      seaport_address: '0x34',
+      seaport_version: '1.5',
+    },
+    sell: [
+      {
+        type: 'ERC20',
+        contract_address: '0x0165878a594ca255338adfa4d48449f69242eb8f',
+        amount: '1000',
+      },
+    ],
+    buy: [
+      {
+        type: 'ERC721_COLLECTION',
+        contract_address: '0x692edad005237c7e737bb2c0f3d8cccc10d3479e',
+        amount: '1',
+      },
+    ],
+  };
+
+  it('maps metadataId mode', () => {
+    const order: OpenApiOrder = {
+      ...baseOrder,
+      metadata_id: '018792c9-4ad7-8ec4-4038-9e05c598534b',
+    };
+
+    const mapped = mapMetadataBidFromOpenApiOrder(order);
+
+    expect(mapped.metadataId).toBe('018792c9-4ad7-8ec4-4038-9e05c598534b');
+    expect(mapped.metadataCriteria).toEqual([]);
+  });
+
+  it('maps metadata_criteria from snake_case API fields', () => {
+    const order: OpenApiOrder = {
+      ...baseOrder,
+      metadata_criteria: [
+        { field_name: 'name', values: ['Cool Dragon'] },
+        { field_name: 'attribute:Background', values: ['Blue', 'Red'] },
+      ],
+    };
+
+    const mapped = mapMetadataBidFromOpenApiOrder(order);
+
+    expect(mapped.metadataId).toBeUndefined();
+    expect(mapped.metadataCriteria).toEqual([
+      { fieldName: 'name', values: ['Cool Dragon'] },
+      { fieldName: 'attribute:Background', values: ['Blue', 'Red'] },
+    ]);
+  });
+
+  it('defaults metadataCriteria to empty when omitted', () => {
+    const mapped = mapMetadataBidFromOpenApiOrder(baseOrder);
+    expect(mapped.metadataCriteria).toEqual([]);
+    expect(mapped.metadataId).toBeUndefined();
+  });
+
+  it('routes METADATA_BID through mapOrderFromOpenApiOrder', () => {
+    const order: OpenApiOrder = {
+      ...baseOrder,
+      metadata_criteria: [{ field_name: 'name', values: ['Foo'] }],
+    };
+    const mapped = mapOrderFromOpenApiOrder(order);
+    expect(mapped.type).toBe('METADATA_BID');
+    if (mapped.type === 'METADATA_BID') {
+      expect(mapped.metadataCriteria).toEqual([{ fieldName: 'name', values: ['Foo'] }]);
     }
   });
 });

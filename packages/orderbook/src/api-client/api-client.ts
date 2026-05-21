@@ -37,7 +37,71 @@ import {
   ListMetadataBidsParams,
   ListTraitBidsParams,
   ListTradesParams,
+  MetadataAttributeField,
+  MetadataFieldFilter,
+  MetadataFieldName,
+  MetadataTopLevelField,
 } from '../types';
+
+const METADATA_TOP_LEVEL_FIELDS = new Set<MetadataTopLevelField>([
+  'name',
+  'image',
+  'description',
+  'animation_url',
+  'external_url',
+  'youtube_url',
+]);
+
+const METADATA_ATTRIBUTE_PREFIX = 'attribute:';
+
+const KNOWN_METADATA_FIELD_NAMES_DESCRIPTION = 'name, image, description, animation_url, '
+  + 'external_url, youtube_url, or "attribute:<trait_type>"';
+
+function isAttributeField(fieldName: string): fieldName is MetadataAttributeField {
+  return fieldName.startsWith(METADATA_ATTRIBUTE_PREFIX)
+    && fieldName.length > METADATA_ATTRIBUTE_PREFIX.length;
+}
+
+function isKnownMetadataFieldName(fieldName: string): fieldName is MetadataFieldName {
+  return METADATA_TOP_LEVEL_FIELDS.has(fieldName as MetadataTopLevelField)
+    || isAttributeField(fieldName);
+}
+
+/**
+ * Validates client-side rules for metadata bid criteria before sending to the
+ * API. The API performs the same checks server-side; this validation is here
+ * to give callers a clear, immediate error.
+ */
+function validateMetadataCriteria(criteria: MetadataFieldFilter[]): void {
+  if (criteria.length === 0) {
+    throw new Error('metadataCriteria must contain at least one filter');
+  }
+
+  const seenFieldNames = new Set<string>();
+  criteria.forEach((filter) => {
+    if (!filter.fieldName) {
+      throw new Error('metadataCriteria entries must have a non-empty fieldName');
+    }
+    if (!isKnownMetadataFieldName(filter.fieldName)) {
+      throw new Error(
+        `metadataCriteria fieldName "${filter.fieldName}" must be one of `
+        + `${KNOWN_METADATA_FIELD_NAMES_DESCRIPTION}`,
+      );
+    }
+    if (!filter.values || filter.values.length === 0) {
+      throw new Error(
+        `metadataCriteria filter "${filter.fieldName}" must have at least one value`,
+      );
+    }
+    if (seenFieldNames.has(filter.fieldName)) {
+      throw new Error(
+        `metadataCriteria contains duplicate fieldName "${filter.fieldName}"; `
+        + 'use a single filter per field with multiple values instead',
+      );
+    }
+    seenFieldNames.add(filter.fieldName);
+  });
+}
 
 export class ImmutableApiClient {
   constructor(
@@ -335,13 +399,16 @@ export class ImmutableApiClient {
     });
   }
 
-  async createMetadataBid({
-    orderHash,
-    orderComponents,
-    orderSignature,
-    makerFees,
-    metadataId,
-  }: CreateMetadataBidParams): Promise<MetadataBidResult> {
+  async createMetadataBid(params: CreateMetadataBidParams): Promise<MetadataBidResult> {
+    const {
+      orderHash,
+      orderComponents,
+      orderSignature,
+      makerFees,
+      metadataId,
+      metadataCriteria,
+    } = params;
+
     if (orderComponents.offer.length !== 1) {
       throw new Error('Only one item can be listed for a metadata bid');
     }
@@ -360,8 +427,18 @@ export class ImmutableApiClient {
       throw new Error('Only ERC721 / ERC1155 collection based tokens can be bid against');
     }
 
-    if (!metadataId) {
-      throw new Error('A metadata_id is required for a metadata bid');
+    const hasMetadataId = !!metadataId;
+    const hasMetadataCriteria = !!metadataCriteria && metadataCriteria.length > 0;
+    if (hasMetadataId && hasMetadataCriteria) {
+      throw new Error(
+        'Exactly one of metadataId or metadataCriteria must be provided, not both',
+      );
+    }
+    if (!hasMetadataId && !hasMetadataCriteria) {
+      throw new Error('Exactly one of metadataId or metadataCriteria must be provided');
+    }
+    if (hasMetadataCriteria) {
+      validateMetadataCriteria(metadataCriteria);
     }
 
     return this.orderbookService.createMetadataBid({
@@ -392,7 +469,10 @@ export class ImmutableApiClient {
         start_at: new Date(
           parseInt(`${orderComponents.startTime.toString()}000`, 10),
         ).toISOString(),
-        metadata_id: metadataId,
+        metadata_id: hasMetadataId ? metadataId : undefined,
+        metadata_criteria: hasMetadataCriteria
+          ? metadataCriteria.map((c) => ({ field_name: c.fieldName, values: c.values }))
+          : undefined,
       },
     });
   }
