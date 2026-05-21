@@ -5,6 +5,7 @@
 import type { AssetCollectionItem } from './AssetCollectionItem';
 import type { ERC20Item } from './ERC20Item';
 import type { Fee } from './Fee';
+import type { MetadataFieldFilter } from './MetadataFieldFilter';
 import type { ProtocolData } from './ProtocolData';
 
 export type CreateMetadataBidRequestBody = {
@@ -40,7 +41,13 @@ export type CreateMetadataBidRequestBody = {
    */
   start_at: string;
   /**
-   * The metadata_id (stack_id) that NFTs must have to fulfil this bid
+   * The metadata_id (stack_id) that NFTs must have to fulfil this bid.
+   * Mutually exclusive with `metadata_criteria`; exactly one must be set.
    */
-  metadata_id: string;
+  metadata_id?: string;
+  /**
+   * Field-level metadata filters that NFTs must satisfy to fulfil this bid.
+   * Mutually exclusive with `metadata_id`; exactly one must be set.
+   */
+  metadata_criteria?: Array<MetadataFieldFilter>;
 };

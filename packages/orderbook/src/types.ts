@@ -83,14 +83,56 @@ export interface TraitBid extends OrderFields {
   traitCriteria: TraitFilter[];
 }
 
+/**
+ * Top-level NFT metadata fields a metadata bid criterion may target.
+ * Mirrors the ERC-721 / OpenSea metadata schema indexed by Immutable.
+ */
+export type MetadataTopLevelField =
+  | 'name'
+  | 'image'
+  | 'description'
+  | 'animation_url'
+  | 'external_url'
+  | 'youtube_url';
+
+/**
+ * An attribute-style field name. The portion after `attribute:` is the
+ * attribute's `trait_type` (e.g. `attribute:Background`).
+ */
+export type MetadataAttributeField = `attribute:${string}`;
+
+/**
+ * Field name a single metadata bid criterion can target. Either a known
+ * top-level metadata field, or an attribute-prefixed name.
+ */
+export type MetadataFieldName = MetadataTopLevelField | MetadataAttributeField;
+
+/**
+ * A single metadata bid criterion: a field name plus the acceptable values
+ * for that field. Within a filter values are OR'd; across filters they AND.
+ * Comparisons are case-insensitive.
+ */
+export interface MetadataFieldFilter {
+  fieldName: MetadataFieldName;
+  values: string[];
+}
+
 export interface MetadataBid extends OrderFields {
   type: 'METADATA_BID';
   sell: ERC20Item[];
   buy: (ERC721CollectionItem | ERC1155CollectionItem)[];
   /**
    * The metadata ID (stack ID) that NFTs must match to fulfil this bid.
+   * Set when the bid was created with a single metadata stack identifier.
+   * Mutually exclusive with `metadataCriteria`.
    */
-  metadataId: string;
+  metadataId?: string;
+  /**
+   * Field-level metadata filters that NFTs must match to fulfil this bid.
+   * Set when the bid was created with criteria instead of a metadata ID.
+   * Empty when the bid was created with a `metadataId`.
+   */
+  metadataCriteria: MetadataFieldFilter[];
 }
 
 interface OrderFields {
@@ -401,9 +443,20 @@ export type PrepareMetadataBidParams = PrepareCollectionBidParams;
 
 export type PrepareMetadataBidResponse = PrepareOrderResponse;
 
-export interface CreateMetadataBidParams extends CreateCollectionBidParams {
-  metadataId: string;
-}
+/**
+ * Parameters for creating a metadata bid. Exactly one of `metadataId` or
+ * `metadataCriteria` must be provided.
+ *
+ * - `metadataId` mode: matches NFTs whose indexed metadata stack ID equals
+ *   the supplied UUID.
+ * - `metadataCriteria` mode: matches NFTs whose metadata satisfies every
+ *   filter (AND across filters, OR within a filter's `values`,
+ *   case-insensitive).
+ */
+export type CreateMetadataBidParams = CreateCollectionBidParams & (
+  | { metadataId: string; metadataCriteria?: never }
+  | { metadataId?: never; metadataCriteria: MetadataFieldFilter[] }
+);
 
 /* Fulfilment Ops */
 

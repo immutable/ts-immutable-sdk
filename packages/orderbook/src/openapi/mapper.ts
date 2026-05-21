@@ -9,6 +9,8 @@ import {
   FeeType,
   Listing,
   MetadataBid,
+  MetadataFieldFilter,
+  MetadataFieldName,
   NativeItem,
   Order,
   Page,
@@ -18,6 +20,7 @@ import {
 } from '../types';
 import { exhaustiveSwitch } from '../utils';
 import { Order as OpenApiOrder } from './sdk/models/Order';
+import type { MetadataFieldFilter as OpenApiMetadataFieldFilter } from './sdk/models/MetadataFieldFilter';
 import type { TraitFilter as OpenApiTraitFilter } from './sdk/models/TraitFilter';
 import { Page as OpenApiPage } from './sdk/models/Page';
 import { Trade as OpenApiTrade } from './sdk/models/Trade';
@@ -175,6 +178,20 @@ function mapTraitCriteriaFromOpenApi(
   }
   return criteria.map((c) => ({
     traitType: c.trait_type,
+    values: [...c.values],
+  }));
+}
+
+function mapMetadataCriteriaFromOpenApi(
+  criteria: OpenApiMetadataFieldFilter[] | undefined,
+): MetadataFieldFilter[] {
+  if (!criteria?.length) {
+    return [];
+  }
+  return criteria.map((c) => ({
+    // The API enforces that field_name is either a known top-level metadata
+    // field or starts with `attribute:`, so the cast is sound at runtime.
+    fieldName: c.field_name as MetadataFieldName,
     values: [...c.values],
   }));
 }
@@ -381,7 +398,8 @@ export function mapMetadataBidFromOpenApiOrder(order: OpenApiOrder): MetadataBid
     },
     createdAt: order.created_at,
     updatedAt: order.updated_at,
-    metadataId: order.metadata_id ?? '',
+    metadataId: order.metadata_id,
+    metadataCriteria: mapMetadataCriteriaFromOpenApi(order.metadata_criteria),
   };
 }
 

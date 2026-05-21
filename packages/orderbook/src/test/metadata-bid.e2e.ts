@@ -26,19 +26,49 @@ const ERC721_ABI = [
   'function ownerOf(uint256 tokenId) external view returns (address)',
 ];
 
+interface NftAttribute {
+  trait_type: string;
+  value: string;
+}
+
+interface NftMetadataOverrides {
+  name?: string;
+  image?: string;
+  description?: string;
+  animationUrl?: string;
+  externalUrl?: string;
+  youtubeUrl?: string;
+  attributes?: NftAttribute[];
+}
+
+const escapeSqlString = (s: string) => s.replace(/'/g, "''");
+
+const stringLiteralOrNull = (v: string | undefined) => (v === undefined ? 'NULL' : `'${escapeSqlString(v)}'`);
+
 /**
- * Seeds the indexer-mr database so that the given NFT is associated with a metadata_id.
- * This allows the fulfillment endpoint to validate the token against the metadata bid.
+ * Seeds the indexer-mr database so that the given NFT is associated with a
+ * metadata_id and the configured metadata fields. This lets the fulfillment
+ * endpoint validate the token against a metadata bid (either by id or by
+ * field-level criteria).
+ *
+ * Returns the generated metadata_id, which callers using id-based bids should
+ * pass into `createMetadataBid`. Callers using criteria-based bids can ignore
+ * the return value.
  */
 function ensureIndexerNft(
   contractAddress: string,
   tokenId: string,
+  overrides: NftMetadataOverrides = {},
 ): string {
   const port = process.env.INDEXER_MR_POSTGRES_PORT ?? '5434';
   const connStr = `postgres://postgres:postgres@localhost:${port}/indexer-mr`;
   const metadataId = randomUUID();
   const metadataHash = randomBytes(16).toString('hex');
   const nftId = randomUUID();
+
+  const name = overrides.name ?? 'e2e metadata-bid nft';
+  const image = overrides.image ?? 'https://example.com/nft.png';
+  const attributesJson = JSON.stringify(overrides.attributes ?? []);
 
   const sql = `
     BEGIN;
@@ -57,11 +87,17 @@ function ensureIndexerNft(
     ON CONFLICT (chain_id, contract_address) DO NOTHING;
 
     INSERT INTO nft_metadata
-      (id, chain_id, contract_address, hash, name, image, attributes, created_at, updated_at)
+      (id, chain_id, contract_address, hash, name, image,
+       description, animation_url, external_url, youtube_url,
+       attributes, created_at, updated_at)
     VALUES
       ('${metadataId}'::uuid, '${LOCAL_CHAIN_ID}', LOWER('${contractAddress}'),
-       '${metadataHash}', 'e2e metadata-bid nft', 'https://example.com/nft.png',
-       '[]'::jsonb, NOW(), NOW());
+       '${metadataHash}', '${escapeSqlString(name)}', '${escapeSqlString(image)}',
+       ${stringLiteralOrNull(overrides.description)},
+       ${stringLiteralOrNull(overrides.animationUrl)},
+       ${stringLiteralOrNull(overrides.externalUrl)},
+       ${stringLiteralOrNull(overrides.youtubeUrl)},
+       '${escapeSqlString(attributesJson)}'::jsonb, NOW(), NOW());
 
     INSERT INTO nfts
       (id, chain_id, contract_address, token_id, contract_type, indexed_at, updated_at, metadata_id)
@@ -76,7 +112,7 @@ function ensureIndexerNft(
     COMMIT;
   `;
 
-  execSync(`psql "${connStr}" -c "${sql.replace(/\n/g, ' ')}"`, { stdio: 'pipe' });
+  execSync(`psql "${connStr}"`, { input: sql, stdio: ['pipe', 'pipe', 'pipe'] });
   return metadataId;
 }
 
@@ -313,5 +349,210 @@ describe('metadata bid e2e', () => {
 
     expect(filledBid.id).toEqual(createdBid.id);
     expect(filledBid.status.name).toEqual(OrderStatusName.FILLED);
+  }, 120_000);
+
+  it('should prepare, create, and get a metadata bid with criteria', async () => {
+    const metadataCriteria = [
+      { fieldName: 'attribute:Background' as const, values: ['Blue', 'Red'] },
+      { fieldName: 'name' as const, values: ['Cool Dragon'] },
+    ];
+
+    const prepareResult = await sdk.prepareMetadataBid({
+      makerAddress: maker.address,
+      sell: {
+        contractAddress: erc20Address,
+        amount: '750000',
+        type: 'ERC20',
+      },
+      buy: {
+        contractAddress: erc721Address,
+        type: 'ERC721_COLLECTION',
+        amount: '1',
+      },
+    });
+
+    const signatures = await actionAll(prepareResult.actions, maker);
+
+    const { result: createdBid } = await sdk.createMetadataBid({
+      orderComponents: prepareResult.orderComponents,
+      orderHash: prepareResult.orderHash,
+      orderSignature: signatures[0],
+      makerFees: [],
+      metadataCriteria,
+    });
+
+    expect(createdBid.id).toBeDefined();
+    expect(createdBid.type).toEqual('METADATA_BID');
+    expect(createdBid.metadataId).toBeUndefined();
+    expect(createdBid.metadataCriteria).toEqual(metadataCriteria);
+
+    const activeBid = await waitForMetadataBidToBeOfStatus(
+      sdk,
+      createdBid.id,
+      OrderStatusName.ACTIVE,
+    );
+
+    expect(activeBid.id).toEqual(createdBid.id);
+    expect(activeBid.metadataId).toBeUndefined();
+    expect(activeBid.metadataCriteria).toEqual(metadataCriteria);
+    expect(activeBid.status.name).toEqual(OrderStatusName.ACTIVE);
+  }, 60_000);
+
+  it('should fulfill a metadata bid matched by attribute criteria', async () => {
+    const tokenId = getRandomTokenId();
+
+    const erc721 = new Contract(erc721Address, ERC721_ABI, maker);
+    const mintTx = await erc721.safeMint(taker.address, tokenId, GAS_OVERRIDES);
+    await mintTx.wait();
+
+    ensureIndexerNft(erc721Address, tokenId, {
+      attributes: [
+        { trait_type: 'Background', value: 'Blue' },
+        { trait_type: 'Rarity', value: 'Common' },
+      ],
+    });
+
+    const takerErc721 = new Contract(erc721Address, ERC721_ABI, taker);
+    const seaportAddress = process.env.SEAPORT_CONTRACT_ADDRESS!;
+    const approvalTx = await takerErc721.setApprovalForAll(seaportAddress, true, GAS_OVERRIDES);
+    await approvalTx.wait();
+
+    const blockTime = await provider.getBlock('latest');
+
+    const prepareResult = await sdk.prepareMetadataBid({
+      makerAddress: maker.address,
+      sell: {
+        contractAddress: erc20Address,
+        amount: '100000',
+        type: 'ERC20',
+      },
+      buy: {
+        contractAddress: erc721Address,
+        type: 'ERC721_COLLECTION',
+        amount: '1',
+      },
+      orderStart: new Date(blockTime!.timestamp - 1000),
+    });
+
+    const signatures = await actionAll(prepareResult.actions, maker);
+
+    const { result: createdBid } = await sdk.createMetadataBid({
+      orderComponents: prepareResult.orderComponents,
+      orderHash: prepareResult.orderHash,
+      orderSignature: signatures[0],
+      makerFees: [],
+      // OR within values ("Blue" matches), case-insensitive on both sides.
+      metadataCriteria: [
+        { fieldName: 'attribute:Background', values: ['blue', 'red'] },
+      ],
+    });
+
+    await waitForMetadataBidToBeOfStatus(
+      sdk,
+      createdBid.id,
+      OrderStatusName.ACTIVE,
+    );
+
+    const fulfillment = await sdk.fulfillOrder(
+      createdBid.id,
+      taker.address,
+      [],
+      undefined,
+      tokenId,
+    );
+
+    await actionAll(fulfillment.actions, taker);
+
+    const filledBid = await waitForMetadataBidToBeOfStatus(
+      sdk,
+      createdBid.id,
+      OrderStatusName.FILLED,
+    );
+
+    expect(filledBid.id).toEqual(createdBid.id);
+    expect(filledBid.status.name).toEqual(OrderStatusName.FILLED);
+    expect(filledBid.metadataId).toBeUndefined();
+    expect(filledBid.metadataCriteria).toEqual([
+      { fieldName: 'attribute:Background', values: ['blue', 'red'] },
+    ]);
+  }, 120_000);
+
+  it('should fulfill a metadata bid matched by mixed top-level + attribute criteria', async () => {
+    const tokenId = getRandomTokenId();
+
+    const erc721 = new Contract(erc721Address, ERC721_ABI, maker);
+    const mintTx = await erc721.safeMint(taker.address, tokenId, GAS_OVERRIDES);
+    await mintTx.wait();
+
+    ensureIndexerNft(erc721Address, tokenId, {
+      name: 'Cool Dragon',
+      attributes: [
+        { trait_type: 'Background', value: 'Blue' },
+      ],
+    });
+
+    const takerErc721 = new Contract(erc721Address, ERC721_ABI, taker);
+    const seaportAddress = process.env.SEAPORT_CONTRACT_ADDRESS!;
+    const approvalTx = await takerErc721.setApprovalForAll(seaportAddress, true, GAS_OVERRIDES);
+    await approvalTx.wait();
+
+    const blockTime = await provider.getBlock('latest');
+
+    const prepareResult = await sdk.prepareMetadataBid({
+      makerAddress: maker.address,
+      sell: {
+        contractAddress: erc20Address,
+        amount: '100000',
+        type: 'ERC20',
+      },
+      buy: {
+        contractAddress: erc721Address,
+        type: 'ERC721_COLLECTION',
+        amount: '1',
+      },
+      orderStart: new Date(blockTime!.timestamp - 1000),
+    });
+
+    const signatures = await actionAll(prepareResult.actions, maker);
+
+    // AND across filters: NFT must have name="Cool Dragon" AND attribute:Background in {Blue}.
+    const metadataCriteria = [
+      { fieldName: 'name' as const, values: ['Cool Dragon'] },
+      { fieldName: 'attribute:Background' as const, values: ['Blue'] },
+    ];
+
+    const { result: createdBid } = await sdk.createMetadataBid({
+      orderComponents: prepareResult.orderComponents,
+      orderHash: prepareResult.orderHash,
+      orderSignature: signatures[0],
+      makerFees: [],
+      metadataCriteria,
+    });
+
+    await waitForMetadataBidToBeOfStatus(
+      sdk,
+      createdBid.id,
+      OrderStatusName.ACTIVE,
+    );
+
+    const fulfillment = await sdk.fulfillOrder(
+      createdBid.id,
+      taker.address,
+      [],
+      undefined,
+      tokenId,
+    );
+
+    await actionAll(fulfillment.actions, taker);
+
+    const filledBid = await waitForMetadataBidToBeOfStatus(
+      sdk,
+      createdBid.id,
+      OrderStatusName.FILLED,
+    );
+
+    expect(filledBid.id).toEqual(createdBid.id);
+    expect(filledBid.status.name).toEqual(OrderStatusName.FILLED);
+    expect(filledBid.metadataCriteria).toEqual(metadataCriteria);
   }, 120_000);
 });

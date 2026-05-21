@@ -6,6 +6,7 @@ import type { Chain } from './Chain';
 import type { Fee } from './Fee';
 import type { FillStatus } from './FillStatus';
 import type { Item } from './Item';
+import type { MetadataFieldFilter } from './MetadataFieldFilter';
 import type { OrderStatus } from './OrderStatus';
 import type { ProtocolData } from './ProtocolData';
 import type { TraitFilter } from './TraitFilter';
@@ -57,9 +58,16 @@ export type Order = {
    */
   trait_criteria?: Array<TraitFilter>;
   /**
-   * Metadata ID (stack ID) for metadata bids when returned by the API
+   * Metadata ID (stack ID) for metadata bids created with a single metadata
+   * stack. Omitted for metadata bids created with `metadata_criteria`.
    */
   metadata_id?: string;
+  /**
+   * Field-level metadata filters for metadata bids created with criteria
+   * instead of a `metadata_id`. Omitted for metadata bids created with a
+   * `metadata_id`.
+   */
+  metadata_criteria?: Array<MetadataFieldFilter>;
 };
 
 export namespace Order {

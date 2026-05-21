@@ -61,6 +61,7 @@ export type { TradeResult } from './models/TradeResult';
 export type { TraitBidResult } from './models/TraitBidResult';
 export type { MetadataBidResult } from './models/MetadataBidResult';
 export type { TraitFilter } from './models/TraitFilter';
+export type { MetadataFieldFilter } from './models/MetadataFieldFilter';
 export type { UnfulfillableOrder } from './models/UnfulfillableOrder';
 
 export { OrdersService } from './services/OrdersService';
