@@ -6,20 +6,20 @@ sdk.track('sign_up');
 sdk.track('sign_up', { method: 'email' });
 sdk.track('sign_in');
 sdk.track('sign_in', { method: 'passport' });
-sdk.track('wishlist_add', { gameId: 'abc' });
-sdk.track('wishlist_add', { gameId: 'abc', source: 'game_page', platform: 'steam' });
-sdk.track('wishlist_remove', { gameId: 'abc' });
+sdk.track('wishlist_add', { game_id: 'abc' });
+sdk.track('wishlist_add', { game_id: 'abc', source: 'game_page', platform: 'steam' });
+sdk.track('wishlist_remove', { game_id: 'abc' });
 sdk.track('purchase', { currency: 'USD', value: 9.99 });
 sdk.track('purchase', {
   currency: 'USD',
   value: 9.99,
-  itemId: 'sku_1',
-  itemName: 'Gold Pack',
+  item_id: 'sku_1',
+  item_name: 'Gold Pack',
   quantity: 2,
-  transactionId: 'txn_42',
+  transaction_id: 'txn_42',
 });
 sdk.track('game_launch');
-sdk.track('game_launch', { platform: 'webgl', version: '1.2.0', buildId: 'ci-42' });
+sdk.track('game_launch', { platform: 'webgl', version: '1.2.0', build_id: 'ci-42' });
 sdk.track('progression', { status: 'start' });
 sdk.track('progression', { status: 'complete', world: 'tutorial' });
 sdk.track('progression', {
@@ -28,26 +28,26 @@ sdk.track('progression', {
   level: '5',
   stage: 'boss',
   score: 420,
-  durationSec: 87,
+  duration_sec: 87,
 });
 sdk.track('resource', { flow: 'sink', currency: 'gold', amount: 50 });
 sdk.track('resource', {
   flow: 'source',
   currency: 'USD',
   amount: 9.99,
-  itemType: 'iap',
-  itemId: 'sku_1',
+  item_type: 'iap',
+  item_id: 'sku_1',
 });
 sdk.track('email_acquired');
 sdk.track('email_acquired', { source: 'linked_account_steam' });
-sdk.track('game_page_viewed', { gameId: 'abc' });
-sdk.track('game_page_viewed', { gameId: 'abc', gameName: 'Devilfish', slug: 'devilfish' });
+sdk.track('game_page_viewed', { game_id: 'abc' });
+sdk.track('game_page_viewed', { game_id: 'abc', game_name: 'Devilfish', slug: 'devilfish' });
 sdk.track('link_clicked', { url: 'https://example.com' });
 sdk.track('link_clicked', {
   url: 'https://example.com',
   label: 'Play Now',
   source: 'game_page',
-  gameId: 'abc',
+  game_id: 'abc',
 });
 
 sdk.track(AudienceEvents.SIGN_UP, { method: 'email' });
@@ -57,19 +57,19 @@ sdk.track(AudienceEvents.PROGRESSION, { status: 'complete' });
 // @ts-expect-error — missing required 'value'
 sdk.track('purchase', { currency: 'USD' });
 
-// @ts-expect-error — missing required 'gameId'
+// @ts-expect-error — missing required 'game_id'
 sdk.track('wishlist_add', {});
 
 // @ts-expect-error — missing required 'status'
 sdk.track('progression', { world: 'tutorial' });
 
 // @ts-expect-error — missing required 'flow', 'currency', 'amount'
-sdk.track('resource', { itemType: 'iap' });
+sdk.track('resource', { item_type: 'iap' });
 
 // @ts-expect-error — missing required 'url'
 sdk.track('link_clicked', { label: 'Play Now' });
 
-// @ts-expect-error — missing required 'gameId'
+// @ts-expect-error — missing required 'game_id'
 sdk.track('game_page_viewed', {});
 
 // @ts-expect-error — purchase requires properties

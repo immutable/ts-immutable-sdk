@@ -21,23 +21,23 @@
     { name: 'sign_in',          fields: [{ key: 'method', type: 'string', optional: true }] },
     { name: 'email_acquired',   fields: [{ key: 'source', type: 'string', optional: true }] },
     { name: 'wishlist_add',     fields: [
-      { key: 'gameId', type: 'string' },
+      { key: 'game_id', type: 'string' },
       { key: 'source', type: 'string', optional: true },
       { key: 'platform', type: 'string', optional: true },
     ] },
-    { name: 'wishlist_remove',  fields: [{ key: 'gameId', type: 'string' }] },
+    { name: 'wishlist_remove',  fields: [{ key: 'game_id', type: 'string' }] },
     { name: 'purchase',         fields: [
       { key: 'currency', type: 'string' },
       { key: 'value', type: 'number' },
-      { key: 'itemId', type: 'string', optional: true },
-      { key: 'itemName', type: 'string', optional: true },
+      { key: 'item_id', type: 'string', optional: true },
+      { key: 'item_name', type: 'string', optional: true },
       { key: 'quantity', type: 'number', optional: true },
-      { key: 'transactionId', type: 'string', optional: true },
+      { key: 'transaction_id', type: 'string', optional: true },
     ] },
     { name: 'game_launch',      fields: [
       { key: 'platform', type: 'string', optional: true },
       { key: 'version', type: 'string', optional: true },
-      { key: 'buildId', type: 'string', optional: true },
+      { key: 'build_id', type: 'string', optional: true },
     ] },
     { name: 'progression',      fields: [
       { key: 'status', type: 'enum', values: ['start', 'complete', 'fail'] },
@@ -45,25 +45,25 @@
       { key: 'level', type: 'string', optional: true },
       { key: 'stage', type: 'string', optional: true },
       { key: 'score', type: 'number', optional: true },
-      { key: 'durationSec', type: 'number', optional: true },
+      { key: 'duration_sec', type: 'number', optional: true },
     ] },
     { name: 'resource',         fields: [
       { key: 'flow', type: 'enum', values: ['sink', 'source'] },
       { key: 'currency', type: 'string' },
       { key: 'amount', type: 'number' },
-      { key: 'itemType', type: 'string', optional: true },
-      { key: 'itemId', type: 'string', optional: true },
+      { key: 'item_type', type: 'string', optional: true },
+      { key: 'item_id', type: 'string', optional: true },
     ] },
     { name: 'game_page_viewed', fields: [
-      { key: 'gameId', type: 'string' },
-      { key: 'gameName', type: 'string', optional: true },
+      { key: 'game_id', type: 'string' },
+      { key: 'game_name', type: 'string', optional: true },
       { key: 'slug', type: 'string', optional: true },
     ] },
     { name: 'link_clicked',     fields: [
       { key: 'url', type: 'string' },
       { key: 'label', type: 'string', optional: true },
       { key: 'source', type: 'string', optional: true },
-      { key: 'gameId', type: 'string', optional: true },
+      { key: 'game_id', type: 'string', optional: true },
     ] },
   ];
 
@@ -269,7 +269,7 @@
         currentAnonId = payload.anonymousId;
         changed = true;
       }
-      var sid = payload.properties && payload.properties.sessionId;
+      var sid = payload.properties && payload.properties.session_id;
       if (typeof sid === 'string' && sid && currentSessionId !== sid) {
         currentSessionId = sid;
         changed = true;

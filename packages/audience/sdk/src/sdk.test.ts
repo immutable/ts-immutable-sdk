@@ -131,7 +131,7 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === SESSION_START,
       );
       expect(msg).toBeDefined();
-      expect(msg.properties).toHaveProperty('sessionId');
+      expect(msg.properties).toHaveProperty('session_id');
 
       sdk.shutdown();
     });
@@ -157,7 +157,7 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === SESSION_START,
       );
       expect(msg).toBeDefined();
-      expect(msg.properties).toHaveProperty('sessionId');
+      expect(msg.properties).toHaveProperty('session_id');
       expect(msg.properties).toHaveProperty('utm_source', 'youtube');
       expect(msg.properties).toHaveProperty('utm_campaign', 'launch');
 
@@ -172,7 +172,7 @@ describe('Audience', () => {
       sdk.track('purchase', {
         currency: 'USD',
         value: 9.99,
-        itemId: 'sword_01',
+        item_id: 'sword_01',
       });
 
       await sdk.flush();
@@ -184,10 +184,10 @@ describe('Audience', () => {
 
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
-        sessionId: expect.any(String),
+        session_id: expect.any(String),
         currency: 'USD',
         value: 9.99,
-        itemId: 'sword_01',
+        item_id: 'sword_01',
       });
       expect(msg.surface).toBe('web');
       expect(msg.context.library).toBe(LIBRARY_NAME);
@@ -247,7 +247,7 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
-        sessionId: expect.any(String),
+        session_id: expect.any(String),
         method: 'email',
       });
 
@@ -260,7 +260,7 @@ describe('Audience', () => {
       sdk.track('game_launch', {
         platform: 'webgl',
         version: '1.2.0',
-        buildId: 'ci-42',
+        build_id: 'ci-42',
       });
       await sdk.flush();
 
@@ -269,10 +269,10 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
-        sessionId: expect.any(String),
+        session_id: expect.any(String),
         platform: 'webgl',
         version: '1.2.0',
-        buildId: 'ci-42',
+        build_id: 'ci-42',
       });
 
       sdk.shutdown();
@@ -287,7 +287,7 @@ describe('Audience', () => {
         level: '5',
         stage: 'boss',
         score: 420,
-        durationSec: 87,
+        duration_sec: 87,
       });
       await sdk.flush();
 
@@ -296,13 +296,13 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
-        sessionId: expect.any(String),
+        session_id: expect.any(String),
         status: 'complete',
         world: 'forest',
         level: '5',
         stage: 'boss',
         score: 420,
-        durationSec: 87,
+        duration_sec: 87,
       });
 
       sdk.shutdown();
@@ -315,8 +315,8 @@ describe('Audience', () => {
         flow: 'source',
         currency: 'gold',
         amount: 50,
-        itemType: 'quest_reward',
-        itemId: 'quest_42',
+        item_type: 'quest_reward',
+        item_id: 'quest_42',
       });
       await sdk.flush();
 
@@ -325,12 +325,12 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
-        sessionId: expect.any(String),
+        session_id: expect.any(String),
         flow: 'source',
         currency: 'gold',
         amount: 50,
-        itemType: 'quest_reward',
-        itemId: 'quest_42',
+        item_type: 'quest_reward',
+        item_id: 'quest_42',
       });
 
       sdk.shutdown();
@@ -340,7 +340,7 @@ describe('Audience', () => {
       const sdk = createSDK();
 
       sdk.track('wishlist_add', {
-        gameId: 'devilfish',
+        game_id: 'devilfish',
         source: 'game_page',
         platform: 'steam',
       });
@@ -351,8 +351,8 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
-        sessionId: expect.any(String),
-        gameId: 'devilfish',
+        session_id: expect.any(String),
+        game_id: 'devilfish',
         source: 'game_page',
         platform: 'steam',
       });
@@ -383,7 +383,7 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
-        sessionId: expect.any(String),
+        session_id: expect.any(String),
         utm_source: 'google',
         utm_campaign: 'spring',
         touchpoint_type: 'click',
@@ -416,7 +416,7 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
-        sessionId: expect.any(String),
+        session_id: expect.any(String),
         utm_source: 'twitter',
         touchpoint_type: 'click',
         url: 'https://store.com',
@@ -449,7 +449,7 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
-        sessionId: expect.any(String),
+        session_id: expect.any(String),
         currency: 'USD',
         value: 9.99,
       });
@@ -468,7 +468,7 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
-        sessionId: expect.any(String),
+        session_id: expect.any(String),
         platform: 'webgl',
       });
 
@@ -487,7 +487,7 @@ describe('Audience', () => {
       expect(msg).toBeDefined();
       // First page merges session-cached attribution (includes landing_page)
       expect(msg.properties).toEqual({
-        sessionId: expect.any(String),
+        session_id: expect.any(String),
         landing_page: expect.any(String),
         section: 'shop',
       });
@@ -576,7 +576,7 @@ describe('Audience', () => {
       const msg = sentMessages().find((m: any) => m.type === 'page');
       expect(msg).toBeDefined();
       expect(msg.properties).toEqual({
-        sessionId: expect.any(String),
+        session_id: expect.any(String),
         landing_page: expect.any(String),
       });
 
@@ -778,7 +778,7 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === SESSION_START,
       );
       expect(sessionStart).toBeDefined();
-      expect(sessionStart.properties).toHaveProperty('sessionId');
+      expect(sessionStart.properties).toHaveProperty('session_id');
 
       const signUp = msgs.find(
         (m: any) => m.type === 'track' && m.eventName === 'sign_up',
@@ -899,7 +899,7 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === SESSION_END,
       );
       expect(msg).toBeDefined();
-      expect(msg.properties).toHaveProperty('sessionId');
+      expect(msg.properties).toHaveProperty('session_id');
       expect(msg.properties.duration).toBe(5);
     });
 

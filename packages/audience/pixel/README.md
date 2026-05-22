@@ -81,10 +81,10 @@ All events fire automatically with no instrumentation required.
 | Event | When it fires | Key properties |
 |-------|--------------|----------------|
 | `page` | Every page load | UTMs, click IDs (`gclid`, `fbclid`, `ttclid`, `msclkid`, `dclid`, `li_fat_id`), `referral_code`, `landing_page` |
-| `session_start` | New session (no active `_imtbl_sid` cookie) | `sessionId` |
-| `session_end` | Page unload (`visibilitychange` / `pagehide`) | `sessionId`, `duration` (seconds) |
-| `form_submitted` | HTML form submission | `formAction`, `formId`, `formName`, `fieldNames`. `emailHash` at `full` consent only. |
-| `link_clicked` | Outbound link click (external domains only) | `linkUrl`, `linkText`, `elementId`, `outbound: true` |
+| `session_start` | New session (no active `_imtbl_sid` cookie) | `session_id` |
+| `session_end` | Page unload (`visibilitychange` / `pagehide`) | `session_id`, `duration` (seconds) |
+| `form_submitted` | HTML form submission | `form_action`, `form_id`, `form_name`, `field_names`. `email_hash` at `full` consent only. |
+| `link_clicked` | Outbound link click (external domains only) | `link_url`, `link_text`, `element_id`, `outbound: true` |
 | `scroll_depth` | Scroll milestone reached (25%, 50%, 75%, 90%, 100%) | `depth` (integer). Fires on standard document scroll or on any internal scroll container larger than half the viewport. Milestones reset on each `page` call. |
 
 ### Disabling specific auto-capture

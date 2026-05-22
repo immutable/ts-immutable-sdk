@@ -23,28 +23,28 @@ export interface SignInProperties {
 }
 
 export interface WishlistAddProperties {
-  gameId: string;
+  game_id: string;
   source?: string;
   platform?: string;
 }
 
 export interface WishlistRemoveProperties {
-  gameId: string;
+  game_id: string;
 }
 
 export interface PurchaseProperties {
   currency: string;
   value: number;
-  itemId?: string;
-  itemName?: string;
+  item_id?: string;
+  item_name?: string;
   quantity?: number;
-  transactionId?: string;
+  transaction_id?: string;
 }
 
 export interface GameLaunchProperties {
   platform?: string;
   version?: string;
-  buildId?: string;
+  build_id?: string;
 }
 
 export type ProgressionStatus = 'start' | 'complete' | 'fail';
@@ -55,7 +55,7 @@ export interface ProgressionProperties {
   level?: string;
   stage?: string;
   score?: number;
-  durationSec?: number;
+  duration_sec?: number;
 }
 
 export type ResourceFlow = 'sink' | 'source';
@@ -64,8 +64,8 @@ export interface ResourceProperties {
   flow: ResourceFlow;
   currency: string;
   amount: number;
-  itemType?: string;
-  itemId?: string;
+  item_type?: string;
+  item_id?: string;
 }
 
 export interface EmailAcquiredProperties {
@@ -73,8 +73,8 @@ export interface EmailAcquiredProperties {
 }
 
 export interface GamePageViewedProperties {
-  gameId: string;
-  gameName?: string;
+  game_id: string;
+  game_name?: string;
   slug?: string;
 }
 
@@ -82,7 +82,7 @@ export interface LinkClickedProperties {
   url: string;
   label?: string;
   source?: string;
-  gameId?: string;
+  game_id?: string;
 }
 
 interface EventPropsMap {

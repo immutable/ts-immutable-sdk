@@ -194,7 +194,7 @@ export class Audience {
       type: 'track',
       eventName: SESSION_START,
       properties: {
-        sessionId: this.sessionId,
+        session_id: this.sessionId,
         ...this.attribution,
       },
     });
@@ -207,7 +207,7 @@ export class Audience {
       type: 'track',
       eventName: SESSION_END,
       properties: {
-        sessionId: this.sessionId,
+        session_id: this.sessionId,
         ...(this.sessionStartTime && {
           duration: Math.round((Date.now() - this.sessionStartTime) / 1000),
         }),
@@ -228,7 +228,7 @@ export class Audience {
     getOrCreateSession(this.cookieDomain);
 
     const mergedProps: Record<string, unknown> = {
-      sessionId: this.sessionId,
+      session_id: this.sessionId,
       ...properties,
     };
     if (this.isFirstPage) {
@@ -268,7 +268,7 @@ export class Audience {
 
     const [properties] = args;
     const mergedProps: Record<string, unknown> = {
-      sessionId: this.sessionId,
+      session_id: this.sessionId,
       ...(UTM_EVENTS.has(event) ? collectPageAttribution() : {}),
       ...properties as Record<string, unknown> | undefined,
     };

@@ -115,7 +115,7 @@ describe('Pixel', () => {
       expect((pageCall!.properties as Record<string, unknown>).utm_source).toBe('google');
 
       expect(sessionStartCall).toBeDefined();
-      expect((sessionStartCall!.properties as Record<string, unknown>).sessionId).toBe('session-abc');
+      expect((sessionStartCall!.properties as Record<string, unknown>).session_id).toBe('session-abc');
     });
 
     it('does not fire page view or session_start when consent is none', () => {
@@ -171,7 +171,7 @@ describe('Pixel', () => {
           surface: 'pixel',
           properties: expect.objectContaining({
             utm_source: 'google',
-            sessionId: 'session-abc',
+            session_id: 'session-abc',
             custom: 'prop',
           }),
         }),
@@ -206,9 +206,9 @@ describe('Pixel', () => {
       const pageCall = calls.find((c) => c.type === 'page');
       const props = pageCall!.properties as Record<string, unknown>;
 
-      expect(props.gaClientId).toBe('GA1.2.123456.789012');
-      expect(props.fbClickId).toBe('fb.1.1234567890.AbCdEf');
-      expect(props.fbBrowserId).toBe('fb.1.1234567890.987654321');
+      expect(props.ga_client_id).toBe('GA1.2.123456.789012');
+      expect(props.fb_click_id).toBe('fb.1.1234567890.AbCdEf');
+      expect(props.fb_browser_id).toBe('fb.1.1234567890.987654321');
     });
 
     it('omits third-party IDs when cookies are not set', () => {
@@ -223,9 +223,9 @@ describe('Pixel', () => {
       const pageCall = calls.find((c) => c.type === 'page');
       const props = pageCall!.properties as Record<string, unknown>;
 
-      expect(props.gaClientId).toBeUndefined();
-      expect(props.fbClickId).toBeUndefined();
-      expect(props.fbBrowserId).toBeUndefined();
+      expect(props.ga_client_id).toBeUndefined();
+      expect(props.fb_click_id).toBeUndefined();
+      expect(props.fb_browser_id).toBeUndefined();
     });
   });
 
@@ -244,7 +244,7 @@ describe('Pixel', () => {
           type: 'track',
           eventName: 'session_end',
           properties: expect.objectContaining({
-            sessionId: 'session-abc',
+            session_id: 'session-abc',
           }),
         }),
       );
@@ -559,7 +559,7 @@ describe('Pixel', () => {
         eventName: string,
         properties: Record<string, unknown>,
       ) => void;
-      enqueueCallback('form_submitted', { formAction: '/signup' });
+      enqueueCallback('form_submitted', { form_action: '/signup' });
 
       expect(mockEnqueue).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -567,8 +567,8 @@ describe('Pixel', () => {
           eventName: 'form_submitted',
           surface: 'pixel',
           properties: expect.objectContaining({
-            formAction: '/signup',
-            sessionId: 'session-xyz',
+            form_action: '/signup',
+            session_id: 'session-xyz',
           }),
         }),
       );

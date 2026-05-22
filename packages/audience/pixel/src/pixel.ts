@@ -152,7 +152,7 @@ export class Pixel {
       properties: {
         ...attribution,
         ...thirdPartyIds,
-        sessionId,
+        session_id: sessionId,
         ...properties,
       },
       userId: undefined,
@@ -230,7 +230,7 @@ export class Pixel {
       ...this.buildBase(),
       type: 'track',
       eventName,
-      properties: { ...properties, sessionId },
+      properties: { ...properties, session_id: sessionId },
       userId: undefined,
     };
 
@@ -254,7 +254,7 @@ export class Pixel {
       ...this.buildBase(),
       type: 'track',
       eventName: 'session_start',
-      properties: { sessionId },
+      properties: { session_id: sessionId },
       userId: undefined,
     };
 
@@ -273,7 +273,7 @@ export class Pixel {
       type: 'track',
       eventName: 'session_end',
       properties: {
-        sessionId: this.sessionId,
+        session_id: this.sessionId,
         duration,
       },
       userId: undefined,
@@ -315,11 +315,11 @@ export class Pixel {
   private collectThirdPartyIds(): Record<string, string> {
     const ids: Record<string, string> = {};
     const ga = getCookie('_ga');
-    if (ga) ids.gaClientId = ga;
+    if (ga) ids.ga_client_id = ga;
     const fbc = getCookie('_fbc');
-    if (fbc) ids.fbClickId = fbc;
+    if (fbc) ids.fb_click_id = fbc;
     const fbp = getCookie('_fbp');
-    if (fbp) ids.fbBrowserId = fbp;
+    if (fbp) ids.fb_browser_id = fbp;
     return ids;
   }
 

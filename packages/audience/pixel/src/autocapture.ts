@@ -174,10 +174,10 @@ export function setupAutocapture(
       if (!form || form.tagName !== 'FORM') return;
 
       const properties: Record<string, unknown> = {
-        formAction: form.action || undefined,
-        formId: form.id || undefined,
-        formName: form.getAttribute('name') || undefined,
-        fieldNames: getFieldNames(form),
+        form_action: form.action || undefined,
+        form_id: form.id || undefined,
+        form_name: form.getAttribute('name') || undefined,
+        field_names: getFieldNames(form),
       };
 
       const consent = getConsent();
@@ -189,7 +189,7 @@ export function setupAutocapture(
           // enqueue without emailHash rather than losing the event entirely.
           hashSHA256(email).then(
             (hash) => {
-              properties.emailHash = hash;
+              properties.email_hash = hash;
               enqueue('form_submitted', properties);
             },
             () => {
@@ -220,9 +220,9 @@ export function setupAutocapture(
         if (linkHost === window.location.hostname) return;
 
         enqueue('link_clicked', {
-          linkUrl: anchor.href,
-          linkText: (anchor.textContent || '').trim().slice(0, 256),
-          elementId: anchor.id || undefined,
+          link_url: anchor.href,
+          link_text: (anchor.textContent || '').trim().slice(0, 256),
+          element_id: anchor.id || undefined,
           outbound: true,
         });
       } catch {

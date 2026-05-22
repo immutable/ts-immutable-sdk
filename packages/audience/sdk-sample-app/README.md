@@ -16,11 +16,11 @@ Every other sample app in this monorepo (`packages/passport/sdk-sample-app`,
 `packages/internal/bridge/bridge-sample-app`) is React + Next.js with the
 `@biom3` design system. This one is plain ES2020 served by a ~90-line Node
 stdlib HTTP server. Intentional: the whole point is to demonstrate how
-`@imtbl/audience` loads via a plain `<script>` tag — the pattern real
+`@imtbl/audience` loads via a plain `<script>` tag - the pattern real
 studios use when they drop the SDK into existing pages. A React wrapper
 would hide `window.ImmutableAudience` behind JSX abstractions and require
 a build step, obscuring the loading pattern we're demonstrating. The SDK
-itself is framework-agnostic — wrap these calls in your framework of
+itself is framework-agnostic - wrap these calls in your framework of
 choice when you ship.
 
 ## Run it
@@ -35,7 +35,7 @@ this package's files plus the CDN bundle over a small Node server.
 
 ## Publishable keys
 
-You need a real publishable key from [Immutable Hub](https://hub.immutable.com/) —
+You need a real publishable key from [Immutable Hub](https://hub.immutable.com/) -
 there is no shared fixture key. Test keys start with `pk_imapik-test-` and
 route to `api.sandbox.immutable.com`; any other prefix routes to
 `api.immutable.com` (prod).
@@ -72,8 +72,8 @@ const { AudienceEvents } = window.ImmutableAudience;
 audience.track(AudienceEvents.PURCHASE, {
   currency: 'USD',
   value: 9.99,
-  itemId: 'sword',
-  transactionId: 'tx_123',
+  item_id: 'sword',
+  transaction_id: 'tx_123',
 });
 ```
 
@@ -84,17 +84,17 @@ picked up yet, the event log shows a `drift warn` entry.
 
 | Event | Required props | Optional props |
 |---|---|---|
-| `sign_up` | — | `method` |
-| `sign_in` | — | `method` |
-| `wishlist_add` | `gameId` | `source`, `platform` |
-| `wishlist_remove` | `gameId` | — |
-| `purchase` | `currency`, `value` | `itemId`, `itemName`, `quantity`, `transactionId` |
-| `game_launch` | — | `platform`, `version`, `buildId` |
-| `progression` | `status: 'start' \| 'complete' \| 'fail'` | `world`, `level`, `stage`, `score`, `durationSec` |
-| `resource` | `flow: 'sink' \| 'source'`, `currency`, `amount` | `itemType`, `itemId` |
-| `email_acquired` | — | `source` |
-| `game_page_viewed` | `gameId` | `gameName`, `slug` |
-| `link_clicked` | `url` | `label`, `source`, `gameId` |
+| `sign_up` | - | `method` |
+| `sign_in` | - | `method` |
+| `wishlist_add` | `game_id` | `source`, `platform` |
+| `wishlist_remove` | `game_id` | - |
+| `purchase` | `currency`, `value` | `item_id`, `item_name`, `quantity`, `transaction_id` |
+| `game_launch` | - | `platform`, `version`, `build_id` |
+| `progression` | `status: 'start' \| 'complete' \| 'fail'` | `world`, `level`, `stage`, `score`, `duration_sec` |
+| `resource` | `flow: 'sink' \| 'source'`, `currency`, `amount` | `item_type`, `item_id` |
+| `email_acquired` | - | `source` |
+| `game_page_viewed` | `game_id` | `game_name`, `slug` |
+| `link_clicked` | `url` | `label`, `source`, `game_id` |
 
 Pass anything else as a custom event with the `string & {}` escape hatch:
 
@@ -129,7 +129,7 @@ The rules themselves are simple:
 The sample app's Identity and Alias buttons stay enabled whenever the SDK
 is initialised, but the handlers call `canIdentify(currentConsent)` before
 invoking `identify()` / `alias()`. When it returns `false`, the handler
-logs a `skipped — canIdentify(...) is false` line and returns without
+logs a `skipped - canIdentify(...) is false` line and returns without
 calling the SDK. This mirrors how the SDK itself handles these calls at
 lower consent levels: it no-ops rather than throwing, so the sample app
 avoids a misleading "ok" log entry for a call that did nothing.
@@ -157,7 +157,7 @@ const audience = window.ImmutableAudience.init({
 
 The sample app's **Lifecycle → Simulate error** dropdown fires `onError`
 with the documented shape for any of the four codes. These are client-side
-simulations — they don't go through the SDK — so you can verify your
+simulations - they don't go through the SDK - so you can verify your
 error-handling UI renders correctly for all four without needing a
 broken backend.
 
@@ -173,5 +173,5 @@ connect-src https://api.dev.immutable.com https://api.sandbox.immutable.com http
 ```
 
 No inline scripts, no inline styles, no third-party origins. If you
-adapt this sample app for a studio-owned page, keep the same posture —
+adapt this sample app for a studio-owned page, keep the same posture -
 `@imtbl/audience` is designed to run under a strict CSP.

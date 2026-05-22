@@ -80,16 +80,16 @@ describe('autocapture', () => {
       expect(enqueue).toHaveBeenCalledWith(
         'form_submitted',
         expect.objectContaining({
-          formAction: expect.stringContaining('/signup'),
-          formId: 'signup-form',
-          formName: 'newsletter',
-          fieldNames: ['email'],
+          form_action: expect.stringContaining('/signup'),
+          form_id: 'signup-form',
+          form_name: 'newsletter',
+          field_names: ['email'],
         }),
       );
 
-      // At anonymous consent, no emailHash
+      // At anonymous consent, no email_hash
       const props = enqueue.mock.calls[0][1];
-      expect(props.emailHash).toBeUndefined();
+      expect(props.email_hash).toBeUndefined();
     });
 
     it('fires form_submitted with email hash at full consent', async () => {
@@ -114,8 +114,8 @@ describe('autocapture', () => {
       expect(enqueue).toHaveBeenCalledWith(
         'form_submitted',
         expect.objectContaining({
-          formAction: expect.stringContaining('/register'),
-          emailHash: expect.stringMatching(/^sha256:[a-f0-9]{64}$/),
+          form_action: expect.stringContaining('/register'),
+          email_hash: expect.stringMatching(/^sha256:[a-f0-9]{64}$/),
         }),
       );
     });
@@ -140,7 +140,7 @@ describe('autocapture', () => {
         .update(new TextEncoder().encode('test@example.com'))
         .digest('hex');
 
-      expect(enqueue.mock.calls[0][1].emailHash).toBe(`sha256:${expected}`);
+      expect(enqueue.mock.calls[0][1].email_hash).toBe(`sha256:${expected}`);
     });
 
     it('detects email inputs by name containing "email"', () => {
@@ -166,7 +166,7 @@ describe('autocapture', () => {
       expect(enqueue).toHaveBeenCalledWith(
         'form_submitted',
         expect.objectContaining({
-          fieldNames: ['user_email_address'],
+          field_names: ['user_email_address'],
         }),
       );
     });
@@ -202,7 +202,7 @@ describe('autocapture', () => {
       document.body.appendChild(form);
       form.dispatchEvent(new Event('submit', { bubbles: true }));
 
-      expect(enqueue.mock.calls[0][1].fieldNames).toEqual([
+      expect(enqueue.mock.calls[0][1].field_names).toEqual([
         'first_name',
         'email',
         'country',
@@ -237,11 +237,11 @@ describe('autocapture', () => {
       expect(enqueue).toHaveBeenCalledWith(
         'form_submitted',
         expect.objectContaining({
-          formAction: expect.stringContaining('/search'),
-          fieldNames: ['query'],
+          form_action: expect.stringContaining('/search'),
+          field_names: ['query'],
         }),
       );
-      expect(enqueue.mock.calls[0][1].emailHash).toBeUndefined();
+      expect(enqueue.mock.calls[0][1].email_hash).toBeUndefined();
     });
 
     it('enqueues without emailHash when crypto.subtle is unavailable', async () => {
@@ -271,9 +271,9 @@ describe('autocapture', () => {
       // Event should still be enqueued, just without emailHash
       expect(enqueue).toHaveBeenCalledWith(
         'form_submitted',
-        expect.objectContaining({ formAction: expect.stringContaining('/signup') }),
+        expect.objectContaining({ form_action: expect.stringContaining('/signup') }),
       );
-      expect(enqueue.mock.calls[0][1].emailHash).toBeUndefined();
+      expect(enqueue.mock.calls[0][1].email_hash).toBeUndefined();
 
       // Restore crypto
       Object.defineProperty(global, 'crypto', { value: saved, configurable: true });
@@ -293,9 +293,9 @@ describe('autocapture', () => {
 
       form.dispatchEvent(new Event('submit', { bubbles: true }));
 
-      // Should fire synchronously (no hash), no emailHash
+      // Should fire synchronously (no hash), no email_hash
       expect(enqueue).toHaveBeenCalledTimes(1);
-      expect(enqueue.mock.calls[0][1].emailHash).toBeUndefined();
+      expect(enqueue.mock.calls[0][1].email_hash).toBeUndefined();
     });
   });
 
@@ -316,9 +316,9 @@ describe('autocapture', () => {
       expect(enqueue).toHaveBeenCalledWith(
         'link_clicked',
         {
-          linkUrl: 'https://store.steampowered.com/app/12345',
-          linkText: 'Wishlist on Steam',
-          elementId: 'steam-link',
+          link_url: 'https://store.steampowered.com/app/12345',
+          link_text: 'Wishlist on Steam',
+          element_id: 'steam-link',
           outbound: true,
         },
       );
@@ -362,7 +362,7 @@ describe('autocapture', () => {
       expect(enqueue).toHaveBeenCalledWith(
         'link_clicked',
         expect.objectContaining({
-          linkUrl: 'https://discord.gg/invite',
+          link_url: 'https://discord.gg/invite',
           outbound: true,
         }),
       );
@@ -392,7 +392,7 @@ describe('autocapture', () => {
       link.dispatchEvent(new Event('click', { bubbles: true }));
 
       const props = enqueue.mock.calls[0][1];
-      expect(props.linkText).toHaveLength(256);
+      expect(props.link_text).toHaveLength(256);
     });
 
     it('resolves clicks on child elements to nearest anchor', () => {
@@ -412,8 +412,8 @@ describe('autocapture', () => {
       expect(enqueue).toHaveBeenCalledWith(
         'link_clicked',
         expect.objectContaining({
-          linkUrl: 'https://store.steampowered.com/app/12345',
-          linkText: 'Click me',
+          link_url: 'https://store.steampowered.com/app/12345',
+          link_text: 'Click me',
           outbound: true,
         }),
       );
@@ -441,7 +441,7 @@ describe('autocapture', () => {
 
       link.dispatchEvent(new Event('click', { bubbles: true }));
 
-      expect(enqueue.mock.calls[0][1].elementId).toBeUndefined();
+      expect(enqueue.mock.calls[0][1].element_id).toBeUndefined();
     });
 
     it('ignores clicks on non-link elements', () => {
@@ -1017,8 +1017,8 @@ describe('autocapture', () => {
       await new Promise((r) => { setTimeout(r, 0); });
 
       expect(enqueue).toHaveBeenCalledTimes(2);
-      const hash1 = enqueue.mock.calls[0][1].emailHash;
-      const hash2 = enqueue.mock.calls[1][1].emailHash;
+      const hash1 = enqueue.mock.calls[0][1].email_hash;
+      const hash2 = enqueue.mock.calls[1][1].email_hash;
       expect(hash1).toBe(hash2);
       expect(hash1).toMatch(/^sha256:[a-f0-9]{64}$/);
     });
