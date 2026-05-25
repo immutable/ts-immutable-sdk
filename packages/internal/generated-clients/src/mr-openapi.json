@@ -83,9 +83,26 @@
       "x-displayName": "passport"
     },
     {
+      "name": "gamefi",
+      "description": "team gamefi",
+      "x-displayName": "gamefi"
+    },
+    {
+      "name": "health",
+      "x-displayName": "health"
+    },
+    {
       "name": "passport profile",
       "description": "Passport Profile endpoints",
       "x-displayName": "passport profile"
+    },
+    {
+      "name": "feed-items",
+      "x-displayName": "feed-items"
+    },
+    {
+      "name": "assets",
+      "x-displayName": "assets"
     },
     {
       "name": "guardian",
@@ -559,14 +576,10 @@
             ]
           },
           {
-            "BearerAuthWithClient": [
-              "refresh:metadata"
-            ]
+            "BearerAuthWithClient": []
           },
           {
-            "BearerAuth": [
-              "refresh:metadata"
-            ]
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -2265,6 +2278,95 @@
         }
       }
     },
+    "/v1/internal/chains/{chain_name}/environment/{environment}/collections/{contract_address}/refresh-metadata": {
+      "post": {
+        "description": "Refresh collection metadata internal",
+        "summary": "Refresh collection metadata internal",
+        "tags": [
+          "collections"
+        ],
+        "operationId": "RefreshCollectionMetadataInternal",
+        "security": [
+          {
+            "BearerAuthWithClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "environment",
+            "in": "path",
+            "description": "The environment of the collection",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshCollectionMetadataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshCollectionMetadataResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/orders/cancel": {
       "post": {
         "tags": [
@@ -2550,6 +2652,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "504": {
+            "$ref": "#/components/responses/GatewayTimeout"
           }
         }
       }
@@ -2768,6 +2876,12 @@
           },
           "501": {
             "$ref": "#/components/responses/NotImplementedError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "504": {
+            "$ref": "#/components/responses/GatewayTimeout"
           }
         }
       }
@@ -2964,6 +3078,522 @@
           },
           "501": {
             "$ref": "#/components/responses/NotImplementedError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "504": {
+            "$ref": "#/components/responses/GatewayTimeout"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/orders/trait-bids": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "List all trait bids",
+        "description": "List all trait bids",
+        "operationId": "ListTraitBids",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Order status to filter by",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/OrderStatusName"
+            }
+          },
+          {
+            "name": "buy_item_contract_address",
+            "in": "query",
+            "description": "Buy item contract address to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "sell_item_contract_address",
+            "in": "query",
+            "description": "Sell item contract address to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "account_address",
+            "in": "query",
+            "description": "The account address of the user who created the bid",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xc49Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "from_updated_at",
+            "in": "query",
+            "description": "From updated at including given date",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2022-03-09T05:00:50.52Z"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Maximum number of orders to return per page",
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Order field to sort by. `sell_item_amount` sorts by per token price, for example if 10eth is offered for 5 ERC1155 items, it’s sorted as 2eth for `sell_item_amount`.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at",
+                "updated_at",
+                "sell_item_amount"
+              ],
+              "description": "Order field to sort by",
+              "example": "created_at"
+            },
+            "example": "created_at"
+          },
+          {
+            "name": "sort_direction",
+            "in": "query",
+            "description": "Ascending or descending direction for sort",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "description": "Ascending or descending direction for sort",
+              "example": "asc"
+            },
+            "example": "asc"
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListTraitBidsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Create a trait bid",
+        "description": "Create a trait bid on NFTs matching specific trait criteria within a collection",
+        "operationId": "CreateTraitBid",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTraitBidRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TraitBidResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "501": {
+            "$ref": "#/components/responses/NotImplementedError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "504": {
+            "$ref": "#/components/responses/GatewayTimeout"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/orders/metadata-bids": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "List all metadata bids",
+        "description": "List all metadata bids",
+        "operationId": "ListMetadataBids",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Order status to filter by",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/OrderStatusName"
+            }
+          },
+          {
+            "name": "buy_item_contract_address",
+            "in": "query",
+            "description": "Buy item contract address to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "sell_item_contract_address",
+            "in": "query",
+            "description": "Sell item contract address to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "account_address",
+            "in": "query",
+            "description": "The account address of the user who created the bid",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xc49Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "from_updated_at",
+            "in": "query",
+            "description": "From updated at including given date",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2022-03-09T05:00:50.52Z"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Maximum number of orders to return per page",
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Order field to sort by. `sell_item_amount` sorts by per token price, for example if 10eth is offered for 5 ERC1155 items, it’s sorted as 2eth for `sell_item_amount`.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at",
+                "updated_at",
+                "sell_item_amount"
+              ],
+              "description": "Order field to sort by",
+              "example": "created_at"
+            },
+            "example": "created_at"
+          },
+          {
+            "name": "sort_direction",
+            "in": "query",
+            "description": "Ascending or descending direction for sort",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "description": "Ascending or descending direction for sort",
+              "example": "asc"
+            },
+            "example": "asc"
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListMetadataBidsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Create a metadata bid",
+        "description": "Create a metadata bid on NFTs matching a specific metadata identifier within a collection",
+        "operationId": "CreateMetadataBid",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMetadataBidRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataBidResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "501": {
+            "$ref": "#/components/responses/NotImplementedError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "504": {
+            "$ref": "#/components/responses/GatewayTimeout"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/orders/trait-bids/{trait_bid_id}": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Get a single trait bid by ID",
+        "description": "Get a single trait bid by ID",
+        "operationId": "GetTraitBid",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "trait_bid_id",
+            "in": "path",
+            "description": "Global Trait Bid identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Global Trait Bid identifier",
+              "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TraitBidResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/orders/metadata-bids/{metadata_bid_id}": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Get a single metadata bid by ID",
+        "description": "Get a single metadata bid by ID",
+        "operationId": "GetMetadataBid",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "metadata_bid_id",
+            "in": "path",
+            "description": "Global Metadata Bid identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Global Metadata Bid identifier",
+              "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataBidResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -3203,6 +3833,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "504": {
+            "$ref": "#/components/responses/GatewayTimeout"
           }
         }
       }
@@ -3585,6 +4221,450 @@
         }
       }
     },
+    "/passport-mr/v1/wallets/{wallet_address}/user": {
+      "get": {
+        "x-internal": true,
+        "summary": "Get user for a wallet",
+        "description": "Get the user associated with a wallet address",
+        "tags": [
+          "passport"
+        ],
+        "parameters": [
+          {
+            "name": "wallet_address",
+            "in": "path",
+            "description": "The wallet address",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{40}$",
+              "maxLength": 42
+            }
+          }
+        ],
+        "operationId": "getUserForWallet",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Wallet user response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetWalletUserRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-mr/v1/users/{email_address}/wallet": {
+      "get": {
+        "x-internal": true,
+        "summary": "Get wallet for a user",
+        "description": "Get the wallet address associated with a user's email",
+        "tags": [
+          "passport"
+        ],
+        "parameters": [
+          {
+            "name": "email_address",
+            "in": "path",
+            "description": "The user's email address",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "operationId": "getWalletForUser",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "User wallet response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserWalletRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-mr/v1/users/delete": {
+      "post": {
+        "x-internal": true,
+        "summary": "Delete user's Passport account",
+        "description": "Delete user's Passport account",
+        "tags": [
+          "passport"
+        ],
+        "operationId": "deleteUser",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_passportAccountDeletions"
+            ]
+          }
+        ],
+        "requestBody": {
+          "description": "The request body to delete a user's Passport account",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User deleted response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteUserRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ConflictError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError409"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-mr/v1/users/email": {
+      "patch": {
+        "x-internal": true,
+        "summary": "Update user email (sandbox only)",
+        "description": "Updates the email_address for a user in the users table, identified by wallet address.\nOnly available in sandbox.\n",
+        "tags": [
+          "passport"
+        ],
+        "operationId": "updateUserEmail",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserEmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User email updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserEmailRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError (e.g. not sandbox)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/chains/{chain_name}/passport/counterfactual-address": {
       "post": {
         "x-internal": true,
@@ -3658,6 +4738,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ConflictError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError409"
                 }
               }
             }
@@ -4044,6 +5134,649 @@
         }
       }
     },
+    "/passport-mr/v1/session-activity-contracts": {
+      "get": {
+        "x-internal": true,
+        "summary": "Get session activity contracts",
+        "description": "Retrieve session activity contracts with optional filtering",
+        "tags": [
+          "passport"
+        ],
+        "operationId": "getPreOnboardingCheckInSessionActivityContracts",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session activity contracts retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPreOnboardingCheckInSessionActivityContractsRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "x-internal": true,
+        "summary": "Create session activity contract",
+        "description": "Create a new session activity contract for tracking user interactions",
+        "tags": [
+          "passport"
+        ],
+        "operationId": "createPreOnboardingCheckInSessionActivityContract",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "requestBody": {
+          "description": "The request body to create a session activity contract",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePreOnboardingCheckInSessionActivityContractRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session activity contract created response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatePreOnboardingCheckInSessionActivityContractRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ConflictError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError409"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/heartbeat": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health check endpoint",
+        "operationId": "heartbeat",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/staking/programs/{program_name}/epochs/{epoch_id}": {
+      "get": {
+        "x-public": true,
+        "x-internal": true,
+        "summary": "Get epoch",
+        "description": "Get epoch by ID",
+        "operationId": "GetEpoch",
+        "tags": [
+          "gamefi"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "program_name",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ProgramName"
+            }
+          },
+          {
+            "in": "path",
+            "name": "epoch_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/EpochID"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Epoch details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetEpochResponseBody"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/staking/programs/{program_name}/wallets/{wallet_address}": {
+      "get": {
+        "x-public": true,
+        "x-internal": true,
+        "summary": "Get wallet staking info",
+        "description": "Get wallet staking info",
+        "operationId": "GetWalletStakingInfo",
+        "tags": [
+          "gamefi"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "program_name",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ProgramName"
+            }
+          },
+          {
+            "in": "path",
+            "name": "wallet_address",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/EthereumAddress"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Wallet staking info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetWalletStakingInfoResponseBody"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/phone-otp/verify": {
+      "post": {
+        "security": [
+          {
+            "BearerAuth": [
+              "openid"
+            ]
+          }
+        ],
+        "tags": [
+          "passport profile"
+        ],
+        "summary": "Verify phone OTP code against user phone number",
+        "description": "Verify phone OTP code for user supplied phone number",
+        "operationId": "verify-phone-otp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhoneNumberOTPVerificationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/profile": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": [
+              "openid"
+            ]
+          }
+        ],
+        "tags": [
+          "passport profile"
+        ],
+        "summary": "Get profile for authenticated user",
+        "description": "Get profile for the authenticated user's Passport wallet",
+        "operationId": "get-profile-by-authenticated-wallet",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/username": {
+      "post": {
+        "security": [
+          {
+            "BearerAuth": [
+              "openid"
+            ]
+          }
+        ],
+        "tags": [
+          "passport profile"
+        ],
+        "summary": "Update username",
+        "description": "Update username for the authenticated user's Passport wallet",
+        "operationId": "update-username",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsernameUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsernameUpdateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/phone-otp": {
+      "post": {
+        "security": [
+          {
+            "BearerAuth": [
+              "openid"
+            ]
+          }
+        ],
+        "tags": [
+          "passport profile"
+        ],
+        "summary": "Send phone OTP code for user supplied phone number",
+        "description": "Send phone OTP code for user supplied phone number",
+        "operationId": "send-phone-otp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhoneNumberOTPRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhoneNumberOTPResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/passport-profile/v2/linked-wallets": {
       "post": {
         "security": [
@@ -4181,6 +5914,1281 @@
         }
       }
     },
+    "/passport-profile/v1/feed-items": {
+      "get": {
+        "x-internal": true,
+        "tags": [
+          "feed-items"
+        ],
+        "summary": "Get feed items",
+        "description": "Get feed items",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "operationId": "get-feed-items",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/PageSizeParam"
+          },
+          {
+            "$ref": "#/components/parameters/SortField"
+          },
+          {
+            "$ref": "#/components/parameters/SortDirection"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "published",
+                "draft",
+                "scheduled",
+                "archived"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully get feed items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedItemsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "x-internal": true,
+        "tags": [
+          "feed-items"
+        ],
+        "summary": "Create a feed item",
+        "description": "Create a feed item",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "operationId": "create-feed-item",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUpdateFeedItemRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully created feed item",
+            "headers": {
+              "Location": {
+                "description": "Location of the created feed item",
+                "required": true,
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/FeedItemResponse"
+                    }
+                  },
+                  "required": [
+                    "result"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/feed-items/actions/update-status": {
+      "post": {
+        "x-internal": true,
+        "tags": [
+          "feed-items"
+        ],
+        "summary": "Update feed items status",
+        "description": "Apply a new value in feed items status",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "operationId": "update-feed-items-status",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeedItemsStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully update feed items status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedItemsStatusResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/feed-items/{feed_item_id}": {
+      "get": {
+        "x-internal": true,
+        "tags": [
+          "feed-items"
+        ],
+        "summary": "Get a feed item",
+        "description": "Get a feed item",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "operationId": "get-feed-item",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FeedItemIdParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully get feed item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedItemResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "x-internal": true,
+        "tags": [
+          "feed-items"
+        ],
+        "summary": "Update a feed item",
+        "description": "Update a feed item",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "operationId": "update-feed-item",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FeedItemIdParam"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUpdateFeedItemRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated feed item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/FeedItemResponse"
+                    }
+                  },
+                  "required": [
+                    "result"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/feed-items/assets": {
+      "get": {
+        "x-internal": true,
+        "tags": [
+          "feed-items",
+          "assets"
+        ],
+        "summary": "Get list of feed items assets",
+        "description": "Get list of feed items assets",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "operationId": "get-feed-items-assets",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PageCursorParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageSizeParam"
+          },
+          {
+            "$ref": "#/components/parameters/FeedItemAssetTypeParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully get list of feed items assets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedItemsAssetsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/feed-items/assets/bulk": {
+      "post": {
+        "x-internal": true,
+        "tags": [
+          "feed-items",
+          "assets"
+        ],
+        "summary": "Create a bunch of feed items assets",
+        "description": "Create a bunch of feed items assets",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "operationId": "create-feed-items-assets",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/CreateFeedItemsAssetsRequest"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully created feed items assets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/{game_id}/assets": {
+      "get": {
+        "x-internal": true,
+        "tags": [
+          "passport profile"
+        ],
+        "summary": "Get list of assets for a game",
+        "description": "Get list of assets for a game",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "operationId": "get-game-assets",
+        "parameters": [
+          {
+            "name": "game_id",
+            "in": "path",
+            "description": "The UUID of the game the file belongs to",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PageCursorParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageSizeParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully get list of assets for a game",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedItemsAssetsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/{game_id}/assets/presign-upload": {
+      "get": {
+        "x-internal": true,
+        "tags": [
+          "passport profile"
+        ],
+        "summary": "Get url to where the asset should be uploaded",
+        "description": "Get url to where the asset should be uploaded",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "operationId": "get-game-presign-upload",
+        "parameters": [
+          {
+            "name": "file_name",
+            "in": "query",
+            "description": "The name of the file to be uploaded to the returned url",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "game_id",
+            "in": "path",
+            "description": "The UUID of the game the file belongs to",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully get url to where the asset should be uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Presigned upload response",
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "url"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/m2m/{game_id}/assets/presign-upload": {
+      "get": {
+        "x-internal": true,
+        "tags": [
+          "passport profile"
+        ],
+        "summary": "Get url to where the asset should be uploaded (M2M)",
+        "description": "Get url to where the asset should be uploaded via M2M authentication",
+        "security": [],
+        "operationId": "m2m-get-game-presign-upload",
+        "parameters": [
+          {
+            "name": "file_name",
+            "in": "query",
+            "description": "The name of the file to be uploaded to the returned url",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "game_id",
+            "in": "path",
+            "description": "The UUID of the game the file belongs to",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully get url to where the asset should be uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Presigned upload response",
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "url"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/feed-items/assets/presign-upload": {
+      "get": {
+        "x-internal": true,
+        "tags": [
+          "feed-items",
+          "assets"
+        ],
+        "summary": "Get url to where the asset should be uploaded",
+        "description": "Get url to where the asset should be uploaded",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "operationId": "get-feed-items-presign-upload",
+        "parameters": [
+          {
+            "name": "file_name",
+            "in": "query",
+            "description": "The name of the file to be uploaded to the returned url",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully get url to where the asset should be uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Presigned upload response",
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "url"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/internal/assets/{game_id}/{path}": {
+      "get": {
+        "x-internal": true,
+        "tags": [
+          "passport profile"
+        ],
+        "summary": "Get list of assets for a game at a specific path",
+        "description": "Lists assets under {game_id}/{path}/ prefix in S3.\nReturns asset metadata including CDN URL, with cursor-based pagination.\nUse page_cursor from the previous response to fetch the next page.\nNo more results when next_cursor is null.\n",
+        "security": [
+          {
+            "BearerAuth": [
+              "openid"
+            ]
+          }
+        ],
+        "operationId": "get-internal-assets",
+        "parameters": [
+          {
+            "name": "game_id",
+            "in": "path",
+            "description": "The UUID of the game",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "path",
+            "in": "path",
+            "description": "The asset path within the game",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "email",
+                "game-page"
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PageCursorParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageSizeParam"
+          },
+          {
+            "name": "search_term",
+            "in": "query",
+            "description": "Optional prefix search term. Matching is case-sensitive.\n",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list of internal assets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalAssetsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError - User does not own this game",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/internal/assets/{game_id}/{path}/presign-upload": {
+      "get": {
+        "x-internal": true,
+        "tags": [
+          "passport profile"
+        ],
+        "summary": "Get presigned URL to upload an asset for a game",
+        "description": "Generates a presigned PUT URL for uploading an asset to S3.\nValidates file extension (.png, .jpg, .jpeg, .webp, .gif) and content type.\nValidates content_length is <= 5MB (5,242,880 bytes).\nChecks current asset count; rejects if at limit (20 assets max per game/path).\nURL expires in 5 minutes.\nS3 enforces Content-Type and Content-Length conditions on upload.\n",
+        "security": [
+          {
+            "BearerAuth": [
+              "openid"
+            ]
+          }
+        ],
+        "operationId": "get-internal-presign-upload",
+        "parameters": [
+          {
+            "name": "game_id",
+            "in": "path",
+            "description": "The UUID of the game",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "path",
+            "in": "path",
+            "description": "The asset path within the game",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "email",
+                "game-page"
+              ]
+            }
+          },
+          {
+            "name": "file_name",
+            "in": "query",
+            "description": "Name of the file to be uploaded (must have valid extension)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            }
+          },
+          {
+            "name": "content_type",
+            "in": "query",
+            "description": "Content type of the file (image/png, image/jpeg, image/webp, image/gif)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "image/png",
+                "image/jpeg",
+                "image/webp",
+                "image/gif"
+              ]
+            }
+          },
+          {
+            "name": "content_length",
+            "in": "query",
+            "description": "Size of the file in bytes (max 5MB = 5242880 bytes)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5242880
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully generated presigned upload URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalPresignUploadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError - Invalid file extension, content type, or size",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError - User does not own this game",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ConflictError - Asset limit reached (max 20 assets per game/path)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError409"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/guardian/v1/transactions/{id}/evaluate": {
       "post": {
         "x-internal": true,
@@ -4195,7 +7203,7 @@
           "guardian"
         ],
         "summary": "Evaluate a transaction",
-        "description": "Check if the transaction is valid by transaction ID for both StarkEx and EVM",
+        "description": "Check if the transaction is valid by transaction ID for EVM",
         "operationId": "evaluateTransaction",
         "parameters": [
           {
@@ -4260,6 +7268,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIError409"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "UnprocessableEntityError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError422"
                 }
               }
             }
@@ -4679,7 +7697,7 @@
             "name": "transactionID",
             "in": "path",
             "required": true,
-            "description": "The id of the starkex transaction to retrieve",
+            "description": "The id of the transaction to retrieve",
             "schema": {
               "type": "string"
             }
@@ -4690,7 +7708,6 @@
             "schema": {
               "type": "string",
               "enum": [
-                "starkex",
                 "evm"
               ]
             },
@@ -4895,6 +7912,618 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Erc191MessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guardian/v1/session-activity-contracts": {
+      "get": {
+        "x-internal": true,
+        "summary": "Get session activity contracts",
+        "description": "Retrieve session activity contracts with optional filtering",
+        "tags": [
+          "passport",
+          "guardian"
+        ],
+        "operationId": "getSessionActivityContracts",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "query",
+            "required": false,
+            "description": "Filter by Passport client ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "enabled",
+            "in": "query",
+            "required": false,
+            "description": "Filter by enabled status (true or false). If not provided, returns ALL records (enabled and disabled) - matching S3 behavior.",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session activity contracts retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionActivityContractsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "x-internal": true,
+        "summary": "Create session activity contract",
+        "description": "Create a new session activity contract for tracking user interactions",
+        "tags": [
+          "passport",
+          "guardian"
+        ],
+        "operationId": "createSessionActivityContract",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "requestBody": {
+          "description": "The request body to create a session activity contract",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertSessionActivityContractReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session activity contract created response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpsertSessionActivityContractResp"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ConflictError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError409"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guardian/v1/session-activity-contracts/{id}": {
+      "get": {
+        "get": null,
+        "x-internal": true,
+        "summary": "Get session activity contract by id",
+        "description": "Get session activity contract by id",
+        "operationId": "getSessionActivityContract",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The id of the session activity contract",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "passport",
+          "guardian"
+        ],
+        "responses": {
+          "200": {
+            "description": "Expected response to a valid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionActivityContractResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "x-internal": true,
+        "summary": "Update session activity contract",
+        "description": "Update a session activity contract",
+        "tags": [
+          "passport",
+          "guardian"
+        ],
+        "operationId": "updateSessionActivityContract",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The id of the session activity contract",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The request body to create a session activity contract",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertSessionActivityContractReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session activity contract updated response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpsertSessionActivityContractResp"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ConflictError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError409"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "passport",
+          "guardian"
+        ],
+        "summary": "deletes session activities",
+        "x-internal": true,
+        "operationId": "deleteSessionActivityContract",
+        "security": [
+          {
+            "OktaBearerAuth": [
+              "retool_role_editor"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the session activity contract to be deleted",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guardian/v1/private/session-activity-contracts": {
+      "get": {
+        "x-internal": true,
+        "summary": "Get session activity contracts for private service to service communication",
+        "description": "Get session activity contracts mappings for private service to service communication",
+        "operationId": "getPrivateSessionActivityContracts",
+        "security": [],
+        "tags": [
+          "passport",
+          "guardian"
+        ],
+        "responses": {
+          "200": {
+            "description": "Expected response to a valid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionActivityContractsResponse"
                 }
               }
             }
@@ -5611,6 +9240,11 @@
         "type": "apiKey",
         "in": "header",
         "name": "x-immutable-api-key"
+      },
+      "OktaBearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     },
     "parameters": {
@@ -5638,10 +9272,95 @@
           "$ref": "#/components/schemas/Address"
         }
       },
+      "FeedItemIdParam": {
+        "name": "feed_item_id",
+        "in": "path",
+        "description": "Feed item ID",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "FeedItemAssetTypeParam": {
+        "name": "type",
+        "in": "query",
+        "description": "Asset type to be sent as a query param",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "image",
+            "video"
+          ]
+        }
+      },
+      "PageCursorParam": {
+        "name": "page_cursor",
+        "in": "query",
+        "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response",
+        "required": false,
+        "schema": {
+          "$ref": "#/components/schemas/PageCursor"
+        }
+      },
+      "Offset": {
+        "name": "offset",
+        "in": "query",
+        "description": "Offset for pagination",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 0,
+          "default": 0,
+          "example": 10
+        }
+      },
+      "PageSizeParam": {
+        "name": "page_size",
+        "description": "Maximum number of items to return",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1,
+          "default": 100,
+          "maximum": 100,
+          "example": 10
+        }
+      },
+      "SortDirection": {
+        "name": "sort_direction",
+        "in": "query",
+        "description": "Ascending or descending direction for sort",
+        "required": false,
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "type": "string"
+        }
+      },
+      "SortField": {
+        "name": "sort_field",
+        "in": "query",
+        "description": "Field to sort by",
+        "required": false,
+        "schema": {
+          "enum": [
+            "name",
+            "slug",
+            "lastPublished"
+          ],
+          "type": "string"
+        }
+      },
       "TransactionId": {
         "name": "id",
         "in": "path",
-        "description": "Transaction identifier: payloadHash on StarkEx or EVM ID",
+        "description": "Transaction identifier: EVM transaction ID",
         "required": true,
         "schema": {
           "type": "string",
@@ -5782,6 +9501,26 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/APIError501"
+            }
+          }
+        }
+      },
+      "ServiceUnavailable": {
+        "description": "Service Unavailable (503) - RPC or upstream service temporarily unavailable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIError503"
+            }
+          }
+        }
+      },
+      "GatewayTimeout": {
+        "description": "Gateway Timeout (504) - Upstream validation request timed out",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIError504"
             }
           }
         }
@@ -9159,7 +12898,9 @@
             "enum": [
               "LISTING",
               "BID",
-              "COLLECTION_BID"
+              "COLLECTION_BID",
+              "TRAIT_BID",
+              "METADATA_BID"
             ]
           },
           "updated_at": {
@@ -9170,6 +12911,52 @@
           },
           "fill_status": {
             "$ref": "#/components/schemas/FillStatus"
+          },
+          "trait_criteria": {
+            "type": "array",
+            "description": "Trait filters for TRAIT_BID orders; omitted for other order types.",
+            "items": {
+              "$ref": "#/components/schemas/TraitFilter"
+            },
+            "minItems": 1,
+            "example": [
+              {
+                "trait_type": "Background",
+                "values": [
+                  "Blue",
+                  "Red"
+                ]
+              }
+            ]
+          },
+          "metadata_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Metadata identifier for METADATA_BID orders created with a single metadata stack. Omitted for other order types and for metadata bids created with `metadata_criteria`.",
+            "example": "018792C9-4AD7-8EC4-4038-9E05C598534B"
+          },
+          "metadata_criteria": {
+            "type": "array",
+            "description": "Field-level metadata filters for METADATA_BID orders created with criteria instead of a `metadata_id`. Omitted for other order types and for metadata bids created with a `metadata_id`.",
+            "items": {
+              "$ref": "#/components/schemas/MetadataFieldFilter"
+            },
+            "minItems": 1,
+            "example": [
+              {
+                "field_name": "name",
+                "values": [
+                  "Cool Dragon"
+                ]
+              },
+              {
+                "field_name": "attribute:Background",
+                "values": [
+                  "Blue",
+                  "Red"
+                ]
+              }
+            ]
           }
         },
         "example": {
@@ -9629,6 +13416,525 @@
             "updated_at": "2022-03-07T07:20:50.52Z"
           }
         }
+      },
+      "MetadataBidResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/Order"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "example": {
+          "result": {
+            "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "sell": [
+              {
+                "type": "ERC20",
+                "amount": "9750000000000000000",
+                "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+              }
+            ],
+            "fees": [],
+            "chain": {
+              "id": "eip155:11155111",
+              "name": "sepolia"
+            },
+            "metadata_id": "018792C9-4AD7-8EC4-4038-9E05C598534B",
+            "created_at": "2022-03-07T07:20:50.52Z",
+            "end_at": "2022-03-10T05:00:50.52Z",
+            "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+            "order_hash": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "protocol_data": {
+              "order_type": "PARTIAL_RESTRICTED",
+              "counter": "1",
+              "zone_address": "0x12",
+              "seaport_address": "0x12",
+              "seaport_version": "1.5"
+            },
+            "salt": "12686911856931635052326433555881236148",
+            "buy": [
+              {
+                "type": "ERC721_COLLECTION",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "amount": "1"
+              }
+            ],
+            "signature": "0x",
+            "start_at": "2022-03-09T05:00:50.52Z",
+            "status": {
+              "name": "EXPIRED"
+            },
+            "type": "METADATA_BID",
+            "updated_at": "2022-03-07T07:20:50.52Z"
+          }
+        }
+      },
+      "TraitFilter": {
+        "type": "object",
+        "description": "A trait filter used to match NFTs by metadata attribute",
+        "properties": {
+          "trait_type": {
+            "type": "string",
+            "description": "The trait type (attribute name)",
+            "example": "Background"
+          },
+          "values": {
+            "type": "array",
+            "description": "The trait values to match against",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "example": [
+              "Blue",
+              "Red"
+            ]
+          }
+        },
+        "required": [
+          "trait_type",
+          "values"
+        ]
+      },
+      "MetadataFieldFilter": {
+        "type": "object",
+        "description": "A field-level filter used to match NFTs for a metadata bid. The\n`field_name` is either a top-level metadata field (`name`, `image`,\n`description`, `animation_url`, `external_url`, `youtube_url`) or an\nattribute identified by the `attribute:<trait_type>` prefix (e.g.\n`attribute:Background`). Values match case-insensitively; multiple\nvalues are OR'd, multiple filters on a bid are AND'd.\n",
+        "properties": {
+          "field_name": {
+            "type": "string",
+            "description": "The metadata field name (top-level field or `attribute:<trait_type>`)",
+            "example": "attribute:Background"
+          },
+          "values": {
+            "type": "array",
+            "description": "The metadata field values to match against (OR semantics)",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "example": [
+              "Blue",
+              "Red"
+            ]
+          }
+        },
+        "required": [
+          "field_name",
+          "values"
+        ]
+      },
+      "CreateMetadataBidRequestBody": {
+        "type": "object",
+        "description": "Request body for creating a metadata bid. Exactly one of `metadata_id`\nor `metadata_criteria` must be provided.\n",
+        "properties": {
+          "account_address": {
+            "type": "string",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "order_hash": {
+            "type": "string",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+          },
+          "metadata_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Metadata identifier that matching NFTs must have to fulfill this bid. Mutually exclusive with `metadata_criteria`.",
+            "example": "018792C9-4AD7-8EC4-4038-9E05C598534B"
+          },
+          "metadata_criteria": {
+            "type": "array",
+            "description": "Field-level metadata filters that matching NFTs must satisfy to fulfill this bid. Mutually exclusive with `metadata_id`.",
+            "items": {
+              "$ref": "#/components/schemas/MetadataFieldFilter"
+            },
+            "minItems": 1,
+            "example": [
+              {
+                "field_name": "name",
+                "values": [
+                  "Cool Dragon"
+                ]
+              },
+              {
+                "field_name": "attribute:Background",
+                "values": [
+                  "Blue",
+                  "Red"
+                ]
+              }
+            ]
+          },
+          "buy": {
+            "type": "array",
+            "description": "Buy item for metadata bid should either be ERC721 or ERC1155 collection item",
+            "items": {
+              "$ref": "#/components/schemas/AssetCollectionItem"
+            },
+            "example": [
+              {
+                "type": "ERC721_COLLECTION",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "amount": "1"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "fees": {
+            "type": "array",
+            "description": "Buy fees should only include maker marketplace fees and should be no more than two entries as more entires will incur more gas. It is best practice to have this as few as possible.",
+            "items": {
+              "$ref": "#/components/schemas/Fee"
+            },
+            "example": [],
+            "minItems": 0,
+            "maxItems": 2
+          },
+          "end_at": {
+            "type": "string",
+            "description": "Time after which the Order is considered expired",
+            "format": "date-time",
+            "example": "2022-03-09T05:00:50.52Z"
+          },
+          "protocol_data": {
+            "$ref": "#/components/schemas/ProtocolData"
+          },
+          "salt": {
+            "type": "string",
+            "description": "A random value added to the create Order request",
+            "example": "12686911856931635052326433555881236148"
+          },
+          "sell": {
+            "type": "array",
+            "description": "Sell item for metadata bid should be an ERC20 item",
+            "items": {
+              "$ref": "#/components/schemas/ERC20Item"
+            },
+            "example": [
+              {
+                "type": "ERC20",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "amount": "9750000000000000000"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "signature": {
+            "type": "string",
+            "description": "Digital signature generated by the user for the specific Order",
+            "example": "0x"
+          },
+          "start_at": {
+            "type": "string",
+            "description": "Time after which Order is considered active",
+            "format": "date-time",
+            "example": "2022-03-09T05:00:50.52Z"
+          }
+        },
+        "example": {
+          "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          "order_hash": "0x0821933d9391bc9bf11a6010fe84776c84b203abff0c1ad781fb4881409c8770",
+          "metadata_id": "018792C9-4AD7-8EC4-4038-9E05C598534B",
+          "sell": [
+            {
+              "type": "ERC20",
+              "amount": "9750000000000000000",
+              "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+            }
+          ],
+          "fees": [
+            {
+              "type": "MAKER_ECOSYSTEM",
+              "amount": "2250000000000000000",
+              "recipient_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
+            }
+          ],
+          "end_at": "2022-03-10T05:00:50.52Z",
+          "protocol_data": {
+            "order_type": "FULL_RESTRICTED",
+            "counter": "1",
+            "zone_address": "0x12",
+            "seaport_address": "0x12",
+            "seaport_version": "1.5"
+          },
+          "salt": "12686911856931635052326433555881236148",
+          "buy": [
+            {
+              "type": "ERC721_COLLECTION",
+              "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+              "amount": "1"
+            }
+          ],
+          "signature": "0x",
+          "start_at": "2022-03-09T05:00:50.52Z"
+        },
+        "required": [
+          "account_address",
+          "order_hash",
+          "buy",
+          "sell",
+          "fees",
+          "end_at",
+          "start_at",
+          "protocol_data",
+          "salt",
+          "signature"
+        ]
+      },
+      "CreateTraitBidRequestBody": {
+        "type": "object",
+        "properties": {
+          "account_address": {
+            "type": "string",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "order_hash": {
+            "type": "string",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+          },
+          "buy": {
+            "type": "array",
+            "description": "Buy item for trait bid should either be ERC721 or ERC1155 collection item",
+            "items": {
+              "$ref": "#/components/schemas/AssetCollectionItem"
+            },
+            "example": [
+              {
+                "type": "ERC721_COLLECTION",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "amount": "1"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "fees": {
+            "type": "array",
+            "description": "Buy fees should only include maker marketplace fees and should be no more than two entries as more entires will incur more gas. It is best practice to have this as few as possible.",
+            "items": {
+              "$ref": "#/components/schemas/Fee"
+            },
+            "example": [],
+            "minItems": 0,
+            "maxItems": 2
+          },
+          "end_at": {
+            "type": "string",
+            "description": "Time after which the Order is considered expired",
+            "format": "date-time",
+            "example": "2022-03-09T05:00:50.52Z"
+          },
+          "protocol_data": {
+            "$ref": "#/components/schemas/ProtocolData"
+          },
+          "salt": {
+            "type": "string",
+            "description": "A random value added to the create Order request",
+            "example": "12686911856931635052326433555881236148"
+          },
+          "sell": {
+            "type": "array",
+            "description": "Sell item for trait bid should be an ERC20 item",
+            "items": {
+              "$ref": "#/components/schemas/ERC20Item"
+            },
+            "example": [
+              {
+                "type": "ERC20",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "amount": "9750000000000000000"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "signature": {
+            "type": "string",
+            "description": "Digital signature generated by the user for the specific Order",
+            "example": "0x"
+          },
+          "start_at": {
+            "type": "string",
+            "description": "Time after which Order is considered active",
+            "format": "date-time",
+            "example": "2022-03-09T05:00:50.52Z"
+          },
+          "trait_criteria": {
+            "type": "array",
+            "description": "Trait criteria to match NFTs against",
+            "items": {
+              "$ref": "#/components/schemas/TraitFilter"
+            },
+            "minItems": 1,
+            "example": [
+              {
+                "trait_type": "Background",
+                "values": [
+                  "Blue",
+                  "Red"
+                ]
+              }
+            ]
+          }
+        },
+        "example": {
+          "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          "order_hash": "0x0821933d9391bc9bf11a6010fe84776c84b203abff0c1ad781fb4881409c8770",
+          "sell": [
+            {
+              "type": "ERC20",
+              "amount": "9750000000000000000",
+              "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+            }
+          ],
+          "fees": [
+            {
+              "type": "MAKER_ECOSYSTEM",
+              "amount": "2250000000000000000",
+              "recipient_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
+            }
+          ],
+          "end_at": "2022-03-10T05:00:50.52Z",
+          "protocol_data": {
+            "order_type": "FULL_RESTRICTED",
+            "counter": "1",
+            "zone_address": "0x12",
+            "seaport_address": "0x12",
+            "seaport_version": "1.5"
+          },
+          "salt": "12686911856931635052326433555881236148",
+          "buy": [
+            {
+              "type": "ERC721_COLLECTION",
+              "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+              "amount": "1"
+            }
+          ],
+          "signature": "0x",
+          "start_at": "2022-03-09T05:00:50.52Z",
+          "trait_criteria": [
+            {
+              "trait_type": "Background",
+              "values": [
+                "Blue",
+                "Red"
+              ]
+            }
+          ]
+        },
+        "required": [
+          "account_address",
+          "order_hash",
+          "buy",
+          "sell",
+          "fees",
+          "end_at",
+          "start_at",
+          "protocol_data",
+          "salt",
+          "signature",
+          "trait_criteria"
+        ]
+      },
+      "TraitBidResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/Order"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "example": {
+          "result": {
+            "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "sell": [
+              {
+                "type": "ERC20",
+                "amount": "9750000000000000000",
+                "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+              }
+            ],
+            "fees": [],
+            "chain": {
+              "id": "eip155:11155111",
+              "name": "sepolia"
+            },
+            "created_at": "2022-03-07T07:20:50.52Z",
+            "end_at": "2022-03-10T05:00:50.52Z",
+            "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+            "order_hash": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "protocol_data": {
+              "order_type": "PARTIAL_RESTRICTED",
+              "counter": "1",
+              "zone_address": "0x12",
+              "seaport_address": "0x12",
+              "seaport_version": "1.5"
+            },
+            "salt": "12686911856931635052326433555881236148",
+            "buy": [
+              {
+                "type": "ERC721_COLLECTION",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "amount": "1"
+              }
+            ],
+            "signature": "0x",
+            "start_at": "2022-03-09T05:00:50.52Z",
+            "status": {
+              "name": "EXPIRED"
+            },
+            "type": "TRAIT_BID",
+            "updated_at": "2022-03-07T07:20:50.52Z"
+          }
+        }
+      },
+      "ListTraitBidsResult": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          },
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Order"
+            },
+            "minItems": 0,
+            "maxItems": 200
+          }
+        },
+        "required": [
+          "page",
+          "result"
+        ]
+      },
+      "ListMetadataBidsResult": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          },
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Order"
+            },
+            "minItems": 0,
+            "maxItems": 200
+          }
+        },
+        "required": [
+          "page",
+          "result"
+        ]
       },
       "ListListingsResult": {
         "type": "object",
@@ -10372,6 +14678,64 @@
                   "NOT_IMPLEMENTED_ERROR"
                 ],
                 "example": "NOT_IMPLEMENTED_ERROR"
+              },
+              "details": {
+                "type": "object",
+                "nullable": true,
+                "description": "Additional details to help resolve the error"
+              }
+            },
+            "required": [
+              "code",
+              "details"
+            ]
+          }
+        ]
+      },
+      "APIError503": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAPIError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error Code",
+                "enum": [
+                  "SERVICE_UNAVAILABLE"
+                ],
+                "example": "SERVICE_UNAVAILABLE"
+              },
+              "details": {
+                "type": "object",
+                "nullable": true,
+                "description": "Additional details to help resolve the error"
+              }
+            },
+            "required": [
+              "code",
+              "details"
+            ]
+          }
+        ]
+      },
+      "APIError504": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAPIError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error Code",
+                "enum": [
+                  "GATEWAY_TIMEOUT"
+                ],
+                "example": "GATEWAY_TIMEOUT"
               },
               "details": {
                 "type": "object",
@@ -11573,6 +15937,293 @@
           }
         }
       },
+      "GetWalletUserRes": {
+        "type": "object",
+        "required": [
+          "email",
+          "user_id"
+        ],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "The user id associated with the wallet address",
+            "example": "google|1234"
+          },
+          "email": {
+            "type": "string",
+            "description": "The email address associated with the wallet address",
+            "example": "user@example.com"
+          }
+        }
+      },
+      "GetUserWalletRes": {
+        "type": "object",
+        "required": [
+          "wallet_address"
+        ],
+        "properties": {
+          "wallet_address": {
+            "type": "string",
+            "description": "The wallet address associated with the user",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "example": "0x1234567890abcdef1234567890abcdef12345678"
+          }
+        }
+      },
+      "DeleteUserRequest": {
+        "type": "object",
+        "properties": {
+          "email_address": {
+            "type": "string",
+            "format": "email",
+            "description": "The email address of the user to delete",
+            "example": "user@example.com"
+          },
+          "reason": {
+            "type": "string",
+            "description": "The reason for deleting the user",
+            "example": "JIRA-123: User requested deletion"
+          }
+        },
+        "required": [
+          "email_address",
+          "reason"
+        ],
+        "example": [
+          {
+            "email_address": "user@example.com",
+            "reason": "JIRA-123: User requested deletion"
+          }
+        ]
+      },
+      "DeleteUserRes": {
+        "type": "object",
+        "properties": {
+          "email_address": {
+            "type": "string",
+            "description": "The email address of the user",
+            "example": "user@example.com"
+          },
+          "user_id": {
+            "type": "string",
+            "description": "The user id of the user",
+            "example": "google|1234"
+          }
+        },
+        "required": [
+          "email_address",
+          "user_id"
+        ],
+        "example": {
+          "email_address": "user@example.com",
+          "user_id": "google|1234"
+        }
+      },
+      "UpdateUserEmailRequest": {
+        "type": "object",
+        "required": [
+          "wallet_address",
+          "email_address"
+        ],
+        "properties": {
+          "wallet_address": {
+            "type": "string",
+            "description": "The user's wallet (eth) address to identify the user",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "maxLength": 42,
+            "example": "0x1234567890abcdef1234567890abcdef12345678"
+          },
+          "email_address": {
+            "type": "string",
+            "format": "email",
+            "description": "The email address to set for the user",
+            "example": "user@example.com",
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateUserEmailRes": {
+        "type": "object",
+        "required": [
+          "wallet_address"
+        ],
+        "properties": {
+          "wallet_address": {
+            "type": "string",
+            "description": "The wallet address that was updated",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "example": "0x1234567890abcdef1234567890abcdef12345678"
+          }
+        }
+      },
+      "CreatePreOnboardingCheckInSessionActivityContractRequest": {
+        "type": "object",
+        "required": [
+          "contract_address",
+          "client_id",
+          "organisation_id"
+        ],
+        "properties": {
+          "contract_address": {
+            "type": "string",
+            "description": "The smart contract address to track session activity for",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "maxLength": 42,
+            "example": "0x1234567890abcdef1234567890abcdef12345678"
+          },
+          "client_id": {
+            "type": "string",
+            "description": "The client ID associated with the session activity contract",
+            "pattern": "^[a-zA-Z0-9]{32}$",
+            "minLength": 32,
+            "maxLength": 32,
+            "example": "ZabAMafQRA9bWE1XatAtBYNe6DRamgqE"
+          },
+          "organisation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The organisation ID that owns this session activity contract (UUID format)",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        },
+        "additionalProperties": false,
+        "example": {
+          "contract_address": "0x1234567890abcdef1234567890abcdef12345678",
+          "client_id": "ZabAMafQRA9bWE1XatAtBYNe6DRamgqE",
+          "organisation_id": "550e8400-e29b-41d4-a716-446655440000"
+        }
+      },
+      "CreatePreOnboardingCheckInSessionActivityContractRes": {
+        "type": "object",
+        "required": [
+          "id",
+          "contract_address",
+          "client_id",
+          "organisation_id",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The unique identifier of the created session activity contract",
+            "example": 1
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "The smart contract address",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "minLength": 42,
+            "maxLength": 42,
+            "example": "0x1234567890abcdef1234567890abcdef12345678"
+          },
+          "client_id": {
+            "type": "string",
+            "description": "The client ID associated with the session activity contract",
+            "pattern": "^[a-zA-Z0-9]{32}$",
+            "minLength": 32,
+            "maxLength": 32,
+            "example": "ZabAMafQRA9bWE1XatAtBYNe6DRamgqE"
+          },
+          "organisation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The organisation ID that owns this session activity contract (UUID format)",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp when the session activity contract was created",
+            "example": "2023-12-07T10:30:00Z"
+          }
+        },
+        "example": {
+          "id": 1,
+          "contract_address": "0x1234567890abcdef1234567890abcdef12345678",
+          "client_id": "ZabAMafQRA9bWE1XatAtBYNe6DRamgqE",
+          "organisation_id": "550e8400-e29b-41d4-a716-446655440000",
+          "created_at": "2023-12-07T10:30:00Z"
+        }
+      },
+      "GetPreOnboardingCheckInSessionActivityContractsRes": {
+        "type": "object",
+        "required": [
+          "session_activity_contracts"
+        ],
+        "properties": {
+          "session_activity_contracts": {
+            "type": "array",
+            "description": "List of session activity contracts",
+            "items": {
+              "$ref": "#/components/schemas/PreOnboardingCheckInSessionActivityContract"
+            }
+          }
+        },
+        "example": {
+          "session_activity_contracts": [
+            {
+              "id": 1,
+              "contract_address": "0x1234567890abcdef1234567890abcdef12345678",
+              "client_id": "ZabAMafQRA9bWE1XatAtBYNe6DRamgqE",
+              "organisation_id": "550e8400-e29b-41d4-a716-446655440000",
+              "created_at": "2023-12-07T10:30:00Z"
+            },
+            {
+              "id": 2,
+              "contract_address": "0xabcdef1234567890abcdef1234567890abcdef12",
+              "client_id": "ZabAMafQRA9bWE1XatAtBYNe6DRamgqE",
+              "organisation_id": "550e8400-e29b-41d4-a716-446655440000",
+              "created_at": "2023-12-07T11:00:00Z"
+            }
+          ]
+        }
+      },
+      "PreOnboardingCheckInSessionActivityContract": {
+        "type": "object",
+        "required": [
+          "id",
+          "contract_address",
+          "client_id",
+          "organisation_id",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The unique identifier of the session activity contract",
+            "example": 1
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "The smart contract address",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "minLength": 42,
+            "maxLength": 42,
+            "example": "0x1234567890abcdef1234567890abcdef12345678"
+          },
+          "client_id": {
+            "type": "string",
+            "description": "The client ID associated with the session activity contract",
+            "pattern": "^[a-zA-Z0-9]{32}$",
+            "minLength": 32,
+            "maxLength": 32,
+            "example": "ZabAMafQRA9bWE1XatAtBYNe6DRamgqE"
+          },
+          "organisation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The organisation ID that owns this session activity contract (UUID format)",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp when the session activity contract was created",
+            "example": "2023-12-07T10:30:00Z"
+          }
+        }
+      },
       "DomainType": {
         "type": "object",
         "properties": {
@@ -11664,6 +16315,120 @@
           "message"
         ]
       },
+      "ProgramName": {
+        "type": "string",
+        "description": "Program ID",
+        "maxLength": 36
+      },
+      "EpochID": {
+        "type": "string",
+        "description": "Latest Epoch",
+        "enum": [
+          "current"
+        ]
+      },
+      "EthereumAddress": {
+        "type": "string",
+        "description": "Ethereum address",
+        "pattern": "^0x[a-fA-F0-9]{40}$",
+        "minLength": 42,
+        "maxLength": 42
+      },
+      "GetEpochResponseBody": {
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/GetEpochResponseBodyResult"
+          }
+        }
+      },
+      "GetEpochResponseBodyResult": {
+        "required": [
+          "epoch",
+          "started_at",
+          "ended_at",
+          "contract_address",
+          "rewards_lifetime"
+        ],
+        "type": "object",
+        "properties": {
+          "epoch": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Epoch number"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Epoch start date"
+          },
+          "ended_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Epoch end date"
+          },
+          "rewards_rate_last_cycle": {
+            "type": "number",
+            "description": "Rewards rate last cycle",
+            "format": "float"
+          },
+          "finalised_at_last_cycle": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Finalised at for the previous epoch"
+          },
+          "contract_address": {
+            "$ref": "#/components/schemas/EthereumAddress"
+          },
+          "rewards_lifetime": {
+            "type": "string",
+            "description": "Total amount of rewards earned globally",
+            "pattern": "^\\d+$"
+          },
+          "average_rewards_rate": {
+            "type": "number",
+            "description": "Average rewards rate historically",
+            "format": "float"
+          }
+        }
+      },
+      "GetWalletStakingInfoResponseBody": {
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/GetWalletStakingInfoResponseBodyResult"
+          }
+        }
+      },
+      "GetWalletStakingInfoResponseBodyResult": {
+        "required": [
+          "rewards_lifetime",
+          "did_trade_this_cycle"
+        ],
+        "type": "object",
+        "properties": {
+          "rewards_lifetime": {
+            "type": "string",
+            "description": "Total amount of rewards earned by this wallet",
+            "pattern": "^\\d+$"
+          },
+          "rewards_last_cycle": {
+            "type": "string",
+            "description": "Amount of rewards earned last cycle by this wallet",
+            "pattern": "^\\d+$"
+          },
+          "did_trade_this_cycle": {
+            "type": "boolean",
+            "description": "Whether this wallet traded this cycle"
+          }
+        }
+      },
       "EthAddress": {
         "description": "Ethereum address",
         "type": "string",
@@ -11671,6 +16436,12 @@
       },
       "CreatedAt": {
         "description": "Created at",
+        "type": "string",
+        "format": "date-time",
+        "example": "2021-08-31T00:00:00Z"
+      },
+      "UpdatedAt": {
+        "description": "Updated at",
         "type": "string",
         "format": "date-time",
         "example": "2021-08-31T00:00:00Z"
@@ -11717,6 +16488,68 @@
             "example": "Passport Dashboard"
           }
         }
+      },
+      "PhoneNumberOTPRequest": {
+        "description": "Phone number OTP request",
+        "type": "object",
+        "required": [
+          "phone_number"
+        ],
+        "properties": {
+          "phone_number": {
+            "$ref": "#/components/schemas/PhoneNumber"
+          },
+          "channel": {
+            "enum": [
+              "sms",
+              "whatsapp"
+            ],
+            "type": "string",
+            "example": "sms"
+          }
+        }
+      },
+      "PhoneNumberOTPResponse": {
+        "description": "Phone number OTP request",
+        "type": "object",
+        "required": [
+          "phone_number"
+        ],
+        "properties": {
+          "phone_number": {
+            "$ref": "#/components/schemas/PhoneNumber"
+          }
+        }
+      },
+      "PhoneNumberOTPVerificationRequest": {
+        "description": "Phone number OTP verification request",
+        "type": "object",
+        "required": [
+          "phone_number",
+          "code"
+        ],
+        "properties": {
+          "phone_number": {
+            "$ref": "#/components/schemas/PhoneNumber"
+          },
+          "code": {
+            "$ref": "#/components/schemas/PhoneNumberOTP"
+          }
+        }
+      },
+      "PhoneNumber": {
+        "description": "Phone number",
+        "type": "string",
+        "example": "+61412345678",
+        "minLength": 3,
+        "maxLength": 50
+      },
+      "PhoneNumberOTP": {
+        "description": "Phone number verification OTP",
+        "type": "string",
+        "example": "123456",
+        "maxLength": 6,
+        "minLength": 6
       },
       "LinkWalletV2Request": {
         "description": "Link wallet V2 request",
@@ -11790,6 +16623,947 @@
           }
         }
       },
+      "FeedItemBase": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Feed item ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Feed item name"
+          },
+          "quest_id": {
+            "type": "string",
+            "description": "Quest ID",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Feed item priority"
+          },
+          "gems_earnable": {
+            "type": "integer",
+            "description": "Amount of gems earnable when user completes the quest"
+          },
+          "bypass": {
+            "type": "boolean",
+            "description": "If the quest is bypassed, the user will not be able to see it on the feed"
+          },
+          "day_zero": {
+            "type": "boolean",
+            "description": "If the quest is a day0 quest"
+          },
+          "game_id": {
+            "type": "string",
+            "description": "Game ID",
+            "format": "uuid"
+          },
+          "game_name": {
+            "type": "string",
+            "description": "Game name"
+          },
+          "quest_completed_popup_text": {
+            "type": "string",
+            "description": "Text to display when the quest is completed in an onboarding experience"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The tags for the feed item"
+          },
+          "control_tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Some specific tags for controlling feed items"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The categories for the feed item"
+          },
+          "onboarding_experience": {
+            "type": "string",
+            "description": "The onboarding experience for the feed item"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "quest_id",
+          "priority",
+          "type",
+          "gems_earnable"
+        ]
+      },
+      "FeedItemVideo": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemBase"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Feed item type",
+                "enum": [
+                  "video"
+                ]
+              },
+              "title": {
+                "type": "string",
+                "description": "Title of the video"
+              },
+              "url": {
+                "type": "string",
+                "description": "URL of the video",
+                "format": "uri"
+              }
+            },
+            "required": [
+              "type",
+              "title",
+              "url"
+            ]
+          }
+        ]
+      },
+      "FeedItemFollowGame": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemBase"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Feed item type",
+                "enum": [
+                  "followgame"
+                ]
+              },
+              "image": {
+                "type": "string",
+                "description": "URL of the CTA image",
+                "format": "uri"
+              },
+              "label": {
+                "type": "string",
+                "description": "Label of the CTA button"
+              },
+              "description": {
+                "type": "string",
+                "description": "Description of the CTA button"
+              },
+              "logo": {
+                "type": "string",
+                "description": "URL of the quiz logo",
+                "format": "uri"
+              },
+              "title": {
+                "type": "string",
+                "description": "Title of the video"
+              },
+              "similar_games": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Similar games to display"
+              }
+            },
+            "required": [
+              "type",
+              "image",
+              "label",
+              "description",
+              "logo",
+              "title"
+            ]
+          }
+        ]
+      },
+      "FeedItemQuiz": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemBase"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Feed item type",
+                "enum": [
+                  "quiz"
+                ]
+              },
+              "header_video_url": {
+                "type": "string",
+                "description": "URL of the quiz header video",
+                "format": "uri"
+              },
+              "logo": {
+                "type": "string",
+                "description": "URL of the quiz logo",
+                "format": "uri"
+              },
+              "question": {
+                "type": "string",
+                "description": "The quiz question"
+              },
+              "answers": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Quiz answers to display"
+              },
+              "correct_answers": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Quiz correct answers"
+              },
+              "correct_answer_text": {
+                "type": "string",
+                "description": "The text to display when the user answers the quiz correctly"
+              },
+              "header_initial_image": {
+                "type": "string",
+                "description": "The initial image for the quiz header",
+                "format": "uri"
+              },
+              "header_answered_image": {
+                "type": "string",
+                "description": "The image to display when the user answers the quiz correctly",
+                "format": "uri"
+              }
+            },
+            "required": [
+              "type",
+              "question",
+              "answers",
+              "correct_answers"
+            ]
+          }
+        ]
+      },
+      "FeedItemCTA": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemBase"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Feed item type",
+                "enum": [
+                  "cta"
+                ]
+              },
+              "label": {
+                "type": "string",
+                "description": "The label for the CTA button"
+              },
+              "description": {
+                "type": "string",
+                "description": "The description for the CTA button"
+              },
+              "url": {
+                "type": "string",
+                "description": "The URL for the CTA button"
+              },
+              "image": {
+                "type": "string",
+                "description": "The image for the CTA background",
+                "format": "uri"
+              }
+            },
+            "required": [
+              "type",
+              "label",
+              "description",
+              "url",
+              "image"
+            ]
+          }
+        ]
+      },
+      "FeedItemSignIn": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemCTA"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Feed item type",
+                "enum": [
+                  "signin"
+                ]
+              },
+              "redirect_url": {
+                "type": "string",
+                "description": "The URL to redirect to when the user completes the sign in quest",
+                "format": "uri"
+              },
+              "background": {
+                "type": "string",
+                "description": "The background for the sign in quest",
+                "format": "uri"
+              }
+            },
+            "required": [
+              "type",
+              "redirect_url",
+              "background"
+            ]
+          }
+        ]
+      },
+      "FeedItemReward": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemSignIn"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Feed item type",
+                "enum": [
+                  "reward"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "FeedItemLanding": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemBase"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Feed item type",
+                "enum": [
+                  "landing"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          }
+        ]
+      },
+      "FeedItemPinToHome": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemBase"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Feed item type",
+                "enum": [
+                  "pintohome"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          }
+        ]
+      },
+      "FeedItemDailyGems": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemBase"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Feed item type",
+                "enum": [
+                  "dailygems"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          }
+        ]
+      },
+      "FeedItemBonusGems": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemBase"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Feed item type",
+                "enum": [
+                  "bonusgems"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          }
+        ]
+      },
+      "FeedItemReferral": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemBase"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Feed item type",
+                "enum": [
+                  "referral"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          }
+        ]
+      },
+      "FeedItemSocialQuest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemBase"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Feed item type",
+                "enum": [
+                  "socialquest"
+                ]
+              },
+              "title": {
+                "type": "string",
+                "description": "Title of the social quest"
+              },
+              "subtitle": {
+                "type": "string",
+                "description": "Title of the social quest"
+              },
+              "label": {
+                "type": "string",
+                "description": "The label for the CTA button"
+              },
+              "description": {
+                "type": "string",
+                "description": "The description for the CTA button"
+              },
+              "url": {
+                "type": "string",
+                "description": "The URL for the CTA button"
+              },
+              "logo": {
+                "type": "string",
+                "description": "URL of the logo",
+                "format": "uri"
+              },
+              "platform_name": {
+                "type": "string",
+                "description": "The name of the platform social quest belongs to"
+              }
+            },
+            "required": [
+              "type",
+              "title",
+              "subtitle",
+              "label",
+              "description",
+              "url",
+              "logo",
+              "platform_name"
+            ]
+          }
+        ]
+      },
+      "FeedItemResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Feed item status, e.g., enabled, disabled, archived, deleted"
+          },
+          "created_at": {
+            "$ref": "#/components/schemas/CreatedAt"
+          },
+          "updated_at": {
+            "$ref": "#/components/schemas/UpdatedAt"
+          }
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemVideo"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemQuiz"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemCTA"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemSignIn"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemReward"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemLanding"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemPinToHome"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemDailyGems"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemBonusGems"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemReferral"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemFollowGame"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemSocialQuest"
+          }
+        ]
+      },
+      "FeedItemResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/FeedItemResponse"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "FeedItemsResponsePage": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "Offset for pagination"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of items"
+          }
+        }
+      },
+      "FeedItemsAssetsResponsePage": {
+        "type": "object",
+        "properties": {
+          "previous_cursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Previous page cursor"
+          },
+          "next_cursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Next page cursor"
+          }
+        },
+        "required": [
+          "previous_cursor",
+          "next_cursor"
+        ]
+      },
+      "FeedItemsResponse": {
+        "description": "Feed item response page",
+        "type": "object",
+        "properties": {
+          "page": {
+            "$ref": "#/components/schemas/FeedItemsResponsePage"
+          },
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeedItemResponse"
+            },
+            "minItems": 0,
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "page",
+          "result"
+        ]
+      },
+      "CreateUpdateFeedItemRequest": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/FeedItemVideo"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemQuiz"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemCTA"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemSignIn"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemReward"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemLanding"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemPinToHome"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemDailyGems"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemBonusGems"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemReferral"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemFollowGame"
+          },
+          {
+            "$ref": "#/components/schemas/FeedItemSocialQuest"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "video": "#/components/schemas/FeedItemVideo",
+            "quiz": "#/components/schemas/FeedItemQuiz",
+            "cta": "#/components/schemas/FeedItemCTA",
+            "signin": "#/components/schemas/FeedItemSignIn",
+            "reward": "#/components/schemas/FeedItemReward",
+            "landing": "#/components/schemas/FeedItemLanding",
+            "pintohome": "#/components/schemas/FeedItemPinToHome",
+            "dailygems": "#/components/schemas/FeedItemDailyGems",
+            "bonusgems": "#/components/schemas/FeedItemBonusGems",
+            "referral": "#/components/schemas/FeedItemReferral",
+            "followgame": "#/components/schemas/FeedItemFollowGame",
+            "socialquest": "#/components/schemas/FeedItemSocialQuest"
+          }
+        }
+      },
+      "FeedItemsStatusRequest": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "description": "Feed item ids to have status updated",
+            "items": {
+              "type": "string"
+            }
+          },
+          "action": {
+            "type": "string",
+            "description": "The action to be applied in feed item status",
+            "enum": [
+              "publish",
+              "unpublish",
+              "archive",
+              "unarchive",
+              "delete"
+            ]
+          }
+        }
+      },
+      "FeedItemsStatusResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "array",
+            "description": "Successfully updated feed items ids",
+            "items": {
+              "type": "string"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "description": "Failed to update status feed items ids",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "FeedItemAssetResponse": {
+        "description": "Feed item response page",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Asset name"
+          },
+          "type": {
+            "type": "string",
+            "description": "Asset type"
+          },
+          "last_modified": {
+            "description": "Last Modified",
+            "type": "string",
+            "format": "date-time",
+            "example": "2021-08-31T00:00:00Z"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Asset size"
+          }
+        }
+      },
+      "CreateFeedItemsAssetsRequest": {
+        "description": "Feed item asset response for creation",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "base64Data": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "integer"
+          }
+        }
+      },
+      "FeedItemsAssetsResponse": {
+        "description": "Feed item response page",
+        "type": "object",
+        "properties": {
+          "page": {
+            "$ref": "#/components/schemas/FeedItemsAssetsResponsePage"
+          },
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeedItemAssetResponse"
+            },
+            "minItems": 0,
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "page",
+          "result"
+        ]
+      },
+      "InternalAssetResponse": {
+        "description": "Internal asset response with CDN URL",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Asset filename"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Asset size in bytes"
+          },
+          "last_modified": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last modified timestamp"
+          },
+          "cdn_url": {
+            "type": "string",
+            "description": "CDN URL to access the asset"
+          }
+        },
+        "required": [
+          "name",
+          "size",
+          "last_modified",
+          "cdn_url"
+        ]
+      },
+      "InternalAssetsPage": {
+        "type": "object",
+        "properties": {
+          "previous_cursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Previous page cursor"
+          },
+          "next_cursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Next page cursor"
+          }
+        },
+        "required": [
+          "previous_cursor",
+          "next_cursor"
+        ]
+      },
+      "InternalAssetsResponse": {
+        "description": "Internal assets list response",
+        "type": "object",
+        "properties": {
+          "page": {
+            "$ref": "#/components/schemas/InternalAssetsPage"
+          },
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InternalAssetResponse"
+            },
+            "minItems": 0,
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "page",
+          "result"
+        ]
+      },
+      "InternalPresignUploadResponse": {
+        "description": "Presigned upload URL response for internal assets",
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Presigned PUT URL for uploading the asset (valid for 15 minutes)"
+          },
+          "cdn_url": {
+            "type": "string",
+            "description": "CDN URL where the asset will be accessible after upload"
+          },
+          "content_type": {
+            "type": "string",
+            "description": "Content-Type that must be used when uploading"
+          }
+        },
+        "required": [
+          "url",
+          "cdn_url",
+          "content_type"
+        ]
+      },
+      "ProfileResponse": {
+        "description": "Get profile by wallet response",
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username"
+        ]
+      },
+      "UsernameUpdateRequest": {
+        "description": "Request to update username",
+        "type": "object",
+        "required": [
+          "username"
+        ],
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "The new username",
+            "minLength": 3,
+            "maxLength": 18,
+            "pattern": "^[a-zA-Z0-9]+$"
+          }
+        }
+      },
+      "UsernameUpdateResponse": {
+        "description": "Username update response",
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username"
+        ]
+      },
       "Transaction": {
         "type": "object",
         "required": [
@@ -11810,7 +17584,7 @@
             "type": "string"
           },
           "status": {
-            "description": "Status of the starkex transactions",
+            "description": "Status of the transaction",
             "type": "string"
           },
           "transaction_type": {
@@ -11829,11 +17603,6 @@
           "client_name": {
             "description": "Name of request client",
             "type": "string"
-          },
-          "validation": {
-            "description": "Validation results",
-            "$ref": "#/components/schemas/ValidationResult",
-            "nullable": true
           }
         }
       },
@@ -11851,7 +17620,6 @@
             "description": "chain type",
             "type": "string",
             "enum": [
-              "starkex",
               "evm"
             ]
           },
@@ -11865,31 +17633,9 @@
         "type": "object",
         "oneOf": [
           {
-            "$ref": "#/components/schemas/StarkExTransactionEvaluationRequest"
-          },
-          {
             "$ref": "#/components/schemas/ZkEvmTransactionEvaluationRequest"
           }
         ]
-      },
-      "StarkExTransactionEvaluationRequest": {
-        "required": [
-          "chainType"
-        ],
-        "type": "object",
-        "properties": {
-          "chainId": {
-            "type": "string",
-            "description": "The ID of the chain"
-          },
-          "chainType": {
-            "type": "string",
-            "enum": [
-              "starkex"
-            ],
-            "description": "The type of the chain"
-          }
-        }
       },
       "ZkEvmTransactionEvaluationRequest": {
         "required": [
@@ -12097,11 +17843,6 @@
           "data": {
             "description": "evm message data",
             "$ref": "#/components/schemas/EIP712Message"
-          },
-          "validation": {
-            "description": "Validation results",
-            "$ref": "#/components/schemas/ValidationResult",
-            "nullable": true
           }
         }
       },
@@ -12137,139 +17878,171 @@
           }
         }
       },
-      "ValidationResult": {
-        "type": "object",
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/ValidationSuccessResults"
-          },
-          {
-            "$ref": "#/components/schemas/ValidationErrorResults"
-          },
-          {
-            "$ref": "#/components/schemas/ValidationSimulationFailedResults"
-          }
-        ],
-        "discriminator": {
-          "propertyName": "status",
-          "mapping": {
-            "error": "#/components/schemas/ValidationErrorResults",
-            "success": "#/components/schemas/ValidationSuccessResults",
-            "simulation_failed": "#/components/schemas/ValidationSimulationFailedResults"
-          }
-        }
-      },
-      "ValidationSuccessResults": {
+      "SessionActivityContractsResponse": {
         "type": "object",
         "required": [
-          "status",
-          "analysis",
-          "highestSeverity"
+          "session_activity_contracts"
         ],
         "properties": {
-          "status": {
-            "$ref": "#/components/schemas/ValidationStatus"
-          },
-          "highestSeverity": {
-            "$ref": "#/components/schemas/HighestSeverity"
-          },
-          "analysis": {
+          "session_activity_contracts": {
             "type": "array",
+            "description": "List of session activity contracts",
             "items": {
-              "$ref": "#/components/schemas/Analysis"
+              "$ref": "#/components/schemas/SessionActivityContractResponse"
+            }
+          }
+        },
+        "example": {
+          "session_activity_contracts": [
+            {
+              "id": 1,
+              "contract_address": "0x1234567890abcdef1234567890abcdef12345678",
+              "client_id": "ZabAMafQRA9bWE1XatAtBYNe6DRamgqE",
+              "organisation_id": "550e8400-e29b-41d4-a716-446655440000",
+              "created_at": "2023-12-07T10:30:00Z"
             },
-            "minItems": 0,
-            "description": "Contains a recommended action and warnings pertaining to the simulated transaction, such as interactions with known malicious addresses"
-          }
+            {
+              "id": 2,
+              "contract_address": "0xabcdef1234567890abcdef1234567890abcdef12",
+              "client_id": "ZabAMafQRA9bWE1XatAtBYNe6DRamgqE",
+              "organisation_id": "550e8400-e29b-41d4-a716-446655440000",
+              "created_at": "2023-12-07T11:00:00Z"
+            }
+          ]
         }
       },
-      "ValidationSimulationFailedResults": {
-        "type": "object",
-        "required": [
-          "status",
-          "error"
-        ],
-        "properties": {
-          "status": {
-            "$ref": "#/components/schemas/ValidationStatus"
+      "SessionActivityContractResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SessionActivityContract"
           },
-          "error": {
-            "description": "human-readable error message representing a failure to simulate the transaction",
-            "type": "string"
+          {
+            "type": "object"
+          },
+          {
+            "required": [
+              "id",
+              "name",
+              "client_id",
+              "contract_address",
+              "chain_id",
+              "organisation_id",
+              "enabled",
+              "created_at"
+            ]
           }
-        }
-      },
-      "ValidationErrorResults": {
-        "type": "object",
-        "required": [
-          "status",
-          "error"
-        ],
-        "properties": {
-          "status": {
-            "$ref": "#/components/schemas/ValidationStatus"
-          },
-          "error": {
-            "description": "human-readable error message representing a failure with the simulated transaction, such as a reversion",
-            "type": "string"
-          }
-        }
-      },
-      "Analysis": {
-        "description": "Contains a recommended action and warnings pertaining to the simulated transaction, such as interactions with known malicious addresses",
-        "type": "object",
-        "required": [
-          "severity",
-          "description"
-        ],
-        "properties": {
-          "severity": {
-            "$ref": "#/components/schemas/Severity"
-          },
-          "description": {
-            "description": "description of the analysis",
-            "type": "string"
-          },
-          "address": {
-            "description": "address of related analysis",
-            "type": "string"
-          }
-        }
-      },
-      "Severity": {
-        "type": "string",
-        "description": "Analysis severity level",
-        "enum": [
-          "malicious",
-          "benign",
-          "warning",
-          "unknown",
-          "info"
         ]
       },
-      "HighestSeverity": {
-        "type": "object",
-        "required": [
-          "severity",
-          "description"
-        ],
-        "description": "Top level severity analysis",
-        "properties": {
-          "severity": {
-            "$ref": "#/components/schemas/Severity"
+      "UpsertSessionActivityContractReq": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SessionActivityContract"
           },
-          "description": {
-            "type": "string"
+          {
+            "type": "object"
+          },
+          {
+            "required": [
+              "name",
+              "contract_address",
+              "client_id",
+              "chain_id",
+              "organisation_id",
+              "enabled"
+            ]
+          }
+        ]
+      },
+      "UpsertSessionActivityContractResp": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SessionActivityContract"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "SessionActivityContract": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The unique identifier of the session activity contract",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the session activity contract",
+            "example": "Session Activity Contract 1"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "The smart contract address",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "minLength": 42,
+            "maxLength": 42,
+            "example": "0x1234567890abcdef1234567890abcdef12345678"
+          },
+          "client_id": {
+            "type": "string",
+            "description": "The client ID associated with the session activity contract",
+            "pattern": "^[a-zA-Z0-9]{32}$",
+            "minLength": 32,
+            "maxLength": 32,
+            "example": "ZabAMafQRA9bWE1XatAtBYNe6DRamgqE"
+          },
+          "chain_id": {
+            "type": "string",
+            "description": "The chain ID for the session activity contract",
+            "example": "eip155:13371"
+          },
+          "organisation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The organisation ID that owns this session activity contract (UUID format)",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the session activity contract is enabled",
+            "example": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp when the session activity contract was created",
+            "example": "2023-12-07T10:30:00Z"
           }
         }
       },
-      "ValidationStatus": {
-        "type": "string",
-        "description": "Status of the validation",
-        "enum": [
-          "success",
-          "error",
-          "simulation_failed"
+      "APIError422": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAPIError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error Code",
+                "enum": [
+                  "UNPROCESSABLE_ENTITY_ERROR"
+                ],
+                "example": "UNPROCESSABLE_ENTITY_ERROR"
+              },
+              "details": {
+                "type": "object",
+                "nullable": true,
+                "description": "Additional details to help resolve the error"
+              }
+            },
+            "required": [
+              "code",
+              "details"
+            ]
+          }
         ]
       },
       "ERC191Message": {
