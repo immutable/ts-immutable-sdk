@@ -15,9 +15,6 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { StarkExTransactionEvaluationRequest } from './stark-ex-transaction-evaluation-request';
-// May contain unused imports in some cases
-// @ts-ignore
 import { ZkEvmTransactionData } from './zk-evm-transaction-data';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -27,6 +24,4 @@ import { ZkEvmTransactionEvaluationRequest } from './zk-evm-transaction-evaluati
  * @type TransactionEvaluationRequest
  * @export
  */
-export type TransactionEvaluationRequest = StarkExTransactionEvaluationRequest | ZkEvmTransactionEvaluationRequest;
-
-
+export type TransactionEvaluationRequest = ZkEvmTransactionEvaluationRequest;

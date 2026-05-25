@@ -204,7 +204,6 @@ export * from './sign-crafting-result';
 export * from './stack';
 export * from './stack-bundle';
 export * from './stack-quote-result';
-export * from './stark-ex-transaction-evaluation-request';
 export * from './token';
 export * from './token-contract-type';
 export * from './trade';
