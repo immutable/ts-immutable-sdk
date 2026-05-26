@@ -227,7 +227,9 @@ export function WalletList(props: WalletListProps) {
 
   const connectCallback = async (ethereumProvider: EthereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
-      const browserProvider = new WrappedBrowserProvider(ethereumProvider);
+      // Pass 'any' so ethers doesn't pin the provider to the initial WC chain.
+      // Without 'any', the subsequent getNetwork() throws NETWORK_ERROR ("network changed: ...").
+      const browserProvider = new WrappedBrowserProvider(ethereumProvider, 'any');
       selectBrowserProvider(browserProvider, 'walletconnect');
 
       const { chainId } = await ((await browserProvider.getSigner()).provider.getNetwork());
