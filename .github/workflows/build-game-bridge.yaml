@@ -25,230 +25,297 @@ on:
         required: false
         default: false
 
+permissions: {}
+
+concurrency:
+  group: build-game-bridge-${{ github.event.inputs.game_engine }}
+  cancel-in-progress: false
+
 env:
   TS_SDK_TAG: ${{ github.event.inputs.ts_sdk_tag }}
   GAME_ENGINE: ${{ github.event.inputs.game_engine }}
   DRY_RUN: ${{ github.event.inputs.dry_run }}
-  GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
-  SDK_TEAM_MEMBERS: ${{ secrets.SDK_TEAM_MEMBERS }}
   CI: true
 
 jobs:
   build-game-bridge:
     name: Build Game Bridge
     runs-on: ubuntu-latest-4-cores
+    environment: npm-publish
+    outputs:
+      artifact-id: ${{ steps.upload-artifact.outputs.artifact-id }}
+    permissions:
+      contents: read
+      id-token: write      # Required for GitHub Attestations
+      attestations: write  # Required for GitHub Attestations
     env:
       NODE_OPTIONS: --max-old-space-size=14366
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
     steps:
       - name: Checkout SDK Repository
         id: checkout-sdk
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
         with:
           ref: "${{ env.TS_SDK_TAG }}"
           fetch-depth: 0
-
-      - name: Check SDK Team Membership
-        id: allowed_actors_check
-        # only allow SDK team members to run this workflow
-        # ["ckailash", "CodeSchwert", "wdinau", "shineli1984", "nattb8", "YermekG", "zaidarain1"]
-        if: ${{ contains(fromJson(env.SDK_TEAM_MEMBERS), github.triggering_actor) }}
-        run: echo "ALLOWED_ACTOR=true" >> $GITHUB_OUTPUT
-
-      - name: Allowed Actors Filter
-        if: ${{ steps.allowed_actors_check.outputs.ALLOWED_ACTOR != 'true' }}
-        run: exit 1
+          persist-credentials: false
 
       - name: setup
         uses: ./.github/actions/setup
+        with:
+          enable-cache: "false"
+
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Set TS SDK hash
-        run: echo "TS_SDK_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
+        shell: bash
+        run: echo "TS_SDK_HASH=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
       - name: Update 'version' in 'sdk/package.json' from '0.0.0' to '${{ env.TS_SDK_TAG }}'
+        shell: bash
         run: |
           if [[ "$OSTYPE" == "darwin"* ]]; then
-            sed -i '' "s/\"version\": \"0.0.0\"/\"version\": \"${{ env.TS_SDK_TAG }}\"/g" sdk/package.json
+            sed -i '' "s/\"version\": \"0.0.0\"/\"version\": \"$TS_SDK_TAG\"/g" sdk/package.json
           else
-            sed -i "s/\"version\": \"0.0.0\"/\"version\": \"${{ env.TS_SDK_TAG }}\"/g" sdk/package.json
+            sed -i "s/\"version\": \"0.0.0\"/\"version\": \"$TS_SDK_TAG\"/g" sdk/package.json
           fi
 
-      - name: Update 'sdkVersionTag' in 'packages/game-bridge/src/index.ts' from '__SDK_VERSION__' to '${{ env.TS_SDK_TAG }}'
+      - name: Update 'sdkVersionTag' in 'packages/game-bridge/src/index.ts'
+        shell: bash
         run: |
           if [[ "$OSTYPE" == "darwin"* ]]; then
-            sed -i '' "s/__SDK_VERSION__/${{ env.TS_SDK_TAG }}/g" packages/game-bridge/src/index.ts
+            sed -i '' "s/__SDK_VERSION__/$TS_SDK_TAG/g" packages/game-bridge/src/index.ts
           else
-            sed -i "s/__SDK_VERSION__/${{ env.TS_SDK_TAG }}/g" packages/game-bridge/src/index.ts
+            sed -i "s/__SDK_VERSION__/$TS_SDK_TAG/g" packages/game-bridge/src/index.ts
           fi
 
-      - name: Update 'sdkVersionSha' in 'packages/game-bridge/src/index.ts' from '__SDK_VERSION_SHA__' to '${{ env.TS_SDK_HASH }}'
+      - name: Update 'sdkVersionSha' in 'packages/game-bridge/src/index.ts'
+        shell: bash
         run: |
           if [[ "$OSTYPE" == "darwin"* ]]; then
-            sed -i '' "s/__SDK_VERSION_SHA__/${{ env.TS_SDK_HASH }}/g" packages/game-bridge/src/index.ts
+            sed -i '' "s/__SDK_VERSION_SHA__/$TS_SDK_HASH/g" packages/game-bridge/src/index.ts
           else
-            sed -i "s/__SDK_VERSION_SHA__/${{ env.TS_SDK_HASH }}/g" packages/game-bridge/src/index.ts
+            sed -i "s/__SDK_VERSION_SHA__/$TS_SDK_HASH/g" packages/game-bridge/src/index.ts
           fi
 
       - name: Build Game Bridge
+        shell: bash
         run: pnpm nx run @imtbl/game-bridge:build --skip-nx-cache
 
-      - name: Cache build artifacts
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # pin@v5.0.3
+      - name: Attest Game Bridge Build
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # pin@v4.1.0
         with:
-          path: ./packages/game-bridge/dist
-          key: "${{ runner.os }}-game-bridge-build-${{ env.TS_SDK_TAG }}"
+          subject-path: |
+            ./packages/game-bridge/dist/unity/index.html
+            ./packages/game-bridge/dist/unreal/index.js
 
       - name: Upload Game Bridge Build
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # pin@v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # pin@v7.0.1
+        id: upload-artifact
         with:
+          name: game-bridge-dist
           path: ./packages/game-bridge/dist
+          if-no-files-found: error
+          retention-days: 1
 
   create-unity-pr:
     name: Create Unity PR
     needs: build-game-bridge
     if: ${{ github.event.inputs.game_engine == 'Unity' || github.event.inputs.game_engine == 'Both' }}
     runs-on: ubuntu-latest-4-cores
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout SDK Repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
         with:
-          token: ${{ env.GH_TOKEN }}
           ref: "${{ env.TS_SDK_TAG }}"
+          persist-credentials: false
 
       - name: Setup Github
+        shell: bash
         run: |
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-      - name: Restore Cached Build Artifacts
-        id: restore-cache-game-bridge-build
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # pin@v5.0.3
+      - name: Download Game Bridge Build
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # pin@v8.0.1
         with:
+          artifact-ids: ${{ needs.build-game-bridge.outputs.artifact-id }}
           path: ./packages/game-bridge/dist
-          key: ${{ runner.os }}-game-bridge-build-${{ env.TS_SDK_TAG }}
 
-      - name: Check Cache Restore
-        if: steps.restore-cache-game-bridge-build.outputs.cache-hit != 'true'
-        run: echo "Game Bridge build cache not restored, exiting" && exit 1
+      - name: Get GitHub Token
+        id: github-token
+        uses: ./.github/actions/github-token
+        with:
+          repositories: |
+            immutable/unity-immutable-sdk
+          permissions: |
+            contents: write
+            pull_requests: write
 
       - name: Checkout Unity SDK Repo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
         with:
           repository: immutable/unity-immutable-sdk
-          token: ${{ env.GH_TOKEN }}
+          token: ${{ steps.github-token.outputs.token }}
           path: unity-immutable-sdk
           ref: main
           clean: true
           fetch-depth: 0
+          persist-credentials: true # required: git push to unity repo
 
       - name: Change Unity Branch
+        shell: bash
         run: |
-          cd unity-immutable-sdk
-          git checkout -b "chore/update-game-bridge-${{ env.TS_SDK_TAG }}"
-          cd ..
+          (
+            cd unity-immutable-sdk || exit
+            git checkout -b "chore/update-game-bridge-$TS_SDK_TAG"
+          )
 
       - name: Copy Game Bridge Build
+        shell: bash
         run: cp -r ./packages/game-bridge/dist/unity/index.html ./unity-immutable-sdk/src/Packages/Passport/Runtime/Resources/index.html
 
       - name: Commit Changes
+        shell: bash
         run: |
-          cd unity-immutable-sdk
-          git add src/Packages/Passport/Runtime/Resources/index.html
-          git commit -m "chore: update game bridge to ${{ env.TS_SDK_TAG }}"
-          cd ..
+          (
+            cd unity-immutable-sdk || exit
+            git add src/Packages/Passport/Runtime/Resources/index.html
+            git commit -m "chore: update game bridge to $TS_SDK_TAG"
+          )
 
       - name: Push Changes
         if: ${{ env.DRY_RUN == 'false' }}
+        shell: bash
         run: |
-          cd unity-immutable-sdk
-          git push -u origin "chore/update-game-bridge-${{ env.TS_SDK_TAG }}"
-          cd ..
+          (
+            cd unity-immutable-sdk || exit
+            git push -u origin "chore/update-game-bridge-$TS_SDK_TAG"
+          )
 
       - name: Create PR (Dry Run)
         if: ${{ env.DRY_RUN == 'true' }}
+        shell: bash
         run: |
-          cd unity-immutable-sdk
-          echo "gh pr create --base main --head chore/update-game-bridge-${{ env.TS_SDK_TAG }} --title 'chore: update game bridge to ${{ env.TS_SDK_TAG }}' --body 'Update game bridge (build from ts-immutable-sdk version [${{ env.TS_SDK_TAG }}](https://github.com/immutable/ts-immutable-sdk/releases/tag/${{ env.TS_SDK_TAG }}))'"
-          cd ..
+          (
+            cd unity-immutable-sdk || exit
+            echo "gh pr create --base main --head chore/update-game-bridge-$TS_SDK_TAG --title 'chore: update game bridge to $TS_SDK_TAG' --body 'Update game bridge (build from ts-immutable-sdk version $TS_SDK_TAG)'"
+          )
 
       - name: Create PR
         if: ${{ env.DRY_RUN == 'false' }}
+        env:
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
+        shell: bash
         run: |
-          cd unity-immutable-sdk
-          gh pr create --base main --head "chore/update-game-bridge-${{ env.TS_SDK_TAG }}" --title "chore: update game bridge to ${{ env.TS_SDK_TAG }}" --body "Update game bridge (build from ts-immutable-sdk version [${{ env.TS_SDK_TAG }}](https://github.com/immutable/ts-immutable-sdk/releases/tag/${{ env.TS_SDK_TAG }}))"
-          cd ..
+          (
+            cd unity-immutable-sdk || exit
+            gh pr create --base main --head "chore/update-game-bridge-$TS_SDK_TAG" \
+              --title "chore: update game bridge to $TS_SDK_TAG" \
+              --body "Update game bridge (build from ts-immutable-sdk version [$TS_SDK_TAG](https://github.com/immutable/ts-immutable-sdk/releases/tag/$TS_SDK_TAG))"
+          )
 
   create-unreal-pr:
     name: Create Unreal PR
     needs: build-game-bridge
     if: ${{ github.event.inputs.game_engine == 'Unreal' || github.event.inputs.game_engine == 'Both' }}
     runs-on: ubuntu-latest-4-cores
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout SDK Repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
         with:
-          token: ${{ env.GH_TOKEN }}
           ref: "${{ env.TS_SDK_TAG }}"
+          persist-credentials: false
 
       - name: Setup Github
+        shell: bash
         run: |
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-      - name: Restore Cached Build Artifacts
-        id: restore-cache-game-bridge-build
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # pin@v5.0.3
+      - name: Download Game Bridge Build
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # pin@v8.0.1
         with:
+          artifact-ids: ${{ needs.build-game-bridge.outputs.artifact-id }}
           path: ./packages/game-bridge/dist
-          key: ${{ runner.os }}-game-bridge-build-${{ env.TS_SDK_TAG }}
 
-      - name: Check Cache Restore
-        if: steps.restore-cache-game-bridge-build.outputs.cache-hit != 'true' 
-        run: echo "Game Bridge build cache not restored, exiting" && exit 1
+      - name: Get GitHub Token
+        id: github-token
+        uses: ./.github/actions/github-token
+        with:
+          repositories: |
+            immutable/unreal-immutable-sdk
+          permissions: |
+            contents: write
+            pull_requests: write
 
       - name: Checkout Unreal SDK Repo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
         with:
           repository: immutable/unreal-immutable-sdk
-          token: ${{ env.GH_TOKEN }}
+          token: ${{ steps.github-token.outputs.token }}
           path: unreal-immutable-sdk
           ref: main
           clean: true
           fetch-depth: 0
+          persist-credentials: true # required: git push to unreal repo
 
       - name: Change Unreal Branch
+        shell: bash
         run: |
-          cd unreal-immutable-sdk
-          git checkout -b "chore/update-game-bridge-${{ env.TS_SDK_TAG }}"
-          cd ..
+          (
+            cd unreal-immutable-sdk || exit
+            git checkout -b "chore/update-game-bridge-$TS_SDK_TAG"
+          )
 
       - name: Copy Game Bridge Build
+        shell: bash
         run: cp -r ./packages/game-bridge/dist/unreal/index.js ./unreal-immutable-sdk/Web/index.js
 
       - name: Commit Changes
+        shell: bash
         run: |
-          cd unreal-immutable-sdk
-          git add Web/index.js
-          git commit -m "chore: update game bridge to ${{ env.TS_SDK_TAG }}"
-          cd ..
+          (
+            cd unreal-immutable-sdk || exit
+            git add Web/index.js
+            git commit -m "chore: update game bridge to $TS_SDK_TAG"
+          )
 
       - name: Push Changes
         if: ${{ env.DRY_RUN == 'false' }}
+        shell: bash
         run: |
-          cd unreal-immutable-sdk
-          git push -u origin "chore/update-game-bridge-${{ env.TS_SDK_TAG }}"
-          cd ..
+          (
+            cd unreal-immutable-sdk || exit
+            git push -u origin "chore/update-game-bridge-$TS_SDK_TAG"
+          )
 
       - name: Create PR (Dry Run)
         if: ${{ env.DRY_RUN == 'true' }}
+        shell: bash
         run: |
-          cd unreal-immutable-sdk
-          echo "gh pr create --base main --head chore/update-game-bridge-${{ env.TS_SDK_TAG }} --title 'chore: update game bridge to ${{ env.TS_SDK_TAG }}' --body 'Update game bridge (build from ts-immutable-sdk version [${{ env.TS_SDK_TAG }}](https://github.com/immutable/ts-immutable-sdk/releases/tag/${{ env.TS_SDK_TAG }}))'"
-          cd ..
+          (
+            cd unreal-immutable-sdk || exit
+            echo "gh pr create --base main --head chore/update-game-bridge-$TS_SDK_TAG --title 'chore: update game bridge to $TS_SDK_TAG' --body 'Update game bridge (build from ts-immutable-sdk version $TS_SDK_TAG)'"
+          )
 
       - name: Create PR
         if: ${{ env.DRY_RUN == 'false' }}
+        env:
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
+        shell: bash
         run: |
-          cd unreal-immutable-sdk
-          gh pr create --base main --head "chore/update-game-bridge-${{ env.TS_SDK_TAG }}" --title "chore: update game bridge to ${{ env.TS_SDK_TAG }}" --body "Update game bridge (build from ts-immutable-sdk version [${{ env.TS_SDK_TAG }}](https://github.com/immutable/ts-immutable-sdk/releases/tag/${{ env.TS_SDK_TAG }}))"
-          cd ..
+          (
+            cd unreal-immutable-sdk || exit
+            gh pr create --base main --head "chore/update-game-bridge-$TS_SDK_TAG" \
+              --title "chore: update game bridge to $TS_SDK_TAG" \
+              --body "Update game bridge (build from ts-immutable-sdk version [$TS_SDK_TAG](https://github.com/immutable/ts-immutable-sdk/releases/tag/$TS_SDK_TAG))"
+          )

@@ -25,6 +25,8 @@ on:
     branches:
       - main
 
+permissions: {}
+
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release_type || 'prerelease' }}
   DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
@@ -37,142 +39,145 @@ jobs:
   Publish:
     name: Publish Workflow
     runs-on: ubuntu-latest-4-cores
-    env:
-      GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
-      NODE_OPTIONS: --max-old-space-size=14366
-      SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
-      SDK_PUBLISH_MAJOR_VERSION_ACTORS: ${{ secrets.SDK_PUBLISH_MAJOR_VERSION_ACTORS }}
-      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
+    environment: npm-publish
     permissions:
-      id-token: write # ! Required for GitHub Attestations, removing will create a Sev 0 incident !
+      id-token: write # Required for GitHub Attestations and npm OIDC trusted publishing
       attestations: write # ! Required for GitHub Attestations, removing will create a Sev 0 incident !
+      contents: write # Required for git tag push and GitHub release creation
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
     steps:
       - name: Check Public Release Branch
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') && github.ref != 'refs/heads/main' }}
+        env:
+          CURRENT_REF: ${{ github.ref }}
+        shell: bash
         run: |
-          echo "Public releases can only be executed from the main branch, current branch ${{ github.ref }}"
+          echo "Public releases can only be executed from the main branch, current branch $CURRENT_REF"
           exit 1
 
-      - name: Check User Permission
-        if: ${{ env.RELEASE_TYPE == 'major' }}
-        id: check_user_permission
-        uses: actions-cool/check-user-permission@7b90a27f92f3961b368376107661682c441f6103
-        with:
-          token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
-          require: admin
-          username: ${{ github.triggering_actor }}
-          check-bot: true
-
-      - name: Log User Permission
-        if: ${{ env.RELEASE_TYPE == 'major' }}
-        run: |
-          echo "Check user permissions for triggering actor - ${{ github.triggering_actor }}"
-          echo "user-permission = ${{ steps.check_user_permission.outputs.user-permission }}"
-          echo "require-result = ${{ steps.check_user_permission.outputs.require-result }}"
-
-      - name: Admin Permission Check
-        if: ${{ steps.check_user_permission.outputs.require-result != 'true' && env.RELEASE_TYPE == 'major' }}
-        run: exit 1
-
-      - name: Allowed Actors Check
-        id: allowed_actors_check
-        # only allow certain SDK team members to run this workflow
-        if: ${{ contains(fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS), github.triggering_actor) && env.RELEASE_TYPE == 'major' }}
-        run: echo "ALLOWED_ACTOR=true" >> $GITHUB_OUTPUT
-
-      - name: Allowed Actors Filter
-        if: ${{ steps.allowed_actors_check.outputs.ALLOWED_ACTOR != 'true' && env.RELEASE_TYPE == 'major' }}
-        run: exit 1
-
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
         with:
           fetch-depth: 0
-          token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+          token: ${{ github.token }}
+          persist-credentials: true # required: git tag push after version bump
 
       - name: Setup
         uses: ./.github/actions/setup
+        with:
+          enable-cache: "false"
+
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Setup Github
+        shell: bash
         run: |
           git config user.name "platform-sa"
           git config user.email "platform-sa@users.noreply.github.com"
 
       - name: Initialize current versions
+        shell: bash
         run: pnpm --filter @imtbl/sdk... --filter @imtbl/checkout-widgets... --filter @imtbl/audience... exec sh -c "jq --arg version \"$(npm view @imtbl/metrics versions --json | jq -r '.[-1]')\" '.version = \$version' package.json > package.tmp.json && mv package.tmp.json package.json"
 
       - name: Setup new package versions
-        run: pnpm nx release version --specifier ${{ env.RELEASE_TYPE }} $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "")
+        shell: bash
+        run: |
+          args=(--specifier "$RELEASE_TYPE")
+          [[ "$DRY_RUN" == "true" ]] && args+=(--dry-run)
+          pnpm nx release version "${args[@]}"
 
       - name: Build SDK, Checkout Widgets & Audience
+        shell: bash
         run: pnpm build
 
       - name: Pack SDK, Checkout Widgets & Audience packages and dependencies
+        shell: bash
         run: pnpm pack-npm-packages
 
       # ! Do NOT remove any of these attestation subject paths - this will cause a Sev 0 incident !
+
       - name: Generate SDK Package Attestations
-        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # pin@v4.1.0
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # pin@v4.1.0
         with:
           subject-path: ./imtbl-*.tgz
 
       - name: Publish Github Release
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
-        run: pnpm nx release changelog $(jq -r '.version' ./sdk/package.json) $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "")
-
-      - name: Tag Git Pre-Release
-        if: ${{ startsWith(env.RELEASE_TYPE, 'pre') }}
+        shell: bash
         run: |
-          git tag -a "prelease-$(jq -r '.version' ./sdk/package.json)" -m "$(jq -r '.version' ./sdk/package.json)"
-          git push origin "prelease-$(jq -r '.version' ./sdk/package.json)"
+          args=("$(jq -r '.version' ./sdk/package.json)")
+          [[ "$DRY_RUN" == "true" ]] && args+=(--dry-run)
+          pnpm nx release changelog "${args[@]}"
 
       - name: Release to NPM
         id: npm_release
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm nx release publish $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") $( ${{ github.event_name == 'push' || startsWith(env.RELEASE_TYPE, 'pre') }} && echo "--tag alpha" || echo "")
+          IS_ALPHA: ${{ github.event_name == 'push' || startsWith(env.RELEASE_TYPE, 'pre') }}
+        shell: bash
+        run: |
+          args=()
+          [[ "$DRY_RUN" == "true" ]] && args+=(--dry-run)
+          [[ "$IS_ALPHA" == "true" ]] && args+=(--tag alpha)
+          pnpm nx release publish "${args[@]}"
+
+      - name: Tag Git Pre-Release
+        if: ${{ startsWith(env.RELEASE_TYPE, 'pre') && steps.npm_release.conclusion == 'success' && env.DRY_RUN == 'false' }}
+        shell: bash
+        run: |
+          git tag -a "prelease-$(jq -r '.version' ./sdk/package.json)" -m "$(jq -r '.version' ./sdk/package.json)"
+          git push origin "prelease-$(jq -r '.version' ./sdk/package.json)"
 
       - name: Warm up CDN
         id: warm_up_cdn
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
+        shell: bash
         run: |
           wget https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets/dist/browser/index.js
 
-      # Wait for 30 seconds to make sure the tag is available on GitHub
-      - uses: GuillaumeFalourd/wait-sleep-action@175a644657d8de245e4c6059d014941646186a84
-        with:
-          time: "30"
+      - name: Wait for tag to propagate
+        shell: bash
+        run: sleep 30
 
       - name: Get GitHub Release Name and URL
         if: contains(env.RELEASE_TYPE, 'release') && env.DRY_RUN == 'false'
         id: release
+        shell: bash
         run: |
-          echo "RELEASE_NAME=$(gh release view --json name | jq -r .name)" >> $GITHUB_OUTPUT
-          echo "RELEASE_URL=$(gh release view --json url | jq -r .url)" >> $GITHUB_OUTPUT
+          echo "RELEASE_NAME=$(gh release view --json name | jq -r .name)" >> "$GITHUB_OUTPUT"
+          echo "RELEASE_URL=$(gh release view --json url | jq -r .url)" >> "$GITHUB_OUTPUT"
 
       - name: Notify SDK Slack Publish Success
         if: ${{ success() && (steps.npm_release.conclusion == 'success') && env.DRY_RUN == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
+          webhook: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
           message: "✅ ${{ github.triggering_actor }} successfully published SDK packages @ version ${{steps.release.outputs.RELEASE_NAME}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.release.outputs.RELEASE_NAME}}"
 
       - name: Notify SDK Slack Publish Failure
         if: ${{ failure() && (steps.npm_release.conclusion == 'failure') && env.DRY_RUN == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
+          webhook: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
           message: "❌ Failed to publish SDK version ${{steps.release.outputs.RELEASE_NAME}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
 
       - name: Wait for NPM @latest Update
         id: wait_for_npm_update
-        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') && github.event_name != 'push' }} && env.DRY_RUN == 'false'
+        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') && github.event_name != 'push' && env.DRY_RUN == 'false' }}
+        env:
+          IS_PRERELEASE: ${{ startsWith(env.RELEASE_TYPE, 'pre') }}
+        shell: bash
         run: |
           VERSION="$(jq -r '.version' ./sdk/package.json)"
           echo "Waiting for NPM registry to reflect version: $VERSION"
 
-          for i in {1..20}; do
-            LATEST_VERSION=$(if [[ "${{ startsWith(env.RELEASE_TYPE, 'pre') }}" == "true" ]]; then npm view @imtbl/sdk@alpha version; else npm view @imtbl/checkout-widgets@latest version; fi)
+          for _ in {1..20}; do
+            LATEST_VERSION=$(if [[ "$IS_PRERELEASE" == "true" ]]; then npm view @imtbl/sdk@alpha version; else npm view @imtbl/checkout-widgets@latest version; fi)
             if [[ "$LATEST_VERSION" == "$VERSION" ]]; then
               echo "NPM registry updated to version: $LATEST_VERSION"
               exit 0
@@ -186,7 +191,8 @@ jobs:
 
       - name: Purge CDN Cache for Checkout Widgets
         id: purge_cdn
-        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}  && env.DRY_RUN == 'false'
+        if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') && env.DRY_RUN == 'false' }}
+        shell: bash
         run: |
           curl -X GET https://purge.jsdelivr.net/npm/@imtbl/checkout-widgets@latest
           echo "CDN cache purged for https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@latest"

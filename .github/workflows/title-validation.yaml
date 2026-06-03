@@ -8,16 +8,29 @@ on:
       - opened
       - edited
 
-permissions:
-  pull-requests: read
+permissions: {}
+
+concurrency:
+  group: title-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   title-validation:
     name: Validate PR title
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read  # read PR title for semantic validation
     steps:
-      - uses: amannn/action-semantic-pull-request@40166f00814508ec3201fc8595b393d451c8cd80
+      - name: Validate PR title
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          requireScope: true
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        shell: bash
+        run: |
+          PATTERN='^(feat|fix|refactor|style|test|docs|build|ops|chore)\([^)]+\)!?: .+'
+          if [[ ! "$PR_TITLE" =~ $PATTERN ]]; then
+            echo "::error::PR title must follow conventional commits format with a required scope."
+            echo "::error::Valid types: feat, fix, refactor, style, test, docs, build, ops, chore"
+            echo "::error::Expected: type(scope): description  (e.g. feat(passport): add logout support)"
+            echo "::error::Got: $PR_TITLE"
+            exit 1
+          fi
