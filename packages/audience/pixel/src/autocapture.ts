@@ -218,7 +218,8 @@ export function setupAutocapture(
       const target = e.target as HTMLElement;
 
       if (options.buttons === true) {
-        const buttonSelector = 'button, input[type="button"], input[type="submit"], input[type="reset"]';
+        const buttonSelector = 'button,'
+          + ' input[type="button"], input[type="submit"], input[type="reset"]';
         const button = target.closest?.(buttonSelector) as HTMLElement | null;
         if (button) {
           const isInput = button.tagName === 'INPUT';
