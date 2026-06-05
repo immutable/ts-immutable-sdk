@@ -226,10 +226,15 @@ export function setupAutocapture(
           const rawText = isInput
             ? (button as HTMLInputElement).value
             : (button.textContent || '');
+          // For <button> elements, .type defaults to 'submit' per HTML spec even when
+          // no type attribute is set — use getAttribute to get the explicit value.
+          const elementType = isInput
+            ? (button as HTMLInputElement).type
+            : button.getAttribute('type') || 'button';
           enqueue('button_clicked', {
             button_text: rawText.trim().slice(0, 256) || undefined,
             element_id: button.id || undefined,
-            element_type: (button as HTMLInputElement).type || 'button',
+            element_type: elementType,
           });
           return;
         }
