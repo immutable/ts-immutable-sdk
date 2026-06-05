@@ -12,6 +12,7 @@ export const AudienceEvents = {
   EMAIL_ACQUIRED: 'email_acquired',
   GAME_PAGE_VIEWED: 'game_page_viewed',
   LINK_CLICKED: 'link_clicked',
+  BUTTON_CLICKED: 'button_clicked',
 } as const;
 
 export interface SignUpProperties {
@@ -85,6 +86,12 @@ export interface LinkClickedProperties {
   game_id?: string;
 }
 
+export interface ButtonClickedProperties {
+  button_text?: string;
+  element_id?: string;
+  element_type?: string;
+}
+
 interface EventPropsMap {
   sign_up: SignUpProperties;
   sign_in: SignInProperties;
@@ -97,6 +104,7 @@ interface EventPropsMap {
   email_acquired: EmailAcquiredProperties;
   game_page_viewed: GamePageViewedProperties;
   link_clicked: LinkClickedProperties;
+  button_clicked: ButtonClickedProperties;
 }
 
 export type AudienceEventName = keyof EventPropsMap;

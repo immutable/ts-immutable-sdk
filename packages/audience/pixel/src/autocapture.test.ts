@@ -467,6 +467,315 @@ describe('autocapture', () => {
     });
   });
 
+  // ---------- Internal link clicks ----------
+
+  describe('internal link clicks', () => {
+    it('fires link_clicked with outbound false when internalClicks is true', () => {
+      setup({ internalClicks: true });
+
+      const link = document.createElement('a');
+      link.href = `${window.location.origin}/about`;
+      link.textContent = 'About Us';
+      link.id = 'about-link';
+      document.body.appendChild(link);
+
+      link.dispatchEvent(new Event('click', { bubbles: true }));
+
+      expect(enqueue).toHaveBeenCalledWith(
+        'link_clicked',
+        {
+          link_url: `${window.location.origin}/about`,
+          link_text: 'About Us',
+          element_id: 'about-link',
+          outbound: false,
+        },
+      );
+    });
+
+    it('does not fire for internal links when internalClicks is not set', () => {
+      setup();
+
+      const link = document.createElement('a');
+      link.href = `${window.location.origin}/about`;
+      link.textContent = 'About';
+      document.body.appendChild(link);
+
+      link.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(enqueue).not.toHaveBeenCalled();
+    });
+
+    it('fires for hash-only links when internalClicks is true', () => {
+      setup({ internalClicks: true });
+
+      const link = document.createElement('a');
+      link.href = '#open-modal';
+      link.textContent = 'Watch Trailer';
+      document.body.appendChild(link);
+
+      link.dispatchEvent(new Event('click', { bubbles: true }));
+
+      expect(enqueue).toHaveBeenCalledWith(
+        'link_clicked',
+        expect.objectContaining({
+          link_text: 'Watch Trailer',
+          outbound: false,
+        }),
+      );
+    });
+
+    it('still fires outbound links when clicks is true and internalClicks is true', () => {
+      setup({ clicks: true, internalClicks: true });
+
+      const outbound = document.createElement('a');
+      outbound.href = 'https://external.com/page';
+      outbound.textContent = 'External';
+      document.body.appendChild(outbound);
+
+      outbound.dispatchEvent(new Event('click', { bubbles: true }));
+
+      expect(enqueue).toHaveBeenCalledWith(
+        'link_clicked',
+        expect.objectContaining({ outbound: true }),
+      );
+    });
+
+    it('does not fire outbound when clicks is false even if internalClicks is true', () => {
+      setup({ clicks: false, internalClicks: true });
+
+      const outbound = document.createElement('a');
+      outbound.href = 'https://external.com/page';
+      outbound.textContent = 'External';
+      document.body.appendChild(outbound);
+
+      outbound.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(enqueue).not.toHaveBeenCalled();
+    });
+
+    it('does not fire at consent none', () => {
+      consent = 'none';
+      setup({ internalClicks: true });
+
+      const link = document.createElement('a');
+      link.href = `${window.location.origin}/games`;
+      link.textContent = 'Games';
+      document.body.appendChild(link);
+
+      link.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(enqueue).not.toHaveBeenCalled();
+    });
+
+    it('truncates link text to 256 characters', () => {
+      setup({ internalClicks: true });
+
+      const link = document.createElement('a');
+      link.href = `${window.location.origin}/page`;
+      link.textContent = 'B'.repeat(300);
+      document.body.appendChild(link);
+
+      link.dispatchEvent(new Event('click', { bubbles: true }));
+
+      expect(enqueue.mock.calls[0][1].link_text).toHaveLength(256);
+    });
+  });
+
+  // ---------- Button clicks ----------
+
+  describe('button clicks', () => {
+    it('fires button_clicked for a <button> element when buttons is true', () => {
+      setup({ buttons: true });
+
+      const button = document.createElement('button');
+      button.textContent = 'Play Now';
+      button.id = 'play-btn';
+      document.body.appendChild(button);
+
+      button.dispatchEvent(new Event('click', { bubbles: true }));
+
+      expect(enqueue).toHaveBeenCalledWith(
+        'button_clicked',
+        {
+          button_text: 'Play Now',
+          element_id: 'play-btn',
+          element_type: 'button',
+        },
+      );
+    });
+
+    it('fires button_clicked for input[type="submit"] when buttons is true', () => {
+      setup({ buttons: true });
+
+      const input = document.createElement('input');
+      input.type = 'submit';
+      input.value = 'Sign Up';
+      input.id = 'submit-btn';
+      document.body.appendChild(input);
+
+      input.dispatchEvent(new Event('click', { bubbles: true }));
+
+      expect(enqueue).toHaveBeenCalledWith(
+        'button_clicked',
+        {
+          button_text: 'Sign Up',
+          element_id: 'submit-btn',
+          element_type: 'submit',
+        },
+      );
+    });
+
+    it('fires button_clicked for input[type="button"] when buttons is true', () => {
+      setup({ buttons: true });
+
+      const input = document.createElement('input');
+      input.type = 'button';
+      input.value = 'Wishlist';
+      document.body.appendChild(input);
+
+      input.dispatchEvent(new Event('click', { bubbles: true }));
+
+      expect(enqueue).toHaveBeenCalledWith(
+        'button_clicked',
+        expect.objectContaining({ element_type: 'button', button_text: 'Wishlist' }),
+      );
+    });
+
+    it('does not fire for buttons when buttons option is not set', () => {
+      setup();
+
+      const button = document.createElement('button');
+      button.textContent = 'Play Now';
+      document.body.appendChild(button);
+
+      button.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(enqueue).not.toHaveBeenCalled();
+    });
+
+    it('does not fire at consent none', () => {
+      consent = 'none';
+      setup({ buttons: true });
+
+      const button = document.createElement('button');
+      button.textContent = 'Play Now';
+      document.body.appendChild(button);
+
+      button.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(enqueue).not.toHaveBeenCalled();
+    });
+
+    it('omits element_id when button has no id', () => {
+      setup({ buttons: true });
+
+      const button = document.createElement('button');
+      button.textContent = 'Join Discord';
+      document.body.appendChild(button);
+
+      button.dispatchEvent(new Event('click', { bubbles: true }));
+
+      expect(enqueue.mock.calls[0][1].element_id).toBeUndefined();
+    });
+
+    it('truncates button text to 256 characters', () => {
+      setup({ buttons: true });
+
+      const button = document.createElement('button');
+      button.textContent = 'C'.repeat(300);
+      document.body.appendChild(button);
+
+      button.dispatchEvent(new Event('click', { bubbles: true }));
+
+      expect(enqueue.mock.calls[0][1].button_text).toHaveLength(256);
+    });
+
+    it('resolves clicks on child elements to nearest button', () => {
+      setup({ buttons: true });
+
+      const button = document.createElement('button');
+      button.id = 'cta-btn';
+      const span = document.createElement('span');
+      span.textContent = 'Play Free';
+      button.appendChild(span);
+      document.body.appendChild(button);
+
+      span.dispatchEvent(new Event('click', { bubbles: true }));
+
+      expect(enqueue).toHaveBeenCalledWith(
+        'button_clicked',
+        expect.objectContaining({ button_text: 'Play Free', element_id: 'cta-btn' }),
+      );
+    });
+
+    it('does not fire button_clicked for a submit button inside a form', () => {
+      setup({ buttons: true });
+
+      const form = document.createElement('form');
+      const button = document.createElement('button');
+      button.textContent = 'Sign Up';
+      form.appendChild(button);
+      document.body.appendChild(form);
+
+      button.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(enqueue).not.toHaveBeenCalledWith('button_clicked', expect.anything());
+    });
+
+    it('does not fire button_clicked for input[type="submit"] inside a form', () => {
+      setup({ buttons: true });
+
+      const form = document.createElement('form');
+      const input = document.createElement('input');
+      input.type = 'submit';
+      input.value = 'Submit';
+      form.appendChild(input);
+      document.body.appendChild(form);
+
+      input.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(enqueue).not.toHaveBeenCalledWith('button_clicked', expect.anything());
+    });
+
+    it('does fire button_clicked for input[type="button"] inside a form', () => {
+      setup({ buttons: true });
+
+      const form = document.createElement('form');
+      const input = document.createElement('input');
+      input.type = 'button';
+      input.value = 'Preview';
+      form.appendChild(input);
+      document.body.appendChild(form);
+
+      input.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(enqueue).toHaveBeenCalledWith(
+        'button_clicked',
+        expect.objectContaining({ button_text: 'Preview', element_type: 'button' }),
+      );
+    });
+
+    it('does fire button_clicked for a submit button that is not inside a form', () => {
+      setup({ buttons: true });
+
+      const button = document.createElement('button');
+      button.setAttribute('type', 'submit');
+      button.textContent = 'Submit';
+      document.body.appendChild(button);
+
+      button.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(enqueue).toHaveBeenCalledWith(
+        'button_clicked',
+        expect.objectContaining({ element_type: 'submit' }),
+      );
+    });
+
+    it('does not also fire link_clicked when a button is clicked', () => {
+      setup({ clicks: true, internalClicks: true, buttons: true });
+
+      const button = document.createElement('button');
+      button.textContent = 'Open Modal';
+      document.body.appendChild(button);
+
+      button.dispatchEvent(new Event('click', { bubbles: true }));
+
+      expect(enqueue).toHaveBeenCalledTimes(1);
+      expect(enqueue.mock.calls[0][0]).toBe('button_clicked');
+    });
+  });
+
   // ---------- Teardown ----------
 
   describe('teardown', () => {
