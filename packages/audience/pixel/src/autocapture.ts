@@ -6,6 +6,10 @@ export interface AutocaptureOptions {
   forms?: boolean;
   /** Enable outbound link click auto-capture. Default: true */
   clicks?: boolean;
+  /** Enable internal (same-domain) link click auto-capture. Default: false */
+  internalClicks?: boolean;
+  /** Enable button and input[type=button|submit|reset] click auto-capture. Default: false */
+  buttons?: boolean;
   /** Enable scroll depth milestone auto-capture. Default: true */
   scroll?: boolean;
 }
@@ -207,24 +211,50 @@ export function setupAutocapture(
     teardowns.push(() => document.removeEventListener('submit', onSubmit, true));
   }
 
-  if (options.clicks !== false) {
+  if (options.clicks !== false || options.internalClicks === true || options.buttons === true) {
     const onClick = (e: Event): void => {
       if (!canTrack(getConsent())) return;
 
       const target = e.target as HTMLElement;
+
+      if (options.buttons === true) {
+        const buttonSelector = 'button, input[type="button"], input[type="submit"], input[type="reset"]';
+        const button = target.closest?.(buttonSelector) as HTMLElement | null;
+        if (button) {
+          const isInput = button.tagName === 'INPUT';
+          const rawText = isInput
+            ? (button as HTMLInputElement).value
+            : (button.textContent || '');
+          enqueue('button_clicked', {
+            button_text: rawText.trim().slice(0, 256) || undefined,
+            element_id: button.id || undefined,
+            element_type: (button as HTMLInputElement).type || 'button',
+          });
+          return;
+        }
+      }
+
       const anchor = target.closest?.('a') as HTMLAnchorElement | null;
       if (!anchor || !anchor.href) return;
 
       try {
-        const linkHost = new URL(anchor.href, window.location.origin).hostname;
-        if (linkHost === window.location.hostname) return;
+        const isOutbound = new URL(anchor.href, window.location.origin).hostname !== window.location.hostname;
 
-        enqueue('link_clicked', {
-          link_url: anchor.href,
-          link_text: (anchor.textContent || '').trim().slice(0, 256),
-          element_id: anchor.id || undefined,
-          outbound: true,
-        });
+        if (isOutbound && options.clicks !== false) {
+          enqueue('link_clicked', {
+            link_url: anchor.href,
+            link_text: (anchor.textContent || '').trim().slice(0, 256),
+            element_id: anchor.id || undefined,
+            outbound: true,
+          });
+        } else if (!isOutbound && options.internalClicks === true) {
+          enqueue('link_clicked', {
+            link_url: anchor.href,
+            link_text: (anchor.textContent || '').trim().slice(0, 256),
+            element_id: anchor.id || undefined,
+            outbound: false,
+          });
+        }
       } catch {
         // Invalid URL — skip silently
       }
