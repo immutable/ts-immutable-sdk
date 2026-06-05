@@ -231,6 +231,12 @@ export function setupAutocapture(
           const elementType = isInput
             ? (button as HTMLInputElement).type
             : button.getAttribute('type') || 'button';
+          // Skip submit buttons that are associated with a form — the form_submitted
+          // event already captures that interaction and we don't want to double-count.
+          const domType = (button as HTMLInputElement).type;
+          if (domType === 'submit' && (button as HTMLButtonElement).form !== null) {
+            return;
+          }
           enqueue('button_clicked', {
             button_text: rawText.trim().slice(0, 256) || undefined,
             element_id: button.id || undefined,

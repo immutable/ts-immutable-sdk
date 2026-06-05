@@ -703,6 +703,65 @@ describe('autocapture', () => {
       );
     });
 
+    it('does not fire button_clicked for a submit button inside a form', () => {
+      setup({ buttons: true });
+
+      const form = document.createElement('form');
+      const button = document.createElement('button');
+      button.textContent = 'Sign Up';
+      form.appendChild(button);
+      document.body.appendChild(form);
+
+      button.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(enqueue).not.toHaveBeenCalledWith('button_clicked', expect.anything());
+    });
+
+    it('does not fire button_clicked for input[type="submit"] inside a form', () => {
+      setup({ buttons: true });
+
+      const form = document.createElement('form');
+      const input = document.createElement('input');
+      input.type = 'submit';
+      input.value = 'Submit';
+      form.appendChild(input);
+      document.body.appendChild(form);
+
+      input.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(enqueue).not.toHaveBeenCalledWith('button_clicked', expect.anything());
+    });
+
+    it('does fire button_clicked for input[type="button"] inside a form', () => {
+      setup({ buttons: true });
+
+      const form = document.createElement('form');
+      const input = document.createElement('input');
+      input.type = 'button';
+      input.value = 'Preview';
+      form.appendChild(input);
+      document.body.appendChild(form);
+
+      input.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(enqueue).toHaveBeenCalledWith(
+        'button_clicked',
+        expect.objectContaining({ button_text: 'Preview', element_type: 'button' }),
+      );
+    });
+
+    it('does fire button_clicked for a submit button that is not inside a form', () => {
+      setup({ buttons: true });
+
+      const button = document.createElement('button');
+      button.setAttribute('type', 'submit');
+      button.textContent = 'Submit';
+      document.body.appendChild(button);
+
+      button.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(enqueue).toHaveBeenCalledWith(
+        'button_clicked',
+        expect.objectContaining({ element_type: 'submit' }),
+      );
+    });
+
     it('does not also fire link_clicked when a button is clicked', () => {
       setup({ clicks: true, internalClicks: true, buttons: true });
 
