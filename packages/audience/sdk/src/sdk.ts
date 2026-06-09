@@ -100,9 +100,10 @@ export class Audience {
     this.testMode = config.testMode ?? false;
     this.debug = new DebugLogger(config.debug ?? false);
 
+    const incomingAid = Audience.readAndStripAidParam();
+
     let isNewSession = false;
     if (canTrack(consentLevel)) {
-      const incomingAid = Audience.readAndStripAidParam();
       if (incomingAid) {
         adoptAnonymousId(incomingAid, cookieDomain);
         this.anonymousId = incomingAid;

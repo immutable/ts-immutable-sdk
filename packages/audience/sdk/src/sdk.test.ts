@@ -161,7 +161,7 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
-    it('strips imtbl_aid from the URL after init', () => {
+    it('strips imtbl_aid from the URL after init, preserving other params', () => {
       const replaceStateSpy = jest.spyOn(window.history, 'replaceState');
       Object.defineProperty(window, 'location', {
         value: {
@@ -176,6 +176,44 @@ describe('Audience', () => {
 
       const sdk = createSDK({ consent: 'anonymous' });
       expect(replaceStateSpy).toHaveBeenCalledWith(null, '', '/games/devilfish?foo=bar');
+      replaceStateSpy.mockRestore();
+      sdk.shutdown();
+    });
+
+    it('strips imtbl_aid with no trailing ? when it is the only param', () => {
+      const replaceStateSpy = jest.spyOn(window.history, 'replaceState');
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?imtbl_aid=incoming-anon-id',
+          pathname: '/games/devilfish',
+          hash: '',
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      const sdk = createSDK({ consent: 'anonymous' });
+      expect(replaceStateSpy).toHaveBeenCalledWith(null, '', '/games/devilfish');
+      replaceStateSpy.mockRestore();
+      sdk.shutdown();
+    });
+
+    it('strips imtbl_aid at none consent too', () => {
+      const replaceStateSpy = jest.spyOn(window.history, 'replaceState');
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?imtbl_aid=incoming-anon-id',
+          pathname: '/games/devilfish',
+          hash: '',
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      const sdk = createSDK({ consent: 'none' });
+      expect(replaceStateSpy).toHaveBeenCalledWith(null, '', '/games/devilfish');
       replaceStateSpy.mockRestore();
       sdk.shutdown();
     });

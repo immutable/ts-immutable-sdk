@@ -37,6 +37,10 @@ export function getAnonymousId(): string | undefined {
   return getCookie(COOKIE_NAME);
 }
 
+/**
+ * Writes an externally carried anonymous ID to the tracking cookie, replacing any existing value.
+ * Intended for use by the Audience SDK only — callers are responsible for enforcing consent before calling.
+ */
 export function adoptAnonymousId(id: string, domain?: string): void {
   setCookie(COOKIE_NAME, id, COOKIE_MAX_AGE_SECONDS, domain);
 }
