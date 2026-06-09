@@ -26,9 +26,11 @@ import {
   createConsentManager,
   canTrack,
   canIdentify,
+  isBrowser,
   SESSION_START,
   SESSION_END,
 } from '@imtbl/audience-core';
+import { adoptAnonymousId } from '@imtbl/audience-core/internal';
 import { DebugLogger } from './debug';
 import type { AudienceEventName, PropsFor } from './events';
 import type { AudienceConfig } from './types';
@@ -74,6 +76,21 @@ export class Audience {
 
   private destroyed = false;
 
+  private static readonly UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  private static readAndStripAidParam(): string | null {
+    if (!isBrowser()) return null;
+    const params = new URLSearchParams(window.location.search);
+    const aid = params.get('imtbl_aid');
+    if (aid !== null) {
+      params.delete('imtbl_aid');
+      const search = params.toString();
+      const newUrl = `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`;
+      window.history.replaceState(window.history.state, '', newUrl);
+    }
+    return aid && Audience.UUID_RE.test(aid) ? aid : null;
+  }
+
   private constructor(config: AudienceConfig) {
     const {
       cookieDomain,
@@ -86,9 +103,16 @@ export class Audience {
     this.testMode = config.testMode ?? false;
     this.debug = new DebugLogger(config.debug ?? false);
 
+    const incomingAid = Audience.readAndStripAidParam();
+
     let isNewSession = false;
     if (canTrack(consentLevel)) {
-      this.anonymousId = getOrCreateAnonymousId(cookieDomain);
+      if (incomingAid) {
+        adoptAnonymousId(incomingAid, cookieDomain);
+        this.anonymousId = incomingAid;
+      } else {
+        this.anonymousId = getOrCreateAnonymousId(cookieDomain);
+      }
       isNewSession = this.startSession();
     } else {
       this.anonymousId = getCookie(COOKIE_NAME) ?? generateId();
@@ -147,6 +171,11 @@ export class Audience {
   }
 
   // --- Helpers ---
+
+  /** Returns the anonymous ID for the current browser session. */
+  getAnonymousId(): string {
+    return this.anonymousId;
+  }
 
   /** True when the current consent level does not permit tracking. */
   private isTrackingDisabled(): boolean {

@@ -36,3 +36,8 @@ export function getOrCreateAnonymousId(domain?: string): string {
 export function getAnonymousId(): string | undefined {
   return getCookie(COOKIE_NAME);
 }
+
+/** Writes an externally carried anonymous ID to the tracking cookie, replacing any existing value. */
+export function adoptAnonymousId(id: string, domain?: string): void {
+  setCookie(COOKIE_NAME, id, COOKIE_MAX_AGE_SECONDS, domain);
+}
