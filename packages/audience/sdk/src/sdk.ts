@@ -12,7 +12,6 @@ import {
   MessageQueue,
   httpSend,
   getOrCreateAnonymousId,
-  adoptAnonymousId,
   getCookie,
   deleteCookie,
   generateId,
@@ -31,6 +30,7 @@ import {
   SESSION_START,
   SESSION_END,
 } from '@imtbl/audience-core';
+import { adoptAnonymousId } from '@imtbl/audience-core/internal';
 import { DebugLogger } from './debug';
 import type { AudienceEventName, PropsFor } from './events';
 import type { AudienceConfig } from './types';

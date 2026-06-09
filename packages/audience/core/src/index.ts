@@ -17,7 +17,6 @@ export { IdentityType } from './types';
 
 export {
   getOrCreateAnonymousId,
-  adoptAnonymousId,
   getCookie,
   deleteCookie,
 } from './cookie';
