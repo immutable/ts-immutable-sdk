@@ -90,6 +90,11 @@ jobs:
           [[ "$DRY_RUN" == "true" ]] && args+=(--dry-run)
           pnpm nx release version "${args[@]}"
 
+      - name: Read SDK version
+        id: sdk_version
+        shell: bash
+        run: echo "SDK_VERSION=$(jq -r '.version' ./sdk/package.json)" >> "$GITHUB_OUTPUT"
+
       - name: Build SDK, Checkout Widgets & Audience
         shell: bash
         run: pnpm build
@@ -107,9 +112,11 @@ jobs:
 
       - name: Publish Github Release
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
+        env:
+          SDK_VERSION: ${{ steps.sdk_version.outputs.SDK_VERSION }}
         shell: bash
         run: |
-          args=("$(jq -r '.version' ./sdk/package.json)")
+          args=("$SDK_VERSION")
           [[ "$DRY_RUN" == "true" ]] && args+=(--dry-run)
           pnpm nx release changelog "${args[@]}"
 
@@ -128,10 +135,12 @@ jobs:
 
       - name: Tag Git Pre-Release
         if: ${{ startsWith(env.RELEASE_TYPE, 'pre') && steps.npm_release.conclusion == 'success' && env.DRY_RUN == 'false' }}
+        env:
+          SDK_VERSION: ${{ steps.sdk_version.outputs.SDK_VERSION }}
         shell: bash
         run: |
-          git tag -a "prelease-$(jq -r '.version' ./sdk/package.json)" -m "$(jq -r '.version' ./sdk/package.json)"
-          git push origin "prelease-$(jq -r '.version' ./sdk/package.json)"
+          git tag -a "prelease-$SDK_VERSION" -m "$SDK_VERSION"
+          git push origin "prelease-$SDK_VERSION"
 
       - name: Warm up CDN
         id: warm_up_cdn
@@ -140,45 +149,34 @@ jobs:
         run: |
           wget https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets/dist/browser/index.js
 
-      - name: Wait for tag to propagate
-        shell: bash
-        run: sleep 30
-
-      - name: Get GitHub Release Name and URL
-        if: contains(env.RELEASE_TYPE, 'release') && env.DRY_RUN == 'false'
-        id: release
-        shell: bash
-        run: |
-          echo "RELEASE_NAME=$(gh release view --json name | jq -r .name)" >> "$GITHUB_OUTPUT"
-          echo "RELEASE_URL=$(gh release view --json url | jq -r .url)" >> "$GITHUB_OUTPUT"
 
       - name: Notify SDK Slack Publish Success
         if: ${{ success() && (steps.npm_release.conclusion == 'success') && env.DRY_RUN == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
           webhook: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
-          message: "✅ ${{ github.triggering_actor }} successfully published SDK packages @ version ${{steps.release.outputs.RELEASE_NAME}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.release.outputs.RELEASE_NAME}}"
+          message: "✅ ${{ github.triggering_actor }} successfully published SDK packages @ version ${{steps.sdk_version.outputs.SDK_VERSION}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.sdk_version.outputs.SDK_VERSION}}"
 
       - name: Notify SDK Slack Publish Failure
         if: ${{ failure() && (steps.npm_release.conclusion == 'failure') && env.DRY_RUN == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
           webhook: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
-          message: "❌ Failed to publish SDK version ${{steps.release.outputs.RELEASE_NAME}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
+          message: "❌ Failed to publish SDK version ${{steps.sdk_version.outputs.SDK_VERSION}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
 
       - name: Wait for NPM @latest Update
         id: wait_for_npm_update
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') && github.event_name != 'push' && env.DRY_RUN == 'false' }}
         env:
           IS_PRERELEASE: ${{ startsWith(env.RELEASE_TYPE, 'pre') }}
+          SDK_VERSION: ${{ steps.sdk_version.outputs.SDK_VERSION }}
         shell: bash
         run: |
-          VERSION="$(jq -r '.version' ./sdk/package.json)"
-          echo "Waiting for NPM registry to reflect version: $VERSION"
+          echo "Waiting for NPM registry to reflect version: $SDK_VERSION"
 
           for _ in {1..20}; do
             LATEST_VERSION=$(if [[ "$IS_PRERELEASE" == "true" ]]; then npm view @imtbl/sdk@alpha version; else npm view @imtbl/checkout-widgets@latest version; fi)
-            if [[ "$LATEST_VERSION" == "$VERSION" ]]; then
+            if [[ "$LATEST_VERSION" == "$SDK_VERSION" ]]; then
               echo "NPM registry updated to version: $LATEST_VERSION"
               exit 0
             fi
