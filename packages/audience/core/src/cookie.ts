@@ -36,3 +36,7 @@ export function getOrCreateAnonymousId(domain?: string): string {
 export function getAnonymousId(): string | undefined {
   return getCookie(COOKIE_NAME);
 }
+
+export function adoptAnonymousId(id: string, domain?: string): void {
+  setCookie(COOKIE_NAME, id, COOKIE_MAX_AGE_SECONDS, domain);
+}

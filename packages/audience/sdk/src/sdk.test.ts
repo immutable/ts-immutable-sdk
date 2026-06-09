@@ -123,6 +123,80 @@ describe('Audience', () => {
       second.shutdown();
     });
 
+    it('adopts imtbl_aid from URL and uses it as the anonymous ID', () => {
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?imtbl_aid=incoming-anon-id&foo=bar',
+          pathname: '/games/devilfish',
+          hash: '',
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      const sdk = createSDK({ consent: 'anonymous' });
+      expect(sdk.getAnonymousId()).toBe('incoming-anon-id');
+      sdk.shutdown();
+    });
+
+    it('adopted imtbl_aid is used in outgoing events', async () => {
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?imtbl_aid=incoming-anon-id',
+          pathname: '/games/devilfish',
+          hash: '',
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      const sdk = createSDK({ consent: 'anonymous' });
+      sdk.page();
+      await sdk.flush();
+
+      const msg = sentMessages().find((m: any) => m.type === 'page');
+      expect(msg?.anonymousId).toBe('incoming-anon-id');
+      sdk.shutdown();
+    });
+
+    it('strips imtbl_aid from the URL after init', () => {
+      const replaceStateSpy = jest.spyOn(window.history, 'replaceState');
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?imtbl_aid=incoming-anon-id&foo=bar',
+          pathname: '/games/devilfish',
+          hash: '',
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      const sdk = createSDK({ consent: 'anonymous' });
+      expect(replaceStateSpy).toHaveBeenCalledWith(null, '', '/games/devilfish?foo=bar');
+      replaceStateSpy.mockRestore();
+      sdk.shutdown();
+    });
+
+    it('ignores imtbl_aid at none consent', () => {
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?imtbl_aid=incoming-anon-id',
+          pathname: '/games/devilfish',
+          hash: '',
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      const sdk = createSDK({ consent: 'none' });
+      expect(sdk.getAnonymousId()).not.toBe('incoming-anon-id');
+      sdk.shutdown();
+    });
+
     it('emits session_start on new session', async () => {
       const sdk = createSDK({ consent: 'full' });
       await sdk.flush();
@@ -161,6 +235,27 @@ describe('Audience', () => {
       expect(msg.properties).toHaveProperty('utm_source', 'youtube');
       expect(msg.properties).toHaveProperty('utm_campaign', 'launch');
 
+      sdk.shutdown();
+    });
+  });
+
+  describe('getAnonymousId', () => {
+    it('returns the anonymous ID after init', () => {
+      const sdk = createSDK({ consent: 'anonymous' });
+      expect(typeof sdk.getAnonymousId()).toBe('string');
+      expect(sdk.getAnonymousId().length).toBeGreaterThan(0);
+      sdk.shutdown();
+    });
+
+    it('returns the same ID used in outgoing events', async () => {
+      const sdk = createSDK({ consent: 'anonymous' });
+      const aid = sdk.getAnonymousId();
+
+      sdk.page();
+      await sdk.flush();
+
+      const msg = sentMessages().find((m: any) => m.type === 'page');
+      expect(msg?.anonymousId).toBe(aid);
       sdk.shutdown();
     });
   });
