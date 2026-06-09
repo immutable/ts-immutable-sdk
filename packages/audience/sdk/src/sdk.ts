@@ -76,16 +76,19 @@ export class Audience {
 
   private destroyed = false;
 
+  private static readonly UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
   private static readAndStripAidParam(): string | null {
     if (!isBrowser()) return null;
     const params = new URLSearchParams(window.location.search);
     const aid = params.get('imtbl_aid');
-    if (!aid) return null;
-    params.delete('imtbl_aid');
-    const search = params.toString();
-    const newUrl = `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`;
-    window.history.replaceState(null, '', newUrl);
-    return aid;
+    if (aid !== null) {
+      params.delete('imtbl_aid');
+      const search = params.toString();
+      const newUrl = `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`;
+      window.history.replaceState(window.history.state, '', newUrl);
+    }
+    return aid && Audience.UUID_RE.test(aid) ? aid : null;
   }
 
   private constructor(config: AudienceConfig) {

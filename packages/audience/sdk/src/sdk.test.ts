@@ -127,7 +127,7 @@ describe('Audience', () => {
       Object.defineProperty(window, 'location', {
         value: {
           ...window.location,
-          search: '?imtbl_aid=incoming-anon-id&foo=bar',
+          search: '?imtbl_aid=a1b2c3d4-e5f6-7890-abcd-ef1234567890&foo=bar',
           pathname: '/games/devilfish',
           hash: '',
         },
@@ -136,7 +136,7 @@ describe('Audience', () => {
       });
 
       const sdk = createSDK({ consent: 'anonymous' });
-      expect(sdk.getAnonymousId()).toBe('incoming-anon-id');
+      expect(sdk.getAnonymousId()).toBe('a1b2c3d4-e5f6-7890-abcd-ef1234567890');
       sdk.shutdown();
     });
 
@@ -144,7 +144,7 @@ describe('Audience', () => {
       Object.defineProperty(window, 'location', {
         value: {
           ...window.location,
-          search: '?imtbl_aid=incoming-anon-id',
+          search: '?imtbl_aid=a1b2c3d4-e5f6-7890-abcd-ef1234567890',
           pathname: '/games/devilfish',
           hash: '',
         },
@@ -156,8 +156,8 @@ describe('Audience', () => {
       sdk.page();
       await sdk.flush();
 
-      const msg = sentMessages().find((m: any) => m.type === 'page');
-      expect(msg?.anonymousId).toBe('incoming-anon-id');
+      const msg = sentMessages().find((m) => m.type === 'page');
+      expect(msg?.anonymousId).toBe('a1b2c3d4-e5f6-7890-abcd-ef1234567890');
       sdk.shutdown();
     });
 
@@ -166,7 +166,7 @@ describe('Audience', () => {
       Object.defineProperty(window, 'location', {
         value: {
           ...window.location,
-          search: '?imtbl_aid=incoming-anon-id&foo=bar',
+          search: '?imtbl_aid=a1b2c3d4-e5f6-7890-abcd-ef1234567890&foo=bar',
           pathname: '/games/devilfish',
           hash: '',
         },
@@ -185,7 +185,7 @@ describe('Audience', () => {
       Object.defineProperty(window, 'location', {
         value: {
           ...window.location,
-          search: '?imtbl_aid=incoming-anon-id',
+          search: '?imtbl_aid=a1b2c3d4-e5f6-7890-abcd-ef1234567890',
           pathname: '/games/devilfish',
           hash: '',
         },
@@ -204,7 +204,7 @@ describe('Audience', () => {
       Object.defineProperty(window, 'location', {
         value: {
           ...window.location,
-          search: '?imtbl_aid=incoming-anon-id',
+          search: '?imtbl_aid=a1b2c3d4-e5f6-7890-abcd-ef1234567890',
           pathname: '/games/devilfish',
           hash: '',
         },
@@ -218,11 +218,35 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
+    it.each([
+      ['empty string', '?imtbl_aid='],
+      ['non-UUID string', '?imtbl_aid=not-a-uuid'],
+      ['excessively long string', `?imtbl_aid=${'a'.repeat(300)}`],
+    ])('strips but does not adopt invalid imtbl_aid: %s', (_, search) => {
+      const replaceStateSpy = jest.spyOn(window.history, 'replaceState');
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search,
+          pathname: '/games/devilfish',
+          hash: '',
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      const sdk = createSDK({ consent: 'anonymous' });
+      expect(sdk.getAnonymousId()).not.toMatch(/^not-a-uuid$|^a{300}$/);
+      expect(replaceStateSpy).toHaveBeenCalledWith(null, '', '/games/devilfish');
+      replaceStateSpy.mockRestore();
+      sdk.shutdown();
+    });
+
     it('ignores imtbl_aid at none consent', () => {
       Object.defineProperty(window, 'location', {
         value: {
           ...window.location,
-          search: '?imtbl_aid=incoming-anon-id',
+          search: '?imtbl_aid=a1b2c3d4-e5f6-7890-abcd-ef1234567890',
           pathname: '/games/devilfish',
           hash: '',
         },
@@ -231,7 +255,7 @@ describe('Audience', () => {
       });
 
       const sdk = createSDK({ consent: 'none' });
-      expect(sdk.getAnonymousId()).not.toBe('incoming-anon-id');
+      expect(sdk.getAnonymousId()).not.toBe('a1b2c3d4-e5f6-7890-abcd-ef1234567890');
       sdk.shutdown();
     });
 
@@ -292,7 +316,7 @@ describe('Audience', () => {
       sdk.page();
       await sdk.flush();
 
-      const msg = sentMessages().find((m: any) => m.type === 'page');
+      const msg = sentMessages().find((m) => m.type === 'page');
       expect(msg?.anonymousId).toBe(aid);
       sdk.shutdown();
     });
