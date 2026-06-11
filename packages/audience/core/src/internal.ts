@@ -1,0 +1,1 @@
+export { adoptAnonymousId } from './cookie';
