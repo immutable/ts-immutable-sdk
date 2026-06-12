@@ -29,6 +29,7 @@ import {
   DEFAULT_AUDIENCE,
 } from './constants';
 import { storeIdToken, getStoredIdToken, clearStoredIdToken } from './idTokenStorage';
+import { useStableValue } from './useStableValue';
 
 // ---------------------------------------------------------------------------
 // Module-level deduplication for session refresh
@@ -366,9 +367,19 @@ export function useImmutableSession(): UseImmutableSessionReturn {
     return refreshed.accessToken;
   }, []); // Empty deps -- uses refs for latest values
 
+  // Stable session reference for consumers.
+  //
+  // next-auth's SessionProvider refetches the session on every window focus
+  // (refetchOnWindowFocus defaults to true). Each refetch returns a new object
+  // even when nothing has changed, which causes unnecessary re-renders and
+  // effect re-runs for any consumer using session in deps or as a prop.
+  // See: https://github.com/nextauthjs/next-auth/issues/3405
+  //
   // Cast to public type (omits accessToken) to prevent consumers from
   // accidentally using a potentially stale token. Use getAccessToken() instead.
-  const publicSession = session as ImmutableSession | null;
+  // sessionRef (above) still tracks the raw latest for imperative use by
+  // getUser/getAccessToken.
+  const publicSession = useStableValue(session as ImmutableSession | null);
 
   return {
     session: publicSession,
