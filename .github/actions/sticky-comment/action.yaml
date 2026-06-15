@@ -1,0 +1,37 @@
+name: "Sticky PR Comment"
+description: "Post or update a sticky pull request comment identified by a header marker"
+
+inputs:
+  header:
+    description: "Unique identifier used as an HTML comment marker to find/update the comment"
+    required: true
+  message:
+    description: "Markdown body to post"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Post or update PR comment
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        HEADER: ${{ inputs.header }}
+        MESSAGE: ${{ inputs.message }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        MARKER="<!-- sticky:${HEADER} -->"
+
+        BODY=$(printf '%s\n%s' "$MARKER" "$MESSAGE")
+
+        COMMENT_ID=$(gh api "repos/$GITHUB_REPOSITORY/issues/${PR_NUMBER}/comments" \
+          | jq --arg marker "$MARKER" '.[] | select(.body | startswith($marker)) | .id' \
+          | head -1)
+
+        if [[ -n "$COMMENT_ID" ]]; then
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/${COMMENT_ID}" \
+            -F "body=$BODY"
+        else
+          gh api "repos/$GITHUB_REPOSITORY/issues/${PR_NUMBER}/comments" \
+            -F "body=$BODY"
+        fi

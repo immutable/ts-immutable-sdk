@@ -8,42 +8,61 @@ on:
       - main
   workflow_dispatch:
 
-# this is used by github OIDC to assume the admin role later on
-permissions: # see this: https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
-  id-token: write # This is required for requesting the JWT
-  contents: write # This is required for actions/checkout
+permissions: {}
+
+concurrency:
+  group: passport-sdk-sample-app-deploy
+  cancel-in-progress: false
 
 jobs:
   deploy:
+    name: Deploy Passport SDK Sample App
     runs-on: ubuntu-latest
+    environment: cdn-deploy
+    permissions:
+      id-token: write # Required for GitHub OIDC to assume the AWS role
+      contents: read
     env:
       AWS_REGION: us-east-2
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
     steps:
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722 # pin@v4.1.0
+        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # pin@v6.1.1
         with:
           role-to-assume: ${{ secrets.AWS_IMMUTABLE_PROD_ADMIN_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: setup
-        uses: ./.github/actions/setup   
+        uses: ./.github/actions/setup
+        with:
+          enable-cache: "false"
+
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Initialize and install current @latest sdk versions on npm
-        run: pnpm --filter @imtbl/sdk... exec sh -c "jq --arg version \"$(npm view @imtbl/metrics versions --json | jq -r '.[-1]')\" '.version = \$version' package.json > package.tmp.json && mv package.tmp.json package.json" && pnpm i
+        shell: bash
+        run: pnpm --filter @imtbl/sdk... exec sh -c "jq --arg version \"$(npm view @imtbl/metrics versions --json | jq -r '.[-1]')\" '.version = \$version' package.json > package.tmp.json && mv package.tmp.json package.json" && pnpm i --ignore-scripts
 
       - name: Build Static Passport sample app
+        shell: bash
         run: pnpm nx run @imtbl/passport-sdk-sample-app:build --skip-nx-cache
 
       - name: Upload to S3
+        shell: bash
         run: |
           aws s3 sync ./packages/passport/sdk-sample-app/out s3://imx-passport-frontend-prod/sdk-sample-app
 
       - name: Clear the cloudfront cache
+        env:
+          CF_DISTRIBUTION_ID: ${{ secrets.CF_PASSPORT_PROD_DISTRIBUTION_ID }}
+        shell: bash
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.CF_PASSPORT_PROD_DISTRIBUTION_ID }} --paths "/*"
+          aws cloudfront create-invalidation --distribution-id "$CF_DISTRIBUTION_ID" --paths "/*"

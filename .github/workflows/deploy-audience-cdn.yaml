@@ -9,10 +9,7 @@ on:
       - main
   workflow_dispatch:
 
-# Required for GitHub OIDC to assume the AWS role
-permissions:
-  id-token: write
-  contents: read
+permissions: {}
 
 concurrency:
   group: deploy-audience-cdn
@@ -20,22 +17,36 @@ concurrency:
 
 jobs:
   deploy:
+    name: Deploy Audience SDK to CDN
     runs-on: ubuntu-latest
+    environment: cdn-deploy
+    permissions:
+      id-token: write # Required for GitHub OIDC to assume the AWS role
+      contents: read
     env:
-      AWS_REGION: us-east-1
       S3_BUCKET: audience-sdk-prod
       S3_KEY: audience/v1/imtbl.js
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
+        with:
+          persist-credentials: false
 
       - name: setup
         uses: ./.github/actions/setup
+        with:
+          enable-cache: "false"
+
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Build audience SDK bundle
+        shell: bash
         run: pnpm --filter @imtbl/audience... build
 
       - name: Verify bundle exists
+        shell: bash
         run: |
           if [ ! -f packages/audience/sdk/dist/cdn/imtbl-audience.global.js ]; then
             echo "::error::Build output not found at packages/audience/sdk/dist/cdn/imtbl-audience.global.js"
@@ -45,32 +56,38 @@ jobs:
           echo "Gzipped size: $(gzip -c packages/audience/sdk/dist/cdn/imtbl-audience.global.js | wc -c) bytes"
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722 # pin@v4.1.0
+        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # pin@v6.1.1
         with:
           role-to-assume: ${{ secrets.AWS_IMMUTABLE_PROD_ADMIN_ROLE }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
 
       - name: Upload to S3
+        shell: bash
         run: |
           aws s3 cp packages/audience/sdk/dist/cdn/imtbl-audience.global.js \
-            s3://${{ env.S3_BUCKET }}/${{ env.S3_KEY }} \
+            "s3://$S3_BUCKET/$S3_KEY" \
             --cache-control "public, max-age=86400" \
             --content-type "application/javascript"
 
       - name: Verify S3 upload
+        shell: bash
         run: |
           aws s3api head-object \
-            --bucket ${{ env.S3_BUCKET }} \
-            --key ${{ env.S3_KEY }} \
+            --bucket "$S3_BUCKET" \
+            --key "$S3_KEY" \
             --query '{ContentType: ContentType, ContentLength: ContentLength, CacheControl: CacheControl}' \
             --output table
 
       - name: Invalidate CloudFront cache
+        env:
+          CF_DISTRIBUTION_ID: ${{ secrets.CF_PIXEL_PROD_DISTRIBUTION_ID }}
+        shell: bash
         run: |
           aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CF_PIXEL_PROD_DISTRIBUTION_ID }} \
-            --paths "/${{ env.S3_KEY }}"
+            --distribution-id "$CF_DISTRIBUTION_ID" \
+            --paths "/$S3_KEY"
 
       - name: Log deployment
+        shell: bash
         run: |
-          echo "Deployed to: https://cdn.immutable.com/${{ env.S3_KEY }}"
+          echo "Deployed to: https://cdn.immutable.com/$S3_KEY"

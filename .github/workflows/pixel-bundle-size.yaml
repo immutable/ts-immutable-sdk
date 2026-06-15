@@ -8,29 +8,39 @@ on:
       - "packages/audience/pixel/**"
       - "packages/audience/core/**"
 
-permissions:
-  pull-requests: write
-  contents: read
+permissions: {}
 
-env:
-  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
+concurrency:
+  group: pixel-bundle-size-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   bundle-size:
     name: Pixel Bundle Size Check
     runs-on: ubuntu-latest-4-cores
+    permissions:
+      pull-requests: write  # post sticky bundle-size comment
+      contents: read
+    env:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup
         uses: ./.github/actions/setup
 
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
       - name: Read budget config
         id: budget
+        shell: bash
         run: |
           BUDGET_FILE="packages/audience/pixel/bundlebudget.json"
           MAX_GZIP=$(jq '.budgets[0].maxSizeGzip' "$BUDGET_FILE")
@@ -39,10 +49,12 @@ jobs:
           echo "warn_gzip=$WARN_GZIP" >> "$GITHUB_OUTPUT"
 
       - name: Build pixel (PR)
+        shell: bash
         run: pnpm --filter @imtbl/pixel build
 
       - name: Measure PR bundle size
         id: pr_size
+        shell: bash
         run: |
           BUNDLE="packages/audience/pixel/dist/imtbl.js"
           RAW_SIZE=$(stat --format=%s "$BUNDLE")
@@ -53,12 +65,14 @@ jobs:
 
       - name: Build pixel (base) and measure
         id: base_size
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        shell: bash
         run: |
-          BASE_SHA="${{ github.event.pull_request.base.sha }}"
-
           git checkout "$BASE_SHA"
-          pnpm install --frozen-lockfile
-          pnpm --filter @imtbl/pixel build 2>/dev/null || true
+          pnpm install --frozen-lockfile --ignore-scripts
+          pnpm --filter @imtbl/pixel build 2> /dev/null || true
 
           BUNDLE="packages/audience/pixel/dist/imtbl.js"
           if [ -f "$BUNDLE" ]; then
@@ -72,19 +86,20 @@ jobs:
           echo "gzip=$GZIP_SIZE" >> "$GITHUB_OUTPUT"
           echo "Base bundle: raw=${RAW_SIZE} bytes, gzip=${GZIP_SIZE} bytes"
 
-          git checkout "${{ github.event.pull_request.head.sha }}"
-          pnpm install --frozen-lockfile
+          git checkout "$HEAD_SHA"
+          pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Evaluate bundle size
         id: evaluate
+        env:
+          PR_GZIP: ${{ steps.pr_size.outputs.gzip }}
+          PR_RAW: ${{ steps.pr_size.outputs.raw }}
+          BASE_GZIP: ${{ steps.base_size.outputs.gzip }}
+          BASE_RAW: ${{ steps.base_size.outputs.raw }}
+          MAX_GZIP: ${{ steps.budget.outputs.max_gzip }}
+          WARN_GZIP: ${{ steps.budget.outputs.warn_gzip }}
+        shell: bash
         run: |
-          PR_GZIP=${{ steps.pr_size.outputs.gzip }}
-          PR_RAW=${{ steps.pr_size.outputs.raw }}
-          BASE_GZIP=${{ steps.base_size.outputs.gzip }}
-          BASE_RAW=${{ steps.base_size.outputs.raw }}
-          MAX_GZIP=${{ steps.budget.outputs.max_gzip }}
-          WARN_GZIP=${{ steps.budget.outputs.warn_gzip }}
-
           DELTA_GZIP=$((PR_GZIP - BASE_GZIP))
           DELTA_RAW=$((PR_RAW - BASE_RAW))
 
@@ -93,10 +108,10 @@ jobs:
 
           STATUS="pass"
           STATUS_ICON="white_check_mark"
-          if [ $PR_GZIP -gt $MAX_GZIP ]; then
+          if [ "$PR_GZIP" -gt "$MAX_GZIP" ]; then
             STATUS="fail"
             STATUS_ICON="x"
-          elif [ $PR_GZIP -gt $WARN_GZIP ]; then
+          elif [ "$PR_GZIP" -gt "$WARN_GZIP" ]; then
             STATUS="warn"
             STATUS_ICON="warning"
           fi
@@ -136,13 +151,19 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Post PR comment
-        uses: marocchino/sticky-pull-request-comment@67d0dec7b07ed060a405f9b2a64b8ab319fdd7db # pin@v2.9.2
+        # Without this guard, fork PRs fail the whole job on a permission error.
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: ./.github/actions/sticky-comment
         with:
           header: pixel-bundle-size
           message: ${{ steps.evaluate.outputs.comment }}
 
       - name: Fail if over budget
         if: steps.evaluate.outputs.status == 'fail'
+        env:
+          PR_GZIP: ${{ steps.pr_size.outputs.gzip }}
+          MAX_GZIP: ${{ steps.budget.outputs.max_gzip }}
+        shell: bash
         run: |
-          echo "::error::Pixel bundle gzipped size (${{ steps.pr_size.outputs.gzip }} bytes) exceeds budget (${{ steps.budget.outputs.max_gzip }} bytes)"
+          echo "::error::Pixel bundle gzipped size (${PR_GZIP} bytes) exceeds budget (${MAX_GZIP} bytes)"
           exit 1

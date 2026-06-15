@@ -1,0 +1,33 @@
+---
+name: "Get GitHub Token"
+description: >
+  Obtains a scoped GitHub installation token from the Immutable Token Service.
+  The calling workflow must set permissions: id-token: write.
+
+inputs:
+  repositories:
+    description: |
+      Newline-separated list of repositories to request access for.
+      Each entry must be in "owner/repo" format and must have a token policy
+      entry in the Token Service permitting the calling repository.
+      Example:
+        immutable/shared-config
+        immutable/internal-libs
+    required: true
+  permissions:
+    description: |
+      Newline-separated list of permissions to request, in "key: value" format.
+      Defaults to "contents: read" if not supplied.
+      The requested permissions must be within the ceiling defined in the Token Service policy.
+      Example:
+        contents: write
+        pull_requests: write
+    required: false
+
+outputs:
+  token:
+    description: "Scoped GitHub installation token returned by the Token Service"
+
+runs:
+  using: "node24"
+  main: "dist/index.js"
