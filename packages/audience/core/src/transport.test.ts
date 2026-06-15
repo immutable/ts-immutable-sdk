@@ -1,6 +1,12 @@
+import { track, trackError } from '@imtbl/metrics';
 import { httpSend } from './transport';
 import { TransportError } from './errors';
 import type { BatchPayload } from './types';
+
+jest.mock('@imtbl/metrics', () => ({
+  track: jest.fn(),
+  trackError: jest.fn(),
+}));
 
 const payload: BatchPayload = {
   messages: [
@@ -17,11 +23,16 @@ const payload: BatchPayload = {
   ],
 };
 
+const mockTrack = track as jest.Mock;
+const mockTrackError = trackError as jest.Mock;
+
 describe('httpSend', () => {
   const originalFetch = global.fetch;
 
   afterEach(() => {
     global.fetch = originalFetch;
+    mockTrack.mockClear();
+    mockTrackError.mockClear();
   });
 
   it('sends POST with correct headers and body', async () => {
@@ -258,5 +269,114 @@ describe('httpSend', () => {
     await httpSend('https://api.immutable.com/v1/audience/messages', 'pk_imx_test', payload);
 
     expect(mockFetch.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
+  });
+
+  describe('failure classification fields', () => {
+    beforeEach(() => {
+      Object.defineProperty(navigator, 'onLine', { value: true, configurable: true, writable: true });
+    });
+
+    it('attaches errorName=TypeError, online, and timeToFailureMs on a Failed to fetch network error', async () => {
+      global.fetch = jest.fn().mockRejectedValue(new TypeError('Failed to fetch'));
+
+      await httpSend('https://example.com', 'pk', payload);
+
+      expect(mockTrackError).toHaveBeenCalledWith(
+        'audience',
+        'transport_send',
+        expect.any(TransportError),
+        expect.objectContaining({
+          errorName: 'TypeError',
+          online: true,
+          timeToFailureMs: expect.any(Number),
+        }),
+      );
+    });
+
+    it('attaches errorName=AbortError, online, and timeToFailureMs on timeout', async () => {
+      jest.useFakeTimers();
+      global.fetch = jest.fn().mockImplementation(
+        (_url: string, init: RequestInit) => new Promise<Response>((_resolve, reject) => {
+          (init.signal as AbortSignal).addEventListener('abort', () => {
+            reject(new DOMException('The operation was aborted.', 'AbortError'));
+          });
+        }),
+      );
+
+      const sendPromise = httpSend('https://example.com', 'pk', payload);
+      jest.advanceTimersByTime(30_000);
+      await sendPromise;
+
+      expect(mockTrackError).toHaveBeenCalledWith(
+        'audience',
+        'transport_send',
+        expect.any(TransportError),
+        expect.objectContaining({
+          errorName: 'AbortError',
+          online: true,
+          timeToFailureMs: expect.any(Number),
+        }),
+      );
+
+      jest.useRealTimers();
+    });
+
+    it('attaches online=false, and timeToFailureMs on network error when offline', async () => {
+      Object.defineProperty(navigator, 'onLine', { value: false, configurable: true, writable: true });
+      global.fetch = jest.fn().mockRejectedValue(new TypeError('Failed to fetch'));
+
+      await httpSend('https://example.com', 'pk', payload);
+
+      expect(mockTrackError).toHaveBeenCalledWith(
+        'audience',
+        'transport_send',
+        expect.any(TransportError),
+        expect.objectContaining({
+          online: false,
+          timeToFailureMs: expect.any(Number),
+        }),
+      );
+    });
+
+    it('attaches online and timeToFailureMs to transport_send_failed on HTTP error', async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: false,
+        status: 500,
+        headers: { get: () => 'text/plain' },
+        text: async () => 'Internal Server Error',
+      });
+
+      await httpSend('https://example.com', 'pk', payload);
+
+      expect(mockTrack).toHaveBeenCalledWith(
+        'audience',
+        'transport_send_failed',
+        expect.objectContaining({
+          status: 500,
+          online: true,
+          timeToFailureMs: expect.any(Number),
+        }),
+      );
+    });
+
+    it('attaches online and timeToFailureMs to transport_send_failed on 429', async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: false,
+        status: 429,
+        headers: { get: () => null },
+      });
+
+      await httpSend('https://example.com', 'pk', payload);
+
+      expect(mockTrack).toHaveBeenCalledWith(
+        'audience',
+        'transport_send_failed',
+        expect.objectContaining({
+          status: 429,
+          online: true,
+          timeToFailureMs: expect.any(Number),
+        }),
+      );
+    });
   });
 });
