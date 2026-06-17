@@ -61,6 +61,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
         with:
           fetch-depth: 0
+          ref: ${{ github.ref }}
           token: ${{ github.token }}
           persist-credentials: true # required: git tag push after version bump
 
@@ -114,6 +115,7 @@ jobs:
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') }}
         env:
           SDK_VERSION: ${{ steps.sdk_version.outputs.SDK_VERSION }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           args=("$SDK_VERSION")
