@@ -132,7 +132,7 @@ jobs:
         run: |
           args=()
           [[ "$DRY_RUN" == "true" ]] && args+=(--dry-run)
-          [[ "$IS_ALPHA" == "true" ]] && args+=(--tag alpha)
+          [[ "$IS_ALPHA" == "true" ]] && args+=(--tag alpha) || args+=(--tag latest)
           pnpm nx release publish "${args[@]}"
 
       - name: Tag Git Pre-Release
