@@ -25,7 +25,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # pin@v6.0.3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
@@ -51,7 +51,7 @@ jobs:
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # pin@v6.0.3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
@@ -78,7 +78,7 @@ jobs:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # pin@v6.0.3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
@@ -132,7 +132,7 @@ jobs:
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # pin@v6.0.3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0

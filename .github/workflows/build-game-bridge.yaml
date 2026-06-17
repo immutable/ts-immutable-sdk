@@ -54,7 +54,7 @@ jobs:
     steps:
       - name: Checkout SDK Repository
         id: checkout-sdk
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # pin@v6.0.3
         with:
           ref: "${{ env.TS_SDK_TAG }}"
           fetch-depth: 0
@@ -130,7 +130,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout SDK Repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # pin@v6.0.3
         with:
           ref: "${{ env.TS_SDK_TAG }}"
           persist-credentials: false
@@ -158,7 +158,7 @@ jobs:
             pull_requests: write
 
       - name: Checkout Unity SDK Repo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # pin@v6.0.3
         with:
           repository: immutable/unity-immutable-sdk
           token: ${{ steps.github-token.outputs.token }}
@@ -230,7 +230,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout SDK Repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # pin@v6.0.3
         with:
           ref: "${{ env.TS_SDK_TAG }}"
           persist-credentials: false
@@ -258,7 +258,7 @@ jobs:
             pull_requests: write
 
       - name: Checkout Unreal SDK Repo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # pin@v6.0.3
         with:
           repository: immutable/unreal-immutable-sdk
           token: ${{ steps.github-token.outputs.token }}
