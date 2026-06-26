@@ -36,6 +36,7 @@ import {
   SignedTransaction,
 } from '../types';
 import { useQuoteOrder, defaultOrderQuote } from '../hooks/useQuoteOrder';
+import { ENV_DEVELOPMENT } from '../utils/config';
 
 type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
@@ -202,11 +203,20 @@ export function SaleContextProvider(props: {
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
+  // `CHECKOUT_DEV_MODE=true` flips `checkout.config.isDevelopment` but leaves
+  // `config.environment` as SANDBOX (the public enum only has SANDBOX/PRODUCTION).
+  // Resolve the effective env once so every primary-sales URL lookup picks the
+  // devnet entry in one place.
+  const effectiveEnvironment = useMemo(
+    () => (checkout?.config.isDevelopment ? ENV_DEVELOPMENT : environment),
+    [checkout, environment],
+  );
+
   const { selectedCurrency, orderQuote, orderQuoteError } = useQuoteOrder({
     items,
     provider,
     environmentId,
-    environment: config.environment,
+    environment: effectiveEnvironment,
     preferredCurrency,
   });
 
@@ -256,7 +266,7 @@ export function SaleContextProvider(props: {
     fromTokenAddress,
     recipientAddress,
     environmentId,
-    environment,
+    environment: effectiveEnvironment,
     waitFulfillmentSettlements,
     customOrderData,
   });
