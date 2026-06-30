@@ -465,6 +465,52 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
+    it('enqueues achievement_unlocked with required fields', async () => {
+      const sdk = createSDK();
+
+      sdk.track('achievement_unlocked', {
+        achievement_id: 'first_win',
+        achievement_name: 'First Win',
+      });
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'achievement_unlocked',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.properties).toEqual({
+        session_id: expect.any(String),
+        achievement_id: 'first_win',
+        achievement_name: 'First Win',
+      });
+
+      sdk.shutdown();
+    });
+
+    it('enqueues achievement_unlocked with optional achievement_type', async () => {
+      const sdk = createSDK();
+
+      sdk.track('achievement_unlocked', {
+        achievement_id: 'tutorial_done',
+        achievement_name: 'Tutorial Complete',
+        achievement_type: 'onboarding',
+      });
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'achievement_unlocked',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.properties).toEqual({
+        session_id: expect.any(String),
+        achievement_id: 'tutorial_done',
+        achievement_name: 'Tutorial Complete',
+        achievement_type: 'onboarding',
+      });
+
+      sdk.shutdown();
+    });
+
     it('enqueues resource with flow, currency, and amount', async () => {
       const sdk = createSDK();
 

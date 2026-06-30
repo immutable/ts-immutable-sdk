@@ -53,6 +53,13 @@ sdk.track('link_clicked', {
 sdk.track(AudienceEvents.SIGN_UP, { method: 'email' });
 sdk.track(AudienceEvents.PURCHASE, { currency: 'USD', value: 9.99 });
 sdk.track(AudienceEvents.PROGRESSION, { status: 'complete' });
+sdk.track(AudienceEvents.ACHIEVEMENT_UNLOCKED, { achievement_id: 'first_win', achievement_name: 'First Win' });
+sdk.track('achievement_unlocked', { achievement_id: 'first_win', achievement_name: 'First Win' });
+sdk.track('achievement_unlocked', {
+  achievement_id: 'first_win',
+  achievement_name: 'First Win',
+  achievement_type: 'progression',
+});
 
 // @ts-expect-error — missing required 'value'
 sdk.track('purchase', { currency: 'USD' });
@@ -110,6 +117,18 @@ sdk.track('progression', { status: 'done' });
 
 // @ts-expect-error — 'flow' must be a ResourceFlow
 sdk.track('resource', { flow: 'both', currency: 'gold', amount: 1 });
+
+// @ts-expect-error — missing required 'achievement_id'
+sdk.track('achievement_unlocked', { achievement_name: 'First Win' });
+
+// @ts-expect-error — missing required 'achievement_name'
+sdk.track('achievement_unlocked', { achievement_id: 'first_win' });
+
+// @ts-expect-error — achievement_unlocked requires properties
+sdk.track('achievement_unlocked');
+
+// @ts-expect-error — 'achievement_type' must be a valid AchievementType
+sdk.track('achievement_unlocked', { achievement_id: 'x', achievement_name: 'X', achievement_type: 'invalid' });
 
 sdk.track('beta_key_redeemed', { source: 'influencer' });
 sdk.track('discord_joined');

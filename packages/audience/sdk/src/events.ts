@@ -13,6 +13,7 @@ export const AudienceEvents = {
   GAME_PAGE_VIEWED: 'game_page_viewed',
   LINK_CLICKED: 'link_clicked',
   BUTTON_CLICKED: 'button_clicked',
+  ACHIEVEMENT_UNLOCKED: 'achievement_unlocked',
 } as const;
 
 export interface SignUpProperties {
@@ -92,6 +93,14 @@ export interface ButtonClickedProperties {
   element_type?: string;
 }
 
+export type AchievementType = 'onboarding' | 'progression' | 'mastery' | 'social' | 'collection';
+
+export interface AchievementUnlockedProperties {
+  achievement_id: string;
+  achievement_name: string;
+  achievement_type?: AchievementType;
+}
+
 interface EventPropsMap {
   sign_up: SignUpProperties;
   sign_in: SignInProperties;
@@ -105,6 +114,7 @@ interface EventPropsMap {
   game_page_viewed: GamePageViewedProperties;
   link_clicked: LinkClickedProperties;
   button_clicked: ButtonClickedProperties;
+  achievement_unlocked: AchievementUnlockedProperties;
 }
 
 export type AudienceEventName = keyof EventPropsMap;
