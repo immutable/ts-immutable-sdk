@@ -10,6 +10,8 @@ export type { ImmutableAudienceGlobal } from './cdn';
 export type { AudienceConfig } from './types';
 export type { AudienceErrorCode } from '@imtbl/audience-core';
 export type {
+  AchievementType,
+  AchievementUnlockedProperties,
   AudienceEventName,
   EmailAcquiredProperties,
   GameLaunchProperties,
