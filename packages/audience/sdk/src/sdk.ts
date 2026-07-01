@@ -29,11 +29,13 @@ import {
   createConsentManager,
   canTrack,
   canIdentify,
+  detectDoNotTrack,
   isBrowser,
   SESSION_START,
   SESSION_END,
 } from '@imtbl/audience-core';
-import { adoptAnonymousId } from '@imtbl/audience-core/internal';
+import { adoptAnonymousId, resolvePrivacySignal } from '@imtbl/audience-core/internal';
+import { track } from '@imtbl/metrics';
 import { DebugLogger } from './debug';
 import type { AudienceEventName, PropsFor } from './events';
 import type { AudienceConfig } from './types';
@@ -114,6 +116,10 @@ export class Audience {
     this.onError = config.onError;
     this.testMode = config.testMode ?? false;
     this.debug = new DebugLogger(config.debug ?? false);
+
+    if (detectDoNotTrack() && consentLevel !== 'none') {
+      this.debug.logWarning('GPC or DNT signal active: consent overridden to none.');
+    }
 
     const incomingAid = Audience.readAndStripAidParam();
 
@@ -395,34 +401,40 @@ export class Audience {
    * - 'full': track everything including player identity.
    */
   setConsent(level: ConsentLevel): void {
+    const privacySignalActive = detectDoNotTrack();
+    const effective: ConsentLevel = privacySignalActive ? 'none' : level;
+
+    if (privacySignalActive && effective !== level) {
+      track('audience', 'gpc_consent_overridden', {
+        signal: resolvePrivacySignal(),
+        requestedLevel: level,
+        context: 'runtime',
+        publishableKey: this.publishableKey,
+      });
+      this.debug.logWarning('GPC or DNT signal active: consent upgrade blocked.');
+    }
+
     const previous = this.consent.level;
-    if (level === previous) return;
+    if (effective === previous) return;
 
-    this.debug.logConsent(previous, level);
+    this.debug.logConsent(previous, effective);
 
-    const isUpgradeFromNone = !canTrack(previous) && canTrack(level);
+    const isUpgradeFromNone = !canTrack(previous) && canTrack(effective);
 
-    // When upgrading from none, create the persisted anonymousId first
-    // so the consent sync sends the correct ID to the server.
     if (isUpgradeFromNone) {
       this.anonymousId = getOrCreateAnonymousId(this.cookieDomain);
     }
 
-    // Web-specific cleanup before core handles queue purge/transform and server sync.
-    // session_end is intentionally not emitted — no events should be sent after opt-out.
-    if (!canTrack(level)) {
+    if (!canTrack(effective)) {
       this.queue.stop();
     }
 
-    // Core handles: queue purge on →none, identify/alias purge + userId strip
-    // on →anonymous, server sync.
-    this.consent.setLevel(level);
+    this.consent.setLevel(effective);
 
-    // Web-specific cleanup after core's transition.
-    if (!canTrack(level)) {
+    if (!canTrack(effective)) {
       deleteCookie(COOKIE_NAME, this.cookieDomain);
       deleteCookie(SESSION_COOKIE, this.cookieDomain);
-    } else if (canIdentify(previous) && !canIdentify(level)) {
+    } else if (canIdentify(previous) && !canIdentify(effective)) {
       this.userId = undefined;
     }
 

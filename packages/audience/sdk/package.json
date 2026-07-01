@@ -5,7 +5,8 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@imtbl/audience-core": "workspace:*"
+    "@imtbl/audience-core": "workspace:*",
+    "@imtbl/metrics": "workspace:*"
   },
   "devDependencies": {
     "@swc/core": "^1.4.2",
