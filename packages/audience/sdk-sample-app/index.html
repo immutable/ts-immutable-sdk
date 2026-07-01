@@ -249,6 +249,25 @@
             </div>
           </div>
         </details>
+
+        <details class="accordion-item">
+          <summary class="accordion-header">
+            <span class="accordion-title">Delete data</span>
+          </summary>
+          <div class="accordion-content">
+            <p class="helper-text">Request erasure of all event data for an identity. Leave User ID blank to erase by anonymous ID.</p>
+            <div class="field">
+              <label for="delete-data-user-id">User ID (optional)</label>
+              <input id="delete-data-user-id" type="text" placeholder="Leave blank to use anonymous ID">
+            </div>
+            <div class="actions">
+              <button id="btn-delete-data" disabled>
+                Delete data
+                <small class="btn-sig">deleteData(userId?)</small>
+              </button>
+            </div>
+          </div>
+        </details>
       </section>
     </div>
 

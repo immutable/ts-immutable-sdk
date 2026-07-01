@@ -349,6 +349,7 @@
     'btn-consent-none', 'btn-consent-anon', 'btn-consent-full',
     'btn-custom-event',
     'btn-identify',
+    'btn-delete-data',
   ];
 
   function setInitState(on) {
@@ -563,6 +564,7 @@
     $('btn-consent-full').addEventListener('click', function () { onSetConsent('full'); });
     $('btn-identify').addEventListener('click', onIdentify);
     $('btn-alias').addEventListener('click', onAlias);
+    $('btn-delete-data').addEventListener('click', onDeleteData);
     ['alias-from-id', 'alias-to-id', 'alias-from-type', 'alias-to-type'].forEach(function (id) {
       $(id).addEventListener('input', syncAliasButton);
     });
@@ -846,6 +848,17 @@
     } catch (err) {
       log('alias()', errMsg(err), 'err');
     }
+  }
+
+  function onDeleteData() {
+    if (!audience) return;
+    var userId = $('delete-data-user-id').value.trim() || undefined;
+    var label = 'deleteData(' + (userId ? JSON.stringify(userId) : '') + ')';
+    audience.deleteData(userId).then(function () {
+      log(label, userId ? { userId: userId } : { anonymousId: 'current' }, 'ok');
+    }).catch(function (err) {
+      log(label, errMsg(err), 'err');
+    });
   }
 
   function syncAliasButton() {

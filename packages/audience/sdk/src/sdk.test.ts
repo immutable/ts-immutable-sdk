@@ -6,6 +6,7 @@ import { LIBRARY_NAME } from './config';
 
 const INGEST_PATH = '/v1/audience/messages';
 const CONSENT_PATH = '/v1/audience/tracking-consent';
+const DATA_PATH = '/v1/audience/data';
 
 // --- Test fixtures ---
 const TEST_USER = { id: 'user@example.com', identityType: 'email' } as const;
@@ -1262,6 +1263,98 @@ describe('Audience', () => {
       expect(errors[0].code).toBe('CONSENT_SYNC_FAILED');
       expect(errors[0].status).toBe(503);
       expect(errors[0].endpoint).toContain(CONSENT_PATH);
+
+      sdk.shutdown();
+    });
+  });
+
+  describe('deleteData', () => {
+    it('sends DELETE to /v1/audience/data?userId=... when userId is supplied', async () => {
+      const sdk = createSDK({ consent: 'full' });
+      await sdk.deleteData('user-123');
+
+      const deleteCalls = fetchCalls.filter((c) => c.init.method === 'DELETE');
+      expect(deleteCalls).toHaveLength(1);
+      expect(deleteCalls[0].url).toContain(DATA_PATH);
+      expect(deleteCalls[0].url).toContain('userId=user-123');
+      expect(deleteCalls[0].init.headers).toMatchObject({
+        'x-immutable-publishable-key': 'pk_imapik-test-local',
+      });
+
+      sdk.shutdown();
+    });
+
+    it('sends DELETE to /v1/audience/data?anonymousId=... when no userId is supplied', async () => {
+      const sdk = createSDK({ consent: 'anonymous' });
+      const anon = sdk.getAnonymousId();
+
+      await sdk.deleteData();
+
+      const deleteCalls = fetchCalls.filter((c) => c.init.method === 'DELETE');
+      expect(deleteCalls).toHaveLength(1);
+      expect(deleteCalls[0].url).toContain(DATA_PATH);
+      expect(deleteCalls[0].url).toContain(`anonymousId=${encodeURIComponent(anon)}`);
+
+      sdk.shutdown();
+    });
+
+    it('is a no-op when no userId supplied and no anonymousId cookie exists', async () => {
+      // consent: none means no cookie is ever written
+      const sdk = createSDK({ consent: 'none' });
+      await sdk.deleteData();
+
+      const deleteCalls = fetchCalls.filter((c) => c.init.method === 'DELETE');
+      expect(deleteCalls).toHaveLength(0);
+
+      sdk.shutdown();
+    });
+
+    it('fires onError with DATA_DELETE_FAILED when the request returns non-2xx', async () => {
+      mockFetch.mockImplementation(async (url: string, init?: RequestInit) => {
+        fetchCalls.push({ url, init: init ?? {} });
+        if (url.includes(DATA_PATH)) {
+          return { ok: false, status: 500, json: async () => ({}) };
+        }
+        return { ok: true, json: async () => ({}) };
+      });
+
+      const errors: any[] = [];
+      const sdk = createSDK({
+        consent: 'full',
+        onError: (err: any) => errors.push(err),
+      });
+
+      await sdk.deleteData('user-123');
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].name).toBe('AudienceError');
+      expect(errors[0].code).toBe('DATA_DELETE_FAILED');
+      expect(errors[0].status).toBe(500);
+      expect(errors[0].endpoint).toContain(DATA_PATH);
+
+      sdk.shutdown();
+    });
+
+    it('fires onError with DATA_DELETE_FAILED on network error', async () => {
+      mockFetch.mockImplementation(async (url: string, init?: RequestInit) => {
+        fetchCalls.push({ url, init: init ?? {} });
+        if (url.includes(DATA_PATH)) throw new TypeError('Failed to fetch');
+        return { ok: true, json: async () => ({}) };
+      });
+
+      const errors: any[] = [];
+      const sdk = createSDK({
+        consent: 'full',
+        onError: (err: any) => errors.push(err),
+      });
+
+      await sdk.deleteData('user-123');
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].name).toBe('AudienceError');
+      expect(errors[0].code).toBe('DATA_DELETE_FAILED');
+      expect(errors[0].status).toBe(0);
+      expect(errors[0].cause).toBeInstanceOf(TypeError);
 
       sdk.shutdown();
     });
