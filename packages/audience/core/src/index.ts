@@ -22,10 +22,12 @@ export {
 } from './cookie';
 
 export {
+  BASE_URL,
   COOKIE_NAME,
   SESSION_COOKIE,
   SESSION_START,
   SESSION_END,
+  DATA_PATH,
 } from './config';
 
 export { generateId, getTimestamp, isBrowser } from './utils';

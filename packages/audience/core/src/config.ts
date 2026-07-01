@@ -2,6 +2,7 @@ export const BASE_URL = 'https://api.immutable.com';
 
 export const INGEST_PATH = '/v1/audience/messages';
 export const CONSENT_PATH = '/v1/audience/tracking-consent';
+export const DATA_PATH = '/v1/audience/data';
 
 export const FLUSH_INTERVAL_MS = 5_000;
 export const FLUSH_SIZE = 20;

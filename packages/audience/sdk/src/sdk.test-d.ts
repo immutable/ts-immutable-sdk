@@ -137,3 +137,7 @@ sdk.track('trailer_watched', { duration: 45, platform: 'youtube' });
 declare const dynamicName: string;
 sdk.track(dynamicName, { anything: 'goes' });
 sdk.track(dynamicName);
+
+// deleteData type checks
+sdk.deleteData() satisfies Promise<void>;
+sdk.deleteData('user-123') satisfies Promise<void>;

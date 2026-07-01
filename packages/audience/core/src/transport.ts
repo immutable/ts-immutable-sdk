@@ -22,7 +22,7 @@ export interface TransportOptions {
 export type HttpSend = (
   url: string,
   publishableKey: string,
-  payload: BatchPayload | ConsentUpdatePayload,
+  payload?: BatchPayload | ConsentUpdatePayload,
   options?: TransportOptions,
 ) => Promise<TransportResult>;
 
@@ -75,13 +75,14 @@ export const httpSend: HttpSend = async (
   const startTime = Date.now();
 
   try {
+    const hasBody = payload !== undefined;
     const response = await fetch(url, {
       method: options?.method ?? 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        ...(hasBody && { 'Content-Type': 'application/json' }),
         'x-immutable-publishable-key': publishableKey,
       },
-      body: JSON.stringify(payload),
+      ...(hasBody && { body: JSON.stringify(payload) }),
       keepalive: options?.keepalive,
       signal: controller.signal,
     });
