@@ -1,8 +1,14 @@
 import {
   COOKIE_NAME, SESSION_COOKIE, SESSION_START, SESSION_END,
 } from '@imtbl/audience-core';
+import { track } from '@imtbl/metrics';
 import { Audience } from './sdk';
 import { LIBRARY_NAME } from './config';
+
+jest.mock('@imtbl/metrics', () => ({
+  track: jest.fn(),
+  trackError: jest.fn(),
+}));
 
 const INGEST_PATH = '/v1/audience/messages';
 const CONSENT_PATH = '/v1/audience/tracking-consent';
@@ -1356,6 +1362,53 @@ describe('Audience', () => {
       expect(errors[0].status).toBe(0);
       expect(errors[0].cause).toBeInstanceOf(TypeError);
 
+      sdk.shutdown();
+    });
+  });
+
+  describe('GPC/DNT enforcement', () => {
+    afterEach(() => {
+      Object.defineProperty(navigator, 'globalPrivacyControl', { value: undefined, configurable: true });
+      Object.defineProperty(navigator, 'doNotTrack', { value: '0', configurable: true });
+    });
+
+    it('blocks setConsent upgrade and tracks gpc_consent_overridden when GPC is active', () => {
+      const sdk = createSDK({ consent: 'none' });
+      Object.defineProperty(navigator, 'globalPrivacyControl', { value: true, configurable: true });
+
+      sdk.setConsent('anonymous');
+
+      expect(sdk.getAnonymousId()).toBeDefined();
+      // Consent stays at none — no events should be sent
+      sdk.page();
+      expect(sentMessages()).toHaveLength(0);
+      const expected = {
+        signal: 'gpc', requestedLevel: 'anonymous', context: 'runtime', publishableKey: 'pk_imapik-test-local',
+      };
+      expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden', expected);
+
+      sdk.shutdown();
+    });
+
+    it('logs a console warning via debug when GPC blocks setConsent', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const sdk = createSDK({ consent: 'none', debug: true });
+      Object.defineProperty(navigator, 'globalPrivacyControl', { value: true, configurable: true });
+
+      sdk.setConsent('full');
+
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('GPC or DNT signal active'));
+      warnSpy.mockRestore();
+      sdk.shutdown();
+    });
+
+    it('does not block setConsent when GPC is not active', async () => {
+      const sdk = createSDK({ consent: 'none' });
+      sdk.setConsent('anonymous');
+      sdk.track('sign_up', { method: 'email' });
+      await sdk.flush();
+      const msg = sentMessages().find((m: any) => m.eventName === 'sign_up');
+      expect(msg).toBeDefined();
       sdk.shutdown();
     });
   });

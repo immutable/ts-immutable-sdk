@@ -1,3 +1,4 @@
+import { track } from '@imtbl/metrics';
 import type {
   ConsentLevel, ConsentUpdatePayload, Message,
 } from './types';
@@ -19,20 +20,36 @@ export function canIdentify(level: ConsentLevel): boolean {
   return level === 'full';
 }
 
+/**
+ * Detect browser-level privacy opt-out signals.
+ *
+ * Returns `true` if the user has set GPC (Global Privacy Control) or DNT
+ * (Do Not Track). GPC is checked first as it carries legal weight under
+ * CCPA/CPRA in California.
+ */
 export function detectDoNotTrack(): boolean {
   if (typeof navigator === 'undefined') return false;
-  // DNT header
-  if (navigator.doNotTrack === '1') return true;
-  // Global Privacy Control
   if ((navigator as unknown as Record<string, unknown>).globalPrivacyControl === true) return true;
-  return false;
+  return navigator.doNotTrack === '1';
+}
+
+/**
+ * Resolve which privacy signal is active. Only call when detectDoNotTrack() is true.
+ */
+export function resolvePrivacySignal(): 'gpc' | 'dnt' {
+  if (typeof navigator === 'undefined') return 'dnt';
+  return (navigator as unknown as Record<string, unknown>).globalPrivacyControl === true
+    ? 'gpc'
+    : 'dnt';
 }
 
 /**
  * Create a consent state machine.
  *
  * - Default level is `'none'` (no collection).
- * - If DNT or GPC is detected and no explicit consent is provided, stays `'none'`.
+ * - If GPC or DNT is detected, consent is forced to `'none'` regardless of
+ *   `initialLevel`. Upgrades via `setLevel` are also blocked while the signal
+ *   remains active.
  * - On downgrade (e.g. full -> anonymous), strips `userId` from queued messages.
  * - On downgrade to `'none'`, purges the queue entirely.
  * - Fires PUT to `/v1/audience/tracking-consent` on every state change via
@@ -53,8 +70,16 @@ export function createConsentManager(
   onError?: (err: AudienceError) => void,
   baseUrl?: string,
 ): ConsentManager {
-  const dntDetected = detectDoNotTrack();
-  let current: ConsentLevel = initialLevel ?? (dntDetected ? 'none' : 'none');
+  const privacySignalActive = detectDoNotTrack();
+  if (privacySignalActive) {
+    track('audience', 'gpc_consent_overridden', {
+      signal: resolvePrivacySignal(),
+      requestedLevel: initialLevel ?? 'none',
+      context: 'init',
+      publishableKey,
+    });
+  }
+  let current: ConsentLevel = privacySignalActive ? 'none' : (initialLevel ?? 'none');
 
   const LEVELS: Record<ConsentLevel, number> = { none: 0, anonymous: 1, full: 2 };
 
@@ -76,16 +101,26 @@ export function createConsentManager(
     },
 
     setLevel(next: ConsentLevel): void {
-      if (next === current) return;
+      const signalActive = detectDoNotTrack();
+      const effective = signalActive ? 'none' : next;
 
-      const isDowngrade = LEVELS[next] < LEVELS[current];
+      if (signalActive && effective !== next) {
+        track('audience', 'gpc_consent_overridden', {
+          signal: resolvePrivacySignal(),
+          requestedLevel: next,
+          context: 'runtime',
+          publishableKey,
+        });
+      }
+
+      if (effective === current) return;
+
+      const isDowngrade = LEVELS[effective] < LEVELS[current];
 
       if (isDowngrade) {
-        if (next === 'none') {
-          // Purge all queued messages
+        if (effective === 'none') {
           queue.purge(() => true);
-        } else if (next === 'anonymous') {
-          // Remove identify/alias messages and strip userId from the rest
+        } else if (effective === 'anonymous') {
           queue.purge((msg: Message) => msg.type === 'identify' || msg.type === 'alias');
           queue.transform((msg: Message) => {
             if ('userId' in msg) {
@@ -97,8 +132,8 @@ export function createConsentManager(
         }
       }
 
-      current = next;
-      notifyBackend(next);
+      current = effective;
+      notifyBackend(effective);
     },
   };
 
