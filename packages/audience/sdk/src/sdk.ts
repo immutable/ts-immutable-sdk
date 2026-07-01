@@ -217,6 +217,11 @@ export class Audience {
       anonymousId: this.anonymousId,
       surface: 'web' as const,
       context: collectContext(LIBRARY_NAME, LIBRARY_VERSION),
+      // Every enqueue path is consent-guarded (page/track via isTrackingDisabled,
+      // identify/alias via canIdentify, session events only when tracking is
+      // allowed), so the level here is always a decided, sendable value
+      // (anonymous/full) — never none/not_set.
+      consentLevel: this.consent.level,
       ...(this.testMode && { test: true as const }),
     };
   }

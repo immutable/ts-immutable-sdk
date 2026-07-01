@@ -86,10 +86,15 @@ export function createConsentManager(
           queue.purge(() => true);
         } else if (next === 'anonymous') {
           // Remove identify/alias messages, strip userId from the rest, and
-          // downgrade the stamped consentLevel.
+          // downgrade the stamped consentLevel. The rewrite only touches
+          // messages that already carry a consentLevel (the pixel stamps every
+          // message; the web SDK does not yet), so surfaces that haven't opted
+          // into the field are left exactly as before.
           queue.purge((msg: Message) => msg.type === 'identify' || msg.type === 'alias');
           queue.transform((msg: Message) => {
-            const downgraded = { ...msg, consentLevel: 'anonymous' as const } as Message;
+            const downgraded = 'consentLevel' in msg
+              ? ({ ...msg, consentLevel: 'anonymous' as const } as Message)
+              : msg;
             if ('userId' in downgraded) {
               const { userId, ...rest } = downgraded;
               return rest as Message;

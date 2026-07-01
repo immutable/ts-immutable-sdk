@@ -788,6 +788,56 @@ describe('Audience', () => {
     });
   });
 
+  describe('consent level', () => {
+    it('stamps the anonymous consent level on every emitted message', async () => {
+      const sdk = createSDK({ consent: 'anonymous' });
+      sdk.page();
+      sdk.track('purchase', { currency: 'USD', value: 1 });
+      await sdk.flush();
+
+      const msgs = sentMessages();
+      expect(msgs.length).toBeGreaterThan(0);
+      msgs.forEach((m: any) => expect(m.consentLevel).toBe('anonymous'));
+
+      sdk.shutdown();
+    });
+
+    it('stamps full consent, carrying userId once identified', async () => {
+      const sdk = createSDK({ consent: 'full' });
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
+      sdk.page();
+      await sdk.flush();
+
+      const idMsg = sentMessages().find((m: any) => m.type === 'identify');
+      expect(idMsg.consentLevel).toBe('full');
+      expect(idMsg.userId).toBe(TEST_USER.id);
+
+      const pageMsg = sentMessages().find((m: any) => m.type === 'page');
+      expect(pageMsg.consentLevel).toBe('full');
+      expect(pageMsg.userId).toBe(TEST_USER.id);
+
+      sdk.shutdown();
+    });
+
+    it('rewrites stamped consentLevel to anonymous and strips userId on downgrade from full', async () => {
+      const sdk = createSDK({ consent: 'full' });
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
+      sdk.track('purchase', { currency: 'USD', value: 9.99 });
+
+      sdk.setConsent('anonymous');
+      await sdk.flush();
+
+      const trackMsg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'purchase',
+      );
+      expect(trackMsg).toBeDefined();
+      expect(trackMsg.consentLevel).toBe('anonymous');
+      expect(trackMsg.userId).toBeUndefined();
+
+      sdk.shutdown();
+    });
+  });
+
   describe('identify', () => {
     it('sends an identify message at full consent', async () => {
       const sdk = createSDK({ consent: 'full' });
