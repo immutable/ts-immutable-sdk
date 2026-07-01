@@ -71,6 +71,7 @@ jest.mock('@imtbl/audience-core', () => ({
     },
   ),
   canTrack: jest.fn().mockImplementation((level: string) => level !== 'none'),
+  detectDoNotTrack: jest.fn().mockReturnValue(false),
 }));
 
 // Mock fetch globally
@@ -487,6 +488,54 @@ describe('Pixel', () => {
       pixel.setConsent('full');
       const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
       expect(calls.find((c) => c.type === 'page')).toBeUndefined();
+    });
+  });
+
+  describe('GPC/DNT debug warning', () => {
+    const mockDetectDoNotTrack = jest.requireMock('@imtbl/audience-core').detectDoNotTrack as jest.Mock;
+
+    beforeEach(() => {
+      mockDetectDoNotTrack.mockReturnValue(false);
+    });
+
+    it('logs a console warning when debug is true and GPC overrides a non-none consent level', () => {
+      mockDetectDoNotTrack.mockReturnValue(true);
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous', debug: true });
+      expect(warnSpy).toHaveBeenCalledWith('[imtbl/pixel] GPC or DNT detected — consent overridden to none.');
+      warnSpy.mockRestore();
+    });
+
+    it('does not log when debug is false', () => {
+      mockDetectDoNotTrack.mockReturnValue(true);
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
+      expect(warnSpy).not.toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+
+    it('does not log when consent is already none', () => {
+      mockDetectDoNotTrack.mockReturnValue(true);
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'none', debug: true });
+      expect(warnSpy).not.toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+
+    it('does not log when consentMode is auto', () => {
+      mockDetectDoNotTrack.mockReturnValue(true);
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_imapik-test-local', consentMode: 'auto', debug: true });
+      expect(warnSpy).not.toHaveBeenCalled();
+      warnSpy.mockRestore();
     });
   });
 

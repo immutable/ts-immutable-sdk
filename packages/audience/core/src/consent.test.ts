@@ -1,8 +1,13 @@
+import { track } from '@imtbl/metrics';
 import {
-  createConsentManager, canTrack, canIdentify,
+  createConsentManager, canTrack, canIdentify, detectDoNotTrack,
 } from './consent';
 import type { HttpSend } from './transport';
 import { TransportError } from './errors';
+
+jest.mock('@imtbl/metrics', () => ({
+  track: jest.fn(),
+}));
 
 function createMockSend() {
   return jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({ ok: true });
@@ -42,6 +47,26 @@ describe('consent capability queries', () => {
     ['full', true],
   ] as const)('canIdentify(%s) returns %s', (level, expected) => {
     expect(canIdentify(level)).toBe(expected);
+  });
+});
+
+describe('detectDoNotTrack', () => {
+  it('returns false when neither DNT nor GPC is set', () => {
+    Object.defineProperty(navigator, 'doNotTrack', { value: '0', configurable: true });
+    Object.defineProperty(navigator, 'globalPrivacyControl', { value: undefined, configurable: true });
+    expect(detectDoNotTrack()).toBe(false);
+  });
+
+  it('returns true when doNotTrack is 1', () => {
+    Object.defineProperty(navigator, 'doNotTrack', { value: '1', configurable: true });
+    expect(detectDoNotTrack()).toBe(true);
+    Object.defineProperty(navigator, 'doNotTrack', { value: '0', configurable: true });
+  });
+
+  it('returns true when globalPrivacyControl is true', () => {
+    Object.defineProperty(navigator, 'globalPrivacyControl', { value: true, configurable: true });
+    expect(detectDoNotTrack()).toBe(true);
+    Object.defineProperty(navigator, 'globalPrivacyControl', { value: undefined, configurable: true });
   });
 });
 
@@ -128,15 +153,77 @@ describe('createConsentManager', () => {
     expect(send).not.toHaveBeenCalled();
   });
 
-  it('respects DNT by defaulting to none', () => {
+  it('forces none when DNT is set even if initialLevel is not none', () => {
     Object.defineProperty(navigator, 'doNotTrack', { value: '1', configurable: true });
-
     const queue = createMockQueue();
     const send = createMockSend();
-    const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel');
+    const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'full');
     expect(manager.level).toBe('none');
-
     Object.defineProperty(navigator, 'doNotTrack', { value: '0', configurable: true });
+  });
+
+  it('forces none when GPC is set even if initialLevel is not none', () => {
+    Object.defineProperty(navigator, 'globalPrivacyControl', { value: true, configurable: true });
+    const queue = createMockQueue();
+    const send = createMockSend();
+    const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'anonymous');
+    expect(manager.level).toBe('none');
+    Object.defineProperty(navigator, 'globalPrivacyControl', { value: undefined, configurable: true });
+  });
+
+  it('tracks gpc_consent_override metric with signal and configured level when GPC fires', () => {
+    Object.defineProperty(navigator, 'globalPrivacyControl', { value: true, configurable: true });
+    const queue = createMockQueue();
+    const send = createMockSend();
+    createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'full');
+    const expected = { signal: 'gpc', requestedLevel: 'full', context: 'init' };
+    expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden', expected);
+    Object.defineProperty(navigator, 'globalPrivacyControl', { value: undefined, configurable: true });
+  });
+
+  it('tracks gpc_consent_override metric with dnt signal when DNT fires', () => {
+    Object.defineProperty(navigator, 'doNotTrack', { value: '1', configurable: true });
+    const queue = createMockQueue();
+    const send = createMockSend();
+    createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'anonymous');
+    const expected = { signal: 'dnt', requestedLevel: 'anonymous', context: 'init' };
+    expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden', expected);
+    Object.defineProperty(navigator, 'doNotTrack', { value: '0', configurable: true });
+  });
+
+  describe('setLevel GPC enforcement', () => {
+    it('caps setLevel to none when GPC is active', () => {
+      Object.defineProperty(navigator, 'globalPrivacyControl', { value: true, configurable: true });
+      const queue = createMockQueue();
+      const send = createMockSend();
+      const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'none');
+      manager.setLevel('anonymous');
+      expect(manager.level).toBe('none');
+      Object.defineProperty(navigator, 'globalPrivacyControl', { value: undefined, configurable: true });
+    });
+
+    it('tracks gpc_consent_overridden when setLevel is blocked by GPC', () => {
+      Object.defineProperty(navigator, 'globalPrivacyControl', { value: true, configurable: true });
+      const queue = createMockQueue();
+      const send = createMockSend();
+      const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'none');
+      (track as jest.Mock).mockClear();
+      manager.setLevel('full');
+      const expected = { signal: 'gpc', requestedLevel: 'full', context: 'runtime' };
+      expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden', expected);
+      Object.defineProperty(navigator, 'globalPrivacyControl', { value: undefined, configurable: true });
+    });
+
+    it('does not track gpc_consent_overridden when setting none while GPC is active', () => {
+      Object.defineProperty(navigator, 'globalPrivacyControl', { value: true, configurable: true });
+      const queue = createMockQueue();
+      const send = createMockSend();
+      const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'none');
+      (track as jest.Mock).mockClear();
+      manager.setLevel('none');
+      expect(track).not.toHaveBeenCalled();
+      Object.defineProperty(navigator, 'globalPrivacyControl', { value: undefined, configurable: true });
+    });
   });
 
   describe('onError callback', () => {

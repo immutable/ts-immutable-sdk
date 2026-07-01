@@ -18,6 +18,7 @@ import {
   getOrCreateSession,
   createConsentManager,
   canTrack,
+  detectDoNotTrack,
   startCmpDetection,
 } from '@imtbl/audience-core';
 import { setupAutocapture } from './autocapture';
@@ -40,6 +41,8 @@ export interface PixelInitOptions {
   baseUrl?: string;
   /** When true, all events are marked test: true and can be filtered from production analytics. */
   testMode?: boolean;
+  /** When true, logs warnings to the console (e.g. GPC/DNT overrides). */
+  debug?: boolean;
 }
 
 export class Pixel {
@@ -97,6 +100,13 @@ export class Pixel {
     // Resolve initial consent level.
     // 'auto' starts at 'none' until a CMP is detected.
     const isAutoConsent = consentMode === 'auto';
+
+    if (!isAutoConsent && consentLevel != null && consentLevel !== 'none' && detectDoNotTrack()) {
+      if (options.debug) {
+        // eslint-disable-next-line no-console
+        console.warn('[imtbl/pixel] GPC or DNT detected — consent overridden to none.');
+      }
+    }
 
     this.consent = createConsentManager(
       this.queue,
