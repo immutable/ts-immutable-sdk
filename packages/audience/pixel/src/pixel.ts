@@ -332,6 +332,7 @@ export class Pixel {
       anonymousId: this.anonymousId,
       surface: 'pixel' as const,
       context: collectContext('@imtbl/pixel', PIXEL_VERSION),
+      consentLevel: this.consent!.level,
       ...(this.testMode && { test: true as const }),
     };
   }

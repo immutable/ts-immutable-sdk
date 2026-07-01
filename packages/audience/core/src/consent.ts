@@ -85,14 +85,16 @@ export function createConsentManager(
           // Purge all queued messages
           queue.purge(() => true);
         } else if (next === 'anonymous') {
-          // Remove identify/alias messages and strip userId from the rest
+          // Remove identify/alias messages, strip userId from the rest, and
+          // downgrade the stamped consentLevel.
           queue.purge((msg: Message) => msg.type === 'identify' || msg.type === 'alias');
           queue.transform((msg: Message) => {
-            if ('userId' in msg) {
-              const { userId, ...rest } = msg;
+            const downgraded = { ...msg, consentLevel: 'anonymous' as const } as Message;
+            if ('userId' in downgraded) {
+              const { userId, ...rest } = downgraded;
               return rest as Message;
             }
-            return msg;
+            return downgraded;
           });
         }
       }

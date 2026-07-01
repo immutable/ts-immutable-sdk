@@ -229,6 +229,45 @@ describe('Pixel', () => {
     });
   });
 
+  describe('consent level', () => {
+    it('stamps the anonymous consent level on every emitted message', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
+
+      const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
+      expect(calls.length).toBeGreaterThan(0);
+      calls.forEach((c) => expect(c.consentLevel).toBe('anonymous'));
+    });
+
+    it('stamps full consent with no userId (full-but-unidentified)', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'full' });
+
+      const pageCall = mockEnqueue.mock.calls
+        .map((c: unknown[]) => (c[0] as Record<string, unknown>))
+        .find((c) => c.type === 'page');
+      expect(pageCall!.consentLevel).toBe('full');
+      expect(pageCall!.userId).toBeUndefined();
+    });
+
+    it('reflects an upgraded consent level on later events', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
+      pixel.setConsent('full');
+      mockEnqueue.mockClear();
+
+      pixel.page();
+
+      const pageCall = mockEnqueue.mock.calls
+        .map((c: unknown[]) => (c[0] as Record<string, unknown>))
+        .find((c) => c.type === 'page');
+      expect(pageCall!.consentLevel).toBe('full');
+    });
+  });
+
   describe('session_end', () => {
     it('fires session_end on pagehide when session is active', () => {
       const pixel = new Pixel();
