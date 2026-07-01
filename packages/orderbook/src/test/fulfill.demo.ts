@@ -31,7 +31,7 @@ async function deployAndMintNftContract(wallet: Wallet, provider: JsonRpcProvide
 /*
   Script:
 
-  The new visibile features of the order book since the last demo are:
+  The new visible features of the order book since the last demo are:
    - Interactions exposed through the SDK (plus docs)
    - Orders expire
    - Orders can be listed and paged
