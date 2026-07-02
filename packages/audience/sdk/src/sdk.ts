@@ -223,6 +223,7 @@ export class Audience {
       anonymousId: this.anonymousId,
       surface: 'web' as const,
       context: collectContext(LIBRARY_NAME, LIBRARY_VERSION),
+      consentLevel: this.consent.level,
       ...(this.testMode && { test: true as const }),
     };
   }

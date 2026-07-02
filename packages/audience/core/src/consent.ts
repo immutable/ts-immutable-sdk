@@ -121,13 +121,17 @@ export function createConsentManager(
         if (effective === 'none') {
           queue.purge(() => true);
         } else if (effective === 'anonymous') {
+          // Remove identify/alias messages, strip userId from the rest, and
+          // downgrade the stamped consentLevel to 'anonymous' — the user
+          // withdrew full consent, so queued events must not still report 'full'.
           queue.purge((msg: Message) => msg.type === 'identify' || msg.type === 'alias');
           queue.transform((msg: Message) => {
-            if ('userId' in msg) {
-              const { userId, ...rest } = msg;
-              return rest as Message;
+            const downgraded = { ...msg, consentLevel: 'anonymous' as const };
+            if ('userId' in downgraded) {
+              const { userId, ...rest } = downgraded;
+              return rest;
             }
-            return msg;
+            return downgraded;
           });
         }
       }

@@ -110,7 +110,7 @@ describe('createConsentManager', () => {
     expect(purgeFn({ type: 'page' })).toBe(true);
   });
 
-  it('strips userId on downgrade from full to anonymous', () => {
+  it('strips userId and downgrades consentLevel on downgrade from full to anonymous', () => {
     const queue = createMockQueue();
     const send = createMockSend();
     const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'full');
@@ -119,12 +119,31 @@ describe('createConsentManager', () => {
     expect(manager.level).toBe('anonymous');
     expect(queue.transform).toHaveBeenCalledWith(expect.any(Function));
 
-    // Verify the transform strips userId
+    // Verify the transform strips userId and rewrites the stamped consentLevel
     const transformFn = queue.transform.mock.calls[0][0];
-    const withUserId = { type: 'page', userId: 'u-1', anonymousId: 'a-1' };
+    const withUserId = {
+      type: 'page', userId: 'u-1', anonymousId: 'a-1', consentLevel: 'full',
+    };
     const result = transformFn(withUserId);
     expect(result.userId).toBeUndefined();
     expect(result.anonymousId).toBe('a-1');
+    expect(result.consentLevel).toBe('anonymous');
+  });
+
+  it('stamps consentLevel anonymous on downgrade even for messages that lacked one', () => {
+    const queue = createMockQueue();
+    const send = createMockSend();
+    const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'web', 'full');
+
+    manager.setLevel('anonymous');
+
+    // The downgrade rewrites consentLevel unconditionally, so even a message
+    // that never carried one (e.g. persisted by a pre-consentLevel build and
+    // restored from storage) is normalised to 'anonymous'.
+    const transformFn = queue.transform.mock.calls[0][0];
+    const result = transformFn({ type: 'page', userId: 'u-1', anonymousId: 'a-1' });
+    expect(result.userId).toBeUndefined();
+    expect(result.consentLevel).toBe('anonymous');
   });
 
   it('fires PUT to consent endpoint on level change via the injected send', () => {

@@ -28,6 +28,7 @@ interface BaseMessage {
   anonymousId: string;
   surface: Surface;
   context: EventContext;
+  consentLevel?: ConsentLevel;
   /** Present when the SDK/pixel is initialised with testMode: true. */
   test?: true;
 }
