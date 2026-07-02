@@ -130,20 +130,20 @@ describe('createConsentManager', () => {
     expect(result.consentLevel).toBe('anonymous');
   });
 
-  it('leaves consentLevel absent on downgrade for messages that never carried one', () => {
+  it('stamps consentLevel anonymous on downgrade even for messages that lacked one', () => {
     const queue = createMockQueue();
     const send = createMockSend();
     const manager = createConsentManager(queue, send, 'pk_imapik-test-local', 'anon-1', 'web', 'full');
 
     manager.setLevel('anonymous');
 
-    // A message with no consentLevel (e.g. current web SDK) must not gain one:
-    // the field is only rewritten, never introduced, so surfaces that haven't
-    // opted in stay untouched.
+    // The downgrade rewrites consentLevel unconditionally, so even a message
+    // that never carried one (e.g. persisted by a pre-consentLevel build and
+    // restored from storage) is normalised to 'anonymous'.
     const transformFn = queue.transform.mock.calls[0][0];
     const result = transformFn({ type: 'page', userId: 'u-1', anonymousId: 'a-1' });
     expect(result.userId).toBeUndefined();
-    expect('consentLevel' in result).toBe(false);
+    expect(result.consentLevel).toBe('anonymous');
   });
 
   it('fires PUT to consent endpoint on level change via the injected send', () => {
