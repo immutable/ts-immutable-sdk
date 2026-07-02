@@ -126,10 +126,10 @@ export function createConsentManager(
           // withdrew full consent, so queued events must not still report 'full'.
           queue.purge((msg: Message) => msg.type === 'identify' || msg.type === 'alias');
           queue.transform((msg: Message) => {
-            const downgraded = { ...msg, consentLevel: 'anonymous' as const } as Message;
+            const downgraded = { ...msg, consentLevel: 'anonymous' as const };
             if ('userId' in downgraded) {
               const { userId, ...rest } = downgraded;
-              return rest as Message;
+              return rest;
             }
             return downgraded;
           });
