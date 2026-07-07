@@ -29,6 +29,7 @@ interface BaseMessage {
   surface: Surface;
   context: EventContext;
   consentLevel?: ConsentLevel;
+  sessionId?: string;
   /** Present when the SDK/pixel is initialised with testMode: true. */
   test?: true;
 }

@@ -213,6 +213,16 @@ export class Audience {
     return session.isNew;
   }
 
+  // Unlike startSession(), fires session_start directly: callers here always already have a queue.
+  private refreshSession(): void {
+    const session = getOrCreateSession(this.cookieDomain);
+    this.sessionId = session.sessionId;
+    if (session.isNew) {
+      this.sessionStartTime = Date.now();
+      this.trackSessionStart();
+    }
+  }
+
   // --- Message factory ---
 
   /** Common fields shared by every message. */
@@ -224,6 +234,7 @@ export class Audience {
       surface: 'web' as const,
       context: collectContext(LIBRARY_NAME, LIBRARY_VERSION),
       consentLevel: this.consent.level,
+      sessionId: this.sessionId,
       ...(this.testMode && { test: true as const }),
     };
   }
@@ -241,10 +252,7 @@ export class Audience {
       ...this.baseMessage(),
       type: 'track',
       eventName: SESSION_START,
-      properties: {
-        session_id: this.sessionId,
-        ...this.attribution,
-      },
+      properties: { ...this.attribution },
     });
   }
 
@@ -255,7 +263,6 @@ export class Audience {
       type: 'track',
       eventName: SESSION_END,
       properties: {
-        session_id: this.sessionId,
         ...(this.sessionStartTime && {
           duration: Math.round((Date.now() - this.sessionStartTime) / 1000),
         }),
@@ -273,12 +280,9 @@ export class Audience {
    */
   page(properties?: Record<string, unknown>): void {
     if (this.isTrackingDisabled()) return;
-    getOrCreateSession(this.cookieDomain);
+    this.refreshSession();
 
-    const mergedProps: Record<string, unknown> = {
-      session_id: this.sessionId,
-      ...properties,
-    };
+    const mergedProps: Record<string, unknown> = { ...properties };
     if (this.isFirstPage) {
       Object.assign(mergedProps, this.attribution);
       this.isFirstPage = false;
@@ -312,11 +316,10 @@ export class Audience {
       : [properties: PropsFor<E>]
   ): void {
     if (this.isTrackingDisabled()) return;
-    getOrCreateSession(this.cookieDomain);
+    this.refreshSession();
 
     const [properties] = args;
     const mergedProps: Record<string, unknown> = {
-      session_id: this.sessionId,
       ...(UTM_EVENTS.has(event) ? collectPageAttribution() : {}),
       ...properties as Record<string, unknown> | undefined,
     };
@@ -346,7 +349,7 @@ export class Audience {
       this.debug.logWarning('identify() requires full consent — call ignored.');
       return;
     }
-    getOrCreateSession(this.cookieDomain);
+    this.refreshSession();
 
     const resolvedId = truncate(id);
     this.userId = resolvedId;
@@ -379,7 +382,7 @@ export class Audience {
       this.debug.logWarning('alias() from and to are identical — call ignored.');
       return;
     }
-    getOrCreateSession(this.cookieDomain);
+    this.refreshSession();
 
     this.enqueue('alias', {
       ...this.baseMessage(),
