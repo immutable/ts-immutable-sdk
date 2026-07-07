@@ -115,7 +115,7 @@ describe('Pixel', () => {
       expect((pageCall!.properties as Record<string, unknown>).utm_source).toBe('google');
 
       expect(sessionStartCall).toBeDefined();
-      expect((sessionStartCall!.properties as Record<string, unknown>).session_id).toBe('session-abc');
+      expect(sessionStartCall!.sessionId).toBe('session-abc');
     });
 
     it('does not fire page view or session_start when consent is none', () => {
@@ -169,9 +169,9 @@ describe('Pixel', () => {
         expect.objectContaining({
           type: 'page',
           surface: 'pixel',
+          sessionId: 'session-abc',
           properties: expect.objectContaining({
             utm_source: 'google',
-            session_id: 'session-abc',
             custom: 'prop',
           }),
         }),
@@ -268,6 +268,24 @@ describe('Pixel', () => {
     });
   });
 
+  describe('session id', () => {
+    it('stamps sessionId at the top level on both page and track (session_start) messages', () => {
+      // Default mock (isNew: true) means init() fires both a page view and a session_start track event.
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
+
+      const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
+      const pageCall = calls.find((c) => c.type === 'page');
+      const trackCall = calls.find((c) => c.type === 'track');
+
+      expect(pageCall).toBeDefined();
+      expect(trackCall).toBeDefined();
+      expect(pageCall!.sessionId).toBe('session-abc');
+      expect(trackCall!.sessionId).toBe('session-abc');
+    });
+  });
+
   describe('session_end', () => {
     it('fires session_end on pagehide when session is active', () => {
       const pixel = new Pixel();
@@ -282,9 +300,7 @@ describe('Pixel', () => {
         expect.objectContaining({
           type: 'track',
           eventName: 'session_end',
-          properties: expect.objectContaining({
-            session_id: 'session-abc',
-          }),
+          sessionId: 'session-abc',
         }),
       );
     });
@@ -605,9 +621,9 @@ describe('Pixel', () => {
           type: 'track',
           eventName: 'form_submitted',
           surface: 'pixel',
+          sessionId: 'session-xyz',
           properties: expect.objectContaining({
             form_action: '/signup',
-            session_id: 'session-xyz',
           }),
         }),
       );

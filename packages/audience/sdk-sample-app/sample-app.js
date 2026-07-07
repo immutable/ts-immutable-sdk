@@ -269,7 +269,7 @@
         currentAnonId = payload.anonymousId;
         changed = true;
       }
-      var sid = payload.properties && payload.properties.session_id;
+      var sid = payload.sessionId;
       if (typeof sid === 'string' && sid && currentSessionId !== sid) {
         currentSessionId = sid;
         changed = true;

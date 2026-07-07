@@ -152,7 +152,6 @@ export class Pixel {
       properties: {
         ...attribution,
         ...thirdPartyIds,
-        session_id: sessionId,
         ...properties,
       },
       userId: undefined,
@@ -230,7 +229,7 @@ export class Pixel {
       ...this.buildBase(),
       type: 'track',
       eventName,
-      properties: { ...properties, session_id: sessionId },
+      properties,
       userId: undefined,
     };
 
@@ -243,18 +242,17 @@ export class Pixel {
     this.sessionId = sessionId;
     if (isNew) {
       this.sessionStartTime = Date.now();
-      this.fireSessionStart(sessionId);
+      this.fireSessionStart();
     }
   }
 
-  private fireSessionStart(sessionId: string): void {
+  private fireSessionStart(): void {
     if (!this.isTrackingAllowed()) return;
 
     const message: TrackMessage = {
       ...this.buildBase(),
       type: 'track',
       eventName: 'session_start',
-      properties: { session_id: sessionId },
       userId: undefined,
     };
 
@@ -272,10 +270,7 @@ export class Pixel {
       ...this.buildBase(),
       type: 'track',
       eventName: 'session_end',
-      properties: {
-        session_id: this.sessionId,
-        duration,
-      },
+      properties: { duration },
       userId: undefined,
     };
 
@@ -333,6 +328,7 @@ export class Pixel {
       surface: 'pixel' as const,
       context: collectContext('@imtbl/pixel', PIXEL_VERSION),
       consentLevel: this.consent!.level,
+      sessionId: this.sessionId,
       ...(this.testMode && { test: true as const }),
     };
   }

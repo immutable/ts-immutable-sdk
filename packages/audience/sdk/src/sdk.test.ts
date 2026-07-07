@@ -274,7 +274,7 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === SESSION_START,
       );
       expect(msg).toBeDefined();
-      expect(msg.properties).toHaveProperty('session_id');
+      expect(msg).toHaveProperty('sessionId');
 
       sdk.shutdown();
     });
@@ -300,7 +300,7 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === SESSION_START,
       );
       expect(msg).toBeDefined();
-      expect(msg.properties).toHaveProperty('session_id');
+      expect(msg).toHaveProperty('sessionId');
       expect(msg.properties).toHaveProperty('utm_source', 'youtube');
       expect(msg.properties).toHaveProperty('utm_campaign', 'launch');
 
@@ -347,8 +347,8 @@ describe('Audience', () => {
       );
 
       expect(msg).toBeDefined();
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         currency: 'USD',
         value: 9.99,
         item_id: 'sword_01',
@@ -410,8 +410,8 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'sign_up',
       );
       expect(msg).toBeDefined();
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         method: 'email',
       });
 
@@ -432,8 +432,8 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'game_launch',
       );
       expect(msg).toBeDefined();
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         platform: 'webgl',
         version: '1.2.0',
         build_id: 'ci-42',
@@ -459,8 +459,8 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'progression',
       );
       expect(msg).toBeDefined();
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         status: 'complete',
         world: 'forest',
         level: '5',
@@ -485,8 +485,8 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'achievement_unlocked',
       );
       expect(msg).toBeDefined();
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         achievement_id: 'first_win',
         achievement_name: 'First Win',
       });
@@ -508,8 +508,8 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'achievement_unlocked',
       );
       expect(msg).toBeDefined();
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         achievement_id: 'tutorial_done',
         achievement_name: 'Tutorial Complete',
         achievement_type: 'onboarding',
@@ -534,8 +534,8 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'resource',
       );
       expect(msg).toBeDefined();
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         flow: 'source',
         currency: 'gold',
         amount: 50,
@@ -560,8 +560,8 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'wishlist_add',
       );
       expect(msg).toBeDefined();
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         game_id: 'devilfish',
         source: 'game_page',
         platform: 'steam',
@@ -592,8 +592,8 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'sign_up',
       );
       expect(msg).toBeDefined();
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         utm_source: 'google',
         utm_campaign: 'spring',
         touchpoint_type: 'click',
@@ -625,8 +625,8 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'link_clicked',
       );
       expect(msg).toBeDefined();
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         utm_source: 'twitter',
         touchpoint_type: 'click',
         url: 'https://store.com',
@@ -658,8 +658,8 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'purchase',
       );
       expect(msg).toBeDefined();
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         currency: 'USD',
         value: 9.99,
       });
@@ -677,10 +677,40 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === 'game_launch',
       );
       expect(msg).toBeDefined();
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         platform: 'webgl',
       });
+
+      sdk.shutdown();
+    });
+
+    it('picks up a session rollover on the next call instead of keeping a stale id', async () => {
+      const sdk = createSDK();
+
+      sdk.track('purchase', { currency: 'USD', value: 1 });
+      await sdk.flush();
+      const firstSessionId = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'purchase',
+      ).sessionId;
+
+      // Simulate the session cookie expiring (30 min idle) before the next call.
+      document.cookie = `${SESSION_COOKIE}=;max-age=0;path=/`;
+
+      sdk.track('purchase', { currency: 'USD', value: 2 });
+      await sdk.flush();
+
+      const msgs = sentMessages();
+      const sessionStarts = msgs.filter(
+        (m: any) => m.type === 'track' && m.eventName === SESSION_START,
+      );
+      const purchases = msgs.filter(
+        (m: any) => m.type === 'track' && m.eventName === 'purchase',
+      );
+
+      expect(sessionStarts).toHaveLength(2);
+      expect(purchases[1].sessionId).not.toBe(firstSessionId);
+      expect(purchases[1].sessionId).toBe(sessionStarts[1].sessionId);
 
       sdk.shutdown();
     });
@@ -696,8 +726,8 @@ describe('Audience', () => {
       const msg = sentMessages().find((m: any) => m.type === 'page');
       expect(msg).toBeDefined();
       // First page merges session-cached attribution (includes landing_page)
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         landing_page: expect.any(String),
         section: 'shop',
       });
@@ -785,8 +815,8 @@ describe('Audience', () => {
 
       const msg = sentMessages().find((m: any) => m.type === 'page');
       expect(msg).toBeDefined();
+      expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
-        session_id: expect.any(String),
         landing_page: expect.any(String),
       });
 
@@ -839,6 +869,30 @@ describe('Audience', () => {
       expect(trackMsg).toBeDefined();
       expect(trackMsg.consentLevel).toBe('anonymous');
       expect(trackMsg.userId).toBeUndefined();
+
+      sdk.shutdown();
+    });
+  });
+
+  describe('session id', () => {
+    it('stamps sessionId at the top level on every message type, including identify and alias', async () => {
+      const sdk = createSDK({ consent: 'full' });
+      sdk.page();
+      sdk.track('purchase', { currency: 'USD', value: 1 });
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
+      sdk.alias(TEST_STEAM, TEST_USER);
+      await sdk.flush();
+
+      const msgs = sentMessages();
+      expect(msgs.length).toBeGreaterThan(0);
+      msgs.forEach((m: any) => expect(m.sessionId).toEqual(expect.any(String)));
+
+      const pageMsg = msgs.find((m: any) => m.type === 'page');
+      const idMsg = msgs.find((m: any) => m.type === 'identify');
+      const aliasMsg = msgs.find((m: any) => m.type === 'alias');
+      // identify/alias have no `properties` field, so sessionId is only ever visible at the top level.
+      expect(idMsg.sessionId).toBe(pageMsg.sessionId);
+      expect(aliasMsg.sessionId).toBe(pageMsg.sessionId);
 
       sdk.shutdown();
     });
@@ -1038,7 +1092,7 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === SESSION_START,
       );
       expect(sessionStart).toBeDefined();
-      expect(sessionStart.properties).toHaveProperty('session_id');
+      expect(sessionStart).toHaveProperty('sessionId');
 
       const signUp = msgs.find(
         (m: any) => m.type === 'track' && m.eventName === 'sign_up',
@@ -1159,7 +1213,7 @@ describe('Audience', () => {
         (m: any) => m.type === 'track' && m.eventName === SESSION_END,
       );
       expect(msg).toBeDefined();
-      expect(msg.properties).toHaveProperty('session_id');
+      expect(msg).toHaveProperty('sessionId');
       expect(msg.properties.duration).toBe(5);
     });
 
