@@ -56,7 +56,7 @@ jobs:
           echo "Gzipped size: $(gzip -c packages/audience/pixel/dist/imtbl.js | wc -c) bytes"
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # pin@v6.1.1
+        uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b # pin@v6.2.1
         with:
           role-to-assume: ${{ secrets.AWS_IMMUTABLE_PROD_ADMIN_ROLE }}
           aws-region: us-east-1
