@@ -51,8 +51,7 @@ export function resolvePrivacySignal(): 'gpc' | 'dnt' {
  *   remains active.
  * - Already-queued events are never mutated on a consent change. Each event
  *   keeps the `consentLevel` (and any `userId`) it carried when it was
- *   recorded, since under GDPR the applicable consent is the one in force at
- *   capture time. Consent only gates what is collected going forward.
+ *   recorded. Consent only gates what is collected going forward.
  * - Fires PUT to `/v1/audience/tracking-consent` on every state change via
  *   the injected `send`, keeping the transport layer uniform across surfaces.
  * - On consent sync failure, fires `onError` with a public {@link AudienceError}
@@ -112,9 +111,6 @@ export function createConsentManager(
 
       if (effective === current) return;
 
-      // Consent changes only gate future collection; events already queued
-      // keep the consentLevel/userId they were recorded with (GDPR: consent
-      // is determined at capture time), so the queue is intentionally untouched.
       current = effective;
       notifyBackend(effective);
     },
