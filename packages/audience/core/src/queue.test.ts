@@ -295,35 +295,6 @@ describe('MessageQueue', () => {
     expect(err.status).toBe(200);
     expect(err.responseBody).toEqual({ accepted: 1, rejected: 1 });
   });
-
-  it('purges messages matching a predicate', () => {
-    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
-    const queue = createQueue(send);
-
-    queue.enqueue(makeMessage('1'));
-    queue.enqueue({ ...makeMessage('2'), type: 'identify' } as any);
-    queue.enqueue(makeMessage('3'));
-
-    queue.purge((m) => m.type === 'identify');
-    expect(queue.length).toBe(2);
-  });
-
-  it('transforms messages in place', async () => {
-    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
-    const queue = createQueue(send);
-
-    queue.enqueue({ ...makeMessage('1'), userId: 'should-strip' } as any);
-
-    queue.transform((m) => {
-      const cleaned = { ...m };
-      delete (cleaned as any).userId;
-      return cleaned;
-    });
-
-    await queue.flush();
-    const msg = (send.mock.calls[0][2] as { messages: Message[] }).messages[0];
-    expect((msg as any).userId).toBeUndefined();
-  });
 });
 
 describe('exponential backoff', () => {

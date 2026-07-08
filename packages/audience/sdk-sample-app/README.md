@@ -54,7 +54,7 @@ first-class environment and must be reached via explicit override.
 5. Set Consent to **full**.
 6. In **Identity → Named identify**, enter `user@example.com`, type `email`, traits `{"name":"Jane"}`, click.
 7. In **Identity → Alias**, connect a Steam ID to the email above.
-8. Set Consent back to **none**. Notice the queue purge in the event log.
+8. Set Consent back to **none**. Tracking stops going forward; events already queued keep the consent level they were captured under and are not rewritten or dropped.
 9. In **Lifecycle → Simulate error**, pick `NETWORK_ERROR` from the dropdown and click **Fire onError**. The `onError` entry lands in the event log with the documented shape.
 
 ## `AudienceEvents` catalogue

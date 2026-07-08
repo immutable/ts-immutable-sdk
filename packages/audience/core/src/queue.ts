@@ -207,18 +207,6 @@ export class MessageQueue {
     this.persist();
   }
 
-  /** Remove all messages matching a predicate. */
-  purge(predicate: (msg: Message) => boolean): void {
-    this.messages = this.messages.filter((m) => !predicate(m));
-    this.persist();
-  }
-
-  /** Transform messages in place (e.g., strip userId on consent downgrade). */
-  transform(fn: (msg: Message) => Message): void {
-    this.messages = this.messages.map(fn);
-    this.persist();
-  }
-
   get length(): number {
     return this.messages.length;
   }

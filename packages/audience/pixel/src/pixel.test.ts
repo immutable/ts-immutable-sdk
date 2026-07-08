@@ -19,8 +19,6 @@ const mockStartCmpDetection = jest.fn().mockReturnValue(mockTeardownCmp);
 const mockEnqueue = jest.fn();
 const mockStart = jest.fn();
 const mockDestroy = jest.fn();
-const mockPurge = jest.fn();
-const mockTransform = jest.fn();
 const mockGetOrCreateSession = jest.fn().mockReturnValue({ sessionId: 'session-abc', isNew: true });
 
 jest.mock('@imtbl/audience-core', () => ({
@@ -28,8 +26,6 @@ jest.mock('@imtbl/audience-core', () => ({
     enqueue: mockEnqueue,
     start: mockStart,
     destroy: mockDestroy,
-    purge: mockPurge,
-    transform: mockTransform,
     stop: jest.fn(),
     flush: jest.fn(),
     flushUnload: jest.fn(),
@@ -56,7 +52,6 @@ jest.mock('@imtbl/audience-core', () => ({
   startCmpDetection: (...args: unknown[]) => mockStartCmpDetection(...args),
   createConsentManager: jest.fn().mockImplementation(
     (
-      _queue: unknown,
       _send: unknown,
       _key: unknown,
       _anonId: unknown,
@@ -501,7 +496,6 @@ describe('Pixel', () => {
 
       // consentMode: 'auto' should start at 'none' regardless of consent param
       expect(createConsentManager).toHaveBeenCalledWith(
-        expect.anything(),
         expect.anything(),
         'pk_imapik-test-local',
         'anon-123',

@@ -70,7 +70,8 @@ If you are not using `consentMode: 'auto'`, you can set consent manually at any 
 // After cookie banner interaction, upgrade to full
 window.__imtbl.push(['consent', 'full']);
 
-// Or downgrade (purges PII from queue)
+// Or downgrade. Consent changes only gate what is collected from now on;
+// events already recorded keep the consent level they were captured under.
 window.__imtbl.push(['consent', 'none']);
 ```
 
