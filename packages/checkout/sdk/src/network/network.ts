@@ -166,6 +166,13 @@ export async function switchWalletNetwork(
     );
   }
 
+  // walletconnect on trying to switch network, if network doesn't exist, it does not throw an error!
+  // so the catch block below is not triggered, so we need to add the network manually
+  // always calling addNetworkToWallet is harmless, as nothing happens if the network already exists
+  if (provider.ethereumProvider?.isWalletConnect) {
+    await addNetworkToWallet(networkMap, provider, chainId);
+  }
+
   // WT-1146 - Refer to the README in this folder for explanation on the switch network flow
   try {
     await switchNetworkInWallet(networkMap, provider, chainId);
