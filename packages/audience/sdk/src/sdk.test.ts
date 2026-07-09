@@ -942,6 +942,105 @@ describe('Audience', () => {
       expect(ids).toHaveLength(0);
       sdk.shutdown();
     });
+
+    it('warns and drops the call when identityType is passport but the id is not passport shaped', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.identify('12345', 'passport');
+      await sdk.flush();
+
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('doesn\'t look like a'));
+      const ids = sentMessages().filter((m: any) => m.type === 'identify');
+      expect(ids).toHaveLength(0);
+
+      warnSpy.mockRestore();
+      sdk.shutdown();
+    });
+
+    it('warns without needing debug mode enabled', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const sdk = createSDK({ consent: 'full', debug: false });
+
+      sdk.identify('12345', 'passport');
+
+      expect(warnSpy).toHaveBeenCalled();
+
+      warnSpy.mockRestore();
+      sdk.shutdown();
+    });
+
+    it('does not persist userId after a dropped passport identify, so later track calls stay anonymous', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.identify('12345', 'passport');
+      sdk.track('sign_up', { method: 'email' });
+      await sdk.flush();
+
+      const trackMsg = sentMessages().find((m: any) => m.eventName === 'sign_up');
+      expect(trackMsg.userId).toBeUndefined();
+
+      warnSpy.mockRestore();
+      sdk.shutdown();
+    });
+
+    it('does not warn for a passport shaped id', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.identify('email|abc123', 'passport');
+      await sdk.flush();
+
+      expect(warnSpy).not.toHaveBeenCalled();
+      const msg = sentMessages().find((m: any) => m.type === 'identify');
+      expect(msg).toBeDefined();
+
+      warnSpy.mockRestore();
+      sdk.shutdown();
+    });
+
+    it('does not warn for a bare UUID passport id', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.identify('550e8400-e29b-41d4-a716-446655440000', 'passport');
+      await sdk.flush();
+
+      expect(warnSpy).not.toHaveBeenCalled();
+      const msg = sentMessages().find((m: any) => m.type === 'identify');
+      expect(msg).toBeDefined();
+
+      warnSpy.mockRestore();
+      sdk.shutdown();
+    });
+
+    it('stores and sends the trimmed id, not the padded one, for a valid passport id', async () => {
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.identify(' email|abc123\n', 'passport');
+      await sdk.flush();
+
+      const msg = sentMessages().find((m: any) => m.type === 'identify');
+      expect(msg.userId).toBe('email|abc123');
+
+      sdk.shutdown();
+    });
+
+    it('does not warn for non-passport identity types regardless of id shape', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.identify('12345', 'steam');
+      await sdk.flush();
+
+      expect(warnSpy).not.toHaveBeenCalled();
+      const msg = sentMessages().find((m: any) => m.type === 'identify');
+      expect(msg).toBeDefined();
+
+      warnSpy.mockRestore();
+      sdk.shutdown();
+    });
   });
 
   describe('alias', () => {
@@ -975,6 +1074,78 @@ describe('Audience', () => {
       const aliases = sentMessages().filter((m: any) => m.type === 'alias');
       expect(aliases).toHaveLength(0);
 
+      sdk.shutdown();
+    });
+
+    it('warns and drops the call when to.identityType is passport but to.id is not passport shaped', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.alias(TEST_STEAM, { id: '12345', identityType: 'passport' });
+      await sdk.flush();
+
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('doesn\'t look like a'));
+      const aliases = sentMessages().filter((m: any) => m.type === 'alias');
+      expect(aliases).toHaveLength(0);
+
+      warnSpy.mockRestore();
+      sdk.shutdown();
+    });
+
+    it('warns and drops the call when from.identityType is passport but from.id is not passport shaped', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.alias({ id: '12345', identityType: 'passport' }, TEST_STEAM);
+      await sdk.flush();
+
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('doesn\'t look like a'));
+      const aliases = sentMessages().filter((m: any) => m.type === 'alias');
+      expect(aliases).toHaveLength(0);
+
+      warnSpy.mockRestore();
+      sdk.shutdown();
+    });
+
+    it('does not warn when the passport side has a passport-shaped id', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.alias(TEST_STEAM, { id: 'email|abc123', identityType: 'passport' });
+      await sdk.flush();
+
+      expect(warnSpy).not.toHaveBeenCalled();
+      const msg = sentMessages().find((m: any) => m.type === 'alias');
+      expect(msg).toBeDefined();
+
+      warnSpy.mockRestore();
+      sdk.shutdown();
+    });
+
+    it('stores and sends the trimmed id, not the padded one, for a valid passport id', async () => {
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.alias(TEST_STEAM, { id: ' email|abc123\n', identityType: 'passport' });
+      await sdk.flush();
+
+      const msg = sentMessages().find((m: any) => m.type === 'alias');
+      expect(msg.toId).toBe('email|abc123');
+
+      sdk.shutdown();
+    });
+
+    it('does not warn when neither side is passport, regardless of id shape', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.alias({ id: '12345', identityType: 'steam' }, { id: '67890', identityType: 'epic' });
+      await sdk.flush();
+
+      expect(warnSpy).not.toHaveBeenCalled();
+      const msg = sentMessages().find((m: any) => m.type === 'alias');
+      expect(msg).toBeDefined();
+
+      warnSpy.mockRestore();
       sdk.shutdown();
     });
 

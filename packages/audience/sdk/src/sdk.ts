@@ -2,7 +2,6 @@ import type {
   Attribution,
   ConsentLevel,
   ConsentManager,
-  IdentityType,
   Message,
   UserTraits,
 } from '@imtbl/audience-core';
@@ -19,8 +18,10 @@ import {
   deleteCookie,
   generateId,
   getTimestamp,
+  IdentityType,
   isAliasValid,
   isTimestampValid,
+  isPassportIdValid,
   truncate,
   collectContext,
   collectSessionAttribution,
@@ -47,6 +48,18 @@ import {
 const UTM_EVENTS: ReadonlySet<string> = new Set([
   'sign_up', 'link_clicked',
 ]);
+
+// Bypasses the debug gate: a caller bug, not routine noise. The sample app
+// string-matches "doesn't look like a Passport ID" to detect a drop — keep
+// that phrase if this wording changes.
+function warnMalformedPassportId(method: string, typeLabel: string, idLabel: string, id: string): void {
+  // eslint-disable-next-line no-console
+  console.warn(
+    `${LOG_PREFIX} ${method} called with ${typeLabel} 'passport' but ${idLabel} "${id}" doesn't look `
+    + 'like a Passport ID (expected a format like "email|123" or a UUID). Check you\'re passing '
+    + 'the Passport user ID, not your own internal user ID. Call ignored.',
+  );
+}
 
 /**
  * Track player activity on your website — page views, purchases, sign-ups —
@@ -342,16 +355,22 @@ export class Audience {
    *
    * `sdk.identify('user@example.com', 'email', { name: 'Jane' })`
    *
-   * Requires 'full' consent.
+   * Requires 'full' consent. When `identityType` is `'passport'`, the id must
+   * look like a real Passport id (`connection|id` or a UUID) — otherwise the
+   * call is dropped and a warning is logged.
    */
   identify(id: string, identityType: IdentityType, traits?: UserTraits): void {
     if (!canIdentify(this.consent.level)) {
       this.debug.logWarning('identify() requires full consent — call ignored.');
       return;
     }
+    if (identityType === IdentityType.Passport && !isPassportIdValid(id)) {
+      warnMalformedPassportId('identify()', 'identityType', 'id', id);
+      return;
+    }
     this.refreshSession();
 
-    const resolvedId = truncate(id);
+    const resolvedId = truncate(id.trim());
     this.userId = resolvedId;
     this.enqueue('identify', {
       ...this.baseMessage(),
@@ -368,7 +387,9 @@ export class Audience {
    * different account (e.g. Passport email). This tells the backend they're
    * the same person so analytics aren't split across two profiles.
    *
-   * Requires 'full' consent. `from` and `to` must differ.
+   * Requires 'full' consent. `from` and `to` must differ. When either side's
+   * `identityType` is `'passport'`, that side's id must look like a real
+   * Passport id (`connection|id` or a UUID) — otherwise the call is dropped.
    */
   alias(
     from: { id: string; identityType: IdentityType },
@@ -382,14 +403,22 @@ export class Audience {
       this.debug.logWarning('alias() from and to are identical — call ignored.');
       return;
     }
+    if (from.identityType === IdentityType.Passport && !isPassportIdValid(from.id)) {
+      warnMalformedPassportId('alias()', 'from.identityType', 'from.id', from.id);
+      return;
+    }
+    if (to.identityType === IdentityType.Passport && !isPassportIdValid(to.id)) {
+      warnMalformedPassportId('alias()', 'to.identityType', 'to.id', to.id);
+      return;
+    }
     this.refreshSession();
 
     this.enqueue('alias', {
       ...this.baseMessage(),
       type: 'alias',
-      fromId: truncate(from.id),
+      fromId: truncate(from.id.trim()),
       fromType: from.identityType,
-      toId: truncate(to.id),
+      toId: truncate(to.id.trim()),
       toType: to.identityType,
     });
   }

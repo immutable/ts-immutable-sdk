@@ -258,6 +258,10 @@
   var currentSessionId = null;
   var pendingQueueCount = 0;
 
+  // Set by the console mirror when the SDK rejects a passport id, so
+  // onIdentify() can tell a dropped call from one that went through.
+  var lastIdentifyRejected = false;
+
   function installConsoleMirror() {
     var originalLog = console.log.bind(console);
     var originalWarn = console.warn.bind(console);
@@ -283,6 +287,7 @@
       var msg = args[0].slice(11);
       var payload = args.length > 1 ? args[1] : undefined;
       harvestIds(payload);
+      if (msg.indexOf("doesn't look like a Passport ID") !== -1) lastIdentifyRejected = true;
       // Promote flush outcomes to ok/err so they stand out in the log.
       var flushMatch = msg.match(/^flush (ok|failed)/);
       if (flushMatch && flushMatch[1] === 'ok') { pendingQueueCount = 0; updateStatus(); }
@@ -349,6 +354,7 @@
     'btn-consent-none', 'btn-consent-anon', 'btn-consent-full',
     'btn-custom-event',
     'btn-identify',
+    'btn-identify-invalid-example',
     'btn-delete-data',
   ];
 
@@ -563,6 +569,11 @@
     $('btn-consent-anon').addEventListener('click', function () { onSetConsent('anonymous'); });
     $('btn-consent-full').addEventListener('click', function () { onSetConsent('full'); });
     $('btn-identify').addEventListener('click', onIdentify);
+    $('btn-identify-invalid-example').addEventListener('click', function () {
+      $('id-id').value = '12345';
+      $('id-type').value = IdentityType.Passport;
+      saveUiState();
+    });
     $('btn-alias').addEventListener('click', onAlias);
     $('btn-delete-data').addEventListener('click', onDeleteData);
     ['alias-from-id', 'alias-to-id', 'alias-from-type', 'alias-to-type'].forEach(function (id) {
@@ -812,7 +823,12 @@
     try { traits = parseTraits($('id-traits').value); }
     catch (err) { log('identify()', 'invalid traits JSON: ' + err.message, 'err'); return; }
     try {
+      lastIdentifyRejected = false;
       audience.identify(id, type, traits);
+      if (lastIdentifyRejected) {
+        log('identify()', 'dropped — invalid Passport ID (see warning above)', 'err');
+        return;
+      }
       enqueued();
       currentUserId = id;
       identityMirror.userId = id;
