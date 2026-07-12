@@ -855,7 +855,7 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
-    it('rewrites stamped consentLevel to anonymous and strips userId on downgrade from full', async () => {
+    it('leaves queued events with their capture-time consentLevel and userId on downgrade from full', async () => {
       const sdk = createSDK({ consent: 'full' });
       sdk.identify(TEST_USER.id, TEST_USER.identityType);
       sdk.track('purchase', { currency: 'USD', value: 9.99 });
@@ -863,12 +863,14 @@ describe('Audience', () => {
       sdk.setConsent('anonymous');
       await sdk.flush();
 
+      // The purchase was recorded under full consent; the downgrade must not
+      // retro-actively rewrite it, so it still reports full + userId.
       const trackMsg = sentMessages().find(
         (m: any) => m.type === 'track' && m.eventName === 'purchase',
       );
       expect(trackMsg).toBeDefined();
-      expect(trackMsg.consentLevel).toBe('anonymous');
-      expect(trackMsg.userId).toBeUndefined();
+      expect(trackMsg.consentLevel).toBe('full');
+      expect(trackMsg.userId).toBe(TEST_USER.id);
 
       sdk.shutdown();
     });
@@ -1102,7 +1104,7 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
-    it('purges identify/alias, strips userId on downgrade', async () => {
+    it('keeps queued identify/alias and userId intact on downgrade to anonymous', async () => {
       const sdk = createSDK({ consent: 'full' });
 
       sdk.identify(TEST_USER.id, TEST_USER.identityType);
@@ -1112,18 +1114,17 @@ describe('Audience', () => {
       sdk.setConsent('anonymous');
       await sdk.flush();
 
+      // Events captured under full consent are not mutated by the downgrade:
+      // identify/alias stay queued and the purchase keeps its userId + level.
       const msgs = sentMessages();
-      expect(
-        msgs.every((m: any) => m.type !== 'identify'),
-      ).toBe(true);
-      expect(
-        msgs.every((m: any) => m.type !== 'alias'),
-      ).toBe(true);
+      expect(msgs.some((m: any) => m.type === 'identify')).toBe(true);
+      expect(msgs.some((m: any) => m.type === 'alias')).toBe(true);
       const trackMsg = msgs.find(
         (m: any) => m.type === 'track' && m.eventName === 'purchase',
       );
       expect(trackMsg).toBeDefined();
-      expect(trackMsg.userId).toBeUndefined();
+      expect(trackMsg.userId).toBe(TEST_USER.id);
+      expect(trackMsg.consentLevel).toBe('full');
 
       sdk.shutdown();
     });

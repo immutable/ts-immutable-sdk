@@ -99,7 +99,6 @@ export class Pixel {
     const isAutoConsent = consentMode === 'auto';
 
     this.consent = createConsentManager(
-      this.queue,
       httpSend,
       key,
       this.anonymousId,

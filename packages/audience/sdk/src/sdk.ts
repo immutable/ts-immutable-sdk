@@ -151,7 +151,6 @@ export class Audience {
     );
 
     this.consent = createConsentManager(
-      this.queue,
       httpSend,
       publishableKey,
       this.anonymousId,

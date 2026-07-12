@@ -682,7 +682,7 @@
       // Log observable side effects of the transition.
       var effects = [];
       if (previous === 'none' && level !== 'none') effects.push('queue started, session created');
-      if (level === 'none') effects.push('queue purged, cookies deleted');
+      if (level === 'none') effects.push('tracking stopped, cookies deleted (queued events kept)');
       if (!canIdentify(level)) {
         currentUserId = null;
         identityMirror = emptyIdentity();

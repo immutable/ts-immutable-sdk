@@ -1,8 +1,7 @@
 import { track } from '@imtbl/metrics';
 import type {
-  ConsentLevel, ConsentUpdatePayload, Message,
+  ConsentLevel, ConsentUpdatePayload,
 } from './types';
-import type { MessageQueue } from './queue';
 import type { HttpSend } from './transport';
 import { type AudienceError, invokeOnError, toAudienceError } from './errors';
 import { BASE_URL, CONSENT_PATH } from './config';
@@ -50,18 +49,17 @@ export function resolvePrivacySignal(): 'gpc' | 'dnt' {
  * - If GPC or DNT is detected, consent is forced to `'none'` regardless of
  *   `initialLevel`. Upgrades via `setLevel` are also blocked while the signal
  *   remains active.
- * - On downgrade (e.g. full -> anonymous), strips `userId` from queued messages.
- * - On downgrade to `'none'`, purges the queue entirely.
+ * - Already-queued events are never mutated on a consent change. Each event
+ *   keeps the `consentLevel` (and any `userId`) it carried when it was
+ *   recorded. Consent only gates what is collected going forward.
  * - Fires PUT to `/v1/audience/tracking-consent` on every state change via
- *   the injected `send`. Sharing the same `HttpSend` instance with the queue
- *   keeps the transport layer uniform — no module-level mocking required.
+ *   the injected `send`, keeping the transport layer uniform across surfaces.
  * - On consent sync failure, fires `onError` with a public {@link AudienceError}
  *   mapped via {@link toAudienceError}, so callers don't have to repeat the
- *   `status === 0 → NETWORK_ERROR` mapping themselves. Exceptions thrown
+ *   `status === 0` to `NETWORK_ERROR` mapping themselves. Exceptions thrown
  *   from the callback are swallowed.
  */
 export function createConsentManager(
-  queue: MessageQueue,
   send: HttpSend,
   publishableKey: string,
   anonymousId: string,
@@ -80,8 +78,6 @@ export function createConsentManager(
     });
   }
   let current: ConsentLevel = privacySignalActive ? 'none' : (initialLevel ?? 'none');
-
-  const LEVELS: Record<ConsentLevel, number> = { none: 0, anonymous: 1, full: 2 };
 
   function notifyBackend(level: ConsentLevel): void {
     const url = `${baseUrl ?? BASE_URL}${CONSENT_PATH}`;
@@ -114,27 +110,6 @@ export function createConsentManager(
       }
 
       if (effective === current) return;
-
-      const isDowngrade = LEVELS[effective] < LEVELS[current];
-
-      if (isDowngrade) {
-        if (effective === 'none') {
-          queue.purge(() => true);
-        } else if (effective === 'anonymous') {
-          // Remove identify/alias messages, strip userId from the rest, and
-          // downgrade the stamped consentLevel to 'anonymous' — the user
-          // withdrew full consent, so queued events must not still report 'full'.
-          queue.purge((msg: Message) => msg.type === 'identify' || msg.type === 'alias');
-          queue.transform((msg: Message) => {
-            const downgraded = { ...msg, consentLevel: 'anonymous' as const };
-            if ('userId' in downgraded) {
-              const { userId, ...rest } = downgraded;
-              return rest;
-            }
-            return downgraded;
-          });
-        }
-      }
 
       current = effective;
       notifyBackend(effective);
