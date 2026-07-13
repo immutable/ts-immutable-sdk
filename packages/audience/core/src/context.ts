@@ -26,6 +26,7 @@ export function collectContext(
   context.locale = navigator.language;
   context.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   context.screen = `${window.screen.width}x${window.screen.height}`;
+  context.screenDensity = window.devicePixelRatio;
   context.pageUrl = window.location.href;
   context.pagePath = window.location.pathname;
   context.pageReferrer = document.referrer;
