@@ -9,6 +9,7 @@ export interface EventContext {
   locale?: string;
   timezone?: string;
   screen?: string;
+  screenDensity?: number;
   pageUrl?: string;
   pagePath?: string;
   pageReferrer?: string;

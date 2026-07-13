@@ -19,6 +19,7 @@ describe('collectContext', () => {
     expect(ctx.locale).toBeDefined();
     expect(ctx.timezone).toBeDefined();
     expect(ctx.screen).toMatch(/^\d+x\d+$/);
+    expect(ctx.screenDensity).toBeDefined();
   });
 
   it('collects page info', () => {
