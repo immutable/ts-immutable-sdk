@@ -27,7 +27,7 @@ jobs:
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
     steps:
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # pin@v6.1.1
+        uses: aws-actions/configure-aws-credentials@517a711dbcd0e402f90c77e7e2f81e849156e31d # pin@v6.2.2
         with:
           role-to-assume: ${{ secrets.AWS_IMMUTABLE_PROD_ADMIN_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
