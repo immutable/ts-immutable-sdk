@@ -1,4 +1,4 @@
-import type { AudienceError, ConsentLevel } from '@imtbl/audience-core';
+import type { AudienceError, AutocaptureOptions, ConsentLevel } from '@imtbl/audience-core';
 
 /** Configuration for the Immutable Web SDK. */
 export interface AudienceConfig {
@@ -6,6 +6,12 @@ export interface AudienceConfig {
   publishableKey: string;
   /** Initial consent level. Defaults to 'none' (no tracking until opted in). */
   consent?: ConsentLevel;
+  /**
+   * Configure passive auto-capture (link clicks, forms, scroll depth),
+   * the same capture engine the tracking pixel uses. Omit to use the
+   * defaults (forms/clicks/scroll on, internalClicks/buttons off).
+   */
+  autocapture?: AutocaptureOptions;
   /** Enable console logging of all events, flushes, and consent changes. */
   debug?: boolean;
   /** Cookie domain for cross-subdomain sharing (e.g. '.studio.com'). */

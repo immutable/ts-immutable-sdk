@@ -1,15 +1,15 @@
 import { Pixel } from './pixel';
 
-// Mock autocapture module
+// Mock autocapture (now shared via @imtbl/audience-core, wired into that mock below)
 const mockTeardownAutocapture = jest.fn();
 const mockResetScrollDepth = jest.fn();
 const mockSetupAutocapture = jest.fn().mockReturnValue({
   teardown: mockTeardownAutocapture,
   resetScroll: mockResetScrollDepth,
 });
-jest.mock('./autocapture', () => ({
-  setupAutocapture: (...args: unknown[]) => mockSetupAutocapture(...args),
-}));
+
+// Third-party ID collection (also shared via @imtbl/audience-core)
+const mockCollectThirdPartyIds = jest.fn().mockReturnValue({});
 
 // CMP detection mock — defined here, wired into the audience-core mock below
 const mockTeardownCmp = jest.fn();
@@ -42,12 +42,12 @@ jest.mock('@imtbl/audience-core', () => ({
   generateId: jest.fn().mockReturnValue('msg-uuid'),
   getTimestamp: jest.fn().mockReturnValue('2026-04-07T00:00:00.000Z'),
   isBrowser: jest.fn().mockReturnValue(true),
-  getCookie: jest.fn(),
-  setCookie: jest.fn(),
   collectSessionAttribution: jest.fn().mockReturnValue({
     utm_source: 'google',
     landing_page: 'https://example.com',
   }),
+  collectThirdPartyIds: (...args: unknown[]) => mockCollectThirdPartyIds(...args),
+  setupAutocapture: (...args: unknown[]) => mockSetupAutocapture(...args),
   getOrCreateSession: (...args: unknown[]) => mockGetOrCreateSession(...args),
   startCmpDetection: (...args: unknown[]) => mockStartCmpDetection(...args),
   createConsentManager: jest.fn().mockImplementation(
@@ -70,8 +70,6 @@ jest.mock('@imtbl/audience-core', () => ({
 
 // Mock fetch globally
 global.fetch = jest.fn().mockResolvedValue({ ok: true });
-
-const mockGetCookie = jest.requireMock('@imtbl/audience-core').getCookie as jest.Mock;
 
 let activePixel: Pixel | null = null;
 
@@ -184,13 +182,10 @@ describe('Pixel', () => {
 
     it('includes GA and Meta cookies in page properties when present', () => {
       mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-abc', isNew: false });
-      mockGetCookie.mockImplementation((name: string) => {
-        const cookies: Record<string, string> = {
-          _ga: 'GA1.2.123456.789012',
-          _fbc: 'fb.1.1234567890.AbCdEf',
-          _fbp: 'fb.1.1234567890.987654321',
-        };
-        return cookies[name];
+      mockCollectThirdPartyIds.mockReturnValue({
+        ga_client_id: 'GA1.2.123456.789012',
+        fb_click_id: 'fb.1.1234567890.AbCdEf',
+        fb_browser_id: 'fb.1.1234567890.987654321',
       });
 
       const pixel = new Pixel();
@@ -208,7 +203,7 @@ describe('Pixel', () => {
 
     it('omits third-party IDs when cookies are not set', () => {
       mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-abc', isNew: false });
-      mockGetCookie.mockReturnValue(undefined);
+      mockCollectThirdPartyIds.mockReturnValue({});
 
       const pixel = new Pixel();
       activePixel = pixel;

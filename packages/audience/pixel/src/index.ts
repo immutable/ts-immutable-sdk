@@ -7,4 +7,4 @@ export type { Command, ImtblGlobal } from './loader';
 export { generateSnippet } from './snippet';
 export type { SnippetOptions } from './snippet';
 
-export type { AutocaptureOptions } from './autocapture';
+export type { AutocaptureOptions } from '@imtbl/audience-core';

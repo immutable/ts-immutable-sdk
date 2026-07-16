@@ -24,13 +24,14 @@ import {
   truncate,
   collectContext,
   collectSessionAttribution,
-  collectPageAttribution,
+  collectThirdPartyIds,
   getOrCreateSession,
   createConsentManager,
   canTrack,
   canIdentify,
   detectDoNotTrack,
   isBrowser,
+  setupAutocapture,
   SESSION_START,
   SESSION_END,
 } from '@imtbl/audience-core';
@@ -86,6 +87,10 @@ export class Audience {
   private isFirstPage = true;
 
   private destroyed = false;
+
+  private teardownAutocapture?: () => void;
+
+  private resetScrollDepth?: () => void;
 
   private static readonly UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -166,6 +171,15 @@ export class Audience {
       this.queue.start();
       if (isNewSession) this.trackSessionStart();
     }
+
+    // Consent is checked at fire time by each handler, not here.
+    const autocaptureResult = setupAutocapture(
+      config.autocapture ?? {},
+      (eventName, properties) => this.track(eventName, properties),
+      () => this.consent.level,
+    );
+    this.teardownAutocapture = autocaptureResult.teardown;
+    this.resetScrollDepth = autocaptureResult.resetScroll;
   }
 
   /**
@@ -280,12 +294,17 @@ export class Audience {
   page(properties?: Record<string, unknown>): void {
     if (this.isTrackingDisabled()) return;
     this.refreshSession();
+    this.resetScrollDepth?.();
 
-    const mergedProps: Record<string, unknown> = { ...properties };
+    // Matches pixel's precedence: attribution, then third-party IDs, then the
+    // caller's own properties (caller-supplied values always win on collision).
+    const mergedProps: Record<string, unknown> = {};
     if (this.isFirstPage) {
       Object.assign(mergedProps, this.attribution);
       this.isFirstPage = false;
     }
+    Object.assign(mergedProps, collectThirdPartyIds());
+    Object.assign(mergedProps, properties);
 
     this.enqueue('page', {
       ...this.baseMessage(),
@@ -303,8 +322,8 @@ export class Audience {
    * For the predefined event names (`sign_up`, `purchase`, etc.),
    * TypeScript enforces the property shape at the call site.
    *
-   * `sign_up` and `link_clicked` events automatically include UTM
-   * attribution from the current page URL. All events include `sessionId`.
+   * `sign_up` and `link_clicked` events automatically include the UTM
+   * attribution captured at session start. All events include `sessionId`.
    *
    * No-op when consent is 'none'.
    */
@@ -319,7 +338,7 @@ export class Audience {
 
     const [properties] = args;
     const mergedProps: Record<string, unknown> = {
-      ...(UTM_EVENTS.has(event) ? collectPageAttribution() : {}),
+      ...(UTM_EVENTS.has(event) ? this.attribution : {}),
       ...properties as Record<string, unknown> | undefined,
     };
 
@@ -531,6 +550,7 @@ export class Audience {
     if (this.destroyed) return;
     this.destroyed = true;
     if (!this.isTrackingDisabled()) this.trackSessionEnd();
+    this.teardownAutocapture?.();
     this.queue.destroy();
     Audience.liveInstances = Math.max(0, Audience.liveInstances - 1);
   }

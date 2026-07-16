@@ -4,6 +4,7 @@ import type {
   TrackMessage,
   ConsentManager,
   CmpDetector,
+  AutocaptureOptions,
 } from '@imtbl/audience-core';
 import {
   MessageQueue,
@@ -13,15 +14,14 @@ import {
   generateId,
   getTimestamp,
   isBrowser,
-  getCookie,
   collectSessionAttribution,
+  collectThirdPartyIds,
   getOrCreateSession,
   createConsentManager,
   canTrack,
   startCmpDetection,
+  setupAutocapture,
 } from '@imtbl/audience-core';
-import { setupAutocapture } from './autocapture';
-import type { AutocaptureOptions } from './autocapture';
 
 // Replaced at build time by tsup `define` (see tsup.config.ts).
 // In tests the global isn't defined, so we fall back to 'unknown'.
@@ -143,7 +143,7 @@ export class Pixel {
     const { sessionId, isNew } = getOrCreateSession(this.domain);
     this.refreshSession(sessionId, isNew);
     const attribution = collectSessionAttribution();
-    const thirdPartyIds = this.collectThirdPartyIds();
+    const thirdPartyIds = collectThirdPartyIds();
 
     const message: PageMessage = {
       ...this.buildBase(),
@@ -296,25 +296,6 @@ export class Pixel {
       window.removeEventListener('pagehide', this.unloadHandler);
       this.unloadHandler = undefined;
     }
-  }
-
-  // -- Third-party identity signals ----------------------------------------
-
-  /**
-   * Read GA Client ID and Meta Pixel cookies when present.
-   * These are set by Google Analytics / Meta Pixel scripts and allow
-   * cross-platform identity stitching without requiring full consent.
-   */
-  // eslint-disable-next-line class-methods-use-this
-  private collectThirdPartyIds(): Record<string, string> {
-    const ids: Record<string, string> = {};
-    const ga = getCookie('_ga');
-    if (ga) ids.ga_client_id = ga;
-    const fbc = getCookie('_fbc');
-    if (fbc) ids.fb_click_id = fbc;
-    const fbp = getCookie('_fbp');
-    if (fbp) ids.fb_browser_id = fbp;
-    return ids;
   }
 
   // -- Helpers ------------------------------------------------------------

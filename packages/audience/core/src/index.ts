@@ -46,6 +46,11 @@ export type { SessionResult } from './session';
 export { collectSessionAttribution, collectPageAttribution } from './attribution';
 export type { Attribution } from './attribution';
 
+export { collectThirdPartyIds } from './thirdPartyIds';
+
+export { setupAutocapture } from './autocapture';
+export type { AutocaptureOptions } from './autocapture';
+
 export {
   createConsentManager, detectDoNotTrack,
   canTrack, canIdentify,

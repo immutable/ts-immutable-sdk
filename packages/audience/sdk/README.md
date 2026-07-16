@@ -42,6 +42,28 @@ audience.setConsent('full');
 audience.shutdown();
 ```
 
+## Auto-capture
+
+The SDK includes the same passive capture engine as the tracking pixel,
+useful if you're integrating the web SDK on its own, without the pixel
+snippet. On by default; pass `autocapture` to `Audience.init()` to
+configure it.
+
+| Event | When it fires | Key properties |
+|-------|--------------|----------------|
+| `link_clicked` | Outbound link click (external domains only) | `link_url`, `link_text`, `element_id`, `outbound: true`, plus session attribution (UTMs, click IDs) |
+| `form_submitted` | HTML form submission | `form_action`, `form_id`, `form_name`, `field_names`. `email_hash` at `full` consent only. |
+| `button_clicked` | Button or `input[type=button\|submit\|reset]` click. Off by default (pass `autocapture: { buttons: true }` to enable). | `button_text`, `element_id`, `element_type`. Submit buttons inside a `<form>` are skipped (the form's own `form_submitted` already covers that interaction). |
+| `scroll_depth` | Scroll milestone reached (25%, 50%, 75%, 90%, 100%) | `depth` (integer). Resets on each `page()` call. |
+
+```ts
+const audience = Audience.init({
+  publishableKey: 'YOUR_PUBLISHABLE_KEY',
+  consent: 'anonymous',
+  autocapture: { forms: false }, // disable form auto-capture; others stay on
+});
+```
+
 ## Quickstart — CDN
 
 ```html

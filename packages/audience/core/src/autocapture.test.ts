@@ -1,6 +1,6 @@
 import { TextEncoder as NodeTextEncoder } from 'util';
 import { createHash } from 'crypto';
-import type { ConsentLevel } from '@imtbl/audience-core';
+import type { ConsentLevel } from './types';
 import { setupAutocapture } from './autocapture';
 
 // Polyfill TextEncoder for older jsdom
@@ -41,6 +41,7 @@ describe('autocapture', () => {
     enqueue = jest.fn();
     consent = 'anonymous';
     document.body.innerHTML = '';
+    sessionStorage.clear();
   });
 
   afterEach(() => {
@@ -315,13 +316,45 @@ describe('autocapture', () => {
 
       expect(enqueue).toHaveBeenCalledWith(
         'link_clicked',
-        {
+        expect.objectContaining({
           link_url: 'https://store.steampowered.com/app/12345',
           link_text: 'Wishlist on Steam',
           element_id: 'steam-link',
           outbound: true,
-        },
+        }),
       );
+    });
+
+    it('attaches session attribution to outbound link clicks', () => {
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?utm_source=twitter',
+          href: 'https://example.com/?utm_source=twitter',
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      setup();
+
+      const link = document.createElement('a');
+      link.href = 'https://store.steampowered.com/app/12345';
+      link.textContent = 'Wishlist on Steam';
+      document.body.appendChild(link);
+
+      link.dispatchEvent(new Event('click', { bubbles: true }));
+
+      expect(enqueue).toHaveBeenCalledWith(
+        'link_clicked',
+        expect.objectContaining({ utm_source: 'twitter' }),
+      );
+
+      Object.defineProperty(window, 'location', {
+        value: { ...window.location, search: '', href: 'https://example.com/' },
+        writable: true,
+        configurable: true,
+      });
     });
 
     it('does not fire for internal links', () => {
@@ -483,12 +516,12 @@ describe('autocapture', () => {
 
       expect(enqueue).toHaveBeenCalledWith(
         'link_clicked',
-        {
+        expect.objectContaining({
           link_url: `${window.location.origin}/about`,
           link_text: 'About Us',
           element_id: 'about-link',
           outbound: false,
-        },
+        }),
       );
     });
 
@@ -1247,7 +1280,7 @@ describe('autocapture', () => {
         document.dispatchEvent(new Event('scroll'));
         expect(enqueue).not.toHaveBeenCalled(); // rAF not flushed yet
 
-        // SPA navigates: pixel.page() calls resetScroll() before the rAF fires.
+        // SPA navigates: the caller's page() calls resetScroll() before the rAF fires.
         // The reused container still reports scrollY = 750 momentarily.
         result.resetScroll();
 
