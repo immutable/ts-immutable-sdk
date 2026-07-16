@@ -1,5 +1,6 @@
-import type { ConsentLevel } from '@imtbl/audience-core';
-import { canTrack, canIdentify } from '@imtbl/audience-core';
+import type { ConsentLevel } from './types';
+import { canTrack, canIdentify } from './consent';
+import { collectSessionAttribution } from './attribution';
 
 export interface AutocaptureOptions {
   /** Enable form submission auto-capture. Default: true */
@@ -67,7 +68,7 @@ const SCROLL_MILESTONES = [25, 50, 75, 90, 100];
  * Fires `scroll_depth` once per milestone (25/50/75/90/100) as the user
  * scrolls. Works for both standard document scroll and SPA internal scroll
  * containers. Milestones reset when `reset()` is called (e.g. on SPA route
- * changes via `pixel.page()`).
+ * changes via the caller's `page()` method).
  *
  * Uses a capture-phase listener on `document` so scroll events on any
  * descendant element are caught without enumerating containers upfront.
@@ -156,7 +157,7 @@ function setupScrollTracking(
 /**
  * Attach document-level listeners for form submissions, outbound link clicks,
  * and scroll depth milestones. `resetScroll()` clears fired scroll milestones
- * (call from `Pixel.page()` on SPA route changes).
+ * (call from the caller's `page()` method on SPA route changes).
  *
  * - Single document-level listener per event type (event delegation).
  * - Consent is checked at fire time, not at attach time.
@@ -254,6 +255,7 @@ export function setupAutocapture(
 
         if (isOutbound && options.clicks !== false) {
           enqueue('link_clicked', {
+            ...collectSessionAttribution(),
             link_url: anchor.href,
             link_text: (anchor.textContent || '').trim().slice(0, 256),
             element_id: anchor.id || undefined,
@@ -261,6 +263,7 @@ export function setupAutocapture(
           });
         } else if (!isOutbound && options.internalClicks === true) {
           enqueue('link_clicked', {
+            ...collectSessionAttribution(),
             link_url: anchor.href,
             link_text: (anchor.textContent || '').trim().slice(0, 256),
             element_id: anchor.id || undefined,

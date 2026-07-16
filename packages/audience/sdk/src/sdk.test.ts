@@ -411,8 +411,11 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.sessionId).toEqual(expect.any(String));
+      // sign_up carries session-cached attribution, which includes landing_page
+      // (a session-start concept, collectPageAttribution() never set this).
       expect(msg.properties).toEqual({
         method: 'email',
+        landing_page: expect.any(String),
       });
 
       sdk.shutdown();
@@ -597,6 +600,7 @@ describe('Audience', () => {
         utm_source: 'google',
         utm_campaign: 'spring',
         touchpoint_type: 'click',
+        landing_page: expect.any(String),
         method: 'passport',
       });
 
@@ -629,9 +633,59 @@ describe('Audience', () => {
       expect(msg.properties).toEqual({
         utm_source: 'twitter',
         touchpoint_type: 'click',
+        landing_page: expect.any(String),
         url: 'https://store.com',
         label: 'Buy',
       });
+
+      sdk.shutdown();
+    });
+
+    it('keeps UTM attribution on link_clicked/sign_up after the URL loses its query params', async () => {
+      // Regression test: attribution must come from the session-cached snapshot
+      // (captured at construction), not be re-parsed from the current URL:
+      // otherwise a user who lands via a UTM'd ad, browses a few pages, then
+      // clicks a link loses attribution the moment the URL no longer has it.
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?utm_source=tiktok',
+          href: 'https://studio.com/?utm_source=tiktok',
+          protocol: 'https:',
+          pathname: '/',
+        },
+        writable: true,
+        configurable: true,
+      });
+      sessionStorage.clear();
+
+      const sdk = createSDK();
+
+      // Simulate navigating to a later page with no UTM params in the URL.
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '',
+          href: 'https://studio.com/games/devilfish',
+          protocol: 'https:',
+          pathname: '/games/devilfish',
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      sdk.track('link_clicked', { url: 'https://store.com', label: 'Buy' });
+      sdk.track('sign_up', { method: 'google' });
+      await sdk.flush();
+
+      const linkMsg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'link_clicked',
+      );
+      const signUpMsg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'sign_up',
+      );
+      expect(linkMsg?.properties).toHaveProperty('utm_source', 'tiktok');
+      expect(signUpMsg?.properties).toHaveProperty('utm_source', 'tiktok');
 
       sdk.shutdown();
     });
@@ -803,6 +857,38 @@ describe('Audience', () => {
       if (pages[1]) {
         expect(pages[1].properties?.utm_source).toBeUndefined();
       }
+
+      sdk.shutdown();
+    });
+
+    it('attaches third-party IDs (ga/fbc/fbp) to page views, matching pixel', async () => {
+      document.cookie = '_ga=GA1.2.111.222; path=/';
+      document.cookie = '_fbc=fb.1.333.444; path=/';
+      document.cookie = '_fbp=fb.1.555.666; path=/';
+
+      const sdk = createSDK();
+      sdk.page();
+      await sdk.flush();
+
+      const msg = sentMessages().find((m: any) => m.type === 'page');
+      expect(msg?.properties).toMatchObject({
+        ga_client_id: 'GA1.2.111.222',
+        fb_click_id: 'fb.1.333.444',
+        fb_browser_id: 'fb.1.555.666',
+      });
+
+      sdk.shutdown();
+    });
+
+    it('lets caller-supplied properties win over third-party IDs on key collision, matching pixel', async () => {
+      document.cookie = '_ga=GA1.2.111.222; path=/';
+
+      const sdk = createSDK();
+      sdk.page({ ga_client_id: 'caller-override' });
+      await sdk.flush();
+
+      const msg = sentMessages().find((m: any) => m.type === 'page');
+      expect(msg?.properties).toMatchObject({ ga_client_id: 'caller-override' });
 
       sdk.shutdown();
     });
@@ -1515,6 +1601,94 @@ describe('Audience', () => {
       const msg = sentMessages().find((m: any) => m.eventName === 'sign_up');
       expect(msg).toBeDefined();
       sdk.shutdown();
+    });
+  });
+
+  describe('autocapture', () => {
+    afterEach(() => {
+      document.body.innerHTML = '';
+    });
+
+    it('captures outbound link clicks standalone, same as pixel', async () => {
+      const sdk = createSDK();
+
+      const link = document.createElement('a');
+      link.href = 'https://store.steampowered.com/app/12345';
+      link.textContent = 'Wishlist on Steam';
+      document.body.appendChild(link);
+
+      link.dispatchEvent(new Event('click', { bubbles: true }));
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'link_clicked',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.properties).toMatchObject({
+        link_url: 'https://store.steampowered.com/app/12345',
+        outbound: true,
+      });
+
+      sdk.shutdown();
+    });
+
+    it('captures form submissions standalone, same as pixel', async () => {
+      const sdk = createSDK();
+
+      const form = document.createElement('form');
+      form.action = '/signup';
+      document.body.appendChild(form);
+      form.dispatchEvent(new Event('submit', { bubbles: true }));
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'form_submitted',
+      );
+      expect(msg).toBeDefined();
+
+      sdk.shutdown();
+    });
+
+    it('is a no-op at none consent', async () => {
+      const sdk = createSDK({ consent: 'none' });
+
+      const link = document.createElement('a');
+      link.href = 'https://store.steampowered.com/app/12345';
+      link.textContent = 'Steam';
+      document.body.appendChild(link);
+      link.dispatchEvent(new Event('click', { bubbles: true }));
+      await sdk.flush();
+
+      expect(sentMessages().filter((m: any) => m.eventName === 'link_clicked')).toHaveLength(0);
+      sdk.shutdown();
+    });
+
+    it('respects the autocapture config option (e.g. disabling clicks)', async () => {
+      const sdk = createSDK({ autocapture: { clicks: false } });
+
+      const link = document.createElement('a');
+      link.href = 'https://store.steampowered.com/app/12345';
+      link.textContent = 'Steam';
+      document.body.appendChild(link);
+      link.dispatchEvent(new Event('click', { bubbles: true }));
+      await sdk.flush();
+
+      expect(sentMessages().filter((m: any) => m.eventName === 'link_clicked')).toHaveLength(0);
+      sdk.shutdown();
+    });
+
+    it('tears down listeners on shutdown', async () => {
+      const sdk = createSDK();
+      sdk.shutdown();
+      fetchCalls.length = 0;
+
+      const link = document.createElement('a');
+      link.href = 'https://store.steampowered.com/app/12345';
+      link.textContent = 'Steam';
+      document.body.appendChild(link);
+      link.dispatchEvent(new Event('click', { bubbles: true }));
+
+      expect(sentMessages().filter((m: any) => m.eventName === 'link_clicked')).toHaveLength(0);
     });
   });
 });

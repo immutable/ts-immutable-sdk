@@ -85,7 +85,8 @@ All events fire automatically with no instrumentation required.
 | `session_start` | New session (no active `_imtbl_sid` cookie) | `session_id` |
 | `session_end` | Page unload (`visibilitychange` / `pagehide`) | `session_id`, `duration` (seconds) |
 | `form_submitted` | HTML form submission | `form_action`, `form_id`, `form_name`, `field_names`. `email_hash` at `full` consent only. |
-| `link_clicked` | Outbound link click (external domains only) | `link_url`, `link_text`, `element_id`, `outbound: true` |
+| `link_clicked` | Outbound link click (external domains only) | `link_url`, `link_text`, `element_id`, `outbound: true`, plus session attribution (UTMs, click IDs) |
+| `button_clicked` | Button or `input[type=button\|submit\|reset]` click. Off by default (set `"autocapture":{"buttons":true}` to enable). | `button_text`, `element_id`, `element_type`. Submit buttons inside a `<form>` are skipped (the form's own `form_submitted` already covers that interaction). |
 | `scroll_depth` | Scroll milestone reached (25%, 50%, 75%, 90%, 100%) | `depth` (integer). Fires on standard document scroll or on any internal scroll container larger than half the viewport. Milestones reset on each `page` call. |
 
 ### Disabling specific auto-capture
