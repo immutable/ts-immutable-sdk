@@ -19,7 +19,7 @@ const mockStartCmpDetection = jest.fn().mockReturnValue(mockTeardownCmp);
 const mockEnqueue = jest.fn();
 const mockStart = jest.fn();
 const mockDestroy = jest.fn();
-const mockGetOrCreateSession = jest.fn().mockReturnValue({ sessionId: 'session-abc', isNew: true });
+const mockGetOrCreateSessionId = jest.fn().mockReturnValue('session-abc');
 
 jest.mock('@imtbl/audience-core', () => ({
   MessageQueue: jest.fn().mockImplementation(() => ({
@@ -48,7 +48,7 @@ jest.mock('@imtbl/audience-core', () => ({
   }),
   collectThirdPartyIds: (...args: unknown[]) => mockCollectThirdPartyIds(...args),
   setupAutocapture: (...args: unknown[]) => mockSetupAutocapture(...args),
-  getOrCreateSession: (...args: unknown[]) => mockGetOrCreateSession(...args),
+  getOrCreateSessionId: (...args: unknown[]) => mockGetOrCreateSessionId(...args),
   startCmpDetection: (...args: unknown[]) => mockStartCmpDetection(...args),
   createConsentManager: jest.fn().mockImplementation(
     (
@@ -75,7 +75,7 @@ let activePixel: Pixel | null = null;
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-abc', isNew: true });
+  mockGetOrCreateSessionId.mockReturnValue('session-abc');
 });
 
 afterEach(() => {
@@ -88,53 +88,29 @@ afterEach(() => {
 
 describe('Pixel', () => {
   describe('init', () => {
-    it('creates queue, starts it, and fires page view + session_start when consent is anonymous', () => {
+    it('creates queue, starts it, and fires page view when consent is anonymous', () => {
       const pixel = new Pixel();
       activePixel = pixel;
       pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
 
       expect(mockStart).toHaveBeenCalled();
 
-      // Should fire session_start (new session) then page view
       const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
       const pageCall = calls.find((c) => c.type === 'page');
-      const sessionStartCall = calls.find(
-        (c) => c.type === 'track' && c.eventName === 'session_start',
-      );
 
       expect(pageCall).toBeDefined();
       expect(pageCall!.surface).toBe('pixel');
       expect(pageCall!.anonymousId).toBe('anon-123');
       expect((pageCall!.properties as Record<string, unknown>).utm_source).toBe('google');
-
-      expect(sessionStartCall).toBeDefined();
-      expect(sessionStartCall!.sessionId).toBe('session-abc');
     });
 
-    it('does not fire page view or session_start when consent is none', () => {
+    it('does not fire page view when consent is none', () => {
       const pixel = new Pixel();
       activePixel = pixel;
       pixel.init({ key: 'pk_imapik-test-local', consent: 'none' });
 
       expect(mockStart).toHaveBeenCalled();
       expect(mockEnqueue).not.toHaveBeenCalled();
-    });
-
-    it('does not fire session_start for existing sessions', () => {
-      mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-abc', isNew: false });
-
-      const pixel = new Pixel();
-      activePixel = pixel;
-      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
-
-      const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
-      const sessionStartCall = calls.find(
-        (c) => c.type === 'track' && c.eventName === 'session_start',
-      );
-
-      expect(sessionStartCall).toBeUndefined();
-      // Page view should still fire
-      expect(calls.find((c) => c.type === 'page')).toBeDefined();
     });
 
     it('only initializes once', () => {
@@ -149,7 +125,7 @@ describe('Pixel', () => {
 
   describe('page', () => {
     it('enqueues a page message with attribution and session', () => {
-      mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-abc', isNew: false });
+      mockGetOrCreateSessionId.mockReturnValue('session-abc');
 
       const pixel = new Pixel();
       activePixel = pixel;
@@ -181,7 +157,7 @@ describe('Pixel', () => {
     });
 
     it('includes GA and Meta cookies in page properties when present', () => {
-      mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-abc', isNew: false });
+      mockGetOrCreateSessionId.mockReturnValue('session-abc');
       mockCollectThirdPartyIds.mockReturnValue({
         ga_client_id: 'GA1.2.123456.789012',
         fb_click_id: 'fb.1.1234567890.AbCdEf',
@@ -202,7 +178,7 @@ describe('Pixel', () => {
     });
 
     it('omits third-party IDs when cookies are not set', () => {
-      mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-abc', isNew: false });
+      mockGetOrCreateSessionId.mockReturnValue('session-abc');
       mockCollectThirdPartyIds.mockReturnValue({});
 
       const pixel = new Pixel();
@@ -259,72 +235,16 @@ describe('Pixel', () => {
   });
 
   describe('session id', () => {
-    it('stamps sessionId at the top level on both page and track (session_start) messages', () => {
-      // Default mock (isNew: true) means init() fires both a page view and a session_start track event.
+    it('stamps sessionId at the top level on the page view', () => {
       const pixel = new Pixel();
       activePixel = pixel;
       pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
 
       const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
       const pageCall = calls.find((c) => c.type === 'page');
-      const trackCall = calls.find((c) => c.type === 'track');
 
       expect(pageCall).toBeDefined();
-      expect(trackCall).toBeDefined();
       expect(pageCall!.sessionId).toBe('session-abc');
-      expect(trackCall!.sessionId).toBe('session-abc');
-    });
-  });
-
-  describe('session_end', () => {
-    it('fires session_end on pagehide when session is active', () => {
-      const pixel = new Pixel();
-      activePixel = pixel;
-      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
-      mockEnqueue.mockClear();
-
-      // Simulate pagehide
-      window.dispatchEvent(new Event('pagehide'));
-
-      expect(mockEnqueue).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'track',
-          eventName: 'session_end',
-          sessionId: 'session-abc',
-        }),
-      );
-    });
-
-    it('includes duration in session_end', () => {
-      const dateNowSpy = jest.spyOn(Date, 'now').mockReturnValue(1000000);
-
-      const pixel = new Pixel();
-      activePixel = pixel;
-      pixel.init({ key: 'pk_imapik-test-local', consent: 'anonymous' });
-      mockEnqueue.mockClear();
-
-      // Advance time by 15 seconds before triggering pagehide
-      dateNowSpy.mockReturnValue(1015000);
-      window.dispatchEvent(new Event('pagehide'));
-
-      const sessionEndCall = mockEnqueue.mock.calls.find(
-        (c: unknown[]) => (c[0] as Record<string, unknown>).eventName === 'session_end',
-      );
-      expect(sessionEndCall).toBeDefined();
-      expect((sessionEndCall![0] as Record<string, unknown>).properties).toEqual(
-        expect.objectContaining({ duration: 15 }),
-      );
-
-      dateNowSpy.mockRestore();
-    });
-
-    it('does not fire session_end when consent is none', () => {
-      const pixel = new Pixel();
-      activePixel = pixel;
-      pixel.init({ key: 'pk_imapik-test-local', consent: 'none' });
-
-      window.dispatchEvent(new Event('pagehide'));
-      expect(mockEnqueue).not.toHaveBeenCalled();
     });
   });
 
@@ -591,7 +511,7 @@ describe('Pixel', () => {
     });
 
     it('enqueue callback fires TrackMessage with session', () => {
-      mockGetOrCreateSession.mockReturnValue({ sessionId: 'session-xyz', isNew: false });
+      mockGetOrCreateSessionId.mockReturnValue('session-xyz');
 
       const pixel = new Pixel();
       activePixel = pixel;

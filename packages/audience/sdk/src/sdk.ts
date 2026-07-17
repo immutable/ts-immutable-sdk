@@ -25,15 +25,13 @@ import {
   collectContext,
   collectSessionAttribution,
   collectThirdPartyIds,
-  getOrCreateSession,
+  getOrCreateSessionId,
   createConsentManager,
   canTrack,
   canIdentify,
   detectDoNotTrack,
   isBrowser,
   setupAutocapture,
-  SESSION_START,
-  SESSION_END,
 } from '@imtbl/audience-core';
 import { adoptAnonymousId, resolvePrivacySignal } from '@imtbl/audience-core/internal';
 import { track } from '@imtbl/metrics';
@@ -79,8 +77,6 @@ export class Audience {
   private anonymousId: string;
 
   private sessionId: string | undefined;
-
-  private sessionStartTime: number | undefined;
 
   private userId: string | undefined;
 
@@ -128,7 +124,6 @@ export class Audience {
 
     const incomingAid = Audience.readAndStripAidParam();
 
-    let isNewSession = false;
     if (canTrack(consentLevel)) {
       if (incomingAid) {
         adoptAnonymousId(incomingAid, cookieDomain);
@@ -136,7 +131,7 @@ export class Audience {
       } else {
         this.anonymousId = getOrCreateAnonymousId(cookieDomain);
       }
-      isNewSession = this.startSession();
+      this.refreshSession();
     } else {
       this.anonymousId = getCookie(COOKIE_NAME) ?? generateId();
     }
@@ -167,10 +162,7 @@ export class Audience {
 
     this.attribution = collectSessionAttribution();
 
-    if (!this.isTrackingDisabled()) {
-      this.queue.start();
-      if (isNewSession) this.trackSessionStart();
-    }
+    if (!this.isTrackingDisabled()) this.queue.start();
 
     // Consent is checked at fire time by each handler, not here.
     const autocaptureResult = setupAutocapture(
@@ -218,22 +210,9 @@ export class Audience {
     return canIdentify(this.consent.level) ? this.userId : undefined;
   }
 
-  /** Create or resume a session, returning whether it's new. */
-  private startSession(): boolean {
-    const session = getOrCreateSession(this.cookieDomain);
-    this.sessionId = session.sessionId;
-    this.sessionStartTime = Date.now();
-    return session.isNew;
-  }
-
-  // Unlike startSession(), fires session_start directly: callers here always already have a queue.
+  /** Create or resume the rolling session and cache its ID. */
   private refreshSession(): void {
-    const session = getOrCreateSession(this.cookieDomain);
-    this.sessionId = session.sessionId;
-    if (session.isNew) {
-      this.sessionStartTime = Date.now();
-      this.trackSessionStart();
-    }
+    this.sessionId = getOrCreateSessionId(this.cookieDomain);
   }
 
   // --- Message factory ---
@@ -255,32 +234,6 @@ export class Audience {
   private enqueue(label: string, message: Message): void {
     this.queue.enqueue(message);
     this.debug.logEvent(label, message);
-  }
-
-  // --- Session lifecycle ---
-
-  private trackSessionStart(): void {
-    if (!this.sessionId) return;
-    this.enqueue('track(session_start)', {
-      ...this.baseMessage(),
-      type: 'track',
-      eventName: SESSION_START,
-      properties: { ...this.attribution },
-    });
-  }
-
-  private trackSessionEnd(): void {
-    if (!this.sessionId) return;
-    this.enqueue('track(session_end)', {
-      ...this.baseMessage(),
-      type: 'track',
-      eventName: SESSION_END,
-      properties: {
-        ...(this.sessionStartTime && {
-          duration: Math.round((Date.now() - this.sessionStartTime) / 1000),
-        }),
-      },
-    });
   }
 
   // --- Page tracking ---
@@ -462,9 +415,8 @@ export class Audience {
 
     if (isUpgradeFromNone) {
       this.isFirstPage = true;
-      const isNewSession = this.startSession();
+      this.refreshSession();
       this.queue.start();
-      if (isNewSession) this.trackSessionStart();
     }
   }
 
@@ -524,12 +476,10 @@ export class Audience {
     deleteCookie(SESSION_COOKIE, this.cookieDomain);
     if (!this.isTrackingDisabled()) {
       this.anonymousId = getOrCreateAnonymousId(this.cookieDomain);
-      const isNewSession = this.startSession();
-      if (isNewSession) this.trackSessionStart();
+      this.refreshSession();
     } else {
       this.anonymousId = generateId();
       this.sessionId = undefined;
-      this.sessionStartTime = undefined;
     }
     this.isFirstPage = true;
   }
@@ -549,7 +499,6 @@ export class Audience {
   shutdown(): void {
     if (this.destroyed) return;
     this.destroyed = true;
-    if (!this.isTrackingDisabled()) this.trackSessionEnd();
     this.teardownAutocapture?.();
     this.queue.destroy();
     Audience.liveInstances = Math.max(0, Audience.liveInstances - 1);

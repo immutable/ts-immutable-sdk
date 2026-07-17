@@ -1,5 +1,5 @@
 import {
-  COOKIE_NAME, SESSION_COOKIE, SESSION_START, SESSION_END,
+  COOKIE_NAME, SESSION_COOKIE,
 } from '@imtbl/audience-core';
 import { track } from '@imtbl/metrics';
 import { Audience } from './sdk';
@@ -263,47 +263,6 @@ describe('Audience', () => {
 
       const sdk = createSDK({ consent: 'none' });
       expect(sdk.getAnonymousId()).not.toBe('a1b2c3d4-e5f6-7890-abcd-ef1234567890');
-      sdk.shutdown();
-    });
-
-    it('emits session_start on new session', async () => {
-      const sdk = createSDK({ consent: 'full' });
-      await sdk.flush();
-
-      const msg = sentMessages().find(
-        (m: any) => m.type === 'track' && m.eventName === SESSION_START,
-      );
-      expect(msg).toBeDefined();
-      expect(msg).toHaveProperty('sessionId');
-
-      sdk.shutdown();
-    });
-
-    it('includes attribution on session_start', async () => {
-      Object.defineProperty(window, 'location', {
-        value: {
-          ...window.location,
-          search: '?utm_source=youtube&utm_campaign=launch',
-          href: 'https://studio.com/?utm_source=youtube&utm_campaign=launch',
-          protocol: 'https:',
-          pathname: '/',
-        },
-        writable: true,
-        configurable: true,
-      });
-      sessionStorage.clear();
-
-      const sdk = createSDK({ consent: 'full' });
-      await sdk.flush();
-
-      const msg = sentMessages().find(
-        (m: any) => m.type === 'track' && m.eventName === SESSION_START,
-      );
-      expect(msg).toBeDefined();
-      expect(msg).toHaveProperty('sessionId');
-      expect(msg.properties).toHaveProperty('utm_source', 'youtube');
-      expect(msg.properties).toHaveProperty('utm_campaign', 'launch');
-
       sdk.shutdown();
     });
   });
@@ -754,17 +713,12 @@ describe('Audience', () => {
       sdk.track('purchase', { currency: 'USD', value: 2 });
       await sdk.flush();
 
-      const msgs = sentMessages();
-      const sessionStarts = msgs.filter(
-        (m: any) => m.type === 'track' && m.eventName === SESSION_START,
-      );
-      const purchases = msgs.filter(
+      const purchases = sentMessages().filter(
         (m: any) => m.type === 'track' && m.eventName === 'purchase',
       );
 
-      expect(sessionStarts).toHaveLength(2);
+      expect(purchases[1].sessionId).toEqual(expect.any(String));
       expect(purchases[1].sessionId).not.toBe(firstSessionId);
-      expect(purchases[1].sessionId).toBe(sessionStarts[1].sessionId);
 
       sdk.shutdown();
     });
@@ -1164,7 +1118,7 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
-    it('starts queue and emits session_start when upgrading from none', async () => {
+    it('starts queue when upgrading from none', async () => {
       const sdk = createSDK({ consent: 'none' });
 
       sdk.track('sign_up', { method: 'google' });
@@ -1175,14 +1129,7 @@ describe('Audience', () => {
       sdk.track('sign_up', { method: 'google' });
       await sdk.flush();
 
-      const msgs = sentMessages();
-      const sessionStart = msgs.find(
-        (m: any) => m.type === 'track' && m.eventName === SESSION_START,
-      );
-      expect(sessionStart).toBeDefined();
-      expect(sessionStart).toHaveProperty('sessionId');
-
-      const signUp = msgs.find(
+      const signUp = sentMessages().find(
         (m: any) => m.type === 'track' && m.eventName === 'sign_up',
       );
       expect(signUp).toBeDefined();
@@ -1283,27 +1230,6 @@ describe('Audience', () => {
   });
 
   describe('shutdown', () => {
-    it('emits session_end with duration', async () => {
-      const sdk = createSDK({ consent: 'full' });
-      await sdk.flush();
-      fetchCalls.length = 0;
-
-      jest.advanceTimersByTime(5000);
-      sdk.shutdown();
-
-      // destroy() calls flushUnload() which fires a keepalive fetch synchronously.
-      // Yield to ensure all microtasks settle before reading fetchCalls.
-      await Promise.resolve();
-      await Promise.resolve();
-
-      const msg = sentMessages().find(
-        (m: any) => m.type === 'track' && m.eventName === SESSION_END,
-      );
-      expect(msg).toBeDefined();
-      expect(msg).toHaveProperty('sessionId');
-      expect(msg.properties.duration).toBe(5);
-    });
-
     it('is safe to call twice (React strict mode)', async () => {
       const sdk = createSDK({ consent: 'full' });
       sdk.shutdown();
@@ -1312,23 +1238,11 @@ describe('Audience', () => {
       await Promise.resolve();
       fetchCalls.length = 0;
 
-      sdk.shutdown();
+      expect(() => sdk.shutdown()).not.toThrow();
       await Promise.resolve();
       await Promise.resolve();
 
-      const sessionEnds = sentMessages().filter(
-        (m: any) => m.eventName === SESSION_END,
-      );
-      expect(sessionEnds).toHaveLength(0);
-    });
-
-    it('does not emit session_end at none consent', async () => {
-      const sdk = createSDK({ consent: 'none' });
-      sdk.shutdown();
-
-      expect(sentMessages().filter(
-        (m: any) => m.eventName === SESSION_END,
-      )).toHaveLength(0);
+      expect(sentMessages()).toHaveLength(0);
     });
   });
 
@@ -1373,22 +1287,6 @@ describe('Audience', () => {
       expect(msg.userId).toBeUndefined();
       expect(msg.anonymousId).toBeDefined();
       expect(msg.anonymousId).not.toBe(originalAnonId);
-
-      sdk.shutdown();
-    });
-
-    it('emits session_start after reset', async () => {
-      const sdk = createSDK({ consent: 'full' });
-      await sdk.flush();
-      fetchCalls.length = 0;
-
-      sdk.reset();
-      await sdk.flush();
-
-      const sessionStarts = sentMessages().filter(
-        (m: any) => m.type === 'track' && m.eventName === SESSION_START,
-      );
-      expect(sessionStarts).toHaveLength(1);
 
       sdk.shutdown();
     });

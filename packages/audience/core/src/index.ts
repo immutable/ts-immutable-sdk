@@ -25,8 +25,6 @@ export {
   BASE_URL,
   COOKIE_NAME,
   SESSION_COOKIE,
-  SESSION_START,
-  SESSION_END,
   DATA_PATH,
 } from './config';
 
@@ -40,8 +38,7 @@ export { MessageQueue } from './queue';
 export { collectContext } from './context';
 export { isTimestampValid, isAliasValid, truncate } from './validation';
 
-export { getOrCreateSession } from './session';
-export type { SessionResult } from './session';
+export { getOrCreateSessionId } from './session';
 
 export { collectSessionAttribution, collectPageAttribution } from './attribution';
 export type { Attribution } from './attribution';
