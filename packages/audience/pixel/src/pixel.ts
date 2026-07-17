@@ -13,10 +13,9 @@ import {
   collectContext,
   generateId,
   getTimestamp,
-  isBrowser,
   collectSessionAttribution,
   collectThirdPartyIds,
-  getOrCreateSession,
+  getOrCreateSessionId,
   createConsentManager,
   canTrack,
   startCmpDetection,
@@ -51,8 +50,6 @@ export class Pixel {
 
   private sessionId: string | undefined;
 
-  private sessionStartTime: number | undefined;
-
   private publishableKey = '';
 
   private domain: string | undefined;
@@ -60,8 +57,6 @@ export class Pixel {
   private testMode = false;
 
   private initialized = false;
-
-  private unloadHandler?: () => void;
 
   private teardownAutocapture?: () => void;
 
@@ -110,10 +105,6 @@ export class Pixel {
 
     this.initialized = true;
 
-    // Register session_end listener BEFORE starting the queue so that
-    // on page unload, session_end is enqueued before the queue flushes.
-    // DOM event listeners fire in registration order.
-    this.registerSessionEnd();
     this.queue.start();
 
     if (isAutoConsent) {
@@ -140,8 +131,7 @@ export class Pixel {
     // Reset scroll milestones so each page view starts from 0.
     this.resetScrollDepth?.();
 
-    const { sessionId, isNew } = getOrCreateSession(this.domain);
-    this.refreshSession(sessionId, isNew);
+    this.sessionId = getOrCreateSessionId(this.domain);
     const attribution = collectSessionAttribution();
     const thirdPartyIds = collectThirdPartyIds();
 
@@ -173,7 +163,6 @@ export class Pixel {
   }
 
   destroy(): void {
-    this.removeSessionEnd();
     if (this.teardownCmp) {
       this.teardownCmp();
       this.teardownCmp = undefined;
@@ -221,8 +210,7 @@ export class Pixel {
   private track(eventName: string, properties: Record<string, unknown>): void {
     if (!this.isTrackingAllowed()) return;
 
-    const { sessionId, isNew } = getOrCreateSession(this.domain);
-    this.refreshSession(sessionId, isNew);
+    this.sessionId = getOrCreateSessionId(this.domain);
 
     const message: TrackMessage = {
       ...this.buildBase(),
@@ -233,69 +221,6 @@ export class Pixel {
     };
 
     this.queue!.enqueue(message);
-  }
-
-  // -- Session lifecycle --------------------------------------------------
-
-  private refreshSession(sessionId: string, isNew: boolean): void {
-    this.sessionId = sessionId;
-    if (isNew) {
-      this.sessionStartTime = Date.now();
-      this.fireSessionStart();
-    }
-  }
-
-  private fireSessionStart(): void {
-    if (!this.isTrackingAllowed()) return;
-
-    const message: TrackMessage = {
-      ...this.buildBase(),
-      type: 'track',
-      eventName: 'session_start',
-      userId: undefined,
-    };
-
-    this.queue!.enqueue(message);
-  }
-
-  private fireSessionEnd(): void {
-    if (!this.isTrackingAllowed() || !this.sessionId) return;
-
-    const duration = this.sessionStartTime
-      ? Math.round((Date.now() - this.sessionStartTime) / 1000)
-      : undefined;
-
-    const message: TrackMessage = {
-      ...this.buildBase(),
-      type: 'track',
-      eventName: 'session_end',
-      properties: { duration },
-      userId: undefined,
-    };
-
-    this.queue!.enqueue(message);
-  }
-
-  private registerSessionEnd(): void {
-    if (!isBrowser()) return;
-
-    this.unloadHandler = () => {
-      this.fireSessionEnd();
-    };
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        this.unloadHandler?.();
-      }
-    });
-    window.addEventListener('pagehide', this.unloadHandler);
-  }
-
-  private removeSessionEnd(): void {
-    if (this.unloadHandler) {
-      window.removeEventListener('pagehide', this.unloadHandler);
-      this.unloadHandler = undefined;
-    }
   }
 
   // -- Helpers ------------------------------------------------------------
