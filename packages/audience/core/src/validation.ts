@@ -16,6 +16,18 @@ export function isTimestampValid(eventTimestamp: string): boolean {
   return ts <= now + MAX_FUTURE_MS && ts >= now - MAX_PAST_MS;
 }
 
+const PASSPORT_ID_RE = /^[^|]+\|[^|]+$/;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Validate that an ID looks like a Passport ID: either `<connection>|<id>`
+ * (e.g. `email|abc123`, `google-oauth2|456`) or a bare UUID.
+ */
+export function isPassportIdValid(id: string): boolean {
+  const trimmed = id.trim();
+  return PASSPORT_ID_RE.test(trimmed) || UUID_RE.test(trimmed);
+}
+
 /**
  * Validate that alias from and to are not the same identity.
  */

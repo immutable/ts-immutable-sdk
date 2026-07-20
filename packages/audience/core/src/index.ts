@@ -36,7 +36,9 @@ export type { TransportResult, AudienceErrorCode } from './errors';
 export { TransportError, AudienceError } from './errors';
 export { MessageQueue } from './queue';
 export { collectContext } from './context';
-export { isTimestampValid, isAliasValid, truncate } from './validation';
+export {
+  isTimestampValid, isAliasValid, isPassportIdValid, truncate,
+} from './validation';
 
 export { getOrCreateSessionId } from './session';
 

@@ -1,6 +1,7 @@
 import {
   isTimestampValid,
   isAliasValid,
+  isPassportIdValid,
   truncate,
   truncateSource,
 } from './validation';
@@ -46,6 +47,40 @@ describe('isAliasValid', () => {
 
   it('returns false when from and to are identical', () => {
     expect(isAliasValid('user@example.com', 'email', 'user@example.com', 'email')).toBe(false);
+  });
+});
+
+describe('isPassportIdValid', () => {
+  it('accepts a connection|id shaped ID', () => {
+    expect(isPassportIdValid('email|abc123')).toBe(true);
+  });
+
+  it('accepts a google-oauth2 connection ID', () => {
+    expect(isPassportIdValid('google-oauth2|11261203362550278288455')).toBe(true);
+  });
+
+  it('accepts a bare UUID', () => {
+    expect(isPassportIdValid('550e8400-e29b-41d4-a716-446655440000')).toBe(true);
+  });
+
+  it('rejects an ID with no pipe and not a UUID', () => {
+    expect(isPassportIdValid('12345')).toBe(false);
+  });
+
+  it('rejects an ID with more than one pipe', () => {
+    expect(isPassportIdValid('email|abc|123')).toBe(false);
+  });
+
+  it('rejects an empty string', () => {
+    expect(isPassportIdValid('')).toBe(false);
+  });
+
+  it('accepts a UUID with surrounding whitespace, e.g. from a trailing newline in a text field', () => {
+    expect(isPassportIdValid(' 550e8400-e29b-41d4-a716-446655440000\n')).toBe(true);
+  });
+
+  it('does not let surrounding whitespace alone turn an invalid ID into a valid one', () => {
+    expect(isPassportIdValid('  12345  ')).toBe(false);
   });
 });
 

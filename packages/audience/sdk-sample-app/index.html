@@ -208,7 +208,15 @@
                 Identify user
                 <small class="btn-sig">identify(id, type, traits)</small>
               </button>
+              <button id="btn-identify-invalid-example" disabled>
+                Fill invalid Passport ID example
+                <small class="btn-sig">id "12345", type passport</small>
+              </button>
             </div>
+            <p class="helper-text">
+              Fills in an ID that isn't Passport-shaped with identity type Passport, so you can
+              click "Identify user" and see the SDK warn and drop the call.
+            </p>
           </div>
         </details>
 
