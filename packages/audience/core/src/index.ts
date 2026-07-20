@@ -37,7 +37,13 @@ export { TransportError, AudienceError } from './errors';
 export { MessageQueue } from './queue';
 export { collectContext } from './context';
 export {
-  isTimestampValid, isAliasValid, isPassportIdValid, truncate,
+  isTimestampValid,
+  isAliasValid,
+  isPassportIdValid,
+  isValidConsentLevel,
+  isValidIdentityType,
+  hasValue,
+  truncate,
 } from './validation';
 
 export { getOrCreateSessionId } from './session';

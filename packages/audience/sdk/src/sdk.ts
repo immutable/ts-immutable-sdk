@@ -22,6 +22,9 @@ import {
   isAliasValid,
   isTimestampValid,
   isPassportIdValid,
+  isValidConsentLevel,
+  isValidIdentityType,
+  hasValue,
   truncate,
   collectContext,
   collectSessionAttribution,
@@ -48,15 +51,18 @@ const UTM_EVENTS: ReadonlySet<string> = new Set([
   'sign_up', 'link_clicked',
 ]);
 
-// Bypasses the debug gate: a caller bug, not routine noise. The sample app
-// string-matches "doesn't look like a Passport ID" to detect a drop — keep
-// that phrase if this wording changes.
-function warnMalformedPassportId(method: string, typeLabel: string, idLabel: string, id: string): void {
-  // eslint-disable-next-line no-console
-  console.warn(
-    `${LOG_PREFIX} ${method} called with ${typeLabel} 'passport' but ${idLabel} "${id}" doesn't look `
+// Thrown so a caller bug can't be missed the way a console warning can be.
+function invalidCall(message: string): never {
+  throw new Error(`${LOG_PREFIX} ${message}`);
+}
+
+// The sample app string-matches "doesn't look like a Passport ID" to detect
+// this failure — keep that phrase if this wording changes.
+function invalidPassportId(method: string, typeLabel: string, idLabel: string, id: string): never {
+  invalidCall(
+    `${method} called with ${typeLabel} 'passport' but ${idLabel} "${id}" doesn't look `
     + 'like a Passport ID (expected a format like "email|123" or a UUID). Check you\'re passing '
-    + 'the Passport user ID, not your own internal user ID. Call ignored.',
+    + 'the Passport user ID, not your own internal user ID.',
   );
 }
 
@@ -291,7 +297,7 @@ export class Audience {
    * `sign_up` and `link_clicked` events automatically include the UTM
    * attribution captured at session start. All events include `sessionId`.
    *
-   * No-op when consent is 'none'.
+   * No-op when consent is 'none'. Throws if the event name is empty.
    */
   track<E extends AudienceEventName | string & {}>(
     event: E,
@@ -300,6 +306,7 @@ export class Audience {
       : [properties: PropsFor<E>]
   ): void {
     if (this.isTrackingDisabled()) return;
+    if (!hasValue(event)) invalidCall('track() called with an empty event name.');
     this.refreshSession();
 
     const [properties] = args;
@@ -327,17 +334,20 @@ export class Audience {
    * `sdk.identify('user@example.com', 'email', { name: 'Jane' })`
    *
    * Requires 'full' consent. When `identityType` is `'passport'`, the id must
-   * look like a real Passport id (`connection|id` or a UUID) — otherwise the
-   * call is dropped and a warning is logged.
+   * look like a real Passport id (`connection|id` or a UUID) — otherwise this
+   * throws.
    */
   identify(id: string, identityType: IdentityType, traits?: UserTraits): void {
     if (!canIdentify(this.consent.level)) {
       this.debug.logWarning('identify() requires full consent — call ignored.');
       return;
     }
+    if (!hasValue(id)) invalidCall('identify() called with an empty id.');
+    if (!isValidIdentityType(identityType)) {
+      invalidCall(`identify() called with unrecognised identityType "${identityType}".`);
+    }
     if (identityType === IdentityType.Passport && !isPassportIdValid(id)) {
-      warnMalformedPassportId('identify()', 'identityType', 'id', id);
-      return;
+      invalidPassportId('identify()', 'identityType', 'id', id);
     }
     this.refreshSession();
 
@@ -360,7 +370,7 @@ export class Audience {
    *
    * Requires 'full' consent. `from` and `to` must differ. When either side's
    * `identityType` is `'passport'`, that side's id must look like a real
-   * Passport id (`connection|id` or a UUID) — otherwise the call is dropped.
+   * Passport id (`connection|id` or a UUID) — otherwise this throws.
    */
   alias(
     from: { id: string; identityType: IdentityType },
@@ -370,17 +380,22 @@ export class Audience {
       this.debug.logWarning('alias() requires full consent — call ignored.');
       return;
     }
-    if (!isAliasValid(from.id, from.identityType, to.id, to.identityType)) {
-      this.debug.logWarning('alias() from and to are identical — call ignored.');
-      return;
+    if (!hasValue(from.id) || !hasValue(to.id)) {
+      invalidCall('alias() called with an empty from.id or to.id.');
+    }
+    if (!isValidIdentityType(from.identityType) || !isValidIdentityType(to.identityType)) {
+      invalidCall(
+        `alias() called with an unrecognised identityType ("${from.identityType}"/"${to.identityType}").`,
+      );
+    }
+    if (!isAliasValid(from.id, to.id)) {
+      invalidCall('alias() from and to are identical.');
     }
     if (from.identityType === IdentityType.Passport && !isPassportIdValid(from.id)) {
-      warnMalformedPassportId('alias()', 'from.identityType', 'from.id', from.id);
-      return;
+      invalidPassportId('alias()', 'from.identityType', 'from.id', from.id);
     }
     if (to.identityType === IdentityType.Passport && !isPassportIdValid(to.id)) {
-      warnMalformedPassportId('alias()', 'to.identityType', 'to.id', to.id);
-      return;
+      invalidPassportId('alias()', 'to.identityType', 'to.id', to.id);
     }
     this.refreshSession();
 
@@ -403,8 +418,13 @@ export class Audience {
    * - 'none': all tracking stops, cookies are cleared.
    * - 'anonymous': track activity without knowing who the player is.
    * - 'full': track everything including player identity.
+   *
+   * Throws if `level` isn't one of the above.
    */
   setConsent(level: ConsentLevel): void {
+    if (!isValidConsentLevel(level)) {
+      invalidCall(`setConsent() called with unrecognised level "${level}".`);
+    }
     const privacySignalActive = detectDoNotTrack();
     const effective: ConsentLevel = privacySignalActive ? 'none' : level;
 

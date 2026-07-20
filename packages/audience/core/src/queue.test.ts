@@ -144,6 +144,51 @@ describe('MessageQueue', () => {
     expect(queue.length).toBe(1);
   });
 
+  it('filters stale messages before a flush attempt, not just on restore', async () => {
+    // A message enqueued fresh can still go stale while waiting for a flush
+    // (offline, backoff, backgrounded tab) without the page ever reloading,
+    // so staleFilter has to run again here too, not only at construction.
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const onError = jest.fn();
+    const queue = createQueue(send, {
+      staleFilter: (m) => m.messageId === 'fresh',
+      onError,
+    });
+
+    queue.enqueue(makeMessage('fresh'));
+    queue.enqueue(makeMessage('stale'));
+    expect(queue.length).toBe(2);
+
+    await queue.flush();
+
+    expect(send).toHaveBeenCalledTimes(1);
+    const [, , payload] = send.mock.calls[0];
+    expect((payload as { messages: Message[] }).messages).toHaveLength(1);
+    expect((payload as { messages: Message[] }).messages[0].messageId).toBe('fresh');
+    expect(onError).toHaveBeenCalledWith(expect.objectContaining({
+      code: 'VALIDATION_REJECTED',
+      status: 0,
+    }));
+  });
+
+  it('drops a batch that is entirely stale without attempting to send', async () => {
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const onError = jest.fn();
+    const queue = createQueue(send, {
+      staleFilter: () => false,
+      onError,
+    });
+
+    queue.enqueue(makeMessage('stale-1'));
+    queue.enqueue(makeMessage('stale-2'));
+
+    await queue.flush();
+
+    expect(send).not.toHaveBeenCalled();
+    expect(queue.length).toBe(0);
+    expect(onError).toHaveBeenCalledWith(expect.objectContaining({ code: 'VALIDATION_REJECTED' }));
+  });
+
   it('does not flush concurrently', async () => {
     let resolveFirst: () => void;
     const firstCall = new Promise<TransportResult>((r) => { resolveFirst = () => r(okResult); });

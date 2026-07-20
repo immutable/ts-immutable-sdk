@@ -258,10 +258,6 @@
   var currentSessionId = null;
   var pendingQueueCount = 0;
 
-  // Set by the console mirror when the SDK rejects a passport id, so
-  // onIdentify() can tell a dropped call from one that went through.
-  var lastIdentifyRejected = false;
-
   function installConsoleMirror() {
     var originalLog = console.log.bind(console);
     var originalWarn = console.warn.bind(console);
@@ -287,7 +283,6 @@
       var msg = args[0].slice(11);
       var payload = args.length > 1 ? args[1] : undefined;
       harvestIds(payload);
-      if (msg.indexOf("doesn't look like a Passport ID") !== -1) lastIdentifyRejected = true;
       // Promote flush outcomes to ok/err so they stand out in the log.
       var flushMatch = msg.match(/^flush (ok|failed)/);
       if (flushMatch && flushMatch[1] === 'ok') { pendingQueueCount = 0; updateStatus(); }
@@ -823,12 +818,7 @@
     try { traits = parseTraits($('id-traits').value); }
     catch (err) { log('identify()', 'invalid traits JSON: ' + err.message, 'err'); return; }
     try {
-      lastIdentifyRejected = false;
       audience.identify(id, type, traits);
-      if (lastIdentifyRejected) {
-        log('identify()', 'dropped — invalid Passport ID (see warning above)', 'err');
-        return;
-      }
       enqueued();
       currentUserId = id;
       identityMirror.userId = id;
@@ -849,7 +839,8 @@
     var fromType = $('alias-from-type').value;
     var toId = $('alias-to-id').value.trim();
     var toType = $('alias-to-type').value;
-    if (!fromId || !toId || (fromId === toId && fromType === toType)) {
+    // Matches the SDK: ids alone decide equality, identityType isn't a factor.
+    if (!fromId || !toId || fromId === toId) {
       log('alias()', 'from and to must both be set and differ', 'err');
       return;
     }
