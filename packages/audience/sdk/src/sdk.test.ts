@@ -722,6 +722,16 @@ describe('Audience', () => {
 
       sdk.shutdown();
     });
+
+    it('throws when the event name is empty', async () => {
+      const sdk = createSDK();
+
+      expect(() => sdk.track('')).toThrow(/empty event name/);
+      await sdk.flush();
+      expect(sentMessages().filter((m: any) => m.type === 'track')).toHaveLength(0);
+
+      sdk.shutdown();
+    });
   });
 
   describe('page', () => {
@@ -985,75 +995,49 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
-    it('warns and drops the call when identityType is passport but the id is not passport shaped', async () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    it('throws when identityType is passport but the id is not passport shaped', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.identify('12345', 'passport');
+      expect(() => sdk.identify('12345', 'passport')).toThrow(/doesn't look like a/);
       await sdk.flush();
-
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('doesn\'t look like a'));
       const ids = sentMessages().filter((m: any) => m.type === 'identify');
       expect(ids).toHaveLength(0);
 
-      warnSpy.mockRestore();
       sdk.shutdown();
     });
 
-    it('warns without needing debug mode enabled', async () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-      const sdk = createSDK({ consent: 'full', debug: false });
-
-      sdk.identify('12345', 'passport');
-
-      expect(warnSpy).toHaveBeenCalled();
-
-      warnSpy.mockRestore();
-      sdk.shutdown();
-    });
-
-    it('does not persist userId after a dropped passport identify, so later track calls stay anonymous', async () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    it('does not persist userId after a rejected passport identify, so later track calls stay anonymous', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.identify('12345', 'passport');
+      expect(() => sdk.identify('12345', 'passport')).toThrow();
       sdk.track('sign_up', { method: 'email' });
       await sdk.flush();
 
       const trackMsg = sentMessages().find((m: any) => m.eventName === 'sign_up');
       expect(trackMsg.userId).toBeUndefined();
 
-      warnSpy.mockRestore();
       sdk.shutdown();
     });
 
-    it('does not warn for a passport shaped id', async () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    it('does not throw for a passport shaped id', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.identify('email|abc123', 'passport');
+      expect(() => sdk.identify('email|abc123', 'passport')).not.toThrow();
       await sdk.flush();
-
-      expect(warnSpy).not.toHaveBeenCalled();
       const msg = sentMessages().find((m: any) => m.type === 'identify');
       expect(msg).toBeDefined();
 
-      warnSpy.mockRestore();
       sdk.shutdown();
     });
 
-    it('does not warn for a bare UUID passport id', async () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    it('does not throw for a bare UUID passport id', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.identify('550e8400-e29b-41d4-a716-446655440000', 'passport');
+      expect(() => sdk.identify('550e8400-e29b-41d4-a716-446655440000', 'passport')).not.toThrow();
       await sdk.flush();
-
-      expect(warnSpy).not.toHaveBeenCalled();
       const msg = sentMessages().find((m: any) => m.type === 'identify');
       expect(msg).toBeDefined();
 
-      warnSpy.mockRestore();
       sdk.shutdown();
     });
 
@@ -1069,18 +1053,34 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
-    it('does not warn for non-passport identity types regardless of id shape', async () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    it('does not throw for non-passport identity types regardless of id shape', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.identify('12345', 'steam');
+      expect(() => sdk.identify('12345', 'steam')).not.toThrow();
       await sdk.flush();
-
-      expect(warnSpy).not.toHaveBeenCalled();
       const msg = sentMessages().find((m: any) => m.type === 'identify');
       expect(msg).toBeDefined();
 
-      warnSpy.mockRestore();
+      sdk.shutdown();
+    });
+
+    it('throws when id is empty', async () => {
+      const sdk = createSDK({ consent: 'full' });
+
+      expect(() => sdk.identify('', 'steam')).toThrow(/empty id/);
+      await sdk.flush();
+      expect(sentMessages().filter((m: any) => m.type === 'identify')).toHaveLength(0);
+
+      sdk.shutdown();
+    });
+
+    it('throws when identityType is not recognised', async () => {
+      const sdk = createSDK({ consent: 'full' });
+
+      expect(() => sdk.identify('player-1', 'facebook' as never)).toThrow(/unrecognised identityType/);
+      await sdk.flush();
+      expect(sentMessages().filter((m: any) => m.type === 'identify')).toHaveLength(0);
+
       sdk.shutdown();
     });
   });
@@ -1104,13 +1104,13 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
-    it('rejects alias when from and to are identical', async () => {
+    it('throws when from and to are identical', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.alias(
+      expect(() => sdk.alias(
         { id: 'same_id', identityType: 'steam' },
         { id: 'same_id', identityType: 'steam' },
-      );
+      )).toThrow(/from and to are identical/);
       await sdk.flush();
 
       const aliases = sentMessages().filter((m: any) => m.type === 'alias');
@@ -1119,48 +1119,74 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
-    it('warns and drops the call when to.identityType is passport but to.id is not passport shaped', async () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    it('throws when the ids match even if identityType differs, matching the backend', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.alias(TEST_STEAM, { id: '12345', identityType: 'passport' });
+      expect(() => sdk.alias(
+        { id: 'same_id', identityType: 'steam' },
+        { id: 'same_id', identityType: 'email' },
+      )).toThrow(/from and to are identical/);
       await sdk.flush();
 
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('doesn\'t look like a'));
       const aliases = sentMessages().filter((m: any) => m.type === 'alias');
       expect(aliases).toHaveLength(0);
 
-      warnSpy.mockRestore();
       sdk.shutdown();
     });
 
-    it('warns and drops the call when from.identityType is passport but from.id is not passport shaped', async () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    it('throws when from.id or to.id is empty', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.alias({ id: '12345', identityType: 'passport' }, TEST_STEAM);
+      expect(() => sdk.alias({ id: '', identityType: 'steam' }, TEST_USER)).toThrow(/empty from.id or to.id/);
       await sdk.flush();
+      expect(sentMessages().filter((m: any) => m.type === 'alias')).toHaveLength(0);
 
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('doesn\'t look like a'));
+      sdk.shutdown();
+    });
+
+    it('throws when either identityType is not recognised', async () => {
+      const sdk = createSDK({ consent: 'full' });
+
+      expect(() => sdk.alias({ id: 'fb-id', identityType: 'facebook' as never }, TEST_USER))
+        .toThrow(/unrecognised identityType/);
+      await sdk.flush();
+      expect(sentMessages().filter((m: any) => m.type === 'alias')).toHaveLength(0);
+
+      sdk.shutdown();
+    });
+
+    it('throws when to.identityType is passport but to.id is not passport shaped', async () => {
+      const sdk = createSDK({ consent: 'full' });
+
+      expect(() => sdk.alias(TEST_STEAM, { id: '12345', identityType: 'passport' }))
+        .toThrow(/doesn't look like a/);
+      await sdk.flush();
       const aliases = sentMessages().filter((m: any) => m.type === 'alias');
       expect(aliases).toHaveLength(0);
 
-      warnSpy.mockRestore();
       sdk.shutdown();
     });
 
-    it('does not warn when the passport side has a passport-shaped id', async () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    it('throws when from.identityType is passport but from.id is not passport shaped', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.alias(TEST_STEAM, { id: 'email|abc123', identityType: 'passport' });
+      expect(() => sdk.alias({ id: '12345', identityType: 'passport' }, TEST_STEAM))
+        .toThrow(/doesn't look like a/);
       await sdk.flush();
+      const aliases = sentMessages().filter((m: any) => m.type === 'alias');
+      expect(aliases).toHaveLength(0);
 
-      expect(warnSpy).not.toHaveBeenCalled();
+      sdk.shutdown();
+    });
+
+    it('does not throw when the passport side has a passport-shaped id', async () => {
+      const sdk = createSDK({ consent: 'full' });
+
+      expect(() => sdk.alias(TEST_STEAM, { id: 'email|abc123', identityType: 'passport' })).not.toThrow();
+      await sdk.flush();
       const msg = sentMessages().find((m: any) => m.type === 'alias');
       expect(msg).toBeDefined();
 
-      warnSpy.mockRestore();
       sdk.shutdown();
     });
 
@@ -1176,18 +1202,15 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
-    it('does not warn when neither side is passport, regardless of id shape', async () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    it('does not throw when neither side is passport, regardless of id shape', async () => {
       const sdk = createSDK({ consent: 'full' });
 
-      sdk.alias({ id: '12345', identityType: 'steam' }, { id: '67890', identityType: 'epic' });
+      expect(() => sdk.alias({ id: '12345', identityType: 'steam' }, { id: '67890', identityType: 'epic' }))
+        .not.toThrow();
       await sdk.flush();
-
-      expect(warnSpy).not.toHaveBeenCalled();
       const msg = sentMessages().find((m: any) => m.type === 'alias');
       expect(msg).toBeDefined();
 
-      warnSpy.mockRestore();
       sdk.shutdown();
     });
 
@@ -1221,13 +1244,13 @@ describe('Audience', () => {
       const sdk = createSDK({ consent: 'full' });
 
       // Valid — should type-check.
-      sdk.identify('player-1', 'passport', { plan: 'premium' });
+      sdk.identify('email|player-1', 'passport', { plan: 'premium' });
 
       // @ts-expect-error — 'facebook' is not a valid IdentityType literal.
-      sdk.identify('player-2', 'facebook');
+      expect(() => sdk.identify('player-2', 'facebook')).toThrow();
 
       // @ts-expect-error — arbitrary strings are rejected.
-      sdk.identify('player-3', 'not-a-real-type' as string);
+      expect(() => sdk.identify('player-3', 'not-a-real-type' as string)).toThrow();
 
       sdk.shutdown();
     });
@@ -1238,20 +1261,29 @@ describe('Audience', () => {
       // Valid.
       sdk.alias(
         { id: 'steam-id', identityType: 'steam' },
-        { id: 'passport-id', identityType: 'passport' },
+        { id: 'email|passport-id', identityType: 'passport' },
       );
 
       // @ts-expect-error — 'facebook' is not a valid IdentityType.
-      sdk.alias(
+      expect(() => sdk.alias(
         { id: 'fb-id', identityType: 'facebook' },
-        { id: 'passport-id', identityType: 'passport' },
-      );
+        { id: 'email|passport-id', identityType: 'passport' },
+      )).toThrow();
 
       sdk.shutdown();
     });
   });
 
   describe('setConsent', () => {
+    it('throws for an unrecognised consent level', async () => {
+      const sdk = createSDK({ consent: 'none' });
+
+      expect(() => sdk.setConsent('bogus' as never)).toThrow(/unrecognised level/);
+      expect(document.cookie).not.toContain(`${COOKIE_NAME}=`);
+
+      sdk.shutdown();
+    });
+
     it('is a no-op when setting the same level', async () => {
       const sdk = createSDK({ consent: 'full' });
       await sdk.flush();

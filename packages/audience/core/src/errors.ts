@@ -69,10 +69,12 @@ export interface TransportResult {
  * - `'NETWORK_ERROR'`:fetch rejected before a response was received
  *                       (network failure, CORS, DNS, etc.).
  * - `'VALIDATION_REJECTED'`:backend returned 2xx but the body reported
- *                       `rejected > 0`, or the server returned a 4xx (non-429)
- *                       indicating the payload was malformed or unauthorised.
+ *                       `rejected > 0`, the server returned a 4xx (non-429)
+ *                       indicating the payload was malformed or unauthorised,
+ *                       or messages were dropped locally for exceeding the
+ *                       backend's timestamp window before ever being sent.
  *                       Terminal: retrying won't help, the messages were dropped
- *                       from the queue.
+ *                       from the queue. `status` is `0` for the locally-dropped case.
  * - `'RATE_LIMITED'`:server returned 429. The batch is retained and will
  *                       be retried after the backoff window (honoring
  *                       `Retry-After` when present).

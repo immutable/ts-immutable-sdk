@@ -20,6 +20,7 @@ const mockEnqueue = jest.fn();
 const mockStart = jest.fn();
 const mockDestroy = jest.fn();
 const mockGetOrCreateSessionId = jest.fn().mockReturnValue('session-abc');
+const mockIsValidConsentLevel = jest.fn().mockReturnValue(true);
 
 jest.mock('@imtbl/audience-core', () => ({
   MessageQueue: jest.fn().mockImplementation(() => ({
@@ -50,6 +51,7 @@ jest.mock('@imtbl/audience-core', () => ({
   setupAutocapture: (...args: unknown[]) => mockSetupAutocapture(...args),
   getOrCreateSessionId: (...args: unknown[]) => mockGetOrCreateSessionId(...args),
   startCmpDetection: (...args: unknown[]) => mockStartCmpDetection(...args),
+  isValidConsentLevel: (...args: [string]) => mockIsValidConsentLevel(...args),
   createConsentManager: jest.fn().mockImplementation(
     (
       _send: unknown,
@@ -259,6 +261,18 @@ describe('Pixel', () => {
       // setConsent should have auto-fired the deferred initial page view
       const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
       expect(calls.find((c) => c.type === 'page')).toBeDefined();
+    });
+
+    it('throws for an unrecognised consent level', () => {
+      const pixel = new Pixel();
+      activePixel = pixel;
+      pixel.init({ key: 'pk_imapik-test-local', consent: 'none' });
+
+      mockIsValidConsentLevel.mockReturnValueOnce(false);
+      expect(() => pixel.setConsent('bogus' as never)).toThrow(/unrecognised level/);
+
+      const calls = mockEnqueue.mock.calls.map((c: unknown[]) => (c[0] as Record<string, unknown>));
+      expect(calls.find((c) => c.type === 'page')).toBeUndefined();
     });
 
     it('fires deferred page view only once on repeated setConsent calls', () => {

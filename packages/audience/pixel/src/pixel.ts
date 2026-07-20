@@ -20,7 +20,10 @@ import {
   canTrack,
   startCmpDetection,
   setupAutocapture,
+  isValidConsentLevel,
 } from '@imtbl/audience-core';
+
+const LOG_PREFIX = '[pixel]';
 
 // Replaced at build time by tsup `define` (see tsup.config.ts).
 // In tests the global isn't defined, so we fall back to 'unknown'.
@@ -149,8 +152,12 @@ export class Pixel {
     this.queue!.enqueue(message);
   }
 
+  /** Throws if `level` isn't a recognised consent level. */
   setConsent(level: ConsentLevel): void {
     if (!this.isReady()) return;
+    if (!isValidConsentLevel(level)) {
+      throw new Error(`${LOG_PREFIX} setConsent() called with unrecognised level "${level}".`);
+    }
     this.consent!.setLevel(level);
 
     // Fire the deferred page view if consent was upgraded from 'none'

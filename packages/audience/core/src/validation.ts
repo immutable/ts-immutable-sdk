@@ -1,3 +1,5 @@
+import { IdentityType } from './types';
+
 const MAX_FUTURE_MS = 24 * 60 * 60 * 1000; // 24 hours
 const MAX_PAST_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
@@ -29,15 +31,32 @@ export function isPassportIdValid(id: string): boolean {
 }
 
 /**
- * Validate that alias from and to are not the same identity.
+ * Validate that alias from and to are not the same identity. Matches the
+ * backend: only the ids are compared, identityType is not a factor.
  */
-export function isAliasValid(
-  fromId: string,
-  fromType: string,
-  toId: string,
-  toType: string,
-): boolean {
-  return fromId !== toId || fromType !== toType;
+export function isAliasValid(fromId: string, toId: string): boolean {
+  return fromId !== toId;
+}
+
+const CONSENT_LEVELS: ReadonlySet<string> = new Set(['none', 'anonymous', 'full']);
+const IDENTITY_TYPES: ReadonlySet<string> = new Set(Object.values(IdentityType));
+
+/** Validate that a consent level is one the backend recognises. */
+export function isValidConsentLevel(value: string): boolean {
+  return CONSENT_LEVELS.has(value);
+}
+
+/** Validate that an identity type is one the backend recognises. */
+export function isValidIdentityType(value: string): boolean {
+  return IDENTITY_TYPES.has(value);
+}
+
+/**
+ * Matches the backend's MISSING_REQUIRED_FIELD check: empty or
+ * whitespace-only counts as missing.
+ */
+export function hasValue(value: string | undefined | null): boolean {
+  return typeof value === 'string' && value.trim() !== '';
 }
 
 /**

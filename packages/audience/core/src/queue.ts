@@ -1,6 +1,6 @@
 import type { Message, BatchPayload } from './types';
 import type { HttpSend } from './transport';
-import { type AudienceError, invokeOnError, toAudienceError } from './errors';
+import { AudienceError, invokeOnError, toAudienceError } from './errors';
 import {
   BASE_URL, INGEST_PATH, FLUSH_INTERVAL_MS, FLUSH_SIZE,
 } from './config';
@@ -74,6 +74,8 @@ export class MessageQueue {
 
   private readonly onError?: (err: AudienceError) => void;
 
+  private readonly staleFilter?: (msg: Message) => boolean;
+
   private readonly storagePrefix?: string;
 
   private readonly endpointUrl: string;
@@ -97,11 +99,12 @@ export class MessageQueue {
     this.flushSize = options?.flushSize ?? FLUSH_SIZE;
     this.onFlush = options?.onFlush;
     this.onError = options?.onError;
+    this.staleFilter = options?.staleFilter;
     this.storagePrefix = options?.storagePrefix;
 
     const restored = (storage.getItem(STORAGE_KEY, this.storagePrefix) as Message[] | undefined) ?? [];
-    this.messages = options?.staleFilter
-      ? restored.filter(options.staleFilter)
+    this.messages = this.staleFilter
+      ? restored.filter(this.staleFilter)
       : restored;
   }
 
@@ -147,6 +150,27 @@ export class MessageQueue {
 
     this.flushing = true;
     try {
+      // Messages can go stale while queued (offline, backoff, backgrounded
+      // tab) without ever going through a restore, which is the only other
+      // place staleFilter runs. Re-check here so a batch isn't sent only to
+      // be rejected for a timestamp that was fine when it was enqueued.
+      if (this.staleFilter) {
+        const before = this.messages.length;
+        this.messages = this.messages.filter(this.staleFilter);
+        const dropped = before - this.messages.length;
+        if (dropped > 0) {
+          this.persist();
+          invokeOnError(this.onError, new AudienceError({
+            code: 'VALIDATION_REJECTED',
+            message: `${dropped} queued message(s) exceeded the backend's accepted timestamp `
+              + 'window and were dropped without sending',
+            status: 0,
+            endpoint: this.endpointUrl,
+          }));
+        }
+        if (this.messages.length === 0) return;
+      }
+
       const batch = this.messages.slice(0, MAX_BATCH_SIZE);
       const payload: BatchPayload = { messages: batch };
 

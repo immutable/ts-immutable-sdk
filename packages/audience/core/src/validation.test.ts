@@ -2,6 +2,9 @@ import {
   isTimestampValid,
   isAliasValid,
   isPassportIdValid,
+  isValidConsentLevel,
+  isValidIdentityType,
+  hasValue,
   truncate,
   truncateSource,
 } from './validation';
@@ -38,15 +41,55 @@ describe('isTimestampValid', () => {
 
 describe('isAliasValid', () => {
   it('returns true when from and to differ', () => {
-    expect(isAliasValid('steam_123', 'steam', 'user@example.com', 'email')).toBe(true);
+    expect(isAliasValid('steam_123', 'user@example.com')).toBe(true);
   });
 
-  it('returns true when same ID but different type', () => {
-    expect(isAliasValid('123', 'steam', '123', 'email')).toBe(true);
+  it('returns false when the same ID is used even with different identity types', () => {
+    // Matches the backend: identityType is not a factor, only the ids are compared.
+    expect(isAliasValid('123', '123')).toBe(false);
   });
 
   it('returns false when from and to are identical', () => {
-    expect(isAliasValid('user@example.com', 'email', 'user@example.com', 'email')).toBe(false);
+    expect(isAliasValid('user@example.com', 'user@example.com')).toBe(false);
+  });
+});
+
+describe('isValidConsentLevel', () => {
+  it.each(['none', 'anonymous', 'full'])('accepts %s', (level) => {
+    expect(isValidConsentLevel(level)).toBe(true);
+  });
+
+  it('rejects an unrecognised level', () => {
+    expect(isValidConsentLevel('not_set')).toBe(false);
+  });
+});
+
+describe('isValidIdentityType', () => {
+  it.each(['passport', 'steam', 'epic', 'google', 'apple', 'discord', 'email', 'custom'])('accepts %s', (type) => {
+    expect(isValidIdentityType(type)).toBe(true);
+  });
+
+  it('rejects an unrecognised type', () => {
+    expect(isValidIdentityType('myspace')).toBe(false);
+  });
+});
+
+describe('hasValue', () => {
+  it('accepts a non-empty string', () => {
+    expect(hasValue('abc')).toBe(true);
+  });
+
+  it('rejects an empty string', () => {
+    expect(hasValue('')).toBe(false);
+  });
+
+  it('rejects a whitespace-only string', () => {
+    expect(hasValue('   ')).toBe(false);
+  });
+
+  it('rejects undefined and null', () => {
+    expect(hasValue(undefined)).toBe(false);
+    expect(hasValue(null)).toBe(false);
   });
 });
 
