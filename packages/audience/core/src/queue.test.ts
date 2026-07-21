@@ -32,6 +32,7 @@ interface QueueOpts {
   onFlush?: (ok: boolean, count: number) => void;
   onError?: (err: AudienceError) => void;
   staleFilter?: (msg: Message) => boolean;
+  logPrefix?: string;
 }
 
 function createQueue(
@@ -47,6 +48,7 @@ function createQueue(
       onFlush: opts.onFlush,
       onError: opts.onError,
       staleFilter: opts.staleFilter,
+      logPrefix: opts.logPrefix,
     },
   );
 }
@@ -311,6 +313,16 @@ describe('MessageQueue', () => {
     expect(onError).toHaveBeenCalled();
   });
 
+  it('swallows exceptions thrown from the onFlush callback', async () => {
+    const onFlush = jest.fn().mockImplementation(() => { throw new Error('callback boom'); });
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send, { onFlush });
+
+    queue.enqueue(makeMessage('1'));
+    await expect(queue.flush()).resolves.toBeUndefined();
+    expect(onFlush).toHaveBeenCalled();
+  });
+
   it('drops batch and fires VALIDATION_REJECTED when backend reports partial rejection', async () => {
     // Backend rejected one message in a batch of two. The 200 OK response
     // body says { accepted: 1, rejected: 1 }. Expected behaviour:
@@ -339,6 +351,56 @@ describe('MessageQueue', () => {
     expect(err.code).toBe('VALIDATION_REJECTED');
     expect(err.status).toBe(200);
     expect(err.responseBody).toEqual({ accepted: 1, rejected: 1 });
+  });
+
+  it('logs once per rejected message, independent of onError', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
+      ok: false,
+      error: new TransportError({
+        status: 200,
+        endpoint: 'https://api.immutable.com/v1/audience/messages',
+        body: {
+          accepted: 0,
+          rejected: 2,
+          rejections: [
+            { messageId: 'msg-1', errors: [{ field: 'surface', code: 'INVALID_ENUM', message: 'invalid surface' }] },
+            { messageId: 'msg-2', errors: [{ field: 'eventName', code: 'MISSING_REQUIRED_FIELD', message: 'req' }] },
+          ],
+        },
+      }),
+    });
+    // No onError passed: the log must not depend on one being wired.
+    const queue = createQueue(send, { logPrefix: '[audience]' });
+
+    queue.enqueue(makeMessage('1'));
+    queue.enqueue(makeMessage('2'));
+    await queue.flush();
+
+    expect(errorSpy).toHaveBeenCalledTimes(2);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('[audience] messageId msg-1 rejected by the server'));
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('[audience] messageId msg-2 rejected by the server'));
+
+    errorSpy.mockRestore();
+  });
+
+  it('does not log when the backend reports no per-message rejections', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
+      ok: false,
+      error: new TransportError({
+        status: 200,
+        endpoint: 'https://api.immutable.com/v1/audience/messages',
+        body: { accepted: 1, rejected: 1 },
+      }),
+    });
+    const queue = createQueue(send);
+
+    queue.enqueue(makeMessage('1'));
+    await queue.flush();
+
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
   });
 });
 
@@ -563,6 +625,42 @@ describe('page-unload flush (keepalive)', () => {
     );
     expect(queue.length).toBe(0);
 
+    queue.stop();
+  });
+
+  it('reports rejections from an unload flush once the response resolves', async () => {
+    const rejectionResult: TransportResult = {
+      ok: false,
+      error: new TransportError({
+        status: 200,
+        endpoint: 'https://api.immutable.com/v1/audience/messages',
+        body: {
+          accepted: 0,
+          rejected: 1,
+          rejections: [
+            { messageId: 'msg-1', errors: [{ field: 'surface', code: 'INVALID_ENUM', message: 'bad' }] },
+          ],
+        },
+      }),
+    };
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(rejectionResult);
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const onError = jest.fn();
+    const queue = createQueue(send, { onError, logPrefix: '[audience]' });
+    queue.start();
+
+    queue.enqueue(makeMessage('1'));
+    window.dispatchEvent(new Event('pagehide'));
+
+    // flushUnload() itself is synchronous; its reporting continuation
+    // resolves on the next microtask tick once the response arrives.
+    await send.mock.results[0].value;
+    await Promise.resolve();
+
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('messageId msg-1 rejected by the server'));
+    expect(onError).toHaveBeenCalledWith(expect.objectContaining({ code: 'VALIDATION_REJECTED' }));
+
+    errorSpy.mockRestore();
     queue.stop();
   });
 

@@ -87,7 +87,7 @@ export class Pixel {
     this.queue = new MessageQueue(
       httpSend,
       key,
-      { baseUrl: options.baseUrl, storagePrefix: '__imtbl_pixel_' },
+      { baseUrl: options.baseUrl, storagePrefix: '__imtbl_pixel_', logPrefix: LOG_PREFIX },
     );
 
     this.anonymousId = getOrCreateAnonymousId(domain);

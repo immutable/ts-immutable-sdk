@@ -124,5 +124,103 @@ describe('toAudienceError', () => {
       expect(err.code).toBe('VALIDATION_REJECTED');
       expect(err.message).toBe('Backend rejected 0 of 0 messages');
     });
+
+    it('parses per-message rejections from the response body', () => {
+      const rejections = [
+        { messageId: 'msg-1', errors: [{ field: 'surface', code: 'INVALID_ENUM', message: 'invalid surface' }] },
+      ];
+      const partialError = new TransportError({
+        status: 200,
+        endpoint: 'https://api.dev.immutable.com/v1/audience/messages',
+        body: { accepted: 1, rejected: 1, rejections },
+      });
+
+      const err = toAudienceError(partialError, 'flush', 2);
+
+      expect(err.rejections).toEqual(rejections);
+    });
+
+    it('leaves rejections undefined when the body has none', () => {
+      const partialError = new TransportError({
+        status: 200,
+        endpoint: 'https://api.dev.immutable.com/v1/audience/messages',
+        body: { accepted: 1, rejected: 0 },
+      });
+
+      const err = toAudienceError(partialError, 'flush', 1);
+
+      expect(err.rejections).toBeUndefined();
+    });
+
+    it('leaves rejections undefined when the body is malformed', () => {
+      const partialError = new TransportError({
+        status: 200,
+        endpoint: 'https://api.dev.immutable.com/v1/audience/messages',
+        body: { rejections: 'not-an-array' },
+      });
+
+      const err = toAudienceError(partialError, 'flush', 1);
+
+      expect(err.rejections).toBeUndefined();
+    });
+
+    it('skips a malformed element instead of throwing, keeping the well-formed ones', () => {
+      const partialError = new TransportError({
+        status: 200,
+        endpoint: 'https://api.dev.immutable.com/v1/audience/messages',
+        body: {
+          rejections: [
+            { messageId: 'msg-1' }, // missing errors
+            { errors: [{ field: 'x', code: 'Y', message: 'z' }] }, // missing messageId
+            'not-an-object',
+            { messageId: 'msg-2', errors: [{ field: 'surface', code: 'INVALID_ENUM', message: 'bad' }] },
+          ],
+        },
+      });
+
+      const err = toAudienceError(partialError, 'flush', 4);
+
+      expect(err.rejections).toEqual([
+        { messageId: 'msg-1', errors: [] },
+        { messageId: 'msg-2', errors: [{ field: 'surface', code: 'INVALID_ENUM', message: 'bad' }] },
+      ]);
+    });
+  });
+
+  describe('4xx (non-429) validation-rejected', () => {
+    const rejectedBody = {
+      success: false,
+      accepted: 0,
+      rejected: 1,
+      rejections: [
+        { messageId: 'msg-1', errors: [{ field: 'eventName', code: 'MISSING_REQUIRED_FIELD', message: 'required' }] },
+      ],
+    };
+
+    it('parses rejections for a flush-source 4xx', () => {
+      const badRequestError = new TransportError({
+        status: 400,
+        endpoint: 'https://api.dev.immutable.com/v1/audience/messages',
+        body: rejectedBody,
+      });
+
+      const err = toAudienceError(badRequestError, 'flush', 1);
+
+      expect(err.code).toBe('VALIDATION_REJECTED');
+      expect(err.rejections).toEqual(rejectedBody.rejections);
+    });
+
+    it('does not parse rejections for a consent-source 4xx (different response shape)', () => {
+      const badRequestError = new TransportError({
+        status: 400,
+        endpoint: 'https://api.dev.immutable.com/v1/audience/tracking-consent',
+        body: rejectedBody,
+      });
+
+      const err = toAudienceError(badRequestError, 'consent');
+
+      expect(err.code).toBe('CONSENT_SYNC_FAILED');
+      expect(err.rejections).toBeUndefined();
+    });
   });
 });

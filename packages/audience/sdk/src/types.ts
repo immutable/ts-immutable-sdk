@@ -30,6 +30,13 @@ export interface AudienceConfig {
    * branch on the failure mode (FLUSH_FAILED, CONSENT_SYNC_FAILED,
    * NETWORK_ERROR, VALIDATION_REJECTED). Exceptions thrown from this
    * callback are swallowed so a bad handler can't wedge the SDK.
+   *
+   * On `VALIDATION_REJECTED`, `err.rejections` carries per-message detail
+   * when the backend reported one. The SDK also logs a `console.error` for
+   * each rejected message regardless of whether this is wired up, but that
+   * console output isn't guaranteed to reach production monitoring; wire
+   * `onError` and forward `err.rejections` to your own error tracking for
+   * reliable delivery.
    */
   onError?: (err: AudienceError) => void;
 }
