@@ -315,12 +315,9 @@ export class MessageQueue {
     }
   }
 
-  // Fires unconditionally, independent of onError, so a rule the backend
-  // enforces but the SDK doesn't catch client-side doesn't fail silently.
-  // console.error, not .warn: a rejected message is lost data, not merely
-  // advisory, and production log-level filters more often keep error than
-  // warn. Neither is a substitute for onError, which is the mechanism to
-  // wire up for guaranteed delivery to a studio's own error tracking.
+  // Fires unconditionally, independent of onError, so a rejection the SDK
+  // didn't catch client-side doesn't fail silently. console.error, not
+  // warn: this is lost data, not an advisory.
   private logRejections(rejections: MessageRejection[]): void {
     for (const rejection of rejections) {
       const reasons = rejection.errors.map((e) => `${e.field} ${e.code}: ${e.message}`).join('; ');
