@@ -166,6 +166,7 @@ export class Audience {
         onError: config.onError,
         staleFilter: (m) => isTimestampValid(m.eventTimestamp),
         storagePrefix: '__imtbl_web_',
+        logPrefix: LOG_PREFIX,
       },
     );
 

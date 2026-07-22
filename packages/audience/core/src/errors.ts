@@ -75,6 +75,8 @@ export interface TransportResult {
  *                       backend's timestamp window before ever being sent.
  *                       Terminal: retrying won't help, the messages were dropped
  *                       from the queue. `status` is `0` for the locally-dropped case.
+ *                       `rejections` carries the per-message reason when the
+ *                       backend reported one.
  * - `'RATE_LIMITED'`:server returned 429. The batch is retained and will
  *                       be retried after the backoff window (honoring
  *                       `Retry-After` when present).
@@ -88,6 +90,19 @@ export type AudienceErrorCode =
   | 'VALIDATION_REJECTED'
   | 'RATE_LIMITED'
   | 'DATA_DELETE_FAILED';
+
+/** One validation failure the backend reported for a single message. */
+export interface RejectionError {
+  field: string;
+  code: string;
+  message: string;
+}
+
+/** A single message the backend rejected, with every reason it gave. */
+export interface MessageRejection {
+  messageId: string;
+  errors: RejectionError[];
+}
 
 /**
  * Public error type passed to the SDK's `onError` callback. Wraps the
@@ -110,6 +125,9 @@ export class AudienceError extends Error {
 
   readonly responseBody?: unknown;
 
+  /** Per-message rejection detail, when `code` is `'VALIDATION_REJECTED'` and the backend reported one. */
+  readonly rejections?: MessageRejection[];
+
   // `cause` is a standard Error prop in ES2022, declared here for older
   // TS targets that don't have it in their lib.d.ts.
   readonly cause?: unknown;
@@ -120,6 +138,7 @@ export class AudienceError extends Error {
     status: number;
     endpoint: string;
     responseBody?: unknown;
+    rejections?: MessageRejection[];
     cause?: unknown;
   }) {
     super(init.message);
@@ -128,8 +147,42 @@ export class AudienceError extends Error {
     this.status = init.status;
     this.endpoint = init.endpoint;
     this.responseBody = init.responseBody;
+    this.rejections = init.rejections;
     this.cause = init.cause;
   }
+}
+
+function parseRejectionError(err: unknown): RejectionError | undefined {
+  if (typeof err !== 'object' || err === null) return undefined;
+  const { field, code, message } = err as { field?: unknown; code?: unknown; message?: unknown };
+  return {
+    field: typeof field === 'string' ? field : '',
+    code: typeof code === 'string' ? code : '',
+    message: typeof message === 'string' ? message : '',
+  };
+}
+
+function parseRejection(item: unknown): MessageRejection | undefined {
+  if (typeof item !== 'object' || item === null) return undefined;
+  const { messageId, errors } = item as { messageId?: unknown; errors?: unknown };
+  if (typeof messageId !== 'string') return undefined;
+  const parsedErrors = Array.isArray(errors) ? errors.map(parseRejectionError).filter(Boolean) : [];
+  return { messageId, errors: parsedErrors as RejectionError[] };
+}
+
+/**
+ * Extracts `rejections` from a MessagesResponse body. Validates each
+ * element individually (not just the outer array) so a malformed or
+ * partial entry is skipped rather than reaching `logRejections`/callers
+ * with a shape they don't expect. Returns undefined when there's nothing
+ * usable left.
+ */
+function parseRejections(body: unknown): MessageRejection[] | undefined {
+  const raw = (body as { rejections?: unknown } | undefined)?.rejections;
+  if (!Array.isArray(raw)) return undefined;
+
+  const rejections = raw.map(parseRejection).filter(Boolean) as MessageRejection[];
+  return rejections.length > 0 ? rejections : undefined;
 }
 
 /**
@@ -177,6 +230,7 @@ export function toAudienceError(
       status: err.status,
       endpoint: err.endpoint,
       responseBody: err.body,
+      rejections: parseRejections(err.body),
     });
   }
 
@@ -204,6 +258,7 @@ export function toAudienceError(
       status: err.status,
       endpoint: err.endpoint,
       responseBody: err.body,
+      rejections: source === 'flush' ? parseRejections(err.body) : undefined,
     });
   }
 

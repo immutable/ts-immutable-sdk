@@ -1,6 +1,8 @@
 import type { Message, BatchPayload } from './types';
 import type { HttpSend } from './transport';
-import { AudienceError, invokeOnError, toAudienceError } from './errors';
+import {
+  AudienceError, invokeOnError, toAudienceError, type MessageRejection, type TransportResult,
+} from './errors';
 import {
   BASE_URL, INGEST_PATH, FLUSH_INTERVAL_MS, FLUSH_SIZE,
 } from './config';
@@ -38,6 +40,8 @@ export interface MessageQueueOptions {
    * messages don't interfere with the shared SDK's queue.
    */
   storagePrefix?: string;
+  /** Prefix for the default per-rejected-message console.error (e.g. '[audience]', '[pixel]'). */
+  logPrefix?: string;
 }
 
 /**
@@ -78,6 +82,8 @@ export class MessageQueue {
 
   private readonly storagePrefix?: string;
 
+  private readonly logPrefix: string;
+
   private readonly endpointUrl: string;
 
   private readonly flushIntervalMs: number;
@@ -101,6 +107,7 @@ export class MessageQueue {
     this.onError = options?.onError;
     this.staleFilter = options?.staleFilter;
     this.storagePrefix = options?.storagePrefix;
+    this.logPrefix = options?.logPrefix ?? '[audience]';
 
     const restored = (storage.getItem(STORAGE_KEY, this.storagePrefix) as Message[] | undefined) ?? [];
     this.messages = this.staleFilter
@@ -175,11 +182,7 @@ export class MessageQueue {
       const payload: BatchPayload = { messages: batch };
 
       const result = await this.send(this.endpointUrl, this.publishableKey, payload);
-
-      let audienceErr: AudienceError | undefined;
-      if (!result.ok && result.error) {
-        audienceErr = toAudienceError(result.error, 'flush', batch.length);
-      }
+      const audienceErr = MessageQueue.deriveError(result, batch.length);
 
       // Drop the batch on success OR on a terminal validation failure.
       // VALIDATION_REJECTED means the backend deterministically rejected
@@ -199,10 +202,7 @@ export class MessageQueue {
         }
       }
 
-      this.onFlush?.(result.ok, batch.length);
-      if (audienceErr) {
-        invokeOnError(this.onError, audienceErr);
-      }
+      this.reportOutcome(result, audienceErr, batch.length);
     } finally {
       this.flushing = false;
     }
@@ -214,7 +214,10 @@ export class MessageQueue {
    * Uses `fetch` with `keepalive: true` so the request survives page
    * navigation. Unlike `flush()`, this is synchronous and does not wait
    * for the response; use it only in `visibilitychange`/`pagehide`
-   * handlers or in `shutdown()`.
+   * handlers or in `shutdown()`. If a response does arrive, `onFlush`/
+   * `onError`/the default rejection log still fire from it; this is
+   * reliable when the trigger was tab-backgrounding, not guaranteed when
+   * the page is actually torn down.
    */
   flushUnload(): void {
     if (this.flushing || this.messages.length === 0) return;
@@ -222,11 +225,11 @@ export class MessageQueue {
     const batch = this.messages.slice(0, MAX_BATCH_SIZE);
     const payload: BatchPayload = { messages: batch };
 
-    // Fire-and-forget: `keepalive: true` lets the request survive page
-    // navigation. We optimistically drop the batch because the page is
-    // going away and can't retry. The HttpSend contract guarantees this
-    // promise never rejects, so the floating call is safe.
-    this.send(this.endpointUrl, this.publishableKey, payload, { keepalive: true });
+    // We optimistically drop the batch because the page is going away and
+    // can't retry. Attaching .then() with no .catch() is safe: HttpSend
+    // never rejects, and reportOutcome guards every callback it calls.
+    this.send(this.endpointUrl, this.publishableKey, payload, { keepalive: true })
+      .then((result) => this.reportOutcome(result, MessageQueue.deriveError(result, batch.length), batch.length));
     this.messages = this.messages.slice(batch.length);
     this.persist();
   }
@@ -290,6 +293,41 @@ export class MessageQueue {
   private resetBackoff(): void {
     this.consecutiveFailures = 0;
     this.nextAttemptAt = 0;
+  }
+
+  private static deriveError(result: TransportResult, batchLength: number): AudienceError | undefined {
+    return !result.ok && result.error ? toAudienceError(result.error, 'flush', batchLength) : undefined;
+  }
+
+  // Batch retention/backoff stay the caller's job: flushUnload() has already
+  // unconditionally dropped its batch by the time this runs.
+  private reportOutcome(result: TransportResult, audienceErr: AudienceError | undefined, batchLength: number): void {
+    // Guarded like invokeOnError: a throwing onFlush must not become an
+    // unhandled rejection on flushUnload()'s floating promise.
+    try {
+      this.onFlush?.(result.ok, batchLength);
+    } catch {
+      // Swallow; handler must not crash the queue.
+    }
+    if (audienceErr) {
+      if (audienceErr.rejections?.length) this.logRejections(audienceErr.rejections);
+      invokeOnError(this.onError, audienceErr);
+    }
+  }
+
+  // Fires unconditionally, independent of onError, so a rejection the SDK
+  // didn't catch client-side doesn't fail silently. console.error, not
+  // warn: this is lost data, not an advisory. One call per flush, not one
+  // per rejected message: a batch can carry up to MAX_BATCH_SIZE rejections,
+  // and that many separate console.error calls floods devtools and any
+  // console-capture integration the app might have wired up.
+  private logRejections(rejections: MessageRejection[]): void {
+    const lines = rejections.map((r) => {
+      const reasons = r.errors.map((e) => `${e.field} ${e.code}: ${e.message}`).join('; ');
+      return `  ${r.messageId}: ${reasons}`;
+    });
+    // eslint-disable-next-line no-console
+    console.error(`${this.logPrefix} ${rejections.length} message(s) rejected by the server:\n${lines.join('\n')}`);
   }
 
   private persist(): void {
