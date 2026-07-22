@@ -317,13 +317,17 @@ export class MessageQueue {
 
   // Fires unconditionally, independent of onError, so a rejection the SDK
   // didn't catch client-side doesn't fail silently. console.error, not
-  // warn: this is lost data, not an advisory.
+  // warn: this is lost data, not an advisory. One call per flush, not one
+  // per rejected message: a batch can carry up to MAX_BATCH_SIZE rejections,
+  // and that many separate console.error calls floods devtools and any
+  // console-capture integration the app might have wired up.
   private logRejections(rejections: MessageRejection[]): void {
-    for (const rejection of rejections) {
-      const reasons = rejection.errors.map((e) => `${e.field} ${e.code}: ${e.message}`).join('; ');
-      // eslint-disable-next-line no-console
-      console.error(`${this.logPrefix} messageId ${rejection.messageId} rejected by the server: ${reasons}`);
-    }
+    const lines = rejections.map((r) => {
+      const reasons = r.errors.map((e) => `${e.field} ${e.code}: ${e.message}`).join('; ');
+      return `  ${r.messageId}: ${reasons}`;
+    });
+    // eslint-disable-next-line no-console
+    console.error(`${this.logPrefix} ${rejections.length} message(s) rejected by the server:\n${lines.join('\n')}`);
   }
 
   private persist(): void {

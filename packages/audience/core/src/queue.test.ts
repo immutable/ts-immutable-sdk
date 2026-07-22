@@ -353,7 +353,7 @@ describe('MessageQueue', () => {
     expect(err.responseBody).toEqual({ accepted: 1, rejected: 1 });
   });
 
-  it('logs once per rejected message, independent of onError', async () => {
+  it('logs one aggregated console.error per flush, independent of onError', async () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue({
       ok: false,
@@ -377,9 +377,11 @@ describe('MessageQueue', () => {
     queue.enqueue(makeMessage('2'));
     await queue.flush();
 
-    expect(errorSpy).toHaveBeenCalledTimes(2);
-    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('[audience] messageId msg-1 rejected by the server'));
-    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('[audience] messageId msg-2 rejected by the server'));
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+    const [message] = errorSpy.mock.calls[0];
+    expect(message).toContain('[audience] 2 message(s) rejected by the server');
+    expect(message).toContain('msg-1: surface INVALID_ENUM: invalid surface');
+    expect(message).toContain('msg-2: eventName MISSING_REQUIRED_FIELD: req');
 
     errorSpy.mockRestore();
   });
@@ -657,7 +659,7 @@ describe('page-unload flush (keepalive)', () => {
     await send.mock.results[0].value;
     await Promise.resolve();
 
-    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('messageId msg-1 rejected by the server'));
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('1 message(s) rejected by the server'));
     expect(onError).toHaveBeenCalledWith(expect.objectContaining({ code: 'VALIDATION_REJECTED' }));
 
     errorSpy.mockRestore();
