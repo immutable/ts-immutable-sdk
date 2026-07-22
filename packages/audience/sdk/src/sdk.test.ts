@@ -732,6 +732,70 @@ describe('Audience', () => {
 
       sdk.shutdown();
     });
+
+    describe('reserved event required properties', () => {
+      it('throws when purchase is missing currency and value', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('purchase', {})).toThrow(/missing required properties: currency, value/);
+        await sdk.flush();
+        expect(sentMessages().filter((m: any) => m.type === 'track')).toHaveLength(0);
+
+        sdk.shutdown();
+      });
+
+      it('throws when progression is missing status', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('progression', {})).toThrow(/missing required property: status/);
+
+        sdk.shutdown();
+      });
+
+      it('throws when resource is missing flow, currency, and amount', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('resource', {})).toThrow(/missing required properties: flow, currency, amount/);
+
+        sdk.shutdown();
+      });
+
+      it('throws when achievement_unlocked is missing achievement_id and achievement_name', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('achievement_unlocked', {})).toThrow(
+          /missing required properties: achievement_id, achievement_name/,
+        );
+
+        sdk.shutdown();
+      });
+
+      it('does not throw when all required properties are present', async () => {
+        const sdk = createSDK();
+
+        expect(() => sdk.track('purchase', { currency: 'USD', value: 9.99 })).not.toThrow();
+        expect(() => sdk.track('progression', { status: 'start' })).not.toThrow();
+        expect(() => sdk.track('resource', { flow: 'source', currency: 'gold', amount: 10 })).not.toThrow();
+        expect(() => sdk.track('achievement_unlocked', {
+          achievement_id: 'a1',
+          achievement_name: 'First Steps',
+        })).not.toThrow();
+
+        sdk.shutdown();
+      });
+
+      it('does not validate unrecognised event names', async () => {
+        const sdk = createSDK();
+
+        expect(() => sdk.track('some_custom_event', {})).not.toThrow();
+
+        sdk.shutdown();
+      });
+    });
   });
 
   describe('page', () => {

@@ -120,6 +120,20 @@ interface EventPropsMap {
 export type AudienceEventName = keyof EventPropsMap;
 
 /**
+ * Required property names per reserved event, enforced at runtime by
+ * `Audience.track()`. `PropsFor`'s required/optional distinction only exists
+ * at compile time; a caller can still bypass it (raw JS, an `any` cast, a
+ * dynamically-built properties object), so this is checked again at the
+ * call site. Events not listed here have no required properties.
+ */
+export const REQUIRED_EVENT_PROPS: Partial<Record<AudienceEventName, readonly string[]>> = {
+  purchase: ['currency', 'value'],
+  progression: ['status'],
+  resource: ['flow', 'currency', 'amount'],
+  achievement_unlocked: ['achievement_id', 'achievement_name'],
+};
+
+/**
  * Event name → property type. Falls back to `Record<string, unknown>` for
  * unknown names. Used by `sdk.track()` to type-check property shapes at the
  * call site. Invariants pinned by `sdk.test-d.ts` — run it before simplifying.
