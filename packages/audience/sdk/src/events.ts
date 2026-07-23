@@ -85,9 +85,9 @@ export interface LinkClickedProperties {
   label?: string;
   source?: string;
   game_id?: string;
-  /** DOM id of the clicked element. Only set by auto-capture. */
+  /** Only set by auto-capture. */
   element_id?: string;
-  /** Whether the link led off-site. Only set by auto-capture. */
+  /** Only set by auto-capture. */
   outbound?: boolean;
 }
 
