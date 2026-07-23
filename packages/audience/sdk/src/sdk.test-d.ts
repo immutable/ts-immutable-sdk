@@ -47,8 +47,10 @@ sdk.track('link_clicked', {
   url: 'https://example.com',
   label: 'Play Now',
   source: 'game_page',
-  game_id: 'abc',
 });
+
+// @ts-expect-error — unknown property 'game_id'
+sdk.track('link_clicked', { url: 'https://example.com', game_id: 'abc' });
 
 sdk.track(AudienceEvents.SIGN_UP, { method: 'email' });
 sdk.track(AudienceEvents.PURCHASE, { currency: 'USD', value: '9.99' });

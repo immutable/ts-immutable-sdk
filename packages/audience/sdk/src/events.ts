@@ -85,7 +85,6 @@ export interface LinkClickedProperties {
   url: string;
   label?: string;
   source?: string;
-  game_id?: string;
   /** Only set by auto-capture. */
   element_id?: string;
   /** Only set by auto-capture. */
