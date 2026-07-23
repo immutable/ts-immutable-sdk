@@ -827,9 +827,7 @@ describe('Audience', () => {
         expect(() => sdk.track('game_launch')).not.toThrow();
         expect(() => sdk.track('email_acquired')).not.toThrow();
         expect(() => sdk.track('button_clicked')).not.toThrow();
-        // link_clicked's `url` isn't enforced at runtime (unlike its compile-time
-        // type): auto-capture's own calls (autocapture.ts) don't send it, see the
-        // comment on REQUIRED_EVENT_PROPS.link_clicked in events.ts.
+        // link_clicked isn't enforced at runtime; see REQUIRED_EVENT_PROPS in events.ts.
         // @ts-expect-error deliberately bypassing the compile-time check
         expect(() => sdk.track('link_clicked', {})).not.toThrow();
 
