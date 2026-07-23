@@ -37,7 +37,8 @@
   },
   "dependencies": {
     "@imtbl/auth": "workspace:*",
-    "@imtbl/auth-next-server": "workspace:*"
+    "@imtbl/auth-next-server": "workspace:*",
+    "fast-json-stable-stringify": "^2.1.0"
   },
   "peerDependencies": {
     "next": "^14.0.0 || ^15.0.0",
