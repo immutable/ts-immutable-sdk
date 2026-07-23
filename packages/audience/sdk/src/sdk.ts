@@ -314,7 +314,8 @@ export class Audience {
    * No-op when consent is 'none'. Throws if the event name is empty, or if a
    * reserved event with required properties (`wishlist_add`,
    * `wishlist_remove`, `purchase`, `progression`, `resource`,
-   * `game_page_viewed`, `achievement_unlocked`) is missing one of them.
+   * `game_page_viewed`, `link_clicked`, `achievement_unlocked`) is missing
+   * one of them.
    */
   track<E extends AudienceEventName | string & {}>(
     event: E,

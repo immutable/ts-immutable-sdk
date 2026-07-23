@@ -256,16 +256,16 @@ export function setupAutocapture(
         if (isOutbound && options.clicks !== false) {
           enqueue('link_clicked', {
             ...collectSessionAttribution(),
-            link_url: anchor.href,
-            link_text: (anchor.textContent || '').trim().slice(0, 256),
+            url: anchor.href,
+            label: (anchor.textContent || '').trim().slice(0, 256),
             element_id: anchor.id || undefined,
             outbound: true,
           });
         } else if (!isOutbound && options.internalClicks === true) {
           enqueue('link_clicked', {
             ...collectSessionAttribution(),
-            link_url: anchor.href,
-            link_text: (anchor.textContent || '').trim().slice(0, 256),
+            url: anchor.href,
+            label: (anchor.textContent || '').trim().slice(0, 256),
             element_id: anchor.id || undefined,
             outbound: false,
           });

@@ -819,6 +819,15 @@ describe('Audience', () => {
         sdk.shutdown();
       });
 
+      it('throws when link_clicked is missing url', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('link_clicked', {})).toThrow(/missing required property: url/);
+
+        sdk.shutdown();
+      });
+
       it('does not throw for events with no required properties', async () => {
         const sdk = createSDK();
 
@@ -827,9 +836,6 @@ describe('Audience', () => {
         expect(() => sdk.track('game_launch')).not.toThrow();
         expect(() => sdk.track('email_acquired')).not.toThrow();
         expect(() => sdk.track('button_clicked')).not.toThrow();
-        // link_clicked isn't enforced at runtime; see REQUIRED_EVENT_PROPS in events.ts.
-        // @ts-expect-error deliberately bypassing the compile-time check
-        expect(() => sdk.track('link_clicked', {})).not.toThrow();
 
         sdk.shutdown();
       });
@@ -1836,7 +1842,7 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toMatchObject({
-        link_url: 'https://store.steampowered.com/app/12345',
+        url: 'https://store.steampowered.com/app/12345',
         outbound: true,
       });
 

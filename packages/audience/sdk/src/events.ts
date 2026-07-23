@@ -85,6 +85,10 @@ export interface LinkClickedProperties {
   label?: string;
   source?: string;
   game_id?: string;
+  /** DOM id of the clicked element. Only set by auto-capture. */
+  element_id?: string;
+  /** Whether the link led off-site. Only set by auto-capture. */
+  outbound?: boolean;
 }
 
 export interface ButtonClickedProperties {
@@ -136,10 +140,7 @@ export const REQUIRED_EVENT_PROPS: Record<AudienceEventName, readonly string[]> 
   resource: ['flow', 'currency', 'amount'],
   email_acquired: [],
   game_page_viewed: ['game_id'],
-  // Deliberately empty: auto-capture's own link_clicked calls (autocapture.ts)
-  // send link_url/link_text, not url/label — a pre-existing type mismatch
-  // tracked separately, not fixed here.
-  link_clicked: [],
+  link_clicked: ['url'],
   button_clicked: [],
   achievement_unlocked: ['achievement_id', 'achievement_name'],
 };
