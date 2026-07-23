@@ -1,13 +1,13 @@
 ## PR / Merge Group
 
-Runs on every PR and merge queue entry. All jobs are automated — no manual gate.
+Runs on every PR and merge queue entry. Functional tests are skipped when all changed files are under `packages/audience/`. All jobs are automated - no manual gate.
 
 ```mermaid
 flowchart LR
     PR([Pull Request\nor Merge Group]) --> sync[Syncpack\ndependency alignment]
     PR --> blt[Build · Lint · Test\nSDK packages]
     PR --> ex[Build · Lint · Test\nExamples]
-    PR --> func[Functional Tests\nSepolia · zkEVM testnet]
+    PR --> func[Functional Tests\nexcept audience-only changes]
     PR --> ab[Audience Bundle\nSize Check]
     PR --> pb[Pixel Bundle\nSize Check]
     PR --> tv[Title Validation\nconventional commits]
