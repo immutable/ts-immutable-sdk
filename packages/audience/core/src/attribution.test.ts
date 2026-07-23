@@ -31,7 +31,7 @@ describe('collectSessionAttribution', () => {
 
   it('parses ad network click IDs', () => {
     setLocation(
-      'https://example.com/?gclid=abc&dclid=dc1&fbclid=fb2&ttclid=tt3&msclkid=ms4&li_fat_id=li5',
+      'https://example.com/?gclid=abc&dclid=dc1&fbclid=fb2&ttclid=tt3&rdt_cid=rdt4&msclkid=ms5&li_fat_id=li6',
     );
 
     const result = collectSessionAttribution();
@@ -39,8 +39,9 @@ describe('collectSessionAttribution', () => {
     expect(result.dclid).toBe('dc1');
     expect(result.fbclid).toBe('fb2');
     expect(result.ttclid).toBe('tt3');
-    expect(result.msclkid).toBe('ms4');
-    expect(result.li_fat_id).toBe('li5');
+    expect(result.rdt_cid).toBe('rdt4');
+    expect(result.msclkid).toBe('ms5');
+    expect(result.li_fat_id).toBe('li6');
   });
 
   it('captures referrer and landing page', () => {

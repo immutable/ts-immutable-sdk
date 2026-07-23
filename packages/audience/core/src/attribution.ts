@@ -11,6 +11,7 @@ const CLICK_ID_PARAMS = [
   'dclid',
   'fbclid',
   'ttclid',
+  'rdt_cid',
   'msclkid',
   'li_fat_id',
 ] as const;
@@ -27,6 +28,7 @@ export interface Attribution {
   dclid?: string;
   fbclid?: string;
   ttclid?: string;
+  rdt_cid?: string;
   msclkid?: string;
   li_fat_id?: string;
   referral_code?: string;
