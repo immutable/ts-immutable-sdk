@@ -123,8 +123,37 @@ jobs:
         shell: bash
         run: pnpm test:examples
 
+  should-run-functional-tests:
+    name: Determine whether functional tests are needed
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      should-run: ${{ steps.changed-files.outputs.should-run }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check changed files
+        id: changed-files
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha || github.sha }}
+        run: |
+          if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -qv '^packages/audience/'; then
+            echo "should-run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should-run=false" >> "$GITHUB_OUTPUT"
+          fi
+
   func-tests:
     name: Functional tests
+    if: needs.should-run-functional-tests.outputs.should-run == 'true'
+    needs: should-run-functional-tests
     runs-on: ubuntu-latest-8-cores
     permissions:
       contents: read
