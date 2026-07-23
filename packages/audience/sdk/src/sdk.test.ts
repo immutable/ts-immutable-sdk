@@ -294,7 +294,7 @@ describe('Audience', () => {
 
       sdk.track('purchase', {
         currency: 'USD',
-        value: 9.99,
+        value: '9.99',
         item_id: 'sword_01',
       });
 
@@ -309,7 +309,7 @@ describe('Audience', () => {
       expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
         currency: 'USD',
-        value: 9.99,
+        value: '9.99',
         item_id: 'sword_01',
       });
       expect(msg.surface).toBe('web');
@@ -664,7 +664,7 @@ describe('Audience', () => {
       sessionStorage.clear();
 
       const sdk = createSDK();
-      sdk.track('purchase', { currency: 'USD', value: 9.99 });
+      sdk.track('purchase', { currency: 'USD', value: '9.99' });
       await sdk.flush();
 
       const msg = sentMessages().find(
@@ -674,7 +674,7 @@ describe('Audience', () => {
       expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
         currency: 'USD',
-        value: 9.99,
+        value: '9.99',
       });
 
       sdk.shutdown();
@@ -701,7 +701,7 @@ describe('Audience', () => {
     it('picks up a session rollover on the next call instead of keeping a stale id', async () => {
       const sdk = createSDK();
 
-      sdk.track('purchase', { currency: 'USD', value: 1 });
+      sdk.track('purchase', { currency: 'USD', value: '1' });
       await sdk.flush();
       const firstSessionId = sentMessages().find(
         (m: any) => m.type === 'track' && m.eventName === 'purchase',
@@ -710,7 +710,7 @@ describe('Audience', () => {
       // Simulate the session cookie expiring (30 min idle) before the next call.
       document.cookie = `${SESSION_COOKIE}=;max-age=0;path=/`;
 
-      sdk.track('purchase', { currency: 'USD', value: 2 });
+      sdk.track('purchase', { currency: 'USD', value: '2' });
       await sdk.flush();
 
       const purchases = sentMessages().filter(
@@ -804,7 +804,7 @@ describe('Audience', () => {
       it('does not throw when all required properties are present', async () => {
         const sdk = createSDK();
 
-        expect(() => sdk.track('purchase', { currency: 'USD', value: 9.99 })).not.toThrow();
+        expect(() => sdk.track('purchase', { currency: 'USD', value: '9.99' })).not.toThrow();
         expect(() => sdk.track('progression', { status: 'start' })).not.toThrow();
         expect(() => sdk.track('resource', { flow: 'source', currency: 'gold', amount: 10 })).not.toThrow();
         expect(() => sdk.track('achievement_unlocked', {
@@ -994,7 +994,7 @@ describe('Audience', () => {
     it('stamps the anonymous consent level on every emitted message', async () => {
       const sdk = createSDK({ consent: 'anonymous' });
       sdk.page();
-      sdk.track('purchase', { currency: 'USD', value: 1 });
+      sdk.track('purchase', { currency: 'USD', value: '1' });
       await sdk.flush();
 
       const msgs = sentMessages();
@@ -1024,7 +1024,7 @@ describe('Audience', () => {
     it('leaves queued events with their capture-time consentLevel and userId on downgrade from full', async () => {
       const sdk = createSDK({ consent: 'full' });
       sdk.identify(TEST_USER.id, TEST_USER.identityType);
-      sdk.track('purchase', { currency: 'USD', value: 9.99 });
+      sdk.track('purchase', { currency: 'USD', value: '9.99' });
 
       sdk.setConsent('anonymous');
       await sdk.flush();
@@ -1046,7 +1046,7 @@ describe('Audience', () => {
     it('stamps sessionId at the top level on every message type, including identify and alias', async () => {
       const sdk = createSDK({ consent: 'full' });
       sdk.page();
-      sdk.track('purchase', { currency: 'USD', value: 1 });
+      sdk.track('purchase', { currency: 'USD', value: '1' });
       sdk.identify(TEST_USER.id, TEST_USER.identityType);
       sdk.alias(TEST_STEAM, TEST_USER);
       await sdk.flush();
@@ -1425,7 +1425,7 @@ describe('Audience', () => {
       expect(document.cookie).toContain(`${COOKIE_NAME}=`);
 
       sdk.identify(TEST_USER.id, TEST_USER.identityType);
-      sdk.track('purchase', { currency: 'USD', value: 9.99 });
+      sdk.track('purchase', { currency: 'USD', value: '9.99' });
       await sdk.flush();
 
       const trackMsg = sentMessages().find(
@@ -1461,7 +1461,7 @@ describe('Audience', () => {
 
       sdk.identify(TEST_USER.id, TEST_USER.identityType);
       sdk.alias(TEST_STEAM, TEST_USER);
-      sdk.track('purchase', { currency: 'USD', value: 9.99 });
+      sdk.track('purchase', { currency: 'USD', value: '9.99' });
 
       sdk.setConsent('anonymous');
       await sdk.flush();

@@ -36,7 +36,8 @@ export interface WishlistRemoveProperties {
 
 export interface PurchaseProperties {
   currency: string;
-  value: number;
+  // String, not number: crypto amounts need precision a JS number can't hold.
+  value: string;
   item_id?: string;
   item_name?: string;
   quantity?: number;
