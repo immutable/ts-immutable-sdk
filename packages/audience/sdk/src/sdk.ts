@@ -312,8 +312,9 @@ export class Audience {
    * attribution captured at session start. All events include `sessionId`.
    *
    * No-op when consent is 'none'. Throws if the event name is empty, or if a
-   * reserved event (`purchase`, `progression`, `resource`,
-   * `achievement_unlocked`) is missing one of its required properties.
+   * reserved event with required properties (`wishlist_add`,
+   * `wishlist_remove`, `purchase`, `progression`, `resource`,
+   * `game_page_viewed`, `achievement_unlocked`) is missing one of them.
    */
   track<E extends AudienceEventName | string & {}>(
     event: E,

@@ -124,12 +124,27 @@ export type AudienceEventName = keyof EventPropsMap;
  * `Audience.track()`. `PropsFor`'s required/optional distinction only exists
  * at compile time; a caller can still bypass it (raw JS, an `any` cast, a
  * dynamically-built properties object), so this is checked again at the
- * call site. Events not listed here have no required properties.
+ * call site. `Record`, not `Partial`: every event must have an entry (`[]`
+ * if it has no required properties), so adding a new event to
+ * `EventPropsMap` without deciding what to list here fails to compile.
  */
-export const REQUIRED_EVENT_PROPS: Partial<Record<AudienceEventName, readonly string[]>> = {
+export const REQUIRED_EVENT_PROPS: Record<AudienceEventName, readonly string[]> = {
+  sign_up: [],
+  sign_in: [],
+  wishlist_add: ['game_id'],
+  wishlist_remove: ['game_id'],
   purchase: ['currency', 'value'],
+  game_launch: [],
   progression: ['status'],
   resource: ['flow', 'currency', 'amount'],
+  email_acquired: [],
+  game_page_viewed: ['game_id'],
+  // Not enforced: auto-capture's own link_clicked calls (autocapture.ts)
+  // send link_url/link_text, not url/label, so `url` isn't actually
+  // guaranteed present. Pre-existing mismatch between LinkClickedProperties
+  // and auto-capture's payload shape, tracked separately.
+  link_clicked: [],
+  button_clicked: [],
   achievement_unlocked: ['achievement_id', 'achievement_name'],
 };
 

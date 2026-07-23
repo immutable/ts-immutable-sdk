@@ -774,6 +774,33 @@ describe('Audience', () => {
         sdk.shutdown();
       });
 
+      it('throws when wishlist_add is missing game_id', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('wishlist_add', {})).toThrow(/missing required property: game_id/);
+
+        sdk.shutdown();
+      });
+
+      it('throws when wishlist_remove is missing game_id', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('wishlist_remove', {})).toThrow(/missing required property: game_id/);
+
+        sdk.shutdown();
+      });
+
+      it('throws when game_page_viewed is missing game_id', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('game_page_viewed', {})).toThrow(/missing required property: game_id/);
+
+        sdk.shutdown();
+      });
+
       it('does not throw when all required properties are present', async () => {
         const sdk = createSDK();
 
@@ -784,6 +811,27 @@ describe('Audience', () => {
           achievement_id: 'a1',
           achievement_name: 'First Steps',
         })).not.toThrow();
+        expect(() => sdk.track('wishlist_add', { game_id: 'abc' })).not.toThrow();
+        expect(() => sdk.track('wishlist_remove', { game_id: 'abc' })).not.toThrow();
+        expect(() => sdk.track('game_page_viewed', { game_id: 'abc' })).not.toThrow();
+        expect(() => sdk.track('link_clicked', { url: 'https://example.com' })).not.toThrow();
+
+        sdk.shutdown();
+      });
+
+      it('does not throw for events with no required properties', async () => {
+        const sdk = createSDK();
+
+        expect(() => sdk.track('sign_up')).not.toThrow();
+        expect(() => sdk.track('sign_in')).not.toThrow();
+        expect(() => sdk.track('game_launch')).not.toThrow();
+        expect(() => sdk.track('email_acquired')).not.toThrow();
+        expect(() => sdk.track('button_clicked')).not.toThrow();
+        // link_clicked's `url` isn't enforced at runtime (unlike its compile-time
+        // type): auto-capture's own calls (autocapture.ts) don't send it, see the
+        // comment on REQUIRED_EVENT_PROPS.link_clicked in events.ts.
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('link_clicked', {})).not.toThrow();
 
         sdk.shutdown();
       });
