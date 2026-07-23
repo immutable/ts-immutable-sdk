@@ -294,7 +294,7 @@ describe('Audience', () => {
 
       sdk.track('purchase', {
         currency: 'USD',
-        value: 9.99,
+        value: '9.99',
         item_id: 'sword_01',
       });
 
@@ -309,7 +309,7 @@ describe('Audience', () => {
       expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
         currency: 'USD',
-        value: 9.99,
+        value: '9.99',
         item_id: 'sword_01',
       });
       expect(msg.surface).toBe('web');
@@ -664,7 +664,7 @@ describe('Audience', () => {
       sessionStorage.clear();
 
       const sdk = createSDK();
-      sdk.track('purchase', { currency: 'USD', value: 9.99 });
+      sdk.track('purchase', { currency: 'USD', value: '9.99' });
       await sdk.flush();
 
       const msg = sentMessages().find(
@@ -674,7 +674,7 @@ describe('Audience', () => {
       expect(msg.sessionId).toEqual(expect.any(String));
       expect(msg.properties).toEqual({
         currency: 'USD',
-        value: 9.99,
+        value: '9.99',
       });
 
       sdk.shutdown();
@@ -701,7 +701,7 @@ describe('Audience', () => {
     it('picks up a session rollover on the next call instead of keeping a stale id', async () => {
       const sdk = createSDK();
 
-      sdk.track('purchase', { currency: 'USD', value: 1 });
+      sdk.track('purchase', { currency: 'USD', value: '1' });
       await sdk.flush();
       const firstSessionId = sentMessages().find(
         (m: any) => m.type === 'track' && m.eventName === 'purchase',
@@ -710,7 +710,7 @@ describe('Audience', () => {
       // Simulate the session cookie expiring (30 min idle) before the next call.
       document.cookie = `${SESSION_COOKIE}=;max-age=0;path=/`;
 
-      sdk.track('purchase', { currency: 'USD', value: 2 });
+      sdk.track('purchase', { currency: 'USD', value: '2' });
       await sdk.flush();
 
       const purchases = sentMessages().filter(
@@ -731,6 +731,122 @@ describe('Audience', () => {
       expect(sentMessages().filter((m: any) => m.type === 'track')).toHaveLength(0);
 
       sdk.shutdown();
+    });
+
+    describe('reserved event required properties', () => {
+      it('throws when purchase is missing currency and value', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('purchase', {})).toThrow(/missing required properties: currency, value/);
+        await sdk.flush();
+        expect(sentMessages().filter((m: any) => m.type === 'track')).toHaveLength(0);
+
+        sdk.shutdown();
+      });
+
+      it('throws when progression is missing status', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('progression', {})).toThrow(/missing required property: status/);
+
+        sdk.shutdown();
+      });
+
+      it('throws when resource is missing flow, currency, and amount', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('resource', {})).toThrow(/missing required properties: flow, currency, amount/);
+
+        sdk.shutdown();
+      });
+
+      it('throws when achievement_unlocked is missing achievement_id and achievement_name', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('achievement_unlocked', {})).toThrow(
+          /missing required properties: achievement_id, achievement_name/,
+        );
+
+        sdk.shutdown();
+      });
+
+      it('throws when wishlist_add is missing game_id', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('wishlist_add', {})).toThrow(/missing required property: game_id/);
+
+        sdk.shutdown();
+      });
+
+      it('throws when wishlist_remove is missing game_id', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('wishlist_remove', {})).toThrow(/missing required property: game_id/);
+
+        sdk.shutdown();
+      });
+
+      it('throws when game_page_viewed is missing game_id', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('game_page_viewed', {})).toThrow(/missing required property: game_id/);
+
+        sdk.shutdown();
+      });
+
+      it('does not throw when all required properties are present', async () => {
+        const sdk = createSDK();
+
+        expect(() => sdk.track('purchase', { currency: 'USD', value: '9.99' })).not.toThrow();
+        expect(() => sdk.track('progression', { status: 'start' })).not.toThrow();
+        expect(() => sdk.track('resource', { flow: 'source', currency: 'gold', amount: 10 })).not.toThrow();
+        expect(() => sdk.track('achievement_unlocked', {
+          achievement_id: 'a1',
+          achievement_name: 'First Steps',
+        })).not.toThrow();
+        expect(() => sdk.track('wishlist_add', { game_id: 'abc' })).not.toThrow();
+        expect(() => sdk.track('wishlist_remove', { game_id: 'abc' })).not.toThrow();
+        expect(() => sdk.track('game_page_viewed', { game_id: 'abc' })).not.toThrow();
+        expect(() => sdk.track('link_clicked', { url: 'https://example.com' })).not.toThrow();
+
+        sdk.shutdown();
+      });
+
+      it('throws when link_clicked is missing url', async () => {
+        const sdk = createSDK();
+
+        // @ts-expect-error deliberately bypassing the compile-time check
+        expect(() => sdk.track('link_clicked', {})).toThrow(/missing required property: url/);
+
+        sdk.shutdown();
+      });
+
+      it('does not throw for events with no required properties', async () => {
+        const sdk = createSDK();
+
+        expect(() => sdk.track('sign_up')).not.toThrow();
+        expect(() => sdk.track('sign_in')).not.toThrow();
+        expect(() => sdk.track('game_launch')).not.toThrow();
+        expect(() => sdk.track('email_acquired')).not.toThrow();
+        expect(() => sdk.track('button_clicked')).not.toThrow();
+
+        sdk.shutdown();
+      });
+
+      it('does not validate unrecognised event names', async () => {
+        const sdk = createSDK();
+
+        expect(() => sdk.track('some_custom_event', {})).not.toThrow();
+
+        sdk.shutdown();
+      });
     });
   });
 
@@ -878,7 +994,7 @@ describe('Audience', () => {
     it('stamps the anonymous consent level on every emitted message', async () => {
       const sdk = createSDK({ consent: 'anonymous' });
       sdk.page();
-      sdk.track('purchase', { currency: 'USD', value: 1 });
+      sdk.track('purchase', { currency: 'USD', value: '1' });
       await sdk.flush();
 
       const msgs = sentMessages();
@@ -908,7 +1024,7 @@ describe('Audience', () => {
     it('leaves queued events with their capture-time consentLevel and userId on downgrade from full', async () => {
       const sdk = createSDK({ consent: 'full' });
       sdk.identify(TEST_USER.id, TEST_USER.identityType);
-      sdk.track('purchase', { currency: 'USD', value: 9.99 });
+      sdk.track('purchase', { currency: 'USD', value: '9.99' });
 
       sdk.setConsent('anonymous');
       await sdk.flush();
@@ -930,7 +1046,7 @@ describe('Audience', () => {
     it('stamps sessionId at the top level on every message type, including identify and alias', async () => {
       const sdk = createSDK({ consent: 'full' });
       sdk.page();
-      sdk.track('purchase', { currency: 'USD', value: 1 });
+      sdk.track('purchase', { currency: 'USD', value: '1' });
       sdk.identify(TEST_USER.id, TEST_USER.identityType);
       sdk.alias(TEST_STEAM, TEST_USER);
       await sdk.flush();
@@ -1309,7 +1425,7 @@ describe('Audience', () => {
       expect(document.cookie).toContain(`${COOKIE_NAME}=`);
 
       sdk.identify(TEST_USER.id, TEST_USER.identityType);
-      sdk.track('purchase', { currency: 'USD', value: 9.99 });
+      sdk.track('purchase', { currency: 'USD', value: '9.99' });
       await sdk.flush();
 
       const trackMsg = sentMessages().find(
@@ -1345,7 +1461,7 @@ describe('Audience', () => {
 
       sdk.identify(TEST_USER.id, TEST_USER.identityType);
       sdk.alias(TEST_STEAM, TEST_USER);
-      sdk.track('purchase', { currency: 'USD', value: 9.99 });
+      sdk.track('purchase', { currency: 'USD', value: '9.99' });
 
       sdk.setConsent('anonymous');
       await sdk.flush();
@@ -1726,7 +1842,7 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.properties).toMatchObject({
-        link_url: 'https://store.steampowered.com/app/12345',
+        url: 'https://store.steampowered.com/app/12345',
         outbound: true,
       });
 

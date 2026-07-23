@@ -317,8 +317,8 @@ describe('autocapture', () => {
       expect(enqueue).toHaveBeenCalledWith(
         'link_clicked',
         expect.objectContaining({
-          link_url: 'https://store.steampowered.com/app/12345',
-          link_text: 'Wishlist on Steam',
+          url: 'https://store.steampowered.com/app/12345',
+          label: 'Wishlist on Steam',
           element_id: 'steam-link',
           outbound: true,
         }),
@@ -395,7 +395,7 @@ describe('autocapture', () => {
       expect(enqueue).toHaveBeenCalledWith(
         'link_clicked',
         expect.objectContaining({
-          link_url: 'https://discord.gg/invite',
+          url: 'https://discord.gg/invite',
           outbound: true,
         }),
       );
@@ -425,7 +425,7 @@ describe('autocapture', () => {
       link.dispatchEvent(new Event('click', { bubbles: true }));
 
       const props = enqueue.mock.calls[0][1];
-      expect(props.link_text).toHaveLength(256);
+      expect(props.label).toHaveLength(256);
     });
 
     it('resolves clicks on child elements to nearest anchor', () => {
@@ -445,8 +445,8 @@ describe('autocapture', () => {
       expect(enqueue).toHaveBeenCalledWith(
         'link_clicked',
         expect.objectContaining({
-          link_url: 'https://store.steampowered.com/app/12345',
-          link_text: 'Click me',
+          url: 'https://store.steampowered.com/app/12345',
+          label: 'Click me',
           outbound: true,
         }),
       );
@@ -517,8 +517,8 @@ describe('autocapture', () => {
       expect(enqueue).toHaveBeenCalledWith(
         'link_clicked',
         expect.objectContaining({
-          link_url: `${window.location.origin}/about`,
-          link_text: 'About Us',
+          url: `${window.location.origin}/about`,
+          label: 'About Us',
           element_id: 'about-link',
           outbound: false,
         }),
@@ -550,7 +550,7 @@ describe('autocapture', () => {
       expect(enqueue).toHaveBeenCalledWith(
         'link_clicked',
         expect.objectContaining({
-          link_text: 'Watch Trailer',
+          label: 'Watch Trailer',
           outbound: false,
         }),
       );
@@ -607,7 +607,7 @@ describe('autocapture', () => {
 
       link.dispatchEvent(new Event('click', { bubbles: true }));
 
-      expect(enqueue.mock.calls[0][1].link_text).toHaveLength(256);
+      expect(enqueue.mock.calls[0][1].label).toHaveLength(256);
     });
   });
 

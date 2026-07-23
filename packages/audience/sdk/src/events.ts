@@ -36,7 +36,8 @@ export interface WishlistRemoveProperties {
 
 export interface PurchaseProperties {
   currency: string;
-  value: number;
+  // String, not number: crypto amounts need precision a JS number can't hold.
+  value: string;
   item_id?: string;
   item_name?: string;
   quantity?: number;
@@ -84,7 +85,10 @@ export interface LinkClickedProperties {
   url: string;
   label?: string;
   source?: string;
-  game_id?: string;
+  /** Only set by auto-capture. */
+  element_id?: string;
+  /** Only set by auto-capture. */
+  outbound?: boolean;
 }
 
 export interface ButtonClickedProperties {
@@ -118,6 +122,28 @@ interface EventPropsMap {
 }
 
 export type AudienceEventName = keyof EventPropsMap;
+
+/**
+ * Required property names per reserved event, enforced at runtime by
+ * `Audience.track()` (see `validateRequiredProps` in sdk.ts). `Record`, not
+ * `Partial`: every event needs an entry (`[]` if none are required), so a
+ * new event added to `EventPropsMap` without one fails to compile.
+ */
+export const REQUIRED_EVENT_PROPS: Record<AudienceEventName, readonly string[]> = {
+  sign_up: [],
+  sign_in: [],
+  wishlist_add: ['game_id'],
+  wishlist_remove: ['game_id'],
+  purchase: ['currency', 'value'],
+  game_launch: [],
+  progression: ['status'],
+  resource: ['flow', 'currency', 'amount'],
+  email_acquired: [],
+  game_page_viewed: ['game_id'],
+  link_clicked: ['url'],
+  button_clicked: [],
+  achievement_unlocked: ['achievement_id', 'achievement_name'],
+};
 
 /**
  * Event name → property type. Falls back to `Record<string, unknown>` for

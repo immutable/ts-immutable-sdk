@@ -40,7 +40,7 @@ import {
 import { adoptAnonymousId, resolvePrivacySignal } from '@imtbl/audience-core/internal';
 import { track } from '@imtbl/metrics';
 import { DebugLogger } from './debug';
-import type { AudienceEventName, PropsFor } from './events';
+import { REQUIRED_EVENT_PROPS, type AudienceEventName, type PropsFor } from './events';
 import type { AudienceConfig } from './types';
 import {
   LIBRARY_NAME, LIBRARY_VERSION, LOG_PREFIX, DEFAULT_CONSENT_SOURCE,
@@ -64,6 +64,19 @@ function invalidPassportId(method: string, typeLabel: string, idLabel: string, i
     + 'like a Passport ID (expected a format like "email|123" or a UUID). Check you\'re passing '
     + 'the Passport user ID, not your own internal user ID.',
   );
+}
+
+// TypeScript enforces this shape at the call site, but only for callers who
+// go through the compiler; this closes the gap for anyone else (raw JS, an
+// `any` cast, a dynamically-built properties object).
+function validateRequiredProps(event: string, properties: Record<string, unknown> | undefined): void {
+  const required = REQUIRED_EVENT_PROPS[event as AudienceEventName];
+  if (!required) return;
+  const missing = required.filter((key) => properties?.[key] === undefined);
+  if (missing.length > 0) {
+    const plural = missing.length > 1 ? 'ies' : 'y';
+    invalidCall(`track('${event}', ...) is missing required propert${plural}: ${missing.join(', ')}.`);
+  }
 }
 
 /**
@@ -298,7 +311,11 @@ export class Audience {
    * `sign_up` and `link_clicked` events automatically include the UTM
    * attribution captured at session start. All events include `sessionId`.
    *
-   * No-op when consent is 'none'. Throws if the event name is empty.
+   * No-op when consent is 'none'. Throws if the event name is empty, or if a
+   * reserved event with required properties (`wishlist_add`,
+   * `wishlist_remove`, `purchase`, `progression`, `resource`,
+   * `game_page_viewed`, `link_clicked`, `achievement_unlocked`) is missing
+   * one of them.
    */
   track<E extends AudienceEventName | string & {}>(
     event: E,
@@ -308,9 +325,12 @@ export class Audience {
   ): void {
     if (this.isTrackingDisabled()) return;
     if (!hasValue(event)) invalidCall('track() called with an empty event name.');
-    this.refreshSession();
 
     const [properties] = args;
+    validateRequiredProps(event, properties as Record<string, unknown> | undefined);
+
+    this.refreshSession();
+
     const mergedProps: Record<string, unknown> = {
       ...(UTM_EVENTS.has(event) ? this.attribution : {}),
       ...properties as Record<string, unknown> | undefined,

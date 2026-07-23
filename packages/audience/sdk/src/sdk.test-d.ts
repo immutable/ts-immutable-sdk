@@ -9,10 +9,10 @@ sdk.track('sign_in', { method: 'passport' });
 sdk.track('wishlist_add', { game_id: 'abc' });
 sdk.track('wishlist_add', { game_id: 'abc', source: 'game_page', platform: 'steam' });
 sdk.track('wishlist_remove', { game_id: 'abc' });
-sdk.track('purchase', { currency: 'USD', value: 9.99 });
+sdk.track('purchase', { currency: 'USD', value: '9.99' });
 sdk.track('purchase', {
   currency: 'USD',
-  value: 9.99,
+  value: '9.99',
   item_id: 'sku_1',
   item_name: 'Gold Pack',
   quantity: 2,
@@ -47,11 +47,13 @@ sdk.track('link_clicked', {
   url: 'https://example.com',
   label: 'Play Now',
   source: 'game_page',
-  game_id: 'abc',
 });
 
+// @ts-expect-error — unknown property 'game_id'
+sdk.track('link_clicked', { url: 'https://example.com', game_id: 'abc' });
+
 sdk.track(AudienceEvents.SIGN_UP, { method: 'email' });
-sdk.track(AudienceEvents.PURCHASE, { currency: 'USD', value: 9.99 });
+sdk.track(AudienceEvents.PURCHASE, { currency: 'USD', value: '9.99' });
 sdk.track(AudienceEvents.PROGRESSION, { status: 'complete' });
 sdk.track(AudienceEvents.ACHIEVEMENT_UNLOCKED, { achievement_id: 'first_win', achievement_name: 'First Win' });
 sdk.track('achievement_unlocked', { achievement_id: 'first_win', achievement_name: 'First Win' });
@@ -101,16 +103,16 @@ sdk.track('game_page_viewed');
 sdk.track('link_clicked');
 
 // @ts-expect-error — unknown property 'currenyc'
-sdk.track('purchase', { currenyc: 'USD', value: 9.99 });
+sdk.track('purchase', { currenyc: 'USD', value: '9.99' });
 
 // @ts-expect-error — unknown property 'extra'
-sdk.track('purchase', { currency: 'USD', value: 9.99, extra: 1 });
+sdk.track('purchase', { currency: 'USD', value: '9.99', extra: 1 });
 
 // @ts-expect-error — unknown property 'isLoggedIn'
 sdk.track('link_clicked', { url: 'x', isLoggedIn: true });
 
-// @ts-expect-error — 'value' must be number
-sdk.track('purchase', { currency: 'USD', value: '9.99' });
+// @ts-expect-error — 'value' must be a string
+sdk.track('purchase', { currency: 'USD', value: 9.99 });
 
 // @ts-expect-error — 'status' must be a ProgressionStatus
 sdk.track('progression', { status: 'done' });
