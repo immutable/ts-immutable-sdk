@@ -34,7 +34,7 @@ const audience = Audience.init({
 });
 
 audience.page();
-audience.track('purchase', { currency: 'USD', value: 9.99 });
+audience.track('purchase', { currency: 'USD', value: '9.99' });
 audience.identify('user@example.com', 'email', { name: 'Jane' });
 audience.setConsent('full');
 
@@ -51,7 +51,7 @@ configure it.
 
 | Event | When it fires | Key properties |
 |-------|--------------|----------------|
-| `link_clicked` | Outbound link click (external domains only) | `link_url`, `link_text`, `element_id`, `outbound: true`, plus session attribution (UTMs, click IDs) |
+| `link_clicked` | Outbound link click (external domains only) | `url`, `label`, `element_id`, `outbound: true`, plus session attribution (UTMs, click IDs) |
 | `form_submitted` | HTML form submission | `form_action`, `form_id`, `form_name`, `field_names`. `email_hash` at `full` consent only. |
 | `button_clicked` | Button or `input[type=button\|submit\|reset]` click. Off by default (pass `autocapture: { buttons: true }` to enable). | `button_text`, `element_id`, `element_type`. Submit buttons inside a `<form>` are skipped (the form's own `form_submitted` already covers that interaction). |
 | `scroll_depth` | Scroll milestone reached (25%, 50%, 75%, 90%, 100%) | `depth` (integer). Resets on each `page()` call. |
@@ -79,7 +79,7 @@ const audience = Audience.init({
     onError: (err) => console.error(err.code, err.message),
   });
   audience.page();
-  audience.track(AudienceEvents.PURCHASE, { currency: 'USD', value: 9.99 });
+  audience.track(AudienceEvents.PURCHASE, { currency: 'USD', value: '9.99' });
 </script>
 ```
 
