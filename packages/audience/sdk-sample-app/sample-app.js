@@ -28,7 +28,7 @@
     { name: 'wishlist_remove',  fields: [{ key: 'game_id', type: 'string' }] },
     { name: 'purchase',         fields: [
       { key: 'currency', type: 'string' },
-      { key: 'value', type: 'number' },
+      { key: 'value', type: 'string' },
       { key: 'item_id', type: 'string', optional: true },
       { key: 'item_name', type: 'string', optional: true },
       { key: 'quantity', type: 'number', optional: true },
@@ -63,7 +63,16 @@
       { key: 'url', type: 'string' },
       { key: 'label', type: 'string', optional: true },
       { key: 'source', type: 'string', optional: true },
-      { key: 'game_id', type: 'string', optional: true },
+    ] },
+    { name: 'button_clicked',   fields: [
+      { key: 'button_text', type: 'string', optional: true },
+      { key: 'element_id', type: 'string', optional: true },
+      { key: 'element_type', type: 'string', optional: true },
+    ] },
+    { name: 'achievement_unlocked', fields: [
+      { key: 'achievement_id', type: 'string' },
+      { key: 'achievement_name', type: 'string' },
+      { key: 'achievement_type', type: 'enum', optional: true, values: ['onboarding', 'progression', 'mastery', 'social', 'collection'] },
     ] },
   ];
 

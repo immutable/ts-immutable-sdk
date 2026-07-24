@@ -59,7 +59,7 @@ first-class environment and must be reached via explicit override.
 
 ## `AudienceEvents` catalogue
 
-These are the 11 predefined event names and their typed property shapes.
+These are the 13 predefined event names and their typed property shapes.
 Both the CDN bundle and the ESM package expose them:
 
 ```ts
@@ -71,7 +71,7 @@ const { AudienceEvents } = window.ImmutableAudience;
 
 audience.track(AudienceEvents.PURCHASE, {
   currency: 'USD',
-  value: 9.99,
+  value: '9.99',
   item_id: 'sword',
   transaction_id: 'tx_123',
 });
@@ -94,7 +94,9 @@ picked up yet, the event log shows a `drift warn` entry.
 | `resource` | `flow: 'sink' \| 'source'`, `currency`, `amount` | `item_type`, `item_id` |
 | `email_acquired` | - | `source` |
 | `game_page_viewed` | `game_id` | `game_name`, `slug` |
-| `link_clicked` | `url` | `label`, `source`, `game_id` |
+| `link_clicked` | `url` | `label`, `source` |
+| `button_clicked` | - | `button_text`, `element_id`, `element_type` |
+| `achievement_unlocked` | `achievement_id`, `achievement_name` | `achievement_type` |
 
 Pass anything else as a custom event with the `string & {}` escape hatch:
 
