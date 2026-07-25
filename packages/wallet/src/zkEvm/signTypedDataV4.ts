@@ -1,4 +1,3 @@
-import { Flow } from '@imtbl/metrics';
 import type { PublicClient } from 'viem';
 import GuardianClient from '../guardian';
 import { signAndPackTypedData } from './walletHelpers';
@@ -14,7 +13,6 @@ export type SignTypedDataV4Params = {
   method: string;
   params: Array<any>;
   guardianClient: GuardianClient;
-  flow: Flow;
 };
 
 const REQUIRED_TYPED_DATA_PROPERTIES = ['types', 'domain', 'primaryType', 'message'];
@@ -77,7 +75,6 @@ export const signTypedDataV4 = async ({
   rpcProvider,
   relayerClient,
   guardianClient,
-  flow,
 }: SignTypedDataV4Params): Promise<string> => {
   const fromAddress: string = params[0];
   const typedDataParam: string | object = params[1];
@@ -88,13 +85,10 @@ export const signTypedDataV4 = async ({
 
   const chainId = await rpcProvider.getChainId();
   const typedData = transformTypedData(typedDataParam, BigInt(chainId));
-  flow.addEvent('endDetectNetwork');
 
   await guardianClient.evaluateEIP712Message({ chainID: String(chainId), payload: typedData });
-  flow.addEvent('endValidateMessage');
 
   const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
-  flow.addEvent('endRelayerSignTypedData');
 
   const signature = await signAndPackTypedData(
     typedData,
@@ -103,7 +97,6 @@ export const signTypedDataV4 = async ({
     fromAddress,
     ethSigner,
   );
-  flow.addEvent('getSignedTypedData');
 
   return signature;
 };

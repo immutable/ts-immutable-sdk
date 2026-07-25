@@ -8,13 +8,8 @@ import {
   WebStorageStateStore,
 } from 'oidc-client-ts';
 import localForage from 'localforage';
-import {
-  Detail,
-  getDetail,
-  identify,
-  track,
-  trackError,
-} from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
+import { getRuntimeId } from './utils/runtimeId';
 import { AuthConfiguration, IAuthConfiguration } from './config';
 import {
   AuthModuleConfiguration,
@@ -208,7 +203,7 @@ export class Auth {
         user = await this.getUserInternal();
       } catch (error: any) {
         if (error instanceof Error && !error.message.includes('Unknown or invalid refresh token')) {
-          trackError('passport', 'login', error);
+          track('passport', 'login', { error });
         }
         if (useCachedSession) {
           throw error;
@@ -227,7 +222,7 @@ export class Auth {
         user = await this.loginWithPopup(options?.directLoginOptions);
       }
 
-      // Emit LOGGED_IN event and identify user if logged in
+      // Emit LOGGED_IN event if logged in
       if (user) {
         this.handleSuccessfulLogin(user);
       }
@@ -317,7 +312,7 @@ export class Auth {
     return withMetricsAsync(async () => {
       const user = await this.getUserInternal();
       return user?.idToken;
-    }, 'getIdToken', false);
+    }, 'getIdToken');
   }
 
   /**
@@ -328,7 +323,7 @@ export class Auth {
     return withMetricsAsync(async () => {
       const user = await this.getUserInternal();
       return user?.accessToken;
-    }, 'getAccessToken', false, false);
+    }, 'getAccessToken');
   }
 
   /**
@@ -436,7 +431,6 @@ export class Auth {
 
   private handleSuccessfulLogin(user: User): void {
     this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
-    identify({ passportId: user.profile.sub });
   }
 
   private buildExtraQueryParams(
@@ -445,7 +439,7 @@ export class Auth {
   ): Record<string, string> {
     const params: Record<string, string> = {
       ...(this.userManager.settings?.extraQueryParams ?? {}),
-      rid: getDetail(Detail.RUNTIME_ID) || '',
+      rid: getRuntimeId(),
     };
 
     if (directLoginOptions) {

@@ -4,8 +4,9 @@
  * making them ideal for use with external session managers like NextAuth.
  */
 
-import { Detail, getDetail, track } from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
 import { decodeJwtPayload } from '../utils/jwt';
+import { getRuntimeId } from '../utils/runtimeId';
 import type {
   DirectLoginOptions, IdTokenPayload, MarketingConsentStatus, ZkEvmInfo,
 } from '../types';
@@ -259,7 +260,7 @@ function appendEmbeddedLoginPromptStyles(): void {
 }
 
 function createEmbeddedLoginIFrame(authDomain: string, clientId: string): HTMLIFrameElement {
-  const runtimeId = getDetail(Detail.RUNTIME_ID);
+  const runtimeId = getRuntimeId();
   const iframe = document.createElement('iframe');
   iframe.id = LOGIN_PROMPT_IFRAME_ID;
   iframe.src = `${authDomain}/im-embedded-login-prompt?client_id=${clientId}&rid=${runtimeId}`;

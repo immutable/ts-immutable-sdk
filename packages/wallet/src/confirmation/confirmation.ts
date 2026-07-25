@@ -1,5 +1,5 @@
 import * as GeneratedClients from '@imtbl/generated-clients';
-import { trackError } from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
 
 import {
   ConfirmationResult,
@@ -193,7 +193,7 @@ export default class ConfirmationScreen {
     } catch (error) {
       // If an error is thrown here then the popup is blocked
       const errorMessage = error instanceof Error ? error.message : String(error);
-      trackError('passport', 'confirmationPopupDenied', new Error(errorMessage));
+      track('passport', 'confirmationPopupDenied', { error: new Error(errorMessage) });
       this.overlay = new ConfirmationOverlay(this.config.popupOverlayOptions || {}, true);
     }
 

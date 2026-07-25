@@ -7,7 +7,6 @@ import { LIBRARY_NAME } from './config';
 
 jest.mock('@imtbl/metrics', () => ({
   track: jest.fn(),
-  trackError: jest.fn(),
 }));
 
 const INGEST_PATH = '/v1/audience/messages';
@@ -1697,10 +1696,7 @@ describe('Audience', () => {
       // Consent stays at none — no events should be sent
       sdk.page();
       expect(sentMessages()).toHaveLength(0);
-      const expected = {
-        signal: 'gpc', requestedLevel: 'anonymous', context: 'runtime', publishableKey: 'pk_imapik-test-local',
-      };
-      expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden', expected);
+      expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden');
 
       sdk.shutdown();
     });

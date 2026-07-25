@@ -70,12 +70,7 @@ export function createConsentManager(
 ): ConsentManager {
   const privacySignalActive = detectDoNotTrack();
   if (privacySignalActive) {
-    track('audience', 'gpc_consent_overridden', {
-      signal: resolvePrivacySignal(),
-      requestedLevel: initialLevel ?? 'none',
-      context: 'init',
-      publishableKey,
-    });
+    track('audience', 'gpc_consent_overridden');
   }
   let current: ConsentLevel = privacySignalActive ? 'none' : (initialLevel ?? 'none');
 
@@ -101,12 +96,7 @@ export function createConsentManager(
       const effective = signalActive ? 'none' : next;
 
       if (signalActive && effective !== next) {
-        track('audience', 'gpc_consent_overridden', {
-          signal: resolvePrivacySignal(),
-          requestedLevel: next,
-          context: 'runtime',
-          publishableKey,
-        });
+        track('audience', 'gpc_consent_overridden');
       }
 
       if (effective === current) return;

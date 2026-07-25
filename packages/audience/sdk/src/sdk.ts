@@ -34,7 +34,7 @@ import {
   isBrowser,
   setupAutocapture,
 } from '@imtbl/audience-core';
-import { adoptAnonymousId, resolvePrivacySignal } from '@imtbl/audience-core/internal';
+import { adoptAnonymousId } from '@imtbl/audience-core/internal';
 import { track } from '@imtbl/metrics';
 import { DebugLogger } from './debug';
 import { REQUIRED_EVENT_PROPS, type AudienceEventName, type PropsFor } from './events';
@@ -447,12 +447,7 @@ export class Audience {
     const effective: ConsentLevel = privacySignalActive ? 'none' : level;
 
     if (privacySignalActive && effective !== level) {
-      track('audience', 'gpc_consent_overridden', {
-        signal: resolvePrivacySignal(),
-        requestedLevel: level,
-        context: 'runtime',
-        publishableKey: this.publishableKey,
-      });
+      track('audience', 'gpc_consent_overridden');
       this.debug.logWarning('GPC or DNT signal active: consent upgrade blocked.');
     }
 

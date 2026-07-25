@@ -69,27 +69,21 @@ jest.mock('@imtbl/generated-clients', () => {
 
 jest.mock('@imtbl/metrics', () => {
   const actual = jest.requireActual('@imtbl/metrics');
-  const trackErrorMock = jest.fn();
-  const trackFlowMock = jest.fn(() => ({
-    addEvent: jest.fn(),
-    details: { flowId: 'flow-id' },
-  }));
+  const trackMock = jest.fn();
 
   return {
     ...actual,
-    trackError: trackErrorMock,
-    trackFlow: trackFlowMock,
-    setPassportClientId: jest.fn(),
+    track: trackMock,
+    configure: jest.fn(),
     __mocked: {
-      trackErrorMock,
-      trackFlowMock,
+      trackMock,
     },
   };
 });
 
 const { __mocked: metricsMocks } = jest.requireMock('@imtbl/metrics');
 const { __mocked: walletMocks } = jest.requireMock('@imtbl/wallet');
-const { trackErrorMock } = metricsMocks;
+const { trackMock } = metricsMocks;
 const { connectWalletMock } = walletMocks;
 
 describe('Passport', () => {
@@ -291,7 +285,7 @@ describe('Passport', () => {
       await expect(passport.linkExternalWallet(linkWalletParams)).rejects.toThrow(
         new PassportError('oops', PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR),
       );
-      expect(trackErrorMock).toHaveBeenCalledWith('passport', 'linkExternalWallet', error);
+      expect(trackMock).toHaveBeenCalledWith('passport', 'linkExternalWallet', { error });
     });
   });
 });
