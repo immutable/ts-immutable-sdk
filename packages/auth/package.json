@@ -34,7 +34,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "@imtbl/generated-clients": "workspace:*",
     "@imtbl/metrics": "workspace:*",
     "localforage": "^1.10.0",
     "oidc-client-ts": "3.4.1"
