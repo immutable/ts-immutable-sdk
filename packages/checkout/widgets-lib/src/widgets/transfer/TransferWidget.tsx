@@ -10,10 +10,6 @@ import { CloudImage, Stack, useTheme } from '@biom3/react';
 import { isAddress, isError, parseUnits } from 'ethers';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { LoadingView } from '../../views/loading/LoadingView';
-import {
-  useAnalytics,
-  UserJourney,
-} from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { getRemoteImage } from '../../lib/utils';
 import {
@@ -41,8 +37,6 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
   const { t } = useTranslation();
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const { track } = useAnalytics();
-
   const {
     connectLoaderState: { checkout, provider },
   } = useContext(ConnectLoaderContext);
@@ -89,15 +83,6 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
 
   const onSend = useCallback(async () => {
     if (viewState.type !== 'FORM') throw new Error('Unexpected state');
-
-    track({
-      screen: 'TransferToken',
-      userJourney: UserJourney.TRANSFER,
-      control: 'Send',
-      controlType: 'Button',
-      extras: { token: viewState.tokenAddress, amount: viewState.amount },
-    });
-
     if (!isAddress(viewState.toAddress)) {
       setViewState((s) => ({ ...s, toAddressError: 'Invalid wallet address' }));
       return;
@@ -177,13 +162,6 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
         && 'code' in e.error
         && e.error.code === TRANSACTION_CANCELLED_ERROR_CODE
       ) {
-        track({
-          screen: 'TransferToken',
-          userJourney: UserJourney.TRANSFER,
-          control: 'TranactionCancel',
-          controlType: 'Event',
-          extras: { token: viewState.tokenAddress, amount: viewState.amount },
-        });
         sendRejectedEvent(eventTarget, 'Transaction cancelled');
       } else {
         // eslint-disable-next-line no-console
@@ -192,7 +170,7 @@ function TransferWidgetInner(props: TransferWidgetInputs) {
         setViewState({ ...viewState, type: 'FORM' }); // TODO: We should be showing a failed view here
       }
     }
-  }, [viewState, eventTarget, track]);
+  }, [viewState, eventTarget]);
 
   switch (viewState.type) {
     case 'INITIALISING':

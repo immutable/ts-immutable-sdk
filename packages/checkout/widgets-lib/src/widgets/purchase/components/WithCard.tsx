@@ -1,6 +1,5 @@
 import { useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { WalletProviderRdns } from '@imtbl/checkout-sdk';
 import { PurchaseContext } from '../context/PurchaseContext';
 import { TransakIframe } from '../../../components/Transak/TransakIframe';
 import { TransakNFTData } from '../../../components/Transak/TransakTypes';
@@ -36,7 +35,6 @@ export function WithCard(props: WithCardProps) {
 
   const {
     providersState: {
-      toProviderInfo,
       toAddress,
       checkout,
     },
@@ -44,7 +42,6 @@ export function WithCard(props: WithCardProps) {
 
   const recipientEmail = '';
   const recipientAddress = toAddress || '';
-  const isPassportWallet = toProviderInfo?.rdns === WalletProviderRdns.PASSPORT;
   const excludeFiatCurrencies = [];
   const { environment } = checkout.config;
   const executeTxn = signResponse?.transactions.find((txn) => txn.methodCall.startsWith('execute'));
@@ -73,7 +70,6 @@ export function WithCard(props: WithCardProps) {
       type="nft-checkout"
       email={recipientEmail}
       walletAddress={recipientAddress}
-      isPassportWallet={isPassportWallet}
       exchangeScreenTitle={t('views.PAY_WITH_CARD.screenTitle')}
       nftData={nftData}
       calldata={executeTxn.rawData}

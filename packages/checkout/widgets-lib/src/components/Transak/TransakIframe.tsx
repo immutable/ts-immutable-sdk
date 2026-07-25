@@ -7,7 +7,6 @@ import {
   TransakWidgetType,
   TransakNFTCheckoutParams,
 } from './useTransakIframe';
-import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export type TransakIframeProps = {
   id: string;
@@ -16,7 +15,6 @@ export type TransakIframeProps = {
   contractId: string;
   environment: Environment;
   walletAddress: string;
-  isPassportWallet: boolean;
 } & TransakEventHandlers &
 TransakNFTCheckoutParams;
 
@@ -26,7 +24,6 @@ export function TransakIframe(props: TransakIframeProps) {
     type,
     email,
     walletAddress,
-    isPassportWallet,
     nftData,
     calldata,
     cryptoCurrencyCode,
@@ -48,10 +45,7 @@ export function TransakIframe(props: TransakIframeProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const { onLoad, initialised } = useTransakEvents({
-    userJourney: UserJourney.SALE,
     ref: iframeRef,
-    walletAddress,
-    isPassportWallet,
     onOpen,
     onOrderCreated,
     onOrderProcessing,

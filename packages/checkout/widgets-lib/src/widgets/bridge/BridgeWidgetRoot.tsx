@@ -10,7 +10,6 @@ import {
 import { Base } from '../BaseWidgetRoot';
 import { isValidWalletProvider, isValidAmount, isValidAddress } from '../../lib/validations/widgetValidators';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import i18n from '../../i18n';
@@ -65,23 +64,23 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="bridge-container" config={this.strongConfig()}>
-            <HandoverProvider>
-              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
-                <BridgeWidget
-                  checkout={this.checkout}
-                  config={this.strongConfig()}
-                  browserProvider={this.browserProvider}
-                  tokenAddress={this.parameters.tokenAddress}
-                  amount={this.parameters.amount}
-                  walletProviderName={this.parameters.walletProviderName}
-                  showBackButton={!!this.parameters.showBackButton}
-                />
-              </Suspense>
-            </HandoverProvider>
-          </ThemeProvider>
-        </CustomAnalyticsProvider>
+
+        <ThemeProvider id="bridge-container" config={this.strongConfig()}>
+          <HandoverProvider>
+            <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
+              <BridgeWidget
+                checkout={this.checkout}
+                config={this.strongConfig()}
+                browserProvider={this.browserProvider}
+                tokenAddress={this.parameters.tokenAddress}
+                amount={this.parameters.amount}
+                walletProviderName={this.parameters.walletProviderName}
+                showBackButton={!!this.parameters.showBackButton}
+              />
+            </Suspense>
+          </HandoverProvider>
+        </ThemeProvider>
+
       </React.StrictMode>,
     );
   }

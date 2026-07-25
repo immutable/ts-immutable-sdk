@@ -18,17 +18,13 @@ import { useTranslation } from 'react-i18next';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import {
   connectToProvider, getWalletProviderNameByProvider,
-  isMetaMaskProvider,
+
   isPassportProvider,
   isWalletConnectProvider,
 } from '../../../lib/provider';
 import { getChainNameById } from '../../../lib/chains';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { abbreviateAddress } from '../../../lib/addressUtils';
-import {
-  useAnalytics,
-  UserJourney,
-} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import {
   bridgeHeadingStyles,
   brigdeWalletWrapperStyles,
@@ -52,9 +48,6 @@ export function WalletAndNetworkSelector({ themeOverrides }: { themeOverrides: T
   const { viewDispatch } = useContext(ViewContext);
   const { providers } = useInjectedProviders({ checkout });
   const { environment } = checkout.config;
-
-  const { track } = useAnalytics();
-
   // add default state from context values
   // if user has clicked back button
   const defaultFromBrowserProvider = from?.browserProvider ?? null;
@@ -158,32 +151,10 @@ export function WalletAndNetworkSelector({ themeOverrides }: { themeOverrides: T
     setFromWalletBrowserProvider(provider);
     const address = await (await provider!.getSigner()).getAddress();
     setFromWalletAddress(address.toLowerCase());
-
-    track({
-      userJourney: UserJourney.BRIDGE,
-      screen: 'WalletAndNetwork',
-      control: 'FromWallet',
-      controlType: 'Select',
-      extras: {
-        walletAddress: address.toLowerCase(),
-      },
-    });
-
     /** if Passport skip from network selector and default to zkEVM */
     if (isPassportProvider(provider)) {
       setFromNetwork(imtblZkEvmNetworkChainId);
-      setFromWalletDrawerOpen(false);
-
-      track({
-        userJourney: UserJourney.BRIDGE,
-        screen: 'WalletAndNetwork',
-        control: 'FromNetwork',
-        controlType: 'Select',
-        extras: {
-          chainId: imtblZkEvmNetworkChainId,
-        },
-      });
-      return;
+      setFromWalletDrawerOpen(false); return;
     }
 
     /**
@@ -224,16 +195,6 @@ export function WalletAndNetworkSelector({ themeOverrides }: { themeOverrides: T
       clearToWalletSelections();
       setFromNetworkDrawerOpen(false);
       setFromNetwork(chainId);
-
-      track({
-        userJourney: UserJourney.BRIDGE,
-        screen: 'WalletAndNetwork',
-        control: 'FromNetwork',
-        controlType: 'Select',
-        extras: {
-          chainId,
-        },
-      });
     },
     [checkout, fromWalletBrowserProvider],
   );
@@ -243,16 +204,6 @@ export function WalletAndNetworkSelector({ themeOverrides }: { themeOverrides: T
       if (!toWalletBrowserProvider) return;
       setToNetworkDrawerOpen(false);
       setToNetwork(chainId);
-
-      track({
-        userJourney: UserJourney.BRIDGE,
-        screen: 'WalletAndNetwork',
-        control: 'ToNetwork',
-        controlType: 'Select',
-        extras: {
-          chainId,
-        },
-      });
     },
     [checkout, toWalletBrowserProvider],
   );
@@ -265,16 +216,6 @@ export function WalletAndNetworkSelector({ themeOverrides }: { themeOverrides: T
       : imtblZkEvmNetworkChainId;
     setToNetwork(theToNetwork);
     setToWalletDrawerOpen(false);
-
-    track({
-      userJourney: UserJourney.BRIDGE,
-      screen: 'WalletAndNetwork',
-      control: 'ToNetwork',
-      controlType: 'Select',
-      extras: {
-        chainId: theToNetwork,
-      },
-    });
   }, [fromWalletAddress, fromNetwork]);
 
   const handleWalletConnectToWalletConnection = useCallback(
@@ -286,16 +227,6 @@ export function WalletAndNetworkSelector({ themeOverrides }: { themeOverrides: T
         .then((address) => {
           setToWalletAddress(address.toLowerCase());
           handleSettingToNetwork(address.toLowerCase());
-
-          track({
-            userJourney: UserJourney.BRIDGE,
-            screen: 'WalletAndNetwork',
-            control: 'ToWallet',
-            controlType: 'Select',
-            extras: {
-              walletAddress: address.toLowerCase(),
-            },
-          });
         });
     },
     [handleSettingToNetwork],
@@ -309,18 +240,7 @@ export function WalletAndNetworkSelector({ themeOverrides }: { themeOverrides: T
         setToWallet(event);
         const address = await (await fromWalletBrowserProvider!.getSigner()).getAddress();
         setToWalletAddress(address.toLowerCase());
-        handleSettingToNetwork(address.toLowerCase());
-
-        track({
-          userJourney: UserJourney.BRIDGE,
-          screen: 'WalletAndNetwork',
-          control: 'ToWallet',
-          controlType: 'Select',
-          extras: {
-            walletAddress: address.toLowerCase(),
-          },
-        });
-        return;
+        handleSettingToNetwork(address.toLowerCase()); return;
       }
 
       try {
@@ -336,16 +256,6 @@ export function WalletAndNetworkSelector({ themeOverrides }: { themeOverrides: T
           setToWalletBrowserProvider(connectedProvider);
           setToWalletAddress(address.toLowerCase());
           handleSettingToNetwork(address.toLowerCase());
-
-          track({
-            userJourney: UserJourney.BRIDGE,
-            screen: 'WalletAndNetwork',
-            control: 'ToWallet',
-            controlType: 'Select',
-            extras: {
-              walletAddress: address.toLowerCase(),
-            },
-          });
         }
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -399,35 +309,6 @@ export function WalletAndNetworkSelector({ themeOverrides }: { themeOverrides: T
         },
       },
     });
-
-    track({
-      userJourney: UserJourney.BRIDGE,
-      screen: 'WalletAndNetwork',
-      control: 'Next',
-      controlType: 'Button',
-      extras: {
-        fromWalletAddress,
-        fromNetwork,
-        fromWallet: {
-          address: fromWalletAddress,
-          rdns: fromWallet?.providerDetail.info.rdns,
-          uuid: fromWallet?.providerDetail.info.uuid,
-          isPassportWallet: isPassportProvider(fromWalletBrowserProvider),
-          isMetaMask: isMetaMaskProvider(fromWalletBrowserProvider),
-        },
-        toWalletAddress,
-        toNetwork,
-        toWallet: {
-          address: toWalletAddress,
-          rdns: toWallet?.providerDetail.info.rdns,
-          uuid: toWallet?.providerDetail.info.uuid,
-          isPassportWallet: isPassportProvider(toWalletBrowserProvider),
-          isMetaMask: isMetaMaskProvider(toWalletBrowserProvider),
-        },
-        moveType: fromNetwork && fromNetwork === toNetwork ? 'transfer' : 'bridge',
-      },
-    });
-
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,

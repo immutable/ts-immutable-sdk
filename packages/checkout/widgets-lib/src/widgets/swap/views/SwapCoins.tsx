@@ -19,7 +19,6 @@ import { SwapContext } from '../context/SwapContext';
 import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
 import { IMX_TOKEN_SYMBOL } from '../../../lib';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { isPassportProvider } from '../../../lib/provider';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
@@ -70,22 +69,6 @@ export function SwapCoins({
   } = useContext(ConnectLoaderContext);
 
   const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
-
-  const { page } = useAnalytics();
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.SWAP,
-      screen: 'SwapCoins',
-      extras: {
-        fromAmount,
-        toAmount,
-        fromTokenAddress,
-        toTokenAddress,
-      },
-    });
-  }, []);
-
   useEffect(() => {
     if (hasZeroBalance(tokenBalances, IMX_TOKEN_SYMBOL) && !isPassportProvider(provider)) {
       setShowNotEnoughImxDrawer(true);

@@ -2,7 +2,6 @@ import { Body, Box, Heading } from '@biom3/react';
 import {
   ReactNode, useContext, useEffect, useMemo, useState,
 } from 'react';
-import { StandardAnalyticsControlTypes } from '@imtbl/react-analytics';
 import {
   Checkout,
   GasEstimateBridgeToL2Result,
@@ -12,13 +11,9 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
-import {
-  UserJourney,
-  useAnalytics,
-} from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
-import { useMount } from '../../hooks/useMount';
+import { } from '../../hooks/useMount';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import {
@@ -50,11 +45,7 @@ interface TopUpViewProps {
   showSwapOption: boolean;
   showBridgeOption: boolean;
   tokenAddress?: string;
-  amount?: string;
-  analytics: {
-    userJourney: UserJourney;
-  };
-  onCloseButtonClick: () => void;
+  amount?: string; onCloseButtonClick: () => void;
   onBackButtonClick?: () => void;
   heading?: [key: string, options?: $Dictionary];
   subheading?: [key: string, options?: $Dictionary];
@@ -84,15 +75,12 @@ export function TopUpView({
   showBridgeOption,
   tokenAddress,
   amount,
-  analytics,
   onCloseButtonClick,
   onBackButtonClick,
   heading,
   subheading,
 }: TopUpViewProps) {
   const { t } = useTranslation();
-  const { userJourney } = analytics;
-
   const { viewDispatch } = useContext(ViewContext);
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -110,9 +98,6 @@ export function TopUpView({
 
   const title = heading ? t(...heading) : t('views.TOP_UP_VIEW.header.title');
   const description = subheading ? t(...subheading) : null;
-
-  const { page, track } = useAnalytics();
-
   const isSwapAvailable = useAsyncMemo<boolean | undefined>(async () => {
     if (!checkout) return undefined;
     try {
@@ -121,11 +106,6 @@ export function TopUpView({
       return false;
     }
   }, [checkout]);
-
-  useMount(() => {
-    page({ userJourney, screen: 'TopUp' });
-  });
-
   useEffect(() => {
     if (!cryptoFiatDispatch) return;
     cryptoFiatDispatch({
@@ -161,21 +141,6 @@ export function TopUpView({
       setOnRampFeesPercentage(onRampFees);
     })();
   }, [checkout !== undefined]);
-
-  const localTrack = (
-    control: string,
-    extras: any,
-    controlType: StandardAnalyticsControlTypes = 'Button',
-  ) => {
-    track({
-      userJourney,
-      screen: 'TopUp',
-      control,
-      controlType,
-      extras,
-    });
-  };
-
   const onClickSwap = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT) {
       const data = {
@@ -192,9 +157,7 @@ export function TopUpView({
             data,
           },
         },
-      });
-      localTrack('Swap', { ...data, widgetEvent });
-      return;
+      }); return;
     }
 
     const data = {
@@ -203,7 +166,6 @@ export function TopUpView({
       amount: '',
     };
     orchestrationEvents.sendRequestSwapEvent(eventTarget, widgetEvent, data);
-    localTrack('Swap', { ...data, widgetEvent });
   };
 
   const onClickBridge = () => {
@@ -221,9 +183,7 @@ export function TopUpView({
             data,
           },
         },
-      });
-      localTrack('Bridge', { ...data, widgetEvent });
-      return;
+      }); return;
     }
 
     const data = {
@@ -231,7 +191,6 @@ export function TopUpView({
       amount: '',
     };
     orchestrationEvents.sendRequestBridgeEvent(eventTarget, widgetEvent, data);
-    localTrack('Bridge', { ...data, widgetEvent });
   };
 
   const onClickOnRamp = () => {
@@ -249,9 +208,7 @@ export function TopUpView({
             data,
           },
         },
-      });
-      localTrack('OnRamp', { ...data, widgetEvent });
-      return;
+      }); return;
     }
 
     const data = {
@@ -259,18 +216,10 @@ export function TopUpView({
       amount: amount ?? '',
     };
     orchestrationEvents.sendRequestOnrampEvent(eventTarget, widgetEvent, data);
-    localTrack('OnRamp', { ...data, widgetEvent });
   };
 
   const onClickAdvancedOptions = () => {
     const toolkitBaseUrl = TOOLKIT_BASE_URL[environment];
-    const data = {
-      tokenAddress: tokenAddress ?? '',
-      amount: amount ?? '',
-    };
-
-    localTrack('AdvancedOptions', { ...data, widgetEvent });
-
     window.open(`${toolkitBaseUrl}/squid-bridge/`, '_blank');
   };
 

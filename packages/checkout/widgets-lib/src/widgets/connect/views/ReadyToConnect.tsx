@@ -18,8 +18,6 @@ import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewCon
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 import { ViewContext, ViewActions } from '../../../context/view-context/ViewContext';
 import { isMetaMaskProvider, isPassportProvider } from '../../../lib/provider';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { identifyUser } from '../../../lib/analytics/identifyUser';
 
 export interface ReadyToConnectProps {
   targetChainId: ChainId;
@@ -35,18 +33,6 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
 
   const isPassport = isPassportProvider(provider);
   const isMetaMask = isMetaMaskProvider(provider);
-
-  const {
-    page, identify, track, user,
-  } = useAnalytics();
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.CONNECT,
-      screen: 'ReadyToConnect',
-    });
-  }, []);
-
   // make sure wallet provider name is set if coming directly to this screen
   // and not through the wallet list
   useEffect(() => {
@@ -127,13 +113,6 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
     setLoading(true);
 
     try {
-      track({
-        userJourney: UserJourney.CONNECT,
-        screen: 'ReadyToConnect',
-        control: 'Connect',
-        controlType: 'Button',
-      });
-
       let changeAccount = false;
       if (isMetaMaskProvider(provider)) {
         changeAccount = true;
@@ -145,13 +124,7 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
       });
 
       // Set up EIP-1193 provider event listeners for widget root instances
-      addProviderListenersForWidgetRoot(connectResult.provider);
-
-      const userData = user ? await user() : undefined;
-      const anonymousId = userData?.anonymousId();
-      await identifyUser(identify, connectResult.provider, { anonymousId });
-
-      connectDispatch({
+      addProviderListenersForWidgetRoot(connectResult.provider); connectDispatch({
         payload: {
           type: ConnectActions.SET_PROVIDER,
           provider: connectResult.provider,
@@ -164,7 +137,7 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
       setLoading(false);
       setFooterButtonTextKey(`${textView()}.footer.buttonText2`);
     }
-  }, [checkout, provider, connectDispatch, viewDispatch, identify]);
+  }, [checkout, provider, connectDispatch, viewDispatch]);
 
   return (
     <SimpleLayout
