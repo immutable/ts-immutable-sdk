@@ -50,8 +50,17 @@ export {
 
 export { getOrCreateSessionId } from './session';
 
-export { collectSessionAttribution, collectPageAttribution } from './attribution';
-export type { Attribution } from './attribution';
+export {
+  collectSessionAttribution,
+  collectPageAttribution,
+  getAttributionNetwork,
+  isPaidMeta,
+  isPaidTikTok,
+  isPaidGoogle,
+  isPaidReddit,
+  isPaidX,
+} from './attribution';
+export type { Attribution, AttributionNetwork } from './attribution';
 
 export { collectThirdPartyIds } from './thirdPartyIds';
 

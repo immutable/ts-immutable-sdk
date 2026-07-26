@@ -14,6 +14,7 @@ const CLICK_ID_PARAMS = [
   'rdt_cid',
   'msclkid',
   'li_fat_id',
+  'twclid',
 ] as const;
 
 const STORAGE_KEY = '__imtbl_attribution';
@@ -31,6 +32,7 @@ export interface Attribution {
   rdt_cid?: string;
   msclkid?: string;
   li_fat_id?: string;
+  twclid?: string;
   referral_code?: string;
   referrer?: string;
   landing_page?: string;
@@ -129,4 +131,78 @@ export function clearAttribution(): void {
   } catch {
     // noop
   }
+}
+
+/**
+ * The ad network a visit is attributed to, derived from `utm_source` and
+ * ad-network click IDs on the current URL. Mirrors the network taxonomy
+ * used by Immutable's server-side attribution pipeline so client- and
+ * server-classified traffic agree on the same names.
+ */
+export type AttributionNetwork = 'meta' | 'tiktok' | 'google' | 'reddit' | 'x' | 'organic' | 'other';
+
+const META_SOURCES = ['facebook', 'instagram', 'meta', 'fb', 'ig'];
+const X_SOURCES = ['x', 'twitter'];
+
+/**
+ * Classifies the current page load's traffic source from `utm_source` and
+ * ad-network click IDs on the URL (e.g. `fbclid`, `ttclid`, `gclid`).
+ *
+ * @returns The matched network, `'organic'` when no UTM or click ID is
+ * present, or `'other'` when a recognised click ID (e.g. `msclkid`,
+ * `li_fat_id`) doesn't map to a named network.
+ * @example
+ * // https://example.com/?utm_source=facebook
+ * getAttributionNetwork(); // 'meta'
+ */
+export function getAttributionNetwork(): AttributionNetwork {
+  if (typeof window === 'undefined' || !window.location) return 'organic';
+
+  const params = new URLSearchParams(window.location.search);
+  const source = params.get('utm_source')?.toLowerCase();
+
+  if (META_SOURCES.includes(source ?? '') || params.has('fbclid')) {
+    return 'meta';
+  }
+  if (source === 'tiktok' || params.has('ttclid')) {
+    return 'tiktok';
+  }
+  if (source === 'google' || params.has('gclid') || params.has('dclid')) {
+    return 'google';
+  }
+  if (source === 'reddit' || params.has('rdt_cid')) {
+    return 'reddit';
+  }
+  if (X_SOURCES.includes(source ?? '') || params.has('twclid')) {
+    return 'x';
+  }
+  if (params.has('msclkid') || params.has('li_fat_id')) {
+    return 'other';
+  }
+  return 'organic';
+}
+
+/** @returns Whether the current visit is attributed to paid Meta (Facebook/Instagram) traffic. */
+export function isPaidMeta(): boolean {
+  return getAttributionNetwork() === 'meta';
+}
+
+/** @returns Whether the current visit is attributed to paid TikTok traffic. */
+export function isPaidTikTok(): boolean {
+  return getAttributionNetwork() === 'tiktok';
+}
+
+/** @returns Whether the current visit is attributed to paid Google traffic. */
+export function isPaidGoogle(): boolean {
+  return getAttributionNetwork() === 'google';
+}
+
+/** @returns Whether the current visit is attributed to paid Reddit traffic. */
+export function isPaidReddit(): boolean {
+  return getAttributionNetwork() === 'reddit';
+}
+
+/** @returns Whether the current visit is attributed to paid X (Twitter) traffic. */
+export function isPaidX(): boolean {
+  return getAttributionNetwork() === 'x';
 }

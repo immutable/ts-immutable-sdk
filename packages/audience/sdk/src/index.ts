@@ -5,10 +5,16 @@ export {
   canTrack,
   canIdentify,
   AudienceError,
+  getAttributionNetwork,
+  isPaidMeta,
+  isPaidTikTok,
+  isPaidGoogle,
+  isPaidReddit,
+  isPaidX,
 } from '@imtbl/audience-core';
 export type { ImmutableAudienceGlobal } from './cdn';
 export type { AudienceConfig } from './types';
-export type { AudienceErrorCode, AutocaptureOptions } from '@imtbl/audience-core';
+export type { AudienceErrorCode, AutocaptureOptions, AttributionNetwork } from '@imtbl/audience-core';
 export type {
   AchievementType,
   AchievementUnlockedProperties,
