@@ -25,7 +25,6 @@ export {
   BASE_URL,
   COOKIE_NAME,
   SESSION_COOKIE,
-  DATA_PATH,
 } from './config';
 
 export { generateId, getTimestamp, isBrowser } from './utils';
@@ -50,8 +49,17 @@ export {
 
 export { getOrCreateSessionId } from './session';
 
-export { collectSessionAttribution, collectPageAttribution } from './attribution';
-export type { Attribution } from './attribution';
+export {
+  collectSessionAttribution,
+  collectPageAttribution,
+  getAttributionNetwork,
+  isPaidMeta,
+  isPaidTikTok,
+  isPaidGoogle,
+  isPaidReddit,
+  isPaidX,
+} from './attribution';
+export type { Attribution, AttributionNetwork } from './attribution';
 
 export { collectThirdPartyIds } from './thirdPartyIds';
 

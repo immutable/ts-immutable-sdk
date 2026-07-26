@@ -359,7 +359,6 @@
     'btn-custom-event',
     'btn-identify',
     'btn-identify-invalid-example',
-    'btn-delete-data',
   ];
 
   function setInitState(on) {
@@ -579,7 +578,6 @@
       saveUiState();
     });
     $('btn-alias').addEventListener('click', onAlias);
-    $('btn-delete-data').addEventListener('click', onDeleteData);
     ['alias-from-id', 'alias-to-id', 'alias-from-type', 'alias-to-type'].forEach(function (id) {
       $(id).addEventListener('input', syncAliasButton);
     });
@@ -864,17 +862,6 @@
     } catch (err) {
       log('alias()', errMsg(err), 'err');
     }
-  }
-
-  function onDeleteData() {
-    if (!audience) return;
-    var userId = $('delete-data-user-id').value.trim() || undefined;
-    var label = 'deleteData(' + (userId ? JSON.stringify(userId) : '') + ')';
-    audience.deleteData(userId).then(function () {
-      log(label, userId ? { userId: userId } : { anonymousId: 'current' }, 'ok');
-    }).catch(function (err) {
-      log(label, errMsg(err), 'err');
-    });
   }
 
   function syncAliasButton() {

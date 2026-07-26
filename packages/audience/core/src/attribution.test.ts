@@ -1,4 +1,14 @@
-import { collectSessionAttribution, collectPageAttribution, clearAttribution } from './attribution';
+import {
+  collectSessionAttribution,
+  collectPageAttribution,
+  clearAttribution,
+  getAttributionNetwork,
+  isPaidMeta,
+  isPaidTikTok,
+  isPaidGoogle,
+  isPaidReddit,
+  isPaidX,
+} from './attribution';
 
 const STORAGE_KEY = '__imtbl_attribution';
 
@@ -31,7 +41,8 @@ describe('collectSessionAttribution', () => {
 
   it('parses ad network click IDs', () => {
     setLocation(
-      'https://example.com/?gclid=abc&dclid=dc1&fbclid=fb2&ttclid=tt3&rdt_cid=rdt4&msclkid=ms5&li_fat_id=li6',
+      'https://example.com/?gclid=abc&dclid=dc1&fbclid=fb2&ttclid=tt3'
+      + '&rdt_cid=rdt4&msclkid=ms5&li_fat_id=li6&twclid=tw7',
     );
 
     const result = collectSessionAttribution();
@@ -42,6 +53,7 @@ describe('collectSessionAttribution', () => {
     expect(result.rdt_cid).toBe('rdt4');
     expect(result.msclkid).toBe('ms5');
     expect(result.li_fat_id).toBe('li6');
+    expect(result.twclid).toBe('tw7');
   });
 
   it('captures referrer and landing page', () => {
@@ -175,5 +187,80 @@ describe('clearAttribution', () => {
 
     clearAttribution();
     expect(sessionStorage.getItem(STORAGE_KEY)).toBeNull();
+  });
+});
+
+describe('getAttributionNetwork', () => {
+  it.each([
+    ['facebook', 'meta'],
+    ['instagram', 'meta'],
+    ['meta', 'meta'],
+    ['fb', 'meta'],
+    ['ig', 'meta'],
+    ['FACEBOOK', 'meta'],
+    ['tiktok', 'tiktok'],
+    ['google', 'google'],
+    ['reddit', 'reddit'],
+    ['x', 'x'],
+    ['twitter', 'x'],
+  ])('classifies utm_source=%s as %s', (source, expected) => {
+    setLocation(`https://example.com/?utm_source=${source}`);
+    expect(getAttributionNetwork()).toBe(expected);
+  });
+
+  it.each([
+    ['fbclid', 'meta'],
+    ['ttclid', 'tiktok'],
+    ['gclid', 'google'],
+    ['dclid', 'google'],
+    ['rdt_cid', 'reddit'],
+    ['twclid', 'x'],
+  ])('classifies %s presence as %s regardless of utm_source', (param, expected) => {
+    setLocation(`https://example.com/?${param}=123`);
+    expect(getAttributionNetwork()).toBe(expected);
+  });
+
+  it.each(['msclkid', 'li_fat_id'])('classifies %s presence as other', (param) => {
+    setLocation(`https://example.com/?${param}=123`);
+    expect(getAttributionNetwork()).toBe('other');
+  });
+
+  it('classifies no params as organic', () => {
+    setLocation('https://example.com/');
+    expect(getAttributionNetwork()).toBe('organic');
+  });
+
+  it('classifies an unrecognised utm_source as organic', () => {
+    setLocation('https://example.com/?utm_source=newsletter');
+    expect(getAttributionNetwork()).toBe('organic');
+  });
+});
+
+describe('isPaid* helpers', () => {
+  it('isPaidMeta reflects getAttributionNetwork', () => {
+    setLocation('https://example.com/?utm_source=facebook');
+    expect(isPaidMeta()).toBe(true);
+    expect(isPaidTikTok()).toBe(false);
+  });
+
+  it('isPaidTikTok reflects getAttributionNetwork', () => {
+    setLocation('https://example.com/?ttclid=abc');
+    expect(isPaidTikTok()).toBe(true);
+    expect(isPaidMeta()).toBe(false);
+  });
+
+  it('isPaidGoogle reflects getAttributionNetwork', () => {
+    setLocation('https://example.com/?gclid=abc');
+    expect(isPaidGoogle()).toBe(true);
+  });
+
+  it('isPaidReddit reflects getAttributionNetwork', () => {
+    setLocation('https://example.com/?utm_source=reddit');
+    expect(isPaidReddit()).toBe(true);
+  });
+
+  it('isPaidX reflects getAttributionNetwork', () => {
+    setLocation('https://example.com/?twclid=abc');
+    expect(isPaidX()).toBe(true);
   });
 });
