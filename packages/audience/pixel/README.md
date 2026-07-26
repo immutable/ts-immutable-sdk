@@ -81,7 +81,7 @@ All events fire automatically with no instrumentation required.
 
 | Event | When it fires | Key properties |
 |-------|--------------|----------------|
-| `page` | Every page load | UTMs, click IDs (`gclid`, `fbclid`, `ttclid`, `rdt_cid`, `msclkid`, `dclid`, `li_fat_id`), `referral_code`, `landing_page` |
+| `page` | Every page load | UTMs, click IDs (`gclid`, `fbclid`, `ttclid`, `rdt_cid`, `msclkid`, `dclid`, `li_fat_id`, `twclid`), `referral_code`, `landing_page` |
 | `session_start` | New session (no active `_imtbl_sid` cookie) | `session_id` |
 | `session_end` | Page unload (`visibilitychange` / `pagehide`) | `session_id`, `duration` (seconds) |
 | `form_submitted` | HTML form submission | `form_action`, `form_id`, `form_name`, `field_names`. `email_hash` at `full` consent only. |
