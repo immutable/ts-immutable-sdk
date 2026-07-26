@@ -45,7 +45,7 @@
   ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "keywords": [
-    "immutablex"
+    "immutable"
   ],
   "license": "Apache-2.0",
   "main": "dist/node/index.cjs",

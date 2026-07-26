@@ -41,7 +41,6 @@ export interface TransactionApprovalRequest {
 }
 
 export const TransactionApprovalRequestChainTypeEnum = {
-    Starkex: 'starkex',
     Evm: 'evm'
 } as const;
 

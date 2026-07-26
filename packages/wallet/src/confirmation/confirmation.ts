@@ -101,14 +101,9 @@ export default class ConfirmationScreen {
         }
       };
 
-      let href = '';
-      if (chainType === GeneratedClients.mr.TransactionApprovalRequestChainTypeEnum.Starkex) {
-        href = this.getHref('transaction', { transactionId, etherAddress, chainType });
-      } else {
-        href = this.getHref('zkevm/transaction', {
-          transactionID: transactionId, etherAddress, chainType, chainID: chainId,
-        });
-      }
+      const href = this.getHref('zkevm/transaction', {
+        transactionID: transactionId, etherAddress, chainType, chainID: chainId,
+      });
       window.addEventListener('message', messageHandler);
       this.showConfirmationScreen(href, messageHandler, resolve);
     });

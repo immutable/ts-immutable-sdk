@@ -7,9 +7,6 @@
       "path": "examples/ts-immutable-sample"
     },
     {
-      "path": "tests/func-tests/imx"
-    },
-    {
       "path": "tests/func-tests/zkevm"
     }
   ]
