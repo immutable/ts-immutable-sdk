@@ -25,7 +25,6 @@ export {
   BASE_URL,
   COOKIE_NAME,
   SESSION_COOKIE,
-  DATA_PATH,
 } from './config';
 
 export { generateId, getTimestamp, isBrowser } from './utils';

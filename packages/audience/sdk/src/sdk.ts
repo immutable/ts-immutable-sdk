@@ -6,10 +6,7 @@ import type {
   UserTraits,
 } from '@imtbl/audience-core';
 import {
-  AudienceError,
-  BASE_URL,
   COOKIE_NAME,
-  DATA_PATH,
   SESSION_COOKIE,
   MessageQueue,
   httpSend,
@@ -487,48 +484,6 @@ export class Audience {
       this.isFirstPage = true;
       this.refreshSession();
       this.queue.start();
-    }
-  }
-
-  // --- Data erasure ---
-
-  /**
-   * Ask the backend to erase a player's event data.
-   *
-   * - When `userId` is supplied: deletes records tied to that user ID.
-   * - When omitted: deletes records tied to this device's anonymous ID.
-   *   No-op on a fresh install where no anonymous ID has been created yet.
-   *
-   * Failures are surfaced via `config.onError` with code `'DATA_DELETE_FAILED'`.
-   * The returned promise always resolves (never rejects).
-   */
-  async deleteData(userId?: string): Promise<void> {
-    if (this.destroyed) return;
-
-    let query: string;
-    if (userId) {
-      query = `userId=${encodeURIComponent(userId)}`;
-    } else {
-      const anon = getCookie(COOKIE_NAME);
-      if (!anon) return;
-      query = `anonymousId=${encodeURIComponent(anon)}`;
-    }
-
-    const url = `${this.baseUrl ?? BASE_URL}${DATA_PATH}?${query}`;
-    const result = await httpSend(url, this.publishableKey, undefined, { method: 'DELETE' });
-    if (!result.ok && result.error && this.onError) {
-      const { error } = result;
-      try {
-        this.onError(new AudienceError({
-          code: 'DATA_DELETE_FAILED',
-          message: error.status
-            ? `Data delete failed with status ${error.status}`
-            : 'Data delete failed: network error',
-          status: error.status,
-          endpoint: url,
-          ...(error.cause !== undefined && { cause: error.cause }),
-        }));
-      } catch { /* swallow */ }
     }
   }
 
