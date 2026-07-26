@@ -80,16 +80,13 @@ export interface TransportResult {
  * - `'RATE_LIMITED'`:server returned 429. The batch is retained and will
  *                       be retried after the backoff window (honoring
  *                       `Retry-After` when present).
- * - `'DATA_DELETE_FAILED'`:DELETE to `/v1/audience/data` returned non-2xx
- *                       or the fetch itself rejected.
  */
 export type AudienceErrorCode =
   | 'FLUSH_FAILED'
   | 'CONSENT_SYNC_FAILED'
   | 'NETWORK_ERROR'
   | 'VALIDATION_REJECTED'
-  | 'RATE_LIMITED'
-  | 'DATA_DELETE_FAILED';
+  | 'RATE_LIMITED';
 
 /** One validation failure the backend reported for a single message. */
 export interface RejectionError {
