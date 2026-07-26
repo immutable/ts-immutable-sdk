@@ -4,7 +4,6 @@
 
 - [About](#about)
 - [Usage](#usage)
-  - [Immutable X](#immutable-x)
   - [Immutable Multi-Rollup](#immutable-multi-rollup)
   - [Regenerate Clients](#regenerate-clients)
   - [Regenerate Blockchain Data Types](#regenerate-blockchain-data-types)
@@ -16,17 +15,9 @@ Generated-clients is an internal package containing generated clients for Immuta
 
 ### Usage
 
-The generated clients are exposed via the `ImxApiClients` and `MultiRollupApiClients` classes. These classes inject the SDK version into the request headers, and provide a single point of configuration for the API clients.
+The generated clients are exposed via the `MultiRollupApiClients` class. This class injects the SDK version into the request headers, and provides a single point of configuration for the API clients.
 
-It's recommended to use the `ImxApiClients` and `MultiRollupApiClients` classes instead of the generated clients directly.
-
-#### Immutable X
-
-```typescript
-import { ImxApiClients, imxApiConfig } from '@imtbl/generated-clients';
-
-const imxApiClients = new ImxApiClients(imxApiConfig.getSandbox());
-```
+It's recommended to use the `MultiRollupApiClients` class instead of the generated clients directly.
 
 #### Immutable Multi-Rollup
 
@@ -36,29 +27,23 @@ import { MultiRollupApiClients, multiRollupConfig } from '@imtbl/generated-clien
 const mrApiClients = new MultiRollupApiClients(multiRollupConfig.sandbox);
 ```
 
-If you do need access to the generated API clients directly for whatever reason, they are exposed via the `imx` and `mr` namespaces:
+If you do need access to the generated API clients directly for whatever reason, they are exposed via the `mr` namespace:
 
 > Note: this won't inject the SDK version into the request headers, and we won't get user metrics for these requests.
 
 ```typescript
-import { imx, mr, createConfig } from '@imtbl/generated-clients';
+import { mr, createConfig } from '@imtbl/generated-clients';
 
 const config = createConfig({
-  basePath: 'https://api.dev.x.immutable.com',
+  basePath: 'https://api.sandbox.immutable.com',
 });
 
-const assetsApi = new imx.AssetsApi(config);
+const collectionsApi = new mr.CollectionsApi(config);
 ```
 
 #### Regenerate Clients
 
 All commands below need to be run in the `generated-clients` package folder where this README is located.
-
-Regenerate the StarkEx clients:
-
-```bash
-make generate-imx-openapi
-```
 
 Regenerate the Immutable multi-rollup clients:
 
