@@ -29,11 +29,10 @@ The need for a Typescript SDK arises from the challenges developers face when ma
     - [Alpha Packages](#alpha-packages)
 - [Technical Architecture](#technical-architecture)
 - [Contribution Guides](#contribution-guides)
-- [Examples](#examples)
 
 # Getting Started
 
-The Typescript SDK is a monorepo that contains all the packages from different Immutable products. Each product area has its own package within the monorepo, and these packages are imported and re-exported by one root-level package. Note that this monorepo also contains an `examples` folder that provides examples of the SDK in use for different use cases.
+The Typescript SDK is a monorepo that contains all the packages from different Immutable products. Each product area has its own package within the monorepo, and these packages are imported and re-exported by one root-level package.
 
 To get started with the SDK, you need to install the dependencies and build the project. You can then work with the packages included in the SDK, such as running them in development mode, running tests, building, and linting.
 
@@ -155,7 +154,3 @@ See [CONTRIBUTING.md](https://github.com/immutable/ts-immutable-sdk/blob/main/CO
 Internal maintainers' guide is available at Immutable's wiki [Typescript SDK Internal Development Guide here](https://immutable.atlassian.net/wiki/spaces/PPS/pages/2333477584/Typescript+SDK+Internal+Development+Guide+-+ts-immutable-sdk)
 - In the .github/CODEOWNERS file add your github team to the corresponding subfolder that your team will be responsible for.
 - [Example from GitHub](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#example-of-a-codeowners-file)
-
-# Examples
-
-The Typescript SDK also provides multiple sample frontend/backend applications in the root `examples` directory. These examples are meant to demonstrate how to use the SDK in a real-world application for external users and provide a base for building custom applications. Each sample has its own README file that provides additional information surrounding that example app. 

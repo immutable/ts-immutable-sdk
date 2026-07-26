@@ -138,7 +138,7 @@ logout({
 });
 ```
 
-See the [wallets-connect-with-nextjs](../../examples/passport/wallets-connect-with-nextjs) example for a full integration with `@imtbl/wallet`.
+See the [Passport wallet docs](https://docs.immutable.com/docs/products/passport/wallet) for integrating with `@imtbl/wallet`.
 
 ### 5. Add Login Button
 

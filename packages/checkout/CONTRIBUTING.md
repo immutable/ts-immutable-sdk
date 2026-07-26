@@ -23,18 +23,6 @@ Running in `sandbox`/`production` mode using the `immutable-testnet`/`mainnet` n
 pnpm start
 ```
 
-Running the Checkout SDK Sample App with the Checkout SDK supporting hot reloading:
-
-```bash
-# Run the Checkout SDK first
-# Context: checkout-sdk in ./sdk
-pnpm start
-
-# Run the Checkout SDK Sample App in a new terminal
-# Context: checkout-sdk-sample-app in ./sdk-sample-app
-pnpm start
-```
-
 Building to the `./sdk/dist` directory for `dev` environment:
 
 ```bash
@@ -69,22 +57,24 @@ pnpm start:dev
 pnpm start
 ```
 
-Running the Widgets Sample App with the Widgets Library supporting hot reloading:
+Running the Checkout Sample App (widgets + SDK method playgrounds) with hot reloading:
 
 ```bash
 # Run the above two commands first
 # ...
 
-# Run the Widgets Sample App in a new terminal
-# Context: checkout-widgets-sample-app in ./widgets-sample-app
+# Run the Sample App in a new terminal
+# Context: checkout-sample-app in ./sample-app
 pnpm start
 ```
+
+Open http://localhost:3000 — use `/sdk` for Checkout SDK methods, or the widget links for Commerce Widgets.
 
 **Read more about running locally below.**
 
 #### Widgets Development Locally
 
-When you develop locally, the widgets-sample-app installs and imports the widgets as an es module. `import { WidgetsFactory} from '@imtbl/checkout-widgets'` This helps local development with hot reloading. (it takes a lot longer to rebuild and minify a browser bundle).
+When you develop locally, the sample-app installs and imports the widgets as an es module. `import { WidgetsFactory} from '@imtbl/checkout-widgets'` This helps local development with hot reloading. (it takes a lot longer to rebuild and minify a browser bundle).
 
 In production however, the widgets-lib package is built as a browser bundle and is dynamically included in the DOM when you call `await checkout.widgets()`.
 
@@ -103,8 +93,8 @@ pnpm build:local
 ```
 
 ```bash
-# Run the Widgets Sample App in a new terminal
-# Context: checkout-widgets-sample-app in ./widgets-sample-app
+# Run the Sample App in a new terminal
+# Context: checkout-sample-app in ./sample-app
 pnpm start
 ```
 
@@ -119,11 +109,9 @@ In a production release, this script is loaded from a CDN. We are currently usin
       │
       ├── sdk - Checkout SDK
       │
-      ├── sdk-sample-app - Sample app where the Checkout SDK is consumed
-      │
       ├── widgets-lib - Commerce Widgets
       │
-      ├── widgets-sample-app - Sample app where the Commerce Widgets are consumed
+      ├── sample-app - Sample app for Checkout SDK methods and Commerce Widgets
       │
       └── README.md
 ```

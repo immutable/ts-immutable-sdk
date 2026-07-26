@@ -4,9 +4,6 @@
       "path": "."
     },
     {
-      "path": "examples/ts-immutable-sample"
-    },
-    {
       "path": "tests/func-tests/imx"
     },
     {

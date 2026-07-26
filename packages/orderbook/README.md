@@ -28,7 +28,7 @@ const orderbook = new Orderbook({
 })
 ```
 
-You can find example usages of this package in the examples set up [here](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/orderbook)
+See the [Orderbook docs](https://docs.immutable.com/docs/products/orderbook/overview) for usage guidance.
 
 # Installation
 

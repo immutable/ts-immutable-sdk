@@ -102,7 +102,7 @@
     "transpile": "node --max-old-space-size=14366 ./node_modules/rollup/dist/bin/rollup --config rollup.config.js",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
-    "build:local": "pnpm build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/browser/*.js ../widgets-sample-app/public/lib/js/",
+    "build:local": "pnpm build && mkdir -p ../sample-app/public/lib/js && cp dist/browser/*.js ../sample-app/public/lib/js/",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --fix",
     "start": "NODE_ENV=development rollup --config rollup.config.js --watch",

@@ -1,0 +1,69 @@
+import "./App.css";
+
+function App() {
+  return (
+    <div>
+      <main className="checkout-sdk-app">
+        <h1>Checkout Sample App</h1>
+        <p>Choose a playground from the list below</p>
+        <br />
+
+        <h2>Checkout SDK</h2>
+        <div>
+          <a href={"/sdk"}>SDK methods (connect, balances, smart checkout)</a>
+        </div>
+        <br />
+
+        <h2>Commerce Widgets</h2>
+        <div>
+          <a href={"/connect"}>Connect Widget</a>
+        </div>
+        <br />
+        <div>
+          <a href={"/wallet"}>Wallet Widget</a>
+        </div>
+        <br />
+        <div>
+          <a href={"/swap"}>Swap Widget</a>
+        </div>
+        <br />
+        <div>
+          <a href={"/bridge"}>Bridge Widget</a>
+        </div>
+        <br />
+        <div>
+          <a href={"/on-ramp"}>On-ramp Widget</a>
+        </div>
+        <br />
+        <div>
+          <a href={"/checkout"}>Commerce Widget</a>
+        </div>
+        <br />
+        <div>
+          <a href={"/add-tokens"}>Add Tokens Widget</a>
+        </div>
+        <br />
+        <div>
+          <a href={"/purchase"}>Purchase Widget</a>
+        </div>
+        <br />
+        <div>
+          <a
+            href={
+              "/sale?environmentId=249d9b0b-ee16-4dd5-91ee-96bece3b0473&collectionName=Iguanas&excludePaymentTypes=credit"
+            }
+          >
+            Sale Widget
+          </a>
+        </div>
+        <br />
+        <div>
+          <a href={"/marketplace-orchestrator"}>Marketplace Orchestrator</a>
+        </div>
+        <br />
+      </main>
+    </div>
+  );
+}
+
+export default App;

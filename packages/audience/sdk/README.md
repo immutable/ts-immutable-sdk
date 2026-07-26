@@ -89,7 +89,7 @@ const audience = Audience.init({
 - [Tracking Pixel](https://docs.immutable.com/docs/products/audience/tracking-pixel) — sibling `@imtbl/pixel` package for drop-in page-view tracking
 - [REST API](https://docs.immutable.com/docs/products/audience/rest-api) — backend reference for direct integration
 - [Data dictionary](https://docs.immutable.com/docs/products/audience/data-dictionary) — predefined event names and property schemas
-- [Sample app](../sdk-sample-app) — runnable example showing init, tracking, identity, and consent
+- [Sample app](../sample-app) — runnable example showing init, tracking, identity, and consent
 
 ## License
 
