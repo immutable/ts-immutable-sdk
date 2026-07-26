@@ -8,9 +8,6 @@ import { SuccessMessage, ErrorMessage } from './messages';
 import { Box, Select, Stack } from '@biom3/react';
 import { passport } from '../passport';
 
-// Connect Passport EVM
-await passport.connectEvm();
-
 interface ProviderProps {
   checkout: Checkout;
   provider: WrappedBrowserProvider | undefined;
@@ -26,6 +23,10 @@ export default function Provider(props: ProviderProps) {
   const [error1, setError1] = useState<any>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    void passport.connectEvm();
+  }, []);
 
   async function createProviderClick() {
     setError1(null);
