@@ -7,6 +7,11 @@ on:
   merge_group:
     branches:
       - main
+  # Break-glass: if main is pushed outside the merge queue, still validate.
+  # Merge-queue merges already ran this workflow; concurrency cancels duplicates.
+  push:
+    branches:
+      - main
 
 permissions: {}
 
@@ -46,6 +51,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # Needed to read PR labels when this job runs in a merge_group context.
+      pull-requests: read
     outputs:
       should-run: ${{ steps.changed-files.outputs.should-run }}
     steps:
@@ -61,18 +68,39 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha || github.sha }}
-          # Force-run when the PR carries this label (escape hatch).
-          FORCE_LABEL: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'run-func-tests') }}
+          EVENT_NAME: ${{ github.event_name }}
+          # pull_request payload includes labels; merge_group / push do not.
+          PR_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+          # merge_group head ref looks like: gh-readonly-queue/main/pr-1234-<sha>
+          MERGE_GROUP_HEAD_REF: ${{ github.event.merge_group.head_ref || '' }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if [ "$FORCE_LABEL" = "true" ]; then
+          force_label=false
+
+          if [ "$EVENT_NAME" = "pull_request" ] && echo "$PR_LABELS" | grep -Fq '"run-func-tests"'; then
+            force_label=true
+          fi
+
+          # On merge_group, re-check the source PR for the force-run label.
+          if [ "$EVENT_NAME" = "merge_group" ] && [ -n "$MERGE_GROUP_HEAD_REF" ]; then
+            pr_number="$(printf '%s' "$MERGE_GROUP_HEAD_REF" | sed -n 's|.*/pr-\([0-9][0-9]*\)-.*|\1|p')"
+            if [ -n "$pr_number" ]; then
+              if gh api "repos/${{ github.repository }}/issues/${pr_number}/labels" --jq '.[].name' \
+                | grep -Fxq 'run-func-tests'; then
+                force_label=true
+              fi
+            fi
+          fi
+
+          if [ "$force_label" = "true" ]; then
             echo "should-run=true" >> "$GITHUB_OUTPUT"
             echo "Running functional tests (run-func-tests label)"
             exit 0
           fi
 
-          # Allowlist: only orderbook / sdk packaging / shared deps the suite exercises.
+          # Allowlist: orderbook surface + shared build/deps roots that can break it.
           if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -qE \
-            '^(packages/orderbook/|sdk/|packages/config/|packages/internal/metrics/|packages/internal/generated-clients/|tests/func-tests/|\.github/workflows/pr\.yaml)'; then
+            '^(packages/orderbook/|sdk/|packages/config/|packages/internal/metrics/|packages/internal/generated-clients/|tests/func-tests/|\.github/workflows/pr\.yaml|pnpm-lock\.yaml|pnpm-workspace\.yaml|package\.json|tsup\.config\.js)'; then
             echo "should-run=true" >> "$GITHUB_OUTPUT"
             echo "Running functional tests (allowlisted path changed)"
           else

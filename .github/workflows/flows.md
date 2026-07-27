@@ -1,11 +1,13 @@
 ## PR / Merge Group
 
-Runs on every PR and merge queue entry. Does **not** re-run on push to `main`
-(merge queue is the final validation). Functional tests run only when allowlisted
-paths change (`packages/orderbook/`, `sdk/`, `packages/config/`,
+Runs on every PR and merge queue entry, and on push to `main` as a break-glass
+safety net (merge queue is the normal final validation). Functional tests run
+when allowlisted paths change (`packages/orderbook/`, `sdk/`, `packages/config/`,
 `packages/internal/metrics/`, `packages/internal/generated-clients/`,
-`tests/func-tests/`, or this workflow), or when the PR has the `run-func-tests`
-label. Syncpack runs inside the SDK job. All jobs are automated — no manual gate.
+`tests/func-tests/`, this workflow, `pnpm-lock.yaml`, `pnpm-workspace.yaml`,
+root `package.json`, or `tsup.config.js`), or when the PR has the
+`run-func-tests` label (honored on both `pull_request` and `merge_group`).
+Syncpack runs inside the SDK job. All jobs are automated — no manual gate.
 
 ```mermaid
 flowchart LR
