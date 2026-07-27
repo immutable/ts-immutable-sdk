@@ -3,10 +3,13 @@
  */
 import { BrowserProvider } from 'ethers';
 import { Passport } from '@imtbl/passport';
+import detectEthereumProvider from '@metamask/detect-provider';
 import { CheckoutErrorType } from '../errors';
 import { WalletProviderName } from '../types';
 import { createProvider } from './provider';
 import { InjectedProvidersManager } from './injectedProvidersManager';
+
+jest.mock('@metamask/detect-provider', () => jest.fn());
 
 jest.mock('./injectedProvidersManager', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -15,26 +18,27 @@ jest.mock('./injectedProvidersManager', () => ({
   },
 }));
 
-let windowSpy: any;
-
 describe('createProvider', () => {
   const providerRequestMock: jest.Mock = jest.fn();
   const mockFindProvider = jest.fn().mockReturnValue(null);
-
-  // const originalGetInstance = InjectedProvidersManager.getInstance;
+  const mockDetectEthereumProvider = detectEthereumProvider as jest.MockedFunction<
+    typeof detectEthereumProvider
+  >;
 
   beforeEach(() => {
-    windowSpy = jest.spyOn(window, 'window', 'get');
-    windowSpy.mockImplementation(() => ({
-      ethereum: {
+    Object.defineProperty(window, 'ethereum', {
+      configurable: true,
+      writable: true,
+      value: {
         request: providerRequestMock,
+        isMetaMask: true,
       },
-      removeEventListener: () => {},
-    }));
+    });
 
     jest.spyOn(console, 'error').mockImplementation(() => {});
 
     mockFindProvider.mockReturnValue(null);
+    mockDetectEthereumProvider.mockResolvedValue(window.ethereum as any);
     jest.spyOn(InjectedProvidersManager as any, 'getInstance')
       .mockImplementation(() => ({
         findProvider: mockFindProvider,
@@ -42,7 +46,7 @@ describe('createProvider', () => {
   });
 
   afterEach(() => {
-    windowSpy.mockRestore();
+    delete (window as any).ethereum;
     jest.resetAllMocks();
   });
 
@@ -83,23 +87,18 @@ describe('createProvider', () => {
   });
 
   it('should throw an error if metamask provider is not found', async () => {
-    windowSpy.mockImplementation(() => ({
-      removeEventListener: () => {},
-    }));
+    mockDetectEthereumProvider.mockResolvedValue(null);
 
     try {
       await createProvider(WalletProviderName.METAMASK);
     } catch (err: any) {
-      expect(err.message).toEqual('[METAMASK_PROVIDER_ERROR] Cause:window.addEventListener is not a function');
+      expect(err.message).toEqual('No MetaMask provider installed.');
       expect(err.type).toEqual(CheckoutErrorType.METAMASK_PROVIDER_ERROR);
     }
   });
 
   it('should throw an error if provider.request is not found', async () => {
-    windowSpy.mockImplementation(() => ({
-      ethereum: {},
-      removeEventListener: () => {},
-    }));
+    mockDetectEthereumProvider.mockResolvedValue({} as any);
 
     try {
       await createProvider(WalletProviderName.METAMASK);

@@ -8,28 +8,29 @@ import { WrappedBrowserProvider, WalletAction, WalletProviderName } from '../typ
 import { CheckoutErrorType } from '../errors';
 import { createProvider } from '../provider';
 
-let windowSpy: any;
-
 describe('connect', () => {
   const providerRequestMock: jest.Mock = jest.fn();
-  beforeEach(() => {
-    windowSpy = jest.spyOn(window, 'window', 'get');
 
-    windowSpy.mockImplementation(() => ({
-      ethereum: {
-        request: providerRequestMock,
-        isMetaMask: true,
-        on: jest.fn(),
-        removeListener: jest.fn(),
-      },
-      dispatchEvent: jest.fn(),
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-    }));
+  const setEthereum = (ethereum: Record<string, unknown>) => {
+    Object.defineProperty(window, 'ethereum', {
+      configurable: true,
+      writable: true,
+      value: ethereum,
+    });
+  };
+
+  beforeEach(() => {
+    setEthereum({
+      request: providerRequestMock,
+      isMetaMask: true,
+      on: jest.fn(),
+      removeListener: jest.fn(),
+    });
   });
 
   afterEach(() => {
-    windowSpy.mockRestore();
+    delete (window as any).ethereum;
+    jest.restoreAllMocks();
   });
 
   describe('checkIsWalletConnected', () => {
@@ -129,16 +130,10 @@ describe('connect', () => {
     });
 
     it('should throw an error if the user rejects the connection request', async () => {
-      windowSpy.mockImplementation(() => ({
-        ethereum: {
-          request: jest
-            .fn()
-            .mockRejectedValue(new Error('User rejected request')),
-        },
-        removeEventListener: jest.fn(),
-        addEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
-      }));
+      setEthereum({
+        request: jest.fn().mockRejectedValue(new Error('User rejected request')),
+        isMetaMask: true,
+      });
 
       const { provider } = await createProvider(WalletProviderName.METAMASK);
 
@@ -153,6 +148,8 @@ describe('connect', () => {
 
   describe('requestPermissions', () => {
     it('should call the requestPermissions function with metamask and return a BrowserProvider', async () => {
+      jest.spyOn(WrappedBrowserProvider.prototype, 'send');
+
       const { provider } = await createProvider(WalletProviderName.METAMASK);
       const reqRes = await requestPermissions(provider);
 
@@ -182,14 +179,10 @@ describe('connect', () => {
     });
 
     it('should throw an error if the user rejects the permission request', async () => {
-      windowSpy.mockImplementation(() => ({
-        ethereum: {
-          request: jest
-            .fn()
-            .mockRejectedValue(new Error('User rejected request')),
-        },
-        removeEventListener: () => {},
-      }));
+      setEthereum({
+        request: jest.fn().mockRejectedValue(new Error('User rejected request')),
+        isMetaMask: true,
+      });
 
       const { provider } = await createProvider(WalletProviderName.METAMASK);
 
