@@ -1,4 +1,9 @@
-import { imx } from '@imtbl/generated-clients';
+/** IMX API error shape (code + message); kept local to avoid generated-clients. */
+export type APIError = {
+  code: string;
+  message: string;
+  details?: string;
+};
 
 export enum PassportErrorType {
   AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR',
@@ -25,7 +30,7 @@ export enum PassportErrorType {
   TRANSACTION_REJECTED = 'TRANSACTION_REJECTED',
 }
 
-export function isAPIError(error: any): error is imx.APIError {
+export function isAPIError(error: any): error is APIError {
   return (
     typeof error === 'object'
     && error !== null
@@ -46,7 +51,7 @@ type AxiosLikeError = {
   };
 };
 
-const extractApiError = (error: unknown): imx.APIError | undefined => {
+const extractApiError = (error: unknown): APIError | undefined => {
   if (isAPIError(error)) {
     return error;
   }

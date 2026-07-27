@@ -36,7 +36,7 @@ export interface Transaction {
      */
     'eth_address': string;
     /**
-     * Status of the starkex transactions
+     * Status of the transaction
      * @type {string}
      * @memberof Transaction
      */

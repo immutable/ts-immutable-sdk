@@ -9,11 +9,7 @@
     "@imtbl/wallet": "workspace:*",
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
-    "@imtbl/metrics": "workspace:*",
-    "@imtbl/toolkit": "workspace:*",
-    "ethers": "^6.13.4",
-    "localforage": "^1.10.0",
-    "oidc-client-ts": "3.4.1"
+    "@imtbl/metrics": "workspace:*"
   },
   "devDependencies": {
     "@swc/core": "^1.4.2",

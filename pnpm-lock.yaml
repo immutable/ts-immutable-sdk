@@ -138,7 +138,7 @@ importers:
         version: 0.25.21(@emotion/react@11.11.3(@types/react@18.3.12)(react@18.3.1))(@rive-app/react-canvas-lite@4.9.0(react@18.3.1))(embla-carousel-react@8.1.5(react@18.3.1))(framer-motion@11.18.2(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@imtbl/sdk':
         specifier: latest
-        version: 2.20.1(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(typescript@5.6.2)(utf-8-validate@5.0.10)
+        version: 2.22.0(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(typescript@5.6.2)(utf-8-validate@5.0.10)
       next:
         specifier: 14.2.25
         version: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1042,9 +1042,6 @@ importers:
 
   packages/auth:
     dependencies:
-      '@imtbl/generated-clients':
-        specifier: workspace:*
-        version: link:../internal/generated-clients
       '@imtbl/metrics':
         specifier: workspace:*
         version: link:../internal/metrics
@@ -2240,21 +2237,9 @@ importers:
       '@imtbl/metrics':
         specifier: workspace:*
         version: link:../../internal/metrics
-      '@imtbl/toolkit':
-        specifier: workspace:*
-        version: link:../../internal/toolkit
       '@imtbl/wallet':
         specifier: workspace:*
         version: link:../../wallet
-      ethers:
-        specifier: ^6.13.4
-        version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      localforage:
-        specifier: ^1.10.0
-        version: 1.10.0
-      oidc-client-ts:
-        specifier: 3.4.1
-        version: 3.4.1
     devDependencies:
       '@jest/test-sequencer':
         specifier: ^29.7.0
@@ -2468,9 +2453,6 @@ importers:
       '@imtbl/config':
         specifier: workspace:*
         version: link:../../config
-      '@imtbl/generated-clients':
-        specifier: workspace:*
-        version: link:../../internal/generated-clients
       sns-validator:
         specifier: ^0.3.5
         version: 0.3.5
@@ -2492,7 +2474,7 @@ importers:
         version: 8.57.0
       jest:
         specifier: ^29.7.0
-        version: 29.7.0(@types/node@22.19.7)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@22.19.7)(typescript@5.6.2))
+        version: 29.7.0(@types/node@20.14.13)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))
       jest-environment-jsdom:
         specifier: ^29.4.3
         version: 29.6.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -4431,8 +4413,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@imtbl/auth-next-client@2.20.1':
-    resolution: {integrity: sha512-spoCdsUVGhwkNFXp1RoSPoHVHJgxR1tSh4nSdkCYd4m/b8q6n2PqtfP+wPjsGlBTDVgUu/JJd7/0XncydizS4w==}
+  '@imtbl/auth-next-client@2.22.0':
+    resolution: {integrity: sha512-tenOYDpycmRMoW7jRREYTjkCMKuNUBRTz0QaZ3KGPqSaR03boq2Vy/zEk3spCA0pNKEUQ2DgK3BJefgjsHXbaQ==}
     peerDependencies:
       next: ^14.0.0 || ^15.0.0
       next-auth: ^5.0.0-beta.25
@@ -4445,8 +4427,8 @@ packages:
       react:
         optional: true
 
-  '@imtbl/auth-next-server@2.20.1':
-    resolution: {integrity: sha512-gixsLtJLu51x3lC9mDdql+cyi7VpQPoVovBUj2rra9+iVrM1qNE1gfQuiO/yYiF51oDZv9q8O5m4uRkZsZNQcw==}
+  '@imtbl/auth-next-server@2.22.0':
+    resolution: {integrity: sha512-RQm2ovzifNXVK5wWyBGVwzLseRMl8DXOy/gUPd0B8Xlm41GBZXF95ftWvahUjcYb3RTX3/AMLSzPDi/kybb/dA==}
     peerDependencies:
       next: ^14.0.0 || ^15.0.0
       next-auth: ^5.0.0-beta.25
@@ -4456,21 +4438,21 @@ packages:
       next-auth:
         optional: true
 
-  '@imtbl/auth@2.20.1':
-    resolution: {integrity: sha512-7pxe15/AsoV24ot5K6oNETU1exUW4+4iU1oDKKVoDtu9OvXyFaK1xPmAWevaAj0Bm1QNTxY6iY6Ot14EmZrKAg==}
+  '@imtbl/auth@2.22.0':
+    resolution: {integrity: sha512-e9gh2Ke20NKhzOar7fLYQuidZivgKW/aIOeFxsVrlmOrcr0QzCZeUqTHLEW7apA0nN37q8ucI7FnRfCqm4YJPA==}
 
-  '@imtbl/blockchain-data@2.20.1':
-    resolution: {integrity: sha512-7k1PTXt8TPU6MEis8gvrKZod5eIgCzj7d/CwEwx05pDXFOtb+EMUQS3wwmA/Tcigt4o84jU4OLTKuP8/LfmUYQ==}
+  '@imtbl/blockchain-data@2.22.0':
+    resolution: {integrity: sha512-PQkAD20F5GuAj+AhI/ukp5kgBEPYnVhGuFwpWqQwjWQr+xh5leI5/eT4x4ATSI/4snYfOZDwYBbSyaNGNS+U/A==}
 
-  '@imtbl/bridge-sdk@2.20.1':
-    resolution: {integrity: sha512-4IX/UFIk4QKd8FntP3E1QSptkg796Vjw6eue+NqMJIt1sdkFhqep+NBmLST2vIPxPMR7//+IkZYvz8JpjYzaFA==}
+  '@imtbl/bridge-sdk@2.22.0':
+    resolution: {integrity: sha512-i/WUd+o5OZtMg4d6l/wTSCornS7GYkDmRIlVCBC/hNmvewg7BLOT4+PpJKVyx6rszN1o2gmfwtHiJoeuB9OIrA==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/checkout-sdk@2.20.1':
-    resolution: {integrity: sha512-9B26rMEM44QfG7d6wjNq2jNFx+4+9YhR6KOv2G4WEdSb/oh9rvUIJGHtsdBSVszE7k9nDfvK6w16jb520YQBig==}
+  '@imtbl/checkout-sdk@2.22.0':
+    resolution: {integrity: sha512-EaZNKjKDbNeU3XK13pv49XAc49gGc11v8oXKx/4CSEXvUmL53etVZYWcDOwUKA7czoIpKyCHsuHIku0YlOH5QQ==}
 
-  '@imtbl/config@2.20.1':
-    resolution: {integrity: sha512-P7qRLFLG/WbFC2veFfYCGN0GtTQ/6J71UDwa0ST/QW00s2swyAUNS54ttHFQnepphimbOTilgUpc/O/VANnbAg==}
+  '@imtbl/config@2.22.0':
+    resolution: {integrity: sha512-uyJKu1bhSLFIs2eDIgwyB++6rcXzWBjS9AUUVl4dh2PcZP1QqV7NxWwbNK4Eu0i3HAJVwPS+epzN3jPeDmSKPQ==}
     engines: {node: '>=20.11.0'}
 
   '@imtbl/contracts@2.2.6':
@@ -4482,36 +4464,36 @@ packages:
     peerDependencies:
       '@openzeppelin/contracts': ^4.9.3 || ^5.0.0
 
-  '@imtbl/dex-sdk@2.20.1':
-    resolution: {integrity: sha512-vfdcpSoSzujRAhfJzgdf0q9v3ewlANEFiWqsZvECVhpdoP2Roo5KhXL3A+cHtyIjQU62gqxKgN5knkdlcoASPQ==}
+  '@imtbl/dex-sdk@2.22.0':
+    resolution: {integrity: sha512-hieaT7AHOdGNiXHjNLKkKQsEtaGs90ip6T77VpwctbxCjk0BOVJ07mkjinLFMw5FeYQAZBXx1Rxzs30w6SB2lw==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/generated-clients@2.20.1':
-    resolution: {integrity: sha512-pqZHyjjJZwNkPYOtQynO3I/zgq4Ed71F0hnGaw2F+9VyvWFP7+rNU4rTMliS0dNaNhPMpIH9OFBbxyBa2BSYOw==}
+  '@imtbl/generated-clients@2.22.0':
+    resolution: {integrity: sha512-Qw0DOAruDlxFu+lVONpsjLrkel2Qdsy2vZAEI/futVfynSjeKMKZ01sGl+ADOm6RZkny9uKWXk7U/bUwotM7DA==}
     engines: {node: '>=20.11.0'}
 
   '@imtbl/image-resizer-utils@0.0.3':
     resolution: {integrity: sha512-/EOJKMJF4gD/Dv0qNhpUTpp2AgWeQ7XgYK9Xjl+xP2WWgaarNv1SHe1aeqSb8aZT5W7wSXdUGzn6TIxNsuCWGw==}
 
-  '@imtbl/metrics@2.20.1':
-    resolution: {integrity: sha512-kugCCz8e1oWTeE5T0yh2DmcgDGSUY4zO9TgbJsiRnbB8H86D7sPQEiMPpt+cmDUEEh4Xdlgz2oD9jxtLpPVYWQ==}
+  '@imtbl/metrics@2.22.0':
+    resolution: {integrity: sha512-OrY+MVI1CyurNNTpDL7ePa8bL1srR8q8p+C53Y9ixX7jcrfG6issZtDHDYxUiYc/Lw+fswfV2od5E7S3vZVoSg==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/minting-backend@2.20.1':
-    resolution: {integrity: sha512-H2qpQjg5BRq1UG025oP5do0aoM90Z4XWK49UrVSzIDO3pBGELMoWNtI61N2hFZAPSBYsiFX0r4AgNd5FeUlaZA==}
+  '@imtbl/minting-backend@2.22.0':
+    resolution: {integrity: sha512-SIVNaApi4vvMyWV/N5XqTjkv1P1+C54tdfv724eUTNp6ZIBp8uMhKxM4cbddPQOinnVtdz09mNa4SX4Yydro8Q==}
 
-  '@imtbl/orderbook@2.20.1':
-    resolution: {integrity: sha512-oflTDkOFXAGYZgFFsIWvVUJhxEYDSl8zLtVUp+q3c716PPIAT5Vi8PbkWTolIp2DvVzzjNL3EviYRVSKrRkkgQ==}
+  '@imtbl/orderbook@2.22.0':
+    resolution: {integrity: sha512-fYKbQt3And9tLoUrLjsxG3bWzCw6JDQw7c9Az+sOUY8ENdqDpmE1VmwktGgwOBm9VTmRFYyk7r/rioj9M1d3yw==}
 
-  '@imtbl/passport@2.20.1':
-    resolution: {integrity: sha512-qqB9KooeqL69jGptTvtjRsiLJf1QielP7GXOs+vDL7fPAP3y8hyz1QNwYVnc0UFxLKNd3yy1OnJqkpgkL7Q77w==}
+  '@imtbl/passport@2.22.0':
+    resolution: {integrity: sha512-VDrUiEyL7QZBqIxZ+wBSUjg5gvfVkIrEoYHpMOIBwWXQLtSpxforJW5VR2TvmRil7MrYx13YCRjYIVvWQyYgrg==}
     engines: {node: '>=20.11.0'}
 
   '@imtbl/react-analytics@0.3.4-alpha':
     resolution: {integrity: sha512-4VWvfm8RZtpLub7+x2D2wNQ507nIVBCSAPA7B5lxdb0cKrHEujM6Y/HScMImHZHvgjUFQT1jiD9b2BL/DS43Pg==}
 
-  '@imtbl/sdk@2.20.1':
-    resolution: {integrity: sha512-5nQRlxh14lKb+LVOoiv2mDzaAcsofCKl3UaiS2UjS2p0Rek/C2daDPRiUjSCr8pNIhpFL71t8Q71kkIBQaVB4Q==}
+  '@imtbl/sdk@2.22.0':
+    resolution: {integrity: sha512-CJLxk5EEBI5EuUK+me1fmnUQeT/TuzbPXrSFOyG6JWqISnwsehgbhQH33MHSkw2njrhJ3O04cP/j5vZMRk2+dg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       next: ^14.2.0 || ^15.0.0
@@ -4525,15 +4507,15 @@ packages:
       react:
         optional: true
 
-  '@imtbl/toolkit@2.20.1':
-    resolution: {integrity: sha512-LtTy4CpX6hSSSDNOFWTG6Ny78VWx52HhKMTQRo19ETCFcW0lEH5UTEfAjjrXVGakQgbk8+fuapkFxFG+rMxJVg==}
+  '@imtbl/toolkit@2.22.0':
+    resolution: {integrity: sha512-9tkQucobN3rI5Ff+mFCgCOWwcVy7YTsZI8HZ1W5DRNgCXo4zf7u0uqobkrYsFzoF87seqy+w4l7s9v96iUmrWw==}
     engines: {node: '>=20.11.0'}
 
-  '@imtbl/wallet@2.20.1':
-    resolution: {integrity: sha512-Qh95lsj+xBvTQSXken4PQp05WECW+2E7OiqJalxZbIzGtewAIXb/tWCrcww8JUEclctD32tZueG5sTjM2uWL6Q==}
+  '@imtbl/wallet@2.22.0':
+    resolution: {integrity: sha512-kUHJ+w5yApAbBZ88y5k8wVIZ8im68OR77lNhJ4DblGcp7a75o5k32kkqiklU+CCmSEDDRMW77cbH1Vqlug6fww==}
 
-  '@imtbl/webhook@2.20.1':
-    resolution: {integrity: sha512-uGeyiSsZX+rLeSK3rk2lGE2CvJdw/1wKP0vsfGRd0KugFnxv8gBPGoY6+a+22vqO/7T4uaIMhNMMzUlVNVIblw==}
+  '@imtbl/webhook@2.22.0':
+    resolution: {integrity: sha512-YuPyl4xEhGShdNQJgartOFd4s4ZY5rxn/T21nD5jgi4IFN2MC8OFj5JJi1g6T6/4N3adarxHMQY8lDoXjzZJlQ==}
 
   '@ioredis/commands@1.2.0':
     resolution: {integrity: sha512-Sx1pU8EM64o2BrqNpEO1CNLtKQwyhuXuqyfH7oGKCk+1a33d2r5saW8zNwm3j6BTExtjrv2BxTgzzkMwts6vGg==}
@@ -4876,6 +4858,7 @@ packages:
 
   '@metamask/sdk-communication-layer@0.26.4':
     resolution: {integrity: sha512-+X4GEc5mV1gWK4moSswVlKsUh+RsA48qPlkxBLTUxQODSnyBe0TRMxE6mH+bSrfponnTzvBkGUXyEjvDwDjDHw==}
+    deprecated: No longer maintained, superseded by https://docs.metamask.io/metamask-connect
     peerDependencies:
       cross-fetch: ^4.0.0
       eciesjs: ^0.3.16
@@ -4885,6 +4868,7 @@ packages:
 
   '@metamask/sdk-install-modal-web@0.26.5':
     resolution: {integrity: sha512-qVA9Nk+NorGx5hXyODy5wskptE8R7RNYTYt49VbQpJogqbbVe1dnJ98+KaA43PBN4XYMCXmcIhULNiEHGsLynA==}
+    deprecated: No longer maintained, superseded by https://docs.metamask.io/metamask-connect
     peerDependencies:
       i18next: 23.11.5
       react: ^18.2.0
@@ -4900,6 +4884,7 @@ packages:
 
   '@metamask/sdk@0.26.5':
     resolution: {integrity: sha512-HS/MPQCCYRS+m3dDdGLcAagwYHiPv9iUshDMBjINUywCtfUN4P2BH8xdvPOgtnzRIuRSMXqMWBbZnTvEvBeQvA==}
+    deprecated: No longer maintained, superseded by https://docs.metamask.io/metamask-connect
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -6317,6 +6302,7 @@ packages:
   '@safe-global/safe-gateway-typescript-sdk@3.22.1':
     resolution: {integrity: sha512-YApSpx+3h6uejrJVh8PSqXRRAwmsWz8PZERObMGJNC9NPoMhZG/Rvqb2UWmVLrjFh880rqutsB+GrTmJP351PA==}
     engines: {node: '>=16'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   '@scure/base@1.1.7':
     resolution: {integrity: sha512-PPNYBslrLNNUQ/Yad37MHYsNQtK67EhWb6WtSvNLLPo7SdVZgkUjD6Dg+5On7zNwmskf8OX7I7Nx5oN+MIWE0g==}
@@ -7809,6 +7795,7 @@ packages:
 
   '@ungap/structured-clone@1.2.0':
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
+    deprecated: Potential CWE-502 - Update to 1.3.1 or higher
 
   '@uniswap/lib@4.0.1-alpha':
     resolution: {integrity: sha512-f6UIliwBbRsgVLxIaBANF6w09tYqc6Y/qXdsrbEmXHyFA7ILiKrIwRFXe1yOg8M3cksgVsO9N7yuL2DdCGQKBA==}
@@ -8012,6 +7999,7 @@ packages:
   '@xmldom/xmldom@0.8.10':
     resolution: {integrity: sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==}
     engines: {node: '>=10.0.0'}
+    deprecated: this version has critical issues, please update to the latest version
 
   '@xtuc/ieee754@1.2.0':
     resolution: {integrity: sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==}
@@ -16088,7 +16076,7 @@ packages:
   tar@6.1.15:
     resolution: {integrity: sha512-/zKt9UyngnxIT/EAGYuxaMYgOIJiP81ab9ZfkILq4oNLPFX50qyYmu7jRj9qeXoxmJHjGlbH0+cm2uy1WCs10A==}
     engines: {node: '>=10'}
-    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   temp-dir@2.0.0:
     resolution: {integrity: sha512-aoBAniQmmwtcKp/7BzsH8Cxzv8OL736p7v1ihGb5e9DJ9kTwGWHrQrVB5+lfVDzfGrdRzXch+ig7LHaY1JTOrg==}
@@ -16785,10 +16773,12 @@ packages:
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   v8-compile-cache-lib@3.0.1:
@@ -20309,10 +20299,10 @@ snapshots:
   '@img/sharp-win32-x64@0.34.5':
     optional: true
 
-  '@imtbl/auth-next-client@2.20.1(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
+  '@imtbl/auth-next-client@2.22.0(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@imtbl/auth': 2.20.1
-      '@imtbl/auth-next-server': 2.20.1(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
+      '@imtbl/auth': 2.22.0
+      '@imtbl/auth-next-server': 2.22.0(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
     optionalDependencies:
       next: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth: 5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
@@ -20320,31 +20310,31 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/auth-next-server@2.20.1(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))':
+  '@imtbl/auth-next-server@2.22.0(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))':
     optionalDependencies:
       next: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth: 5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
 
-  '@imtbl/auth@2.20.1':
+  '@imtbl/auth@2.22.0':
     dependencies:
-      '@imtbl/generated-clients': 2.20.1
-      '@imtbl/metrics': 2.20.1
+      '@imtbl/generated-clients': 2.22.0
+      '@imtbl/metrics': 2.22.0
       localforage: 1.10.0
       oidc-client-ts: 3.4.1
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/blockchain-data@2.20.1':
+  '@imtbl/blockchain-data@2.22.0':
     dependencies:
-      '@imtbl/config': 2.20.1
-      '@imtbl/generated-clients': 2.20.1
+      '@imtbl/config': 2.22.0
+      '@imtbl/generated-clients': 2.22.0
       axios: 1.7.7
     transitivePeerDependencies:
       - debug
 
-  '@imtbl/bridge-sdk@2.20.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/bridge-sdk@2.22.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/config': 2.20.1
+      '@imtbl/config': 2.22.0
       '@jest/globals': 29.7.0
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -20354,16 +20344,16 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@imtbl/checkout-sdk@2.20.1(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/checkout-sdk@2.22.0(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/blockchain-data': 2.20.1
-      '@imtbl/bridge-sdk': 2.20.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/config': 2.20.1
-      '@imtbl/dex-sdk': 2.20.1(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)
-      '@imtbl/generated-clients': 2.20.1
-      '@imtbl/metrics': 2.20.1
-      '@imtbl/orderbook': 2.20.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/passport': 2.20.1(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/blockchain-data': 2.22.0
+      '@imtbl/bridge-sdk': 2.22.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/config': 2.22.0
+      '@imtbl/dex-sdk': 2.22.0(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)
+      '@imtbl/generated-clients': 2.22.0
+      '@imtbl/metrics': 2.22.0
+      '@imtbl/orderbook': 2.22.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/passport': 2.22.0(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -20378,9 +20368,9 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@imtbl/config@2.20.1':
+  '@imtbl/config@2.22.0':
     dependencies:
-      '@imtbl/metrics': 2.20.1
+      '@imtbl/metrics': 2.22.0
 
   '@imtbl/contracts@2.2.6(bufferutil@4.0.8)(eslint@9.16.0(jiti@1.21.0))(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
@@ -20407,9 +20397,9 @@ snapshots:
     dependencies:
       '@openzeppelin/contracts': 5.0.2
 
-  '@imtbl/dex-sdk@2.20.1(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)':
+  '@imtbl/dex-sdk@2.22.0(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/config': 2.20.1
+      '@imtbl/config': 2.22.0
       '@uniswap/sdk-core': 3.2.3
       '@uniswap/swap-router-contracts': 1.3.1(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
       '@uniswap/v3-sdk': 3.10.0(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))
@@ -20419,7 +20409,7 @@ snapshots:
       - hardhat
       - utf-8-validate
 
-  '@imtbl/generated-clients@2.20.1':
+  '@imtbl/generated-clients@2.22.0':
     dependencies:
       axios: 1.7.7
     transitivePeerDependencies:
@@ -20429,18 +20419,18 @@ snapshots:
     dependencies:
       buffer: 6.0.3
 
-  '@imtbl/metrics@2.20.1':
+  '@imtbl/metrics@2.22.0':
     dependencies:
       global-const: 0.1.2
       lru-memorise: 0.3.0
 
-  '@imtbl/minting-backend@2.20.1':
+  '@imtbl/minting-backend@2.22.0':
     dependencies:
-      '@imtbl/blockchain-data': 2.20.1
-      '@imtbl/config': 2.20.1
-      '@imtbl/generated-clients': 2.20.1
-      '@imtbl/metrics': 2.20.1
-      '@imtbl/webhook': 2.20.1
+      '@imtbl/blockchain-data': 2.22.0
+      '@imtbl/config': 2.22.0
+      '@imtbl/generated-clients': 2.22.0
+      '@imtbl/metrics': 2.22.0
+      '@imtbl/webhook': 2.22.0
       uuid: 9.0.1
     optionalDependencies:
       pg: 8.11.5
@@ -20449,10 +20439,10 @@ snapshots:
       - debug
       - pg-native
 
-  '@imtbl/orderbook@2.20.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/orderbook@2.22.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/config': 2.20.1
-      '@imtbl/metrics': 2.20.1
+      '@imtbl/config': 2.22.0
+      '@imtbl/metrics': 2.22.0
       '@opensea/seaport-js': 4.0.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       axios: 1.7.7
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -20463,14 +20453,14 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/passport@2.20.1(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/passport@2.22.0(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/auth': 2.20.1
-      '@imtbl/config': 2.20.1
-      '@imtbl/generated-clients': 2.20.1
-      '@imtbl/metrics': 2.20.1
-      '@imtbl/toolkit': 2.20.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/wallet': 2.20.1(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/auth': 2.22.0
+      '@imtbl/config': 2.22.0
+      '@imtbl/generated-clients': 2.22.0
+      '@imtbl/metrics': 2.22.0
+      '@imtbl/toolkit': 2.22.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/wallet': 2.22.0(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
       ethers: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       localforage: 1.10.0
       oidc-client-ts: 3.4.1
@@ -20489,19 +20479,19 @@ snapshots:
       - encoding
       - supports-color
 
-  '@imtbl/sdk@2.20.1(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/sdk@2.22.0(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/auth': 2.20.1
-      '@imtbl/auth-next-client': 2.20.1(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
-      '@imtbl/auth-next-server': 2.20.1(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
-      '@imtbl/blockchain-data': 2.20.1
-      '@imtbl/checkout-sdk': 2.20.1(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typescript@5.6.2)(utf-8-validate@5.0.10)
-      '@imtbl/config': 2.20.1
-      '@imtbl/minting-backend': 2.20.1
-      '@imtbl/orderbook': 2.20.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@imtbl/passport': 2.20.1(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
-      '@imtbl/wallet': 2.20.1(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
-      '@imtbl/webhook': 2.20.1
+      '@imtbl/auth': 2.22.0
+      '@imtbl/auth-next-client': 2.22.0(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+      '@imtbl/auth-next-server': 2.22.0(next-auth@5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
+      '@imtbl/blockchain-data': 2.22.0
+      '@imtbl/checkout-sdk': 2.22.0(bufferutil@4.0.8)(hardhat@2.22.6(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.15.3(@swc/helpers@0.5.15))(@types/node@20.14.13)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10))(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/config': 2.22.0
+      '@imtbl/minting-backend': 2.22.0
+      '@imtbl/orderbook': 2.22.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@imtbl/passport': 2.22.0(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/wallet': 2.22.0(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@imtbl/webhook': 2.22.0
     optionalDependencies:
       next: 14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth: 5.0.0-beta.30(next@14.2.25(@babel/core@7.26.10)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
@@ -20516,7 +20506,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@imtbl/toolkit@2.20.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@imtbl/toolkit@2.22.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@metamask/detect-provider': 2.0.0
       axios: 1.7.7
@@ -20529,11 +20519,11 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@imtbl/wallet@2.20.1(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
+  '@imtbl/wallet@2.22.0(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)':
     dependencies:
-      '@imtbl/auth': 2.20.1
-      '@imtbl/generated-clients': 2.20.1
-      '@imtbl/metrics': 2.20.1
+      '@imtbl/auth': 2.22.0
+      '@imtbl/generated-clients': 2.22.0
+      '@imtbl/metrics': 2.22.0
       viem: 2.18.2(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
@@ -20542,10 +20532,10 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@imtbl/webhook@2.20.1':
+  '@imtbl/webhook@2.22.0':
     dependencies:
-      '@imtbl/config': 2.20.1
-      '@imtbl/generated-clients': 2.20.1
+      '@imtbl/config': 2.22.0
+      '@imtbl/generated-clients': 2.22.0
       sns-validator: 0.3.5
     transitivePeerDependencies:
       - debug
@@ -31777,7 +31767,7 @@ snapshots:
       jest-util: 29.7.0
       natural-compare: 1.4.0
       pretty-format: 29.7.0
-      semver: 7.7.1
+      semver: 7.7.3
     transitivePeerDependencies:
       - supports-color
 

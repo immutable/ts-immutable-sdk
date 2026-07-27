@@ -258,9 +258,9 @@ export const GuardianApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Check if the transaction is valid by transaction ID for both StarkEx and EVM
+         * Check if the transaction is valid by transaction ID
          * @summary Evaluate a transaction
-         * @param {string} id Transaction identifier: payloadHash on StarkEx or EVM ID
+         * @param {string} id Transaction identifier: EVM transaction ID
          * @param {TransactionEvaluationRequest} transactionEvaluationRequest Specifies the kind of transaction
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -380,7 +380,7 @@ export const GuardianApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * Get a transaction by payload hash
          * @summary Info for a specific transaction
-         * @param {string} transactionID The id of the starkex transaction to retrieve
+         * @param {string} transactionID The id of the transaction to retrieve
          * @param {GetTransactionByIDChainTypeEnum} chainType roll up type
          * @param {string} [chainID] ID of evm chain
          * @param {*} [options] Override http request option.
@@ -494,9 +494,9 @@ export const GuardianApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Check if the transaction is valid by transaction ID for both StarkEx and EVM
+         * Check if the transaction is valid by transaction ID
          * @summary Evaluate a transaction
-         * @param {string} id Transaction identifier: payloadHash on StarkEx or EVM ID
+         * @param {string} id Transaction identifier: EVM transaction ID
          * @param {TransactionEvaluationRequest} transactionEvaluationRequest Specifies the kind of transaction
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -530,7 +530,7 @@ export const GuardianApiFp = function(configuration?: Configuration) {
         /**
          * Get a transaction by payload hash
          * @summary Info for a specific transaction
-         * @param {string} transactionID The id of the starkex transaction to retrieve
+         * @param {string} transactionID The id of the transaction to retrieve
          * @param {GetTransactionByIDChainTypeEnum} chainType roll up type
          * @param {string} [chainID] ID of evm chain
          * @param {*} [options] Override http request option.
@@ -601,7 +601,7 @@ export const GuardianApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.evaluateMessage(requestParameters.messageEvaluationRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Check if the transaction is valid by transaction ID for both StarkEx and EVM
+         * Check if the transaction is valid by transaction ID
          * @summary Evaluate a transaction
          * @param {GuardianApiEvaluateTransactionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -727,7 +727,7 @@ export interface GuardianApiEvaluateMessageRequest {
  */
 export interface GuardianApiEvaluateTransactionRequest {
     /**
-     * Transaction identifier: payloadHash on StarkEx or EVM ID
+     * Transaction identifier: EVM transaction ID
      * @type {string}
      * @memberof GuardianApiEvaluateTransaction
      */
@@ -776,7 +776,7 @@ export interface GuardianApiGetMessageByIDRequest {
  */
 export interface GuardianApiGetTransactionByIDRequest {
     /**
-     * The id of the starkex transaction to retrieve
+     * The id of the transaction to retrieve
      * @type {string}
      * @memberof GuardianApiGetTransactionByID
      */
@@ -784,7 +784,7 @@ export interface GuardianApiGetTransactionByIDRequest {
 
     /**
      * roll up type
-     * @type {'starkex' | 'evm'}
+     * @type {'evm'}
      * @memberof GuardianApiGetTransactionByID
      */
     readonly chainType: GetTransactionByIDChainTypeEnum
@@ -865,7 +865,7 @@ export class GuardianApi extends BaseAPI {
     }
 
     /**
-     * Check if the transaction is valid by transaction ID for both StarkEx and EVM
+     * Check if the transaction is valid by transaction ID
      * @summary Evaluate a transaction
      * @param {GuardianApiEvaluateTransactionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -917,7 +917,6 @@ export class GuardianApi extends BaseAPI {
  * @export
  */
 export const GetTransactionByIDChainTypeEnum = {
-    Starkex: 'starkex',
     Evm: 'evm'
 } as const;
 export type GetTransactionByIDChainTypeEnum = typeof GetTransactionByIDChainTypeEnum[keyof typeof GetTransactionByIDChainTypeEnum];

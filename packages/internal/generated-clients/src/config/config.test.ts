@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { createConfig, ImmutableAPIConfiguration } from './config';
-import { Configuration } from '../imx';
+import { Configuration } from '../multi-rollup';
 
 const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
@@ -18,7 +18,7 @@ describe('createConfig', () => {
   });
 
   it('should return config', () => {
-    const basePath = 'https://api.sandbox.x.immutable.com';
+    const basePath = 'https://api.sandbox.immutable.com';
     const customHeaders = {
       'x-custom-headers': 'x values',
       'x-sdk-version': 'this should not get overwritten',

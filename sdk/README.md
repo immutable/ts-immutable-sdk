@@ -1,6 +1,6 @@
 <div align="center">
   <p align="center">
-    <a href="https://docs.x.immutable.com/docs">
+    <a href="https://docs.immutable.com">
       <img src="https://cdn.dribbble.com/users/1299339/screenshots/7133657/media/837237d447d36581ebd59ec36d30daea.gif" width="280"/>
     </a>
   </p>
@@ -12,7 +12,6 @@
 [Typescript SDK Official Starting guide](https://docs.immutable.com/sdk-docs/ts-immutable-sdk/overview/)
 
 Checkout our API references for more information.
-- [Immutable X API Reference](https://docs.immutable.com/x/reference)
 - [Immutable zkEVM API Reference](https://docs.immutable.com/zkevm/api/reference)
 
 # Installation

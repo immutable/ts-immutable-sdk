@@ -1,30 +1,4 @@
 # -------------------------------------------------
-# Immutable X
-# -------------------------------------------------
-
-.PHONY: generate-imx-openapi
-generate-imx-openapi: get-imx-openapi generate-imx-api-client
-
-# Note: We generate clients with sandbox spec only as Prod and Sandbox are maintained to be same.
-#.      Prod url is passed in via config to talk to prod API.
-.PHONY: get-imx-openapi
-get-imx-openapi:
-	rm -f src/imx-openapi.json && touch src/imx-openapi.json && \
-	curl -H "Accept: application/json+v3" \
-    https://api.sandbox.x.immutable.com/openapi \
-    -o src/imx-openapi.json
-
-.PHONY: generate-imx-api-client
-generate-imx-api-client:
-	pnpm rimraf src/imx && \
-    mkdir src/imx && \
-	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate \
-    -i ./app/src/imx-openapi.json \
-    -g typescript-axios \
-    -o /app/src/imx \
-    -c /app/config/imx.config.json
-
-# -------------------------------------------------
 # Immutable zkEVM - Combined clients
 # -------------------------------------------------
 
