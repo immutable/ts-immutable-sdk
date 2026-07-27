@@ -36,4 +36,4 @@ tests/**/.env
 tests/**/playwright-report/
 tests/**/test-results/
 
-*.prepack-backup
+*.prepack-backup.claude/
