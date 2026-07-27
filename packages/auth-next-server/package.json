@@ -4,15 +4,15 @@
   "version": "0.0.0",
   "author": "Immutable",
   "devDependencies": {
-    "@swc/core": "^1.4.2",
-    "@swc/jest": "^0.2.37",
-    "@types/jest": "^29.5.12",
-    "@types/node": "^22.10.7",
-    "@typescript/native": "npm:typescript@^7.0.2",
-    "jest": "^29.7.0",
-    "next": "^15.2.6",
-    "next-auth": "^5.0.0-beta.30",
-    "typescript": "npm:@typescript/typescript6@^6.0.2"
+    "@swc/core": "catalog:toolchain",
+    "@swc/jest": "catalog:toolchain",
+    "@types/jest": "catalog:toolchain",
+    "@types/node": "catalog:toolchain",
+    "@typescript/native": "catalog:toolchain",
+    "jest": "catalog:toolchain",
+    "next": "catalog:react",
+    "next-auth": "catalog:react",
+    "typescript": "catalog:toolchain"
   },
   "exports": {
     ".": {
@@ -32,7 +32,7 @@
   "main": "./dist/node/index.cjs",
   "module": "./dist/node/index.js",
   "peerDependencies": {
-    "next": "^14.0.0 || ^15.0.0",
+    "next": "^14.0.0 || ^15.0.0 || ^16.0.0",
     "next-auth": "^5.0.0-beta.25"
   },
   "peerDependenciesMeta": {

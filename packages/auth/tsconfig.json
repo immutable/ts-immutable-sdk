@@ -3,18 +3,25 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "rootDirs": ["src"],
-    "customConditions": ["development"],
-    "types": ["node"]
+    "rootDirs": [
+      "src"
+    ],
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src", "src/types.ts"],
+  "include": [
+    "src"
+  ],
   "exclude": [
     "node_modules",
     "dist",
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
     "src/**/*.spec.ts",
-    "src/**/*.spec.tsx"
+    "src/**/*.spec.tsx",
+    "src/**/*.e2e.ts",
+    "src/**/*.demo.ts",
+    "src/test/**"
   ]
 }
-

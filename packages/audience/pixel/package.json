@@ -8,13 +8,13 @@
     "@imtbl/audience-core": "workspace:*"
   },
   "devDependencies": {
-    "@swc/core": "^1.4.2",
-    "@swc/jest": "^0.2.37",
-    "@types/jest": "^29.5.12",
-    "@typescript/native": "npm:typescript@^7.0.2",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.4.3",
-    "typescript": "npm:@typescript/typescript6@^6.0.2"
+    "@swc/core": "catalog:toolchain",
+    "@swc/jest": "catalog:toolchain",
+    "@types/jest": "catalog:toolchain",
+    "@typescript/native": "catalog:toolchain",
+    "jest": "catalog:toolchain",
+    "jest-environment-jsdom": "catalog:toolchain",
+    "typescript": "catalog:toolchain"
   },
   "exports": {
     "development": {

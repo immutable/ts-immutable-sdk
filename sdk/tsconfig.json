@@ -1,14 +1,24 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "customConditions": ["development"],
-    "outDir": "./dist",
     "rootDir": "./src",
-    "rootDirs": ["src"],
+    "outDir": "./dist",
+    "rootDirs": [
+      "src"
+    ]
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.spec.ts",
+    "src/**/*.spec.tsx",
+    "src/**/*.e2e.ts",
+    "src/**/*.demo.ts",
+    "src/test/**"
   ]
 }

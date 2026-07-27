@@ -8,7 +8,7 @@
     "@imtbl/config": "workspace:*",
     "@imtbl/metrics": "workspace:*",
     "@imtbl/passport": "workspace:*",
-    "ethers": "^6.13.4"
+    "ethers": "catalog:web3"
   },
   "devDependencies": {
     "parcel": "^2.13.3"

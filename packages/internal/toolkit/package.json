@@ -6,30 +6,25 @@
   "browser": "dist/browser/index.js",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@metamask/detect-provider": "^2.0.0",
-    "axios": "^1.6.5",
+    "@metamask/detect-provider": "catalog:web3",
+    "axios": "catalog:web3",
     "bn.js": "^5.2.1",
     "enc-utils": "^3.0.0",
-    "ethers": "^6.13.4",
+    "ethers": "catalog:web3",
     "oidc-client-ts": "3.4.1"
   },
   "devDependencies": {
-    "@swc/core": "^1.4.2",
-    "@swc/jest": "^0.2.37",
-    "@types/axios": "^0.14.0",
+    "@swc/core": "catalog:toolchain",
+    "@swc/jest": "catalog:toolchain",
     "@types/bn.js": "^5.1.6",
-    "@types/jest": "^29.5.12",
-    "@types/node": "^22.10.7",
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
-    "@typescript/native": "npm:typescript@^7.0.2",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.4.3",
-    "prettier": "^2.8.7",
-    "typescript": "npm:@typescript/typescript6@^6.0.2"
+    "@types/jest": "catalog:toolchain",
+    "@types/node": "catalog:toolchain",
+    "@typescript/native": "catalog:toolchain",
+    "jest": "catalog:toolchain",
+    "typescript": "catalog:toolchain"
   },
   "engines": {
-    "node": ">=20.11.0"
+    "node": ">=24"
   },
   "exports": {
     "development": {

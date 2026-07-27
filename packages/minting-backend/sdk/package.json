@@ -10,20 +10,19 @@
     "@imtbl/generated-clients": "workspace:*",
     "@imtbl/metrics": "workspace:*",
     "@imtbl/webhook": "workspace:*",
-    "uuid": "^9.0.1"
+    "uuid": "catalog:web3"
   },
   "devDependencies": {
-    "@swc/core": "^1.4.2",
-    "@swc/jest": "^0.2.37",
+    "@swc/core": "catalog:toolchain",
+    "@swc/jest": "catalog:toolchain",
     "@testcontainers/postgresql": "^10.9.0",
-    "@types/jest": "^29.5.12",
+    "@types/jest": "catalog:toolchain",
     "@types/pg": "^8.11.5",
-    "@types/uuid": "^8.3.4",
-    "@typescript/native": "npm:typescript@^7.0.2",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.4.3",
+    "@types/uuid": "catalog:web3",
+    "@typescript/native": "catalog:toolchain",
+    "jest": "catalog:toolchain",
     "testcontainers": "^10.9.0",
-    "typescript": "npm:@typescript/typescript6@^6.0.2"
+    "typescript": "catalog:toolchain"
   },
   "exports": {
     "development": {

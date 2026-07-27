@@ -19,11 +19,11 @@
     "@imtbl/webhook": "workspace:*"
   },
   "devDependencies": {
-    "@typescript/native": "npm:typescript@^7.0.2",
-    "typescript": "npm:@typescript/typescript6@^6.0.2"
+    "@typescript/native": "catalog:toolchain",
+    "typescript": "catalog:toolchain"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=24"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -198,7 +198,7 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "peerDependencies": {
-    "next": "^14.2.0 || ^15.0.0",
+    "next": "^14.2.0 || ^15.0.0 || ^16.0.0",
     "next-auth": "^5.0.0-beta.25",
     "react": "^18.2.0 || ^19.0.0"
   },

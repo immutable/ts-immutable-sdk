@@ -1,8 +1,8 @@
 import {
   createAnalytics,
-  StandardAnalyticsActions,
   StandardAnalyticsControlTypes,
 } from '@imtbl/react-analytics';
+import type { PropsWithChildren, ReactElement } from 'react';
 
 export enum UserJourney {
   CONNECT = 'Connect',
@@ -23,15 +23,19 @@ export type AnalyticsControlTypes =
 
 const productName = 'checkout';
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const { AnalyticsProvider, useAnalytics } = createAnalytics<
-UserJourney,
-string,
-string,
-AnalyticsControlTypes,
-StandardAnalyticsActions
+const analytics = createAnalytics<
+  UserJourney,
+  string,
+  string,
+  AnalyticsControlTypes
 >({
   writeKey: '',
   appName: productName,
   storageKeyPrefix: 'checkoutWidgets',
 });
+
+// Explicit annotation: createAnalytics returns emotion JSX.Element, which is not portable
+export const AnalyticsProvider = analytics.AnalyticsProvider as (
+  props: PropsWithChildren,
+) => ReactElement;
+export const useAnalytics = analytics.useAnalytics;

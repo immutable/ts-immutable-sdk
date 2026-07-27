@@ -27,4 +27,140 @@ packages:
   - "packages/minting-backend/sdk"
   - "tests/**"
 
-  # Setup catalog file versions for core packages like typescript/eslint
+# Named catalogs — reference as catalog:<name> from package.json
+catalogs:
+  toolchain:
+    typescript: npm:@typescript/typescript6@^6.0.2
+    "@typescript/native": npm:typescript@^7.0.2
+    jest: ^29.7.0
+    "@types/jest": ^29.5.12
+    "@jest/globals": ^29.7.0
+    jest-environment-jsdom: ^29.7.0
+    "@swc/core": ^1.15.46
+    "@swc/jest": ^0.2.37
+    "@types/node": ^22.10.7
+    nx: ^23.1.0
+    "@nx/js": ^23.1.0
+    "@rollup/plugin-replace": ^6.0.3
+    rollup-plugin-polyfill-node: ^0.13.0
+    typechain: ^8.1.1
+    "@typechain/ethers-v6": ^0.5.1
+  react:
+    react: ^19.2.8
+    react-dom: ^19.2.8
+    # Temporary: biom3/emotion JSX breaks under @types/react 19 — bump when biom3 supports it
+    "@types/react": ^18.3.18
+    "@types/react-dom": ^18.3.5
+    next: ^16.2.12
+    next-auth: ^5.0.0-beta.30
+    "@biom3/react": ^0.29.4
+    "@biom3/design-tokens": ^0.4.5
+  testing:
+    "@testing-library/react": ^13.4.0
+    "@testing-library/jest-dom": ^5.16.5
+    "@testing-library/user-event": ^13.5.0
+  web3:
+    ethers: ^6.17.0
+    axios: ^1.18.1
+    uuid: ^9.0.1
+    "@types/uuid": ^8.3.4
+    "@metamask/detect-provider": ^2.0.0
+
+# Named catalogs cover shared deps; strict rejects ad-hoc versions for catalogued names
+catalogMode: strict
+cleanupUnusedCatalogs: true
+
+overrides:
+  # Keep React runtime + types aligned across nested peers
+  react: "catalog:react"
+  react-dom: "catalog:react"
+  # Temporary React 18 types pin (testing-library / nested peers)
+  "@types/react": "catalog:react"
+  "@types/react-dom": "catalog:react"
+  # Migrated from package.json#resolutions (Yarn field; ignored by pnpm 11)
+  elliptic: ^6.6.1
+  responselike: ^2.0.0
+  "@openzeppelin/contracts@3.4.1-solc-0.7-2": 3.4.2
+  "@openzeppelin/contracts@3.4.2-solc-0.7": 3.4.2
+
+# Intentional peer mismatches (React 19 + TS 6/7 ahead of some libs)
+peerDependencyRules:
+  allowedVersions:
+    react: "19"
+    react-dom: "19"
+    typescript: "6 || 7"
+    "@emotion/react": ">=11.11.3"
+    embla-carousel-react: ">=8"
+    typedoc: ">=0.28"
+  allowAny:
+    - "@nomicfoundation/hardhat-verify"
+    - "@typechain/ethers-v6"
+    - "@typechain/hardhat"
+    - vite # sample-app vite-plugin-node-polyfills lags vite 5
+
+dedupePeers: true
+
+# Prefer selective injection via package.json#dependenciesMeta.<dep>.injected
+# when a consumer needs hard-linked workspace copies (e.g. packing). Global
+# injectWorkspacePackages breaks watch/dev and does not replace audience's
+# prepack (which strips bundled workspace deps from published metadata).
+
+# Formerly in .npmrc / package.json#pnpm (pnpm 11 requires these here)
+linkWorkspacePackages: false
+preferWorkspacePackages: true
+saveWorkspaceProtocol: rolling
+disallowWorkspaceCycles: true
+workspaceConcurrency: 0
+
+# @imtbl/* hoist is still required for rollup/tsc resolution of transitive
+# workspace deps (e.g. widgets → metrics). Solidity patterns for hardhat.
+# Jest no longer depends on this (maps to package src directly).
+publicHoistPattern:
+  - "@imtbl/*"
+  - "*openzeppelin*"
+  - "*solidity*"
+
+# Serialize git-hosted package preparation to prevent parallel yarn installs
+# from corrupting each other (seaport packages use yarn install as prepare script)
+networkConcurrency: 1
+
+# @imtbl/contracts depends on git-hosted seaport; allow exotic transitive deps
+blockExoticSubdeps: false
+
+allowBuilds:
+  lefthook: true
+  nx: true
+  "@swc/core": true
+  esbuild: true
+  # git-hosted seaport (via @imtbl/contracts) runs yarn prepare
+  seaport: true
+  seaport-core: true
+  "seaport@https://codeload.github.com/immutable/seaport/tar.gz/ae061dc008105dd8d05937df9ad9a676f878cbf9": true
+  "seaport-core@https://codeload.github.com/immutable/seaport-core/tar.gz/0633350ec34f21fcede657ff812f11cf7d19144e": true
+  # Explicitly reviewed: keep blocked (matches prior onlyBuiltDependencies allowlist)
+  "@axelar-network/axelarjs-sdk": false
+  "@imtbl/contracts": false
+  "@nestjs/core": false
+  "@openapitools/openapi-generator-cli": false
+  "@opensea/seaport-js": false
+  "@prisma/engines": false
+  bufferutil: false
+  core-js: false
+  core-js-pure: false
+  cpu-features: false
+  keccak: false
+  lmdb: false
+  msgpackr-extract: false
+  msw: false
+  nice-napi: false
+  prisma: false
+  protobufjs: false
+  secp256k1: false
+  sharp: false
+  ssh2: false
+  utf-8-validate: false
+  seaport-core@https://codeload.github.com/immutable/seaport-core/tar.gz/33e9030f308500b422926a1be12d7a1e4d6adc06: true
+
+# pnpm 11 defaults to a 1-day minimumReleaseAge; allow known blockers through
+minimumReleaseAgeExclude:
+  - yoctocolors

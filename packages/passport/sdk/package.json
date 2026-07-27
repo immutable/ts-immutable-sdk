@@ -13,24 +13,22 @@
     "@imtbl/wallet": "workspace:*"
   },
   "devDependencies": {
-    "@jest/test-sequencer": "^29.7.0",
-    "@swc/core": "^1.4.2",
-    "@swc/jest": "^0.2.37",
-    "@types/jest": "^29.5.12",
+    "@swc/core": "catalog:toolchain",
+    "@swc/jest": "catalog:toolchain",
+    "@types/jest": "catalog:toolchain",
     "@types/jwt-encode": "^1.0.1",
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
-    "@typescript/native": "npm:typescript@^7.0.2",
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
+    "@typescript/native": "catalog:toolchain",
     "cross-fetch": "^3.1.6",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.4.3",
+    "jest": "catalog:toolchain",
+    "jest-environment-jsdom": "catalog:toolchain",
     "jwt-encode": "^1.0.1",
     "msw": "^1.2.2",
-    "prettier": "^2.8.7",
-    "typescript": "npm:@typescript/typescript6@^6.0.2"
+    "typescript": "catalog:toolchain"
   },
   "engines": {
-    "node": ">=20.11.0"
+    "node": ">=24"
   },
   "exports": {
     "development": {
