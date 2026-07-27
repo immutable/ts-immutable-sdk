@@ -38,8 +38,7 @@
     "packages/audience/sdk/tsdown.cdn.js",
     "packages/orderbook/src/openapi/**",
     ".claude/**",
-    "**/.claude/**",
-    ".github/actions/**"
+    "**/.claude/**"
   ],
   "rules": {
     "no-plusplus": "off",

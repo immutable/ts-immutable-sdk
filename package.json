@@ -7,7 +7,6 @@
     "tslib": "^2.6.2"
   },
   "devDependencies": {
-    "@actions/core": "^3.0.1",
     "@emotion/react": "^11.11.3",
     "@jest/test-sequencer": "^29.7.0",
     "@nx/js": "^23.1.0",

@@ -1,5 +1,0 @@
-node_modules/
-*.tsbuildinfo
-.eslintcache
-pnpm-lock.yaml
-!dist/
