@@ -16,7 +16,6 @@
     "@typescript/native": "npm:typescript@^7.0.2",
     "jest": "^29.7.0",
     "rimraf": "^6.0.1",
-    "tsup": "^8.3.0",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "engines": {
@@ -52,7 +51,7 @@
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
     "test": "jest",
     "test:watch": "jest --watch",
-    "transpile": "tsup src/index.ts --config ../../../tsup.config.js",
+    "transpile": "tsdown",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
     "view-generators": "openapi-generator-cli author template -g typescript-axios -o src/templates"

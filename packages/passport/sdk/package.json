@@ -27,8 +27,6 @@
     "jwt-encode": "^1.0.1",
     "msw": "^1.2.2",
     "prettier": "^2.8.7",
-    "ts-node": "^10.9.1",
-    "tsup": "^8.3.0",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "engines": {
@@ -64,7 +62,7 @@
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
     "test": "jest",
     "test:watch": "jest --watch",
-    "transpile": "tsup src/index.ts --config ../../../tsup.config.js",
+    "transpile": "tsdown",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types"
   },

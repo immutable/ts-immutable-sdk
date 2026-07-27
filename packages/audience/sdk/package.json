@@ -22,7 +22,6 @@
     "rollup": "^4.22.4",
     "rollup-plugin-dts": "^6.4.1",
     "ts-jest": "^29.1.0",
-    "tsup": "^8.3.0",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "engines": {
@@ -60,8 +59,8 @@
     "test": "jest --passWithNoTests && pnpm test:cdn-artifact",
     "test:cdn-artifact": "pnpm transpile:cdn && jest --config jest.cdn-artifact.config.ts",
     "test:watch": "jest --watch",
-    "transpile": "tsup --config tsup.config.js",
-    "transpile:cdn": "tsup --config ./tsup.cdn.js",
+    "transpile": "tsdown",
+    "transpile:cdn": "tsdown --config ./tsdown.cdn.js",
     "typecheck": "tsc --customConditions development --noEmit --jsx preserve",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types && rollup -c rollup.dts.config.js && find dist/types -name '*.d.ts' ! -name 'index.d.ts' -delete"
   },

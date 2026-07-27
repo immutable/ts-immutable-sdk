@@ -80,20 +80,20 @@
 
 ## Linting
 
-Linting ensures code consistency and follows best practices. We use ESLint for linting.
+Linting ensures code consistency and follows best practices. We use [Oxlint](https://oxc.rs/docs/guide/usage/linter) for linting.
 
-The repository has a pre-commit hook that will lint any files that have been staged using `lint-staged`. This will prevent pushing any unlinted files to GitHub. You can also manually lint your code using the commands set up below.
+The repository has a [Lefthook](https://lefthook.dev/) pre-commit hook that runs Oxlint on staged `*.{js,jsx,ts,tsx}` files. This will prevent committing unlinted files. You can also manually lint your code using the commands set up below.
 
-You can either lint the entire project or a specific package. To lint all SDK packages that are affected by any changes made, run the following in the root of the monorepo:
+To lint the whole repository from the root:
 
 ```sh
 pnpm lint
 ```
 
-To lint a specific package, run the following in the root of the monorepo:
+To lint specific paths:
 
 ```sh
-pnpm --filter=<package-name> lint
+pnpm exec oxlint packages/passport/sdk/src
 ```
 
 ## Testing

@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // Tests the actual built IIFE, not the TypeScript source. Catches failure
-// modes that src/cdn.test.ts cannot: a broken tsup.cdn.js config, a missing
+// modes that src/cdn.test.ts cannot: a broken tsdown.cdn.js config, a missing
 // noExternal entry, an unreplaced __SDK_VERSION__ placeholder, or an IIFE
 // wrapper that clobbers the side-effect global assignment.
 //

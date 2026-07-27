@@ -20,7 +20,6 @@
     "next": "^15.2.6",
     "next-auth": "^5.0.0-beta.30",
     "react": "^18.2.0",
-    "tsup": "^8.3.0",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "exports": {
@@ -64,7 +63,7 @@
     "build": "pnpm transpile && pnpm typegen",
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
     "test": "jest --passWithNoTests",
-    "transpile": "tsup src/index.ts --config ./tsup.config.ts",
+    "transpile": "tsdown",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types"
   },

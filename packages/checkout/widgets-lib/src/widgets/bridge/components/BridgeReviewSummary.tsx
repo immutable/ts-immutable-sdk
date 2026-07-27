@@ -391,8 +391,7 @@ export function BridgeReviewSummary() {
         return;
       }
       const currentChainId = await provider.send('eth_chainId', []);
-      // eslint-disable-next-line radix
-      const parsedChainId = parseInt(currentChainId.toString());
+      const parsedChainId = parseInt(String(currentChainId), 10);
       if (parsedChainId !== from?.network) {
         setShowSwitchNetworkDrawer(true);
         return;

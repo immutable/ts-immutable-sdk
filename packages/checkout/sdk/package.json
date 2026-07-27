@@ -32,7 +32,6 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.4.3",
     "text-encoding": "^0.7.0",
-    "tsup": "^8.3.0",
     "typedoc": "^0.26.5",
     "typedoc-plugin-markdown": "^4.2.3",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
@@ -70,11 +69,11 @@
     "build:dev": "CHECKOUT_DEV_MODE=true pnpm build",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
-    "start": "tsup --config ./tsup.config.js --watch",
+    "start": "tsdown --watch",
     "start:dev": "CHECKOUT_DEV_MODE=true pnpm start",
     "test": "jest test",
     "test:watch": "jest test --watch",
-    "transpile": "tsup src/index.ts --config ./tsup.config.js",
+    "transpile": "tsdown",
     "typecheck": "tsc --customConditions default --noEmit",
     "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types"
   },

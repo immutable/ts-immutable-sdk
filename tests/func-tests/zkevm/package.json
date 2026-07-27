@@ -27,7 +27,6 @@
     "jest-cucumber": "^3.0.1",
     "pinst": "^3.0.0",
     "ts-jest": "^29.1.1",
-    "ts-node": "^10.9.2",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "@typescript/native": "npm:typescript@^7.0.2"
   },

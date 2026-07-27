@@ -15,12 +15,5 @@
     "isolatedModules": true,
     "noEmitOnError": true,
     "types": ["*"]
-  },
-  "ts-node": {
-    "compilerOptions": {
-      "module": "commonjs",
-      "moduleResolution": "bundler",
-      "customConditions": null
-    }
   }
 }

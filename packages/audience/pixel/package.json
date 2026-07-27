@@ -14,7 +14,6 @@
     "@typescript/native": "npm:typescript@^7.0.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.4.3",
-    "tsup": "^8.3.0",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "exports": {
@@ -37,7 +36,7 @@
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
     "test": "jest --passWithNoTests",
-    "transpile": "tsup",
+    "transpile": "tsdown",
     "typecheck": "tsc --customConditions development --noEmit",
     "typegen": "tsc --customConditions development --emitDeclarationOnly --outDir dist/types"
   },
