@@ -1,13 +1,18 @@
 ## PR / Merge Group
 
-Runs on every PR and merge queue entry. Functional tests are skipped when all changed files are under `packages/audience/`. All jobs are automated - no manual gate.
+Runs on every PR and merge queue entry, and on push to `main` as a break-glass
+safety net (merge queue is the normal final validation). Functional tests run
+when allowlisted paths change (`packages/orderbook/`, `sdk/`, `packages/config/`,
+`packages/internal/metrics/`, `packages/internal/generated-clients/`,
+`tests/func-tests/`, this workflow, `pnpm-lock.yaml`, `pnpm-workspace.yaml`,
+root `package.json`, or `tsup.config.js`), or when the PR has the
+`run-func-tests` label (honored on both `pull_request` and `merge_group`).
+Syncpack runs inside the SDK job. All jobs are automated — no manual gate.
 
 ```mermaid
 flowchart LR
-    PR([Pull Request\nor Merge Group]) --> sync[Syncpack\ndependency alignment]
-    PR --> blt[Build · Lint · Test\nSDK packages]
-    PR --> ex[Build · Lint · Test\nExamples]
-    PR --> func[Functional Tests\nexcept audience-only changes]
+    PR([Pull Request\nor Merge Group]) --> blt[Build · Lint · Test SDK\n+ Syncpack]
+    PR --> func[Functional Tests\nallowlisted paths or label]
     PR --> ab[Audience Bundle\nSize Check]
     PR --> pb[Pixel Bundle\nSize Check]
     PR --> tv[Title Validation\nconventional commits]

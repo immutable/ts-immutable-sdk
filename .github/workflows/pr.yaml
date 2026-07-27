@@ -1,13 +1,15 @@
 name: PR
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - "**"
   merge_group:
+    branches:
+      - main
+  # Break-glass: if main is pushed outside the merge queue, still validate.
+  # Merge-queue merges already ran this workflow; concurrency cancels duplicates.
+  push:
     branches:
       - main
 
@@ -18,30 +20,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  syncpack:
-    name: Syncpack
-    runs-on: ubuntu-latest-4-cores
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: setup
-        uses: ./.github/actions/setup
-
-      - name: Install dependencies
-        shell: bash
-        run: pnpm install --frozen-lockfile --ignore-scripts
-
-      - name: Syncpack
-        shell: bash
-        run: pnpm syncpack:check
-
   build-lint-test-sdk:
     name: Build, Lint & Test SDK
     runs-on: ubuntu-latest-8-cores
@@ -53,16 +31,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
 
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Install dependencies
+      - name: Syncpack
         shell: bash
-        run: pnpm install --frozen-lockfile --ignore-scripts
+        run: pnpm syncpack:check
 
       - name: Build, Lint & Test
         shell: bash
@@ -73,6 +51,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # Needed to read PR labels when this job runs in a merge_group context.
+      pull-requests: read
     outputs:
       should-run: ${{ steps.changed-files.outputs.should-run }}
     steps:
@@ -88,16 +68,50 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha || github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+          # pull_request payload includes labels; merge_group / push do not.
+          PR_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+          # merge_group head ref looks like: gh-readonly-queue/main/pr-1234-<sha>
+          MERGE_GROUP_HEAD_REF: ${{ github.event.merge_group.head_ref || '' }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -qv '^packages/audience/'; then
-            echo "should-run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "should-run=false" >> "$GITHUB_OUTPUT"
+          force_label=false
+
+          if [ "$EVENT_NAME" = "pull_request" ] && echo "$PR_LABELS" | grep -Fq '"run-func-tests"'; then
+            force_label=true
           fi
 
+          # On merge_group, re-check the source PR for the force-run label.
+          if [ "$EVENT_NAME" = "merge_group" ] && [ -n "$MERGE_GROUP_HEAD_REF" ]; then
+            pr_number="$(printf '%s' "$MERGE_GROUP_HEAD_REF" | sed -n 's|.*/pr-\([0-9][0-9]*\)-.*|\1|p')"
+            if [ -n "$pr_number" ]; then
+              if gh api "repos/${{ github.repository }}/issues/${pr_number}/labels" --jq '.[].name' \
+                | grep -Fxq 'run-func-tests'; then
+                force_label=true
+              fi
+            fi
+          fi
+
+          if [ "$force_label" = "true" ]; then
+            echo "should-run=true" >> "$GITHUB_OUTPUT"
+            echo "Running functional tests (run-func-tests label)"
+            exit 0
+          fi
+
+          # Allowlist: orderbook surface + shared build/deps roots that can break it.
+          if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -qE \
+            '^(packages/orderbook/|sdk/|packages/config/|packages/internal/metrics/|packages/internal/generated-clients/|tests/func-tests/|\.github/workflows/pr\.yaml|pnpm-lock\.yaml|pnpm-workspace\.yaml|package\.json|tsup\.config\.js)'; then
+            echo "should-run=true" >> "$GITHUB_OUTPUT"
+            echo "Running functional tests (allowlisted path changed)"
+          else
+            echo "should-run=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping functional tests (no allowlisted paths changed)"
+          fi
+
+  # Always reports the required check name. Heavy work is conditional so skips
+  # still satisfy branch protection / merge queue.
   func-tests:
     name: Functional tests
-    if: needs.should-run-functional-tests.outputs.should-run == 'true'
     needs: should-run-functional-tests
     runs-on: ubuntu-latest-8-cores
     permissions:
@@ -105,37 +119,46 @@ jobs:
     env:
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
     steps:
+      - name: Skip functional tests
+        if: needs.should-run-functional-tests.outputs.should-run != 'true'
+        shell: bash
+        run: echo "No allowlisted paths changed; skipping functional tests."
+
       - name: Checkout code
+        if: needs.should-run-functional-tests.outputs.should-run == 'true'
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6.0.2
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
 
       - name: setup
+        if: needs.should-run-functional-tests.outputs.should-run == 'true'
         uses: ./.github/actions/setup
-
-      - name: Install dependencies
-        shell: bash
-        run: pnpm install --frozen-lockfile --ignore-scripts
+        with:
+          nx-set-shas: "false"
 
       - name: Build SDK
+        if: needs.should-run-functional-tests.outputs.should-run == 'true'
         shell: bash
         run: pnpm build
 
       - name: Prepare SDK
+        if: needs.should-run-functional-tests.outputs.should-run == 'true'
         shell: bash
         run: pnpm prepare:sdk
 
       - name: Prepare tests
+        if: needs.should-run-functional-tests.outputs.should-run == 'true'
         shell: bash
         run: pnpm prepare:tests
 
       - name: Update modules
+        if: needs.should-run-functional-tests.outputs.should-run == 'true'
         shell: bash
-        run: pnpm install --frozen-lockfile=false --ignore-scripts
+        run: pnpm install --frozen-lockfile=false --ignore-scripts --prefer-offline
 
       - name: Run functional tests
+        if: needs.should-run-functional-tests.outputs.should-run == 'true'
         shell: bash
         env:
           ZKEVM_ORDERBOOK_BANKER: ${{ secrets.ZKEVM_ORDERBOOK_BANKER }}
@@ -147,4 +170,4 @@ jobs:
           ZKEVM_RPC_ENDPOINT: "https://rpc.testnet.immutable.com"
           ORDERBOOK_MR_API_URL: "https://api.sandbox.immutable.com"
           ZKEVM_CHAIN_NAME: "imtbl-zkevm-testnet"
-        run: pnpm --filter "@tests/func-tests-zkevm" --parallel func-test:ci
+        run: pnpm --filter "@tests/func-tests-zkevm" func-test:ci

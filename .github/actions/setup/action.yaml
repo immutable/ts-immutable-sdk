@@ -1,15 +1,22 @@
 name: "Setup"
-description: "Bootstrap NX SHAs, pnpm, and Node.js — callers own their pnpm install step"
+description: "Bootstrap NX SHAs, pnpm, Node.js, and optionally install dependencies"
 
 inputs:
   enable-cache:
     description: "Whether to cache the pnpm store. Set to 'false' for publish jobs to ensure a clean install."
+    default: "true"
+  run-install:
+    description: "Whether to run pnpm install after setting up Node/pnpm."
+    default: "true"
+  nx-set-shas:
+    description: "Whether to derive NX_BASE/NX_HEAD via nrwl/nx-set-shas (needs fetch-depth: 0)."
     default: "true"
 
 runs:
   using: "composite"
   steps:
     - name: Derive appropriate SHAs for base and head for `nx affected` commands
+      if: inputs.nx-set-shas == 'true'
       uses: nrwl/nx-set-shas@afb73a62d26e41464e9254689e1fd6122ee683c1 # pin@v5.0.1
 
     - name: Setup pnpm
@@ -22,3 +29,7 @@ runs:
         registry-url: https://registry.npmjs.org/
         cache: ${{ inputs.enable-cache == 'true' && 'pnpm' || '' }}
 
+    - name: Install dependencies
+      if: inputs.run-install == 'true'
+      shell: bash
+      run: pnpm install --frozen-lockfile --ignore-scripts
