@@ -119,7 +119,7 @@
       },
       "transferAssetsL1Warning": {
         "heading": "Do not send assets to Passport on Ethereum",
-        "body": "Passport does not yet exist on Ethereum, so your funds will get lost there. Only transfer on Immutable zkEVM or Immutable X. "
+        "body": "Passport does not yet exist on Ethereum, so your funds will get lost there. Only transfer on Immutable zkEVM. "
       }
     },
     "COIN_INFO": {

@@ -11799,7 +11799,7 @@
           "link": {
             "type": "string",
             "description": "Link to IMX documentation that can help resolve this error",
-            "example": "https://docs.x.immutable.com/reference/#/"
+            "example": "https://docs.immutable.com/zkevm/api/reference/"
           },
           "trace_id": {
             "type": "string",

@@ -203,10 +203,18 @@ describe('getAttributionNetwork', () => {
     ['reddit', 'reddit'],
     ['x', 'x'],
     ['twitter', 'x'],
-  ])('classifies utm_source=%s as %s', (source, expected) => {
-    setLocation(`https://example.com/?utm_source=${source}`);
+  ])('classifies utm_source=%s with a paid utm_medium as %s', (source, expected) => {
+    setLocation(`https://example.com/?utm_source=${source}&utm_medium=cpc`);
     expect(getAttributionNetwork()).toBe(expected);
   });
+
+  it.each(['cpc', 'ppc', 'paid', 'paid_social', 'paidsocial', 'CPC'])(
+    'treats utm_medium=%s as a paid medium',
+    (medium) => {
+      setLocation(`https://example.com/?utm_source=facebook&utm_medium=${medium}`);
+      expect(getAttributionNetwork()).toBe('meta');
+    },
+  );
 
   it.each([
     ['fbclid', 'meta'],
@@ -215,7 +223,7 @@ describe('getAttributionNetwork', () => {
     ['dclid', 'google'],
     ['rdt_cid', 'reddit'],
     ['twclid', 'x'],
-  ])('classifies %s presence as %s regardless of utm_source', (param, expected) => {
+  ])('classifies %s presence as %s regardless of utm_source or utm_medium', (param, expected) => {
     setLocation(`https://example.com/?${param}=123`);
     expect(getAttributionNetwork()).toBe(expected);
   });
@@ -231,16 +239,34 @@ describe('getAttributionNetwork', () => {
   });
 
   it('classifies an unrecognised utm_source as organic', () => {
-    setLocation('https://example.com/?utm_source=newsletter');
+    setLocation('https://example.com/?utm_source=newsletter&utm_medium=cpc');
     expect(getAttributionNetwork()).toBe('organic');
   });
+
+  it('classifies utm_source alone without utm_medium as organic', () => {
+    setLocation('https://example.com/?utm_source=facebook');
+    expect(getAttributionNetwork()).toBe('organic');
+  });
+
+  it.each(['organic', 'social', 'referral', 'email'])(
+    'classifies a matching utm_source with non-paid utm_medium=%s as organic',
+    (medium) => {
+      setLocation(`https://example.com/?utm_source=facebook&utm_medium=${medium}`);
+      expect(getAttributionNetwork()).toBe('organic');
+    },
+  );
 });
 
 describe('isPaid* helpers', () => {
   it('isPaidMeta reflects getAttributionNetwork', () => {
-    setLocation('https://example.com/?utm_source=facebook');
+    setLocation('https://example.com/?utm_source=facebook&utm_medium=paid_social');
     expect(isPaidMeta()).toBe(true);
     expect(isPaidTikTok()).toBe(false);
+  });
+
+  it('isPaidMeta is false for organic Meta-sourced traffic', () => {
+    setLocation('https://example.com/?utm_source=facebook&utm_medium=organic');
+    expect(isPaidMeta()).toBe(false);
   });
 
   it('isPaidTikTok reflects getAttributionNetwork', () => {
@@ -255,7 +281,7 @@ describe('isPaid* helpers', () => {
   });
 
   it('isPaidReddit reflects getAttributionNetwork', () => {
-    setLocation('https://example.com/?utm_source=reddit');
+    setLocation('https://example.com/?utm_source=reddit&utm_medium=paid');
     expect(isPaidReddit()).toBe(true);
   });
 

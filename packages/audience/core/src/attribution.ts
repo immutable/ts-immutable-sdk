@@ -134,10 +134,10 @@ export function clearAttribution(): void {
 }
 
 /**
- * The ad network a visit is attributed to, derived from `utm_source` and
- * ad-network click IDs on the current URL. Mirrors the network taxonomy
- * used by Immutable's server-side attribution pipeline so client- and
- * server-classified traffic agree on the same names.
+ * The ad network a visit is attributed to, derived from `utm_source` /
+ * `utm_medium` and ad-network click IDs on the current URL. Mirrors the
+ * network taxonomy used by Immutable's server-side attribution pipeline
+ * so client- and server-classified traffic agree on the same names.
  */
 export type AttributionNetwork = 'meta' | 'tiktok' | 'google' | 'reddit' | 'x' | 'organic' | 'other';
 
@@ -145,35 +145,58 @@ const META_SOURCES = ['facebook', 'instagram', 'meta', 'fb', 'ig'];
 const X_SOURCES = ['x', 'twitter'];
 
 /**
- * Classifies the current page load's traffic source from `utm_source` and
- * ad-network click IDs on the URL (e.g. `fbclid`, `ttclid`, `gclid`).
+ * `utm_medium` values that indicate paid traffic. A `utm_source` match
+ * alone isn't sufficient to call a visit "paid" — e.g. `utm_source=facebook`
+ * also covers an organic post shared on Facebook — so the medium must
+ * corroborate paid intent unless a network click ID is present.
+ */
+const PAID_MEDIUMS = ['cpc', 'ppc', 'paid', 'paid_social', 'paidsocial'];
+
+function isPaidSourceMatch(source: string | undefined, medium: string | undefined, sources: string[]): boolean {
+  return sources.includes(source ?? '') && PAID_MEDIUMS.includes(medium ?? '');
+}
+
+/**
+ * Classifies the current page load's traffic source from `utm_source` /
+ * `utm_medium` and ad-network click IDs on the URL (e.g. `fbclid`,
+ * `ttclid`, `gclid`). A network click ID is treated as paid on its own;
+ * a bare `utm_source` match additionally requires `utm_medium` to be a
+ * paid value (see {@link PAID_MEDIUMS}), so organic traffic tagged with
+ * e.g. `utm_source=facebook&utm_medium=organic` isn't misclassified as paid.
  *
  * @returns The matched network, `'organic'` when no UTM or click ID is
  * present, or `'other'` when a recognised click ID (e.g. `msclkid`,
  * `li_fat_id`) doesn't map to a named network.
  * @example
- * // https://example.com/?utm_source=facebook
+ * // https://example.com/?utm_source=facebook&utm_medium=paid_social
  * getAttributionNetwork(); // 'meta'
+ * @example
+ * // https://example.com/?utm_source=facebook&utm_medium=organic
+ * getAttributionNetwork(); // 'organic'
+ * @example
+ * // https://example.com/?fbclid=abc123
+ * getAttributionNetwork(); // 'meta' — click ID alone is a sufficient paid signal
  */
 export function getAttributionNetwork(): AttributionNetwork {
   if (typeof window === 'undefined' || !window.location) return 'organic';
 
   const params = new URLSearchParams(window.location.search);
   const source = params.get('utm_source')?.toLowerCase();
+  const medium = params.get('utm_medium')?.toLowerCase();
 
-  if (META_SOURCES.includes(source ?? '') || params.has('fbclid')) {
+  if (params.has('fbclid') || isPaidSourceMatch(source, medium, META_SOURCES)) {
     return 'meta';
   }
-  if (source === 'tiktok' || params.has('ttclid')) {
+  if (params.has('ttclid') || isPaidSourceMatch(source, medium, ['tiktok'])) {
     return 'tiktok';
   }
-  if (source === 'google' || params.has('gclid') || params.has('dclid')) {
+  if (params.has('gclid') || params.has('dclid') || isPaidSourceMatch(source, medium, ['google'])) {
     return 'google';
   }
-  if (source === 'reddit' || params.has('rdt_cid')) {
+  if (params.has('rdt_cid') || isPaidSourceMatch(source, medium, ['reddit'])) {
     return 'reddit';
   }
-  if (X_SOURCES.includes(source ?? '') || params.has('twclid')) {
+  if (params.has('twclid') || isPaidSourceMatch(source, medium, X_SOURCES)) {
     return 'x';
   }
   if (params.has('msclkid') || params.has('li_fat_id')) {

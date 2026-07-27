@@ -1,12 +1,6 @@
 import MessageValidator from 'sns-validator';
 import { Environment } from '@imtbl/config';
 import {
-  XNftCreated,
-  XNftUpdated,
-  XOrderAccepted,
-  XOrderCancelled,
-  XOrderFilled,
-  XTransferCreated,
   ZkevmActivityBurn, ZkevmActivityDeposit, ZkevmActivityMint, ZkevmActivitySale,
   ZkevmActivityTransfer, ZkevmActivityWithdrawal, ZkevmCollectionUpdated, ZkevmMetadataUpdated,
   ZkevmMintRequestUpdated, ZkevmNftUpdated, ZkevmOrderUpdated, ZkevmTokenUpdated,
@@ -34,12 +28,6 @@ export type WebhookHandlers = {
   zkEvmTokenUpdated?: (event: ZkevmTokenUpdated) => Promise<void>;
   zkEvmOrderUpdated?: (event: ZkevmOrderUpdated) => Promise<void>;
   zkEvmTradeCreated?: (event: ZkevmTradeCreated) => Promise<void>;
-  xNftCreated?: (event: XNftCreated) => Promise<void>;
-  xNftUpdated?: (event: XNftUpdated) => Promise<void>;
-  xOrderAccepted?: (event: XOrderAccepted) => Promise<void>;
-  xOrderFilled?: (event: XOrderFilled) => Promise<void>;
-  xOrderCancelled?: (event: XOrderCancelled) => Promise<void>;
-  xTransferCreated?: (event: XTransferCreated) => Promise<void>;
   all?: (event: any) => Promise<void>;
 };
 
@@ -144,36 +132,6 @@ export const handle = async (
       case 'imtbl_zkevm_trade_created':
         if (handlers?.zkEvmTradeCreated) {
           await handlers?.zkEvmTradeCreated(event);
-        }
-        break;
-      case 'imtbl_x_nft_created':
-        if (handlers?.xNftCreated) {
-          await handlers?.xNftCreated(event);
-        }
-        break;
-      case 'imtbl_x_nft_updated':
-        if (handlers?.xNftUpdated) {
-          await handlers?.xNftUpdated(event);
-        }
-        break;
-      case 'imtbl_x_order_accepted':
-        if (handlers?.xOrderAccepted) {
-          await handlers?.xOrderAccepted(event);
-        }
-        break;
-      case 'imtbl_x_order_filled':
-        if (handlers?.xOrderFilled) {
-          await handlers?.xOrderFilled(event);
-        }
-        break;
-      case 'imtbl_x_order_cancelled':
-        if (handlers?.xOrderCancelled) {
-          await handlers?.xOrderCancelled(event);
-        }
-        break;
-      case 'imtbl_x_transfer_created':
-        if (handlers?.xTransferCreated) {
-          await handlers?.xTransferCreated(event);
         }
         break;
       default:

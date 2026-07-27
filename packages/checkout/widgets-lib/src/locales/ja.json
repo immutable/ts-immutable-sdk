@@ -119,7 +119,7 @@
       },
       "transferAssetsL1Warning": {
         "heading": "Ethereumのパスポートに資産を送らないでください",
-        "body": "パスポートはまだEthereumに存在していないため、そこに資金を送ると失われます。Immutable zkEVMまたはImmutable Xでのみ転送してください。"
+        "body": "パスポートはまだEthereumに存在していないため、そこに資金を送ると失われます。Immutable zkEVMでのみ転送してください。"
       }
     },
     "COIN_INFO": {

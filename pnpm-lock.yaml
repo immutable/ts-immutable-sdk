@@ -231,9 +231,6 @@ importers:
 
   packages/auth:
     dependencies:
-      '@imtbl/generated-clients':
-        specifier: workspace:*
-        version: link:../internal/generated-clients
       '@imtbl/metrics':
         specifier: workspace:*
         version: link:../internal/metrics
@@ -1371,21 +1368,9 @@ importers:
       '@imtbl/metrics':
         specifier: workspace:*
         version: link:../../internal/metrics
-      '@imtbl/toolkit':
-        specifier: workspace:*
-        version: link:../../internal/toolkit
       '@imtbl/wallet':
         specifier: workspace:*
         version: link:../../wallet
-      ethers:
-        specifier: ^6.13.4
-        version: 6.13.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      localforage:
-        specifier: ^1.10.0
-        version: 1.10.0
-      oidc-client-ts:
-        specifier: 3.4.1
-        version: 3.4.1
     devDependencies:
       '@jest/test-sequencer':
         specifier: ^29.7.0
@@ -1496,9 +1481,6 @@ importers:
       '@imtbl/config':
         specifier: workspace:*
         version: link:../../config
-      '@imtbl/generated-clients':
-        specifier: workspace:*
-        version: link:../../internal/generated-clients
       sns-validator:
         specifier: ^0.3.5
         version: 0.3.5

@@ -3,8 +3,7 @@ import { TextEncoder } from 'util';
 global.TextEncoder = TextEncoder;
 
 /**
- * Required for ethers v6
- * @see https://github.com/ethers-io/ethers.js/issues/4365
+ * Normalize Uint8Array instanceof checks across realms (jsdom / Node).
  */
 Object.defineProperty(Uint8Array, Symbol.hasInstance, {
     value(potentialInstance) {
