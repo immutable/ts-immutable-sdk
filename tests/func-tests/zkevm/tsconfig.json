@@ -1,7 +1,8 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDirs": ["utils", "step-definitions", "specs", "hardhat.config.ts"],
+    "rootDir": ".",
+    "rootDirs": ["utils", "step-definitions", "specs", "hardhat.config.ts"]
   },
   "include": ["utils", "step-definitions", "specs", "hardhat.config.ts"],
   "exclude": [

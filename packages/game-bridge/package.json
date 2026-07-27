@@ -1,6 +1,9 @@
 {
   "name": "@imtbl/game-bridge",
   "version": "0.0.0",
+  "browserslist": [
+    "Chrome 137"
+  ],
   "dependencies": {
     "@imtbl/config": "workspace:*",
     "@imtbl/metrics": "workspace:*",
@@ -40,8 +43,5 @@
         "browsers": "Chrome 137"
       }
     }
-  },
-  "browserslist": [
-    "Chrome 137"
-  ]
+  }
 }

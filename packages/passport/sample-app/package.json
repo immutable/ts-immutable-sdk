@@ -10,8 +10,8 @@
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
     "@imtbl/orderbook": "workspace:*",
-    "@imtbl/wallet": "workspace:*",
     "@imtbl/passport": "workspace:*",
+    "@imtbl/wallet": "workspace:*",
     "@metamask/detect-provider": "^2.0.0",
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.10.3",
@@ -33,10 +33,11 @@
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "concurrently": "^8.2.2",
     "eslint": "^8.56.0",
     "eslint-config-next": "13.3.1",
-    "typescript": "^5.6.2"
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "private": true,
   "scripts": {

@@ -13,12 +13,13 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "noEmitOnError": true
+    "noEmitOnError": true,
+    "types": ["*"]
   },
   "ts-node": {
     "compilerOptions": {
       "module": "commonjs",
-      "moduleResolution": "node",
+      "moduleResolution": "bundler",
       "customConditions": null
     }
   }

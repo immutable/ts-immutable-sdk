@@ -3,6 +3,7 @@
   "description": "Immutable Audience — consent-aware event tracking and identity management",
   "version": "0.0.0",
   "author": "Immutable",
+  "browser": "dist/browser/index.js",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/audience-core": "workspace:*",
@@ -13,6 +14,7 @@
     "@swc/jest": "^0.2.37",
     "@types/jest": "^29.5.12",
     "@types/node": "^22.10.7",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "esbuild-plugin-replace": "^1.4.0",
     "esbuild-plugins-node-modules-polyfill": "^1.6.7",
     "eslint": "^8.56.0",
@@ -22,7 +24,7 @@
     "rollup-plugin-dts": "^6.4.1",
     "ts-jest": "^29.1.0",
     "tsup": "^8.3.0",
-    "typescript": "^5.6.2"
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "engines": {
     "node": ">=20.11.0"
@@ -47,24 +49,23 @@
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "main": "dist/node/index.cjs",
   "module": "dist/node/index.js",
-  "browser": "dist/browser/index.js",
   "publishConfig": {
     "access": "public"
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "pnpm transpile && pnpm transpile:cdn && pnpm typegen",
-    "transpile": "tsup --config tsup.config.js",
-    "transpile:cdn": "tsup --config ./tsup.cdn.js",
-    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types && rollup -c rollup.dts.config.js && find dist/types -name '*.d.ts' ! -name 'index.d.ts' -delete",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
-    "prepack": "node scripts/prepack.mjs",
     "postpack": "node scripts/postpack.mjs",
+    "prepack": "node scripts/prepack.mjs",
     "test": "jest --passWithNoTests && pnpm test:cdn-artifact",
     "test:cdn-artifact": "pnpm transpile:cdn && jest --config jest.cdn-artifact.config.ts",
     "test:watch": "jest --watch",
-    "typecheck": "tsc --customConditions development --noEmit --jsx preserve"
+    "transpile": "tsup --config tsup.config.js",
+    "transpile:cdn": "tsup --config ./tsup.cdn.js",
+    "typecheck": "tsc --customConditions development --noEmit --jsx preserve",
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types && rollup -c rollup.dts.config.js && find dist/types -name '*.d.ts' ! -name 'index.d.ts' -delete"
   },
   "type": "module",
   "types": "./dist/types/index.d.ts"

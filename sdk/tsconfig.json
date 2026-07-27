@@ -3,6 +3,7 @@
   "compilerOptions": {
     "customConditions": ["development"],
     "outDir": "./dist",
+    "rootDir": "./src",
     "rootDirs": ["src"],
   },
   "include": ["src"],
