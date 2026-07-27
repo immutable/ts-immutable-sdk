@@ -65,10 +65,6 @@ jobs:
         with:
           enable-cache: "false"
 
-      - name: Install dependencies
-        shell: bash
-        run: pnpm install --frozen-lockfile --ignore-scripts
-
       - name: Set TS SDK hash
         shell: bash
         run: echo "TS_SDK_HASH=$(git rev-parse HEAD)" >> "$GITHUB_ENV"

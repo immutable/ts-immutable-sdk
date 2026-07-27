@@ -5,6 +5,9 @@ on:
     paths:
       - "packages/audience/sdk/**"
       - "packages/audience/core/**"
+      - ".github/workflows/deploy-audience-cdn.yaml"
+    paths-ignore:
+      - "**/*.md"
     branches:
       - main
   workflow_dispatch:
@@ -36,10 +39,6 @@ jobs:
         uses: ./.github/actions/setup
         with:
           enable-cache: "false"
-
-      - name: Install dependencies
-        shell: bash
-        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Build audience SDK bundle
         shell: bash

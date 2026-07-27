@@ -3,7 +3,11 @@ name: Passport Sample App Deployment
 on:
   push:
     paths:
-      - "packages/passport/**"
+      - "packages/passport/sample-app/**"
+      - "packages/passport/sdk/**"
+      - ".github/workflows/passport-sample-app-deployment.yaml"
+    paths-ignore:
+      - "**/*.md"
     branches:
       - main
   workflow_dispatch:
@@ -42,10 +46,6 @@ jobs:
         uses: ./.github/actions/setup
         with:
           enable-cache: "false"
-
-      - name: Install dependencies
-        shell: bash
-        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Initialize and install current @latest sdk versions on npm
         shell: bash
