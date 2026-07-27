@@ -20,7 +20,6 @@
   },
   "devDependencies": {
     "@typescript/native": "npm:typescript@^7.0.2",
-    "eslint": "^8.56.0",
     "tsup": "^8.3.0",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
@@ -221,7 +220,6 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
-    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
     "transpile": "tsup --config ./tsup.config.js",
     "typecheck": "tsc --customConditions default --noEmit --jsx preserve",

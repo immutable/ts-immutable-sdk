@@ -11,13 +11,11 @@
     "ethers": "^6.13.4"
   },
   "devDependencies": {
-    "eslint": "^8.56.0",
     "parcel": "^2.13.3"
   },
   "scripts": {
     "build": "parcel build --no-cache --no-scope-hoist && node scripts/fixUnityBuild.js",
     "build:local": "parcel build --no-cache --no-scope-hoist && node scripts/fixUnityBuild.js && pnpm updateSdkVersion",
-    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "start": "parcel",
     "updateSdkVersion": "./scripts/updateSdkVersion.sh"
   },

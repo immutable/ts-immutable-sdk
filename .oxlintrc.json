@@ -36,7 +36,9 @@
     "packages/audience/sdk/rollup.dts.config.js",
     "packages/audience/sdk/tsup.config.js",
     "packages/orderbook/src/openapi/**",
-    "**/.claude/**"
+    ".claude/**",
+    "**/.claude/**",
+    ".github/actions/**"
   ],
   "rules": {
     "no-plusplus": "off",
@@ -52,6 +54,17 @@
     "jsx-a11y/no-autofocus": "off",
     "no-console": "off",
     "no-underscore-dangle": "off",
+
+    "id-match": [
+      "warn",
+      "^(_?[a-z][a-zA-Z0-9]*|[A-Z][a-zA-Z0-9]*(__[a-zA-Z][a-zA-Z0-9]*)*|[A-Z][A-Z0-9_]*)$",
+      {
+        "properties": false,
+        "onlyDeclarations": true,
+        "ignoreDestructuring": true,
+        "classFields": false
+      }
+    ],
 
     "eslint/no-unused-vars": [
       "warn",

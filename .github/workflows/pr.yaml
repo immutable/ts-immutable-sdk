@@ -64,13 +64,13 @@ jobs:
         shell: bash
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Oxlint
+      - name: Lint
         shell: bash
-        run: pnpm lint:oxlint
+        run: pnpm lint
 
-      - name: Build, Lint & Test
+      - name: Build & Test
         shell: bash
-        run: pnpm --if-present nx affected -t build,lint,test
+        run: pnpm --if-present nx affected -t build,test
 
   should-run-functional-tests:
     name: Determine whether functional tests are needed

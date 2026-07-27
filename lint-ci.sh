@@ -14,4 +14,4 @@ for f in $files; do
   fi
 done
 
-[[ -z $tolint ]] || eslint $tolint --no-error-on-unmatched-pattern
+[[ -z $tolint ]] || oxlint $tolint --no-error-on-unmatched-pattern

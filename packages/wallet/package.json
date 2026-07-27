@@ -48,7 +48,6 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
-    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
     "test": "jest",
     "transpile": "tsup src/index.ts --config ../../tsup.config.js",
