@@ -17,7 +17,7 @@ Passport also comes equipped with a non-custodial wallet as a default option for
 
 # Usage
 
-You can find example usages of this package in the examples set up [here](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport)
+See the [Passport docs](https://docs.immutable.com/docs/products/passport/overview) for usage guidance, or run the sample app in `packages/passport/sample-app`.
 
 # Installation
 

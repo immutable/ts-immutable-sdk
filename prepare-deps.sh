@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to manually prepare dependencies for the SDK, examples, or tests
+# Script to manually prepare dependencies for the SDK or tests
 
 # It will go through each workspace in the provided environment and prepare the dependencies
 # The dependencies are prepared by having the script check its dependencies and devDependencies
@@ -17,7 +17,7 @@ envToPrepare=$1
 # Check if an argument was provided
 if [ -z "$envToPrepare" ]; then
   echo "Please provide the environment to prepare"
-  echo "Environments: sdk | examples | tests"
+  echo "Environments: sdk | tests"
   echo "Example: ./prepare-deps.sh sdk"
   exit 1
 fi
@@ -26,9 +26,7 @@ fi
 workspaceFilter="@imtbl/sdk..."
 
 # Change the workspace filter based on the provided environment
-if [ "$envToPrepare" = "examples" ]; then
-  workspaceFilter="@examples/**"
-elif [ "$envToPrepare" = "tests" ]; then
+if [ "$envToPrepare" = "tests" ]; then
   workspaceFilter="@tests/**"
 fi
 

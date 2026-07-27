@@ -15,7 +15,7 @@ The Checkout SDK folder provides both functions and user interfaces for interact
 
 # Usage
 
-You can find example usages of this package in the examples set up [here](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/checkout)
+See the [Checkout docs](https://docs.immutable.com/docs/products/checkout/overview) for usage guidance, or run the sample app in `packages/checkout/sample-app`.
 
 # Installation
 

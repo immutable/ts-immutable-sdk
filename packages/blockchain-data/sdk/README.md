@@ -15,7 +15,7 @@ The Blockchain Data SDK provides a set of wrapper functions for interacting with
 
 # Usage
 
-You can find an example usage of this package in the example set up [here](https://github.com/immutable/ts-immutable-sdk/tree/main/examples/blockchain-data)
+See the [Indexer docs](https://docs.immutable.com/docs/products/indexer/overview) for usage guidance.
 
 # Installation
 

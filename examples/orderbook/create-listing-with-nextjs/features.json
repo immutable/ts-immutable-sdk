@@ -1,7 +1,0 @@
-{
-    "features": [
-        "create-listing-for-erc721",
-        "create-listing-for-erc1155"
-    ],
-    "order": 1
-}

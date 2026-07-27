@@ -9,7 +9,6 @@
 /pnpm-workspace.yaml @immutable/ped-engineering-blockchain-list @immutable/ped-stream-sdk-integrations-list
 /tsconfig.base.json @immutable/ped-engineering-blockchain-list @immutable/ped-stream-sdk-integrations-list
 /tsup.config.js @immutable/ped-engineering-blockchain-list @immutable/ped-stream-sdk-integrations-list
-/examples/ @immutable/devgrowth
 /packages/config/ @immutable/ped-engineering-blockchain-list @immutable/ped-stream-sdk-integrations-list
 
 # Blockchain Services
@@ -22,7 +21,6 @@
 /packages/internal/bridge/ @immutable/ped-engineering-blockchain-list
 /packages/orderbook/ @immutable/ped-engineering-blockchain-list
 /packages/passport/ @immutable/ped-engineering-blockchain-list
-/packages/x-provider/ @immutable/ped-engineering-blockchain-list
 /packages/checkout/ @immutable/ped-engineering-blockchain-list
 /packages/checkout/widgets-lib/ @immutable/ped-engineering-blockchain-list
 /packages/blockchain-data/ @immutable/ped-engineering-blockchain-list

@@ -15,7 +15,7 @@ All commands below need to be run in the context of the `passport` package in th
 Running the Passport SDK Sample App with the Passport SDK supporting hot reloading:
 
 ```bash
-# Context: passport-sdk-sample-app in ./sdk-sample-app
+# Context: passport-sample-app in ./sample-app
 pnpm dev-with-sdk
 ```
 
