@@ -36,8 +36,8 @@
   },
   "private": true,
   "scripts": {
-    "build": "next build",
-    "dev": "next dev",
+    "build": "next build --webpack",
+    "dev": "next dev --webpack",
     "dev-with-sdk": "concurrently 'ENABLE_API_ROUTES=true pnpm dev' 'pnpm run -w dev'",
     "start": "next start"
   }

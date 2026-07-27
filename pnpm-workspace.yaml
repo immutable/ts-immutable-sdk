@@ -51,6 +51,7 @@ catalogs:
     # Temporary: biom3/emotion JSX breaks under @types/react 19 — bump when biom3 supports it
     "@types/react": ^18.3.18
     "@types/react-dom": ^18.3.5
+    "@emotion/react": ^11.11.3
     next: ^16.2.12
     next-auth: ^5.0.0-beta.30
     "@biom3/react": ^0.29.4
@@ -164,3 +165,7 @@ allowBuilds:
 # pnpm 11 defaults to a 1-day minimumReleaseAge; allow known blockers through
 minimumReleaseAgeExclude:
   - yoctocolors
+
+catalog:
+  buffer: ^6.0.3
+  process: ^0.11.10

@@ -16,6 +16,7 @@
   "dependencies": {
     "@biom3/design-tokens": "catalog:react",
     "@biom3/react": "catalog:react",
+    "@emotion/react": "catalog:react",
     "@imtbl/checkout-sdk": "workspace:*",
     "@imtbl/checkout-widgets": "workspace:*",
     "@imtbl/config": "workspace:*",

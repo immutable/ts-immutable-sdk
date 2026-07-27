@@ -8,6 +8,7 @@
     "@imtbl/config": "workspace:*",
     "@imtbl/metrics": "workspace:*",
     "@imtbl/passport": "workspace:*",
+    "buffer": "^6.0.3",
     "ethers": "catalog:web3"
   },
   "devDependencies": {
