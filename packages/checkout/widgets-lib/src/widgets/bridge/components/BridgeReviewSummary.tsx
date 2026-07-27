@@ -383,8 +383,14 @@ export function BridgeReviewSummary() {
     }
 
     try {
-      // eslint-disable-next-line max-len
-      const currentChainId = await (from?.browserProvider.provider as any).send('eth_chainId', []);
+      const provider = from?.browserProvider?.provider as
+        | { send: (method: string, params: unknown[]) => Promise<unknown> }
+        | undefined;
+      if (!provider) {
+        setShowSwitchNetworkDrawer(true);
+        return;
+      }
+      const currentChainId = await provider.send('eth_chainId', []);
       // eslint-disable-next-line radix
       const parsedChainId = parseInt(currentChainId.toString());
       if (parsedChainId !== from?.network) {

@@ -63,7 +63,7 @@ export const withBridgeError = async <T>(
   try {
     return await fn();
   } catch (error) {
-    let errorMessage = `${customErrorType}: ${(error as Error).message}` || 'UnknownError';
+    let errorMessage = `${customErrorType}: ${(error as Error).message || 'UnknownError'}`;
     if (details) {
       errorMessage = `${details}: ${errorMessage}`;
     }

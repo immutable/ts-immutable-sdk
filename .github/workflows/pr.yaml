@@ -64,6 +64,10 @@ jobs:
         shell: bash
         run: pnpm install --frozen-lockfile --ignore-scripts
 
+      - name: Oxlint
+        shell: bash
+        run: pnpm lint:oxlint
+
       - name: Build, Lint & Test
         shell: bash
         run: pnpm --if-present nx affected -t build,lint,test

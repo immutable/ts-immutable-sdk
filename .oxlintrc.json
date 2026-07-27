@@ -1,0 +1,113 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "options": {
+    "typeAware": true
+  },
+  "plugins": ["typescript", "react", "import", "jsx-a11y", "unicorn", "oxc", "jest"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "off",
+    "style": "off",
+    "pedantic": "off",
+    "restriction": "off",
+    "nursery": "off"
+  },
+  "env": {
+    "builtin": true,
+    "es2022": true
+  },
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "docs/**",
+    "sdk/scripts/**",
+    "jest.*.js",
+    "jest.config.*",
+    "**/*.md",
+    "**/*sample-app*/**",
+    "**/*playground*/**",
+    "examples/**",
+    "tests/func-tests/**",
+    "tsup.*",
+    "*.cjs",
+    "packages/internal/generated-clients/src/**",
+    "packages/game-bridge/scripts/**/*.js",
+    "packages/audience/sdk/rollup.dts.config.js",
+    "packages/audience/sdk/tsup.config.js",
+    "packages/orderbook/src/openapi/**",
+    "**/.claude/**"
+  ],
+  "rules": {
+    "no-plusplus": "off",
+    "max-classes-per-file": "off",
+    "import/prefer-default-export": "off",
+    "react/button-has-type": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react-hooks/exhaustive-deps": "warn",
+    "jsx-a11y/anchor-is-valid": "off",
+    "jsx-a11y/anchor-has-content": "off",
+    "jsx-a11y/control-has-associated-label": "off",
+    "jsx-a11y/no-autofocus": "off",
+    "no-console": "off",
+    "no-underscore-dangle": "off",
+
+    "eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+
+    "typescript/no-floating-promises": "warn",
+    "typescript/unbound-method": "warn",
+    "typescript/no-misused-spread": "warn",
+    "typescript/restrict-template-expressions": "warn",
+    "typescript/await-thenable": "warn",
+    "typescript/no-redundant-type-constituents": "warn",
+    "typescript/no-non-null-asserted-optional-chain": "warn",
+    "typescript/no-duplicate-type-constituents": "warn",
+    "typescript/no-unsafe-type-assertion": "off",
+    "typescript/no-unnecessary-type-assertion": "off",
+    "typescript/no-unsafe-enum-comparison": "warn",
+    "typescript/no-unnecessary-type-conversion": "off",
+    "typescript/no-useless-default-assignment": "warn",
+    "typescript/no-duplicate-enum-values": "warn",
+    "typescript/no-unnecessary-parameter-property-assignment": "off",
+    "typescript/no-this-alias": "warn",
+    "typescript/no-base-to-string": "warn",
+    "typescript/no-wrapper-object-types": "warn",
+    "typescript/no-for-in-array": "warn",
+
+    "unicorn/no-useless-fallback-in-spread": "warn",
+    "unicorn/no-useless-spread": "warn",
+    "unicorn/no-new-array": "warn",
+    "unicorn/no-thenable": "warn",
+    "unicorn/no-await-in-promise-methods": "warn",
+    "unicorn/consistent-function-scoping": "off",
+
+    "jest/no-conditional-expect": "warn",
+    "jest/require-to-throw-message": "warn",
+    "jest/valid-expect": "warn",
+    "jest/valid-title": "warn",
+    "jest/expect-expect": "warn",
+    "jest/no-export": "warn",
+    "jest/no-disabled-tests": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.{test,spec}.{ts,tsx,js,jsx}", "**/__tests__/**"],
+      "env": {
+        "jest": true
+      },
+      "rules": {
+        "typescript/no-explicit-any": "off",
+        "typescript/unbound-method": "off",
+        "typescript/no-floating-promises": "off",
+        "typescript/no-misused-spread": "off"
+      }
+    }
+  ]
+}
