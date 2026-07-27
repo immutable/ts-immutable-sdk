@@ -37,10 +37,6 @@ jobs:
         with:
           enable-cache: "false"
 
-      - name: Install dependencies
-        shell: bash
-        run: pnpm install --frozen-lockfile --ignore-scripts
-
       - name: Build audience SDK bundle
         shell: bash
         run: pnpm --filter @imtbl/audience... build
