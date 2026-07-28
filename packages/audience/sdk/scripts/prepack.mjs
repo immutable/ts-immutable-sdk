@@ -19,7 +19,7 @@ const backupPath = new URL('../package.json.prepack-backup', import.meta.url);
 copyFileSync(pkgPath, backupPath);
 const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
 
-// Deps bundled into dist/ by tsup: remove from published metadata so
+// Deps bundled into dist/ by tsdown: remove from published metadata so
 // `npm install @imtbl/audience` doesn't try to resolve them from the
 // registry (audience-core is private and never published).
 for (const name of BUNDLED_WORKSPACE_DEPS) {

@@ -31,11 +31,8 @@ const nextConfig = {
   reactStrictMode: true,
   // Transpile packages to resolve ESM/CJS compatibility issues with pnpm
   transpilePackages: ['next-auth', '@auth/core', '@imtbl/auth-next-client', '@imtbl/auth-next-server'],
-  // Experimental settings for module resolution
-  experimental: {
-    // Ensure proper server component handling for auth packages
-    serverComponentsExternalPackages: [],
-  },
+  // Ensure proper server component handling for auth packages (Next 15+)
+  serverExternalPackages: [],
   // Ensure next-auth/react imports resolve to the same instance
   // This is critical for React Context (SessionProvider) to work across packages in the monorepo
   webpack: (config) => {

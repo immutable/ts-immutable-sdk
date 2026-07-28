@@ -1,25 +1,19 @@
 {
   "compilerOptions": {
-    "target": "es2022",
-    "module": "esnext",
+    "target": "ES2022",
+    "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowJs": false,
-    "removeComments": false,
+    "moduleDetection": "force",
+    "customConditions": ["development"],
     "strict": true,
-    "forceConsistentCasingInFileNames": false,
-    "allowSyntheticDefaultImports": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
     "esModuleInterop": true,
-    "declaration": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "isolatedModules": true,
-    "noEmitOnError": true
-  },
-  "ts-node": {
-    "compilerOptions": {
-      "module": "commonjs",
-      "moduleResolution": "node",
-      "customConditions": null
-    }
+    "declaration": true,
+    "noEmitOnError": true,
+    "types": ["*"]
   }
 }

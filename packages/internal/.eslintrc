@@ -1,4 +1,0 @@
-{
-  "ignorePatterns": ["**sample-app**/"],
-  "extends": ["../../.eslintrc"]
-}

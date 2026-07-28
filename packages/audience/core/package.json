@@ -3,20 +3,19 @@
   "description": "Shared core for Immutable Audience SDKs: transport, queue, cookie, context collection",
   "version": "0.0.0",
   "author": "Immutable",
-  "private": true,
+  "browser": "dist/browser/index.js",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/metrics": "workspace:*"
   },
   "devDependencies": {
-    "@swc/core": "^1.4.2",
-    "@swc/jest": "^0.2.37",
-    "@types/jest": "^29.5.12",
-    "eslint": "^8.56.0",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.4.3",
-    "tsup": "^8.3.0",
-    "typescript": "^5.6.2"
+    "@swc/core": "catalog:toolchain",
+    "@swc/jest": "catalog:toolchain",
+    "@types/jest": "catalog:toolchain",
+    "@typescript/native": "catalog:toolchain",
+    "jest": "catalog:toolchain",
+    "jest-environment-jsdom": "catalog:toolchain",
+    "typescript": "catalog:toolchain"
   },
   "exports": {
     ".": {
@@ -48,19 +47,20 @@
       }
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "main": "dist/node/index.cjs",
   "module": "dist/node/index.js",
-  "browser": "dist/browser/index.js",
-  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
-    "transpile": "tsup src/index.ts src/internal.ts --config ../../../tsup.config.js",
-    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types",
-    "lint": "eslint ./src --ext .ts --max-warnings=0",
     "test": "jest --passWithNoTests",
-    "typecheck": "tsc --customConditions default --noEmit"
+    "transpile": "tsdown",
+    "typecheck": "tsc --customConditions default --noEmit",
+    "typegen": "tsc --customConditions default --emitDeclarationOnly --outDir dist/types"
   },
   "type": "module",
   "types": "./dist/types/index.d.ts"

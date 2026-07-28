@@ -26,6 +26,9 @@ import {
 } from '../env';
 
 let windowSpy: any;
+// Capture before window spies replace globalThis.window (jsdom resolves
+// `window` via that property). Incomplete mocks break axios/ethers URL parsing.
+const NativeURL = globalThis.URL;
 const ethNetworkInfo = {
   name: ChainName.ETHEREUM,
   chainId: ChainId.ETHEREUM,
@@ -85,6 +88,7 @@ describe('network functions', () => {
       ethereum: {
         request: jest.fn(),
       },
+      URL: NativeURL,
       dispatchEvent: jest.fn(),
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
@@ -229,6 +233,7 @@ describe('network functions', () => {
               message: 'Provider error',
             }),
         },
+        URL: NativeURL,
         addEventListener: jest.fn(),
         dispatchEvent: jest.fn(),
         removeEventListener: () => {},

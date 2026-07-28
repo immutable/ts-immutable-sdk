@@ -23,11 +23,144 @@ inputs:
         contents: write
         pull_requests: write
     required: false
+    default: ""
 
 outputs:
   token:
     description: "Scoped GitHub installation token returned by the Token Service"
+    value: ${{ steps.token.outputs.token }}
 
 runs:
-  using: "node24"
-  main: "dist/index.js"
+  using: "composite"
+  steps:
+    - name: Request installation token
+      id: token
+      shell: bash
+      env:
+        REPOSITORIES: ${{ inputs.repositories }}
+        PERMISSIONS: ${{ inputs.permissions }}
+      run: |
+        set -euo pipefail
+
+        TOKEN_SERVICE_URL="https://immutabot.security.immutable.com"
+        TOKEN_SERVICE_AUDIENCE="immutabot"
+        REQUEST_TIMEOUT_S=30
+
+        trim() {
+          local s="$1"
+          s="${s#"${s%%[![:space:]]*}"}"
+          s="${s%"${s##*[![:space:]]}"}"
+          printf '%s' "$s"
+        }
+
+        repos=()
+        while IFS= read -r line || [[ -n "$line" ]]; do
+          trimmed="$(trim "$line")"
+          [[ -z "$trimmed" ]] && continue
+          if [[ ! "$trimmed" =~ ^[a-zA-Z0-9._-]+/[a-zA-Z0-9._-]+$ ]]; then
+            echo "::error::Invalid repository format: \"$trimmed\" — expected \"owner/repo\""
+            exit 1
+          fi
+          repos+=("$trimmed")
+        done <<< "$REPOSITORIES"
+
+        if (( ${#repos[@]} == 0 )); then
+          echo "::error::At least one repository must be specified"
+          exit 1
+        fi
+        if (( ${#repos[@]} > 5 )); then
+          echo "::error::A maximum of 5 repositories may be requested per token"
+          exit 1
+        fi
+
+        perm_keys=()
+        perm_vals=()
+        has_perm_input=0
+        while IFS= read -r line || [[ -n "$line" ]]; do
+          trimmed="$(trim "$line")"
+          [[ -z "$trimmed" ]] && continue
+          has_perm_input=1
+          if [[ "$trimmed" != *:* ]]; then
+            echo "::error::Invalid permissions format: \"$trimmed\" — expected \"key: value\""
+            exit 1
+          fi
+          key="$(trim "${trimmed%%:*}")"
+          value="$(trim "${trimmed#*:}")"
+          if [[ -z "$key" || -z "$value" ]]; then
+            echo "::error::Invalid permissions entry: \"$trimmed\" — key and value must not be empty"
+            exit 1
+          fi
+          perm_keys+=("$key")
+          perm_vals+=("$value")
+        done <<< "${PERMISSIONS:-}"
+
+        if (( has_perm_input == 0 )); then
+          permissions_json='{"contents":"read"}'
+        elif (( ${#perm_keys[@]} == 0 )); then
+          echo "::error::Permissions input was provided but contained no valid entries"
+          exit 1
+        else
+          permissions_json=$(
+            jq -n \
+              --argjson keys "$(printf '%s\n' "${perm_keys[@]}" | jq -R . | jq -s -c .)" \
+              --argjson vals "$(printf '%s\n' "${perm_vals[@]}" | jq -R . | jq -s -c .)" \
+              '[range(0; $keys | length) | {($keys[.]): $vals[.]}] | add'
+          )
+        fi
+
+        repositories_json=$(printf '%s\n' "${repos[@]}" | jq -R . | jq -s -c .)
+
+        if [[ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" || -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-}" ]]; then
+          echo "::error::OIDC token request env vars missing — ensure permissions: id-token: write"
+          exit 1
+        fi
+
+        oidc_token=$(
+          curl -sS --max-time "$REQUEST_TIMEOUT_S" \
+            -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${TOKEN_SERVICE_AUDIENCE}" \
+            | jq -r '.value // empty'
+        ) || {
+          echo "::error::Token Service request failed — check your network or Token Service availability"
+          exit 1
+        }
+
+        if [[ -z "$oidc_token" ]]; then
+          echo "::error::Failed to obtain OIDC token"
+          exit 1
+        fi
+        echo "::add-mask::$oidc_token"
+
+        body=$(
+          jq -n \
+            --argjson repositories "$repositories_json" \
+            --argjson permissions "$permissions_json" \
+            '{ repositories: $repositories, permissions: $permissions }'
+        )
+
+        http_code=$(
+          curl -sS -o /tmp/token-service-body.json -w "%{http_code}" \
+            --max-time "$REQUEST_TIMEOUT_S" \
+            -X POST "${TOKEN_SERVICE_URL}/v1/github/token/actions" \
+            -H "Authorization: Bearer ${oidc_token}" \
+            -H "Content-Type: application/json" \
+            -d "$body"
+        ) || {
+          echo "::error::Token Service request timed out or failed — check your network or Token Service availability"
+          exit 1
+        }
+
+        if [[ "$http_code" != "200" ]]; then
+          echo "::error::Token Service returned HTTP ${http_code}"
+          exit 1
+        fi
+
+        token=$(jq -r '.token // empty' </tmp/token-service-body.json)
+        if [[ -z "$token" ]]; then
+          echo "::error::Token Service returned an unexpected response shape"
+          exit 1
+        fi
+
+        echo "::add-mask::$token"
+        echo "token=$token" >> "$GITHUB_OUTPUT"
+        echo "Successfully obtained installation token"

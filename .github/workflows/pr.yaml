@@ -38,13 +38,13 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Syncpack
+      - name: Lint
         shell: bash
-        run: pnpm syncpack:check
+        run: pnpm lint
 
-      - name: Build, Lint & Test
+      - name: Build & Test
         shell: bash
-        run: pnpm --if-present nx affected -t build,lint,test
+        run: pnpm --if-present nx affected -t build,test
 
   should-run-functional-tests:
     name: Determine whether functional tests are needed
@@ -100,7 +100,7 @@ jobs:
 
           # Allowlist: orderbook surface + shared build/deps roots that can break it.
           if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -qE \
-            '^(packages/orderbook/|sdk/|packages/config/|packages/internal/metrics/|packages/internal/generated-clients/|tests/func-tests/|\.github/workflows/pr\.yaml|pnpm-lock\.yaml|pnpm-workspace\.yaml|package\.json|tsup\.config\.js)'; then
+            '^(packages/orderbook/|sdk/|packages/config/|packages/internal/metrics/|packages/internal/generated-clients/|tests/func-tests/|\.github/workflows/pr\.yaml|pnpm-lock\.yaml|pnpm-workspace\.yaml|package\.json|tsdown\.base\.ts|tsdown\.config\.)'; then
             echo "should-run=true" >> "$GITHUB_OUTPUT"
             echo "Running functional tests (allowlisted path changed)"
           else

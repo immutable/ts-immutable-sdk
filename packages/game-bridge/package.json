@@ -1,20 +1,22 @@
 {
   "name": "@imtbl/game-bridge",
   "version": "0.0.0",
+  "browserslist": [
+    "Chrome 137"
+  ],
   "dependencies": {
     "@imtbl/config": "workspace:*",
     "@imtbl/metrics": "workspace:*",
     "@imtbl/passport": "workspace:*",
-    "ethers": "^6.13.4"
+    "buffer": "^6.0.3",
+    "ethers": "catalog:web3"
   },
   "devDependencies": {
-    "eslint": "^8.56.0",
     "parcel": "^2.13.3"
   },
   "scripts": {
     "build": "parcel build --no-cache --no-scope-hoist && node scripts/fixUnityBuild.js",
     "build:local": "parcel build --no-cache --no-scope-hoist && node scripts/fixUnityBuild.js && pnpm updateSdkVersion",
-    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "start": "parcel",
     "updateSdkVersion": "./scripts/updateSdkVersion.sh"
   },
@@ -40,8 +42,5 @@
         "browsers": "Chrome 137"
       }
     }
-  },
-  "browserslist": [
-    "Chrome 137"
-  ]
+  }
 }

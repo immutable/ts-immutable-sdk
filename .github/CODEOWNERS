@@ -3,12 +3,12 @@
 # Shared Files
 /package.json @immutable/ped-engineering-blockchain-list @immutable/ped-stream-sdk-integrations-list
 /.github/ @immutable/security @immutable/ped-engineering-blockchain-list @immutable/ped-stream-sdk-integrations-list
-/.husky/ @immutable/ped-engineering-blockchain-list
+/lefthook.yml @immutable/ped-engineering-blockchain-list
 /.nvmrc/ @immutable/ped-engineering-blockchain-list
 /pnpm-lock.yaml @immutable/ped-engineering-blockchain-list @immutable/ped-stream-sdk-integrations-list
 /pnpm-workspace.yaml @immutable/ped-engineering-blockchain-list @immutable/ped-stream-sdk-integrations-list
 /tsconfig.base.json @immutable/ped-engineering-blockchain-list @immutable/ped-stream-sdk-integrations-list
-/tsup.config.js @immutable/ped-engineering-blockchain-list @immutable/ped-stream-sdk-integrations-list
+/tsdown.base.ts @immutable/ped-engineering-blockchain-list @immutable/ped-stream-sdk-integrations-list
 /packages/config/ @immutable/ped-engineering-blockchain-list @immutable/ped-stream-sdk-integrations-list
 
 # Blockchain Services

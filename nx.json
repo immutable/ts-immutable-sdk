@@ -1,58 +1,87 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
+  "parallel": 8,
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test|e2e|demo).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/src/test/**",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/jest.setup.[jt]s"
+    ],
+    "sharedGlobals": [
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/tsdown.base.ts",
+      "{workspaceRoot}/jest.config.base.cjs",
+      "{workspaceRoot}/.oxlintrc.json",
+      "{workspaceRoot}/pnpm-workspace.yaml"
+    ]
+  },
   "targetDefaults": {
-    "d": {
-      "dependsOn": ["^d"],
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"],
       "outputs": ["{projectRoot}/dist"],
       "cache": true
     },
-    "lint": {
+    "transpile": {
+      "dependsOn": ["^transpile"],
+      "inputs": ["production", "^production"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": true
+    },
+    "typegen": {
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"],
+      "outputs": ["{projectRoot}/dist/types", "{projectRoot}/dist/**/*.d.ts"],
       "cache": true
     },
     "typecheck": {
-      "cache": true,
-      "dependsOn": ["build"]
+      "dependsOn": ["^build"],
+      "inputs": ["default", "^production"],
+      "cache": true
     },
     "test": {
-      "cache": true,
-      "dependsOn": ["build"],
+      "dependsOn": ["^build"],
+      "inputs": ["default", "^production"],
       "outputs": ["{projectRoot}/coverage"],
+      "cache": true,
       "configurations": {
         "ci": {
           "codeCoverage": true
         }
       }
     },
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["{projectRoot}/dist"],
-      "cache": true
-    },
-    "export": {
-      "dependsOn": [
-        "build"
-      ],
-      "outputs": ["{projectRoot}/out"],
+    "lint": {
+      "inputs": ["default", "{workspaceRoot}/.oxlintrc.json"],
       "cache": true
     }
   },
   "release": {
     "projectsRelationship": "fixed",
-    "projects": ["sdk/**", "packages/**", "!packages/**/sample-app/**", "!packages/game-bridge", "!@imtbl-alpha/**"],
+    "projects": [
+      "sdk/**",
+      "packages/**",
+      "!packages/**/sample-app/**",
+      "!packages/game-bridge",
+      "!@imtbl-alpha/**"
+    ],
     "releaseTagPattern": "{version}",
     "changelog": {
-        "workspaceChangelog": {
-          "file": false,
-          "createRelease": "github",
-          "renderOptions": {
-            "authors": false
-          }
-        },
-        "git": {
-          "commit": false,
-          "tag": false,
-          "stageChanges": false
+      "workspaceChangelog": {
+        "file": false,
+        "createRelease": "github",
+        "renderOptions": {
+          "authors": false
         }
+      },
+      "git": {
+        "commit": false,
+        "tag": false,
+        "stageChanges": false
+      }
     },
     "version": {
       "generatorOptions": {
@@ -68,27 +97,13 @@
     },
     "conventionalCommits": {
       "types": {
-        "refactor": {
-          "changelog": false
-        },
-        "style": {
-          "changelog": false
-        },
-        "test": {
-          "changelog": false
-        },
-        "build": {
-          "changelog": false
-        },
-        "ops": {
-          "changelog": false
-        },
-        "chore": {
-          "changelog": false
-        }
+        "refactor": { "changelog": false },
+        "style": { "changelog": false },
+        "test": { "changelog": false },
+        "build": { "changelog": false },
+        "ops": { "changelog": false },
+        "chore": { "changelog": false }
       }
     }
-  },
-  "defaultBase": "main",
-  "parallel": 8
+  }
 }

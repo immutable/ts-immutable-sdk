@@ -3,6 +3,7 @@
   "description": "Immutable Typescript SDK",
   "version": "0.0.0",
   "author": "Immutable",
+  "browser": "./dist/index.browser.js",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/auth": "workspace:*",
@@ -18,28 +19,11 @@
     "@imtbl/webhook": "workspace:*"
   },
   "devDependencies": {
-    "eslint": "^8.56.0",
-    "tsup": "^8.3.0",
-    "typescript": "^5.6.2"
-  },
-  "peerDependencies": {
-    "next": "^14.2.0 || ^15.0.0",
-    "next-auth": "^5.0.0-beta.25",
-    "react": "^18.2.0 || ^19.0.0"
-  },
-  "peerDependenciesMeta": {
-    "next": {
-      "optional": true
-    },
-    "next-auth": {
-      "optional": true
-    },
-    "react": {
-      "optional": true
-    }
+    "@typescript/native": "catalog:toolchain",
+    "typescript": "catalog:toolchain"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=24"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -213,18 +197,32 @@
   "license": "Apache-2.0",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
-  "browser": "./dist/index.browser.js",
+  "peerDependencies": {
+    "next": "^14.2.0 || ^15.0.0 || ^16.0.0",
+    "next-auth": "^5.0.0-beta.25",
+    "react": "^18.2.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    },
+    "next-auth": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "pnpm transpile && pnpm typegen",
-    "transpile": "tsup --config ./tsup.config.js",
-    "typegen": "tsc --customConditions default --emitDeclarationOnly",
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",
-    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
-    "typecheck": "tsc --customConditions default --noEmit --jsx preserve"
+    "transpile": "tsdown",
+    "typecheck": "tsc --customConditions default --noEmit --jsx preserve",
+    "typegen": "tsc --customConditions default --emitDeclarationOnly"
   },
   "type": "module",
   "types": "./dist/index.d.ts"

@@ -10,5 +10,33 @@ inputs:
     required: true
     default: ""
 runs:
-  using: "node24"
-  main: "dist/index.js"
+  using: "composite"
+  steps:
+    - name: Post message to Slack
+      shell: bash
+      env:
+        WEBHOOK: ${{ inputs.webhook }}
+        MESSAGE: ${{ inputs.message }}
+      run: |
+        set -euo pipefail
+
+        payload=$(jq -n --arg text "$MESSAGE" '{
+          text: $text,
+          blocks: [{ type: "section", text: { type: "mrkdwn", text: $text } }]
+        }')
+
+        status=$(curl -sS -o /tmp/slack-response.txt -w "%{http_code}" \
+          -X POST \
+          -H "Content-Type: application/json" \
+          -d "$payload" \
+          "$WEBHOOK") || {
+          echo "::error::Failed to post message to Slack"
+          exit 1
+        }
+
+        if [[ "$status" != "200" ]]; then
+          echo "::error::Failed to post message to Slack. Status: $status"
+          exit 1
+        fi
+
+        echo "Posted message to Slack successfully"
