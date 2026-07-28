@@ -430,6 +430,36 @@ async function buildAuthorizationUrl(
 // Token Exchange
 // ============================================================================
 
+// A transient failure on the token exchange (network error, CloudFront 5xx, rate
+// limit) would otherwise drop an otherwise-valid login. The auth code is not
+// consumed on a 5xx, so re-POSTing it is safe; a 4xx is permanent (bad/expired code).
+const TOKEN_EXCHANGE_MAX_RETRIES = 2;
+const TOKEN_EXCHANGE_RETRY_DELAY_MS = 1000;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function parseTokenErrorMessage(response: Response): Promise<string> {
+  const errorText = await response.text();
+  let errorMessage = `Token exchange failed with status ${response.status}`;
+  try {
+    const errorData = JSON.parse(errorText);
+    if (errorData.error_description) {
+      errorMessage = errorData.error_description;
+    } else if (errorData.error) {
+      errorMessage = errorData.error;
+    }
+  } catch {
+    if (errorText) {
+      errorMessage = errorText;
+    }
+  }
+  return errorMessage;
+}
+
 async function exchangeCodeForTokens(
   config: LoginConfig,
   code: string,
@@ -438,8 +468,7 @@ async function exchangeCodeForTokens(
 ): Promise<TokenResponse> {
   const authDomain = getAuthDomain(config);
   const tokenUrl = `${authDomain}${TOKEN_ENDPOINT}`;
-
-  const response = await fetch(tokenUrl, {
+  const requestInit: RequestInit = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -451,28 +480,39 @@ async function exchangeCodeForTokens(
       code,
       redirect_uri: redirectUri,
     }),
-  });
+  };
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    let errorMessage = `Token exchange failed with status ${response.status}`;
+  const attempt = async (retriesLeft: number): Promise<TokenResponse> => {
+    const backoffMs = TOKEN_EXCHANGE_RETRY_DELAY_MS * (TOKEN_EXCHANGE_MAX_RETRIES - retriesLeft + 1);
+
+    let response: Response;
     try {
-      const errorData = JSON.parse(errorText);
-      if (errorData.error_description) {
-        errorMessage = errorData.error_description;
-      } else if (errorData.error) {
-        errorMessage = errorData.error;
+      response = await fetch(tokenUrl, requestInit);
+    } catch (networkError) {
+      // Network/transport failure — transient, retry.
+      if (retriesLeft > 0) {
+        await delay(backoffMs);
+        return attempt(retriesLeft - 1);
       }
-    } catch {
-      if (errorText) {
-        errorMessage = errorText;
-      }
+      throw networkError instanceof Error ? networkError : new Error('Token exchange network error');
+    }
+
+    if (response.ok) {
+      const tokenData = await response.json();
+      return mapTokenResponseToResult(tokenData);
+    }
+
+    const errorMessage = await parseTokenErrorMessage(response);
+
+    // Only 5xx is transient; a 4xx (bad/expired/consumed code) is permanent.
+    if (response.status >= 500 && retriesLeft > 0) {
+      await delay(backoffMs);
+      return attempt(retriesLeft - 1);
     }
     throw new Error(errorMessage);
-  }
+  };
 
-  const tokenData = await response.json();
-  return mapTokenResponseToResult(tokenData);
+  return attempt(TOKEN_EXCHANGE_MAX_RETRIES);
 }
 
 // ============================================================================
