@@ -452,6 +452,13 @@ function backoffWithJitter(attemptNumber: number): number {
   return base * (0.5 + Math.random() * 0.5);
 }
 
+// Outcome of a single token-exchange attempt: transient failures are retried, permanent
+// ones (4xx) are thrown straight through.
+type TokenAttemptOutcome =
+  | { kind: 'ok'; tokens: TokenResponse }
+  | { kind: 'transient'; error: Error; reason: string }
+  | { kind: 'permanent'; error: Error };
+
 async function parseTokenErrorMessage(response: Response): Promise<string> {
   const errorText = await response.text();
   let errorMessage = `Token exchange failed with status ${response.status}`;
@@ -500,34 +507,56 @@ async function exchangeCodeForTokens(
     const attemptNumber = TOKEN_EXCHANGE_MAX_RETRIES - retriesLeft + 1;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), TOKEN_EXCHANGE_TIMEOUT_MS);
+    const startTime = Date.now();
 
-    let response: Response;
+    // Classified as data rather than thrown, so a permanent failure isn't confused with a
+    // transient one by the catch below.
+    let outcome: TokenAttemptOutcome;
+
     try {
-      response = await fetch(tokenUrl, { ...requestInit, signal: controller.signal });
-    } catch (networkError) {
-      // Network error or a timed-out (aborted) attempt — both transient, retry.
-      if (retriesLeft > 0) {
-        await delay(backoffWithJitter(attemptNumber));
-        return attempt(retriesLeft - 1);
+      const response = await fetch(tokenUrl, { ...requestInit, signal: controller.signal });
+
+      // Body reads stay inside the try so the abort above still covers them: fetch resolves
+      // once headers arrive, so a server that stalls the body would otherwise hang unbounded.
+      if (response.ok) {
+        outcome = { kind: 'ok', tokens: mapTokenResponseToResult(await response.json()) };
+      } else {
+        const error = new Error(await parseTokenErrorMessage(response));
+        // Only 5xx is transient; a 4xx (bad/expired/consumed code) is permanent.
+        outcome = response.status >= 500
+          ? { kind: 'transient', error, reason: String(response.status) }
+          : { kind: 'permanent', error };
       }
-      throw networkError instanceof Error ? networkError : new Error('Token exchange network error');
+    } catch (caught) {
+      // Network failure, or this attempt timing out mid-request or mid-body — all transient.
+      const error = caught instanceof Error ? caught : new Error('Token exchange network error');
+      outcome = { kind: 'transient', error, reason: error.name === 'AbortError' ? 'timeout' : 'network' };
     } finally {
       clearTimeout(timeoutId);
     }
 
-    if (response.ok) {
-      const tokenData = await response.json();
-      return mapTokenResponseToResult(tokenData);
+    if (outcome.kind === 'ok') {
+      if (attemptNumber > 1) {
+        track('passport', 'standaloneTokenExchangeRecovered', { attempt: attemptNumber });
+      }
+      return outcome.tokens;
+    }
+    if (outcome.kind === 'permanent') {
+      throw outcome.error;
     }
 
-    const errorMessage = await parseTokenErrorMessage(response);
+    track('passport', 'standaloneTokenExchangeFailed', {
+      attempt: attemptNumber,
+      reason: outcome.reason,
+      willRetry: retriesLeft > 0,
+      timeToFailureMs: Date.now() - startTime,
+    });
 
-    // Only 5xx is transient; a 4xx (bad/expired/consumed code) is permanent.
-    if (response.status >= 500 && retriesLeft > 0) {
+    if (retriesLeft > 0) {
       await delay(backoffWithJitter(attemptNumber));
       return attempt(retriesLeft - 1);
     }
-    throw new Error(errorMessage);
+    throw outcome.error;
   };
 
   return attempt(TOKEN_EXCHANGE_MAX_RETRIES);
