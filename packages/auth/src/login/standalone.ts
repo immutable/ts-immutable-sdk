@@ -430,6 +430,53 @@ async function buildAuthorizationUrl(
 // Token Exchange
 // ============================================================================
 
+// A transient failure on the token exchange (network error, timeout, CloudFront 5xx,
+// rate limit) would otherwise drop an otherwise-valid login. The auth code is not
+// consumed on a 5xx, so re-POSTing it is safe; a 4xx is permanent (bad/expired code).
+const TOKEN_EXCHANGE_MAX_RETRIES = 2;
+const TOKEN_EXCHANGE_RETRY_DELAY_MS = 1000;
+// Bound each attempt so a stalled request becomes a retryable failure rather than an
+// indefinite hang (this path has no other timeout around it).
+const TOKEN_EXCHANGE_TIMEOUT_MS = 10000;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+// Full jitter on the backoff so that when auth returns 5xx to many clients at once,
+// their retries spread out instead of synchronising into a thundering herd.
+function backoffWithJitter(attemptNumber: number): number {
+  const base = TOKEN_EXCHANGE_RETRY_DELAY_MS * attemptNumber;
+  return base * (0.5 + Math.random() * 0.5);
+}
+
+// Outcome of a single token-exchange attempt: transient failures are retried, permanent
+// ones (4xx) are thrown straight through.
+type TokenAttemptOutcome =
+  | { kind: 'ok'; tokens: TokenResponse }
+  | { kind: 'transient'; error: Error; reason: string }
+  | { kind: 'permanent'; error: Error };
+
+async function parseTokenErrorMessage(response: Response): Promise<string> {
+  const errorText = await response.text();
+  let errorMessage = `Token exchange failed with status ${response.status}`;
+  try {
+    const errorData = JSON.parse(errorText);
+    if (errorData.error_description) {
+      errorMessage = errorData.error_description;
+    } else if (errorData.error) {
+      errorMessage = errorData.error;
+    }
+  } catch {
+    if (errorText) {
+      errorMessage = errorText;
+    }
+  }
+  return errorMessage;
+}
+
 async function exchangeCodeForTokens(
   config: LoginConfig,
   code: string,
@@ -438,8 +485,11 @@ async function exchangeCodeForTokens(
 ): Promise<TokenResponse> {
   const authDomain = getAuthDomain(config);
   const tokenUrl = `${authDomain}${TOKEN_ENDPOINT}`;
-
-  const response = await fetch(tokenUrl, {
+  // Deliberately built once and reused across retry attempts: the body is a
+  // URLSearchParams, which fetch re-serialises on every call (it is not a one-shot
+  // consumable stream), so re-sending it is safe. Only the per-attempt AbortSignal
+  // differs, and that is merged in at the fetch call below.
+  const requestInit: RequestInit = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -451,28 +501,65 @@ async function exchangeCodeForTokens(
       code,
       redirect_uri: redirectUri,
     }),
-  });
+  };
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    let errorMessage = `Token exchange failed with status ${response.status}`;
+  const attempt = async (retriesLeft: number): Promise<TokenResponse> => {
+    const attemptNumber = TOKEN_EXCHANGE_MAX_RETRIES - retriesLeft + 1;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), TOKEN_EXCHANGE_TIMEOUT_MS);
+    const startTime = Date.now();
+
+    // Classified as data rather than thrown, so a permanent failure isn't confused with a
+    // transient one by the catch below.
+    let outcome: TokenAttemptOutcome;
+
     try {
-      const errorData = JSON.parse(errorText);
-      if (errorData.error_description) {
-        errorMessage = errorData.error_description;
-      } else if (errorData.error) {
-        errorMessage = errorData.error;
-      }
-    } catch {
-      if (errorText) {
-        errorMessage = errorText;
-      }
-    }
-    throw new Error(errorMessage);
-  }
+      const response = await fetch(tokenUrl, { ...requestInit, signal: controller.signal });
 
-  const tokenData = await response.json();
-  return mapTokenResponseToResult(tokenData);
+      // Body reads stay inside the try so the abort above still covers them: fetch resolves
+      // once headers arrive, so a server that stalls the body would otherwise hang unbounded.
+      if (response.ok) {
+        outcome = { kind: 'ok', tokens: mapTokenResponseToResult(await response.json()) };
+      } else {
+        const error = new Error(await parseTokenErrorMessage(response));
+        // Only 5xx is transient; a 4xx (bad/expired/consumed code) is permanent.
+        outcome = response.status >= 500
+          ? { kind: 'transient', error, reason: String(response.status) }
+          : { kind: 'permanent', error };
+      }
+    } catch (caught) {
+      // Network failure, or this attempt timing out mid-request or mid-body — all transient.
+      const error = caught instanceof Error ? caught : new Error('Token exchange network error');
+      outcome = { kind: 'transient', error, reason: error.name === 'AbortError' ? 'timeout' : 'network' };
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
+    if (outcome.kind === 'ok') {
+      if (attemptNumber > 1) {
+        track('passport', 'standaloneTokenExchangeRecovered', { attempt: attemptNumber });
+      }
+      return outcome.tokens;
+    }
+    if (outcome.kind === 'permanent') {
+      throw outcome.error;
+    }
+
+    track('passport', 'standaloneTokenExchangeFailed', {
+      attempt: attemptNumber,
+      reason: outcome.reason,
+      willRetry: retriesLeft > 0,
+      timeToFailureMs: Date.now() - startTime,
+    });
+
+    if (retriesLeft > 0) {
+      await delay(backoffWithJitter(attemptNumber));
+      return attempt(retriesLeft - 1);
+    }
+    throw outcome.error;
+  };
+
+  return attempt(TOKEN_EXCHANGE_MAX_RETRIES);
 }
 
 // ============================================================================
