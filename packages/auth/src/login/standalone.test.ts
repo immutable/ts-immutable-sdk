@@ -84,6 +84,27 @@ describe('exchangeCodeForTokens retry (via handleLoginCallback)', () => {
     expect(result?.accessToken).toBe('access-tok');
   });
 
+  it('aborts a hung attempt at the timeout and retries', async () => {
+    // First attempt never responds; the per-attempt AbortController should fire at
+    // TOKEN_EXCHANGE_TIMEOUT_MS and reject it, which is treated as transient.
+    fetchMock.mockImplementationOnce(
+      (_url: string, init: RequestInit) => new Promise<Response>((_resolve, reject) => {
+        init.signal?.addEventListener('abort', () => {
+          reject(Object.assign(new Error('The operation was aborted'), { name: 'AbortError' }));
+        });
+      }),
+    );
+    fetchMock.mockResolvedValueOnce(mockResponse(200, TOKENS));
+
+    const promise = handleLoginCallback(CONFIG);
+    await jest.advanceTimersByTimeAsync(10000); // fire the attempt timeout -> abort
+    await jest.advanceTimersByTimeAsync(1000); // backoff before the retry
+    const result = await promise;
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(result?.accessToken).toBe('access-tok');
+  });
+
   it('does not retry a 4xx', async () => {
     fetchMock.mockResolvedValueOnce(mockResponse(400, { error: 'invalid_grant' }));
 

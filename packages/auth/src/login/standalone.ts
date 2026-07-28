@@ -430,16 +430,26 @@ async function buildAuthorizationUrl(
 // Token Exchange
 // ============================================================================
 
-// A transient failure on the token exchange (network error, CloudFront 5xx, rate
-// limit) would otherwise drop an otherwise-valid login. The auth code is not
+// A transient failure on the token exchange (network error, timeout, CloudFront 5xx,
+// rate limit) would otherwise drop an otherwise-valid login. The auth code is not
 // consumed on a 5xx, so re-POSTing it is safe; a 4xx is permanent (bad/expired code).
 const TOKEN_EXCHANGE_MAX_RETRIES = 2;
 const TOKEN_EXCHANGE_RETRY_DELAY_MS = 1000;
+// Bound each attempt so a stalled request becomes a retryable failure rather than an
+// indefinite hang (this path has no other timeout around it).
+const TOKEN_EXCHANGE_TIMEOUT_MS = 10000;
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+// Full jitter on the backoff so that when auth returns 5xx to many clients at once,
+// their retries spread out instead of synchronising into a thundering herd.
+function backoffWithJitter(attemptNumber: number): number {
+  const base = TOKEN_EXCHANGE_RETRY_DELAY_MS * attemptNumber;
+  return base * (0.5 + Math.random() * 0.5);
 }
 
 async function parseTokenErrorMessage(response: Response): Promise<string> {
@@ -468,6 +478,10 @@ async function exchangeCodeForTokens(
 ): Promise<TokenResponse> {
   const authDomain = getAuthDomain(config);
   const tokenUrl = `${authDomain}${TOKEN_ENDPOINT}`;
+  // Deliberately built once and reused across retry attempts: the body is a
+  // URLSearchParams, which fetch re-serialises on every call (it is not a one-shot
+  // consumable stream), so re-sending it is safe. Only the per-attempt AbortSignal
+  // differs, and that is merged in at the fetch call below.
   const requestInit: RequestInit = {
     method: 'POST',
     headers: {
@@ -483,18 +497,22 @@ async function exchangeCodeForTokens(
   };
 
   const attempt = async (retriesLeft: number): Promise<TokenResponse> => {
-    const backoffMs = TOKEN_EXCHANGE_RETRY_DELAY_MS * (TOKEN_EXCHANGE_MAX_RETRIES - retriesLeft + 1);
+    const attemptNumber = TOKEN_EXCHANGE_MAX_RETRIES - retriesLeft + 1;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), TOKEN_EXCHANGE_TIMEOUT_MS);
 
     let response: Response;
     try {
-      response = await fetch(tokenUrl, requestInit);
+      response = await fetch(tokenUrl, { ...requestInit, signal: controller.signal });
     } catch (networkError) {
-      // Network/transport failure — transient, retry.
+      // Network error or a timed-out (aborted) attempt — both transient, retry.
       if (retriesLeft > 0) {
-        await delay(backoffMs);
+        await delay(backoffWithJitter(attemptNumber));
         return attempt(retriesLeft - 1);
       }
       throw networkError instanceof Error ? networkError : new Error('Token exchange network error');
+    } finally {
+      clearTimeout(timeoutId);
     }
 
     if (response.ok) {
@@ -506,7 +524,7 @@ async function exchangeCodeForTokens(
 
     // Only 5xx is transient; a 4xx (bad/expired/consumed code) is permanent.
     if (response.status >= 500 && retriesLeft > 0) {
-      await delay(backoffMs);
+      await delay(backoffWithJitter(attemptNumber));
       return attempt(retriesLeft - 1);
     }
     throw new Error(errorMessage);
