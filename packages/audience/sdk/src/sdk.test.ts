@@ -1856,6 +1856,8 @@ describe('Audience', () => {
       ['?fbclid=abc', 'meta'],
       ['?ttclid=abc', 'tiktok'],
       ['?rdt_cid=abc', 'reddit'],
+      ['?twclid=abc', 'x'],
+      ['?gclid=abc', 'google'],
     ])('mints an id for the dedup-capable network from %s', (search, network) => {
       const sdk = initWithLocation(search);
 
@@ -1868,11 +1870,13 @@ describe('Audience', () => {
     });
 
     it('does not mint an id for a non-dedup-capable network but still tracks the event', async () => {
-      const sdk = initWithLocation('?gclid=abc');
+      // msclkid classifies as 'other' (Microsoft/LinkedIn) — a paid network we
+      // don't support server-side dedup for.
+      const sdk = initWithLocation('?msclkid=abc');
 
       const result = sdk.trackConversion('sign_up', { method: 'email' });
 
-      expect(result.network).toBe('google');
+      expect(result.network).toBe('other');
       expect(result.eventId).toBeNull();
 
       await sdk.flush();

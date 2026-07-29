@@ -21,24 +21,30 @@ export const CONVERSION_ID_PROPERTY = '_imtbl_conversion_id';
 export const CONVERSION_NETWORK_PROPERTY = '_imtbl_conversion_network';
 
 /**
- * Networks whose browser pixel and server Conversions API both support
- * deduplicating on a shared event id. Google dedups on gclid + conversion
- * action (not a shared id) and is intentionally excluded.
+ * Networks whose browser pixel and server Conversions API can deduplicate on a
+ * shared, client-minted id passed to both legs. Each network names the field
+ * differently (Meta `eventID`, TikTok `event_id`, Reddit/X `conversion_id`,
+ * Google `transaction_id`/`order_id`) but the value is the same. Google dedup
+ * relies on the postbacks upload sending the id as `order_id`; the browser
+ * gtag must send it as `transaction_id`.
  */
 export const DEDUP_CAPABLE_NETWORKS: ReadonlySet<AttributionNetwork> = new Set<AttributionNetwork>([
   'meta',
   'tiktok',
   'reddit',
+  'x',
+  'google',
 ]);
 
 /** Result of {@link Audience.trackConversion}. */
 export interface ConversionResult {
   /**
    * The shared id to pass to the ad-network browser pixel (e.g. Meta
-   * `eventID`, TikTok `event_id`, Reddit `conversionId`). `null` when the
-   * visit isn't attributed to a dedup-capable paid network, or when consent
-   * doesn't permit tracking — in both cases no dedup id is emitted and the
-   * caller should not fire a deduplicated pixel event.
+   * `eventID`, TikTok `event_id`, Reddit/X `conversion_id`, Google gtag
+   * `transaction_id`). `null` when the visit isn't attributed to a
+   * dedup-capable paid network, or when consent doesn't permit tracking — in
+   * both cases no dedup id is emitted and the caller should not fire a
+   * deduplicated pixel event.
    */
   eventId: string | null;
   /** The network the visit was attributed to. */

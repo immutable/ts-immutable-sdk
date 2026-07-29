@@ -350,8 +350,8 @@ export class Audience {
    *
    * Classifies the visit's network from the session-cached first-touch
    * attribution (the same signals that drive server-side attribution). For a
-   * network that can dedupe on a shared id (Meta, TikTok, Reddit), it mints a
-   * conversion event id, stamps it onto the event under the reserved
+   * network that can dedupe on a shared id (Meta, TikTok, Reddit, X, Google),
+   * it mints a conversion event id, stamps it onto the event under the reserved
    * `_imtbl_conversion_id` / `_imtbl_conversion_network` properties, and returns
    * it. Pass the returned `eventId` to that network's browser pixel (e.g. Meta
    * `fbq('track', 'CompleteRegistration', {}, { eventID })`) so it deduplicates
