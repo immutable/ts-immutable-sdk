@@ -1815,4 +1815,180 @@ describe('Audience', () => {
       expect(sentMessages().filter((m: any) => m.eventName === 'link_clicked')).toHaveLength(0);
     });
   });
+
+  describe('trackConversion', () => {
+    function initWithLocation(search: string, overrides: Record<string, unknown> = {}) {
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search,
+          href: `https://studio.com/${search}`,
+          protocol: 'https:',
+          pathname: '/',
+        },
+        writable: true,
+        configurable: true,
+      });
+      sessionStorage.clear();
+      return createSDK(overrides);
+    }
+
+    it('mints a shared id and stamps reserved props for a dedup-capable network', async () => {
+      const sdk = initWithLocation('?fbclid=abc123');
+
+      const result = sdk.trackConversion('sign_up', { method: 'email' });
+
+      expect(result.network).toBe('meta');
+      expect(result.eventId).toEqual(expect.any(String));
+      expect(result.eventId).not.toBe('');
+
+      await sdk.flush();
+      const msg = sentMessages().find((m: any) => m.eventName === 'sign_up');
+      expect(msg).toBeDefined();
+      expect(msg.properties._imtbl_conversion_id).toBe(result.eventId);
+      expect(msg.properties._imtbl_conversion_network).toBe('meta');
+      expect(msg.properties.method).toBe('email');
+
+      sdk.shutdown();
+    });
+
+    it.each([
+      ['?fbclid=abc', 'meta'],
+      ['?ttclid=abc', 'tiktok'],
+      ['?rdt_cid=abc', 'reddit'],
+    ])('mints an id for the dedup-capable network from %s', (search, network) => {
+      const sdk = initWithLocation(search);
+
+      const result = sdk.trackConversion('sign_up', { method: 'email' });
+
+      expect(result.network).toBe(network);
+      expect(result.eventId).toEqual(expect.any(String));
+
+      sdk.shutdown();
+    });
+
+    it('does not mint an id for a non-dedup-capable network but still tracks the event', async () => {
+      const sdk = initWithLocation('?gclid=abc');
+
+      const result = sdk.trackConversion('sign_up', { method: 'email' });
+
+      expect(result.network).toBe('google');
+      expect(result.eventId).toBeNull();
+
+      await sdk.flush();
+      const msg = sentMessages().find((m: any) => m.eventName === 'sign_up');
+      expect(msg).toBeDefined();
+      expect(msg.properties._imtbl_conversion_id).toBeUndefined();
+      expect(msg.properties._imtbl_conversion_network).toBeUndefined();
+      expect(msg.properties.method).toBe('email');
+
+      sdk.shutdown();
+    });
+
+    it('does not mint an id for organic traffic but still tracks the event', async () => {
+      const sdk = initWithLocation('');
+
+      const result = sdk.trackConversion('sign_up', { method: 'email' });
+
+      expect(result.network).toBe('organic');
+      expect(result.eventId).toBeNull();
+
+      await sdk.flush();
+      const msg = sentMessages().find((m: any) => m.eventName === 'sign_up');
+      expect(msg).toBeDefined();
+      expect(msg.properties._imtbl_conversion_id).toBeUndefined();
+
+      sdk.shutdown();
+    });
+
+    it('classifies from session-cached attribution after the URL loses its params', async () => {
+      const sdk = initWithLocation('?fbclid=abc123');
+
+      // Simulate navigating to a later page whose URL has no click-ID params.
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '',
+          href: 'https://studio.com/games/devilfish',
+          protocol: 'https:',
+          pathname: '/games/devilfish',
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      const result = sdk.trackConversion('sign_up', { method: 'email' });
+
+      expect(result.network).toBe('meta');
+      expect(result.eventId).toEqual(expect.any(String));
+
+      await sdk.flush();
+      const msg = sentMessages().find((m: any) => m.eventName === 'sign_up');
+      expect(msg.properties._imtbl_conversion_id).toBe(result.eventId);
+
+      sdk.shutdown();
+    });
+
+    it('is a no-op at none consent and returns a null eventId', async () => {
+      const sdk = initWithLocation('?fbclid=abc123', { consent: 'none' });
+
+      const result = sdk.trackConversion('sign_up', { method: 'email' });
+
+      expect(result.eventId).toBeNull();
+
+      await sdk.flush();
+      expect(sentMessages()).toHaveLength(0);
+
+      sdk.shutdown();
+    });
+  });
+
+  describe('getAttributionNetwork', () => {
+    function initWithLocation(search: string) {
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search,
+          href: `https://studio.com/${search}`,
+          protocol: 'https:',
+          pathname: '/',
+        },
+        writable: true,
+        configurable: true,
+      });
+      sessionStorage.clear();
+      return createSDK();
+    }
+
+    it('classifies the network from the session-cached first-touch attribution', () => {
+      const sdk = initWithLocation('?fbclid=abc123');
+      expect(sdk.getAttributionNetwork()).toBe('meta');
+      sdk.shutdown();
+    });
+
+    it('returns organic when there is no paid signal', () => {
+      const sdk = initWithLocation('');
+      expect(sdk.getAttributionNetwork()).toBe('organic');
+      sdk.shutdown();
+    });
+
+    it('stays stable after the URL loses its query params', () => {
+      const sdk = initWithLocation('?ttclid=abc');
+
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '',
+          href: 'https://studio.com/games/devilfish',
+          protocol: 'https:',
+          pathname: '/games/devilfish',
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      expect(sdk.getAttributionNetwork()).toBe('tiktok');
+      sdk.shutdown();
+    });
+  });
 });

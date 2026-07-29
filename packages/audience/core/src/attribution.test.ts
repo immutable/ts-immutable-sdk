@@ -3,11 +3,6 @@ import {
   collectPageAttribution,
   clearAttribution,
   getAttributionNetwork,
-  isPaidMeta,
-  isPaidTikTok,
-  isPaidGoogle,
-  isPaidReddit,
-  isPaidX,
 } from './attribution';
 
 const STORAGE_KEY = '__imtbl_attribution';
@@ -204,15 +199,13 @@ describe('getAttributionNetwork', () => {
     ['x', 'x'],
     ['twitter', 'x'],
   ])('classifies utm_source=%s with a paid utm_medium as %s', (source, expected) => {
-    setLocation(`https://example.com/?utm_source=${source}&utm_medium=cpc`);
-    expect(getAttributionNetwork()).toBe(expected);
+    expect(getAttributionNetwork({ utm_source: source, utm_medium: 'cpc' })).toBe(expected);
   });
 
   it.each(['cpc', 'ppc', 'paid', 'paid_social', 'paidsocial', 'CPC'])(
     'treats utm_medium=%s as a paid medium',
     (medium) => {
-      setLocation(`https://example.com/?utm_source=facebook&utm_medium=${medium}`);
-      expect(getAttributionNetwork()).toBe('meta');
+      expect(getAttributionNetwork({ utm_source: 'facebook', utm_medium: medium })).toBe('meta');
     },
   );
 
@@ -223,70 +216,75 @@ describe('getAttributionNetwork', () => {
     ['dclid', 'google'],
     ['rdt_cid', 'reddit'],
     ['twclid', 'x'],
-  ])('classifies %s presence as %s regardless of utm_source or utm_medium', (param, expected) => {
-    setLocation(`https://example.com/?${param}=123`);
-    expect(getAttributionNetwork()).toBe(expected);
+  ])('classifies %s presence as %s regardless of utm_source or utm_medium', (key, expected) => {
+    expect(getAttributionNetwork({ [key]: '123' })).toBe(expected);
   });
 
-  it.each(['msclkid', 'li_fat_id'])('classifies %s presence as other', (param) => {
-    setLocation(`https://example.com/?${param}=123`);
-    expect(getAttributionNetwork()).toBe('other');
+  it.each(['msclkid', 'li_fat_id'])('classifies %s presence as other', (key) => {
+    expect(getAttributionNetwork({ [key]: '123' })).toBe('other');
   });
 
-  it('classifies no params as organic', () => {
-    setLocation('https://example.com/');
-    expect(getAttributionNetwork()).toBe('organic');
+  it('classifies an empty snapshot as organic', () => {
+    expect(getAttributionNetwork({})).toBe('organic');
+  });
+
+  it('ignores empty-string click IDs', () => {
+    expect(getAttributionNetwork({ fbclid: '' })).toBe('organic');
   });
 
   it('classifies an unrecognised utm_source as organic', () => {
-    setLocation('https://example.com/?utm_source=newsletter&utm_medium=cpc');
-    expect(getAttributionNetwork()).toBe('organic');
+    expect(getAttributionNetwork({ utm_source: 'newsletter', utm_medium: 'cpc' })).toBe('organic');
   });
 
   it('classifies utm_source alone without utm_medium as organic', () => {
-    setLocation('https://example.com/?utm_source=facebook');
-    expect(getAttributionNetwork()).toBe('organic');
+    expect(getAttributionNetwork({ utm_source: 'facebook' })).toBe('organic');
   });
 
   it.each(['organic', 'social', 'referral', 'email'])(
     'classifies a matching utm_source with non-paid utm_medium=%s as organic',
     (medium) => {
-      setLocation(`https://example.com/?utm_source=facebook&utm_medium=${medium}`);
-      expect(getAttributionNetwork()).toBe('organic');
+      expect(getAttributionNetwork({ utm_source: 'facebook', utm_medium: medium })).toBe('organic');
     },
   );
+
+  it('classifies from the snapshot, independent of the current URL', () => {
+    // URL says Meta, but classification is driven solely by the snapshot.
+    setLocation('https://example.com/?fbclid=abc');
+    expect(getAttributionNetwork({ ttclid: 'xyz' })).toBe('tiktok');
+
+    // A clean URL still classifies from the snapshot's click ID.
+    setLocation('https://example.com/games/devilfish');
+    expect(getAttributionNetwork({ fbclid: 'abc' })).toBe('meta');
+  });
 });
 
-describe('isPaid* helpers', () => {
-  it('isPaidMeta reflects getAttributionNetwork', () => {
-    setLocation('https://example.com/?utm_source=facebook&utm_medium=paid_social');
-    expect(isPaidMeta()).toBe(true);
-    expect(isPaidTikTok()).toBe(false);
+describe('getAttributionNetwork from the current URL (no snapshot)', () => {
+  it.each([
+    ['fbclid', 'meta'],
+    ['ttclid', 'tiktok'],
+    ['gclid', 'google'],
+    ['rdt_cid', 'reddit'],
+    ['twclid', 'x'],
+  ])('classifies %s on the URL as %s', (param, expected) => {
+    setLocation(`https://example.com/?${param}=123`);
+    expect(getAttributionNetwork()).toBe(expected);
   });
 
-  it('isPaidMeta is false for organic Meta-sourced traffic', () => {
-    setLocation('https://example.com/?utm_source=facebook&utm_medium=organic');
-    expect(isPaidMeta()).toBe(false);
+  it('classifies a paid utm_source/medium on the URL', () => {
+    setLocation('https://example.com/?utm_source=facebook&utm_medium=cpc');
+    expect(getAttributionNetwork()).toBe('meta');
   });
 
-  it('isPaidTikTok reflects getAttributionNetwork', () => {
-    setLocation('https://example.com/?ttclid=abc');
-    expect(isPaidTikTok()).toBe(true);
-    expect(isPaidMeta()).toBe(false);
+  it('classifies no params on the URL as organic', () => {
+    setLocation('https://example.com/');
+    expect(getAttributionNetwork()).toBe('organic');
   });
 
-  it('isPaidGoogle reflects getAttributionNetwork', () => {
-    setLocation('https://example.com/?gclid=abc');
-    expect(isPaidGoogle()).toBe(true);
-  });
-
-  it('isPaidReddit reflects getAttributionNetwork', () => {
-    setLocation('https://example.com/?utm_source=reddit&utm_medium=paid');
-    expect(isPaidReddit()).toBe(true);
-  });
-
-  it('isPaidX reflects getAttributionNetwork', () => {
-    setLocation('https://example.com/?twclid=abc');
-    expect(isPaidX()).toBe(true);
+  it('returns organic when there is no window (SSR)', () => {
+    const original = Object.getOwnPropertyDescriptor(globalThis, 'window');
+    // @ts-expect-error simulate a non-browser runtime
+    delete globalThis.window;
+    expect(getAttributionNetwork()).toBe('organic');
+    if (original) Object.defineProperty(globalThis, 'window', original);
   });
 });

@@ -53,11 +53,6 @@ export {
   collectSessionAttribution,
   collectPageAttribution,
   getAttributionNetwork,
-  isPaidMeta,
-  isPaidTikTok,
-  isPaidGoogle,
-  isPaidReddit,
-  isPaidX,
 } from './attribution';
 export type { Attribution, AttributionNetwork } from './attribution';
 
