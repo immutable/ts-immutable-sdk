@@ -68,7 +68,9 @@
       "!packages/game-bridge",
       "!@imtbl-alpha/**"
     ],
-    "releaseTagPattern": "{version}",
+    "releaseTag": {
+      "pattern": "{version}"
+    },
     "changelog": {
       "workspaceChangelog": {
         "file": false,
