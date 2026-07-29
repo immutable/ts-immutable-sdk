@@ -157,75 +157,63 @@ function isPaidSourceMatch(source: string | undefined, medium: string | undefine
 }
 
 /**
- * Classifies the current page load's traffic source from `utm_source` /
- * `utm_medium` and ad-network click IDs on the URL (e.g. `fbclid`,
- * `ttclid`, `gclid`). A network click ID is treated as paid on its own;
- * a bare `utm_source` match additionally requires `utm_medium` to be a
- * paid value (see {@link PAID_MEDIUMS}), so organic traffic tagged with
- * e.g. `utm_source=facebook&utm_medium=organic` isn't misclassified as paid.
- *
- * @returns The matched network, `'organic'` when no UTM or click ID is
- * present, or `'other'` when a recognised click ID (e.g. `msclkid`,
- * `li_fat_id`) doesn't map to a named network.
- * @example
- * // https://example.com/?utm_source=facebook&utm_medium=paid_social
- * getAttributionNetwork(); // 'meta'
- * @example
- * // https://example.com/?utm_source=facebook&utm_medium=organic
- * getAttributionNetwork(); // 'organic'
- * @example
- * // https://example.com/?fbclid=abc123
- * getAttributionNetwork(); // 'meta' — click ID alone is a sufficient paid signal
+ * Shared classifier for {@link getAttributionNetwork}. `source` / `medium`
+ * are expected pre-lowercased; `hasParam` reports whether a given click-ID
+ * key is present, letting the same logic run against a URL or an
+ * {@link Attribution} snapshot.
  */
-export function getAttributionNetwork(): AttributionNetwork {
-  if (typeof window === 'undefined' || !window.location) return 'organic';
-
-  const params = new URLSearchParams(window.location.search);
-  const source = params.get('utm_source')?.toLowerCase();
-  const medium = params.get('utm_medium')?.toLowerCase();
-
-  if (params.has('fbclid') || isPaidSourceMatch(source, medium, META_SOURCES)) {
-    return 'meta';
-  }
-  if (params.has('ttclid') || isPaidSourceMatch(source, medium, ['tiktok'])) {
-    return 'tiktok';
-  }
-  if (params.has('gclid') || params.has('dclid') || isPaidSourceMatch(source, medium, ['google'])) {
-    return 'google';
-  }
-  if (params.has('rdt_cid') || isPaidSourceMatch(source, medium, ['reddit'])) {
-    return 'reddit';
-  }
-  if (params.has('twclid') || isPaidSourceMatch(source, medium, X_SOURCES)) {
-    return 'x';
-  }
-  if (params.has('msclkid') || params.has('li_fat_id')) {
-    return 'other';
-  }
+function classifyNetwork(
+  source: string | undefined,
+  medium: string | undefined,
+  hasParam: (key: AttributionKey) => boolean,
+): AttributionNetwork {
+  if (hasParam('fbclid') || isPaidSourceMatch(source, medium, META_SOURCES)) return 'meta';
+  if (hasParam('ttclid') || isPaidSourceMatch(source, medium, ['tiktok'])) return 'tiktok';
+  if (hasParam('gclid') || hasParam('dclid') || isPaidSourceMatch(source, medium, ['google'])) return 'google';
+  if (hasParam('rdt_cid') || isPaidSourceMatch(source, medium, ['reddit'])) return 'reddit';
+  if (hasParam('twclid') || isPaidSourceMatch(source, medium, X_SOURCES)) return 'x';
+  if (hasParam('msclkid') || hasParam('li_fat_id')) return 'other';
   return 'organic';
 }
 
-/** @returns Whether the current visit is attributed to paid Meta (Facebook/Instagram) traffic. */
-export function isPaidMeta(): boolean {
-  return getAttributionNetwork() === 'meta';
-}
+/**
+ * Classifies a visit's traffic source from `utm_source` / `utm_medium` and
+ * ad-network click IDs (e.g. `fbclid`, `ttclid`, `gclid`). A network click ID
+ * is treated as paid on its own; a bare `utm_source` match additionally
+ * requires `utm_medium` to be a paid value (see {@link PAID_MEDIUMS}), so
+ * organic traffic tagged with e.g. `utm_source=facebook&utm_medium=organic`
+ * isn't misclassified as paid.
+ *
+ * @param attribution When provided, classifies from this snapshot. Pass the
+ * session-cached first-touch attribution (the same signals that ride on
+ * `sign_up` events and drive server-side attribution) so client- and
+ * server-classified traffic agree, even after the landing URL's query params
+ * are gone. When omitted, reads the current `window.location` — use this
+ * standalone form only where no {@link Audience} instance exists (e.g. a page
+ * with just an ad pixel); when you have an instance, prefer
+ * `Audience.getAttributionNetwork()`, which classifies from its cached snapshot.
+ * @returns The matched network, `'organic'` when no UTM or click ID is
+ * present, or `'other'` when a recognised click ID (e.g. `msclkid`,
+ * `li_fat_id`) doesn't map to a named network.
+ */
+export function getAttributionNetwork(attribution?: Attribution): AttributionNetwork {
+  if (attribution) {
+    return classifyNetwork(
+      attribution.utm_source?.toLowerCase(),
+      attribution.utm_medium?.toLowerCase(),
+      (key) => {
+        const value = attribution[key];
+        return value != null && value !== '';
+      },
+    );
+  }
 
-/** @returns Whether the current visit is attributed to paid TikTok traffic. */
-export function isPaidTikTok(): boolean {
-  return getAttributionNetwork() === 'tiktok';
-}
+  if (typeof window === 'undefined' || !window.location) return 'organic';
 
-/** @returns Whether the current visit is attributed to paid Google traffic. */
-export function isPaidGoogle(): boolean {
-  return getAttributionNetwork() === 'google';
-}
-
-/** @returns Whether the current visit is attributed to paid Reddit traffic. */
-export function isPaidReddit(): boolean {
-  return getAttributionNetwork() === 'reddit';
-}
-
-/** @returns Whether the current visit is attributed to paid X (Twitter) traffic. */
-export function isPaidX(): boolean {
-  return getAttributionNetwork() === 'x';
+  const params = new URLSearchParams(window.location.search);
+  return classifyNetwork(
+    params.get('utm_source')?.toLowerCase(),
+    params.get('utm_medium')?.toLowerCase(),
+    (key) => params.has(key),
+  );
 }

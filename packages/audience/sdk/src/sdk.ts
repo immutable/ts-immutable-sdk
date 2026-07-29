@@ -1,5 +1,6 @@
 import type {
   Attribution,
+  AttributionNetwork,
   ConsentLevel,
   ConsentManager,
   Message,
@@ -26,6 +27,7 @@ import {
   collectContext,
   collectSessionAttribution,
   collectThirdPartyIds,
+  getAttributionNetwork as resolveAttributionNetwork,
   getOrCreateSessionId,
   createConsentManager,
   canTrack,
@@ -38,6 +40,12 @@ import { adoptAnonymousId, resolvePrivacySignal } from '@imtbl/audience-core/int
 import { track } from '@imtbl/metrics';
 import { DebugLogger } from './debug';
 import { REQUIRED_EVENT_PROPS, type AudienceEventName, type PropsFor } from './events';
+import {
+  CONVERSION_ID_PROPERTY,
+  CONVERSION_NETWORK_PROPERTY,
+  DEDUP_CAPABLE_NETWORKS,
+  type ConversionResult,
+} from './conversion';
 import type { AudienceConfig } from './types';
 import {
   LIBRARY_NAME, LIBRARY_VERSION, LOG_PREFIX, DEFAULT_CONSENT_SOURCE,
@@ -230,6 +238,18 @@ export class Audience {
     return this.anonymousId;
   }
 
+  /**
+   * The ad network this visit is attributed to, classified from the
+   * session-cached first-touch attribution captured when the SDK initialised
+   * (UTM params + ad-network click IDs). Returns `'organic'` when there's no
+   * paid signal, or `'other'` for a recognised but unnamed click ID. Stable
+   * for the session, so it agrees with server-side attribution even after the
+   * landing URL's query params are gone.
+   */
+  getAttributionNetwork(): AttributionNetwork {
+    return resolveAttributionNetwork(this.attribution);
+  }
+
   /** True when the current consent level does not permit tracking. */
   private isTrackingDisabled(): boolean {
     return !canTrack(this.consent.level);
@@ -320,17 +340,71 @@ export class Audience {
       ? [properties?: PropsFor<E>]
       : [properties: PropsFor<E>]
   ): void {
+    this.emitTrack(event, args[0] as Record<string, unknown> | undefined);
+  }
+
+  /**
+   * Like {@link track}, but mints a shared id for ad-network deduplication.
+   * Use for conversion events reported to ad networks, e.g. `sign_up` or
+   * `purchase`.
+   *
+   * Classifies the visit's network from the session-cached first-touch
+   * attribution (the same signals that drive server-side attribution). For a
+   * network that can dedupe on a shared id (Meta, TikTok, Reddit), it mints a
+   * conversion event id, stamps it onto the event under the reserved
+   * `_imtbl_conversion_id` / `_imtbl_conversion_network` properties, and returns
+   * it. Pass the returned `eventId` to that network's browser pixel (e.g. Meta
+   * `fbq('track', 'CompleteRegistration', {}, { eventID })`) so it deduplicates
+   * against the server-side event.
+   *
+   * `eventId` is null (and no dedup id is emitted) for a non-dedup-capable or
+   * organic visit, or when consent doesn't permit tracking; `network` is always
+   * returned for the caller's own routing. Same validation as {@link track}.
+   */
+  trackConversion<E extends AudienceEventName | string & {}>(
+    event: E,
+    ...args: {} extends PropsFor<E>
+      ? [properties?: PropsFor<E>]
+      : [properties: PropsFor<E>]
+  ): ConversionResult {
+    const network = this.getAttributionNetwork();
+
+    if (this.isTrackingDisabled()) return { eventId: null, network };
+
+    const eventId = DEDUP_CAPABLE_NETWORKS.has(network) ? generateId() : null;
+    const conversionProps = eventId
+      ? {
+        [CONVERSION_ID_PROPERTY]: eventId,
+        [CONVERSION_NETWORK_PROPERTY]: network,
+      }
+      : undefined;
+
+    this.emitTrack(event, args[0] as Record<string, unknown> | undefined, conversionProps);
+
+    return { eventId, network };
+  }
+
+  /**
+   * Shared implementation for {@link track} and {@link trackConversion}.
+   * `reserved` are SDK-owned properties (e.g. conversion ids) that take
+   * precedence over caller-supplied properties on collision.
+   */
+  private emitTrack(
+    event: string,
+    properties: Record<string, unknown> | undefined,
+    reserved?: Record<string, unknown>,
+  ): void {
     if (this.isTrackingDisabled()) return;
     if (!hasValue(event)) invalidCall('track() called with an empty event name.');
 
-    const [properties] = args;
-    validateRequiredProps(event, properties as Record<string, unknown> | undefined);
+    validateRequiredProps(event, properties);
 
     this.refreshSession();
 
     const mergedProps: Record<string, unknown> = {
       ...(UTM_EVENTS.has(event) ? this.attribution : {}),
-      ...properties as Record<string, unknown> | undefined,
+      ...properties,
+      ...reserved,
     };
 
     this.enqueue('track', {
