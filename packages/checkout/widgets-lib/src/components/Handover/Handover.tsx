@@ -37,16 +37,19 @@ export function Handover({ id, children }: { id: string, children?: React.ReactN
   return (
     <>
       {children}
-      {loader && (
-        <LoadingOverlay visible>
-          <LoadingOverlay.Content>
-            <LoadingOverlay.Content.LoopingText
-              text={[...loader.text]}
-              textDuration={loader.duration}
-            />
-          </LoadingOverlay.Content>
-        </LoadingOverlay>
-      )}
+      {/*
+        Keep LoadingOverlay mounted and toggle `visible`. Conditionally mounting
+        `{loader && <LoadingOverlay visible>}` orphans the modal under React 19
+        (biom3 useControlledOverlay cleanup race).
+      */}
+      <LoadingOverlay visible={Boolean(loader)}>
+        <LoadingOverlay.Content>
+          <LoadingOverlay.Content.LoopingText
+            text={loader ? [...loader.text] : ['']}
+            textDuration={loader?.duration}
+          />
+        </LoadingOverlay.Content>
+      </LoadingOverlay>
       {handover && (renderChildren || handover.animationUrl) && (
         <Stack
           sx={{
