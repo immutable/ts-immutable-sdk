@@ -132,8 +132,13 @@ export class Checkout {
     const version = globalPackageVersion();
 
     try {
-      // eslint-disable-next-line max-len
-      const cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@${globalPackageVersion()}/dist/browser/index.js`;
+      // Build via join so rolldown cannot fold a template literal into import()
+      // (it does that even with minify off, which breaks webpack/Vite consumers).
+      const cdnUrl = [
+        'https://cdn.jsdelivr.net/npm/@imtbl/checkout-widgets@',
+        version,
+        '/dist/browser/index.js',
+      ].join('');
 
       // WebpackIgnore comment required to prevent webpack modifying the import statement and
       // breaking the dynamic import in certain applications integrating checkout

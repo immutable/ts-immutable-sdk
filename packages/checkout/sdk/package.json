@@ -63,7 +63,8 @@
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "NODE_ENV=production pnpm transpile && pnpm typegen",
+    "assert-widgets-import": "node scripts/assert-widgets-import.mjs",
+    "build": "NODE_ENV=production pnpm transpile && pnpm typegen && pnpm assert-widgets-import",
     "build:dev": "CHECKOUT_DEV_MODE=true pnpm build",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "pack:root": "pnpm pack --pack-destination $(dirname $(pnpm root -w))",

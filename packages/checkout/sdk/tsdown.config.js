@@ -40,8 +40,9 @@ export default defineConfig((options) => {
       platform: 'browser',
       format: 'esm',
       target: 'es2022',
-      // Identifier-only minify avoids "request of a dependency is an expression"
-      minify: { compress: false, mangle: true },
+      // Keep minify off: rolldown mangle strips /* webpackIgnore: true */ and inlines
+      // the CDN URL into import(), which breaks webpack/Vite consumers of widgets().
+      minify: false,
       dts: false,
       deps: { onlyBundle: false },
       plugins: [
@@ -57,7 +58,7 @@ export default defineConfig((options) => {
       fixedExtension: false,
       format: ['esm', 'cjs'],
       target: 'es2022',
-      minify: { compress: false, mangle: true },
+      minify: false,
       dts: false,
       clean: true,
       deps: { onlyBundle: false },
