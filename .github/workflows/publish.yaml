@@ -136,33 +136,49 @@ jobs:
           TAG=latest
           [[ "$IS_ALPHA" == "true" ]] && TAG=alpha
 
+          # Derive the publish list from the attested tarballs themselves -
+          # they are the single source of truth for what this release ships.
+          # Topologically sorted so dependencies publish before dependents.
+          node > publish-order.txt <<'SORT'
+          const { execSync } = require('child_process');
+          const fs = require('fs');
+          const tgzs = fs.readdirSync('.').filter(f => /^imtbl-.*\.tgz$/.test(f));
+          const pkgs = new Map();
+          for (const tgz of tgzs) {
+            const m = JSON.parse(execSync(`tar -xzOf "${tgz}" package/package.json`, { maxBuffer: 16 * 1024 * 1024 }));
+            pkgs.set(m.name, { tgz, version: m.version, deps: Object.keys(m.dependencies || {}) });
+          }
+          const done = new Set();
+          const emit = (name) => {
+            if (done.has(name) || !pkgs.has(name)) return;
+            done.add(name);
+            for (const d of pkgs.get(name).deps) emit(d);
+            const p = pkgs.get(name);
+            console.log(`${name} ${p.version} ${p.tgz}`);
+          };
+          [...pkgs.keys()].sort().forEach(emit);
+          SORT
+
+          total=$(find . -maxdepth 1 -name 'imtbl-*.tgz' | wc -l | tr -d ' ')
+          listed=$(wc -l < publish-order.txt | tr -d ' ')
+          if [[ "$total" -eq 0 || "$listed" -ne "$total" ]]; then
+            echo "::error::Packed ${total} tarballs but resolved ${listed} publishable packages."
+            echo "::error::A duplicate or unreadable tarball means the attested set is ambiguous - refusing to publish."
+            exit 1
+          fi
+
           rm -f published-packages.txt
-          processed=0
-          # pnpm -r exec runs in topological order (dependencies first), so
-          # packages are published in the same order nx release publish used.
-          while read -r name version; do
-            [[ -z "$name" ]] && continue
-            tgz="imtbl-${name#@imtbl/}-${version}.tgz"
-            [[ -f "$tgz" ]] || continue
-            processed=$((processed + 1))
-            if [[ "$DRY_RUN" != "true" ]] && npm view "${name}@${version}" version >/dev/null 2>&1; then
+          while read -r name version tgz; do
+            if [[ "$DRY_RUN" != "true" ]] && npm view "${name}@${version}" version >/dev/null 2>&1 < /dev/null; then
               echo "Skipping ${name}@${version} - already published"
               continue
             fi
             args=("$tgz" --tag "$TAG")
             [[ "$DRY_RUN" == "true" ]] && args+=(--dry-run)
-            npm publish "${args[@]}"
+            npm publish "${args[@]}" < /dev/null
             echo "${name} ${version} ${tgz}" >> published-packages.txt
             echo "Published ${name}@${version} from ${tgz}"
-          done < <(pnpm -r exec node -e 'const p=require("./package.json"); if (!p.private) console.log(p.name, p.version)')
-
-          # Every attested tarball must be accounted for - fail loudly if the
-          # workspace listing missed any.
-          total=$(find . -maxdepth 1 -name 'imtbl-*.tgz' | wc -l | tr -d ' ')
-          if [[ "$processed" -ne "$total" ]]; then
-            echo "::error::Processed ${processed} tarballs but ${total} were packed and attested"
-            exit 1
-          fi
+          done < publish-order.txt
 
       - name: Verify Published Artifacts Match Attested Tarballs
         if: ${{ steps.npm_release.conclusion == 'success' && env.DRY_RUN == 'false' }}
