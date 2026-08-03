@@ -40,12 +40,14 @@ export interface TrackMessage extends BaseMessage {
   eventName: string;
   properties?: Record<string, unknown>;
   userId?: string;
+  identityType?: string;
 }
 
 export interface PageMessage extends BaseMessage {
   type: 'page';
   properties?: Record<string, unknown>;
   userId?: string;
+  identityType?: string;
 }
 
 export interface ScreenMessage extends BaseMessage {

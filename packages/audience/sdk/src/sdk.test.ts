@@ -358,6 +358,37 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
+    it('excludes identityType at anonymous consent', async () => {
+      const sdk = createSDK({ consent: 'anonymous' });
+
+      sdk.track('sign_in', { method: 'passport' });
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'sign_in',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.identityType).toBeUndefined();
+
+      sdk.shutdown();
+    });
+
+    it('includes identityType at full consent after identify', async () => {
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
+      sdk.track('level_up', { level: 5 });
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'level_up',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.identityType).toBe(TEST_USER.identityType);
+
+      sdk.shutdown();
+    });
+
     it('enqueues sign_up with method property and sessionId', async () => {
       const sdk = createSDK();
 
@@ -907,6 +938,33 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
+    it('excludes identityType at anonymous consent', async () => {
+      const sdk = createSDK({ consent: 'anonymous' });
+
+      sdk.page({ section: 'shop' });
+      await sdk.flush();
+
+      const msg = sentMessages().find((m: any) => m.type === 'page');
+      expect(msg).toBeDefined();
+      expect(msg.identityType).toBeUndefined();
+
+      sdk.shutdown();
+    });
+
+    it('includes identityType at full consent after identify', async () => {
+      const sdk = createSDK({ consent: 'full' });
+
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
+      sdk.page({ section: 'shop' });
+      await sdk.flush();
+
+      const msg = sentMessages().find((m: any) => m.type === 'page');
+      expect(msg).toBeDefined();
+      expect(msg.identityType).toBe(TEST_USER.identityType);
+
+      sdk.shutdown();
+    });
+
     it('attaches attribution to the first page view only', async () => {
       Object.defineProperty(window, 'location', {
         value: {
@@ -1016,6 +1074,7 @@ describe('Audience', () => {
       const pageMsg = sentMessages().find((m: any) => m.type === 'page');
       expect(pageMsg.consentLevel).toBe('full');
       expect(pageMsg.userId).toBe(TEST_USER.id);
+      expect(pageMsg.identityType).toBe(TEST_USER.identityType);
 
       sdk.shutdown();
     });
@@ -1036,6 +1095,24 @@ describe('Audience', () => {
       expect(trackMsg).toBeDefined();
       expect(trackMsg.consentLevel).toBe('full');
       expect(trackMsg.userId).toBe(TEST_USER.id);
+      expect(trackMsg.identityType).toBe(TEST_USER.identityType);
+
+      sdk.shutdown();
+    });
+
+    it('drops identityType (like userId) from track events after downgrade from full', async () => {
+      const sdk = createSDK({ consent: 'full' });
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
+      sdk.setConsent('anonymous');
+      sdk.track('post_downgrade_event');
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'post_downgrade_event',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.userId).toBeUndefined();
+      expect(msg.identityType).toBeUndefined();
 
       sdk.shutdown();
     });
@@ -1492,6 +1569,25 @@ describe('Audience', () => {
       sdk.shutdown();
     });
 
+    it('clears userId and identityType on downgrade to none, so a later upgrade to full does not resurface them', async () => {
+      const sdk = createSDK({ consent: 'full' });
+      sdk.identify(TEST_USER.id, TEST_USER.identityType);
+
+      sdk.setConsent('none');
+      sdk.setConsent('full');
+      sdk.track('post_reidentify_event');
+      await sdk.flush();
+
+      const msg = sentMessages().find(
+        (m: any) => m.type === 'track' && m.eventName === 'post_reidentify_event',
+      );
+      expect(msg).toBeDefined();
+      expect(msg.userId).toBeUndefined();
+      expect(msg.identityType).toBeUndefined();
+
+      sdk.shutdown();
+    });
+
     it('stops queue and makes track no-op on anonymous to none downgrade', async () => {
       const sdk = createSDK({ consent: 'anonymous' });
 
@@ -1603,6 +1699,7 @@ describe('Audience', () => {
       );
       expect(msg).toBeDefined();
       expect(msg.userId).toBeUndefined();
+      expect(msg.identityType).toBeUndefined();
       expect(msg.anonymousId).toBeDefined();
       expect(msg.anonymousId).not.toBe(originalAnonId);
 
