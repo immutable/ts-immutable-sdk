@@ -118,6 +118,11 @@ jobs:
           [[ "$DRY_RUN" == "true" ]] && args+=(--dry-run)
           pnpm nx release changelog "${args[@]}"
 
+      # ! The tarballs published below MUST be the same files attested above.
+      # Re-packing at publish time produces different bytes (package.json key
+      # ordering differs between pnpm pack and nx release publish), which breaks
+      # attestation verification for the published artifacts.
+
       - name: Release to NPM
         id: npm_release
         env:
@@ -126,10 +131,65 @@ jobs:
           IS_ALPHA: ${{ github.event_name == 'push' || startsWith(env.RELEASE_TYPE, 'pre') }}
         shell: bash
         run: |
-          args=()
-          [[ "$DRY_RUN" == "true" ]] && args+=(--dry-run)
-          [[ "$IS_ALPHA" == "true" ]] && args+=(--tag alpha) || args+=(--tag latest)
-          pnpm nx release publish "${args[@]}"
+          set -euo pipefail
+
+          TAG=latest
+          [[ "$IS_ALPHA" == "true" ]] && TAG=alpha
+
+          rm -f published-packages.txt
+          processed=0
+          # pnpm -r exec runs in topological order (dependencies first), so
+          # packages are published in the same order nx release publish used.
+          while read -r name version; do
+            [[ -z "$name" ]] && continue
+            tgz="imtbl-${name#@imtbl/}-${version}.tgz"
+            [[ -f "$tgz" ]] || continue
+            processed=$((processed + 1))
+            if [[ "$DRY_RUN" != "true" ]] && npm view "${name}@${version}" version >/dev/null 2>&1; then
+              echo "Skipping ${name}@${version} - already published"
+              continue
+            fi
+            args=("$tgz" --tag "$TAG")
+            [[ "$DRY_RUN" == "true" ]] && args+=(--dry-run)
+            npm publish "${args[@]}"
+            echo "${name} ${version} ${tgz}" >> published-packages.txt
+            echo "Published ${name}@${version} from ${tgz}"
+          done < <(pnpm -r exec node -e 'const p=require("./package.json"); if (!p.private) console.log(p.name, p.version)')
+
+          # Every attested tarball must be accounted for - fail loudly if the
+          # workspace listing missed any.
+          total=$(find . -maxdepth 1 -name 'imtbl-*.tgz' | wc -l | tr -d ' ')
+          if [[ "$processed" -ne "$total" ]]; then
+            echo "::error::Processed ${processed} tarballs but ${total} were packed and attested"
+            exit 1
+          fi
+
+      - name: Verify Published Artifacts Match Attested Tarballs
+        if: ${{ steps.npm_release.conclusion == 'success' && env.DRY_RUN == 'false' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -f published-packages.txt ]]; then
+            echo "Nothing published in this run - skipping verification"
+            exit 0
+          fi
+          while read -r name version tgz; do
+            local_sha=$(shasum -a 256 "$tgz" | cut -d ' ' -f 1)
+            for attempt in {1..10}; do
+              url=$(npm view "${name}@${version}" dist.tarball 2>/dev/null || true)
+              if [[ -n "$url" ]]; then
+                remote_sha=$(curl -sSL "$url" | shasum -a 256 | cut -d ' ' -f 1)
+                if [[ "$remote_sha" == "$local_sha" ]]; then
+                  echo "Verified ${name}@${version}"
+                  continue 2
+                fi
+              fi
+              echo "Attempt ${attempt}: ${name}@${version} not yet consistent on registry, retrying in 15s..."
+              sleep 15
+            done
+            echo "::error::${name}@${version}: registry tarball does not match the attested tarball ${tgz}"
+            exit 1
+          done < published-packages.txt
 
       - name: Tag Git Pre-Release
         if: ${{ startsWith(env.RELEASE_TYPE, 'pre') && steps.npm_release.conclusion == 'success' && env.DRY_RUN == 'false' }}
