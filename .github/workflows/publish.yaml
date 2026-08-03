@@ -169,7 +169,9 @@ jobs:
 
           rm -f published-packages.txt
           while read -r name version tgz; do
-            if [[ "$DRY_RUN" != "true" ]] && npm view "${name}@${version}" version >/dev/null 2>&1 < /dev/null; then
+            # Checked in dry-run mode too: npm validates against the registry
+            # even with --dry-run and errors on already-published versions.
+            if npm view "${name}@${version}" version >/dev/null 2>&1 < /dev/null; then
               echo "Skipping ${name}@${version} - already published"
               continue
             fi
@@ -192,7 +194,9 @@ jobs:
           while read -r name version tgz; do
             local_sha=$(shasum -a 256 "$tgz" | cut -d ' ' -f 1)
             for attempt in {1..10}; do
-              url=$(npm view "${name}@${version}" dist.tarball 2>/dev/null || true)
+              # npm view stdout is not guaranteed pure (update notices,
+              # wrapper banners) - extract the tarball URL defensively.
+              url=$(npm view "${name}@${version}" dist.tarball 2>/dev/null < /dev/null | grep -oE 'https://[^ ]+\.tgz' | head -1 || true)
               if [[ -n "$url" ]]; then
                 remote_sha=$(curl -sSL "$url" | shasum -a 256 | cut -d ' ' -f 1)
                 if [[ "$remote_sha" == "$local_sha" ]]; then
