@@ -195,19 +195,40 @@ describe('getAttributionNetwork', () => {
     ['FACEBOOK', 'meta'],
     ['tiktok', 'tiktok'],
     ['google', 'google'],
+    ['youtube', 'google'],
     ['reddit', 'reddit'],
     ['x', 'x'],
     ['twitter', 'x'],
-  ])('classifies utm_source=%s with a paid utm_medium as %s', (source, expected) => {
+    ['linkedin', 'other'],
+  ])('classifies gated utm_source=%s with a paid utm_medium as %s', (source, expected) => {
     expect(getAttributionNetwork({ utm_source: source, utm_medium: 'cpc' })).toBe(expected);
   });
 
-  it.each(['cpc', 'ppc', 'paid', 'paid_social', 'paidsocial', 'CPC'])(
-    'treats utm_medium=%s as a paid medium',
-    (medium) => {
-      expect(getAttributionNetwork({ utm_source: 'facebook', utm_medium: medium })).toBe('meta');
-    },
-  );
+  it.each([
+    ['amazon_ads', 'amazon', 'amazon'],
+    ['amazon_ads', undefined, 'amazon'],
+    ['AMAZON_ADS', 'social', 'amazon'],
+    ['adwords', 'dsc_5653372', 'google'],
+    ['ironsource', '618640', 'other'],
+  ])('classifies dedicated utm_source=%s (medium=%s) on source alone as %s', (source, medium, expected) => {
+    expect(getAttributionNetwork({ utm_source: source, utm_medium: medium })).toBe(expected);
+  });
+
+  it.each([
+    'cpc',
+    'cpm',
+    'ppc',
+    'paid',
+    'paid_social',
+    'paidsocial',
+    'ads',
+    'sponsored_post',
+    'pmax_cpc',
+    'pmax_cpa',
+    'CPC',
+  ])('treats utm_medium=%s as a paid medium', (medium) => {
+    expect(getAttributionNetwork({ utm_source: 'facebook', utm_medium: medium })).toBe('meta');
+  });
 
   it.each([
     ['fbclid', 'meta'],
@@ -224,6 +245,11 @@ describe('getAttributionNetwork', () => {
     expect(getAttributionNetwork({ [key]: '123' })).toBe('other');
   });
 
+  it('classifies google from a paid UTM even without a click ID', () => {
+    expect(getAttributionNetwork({ gclid: '1', utm_source: 'google', utm_medium: 'cpc' })).toBe('google');
+    expect(getAttributionNetwork({ utm_source: 'google', utm_medium: 'cpc' })).toBe('google');
+  });
+
   it('classifies an empty snapshot as organic', () => {
     expect(getAttributionNetwork({})).toBe('organic');
   });
@@ -236,12 +262,12 @@ describe('getAttributionNetwork', () => {
     expect(getAttributionNetwork({ utm_source: 'newsletter', utm_medium: 'cpc' })).toBe('organic');
   });
 
-  it('classifies utm_source alone without utm_medium as organic', () => {
+  it('classifies a gated utm_source alone without utm_medium as organic', () => {
     expect(getAttributionNetwork({ utm_source: 'facebook' })).toBe('organic');
   });
 
   it.each(['organic', 'social', 'referral', 'email'])(
-    'classifies a matching utm_source with non-paid utm_medium=%s as organic',
+    'classifies a gated utm_source with non-paid utm_medium=%s as organic',
     (medium) => {
       expect(getAttributionNetwork({ utm_source: 'facebook', utm_medium: medium })).toBe('organic');
     },
@@ -270,9 +296,19 @@ describe('getAttributionNetwork from the current URL (no snapshot)', () => {
     expect(getAttributionNetwork()).toBe(expected);
   });
 
-  it('classifies a paid utm_source/medium on the URL', () => {
+  it('classifies a paid gated utm_source/medium on the URL', () => {
     setLocation('https://example.com/?utm_source=facebook&utm_medium=cpc');
     expect(getAttributionNetwork()).toBe('meta');
+  });
+
+  it('classifies a dedicated utm_source on the URL as amazon', () => {
+    setLocation('https://example.com/?utm_source=amazon_ads&utm_medium=amazon');
+    expect(getAttributionNetwork()).toBe('amazon');
+  });
+
+  it('classifies a paid google UTM on the URL', () => {
+    setLocation('https://example.com/?utm_source=google&utm_medium=cpc');
+    expect(getAttributionNetwork()).toBe('google');
   });
 
   it('classifies no params on the URL as organic', () => {
