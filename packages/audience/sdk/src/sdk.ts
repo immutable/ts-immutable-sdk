@@ -117,6 +117,8 @@ export class Audience {
 
   private userId: string | undefined;
 
+  private identityType: IdentityType | undefined;
+
   private isFirstPage = true;
 
   private destroyed = false;
@@ -260,6 +262,11 @@ export class Audience {
     return canIdentify(this.consent.level) ? this.userId : undefined;
   }
 
+  /** Returns identityType if consent is full, undefined otherwise. */
+  private effectiveIdentityType(): IdentityType | undefined {
+    return canIdentify(this.consent.level) ? this.identityType : undefined;
+  }
+
   /** Create or resume the rolling session and cache its ID. */
   private refreshSession(): void {
     this.sessionId = getOrCreateSessionId(this.cookieDomain);
@@ -314,6 +321,7 @@ export class Audience {
       type: 'page',
       properties: mergedProps,
       userId: this.effectiveUserId(),
+      identityType: this.effectiveIdentityType(),
     });
   }
 
@@ -413,6 +421,7 @@ export class Audience {
       eventName: truncate(event),
       properties: mergedProps,
       userId: this.effectiveUserId(),
+      identityType: this.effectiveIdentityType(),
     });
   }
 
@@ -445,6 +454,7 @@ export class Audience {
 
     const resolvedId = truncate(id.trim());
     this.userId = resolvedId;
+    this.identityType = identityType;
     this.enqueue('identify', {
       ...this.baseMessage(),
       type: 'identify',
@@ -550,8 +560,13 @@ export class Audience {
     if (!canTrack(effective)) {
       deleteCookie(COOKIE_NAME, this.cookieDomain);
       deleteCookie(SESSION_COOKIE, this.cookieDomain);
-    } else if (canIdentify(previous) && !canIdentify(effective)) {
+    }
+    if (!canIdentify(effective)) {
+      // Cleared on any downgrade out of full (not just to anonymous) so a
+      // later upgrade back to full can't resurface a stale identity without
+      // a fresh identify() call.
       this.userId = undefined;
+      this.identityType = undefined;
     }
 
     if (isUpgradeFromNone) {
@@ -570,6 +585,7 @@ export class Audience {
    */
   reset(): void {
     this.userId = undefined;
+    this.identityType = undefined;
     this.queue.clear();
     deleteCookie(COOKIE_NAME, this.cookieDomain);
     deleteCookie(SESSION_COOKIE, this.cookieDomain);
