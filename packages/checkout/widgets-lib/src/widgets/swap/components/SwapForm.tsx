@@ -15,7 +15,6 @@ import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
 import { formatUnits, parseEther, parseUnits } from 'ethers';
 import { motion } from 'framer-motion';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { NetworkSwitchDrawer } from '../../../components/NetworkSwitchDrawer/NetworkSwitchDrawer';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/SwapContext';
@@ -116,8 +115,6 @@ export function SwapForm({
 
   const [direction, setDirection] = useState<SwapDirection>(SwapDirection.FROM);
   const [loading, setLoading] = useState(false);
-  const { track } = useAnalytics();
-
   // Form State
   const [fromAmount, setFromAmount] = useState<string>(data?.fromAmount || '');
   const [fromAmountError, setFromAmountError] = useState<string>('');
@@ -239,20 +236,7 @@ export function SwapForm({
 
   const onQuoteError = useCallback((error: any) => {
     setQuoteError(error);
-    track({
-      userJourney: UserJourney.SWAP,
-      screen: 'SwapCoins',
-      control: 'UnableToSwapDrawer',
-      controlType: 'Button',
-      extras: {
-        fromToken,
-        toToken,
-        fromAmount,
-        toAmount,
-        error: 'message' in error ? error.message : error,
-      },
-    });
-  }, [track, fromToken, toToken, fromAmount, toAmount]);
+  }, [fromToken, toToken, fromAmount, toAmount]);
 
   const tokensOptionsTo = useMemo(() => allowedTokens
     .map(
@@ -569,18 +553,6 @@ export function SwapForm({
     setFromToken(selected.token);
     setFromBalance(selected.formattedBalance);
     setFromTokenError('');
-
-    track({
-      userJourney: UserJourney.SWAP,
-      screen: 'SwapCoins',
-      control: 'SelectFrom',
-      controlType: 'Select',
-      extras: {
-        fromBalance: selected.formattedBalance,
-        fromToken: selected.token,
-        fromAmount,
-      },
-    });
   }, [toToken]);
 
   const onFromTextInputFocus = () => {
@@ -598,18 +570,6 @@ export function SwapForm({
       setLoading(true);
     }
     setFromAmount(value);
-
-    track({
-      userJourney: UserJourney.SWAP,
-      screen: 'SwapCoins',
-      control: 'InputFrom',
-      controlType: 'TextInput',
-      extras: {
-        fromBalance,
-        fromToken,
-        fromAmount: value,
-      },
-    });
   };
 
   const textInputMaxButtonClick = () => {
@@ -628,16 +588,6 @@ export function SwapForm({
     } else {
       setFromAmount(fromBalanceTruncated);
     }
-    track({
-      userJourney: UserJourney.SWAP,
-      screen: 'SwapCoins',
-      control: 'MaxFrom',
-      controlType: 'Button',
-      extras: {
-        fromBalance,
-        fromBalanceTruncated,
-      },
-    });
   };
 
   // ------------//
@@ -653,17 +603,6 @@ export function SwapForm({
 
     setToToken(selected);
     setToTokenError('');
-
-    track({
-      userJourney: UserJourney.SWAP,
-      screen: 'SwapCoins',
-      control: 'SelectTo',
-      controlType: 'Select',
-      extras: {
-        toToken: selected,
-        toAmount,
-      },
-    });
   }, [fromToken]);
 
   const onToTextInputFocus = () => {
@@ -682,23 +621,11 @@ export function SwapForm({
       setLoading(true);
     }
     setToAmount(value);
-
-    track({
-      userJourney: UserJourney.SWAP,
-      screen: 'SwapCoins',
-      control: 'InputTo',
-      controlType: 'TextInput',
-      extras: {
-        toToken,
-        toAmount: value,
-      },
-    });
   };
 
   const reverseTokens = () => {
     const currentFromToken = fromToken;
     const currentToToken = toToken;
-    const currentFromAmount = fromAmount;
     const currentToAmount = toAmount;
 
     setReverseRotation((prev) => (prev === 0 ? 180 : 0));
@@ -731,20 +658,6 @@ export function SwapForm({
       setToToken(currentFromToken);
       setToAmount(fromAmount);
     }
-
-    track({
-      userJourney: UserJourney.SWAP,
-      screen: 'SwapCoins',
-      control: 'Flip',
-      controlType: 'Button',
-      extras: {
-        fromToken: currentFromToken,
-        fromAmount: currentFromAmount,
-        toToken: currentToToken,
-        toAmount: currentToAmount,
-        isCurrentToTokenInSellList,
-      },
-    });
   };
 
   const openNotEnoughImxDrawer = () => {
@@ -777,24 +690,6 @@ export function SwapForm({
       || validateToTokenError
       || (validateFromAmountError && direction === SwapDirection.FROM)
       || (validateToAmountError && direction === SwapDirection.TO)) isSwapFormValid = false;
-
-    track({
-      userJourney: UserJourney.SWAP,
-      screen: 'SwapCoins',
-      control: 'FormValid',
-      controlType: 'Button',
-      extras: {
-        isSwapFormValid,
-        swapFromAddress: fromToken?.address,
-        swapFromAmount: fromAmount,
-        swapFromTokenSymbol: fromToken?.symbol,
-        swapToAddress: toToken?.address,
-        swapToAmount: toAmount,
-        swapToTokenSymbol: toToken?.symbol,
-        autoProceed,
-      },
-    });
-
     return isSwapFormValid;
   };
 
@@ -823,26 +718,7 @@ export function SwapForm({
     if (!quote) return;
 
     const transaction = quote;
-    const isValid = SwapFormValidator();
-    // Tracking swap from data here and is valid or not to understand behaviour
-    track({
-      userJourney: UserJourney.SWAP,
-      screen: 'SwapCoins',
-      control: 'Swap',
-      controlType: 'Button',
-      extras: {
-        swapFromAddress: fromToken?.address,
-        swapFromAmount: fromAmount,
-        swapFromTokenSymbol: fromToken?.symbol,
-        swapToAddress: toToken?.address,
-        swapToAmount: toAmount,
-        swapToTokenSymbol: toToken?.symbol,
-        isSwapFormValid: isValid,
-        hasFundsForGas: !insufficientFundsForGas,
-        autoProceed,
-      },
-    });
-    if (!isValid) return;
+    const isValid = SwapFormValidator(); if (!isValid) return;
     if (!checkout || !provider || !transaction) return;
     if (insufficientFundsForGas) {
       cancelAutoProceed();
@@ -1006,9 +882,6 @@ export function SwapForm({
                 : undefined}
               coinSelectorHeading={t('views.SWAP.swapForm.from.selectorTitle')}
               defaultTokenImage={defaultTokenImage}
-              control="FromToken"
-              userJourney={UserJourney.SWAP}
-              screen="SwapCoins"
               environment={checkout?.config.environment}
               theme={theme}
               themeOverrides={themeOverrides}
@@ -1085,9 +958,6 @@ export function SwapForm({
                 : undefined}
               coinSelectorHeading={t('views.SWAP.swapForm.to.selectorTitle')}
               defaultTokenImage={defaultTokenImage}
-              control="ToToken"
-              userJourney={UserJourney.SWAP}
-              screen="SwapCoins"
               environment={checkout?.config.environment}
               theme={theme}
               themeOverrides={themeOverrides}
@@ -1098,14 +968,6 @@ export function SwapForm({
           feeFiatValue={feeFiatValue}
           gasFeeToken={gasFeeToken}
           fees={formattedFees}
-          onFeesClick={() => {
-            track({
-              userJourney: UserJourney.SWAP,
-              screen: 'SwapCoins',
-              control: 'ViewFees',
-              controlType: 'Button',
-            });
-          }}
           sx={{
             paddingBottom: '0',
           }}

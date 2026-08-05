@@ -12,7 +12,6 @@ import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { ViewContext, ViewActions } from '../../../context/view-context/ViewContext';
 import { addChainChangedListener, removeChainChangedListener } from '../../../lib';
 import { ImmutablePlanetHero } from '../../../components/Hero/ImmutablePlanetHero';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export function SwitchNetworkZkEVM() {
   const { t } = useTranslation();
@@ -20,15 +19,6 @@ export function SwitchNetworkZkEVM() {
   const { connectDispatch, connectState } = useContext(ConnectContext);
   const { checkout, provider, sendCloseEvent } = connectState;
   const [buttonTextKey, setButtonTextKey] = useState(t('views.SWITCH_NETWORK.zkEVM.button.text'));
-  const { page, track } = useAnalytics();
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.CONNECT,
-      screen: 'SwitchNetworkZkEVM',
-    });
-  }, []);
-
   useEffect(() => {
     if (!provider || !checkout) return;
 
@@ -65,14 +55,6 @@ export function SwitchNetworkZkEVM() {
 
   const switchNetwork = useCallback(async () => {
     if (!provider || !checkout) return;
-
-    track({
-      userJourney: UserJourney.CONNECT,
-      screen: 'SwitchNetworkZkEVM',
-      control: 'Switch',
-      controlType: 'Button',
-    });
-
     if (!provider.send) return;
 
     const currentChainId = await provider.send('eth_chainId', []) as `0x${string}`;

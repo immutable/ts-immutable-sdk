@@ -13,7 +13,6 @@ import { Base } from '../BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
@@ -89,35 +88,35 @@ export class Swap extends Base<WidgetType.SWAP> {
 
     this.reactRoot!.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="swap-container" config={this.strongConfig()}>
-            <HandoverProvider>
-              <ConnectLoader
-                params={connectLoaderParams}
-                widgetConfig={this.strongConfig()}
-                closeEvent={() => sendSwapWidgetCloseEvent(window)}
-              >
-                <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
-                  <SwapWidget
-                    fromTokenAddress={this.parameters.fromTokenAddress}
-                    toTokenAddress={this.parameters.toTokenAddress}
-                    amount={this.parameters.amount}
-                    config={this.strongConfig()}
-                    autoProceed={this.parameters.autoProceed}
-                    direction={this.parameters.direction ?? SwapDirection.FROM}
-                    showBackButton={this.parameters.showBackButton}
-                    walletProviderName={this.parameters.walletProviderName}
-                    swapConfig={{
-                      customTitle: this.properties.config?.customTitle,
-                      customSubTitle: this.properties.config?.customSubTitle,
-                      showHeader: this.properties.config?.showHeader,
-                    }}
-                  />
-                </Suspense>
-              </ConnectLoader>
-            </HandoverProvider>
-          </ThemeProvider>
-        </CustomAnalyticsProvider>
+
+        <ThemeProvider id="swap-container" config={this.strongConfig()}>
+          <HandoverProvider>
+            <ConnectLoader
+              params={connectLoaderParams}
+              widgetConfig={this.strongConfig()}
+              closeEvent={() => sendSwapWidgetCloseEvent(window)}
+            >
+              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
+                <SwapWidget
+                  fromTokenAddress={this.parameters.fromTokenAddress}
+                  toTokenAddress={this.parameters.toTokenAddress}
+                  amount={this.parameters.amount}
+                  config={this.strongConfig()}
+                  autoProceed={this.parameters.autoProceed}
+                  direction={this.parameters.direction ?? SwapDirection.FROM}
+                  showBackButton={this.parameters.showBackButton}
+                  walletProviderName={this.parameters.walletProviderName}
+                  swapConfig={{
+                    customTitle: this.properties.config?.customTitle,
+                    customSubTitle: this.properties.config?.customSubTitle,
+                    showHeader: this.properties.config?.showHeader,
+                  }}
+                />
+              </Suspense>
+            </ConnectLoader>
+          </HandoverProvider>
+        </ThemeProvider>
+
       </React.StrictMode>,
     );
   }

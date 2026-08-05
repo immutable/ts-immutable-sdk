@@ -11,10 +11,6 @@ import {
   ViewContext,
 } from '../../../context/view-context/ViewContext';
 import { AddTokensWidgetViews } from '../../../context/view-context/AddTokensViewContextTypes';
-import {
-  useAnalytics,
-  UserJourney,
-} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { RiveStateMachineInput } from '../../../types/HandoverTypes';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { APPROVE_TXN_ANIMATION } from '../../../lib/squid/config';
@@ -30,10 +26,7 @@ interface ErrorConfig {
 }
 
 export const useError = (environment: Environment) => {
-  const { viewDispatch } = useContext(ViewContext);
-
-  const { page } = useAnalytics();
-  const { t } = useTranslation();
+  const { viewDispatch } = useContext(ViewContext); const { t } = useTranslation();
   const { addHandover, closeHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
@@ -151,17 +144,7 @@ export const useError = (environment: Environment) => {
 
   const showErrorHandover = (
     errorType: AddTokensErrorTypes,
-    data?: Record<string, unknown>,
   ) => {
-    page({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'Error',
-      extras: {
-        errorType,
-        ...data,
-      },
-    });
-
     addHandover({
       animationUrl: getRemoteRive(environment, APPROVE_TXN_ANIMATION),
       inputValue: RiveStateMachineInput.ERROR,

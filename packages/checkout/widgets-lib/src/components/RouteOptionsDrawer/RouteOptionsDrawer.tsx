@@ -2,11 +2,10 @@ import {
   Drawer, EllipsizedText, MenuItem,
 } from '@biom3/react';
 import { motion } from 'framer-motion';
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useRef } from 'react';
 
 import { Checkout } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../context/providers-context/ProvidersContext';
 import { listVariants } from '../../lib/animation/listAnimation';
 import { RouteData } from '../../lib/squid/types';
@@ -42,10 +41,8 @@ export function RouteOptionsDrawer({
   insufficientBalance,
 }: OptionsDrawerProps) {
   const { t } = useTranslation();
-  const { track } = useAnalytics();
-
   const {
-    addTokensState: { id, chains },
+    addTokensState: { chains },
   } = useContext(AddTokensContext);
 
   const {
@@ -58,27 +55,6 @@ export function RouteOptionsDrawer({
     selectedRouteIndex.current = index;
     onRouteClick(route);
   };
-
-  useEffect(() => {
-    if (!visible) {
-      return;
-    }
-
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'InputScreen',
-      control: 'RoutesMenu',
-      controlType: 'MenuItem',
-      action: 'Opened',
-      extras: {
-        contextId: id,
-        showOnrampOption: Boolean(showOnrampOption),
-        showSwapOption: Boolean(showSwapOption),
-        insufficientBalance: Boolean(insufficientBalance),
-        routesAvailable: routes?.length ?? 0,
-      },
-    });
-  }, [visible]);
 
   return (
     <Drawer

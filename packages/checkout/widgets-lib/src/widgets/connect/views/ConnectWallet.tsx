@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { Body, Box, Heading } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import { ChainId, ThemeOverrides } from '@imtbl/checkout-sdk';
@@ -7,7 +7,6 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { WalletList } from '../components/WalletList';
 import { ConnectContext } from '../context/ConnectContext';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface ConnectWalletProps {
   targetWalletRdns?: string,
@@ -36,16 +35,6 @@ export function ConnectWallet({
   const {
     connectState: { sendCloseEvent },
   } = useContext(ConnectContext);
-
-  const { page } = useAnalytics();
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.CONNECT,
-      screen: 'ConnectWallet',
-    });
-  }, []);
-
   return (
     <SimpleLayout
       testId="connect-wallet"

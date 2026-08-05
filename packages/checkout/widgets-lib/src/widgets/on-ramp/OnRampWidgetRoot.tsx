@@ -12,7 +12,6 @@ import { Base } from '../BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { isValidAddress, isValidAmount } from '../../lib/validations/widgetValidators';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
@@ -87,29 +86,29 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="onramp-container" config={this.strongConfig()}>
-            <HandoverProvider>
-              <ConnectLoader
-                widgetConfig={this.strongConfig()}
-                params={connectLoaderParams}
-                closeEvent={() => sendOnRampWidgetCloseEvent(window)}
-                goBackEvent={() => this.goBackEvent(window)}
-                showBackButton={this.parameters.showBackButton}
-              >
-                <Suspense fallback={<LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />}>
-                  <OnRampWidget
-                    tokenAddress={this.parameters.tokenAddress}
-                    amount={this.parameters.amount}
-                    config={this.strongConfig()}
-                    showBackButton={this.parameters.showBackButton}
-                    onrampConfig={this.properties.config}
-                  />
-                </Suspense>
-              </ConnectLoader>
-            </HandoverProvider>
-          </ThemeProvider>
-        </CustomAnalyticsProvider>
+
+        <ThemeProvider id="onramp-container" config={this.strongConfig()}>
+          <HandoverProvider>
+            <ConnectLoader
+              widgetConfig={this.strongConfig()}
+              params={connectLoaderParams}
+              closeEvent={() => sendOnRampWidgetCloseEvent(window)}
+              goBackEvent={() => this.goBackEvent(window)}
+              showBackButton={this.parameters.showBackButton}
+            >
+              <Suspense fallback={<LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />}>
+                <OnRampWidget
+                  tokenAddress={this.parameters.tokenAddress}
+                  amount={this.parameters.amount}
+                  config={this.strongConfig()}
+                  showBackButton={this.parameters.showBackButton}
+                  onrampConfig={this.properties.config}
+                />
+              </Suspense>
+            </ConnectLoader>
+          </HandoverProvider>
+        </ThemeProvider>
+
       </React.StrictMode>,
     );
   }

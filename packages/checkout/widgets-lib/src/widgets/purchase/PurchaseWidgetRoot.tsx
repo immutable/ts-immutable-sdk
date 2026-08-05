@@ -9,7 +9,6 @@ import {
 import React, { Suspense } from 'react';
 import { Base } from '../BaseWidgetRoot';
 import i18n from '../../i18n';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
 import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import { ProvidersContextProvider } from '../../context/providers-context/ProvidersContext';
@@ -70,29 +69,29 @@ export class Purchase extends Base<WidgetType.PURCHASE> {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="purchase-container" config={this.strongConfig()}>
-            <HandoverProvider>
-              <ProvidersContextProvider
-                initialState={{
-                  checkout: this.checkout,
-                }}
-              >
-                <Suspense
-                  fallback={
-                    <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+
+        <ThemeProvider id="purchase-container" config={this.strongConfig()}>
+          <HandoverProvider>
+            <ProvidersContextProvider
+              initialState={{
+                checkout: this.checkout,
+              }}
+            >
+              <Suspense
+                fallback={
+                  <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
                 }
-                >
-                  <PurchaseWidget
-                    config={this.strongConfig()}
-                    environmentId={this.parameters.environmentId!}
-                    items={this.parameters.items!}
-                  />
-                </Suspense>
-              </ProvidersContextProvider>
-            </HandoverProvider>
-          </ThemeProvider>
-        </CustomAnalyticsProvider>
+              >
+                <PurchaseWidget
+                  config={this.strongConfig()}
+                  environmentId={this.parameters.environmentId!}
+                  items={this.parameters.items!}
+                />
+              </Suspense>
+            </ProvidersContextProvider>
+          </HandoverProvider>
+        </ThemeProvider>
+
       </React.StrictMode>,
     );
   }

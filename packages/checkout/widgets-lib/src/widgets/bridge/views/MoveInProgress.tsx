@@ -1,7 +1,6 @@
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Badge, ButtCon } from '@biom3/react';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { ButtonNavigationStyles } from '../../../components/Header/HeaderStyles';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
@@ -13,8 +12,6 @@ import { sendBridgeTransactionSentEvent, sendBridgeWidgetCloseEvent } from '../B
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { BridgeContext } from '../context/BridgeContext';
-import { calculateCryptoToFiat } from '../../../lib/utils';
-import { CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 
 export interface MoveInProgressProps {
   transactionHash: string;
@@ -24,17 +21,10 @@ export interface MoveInProgressProps {
 export function MoveInProgress({ transactionHash, isTransfer }: MoveInProgressProps) {
   const { t } = useTranslation();
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const { page } = useAnalytics();
-
-  const { cryptoFiatState } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
   const {
     bridgeState: {
       checkout,
-      from,
-      to,
-      token,
-      amount,
     },
   } = useContext(BridgeContext);
 
@@ -43,20 +33,6 @@ export function MoveInProgress({ transactionHash, isTransfer }: MoveInProgressPr
       eventTarget,
       transactionHash,
     );
-
-    const fiatAmount = calculateCryptoToFiat(amount, token?.symbol ?? '', cryptoFiatState.conversions);
-    page({
-      userJourney: UserJourney.BRIDGE,
-      screen: 'InProgress',
-      extras: {
-        fromWalletAddress: from?.walletAddress,
-        toWalletAddress: to?.walletAddress,
-        amount,
-        fiatAmount,
-        tokenAddress: token?.address,
-        moveType: isTransfer ? 'transfer' : 'bridge',
-      },
-    });
   }, []);
 
   return (

@@ -8,7 +8,6 @@ import { TokenImage } from '../../TokenImage/TokenImage';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 import { CoinSelector } from '../../CoinSelector/CoinSelector';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
-import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface SelectFormProps {
   testId: string;
@@ -21,11 +20,7 @@ interface SelectFormProps {
   disabled?: boolean;
   onSelectChange: (value: string) => void;
   coinSelectorHeading: string;
-  defaultTokenImage: string;
-  userJourney: UserJourney;
-  screen: string;
-  control: string;
-  environment?: Environment;
+  defaultTokenImage: string;environment?: Environment;
   theme: WidgetTheme,
   themeOverrides: ThemeOverrides,
 }
@@ -42,14 +37,10 @@ export function SelectForm({
   selectedOption,
   coinSelectorHeading,
   defaultTokenImage,
-  userJourney,
-  screen,
-  control,
   environment = Environment.PRODUCTION,
   theme,
   themeOverrides,
 }: SelectFormProps) {
-  const { track } = useAnalytics();
   const [coinSelectorOpen, setCoinSelectorOpen] = useState<boolean>(false);
   const coinSelectorOptions = useMemo(() => options.map((option) => ({
     ...option,
@@ -71,14 +62,7 @@ export function SelectForm({
 
   const openCoinSelector = useCallback(() => {
     setCoinSelectorOpen(true);
-    track({
-      userJourney,
-      screen,
-      control,
-      controlType: 'Select',
-      action: 'Opened',
-    });
-  }, [setCoinSelectorOpen, track]);
+  }, [setCoinSelectorOpen]);
 
   return (
     <Box>

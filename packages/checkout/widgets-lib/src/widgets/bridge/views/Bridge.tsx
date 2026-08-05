@@ -6,7 +6,6 @@ import {
 } from 'react';
 import { ThemeOverrides, TokenFilterTypes, WidgetTheme } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -40,21 +39,7 @@ export function Bridge({
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const [isTokenBalancesLoading, setIsTokenBalancesLoading] = useState(false);
   const showBackButton = true;
-
-  const { page } = useAnalytics();
-
-  useEffect(() => {
-    if (amount || tokenAddress) {
-      page({
-        userJourney: UserJourney.BRIDGE,
-        screen: 'TokenAmount',
-        extras: {
-          amount,
-          tokenAddress,
-        },
-      });
-    }
-  }, []);
+  useEffect(() => { }, []);
 
   // This is used to refresh the balances after the Bridge widget
   // has been loaded so that processing transfers will be eventually

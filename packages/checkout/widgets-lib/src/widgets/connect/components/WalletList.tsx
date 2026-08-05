@@ -28,10 +28,6 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
-import {
-  useAnalytics,
-  UserJourney,
-} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
 import { walletListStyle } from './WalletListStyles';
@@ -48,9 +44,8 @@ import { WalletDrawer } from '../../../components/WalletDrawer/WalletDrawer';
 import { WalletChangeEvent } from '../../../components/WalletDrawer/WalletDrawerEvents';
 import { WalletConnectItem } from './WalletConnectItem';
 import { BrowserWalletItem } from './BrowserWalletItem';
-import { identifyUser } from '../../../lib/analytics/identifyUser';
 import { NonPassportWarningDrawer } from './NonPassportWarningDrawer';
-import { removeSpace } from '../../../lib/utils';
+import { } from '../../../lib/utils';
 
 export interface WalletListProps {
   targetWalletRdns?: string;
@@ -83,9 +78,7 @@ export function WalletList(props: WalletListProps) {
     connectDispatch,
     connectState: { checkout },
   } = useContext(ConnectContext);
-  const { viewDispatch } = useContext(ViewContext);
-  const { track, identify, user } = useAnalytics();
-  const { providers } = useInjectedProviders({ checkout });
+  const { viewDispatch } = useContext(ViewContext); const { providers } = useInjectedProviders({ checkout });
   const [showWalletDrawer, setShowWalletDrawer] = useState(false);
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
   const walletConnectItemRef = useRef(null);
@@ -191,13 +184,7 @@ export function WalletList(props: WalletListProps) {
           });
 
           // Set up EIP-1193 provider event listeners for widget root instances
-          addProviderListenersForWidgetRoot(connectResult.provider);
-
-          const userData = user ? await user() : undefined;
-          const anonymousId = userData?.anonymousId();
-          await identifyUser(identify, connectResult.provider, { anonymousId });
-
-          selectBrowserProvider(
+          addProviderListenersForWidgetRoot(connectResult.provider); selectBrowserProvider(
             browserProvider,
             getProviderSlugFromRdns(providerDetail.info.rdns),
           );
@@ -258,12 +245,6 @@ export function WalletList(props: WalletListProps) {
   };
 
   const handleWalletConnectConnection = async () => {
-    track({
-      userJourney: UserJourney.CONNECT,
-      screen: 'ConnectWallet',
-      control: 'WalletConnect',
-      controlType: 'MenuItem',
-    });
     await openWalletConnectModal({
       connectCallback,
       restoreSession: false,
@@ -272,19 +253,7 @@ export function WalletList(props: WalletListProps) {
 
   const handleWalletChange = async (event: WalletChangeEvent) => {
     const { providerDetail } = event;
-    setChosenProviderDetail(providerDetail);
-    track({
-      userJourney: UserJourney.CONNECT,
-      screen: 'ConnectWallet',
-      control: removeSpace(providerDetail.info.name),
-      controlType: 'MenuItem',
-      extras: {
-        wallet: getProviderSlugFromRdns(providerDetail.info.rdns),
-        walletRdns: providerDetail.info.rdns,
-        walletUuid: providerDetail.info.uuid,
-      },
-    });
-    await selectProviderDetail(providerDetail);
+    setChosenProviderDetail(providerDetail); await selectProviderDetail(providerDetail);
     setShowWalletDrawer(false);
   };
 
@@ -303,21 +272,9 @@ export function WalletList(props: WalletListProps) {
 
       setShowChangedYourMindDrawer(false);
       setShowUnableToConnectDrawer(false);
-      setChosenProviderDetail(providerDetail);
-      track({
-        userJourney: UserJourney.CONNECT,
-        screen: 'ConnectWallet',
-        control: removeSpace(providerDetail.info.name),
-        controlType: 'MenuItem',
-        extras: {
-          wallet: getProviderSlugFromRdns(providerDetail.info.rdns),
-          walletRdns: providerDetail.info.rdns,
-          walletUuid: providerDetail.info.uuid,
-        },
-      });
-      await selectProviderDetail(providerDetail);
+      setChosenProviderDetail(providerDetail); await selectProviderDetail(providerDetail);
     },
-    [track, checkout],
+    [checkout],
   );
 
   const onChosenProviderDetailChange = useCallback(() => {
@@ -326,14 +283,8 @@ export function WalletList(props: WalletListProps) {
   }, [chosenProviderDetail]);
 
   const onBrowserWalletsClick = useCallback(() => {
-    track({
-      userJourney: UserJourney.CONNECT,
-      screen: 'ConnectWallet',
-      control: 'BrowserWallets',
-      controlType: 'MenuItem',
-    });
     setShowWalletDrawer(true);
-  }, [track]);
+  }, []);
 
   useEffect(() => {
     // Auto-trigger wallet connection via rdns

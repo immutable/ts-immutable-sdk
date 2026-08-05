@@ -27,7 +27,6 @@ export function WithCard(props: WithCardProps) {
   const {
     recipientEmail,
     recipientAddress,
-    isPassportWallet,
     signResponse,
     goToErrorView,
     environment,
@@ -64,7 +63,6 @@ export function WithCard(props: WithCardProps) {
       type="nft-checkout"
       email={recipientEmail}
       walletAddress={recipientAddress}
-      isPassportWallet={isPassportWallet}
       exchangeScreenTitle={t('views.PAY_WITH_CARD.screenTitle')}
       nftData={nftData}
       calldata={executeTxn.rawData}

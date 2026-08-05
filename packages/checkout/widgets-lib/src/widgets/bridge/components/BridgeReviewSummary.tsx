@@ -17,8 +17,7 @@ import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewConte
 import { abbreviateAddress } from '../../../lib/addressUtils';
 import { CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import {
-  isMetaMaskProvider,
-  isPassportProvider,
+
   isWalletConnectProvider,
 } from '../../../lib/provider';
 import { calculateCryptoToFiat, getChainImage, isNativeToken } from '../../../lib/utils';
@@ -33,10 +32,6 @@ import {
   removeChainChangedListener,
 } from '../../../lib';
 import { useInterval } from '../../../lib/hooks/useInterval';
-import {
-  UserJourney,
-  useAnalytics,
-} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { NetworkSwitchDrawer } from '../../../components/NetworkSwitchDrawer/NetworkSwitchDrawer';
 import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
@@ -80,9 +75,6 @@ export function BridgeReviewSummary() {
     bridgeDispatch,
   } = useContext(BridgeContext);
   const { environment } = checkout.config;
-
-  const { track } = useAnalytics();
-
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const [loading, setLoading] = useState(false);
   const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
@@ -400,38 +392,6 @@ export function BridgeReviewSummary() {
       // eslint-disable-next-line no-console
       console.error('Current network check failed', err);
     }
-
-    track({
-      userJourney: UserJourney.BRIDGE,
-      screen: 'Summary',
-      control: 'Submit',
-      controlType: 'Button',
-      extras: {
-        fromWalletAddress: fromAddress,
-        fromNetwork,
-        fromWallet: {
-          address: fromAddress,
-          rdns: from?.walletProviderInfo?.rdns,
-          uuid: from?.walletProviderInfo?.uuid,
-          isPassportWallet: isPassportProvider(from?.browserProvider),
-          isMetaMask: isMetaMaskProvider(from?.browserProvider),
-        },
-        toWalletAddress: toAddress,
-        toNetwork,
-        toWallet: {
-          address: toAddress,
-          rdns: to?.walletProviderInfo?.rdns,
-          uuid: to?.walletProviderInfo?.uuid,
-          isPassportWallet: isPassportProvider(to?.browserProvider),
-          isMetaMask: isMetaMaskProvider(to?.browserProvider),
-        },
-        amount,
-        fiatAmount: fromFiatAmount,
-        tokenAddress: token?.address,
-        moveType: isTransfer ? 'transfer' : 'bridge',
-      },
-    });
-
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -589,14 +549,6 @@ export function BridgeReviewSummary() {
         gasFeeFiatValue={gasFeeFiatValue}
         gasFeeToken={estimates?.token}
         fees={formatFeeBreakdown()}
-        onFeesClick={() => {
-          track({
-            userJourney: UserJourney.BRIDGE,
-            screen: 'MoveCoins',
-            control: 'ViewFees',
-            controlType: 'Button',
-          });
-        }}
         sx={{ borderTopRightRadius: '0', borderTopLeftRadius: '0' }}
         loading={loading}
       />
