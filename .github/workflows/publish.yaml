@@ -103,7 +103,7 @@ jobs:
       # ! Do NOT remove any of these attestation subject paths - this will cause a Sev 0 incident !
 
       - name: Generate SDK Package Attestations
-        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # pin@v4.1.0
+        uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d # pin@v4.2.1
         with:
           subject-path: ./imtbl-*.tgz
 
