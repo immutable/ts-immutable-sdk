@@ -1,5 +1,26 @@
 import { ChainId, ChainName, ChainSlug } from '@imtbl/checkout-sdk';
 
+/**
+ * Parse a chain id as returned by an EIP-1193 provider (e.g. `eth_chainId`).
+ *
+ * EIP-695 specifies a hex-encoded quantity such as `0x343b`, but providers are
+ * inconsistent and may return a decimal string or a number instead. `Number()`
+ * handles all three.
+ *
+ * Do NOT reach for `parseInt(value, 10)` here: it silently returns 0 for hex
+ * input, which reads as "wrong network" for every chain. Use this helper so the
+ * radix decision lives in one tested place rather than at each call site.
+ *
+ * Returns `null` when the value cannot be parsed, so callers can tell an
+ * unknown chain apart from a legitimately parsed id.
+ */
+export function parseChainId(chainId: unknown): ChainId | null {
+  if (chainId === null || chainId === undefined || chainId === '') return null;
+  const parsed = Number(chainId);
+  if (!Number.isInteger(parsed) || parsed <= 0) return null;
+  return parsed as ChainId;
+}
+
 export function getChainNameById(chainId: ChainId): ChainName {
   switch (chainId) {
     case ChainId.ETHEREUM: return ChainName.ETHEREUM;

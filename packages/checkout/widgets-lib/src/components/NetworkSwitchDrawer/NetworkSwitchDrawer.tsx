@@ -8,7 +8,7 @@ import {
   Heading,
 } from '@biom3/react';
 import {
-  useCallback, useMemo, useEffect,
+  useCallback, useMemo, useEffect, useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChainId, Checkout, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
@@ -17,6 +17,7 @@ import { FooterLogo } from '../Footer/FooterLogo';
 import { getChainNameById } from '../../lib/chains';
 import {
   isMetaMaskProvider,
+  isPassportProvider,
   isWalletConnectProvider,
 } from '../../lib/provider';
 import { getRemoteImage } from '../../lib/utils';
@@ -38,6 +39,7 @@ export function NetworkSwitchDrawer({
   onNetworkSwitch,
 }: NetworkSwitchDrawerProps) {
   const { t } = useTranslation();
+  const [switchFailed, setSwitchFailed] = useState(false);
 
   const ethImageUrl = getRemoteImage(
     checkout.config.environment ?? Environment.PRODUCTION,
@@ -54,12 +56,21 @@ export function NetworkSwitchDrawer({
 
   const handleSwitchNetwork = useCallback(async () => {
     if (!checkout) return;
-    const switchNetworkResult = await checkout.switchNetwork({
-      provider,
-      chainId: targetChainId,
-    });
-    if (onNetworkSwitch) {
-      onNetworkSwitch(switchNetworkResult.provider);
+    try {
+      const switchNetworkResult = await checkout.switchNetwork({
+        provider,
+        chainId: targetChainId,
+      });
+      if (onNetworkSwitch) {
+        onNetworkSwitch(switchNetworkResult.provider);
+      }
+    } catch (err) {
+      // Without this catch the rejection is unhandled: the click handler returns
+      // a floating promise, so a failed switch surfaces only as a console error
+      // and floods error reporting instead of telling the user anything.
+      // eslint-disable-next-line no-console
+      console.error(err);
+      setSwitchFailed(true);
     }
   }, [checkout, provider, onNetworkSwitch, targetChainId]);
 
@@ -76,12 +87,30 @@ export function NetworkSwitchDrawer({
   );
 
   const walletDisplayName = useMemo(() => {
+    if (isPassportProvider(provider)) return 'Passport wallet';
     if (isMetaMaskProvider(provider)) return 'MetaMask wallet';
     if (isWalletConnect && walletConnectPeerName) return walletConnectPeerName;
     return 'wallet';
   }, [provider, isWalletConnect, walletConnectPeerName]);
 
+  // Passport rejects wallet_switchEthereumChain by design (see `switchWalletNetwork`
+  // in checkout-sdk), so offering a switch button leads the user to a dead end.
+  const cannotSwitch = isPassportProvider(provider);
+
   const requireManualSwitch = isWalletConnect && isMetaMaskMobileWalletPeer;
+
+  const bodyTextKey = useMemo(() => {
+    if (cannotSwitch) return 'drawers.networkSwitch.unsupportedSwitch.body';
+    if (switchFailed) return 'drawers.networkSwitch.switchFailed.body';
+    if (requireManualSwitch) return 'drawers.networkSwitch.manualSwitch.body';
+    return 'drawers.networkSwitch.controlledSwitch.body';
+  }, [cannotSwitch, switchFailed, requireManualSwitch]);
+
+  // Clear a previous failure when the drawer is reopened or the target changes,
+  // so a stale error message doesn't carry into a fresh attempt.
+  useEffect(() => {
+    if (visible) setSwitchFailed(false);
+  }, [visible, provider, targetChainId]);
 
   // Image preloading - load images into browser when component mounts
   // show cached images when drawer is made visible
@@ -140,8 +169,11 @@ export function NetworkSwitchDrawer({
               wallet: walletDisplayName,
             })}
           </Heading>
-          {/** MetaMask mobile requires manual switch */}
-          {requireManualSwitch && (
+          {/**
+            * Copy depends on whether the wallet can switch at all (Passport cannot),
+            * whether a previous attempt failed, and whether the wallet requires a
+            * manual switch (MetaMask mobile over WalletConnect).
+            */}
           <Body
             size="medium"
             weight="regular"
@@ -151,26 +183,11 @@ export function NetworkSwitchDrawer({
               paddingX: 'base.spacing.x6',
             }}
           >
-            {t('drawers.networkSwitch.manualSwitch.body', {
+            {t(bodyTextKey, {
               chain: targetChainName,
+              wallet: walletDisplayName,
             })}
           </Body>
-          )}
-          {!requireManualSwitch && (
-          <Body
-            size="medium"
-            weight="regular"
-            sx={{
-              color: 'base.color.text.body.secondary',
-              textAlign: 'center',
-              paddingX: 'base.spacing.x6',
-            }}
-          >
-            {t('drawers.networkSwitch.controlledSwitch.body', {
-              chain: targetChainName,
-            })}
-          </Body>
-          )}
         </Box>
 
         <Box sx={{
@@ -180,16 +197,19 @@ export function NetworkSwitchDrawer({
           width: '100%',
         }}
         >
-          {!requireManualSwitch && (
+          {!requireManualSwitch && !cannotSwitch && (
           <Button
             size="large"
             variant="primary"
             sx={{ width: '100%', marginBottom: 'base.spacing.x2' }}
             onClick={handleSwitchNetwork}
           >
-            {t('drawers.networkSwitch.switchButton', {
-              chain: targetChainName,
-            })}
+            {t(
+              switchFailed
+                ? 'drawers.networkSwitch.retryButton'
+                : 'drawers.networkSwitch.switchButton',
+              { chain: targetChainName },
+            )}
           </Button>
           )}
           <FooterLogo />
