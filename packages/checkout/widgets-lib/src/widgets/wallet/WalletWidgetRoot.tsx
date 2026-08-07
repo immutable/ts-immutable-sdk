@@ -96,8 +96,8 @@ export class Wallet extends Base<WidgetType.WALLET> {
                     config={this.strongConfig()}
                     walletConfig={{
                       showDisconnectButton:
-                        this.properties.config?.showDisconnectButton!,
-                      showNetworkMenu: this.properties.config?.showNetworkMenu!,
+                        this.properties.config?.showDisconnectButton ?? false,
+                      showNetworkMenu: this.properties.config?.showNetworkMenu ?? false,
                     }}
                   />
                 </Suspense>

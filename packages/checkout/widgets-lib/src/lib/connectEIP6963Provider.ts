@@ -43,9 +43,10 @@ export const connectEIP6963Provider = async (
       case CheckoutErrorType.USER_REJECTED_REQUEST_ERROR:
         throw new Error(
           ConnectEIP6963ProviderError.USER_REJECTED_REQUEST_ERROR,
+          { cause: error },
         );
       default:
-        throw new Error(ConnectEIP6963ProviderError.CONNECT_ERROR);
+        throw new Error(ConnectEIP6963ProviderError.CONNECT_ERROR, { cause: error });
     }
   }
 };

@@ -155,7 +155,7 @@ export class RelayerClient {
     } catch (parseError) {
       const preview = RelayerClient.getResponsePreview(responseText);
       // eslint-disable-next-line max-len
-      throw new Error(`Relayer JSON parse error: ${parseError instanceof Error ? parseError.message : 'Unknown error'}. Content: "${preview}"`);
+      throw new Error(`Relayer JSON parse error: ${parseError instanceof Error ? parseError.message : 'Unknown error'}. Content: "${preview}"`, { cause: parseError });
     }
 
     if (jsonResponse.error) {

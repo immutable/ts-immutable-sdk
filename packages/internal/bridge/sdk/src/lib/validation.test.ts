@@ -35,7 +35,7 @@ describe('Validation', () => {
       try {
         await validateChainConfiguration(bridgeConfig);
       } catch (error: any) {
-        throw new Error(`Should not have thrown an error, but threw ${error}`);
+        throw new Error(`Should not have thrown an error, but threw ${error}`, { cause: error });
       }
     });
 
@@ -107,7 +107,7 @@ describe('Validation', () => {
       try {
         await checkReceiver(tokenSent, destinationChainId, '0x123', config);
       } catch (error: any) {
-        throw new Error(`Should not have thrown an error, but threw ${error}`);
+        throw new Error(`Should not have thrown an error, but threw ${error}`, { cause: error });
       }
     });
 
@@ -125,7 +125,7 @@ describe('Validation', () => {
       try {
         await checkReceiver(tokenSent, destinationChainId, '0x123', config);
       } catch (error: any) {
-        throw new Error(`Should not have thrown an error, but threw ${error}`);
+        throw new Error(`Should not have thrown an error, but threw ${error}`, { cause: error });
       }
     });
 
@@ -147,7 +147,7 @@ describe('Validation', () => {
         await checkReceiver(tokenSent, destinationChainId, '0x123', config);
         expect(mockProvider.getCode).toHaveBeenCalledTimes(1);
       } catch (error: any) {
-        throw new Error(`Should not have thrown an error, but threw ${error}`);
+        throw new Error(`Should not have thrown an error, but threw ${error}`, { cause: error });
       }
     });
 
