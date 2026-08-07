@@ -231,7 +231,9 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       // suggest to top up base currency balance
       const smartCheckoutResult = fundingBalancesResult.find(
         (result) => result.currency.base,
-      )?.smartCheckoutResult!;
+      )?.smartCheckoutResult;
+      if (!smartCheckoutResult) return;
+
       const data = getTopUpViewData(
         smartCheckoutResult.transactionRequirements,
       );

@@ -235,7 +235,7 @@ export default class MagicTEESigner implements WalletSigner {
           errorMessage += `: ${(error as Error).message}`;
         }
 
-        throw new Error(errorMessage);
+        throw new Error(errorMessage, { cause: error });
       }
     }, 'magicSignMessage');
   }

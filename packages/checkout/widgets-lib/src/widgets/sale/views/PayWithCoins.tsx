@@ -89,7 +89,11 @@ export function PayWithCoins() {
       },
       (error, txns) => {
         const details = { transactionId: signResponse?.transactionId };
-        sendFailedEvent(error.toString(), error, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
+        // `error` is a SignOrderError ({ type, data }), not an Error. Its default
+        // toString is "[object Object]", so this event was reporting nothing
+        // useful — `type` is the field that identifies the failure.
+        const reason = error instanceof Error ? error.message : error.type;
+        sendFailedEvent(reason, error, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
         goToErrorView(error.type, error.data);
       },
       onTxnStepExecuteAll,

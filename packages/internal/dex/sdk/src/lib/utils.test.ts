@@ -25,7 +25,7 @@ const provider = {
       if (payload.to === USDC_TEST_TOKEN.address) {
         return USDC_TEST_TOKEN.decimals.toString(16);
       }
-      throw new Error(`Unrecognized ERC20: ${payload.to}`);
+      throw new Error(`Unrecognized ERC20: ${JSON.stringify(payload.to)}`);
     }
     throw new Error(`Call not supported: ${payload.data}`);
   }),

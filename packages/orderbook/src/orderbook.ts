@@ -94,7 +94,7 @@ export class Orderbook {
 
     if (config.overrides?.jsonRpcProviderUrl) {
       finalConfig.provider = getConfiguredProvider(
-        config.overrides?.jsonRpcProviderUrl!,
+        config.overrides.jsonRpcProviderUrl,
         config.baseConfig.rateLimitingKey,
       );
     }
@@ -778,7 +778,7 @@ export class Orderbook {
 
     if (orderResult.status.name !== OrderStatusName.ACTIVE) {
       throw new Error(
-        `Cannot fulfil order that is not active. Current status: ${orderResult.status}`,
+        `Cannot fulfil order that is not active. Current status: ${orderResult.status.name}`,
       );
     }
 

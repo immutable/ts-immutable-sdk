@@ -305,24 +305,28 @@ export function BridgeReviewSummary() {
   }, []);
 
   const handleNetworkSwitch = useCallback((provider: WrappedBrowserProvider) => {
+    // Both sides must already be selected — this only ever runs after the review
+    // screen has them. Bail rather than dispatching undefined into bridge state.
+    if (!from || !to) return;
+
     bridgeDispatch({
       payload: {
         type: BridgeActions.SET_WALLETS_AND_NETWORKS,
         from: {
           browserProvider: provider,
-          walletAddress: from?.walletAddress!,
-          walletProviderInfo: from?.walletProviderInfo!,
-          network: from?.network!,
+          walletAddress: from.walletAddress,
+          walletProviderInfo: from.walletProviderInfo,
+          network: from.network,
         },
         to: {
-          browserProvider: to?.browserProvider!,
-          walletAddress: to?.walletAddress!,
-          walletProviderInfo: to?.walletProviderInfo!,
-          network: to?.network!,
+          browserProvider: to.browserProvider,
+          walletAddress: to.walletAddress,
+          walletProviderInfo: to.walletProviderInfo,
+          network: to.network,
         },
       },
     });
-  }, [from?.browserProvider, from?.network, to?.browserProvider, to?.network]);
+  }, [from, to]);
 
   useEffect(() => {
     if (!from?.browserProvider) return;
@@ -627,14 +631,16 @@ export function BridgeReviewSummary() {
         </Button>
         )}
       </Box>
-      <NetworkSwitchDrawer
-        visible={showSwitchNetworkDrawer}
-        targetChainId={from?.network!}
-        provider={from?.browserProvider!}
-        checkout={checkout}
-        onCloseDrawer={() => setShowSwitchNetworkDrawer(false)}
-        onNetworkSwitch={handleNetworkSwitch}
-      />
+      {from && (
+        <NetworkSwitchDrawer
+          visible={showSwitchNetworkDrawer}
+          targetChainId={from.network}
+          provider={from.browserProvider}
+          checkout={checkout}
+          onCloseDrawer={() => setShowSwitchNetworkDrawer(false)}
+          onNetworkSwitch={handleNetworkSwitch}
+        />
+      )}
       <NotEnoughGas
         environment={checkout.config.environment}
         visible={showNotEnoughGasDrawer}
