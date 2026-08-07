@@ -51,6 +51,7 @@ import { BrowserWalletItem } from './BrowserWalletItem';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
 import { NonPassportWarningDrawer } from './NonPassportWarningDrawer';
 import { removeSpace } from '../../../lib/utils';
+import { parseChainId } from '../../../lib/chains';
 
 export interface WalletListProps {
   targetWalletRdns?: string;
@@ -136,11 +137,10 @@ export function WalletList(props: WalletListProps) {
   const handleConnectViewUpdate = async (provider: WrappedBrowserProvider) => {
     const isPassport = isPassportProvider(provider);
     const chainId = await provider.send!('eth_chainId', []);
-    // eslint-disable-next-line radix
-    const parsedChainId = parseInt(chainId.toString());
+    const parsedChainId = parseChainId(chainId);
     if (
       parsedChainId !== targetChainId
-      && !allowedChains?.includes(parsedChainId)
+      && !(parsedChainId && allowedChains?.includes(parsedChainId))
     ) {
       // TODO: What do we do with Passport here as it can't connect to L1
       if (isPassport) {

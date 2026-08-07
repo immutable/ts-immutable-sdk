@@ -1237,7 +1237,14 @@
       "controlledSwitch": {
         "body": "You'll need to switch to the {{chain}} network to proceed"
       },
-      "switchButton": "Switch to {{chain}}"
+      "unsupportedSwitch": {
+        "body": "Your {{wallet}} can't switch networks. Go back and choose a different wallet to use the {{chain}} network."
+      },
+      "switchFailed": {
+        "body": "We couldn't switch to the {{chain}} network. Check your {{wallet}} and try again."
+      },
+      "switchButton": "Switch to {{chain}}",
+      "retryButton": "Try again"
     },
     "walletConnectionError": {
       "unableToConnect": {

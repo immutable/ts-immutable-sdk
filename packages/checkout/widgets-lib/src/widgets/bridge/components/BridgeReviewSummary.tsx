@@ -22,6 +22,7 @@ import {
   isWalletConnectProvider,
 } from '../../../lib/provider';
 import { calculateCryptoToFiat, getChainImage, isNativeToken } from '../../../lib/utils';
+import { parseChainId } from '../../../lib/chains';
 import {
   DEFAULT_QUOTE_REFRESH_INTERVAL,
   DEFAULT_TOKEN_DECIMALS,
@@ -391,7 +392,7 @@ export function BridgeReviewSummary() {
         return;
       }
       const currentChainId = await provider.send('eth_chainId', []);
-      const parsedChainId = parseInt(String(currentChainId), 10);
+      const parsedChainId = parseChainId(currentChainId);
       if (parsedChainId !== from?.network) {
         setShowSwitchNetworkDrawer(true);
         return;
