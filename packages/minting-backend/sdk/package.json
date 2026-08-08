@@ -8,7 +8,6 @@
     "@imtbl/blockchain-data": "workspace:*",
     "@imtbl/config": "workspace:*",
     "@imtbl/generated-clients": "workspace:*",
-    "@imtbl/metrics": "workspace:*",
     "@imtbl/webhook": "workspace:*",
     "uuid": "catalog:web3"
   },

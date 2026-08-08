@@ -12,7 +12,6 @@ export const sendDeployTransactionAndPersonalSign = async ({
   relayerClient,
   guardianClient,
   zkEvmAddress,
-  flow,
 }: EthSendDeployTransactionParams): Promise<string> => {
   const deployTransaction = { to: zkEvmAddress, value: 0n };
 
@@ -23,7 +22,6 @@ export const sendDeployTransactionAndPersonalSign = async ({
     guardianClient,
     relayerClient,
     zkEvmAddress,
-    flow,
   });
 
   return guardianClient.withConfirmationScreen()(async () => {
@@ -34,10 +32,9 @@ export const sendDeployTransactionAndPersonalSign = async ({
       rpcProvider,
       guardianClient,
       relayerClient,
-      flow,
     });
 
-    await pollRelayerTransaction(relayerClient, relayerId, flow);
+    await pollRelayerTransaction(relayerClient, relayerId);
 
     return signedMessage;
   });

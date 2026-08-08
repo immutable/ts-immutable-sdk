@@ -11,7 +11,6 @@ export const sendTransaction = async ({
   relayerClient,
   guardianClient,
   zkEvmAddress,
-  flow,
   nonceSpace,
   isBackgroundTransaction = false,
 }: EthSendTransactionParams): Promise<string> => {
@@ -24,11 +23,10 @@ export const sendTransaction = async ({
     guardianClient,
     relayerClient,
     zkEvmAddress,
-    flow,
     nonceSpace,
     isBackgroundTransaction,
   });
 
-  const { hash } = await pollRelayerTransaction(relayerClient, relayerId, flow);
+  const { hash } = await pollRelayerTransaction(relayerClient, relayerId);
   return hash;
 };

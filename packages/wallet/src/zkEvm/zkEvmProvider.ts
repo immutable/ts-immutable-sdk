@@ -1,7 +1,5 @@
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import {
-  Flow, identify, trackError, trackFlow,
-} from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
 import {
   createPublicClient,
   http,
@@ -165,14 +163,13 @@ export class ZkEvmProvider implements Provider {
     // we can submit a session activity request per SCW in parallel without a SCW
     // INVALID_NONCE error.
     const nonceSpace: bigint = BigInt(1);
-    const sendTransactionClosure = async (params: Array<any>, flow: Flow) => await sendTransaction({
+    const sendTransactionClosure = async (params: Array<any>) => await sendTransaction({
       params,
       ethSigner: this.#ethSigner,
       guardianClient: this.#guardianClient,
       rpcProvider: this.#rpcProvider,
       relayerClient: this.#relayerClient,
       zkEvmAddress,
-      flow,
       nonceSpace,
       isBackgroundTransaction: true,
     });
@@ -206,7 +203,7 @@ export class ZkEvmProvider implements Provider {
         const zkEvmAddress = await this.#getZkEvmAddress();
         if (zkEvmAddress) return [zkEvmAddress];
 
-        const flow = trackFlow('passport', 'ethRequestAccounts');
+        track('passport', 'ethRequestAccounts');
 
         try {
           // Get user via getUser function
@@ -217,27 +214,21 @@ export class ZkEvmProvider implements Provider {
               'User not authenticated. Please log in first.',
             );
           }
-          flow.addEvent('endGetUser');
 
           let userZkEvmEthAddress: string | undefined;
 
           if (!isZkEvmUser(user)) {
-            flow.addEvent('startUserRegistration');
-
             userZkEvmEthAddress = await registerZkEvmUser({
               ethSigner: this.#ethSigner,
               getUser: this.#getUser,
               multiRollupApiClients: this.#multiRollupApiClients,
               accessToken: user.accessToken,
               rpcProvider: this.#rpcProvider,
-              flow,
             });
-            flow.addEvent('endUserRegistration');
 
             // Force refresh to update session with zkEvm claims from IDP
             // This ensures subsequent getUser() calls return the updated user
             await this.#getUser(true);
-            flow.addEvent('endForceRefresh');
           } else {
             userZkEvmEthAddress = user.zkEvm.ethAddress;
           }
@@ -245,20 +236,13 @@ export class ZkEvmProvider implements Provider {
           this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [
             userZkEvmEthAddress,
           ]);
-          identify({
-            passportId: user.profile.sub,
-          });
           this.#callSessionActivity(userZkEvmEthAddress);
           return [userZkEvmEthAddress];
         } catch (error) {
           if (error instanceof Error) {
-            trackError('passport', 'ethRequestAccounts', error, { flowId: flow.details.flowId });
-          } else {
-            flow.addEvent('errored');
+            track('passport', 'ethRequestAccounts', { error });
           }
           throw error;
-        } finally {
-          flow.addEvent('End');
         }
       }
       case 'eth_sendTransaction': {
@@ -270,7 +254,7 @@ export class ZkEvmProvider implements Provider {
           );
         }
 
-        const flow = trackFlow('passport', 'ethSendTransaction');
+        track('passport', 'ethSendTransaction');
 
         try {
           return await this.#guardianClient.withConfirmationScreen({
@@ -283,17 +267,12 @@ export class ZkEvmProvider implements Provider {
             rpcProvider: this.#rpcProvider,
             relayerClient: this.#relayerClient,
             zkEvmAddress,
-            flow,
           }));
         } catch (error) {
           if (error instanceof Error) {
-            trackError('passport', 'eth_sendTransaction', error, { flowId: flow.details.flowId });
-          } else {
-            flow.addEvent('errored');
+            track('passport', 'eth_sendTransaction', { error });
           }
           throw error;
-        } finally {
-          flow.addEvent('End');
         }
       }
       case 'eth_accounts': {
@@ -309,7 +288,7 @@ export class ZkEvmProvider implements Provider {
           );
         }
 
-        const flow = trackFlow('passport', 'personalSign');
+        track('passport', 'personalSign');
 
         try {
           return await this.#guardianClient.withConfirmationScreen({
@@ -329,7 +308,6 @@ export class ZkEvmProvider implements Provider {
                   rpcProvider: this.#rpcProvider,
                   guardianClient: this.#guardianClient,
                   relayerClient: this.#relayerClient,
-                  flow,
                 });
               }
             }
@@ -341,18 +319,13 @@ export class ZkEvmProvider implements Provider {
               rpcProvider: this.#rpcProvider,
               guardianClient: this.#guardianClient,
               relayerClient: this.#relayerClient,
-              flow,
             });
           });
         } catch (error) {
           if (error instanceof Error) {
-            trackError('passport', 'personal_sign', error, { flowId: flow.details.flowId });
-          } else {
-            flow.addEvent('errored');
+            track('passport', 'personal_sign', { error });
           }
           throw error;
-        } finally {
-          flow.addEvent('End');
         }
       }
       case 'eth_signTypedData':
@@ -365,7 +338,7 @@ export class ZkEvmProvider implements Provider {
           );
         }
 
-        const flow = trackFlow('passport', 'ethSignTypedDataV4');
+        track('passport', 'ethSignTypedDataV4');
 
         try {
           return await this.#guardianClient.withConfirmationScreen({
@@ -378,17 +351,12 @@ export class ZkEvmProvider implements Provider {
             rpcProvider: this.#rpcProvider,
             relayerClient: this.#relayerClient,
             guardianClient: this.#guardianClient,
-            flow,
           }));
         } catch (error) {
           if (error instanceof Error) {
-            trackError('passport', 'eth_signTypedData', error, { flowId: flow.details.flowId });
-          } else {
-            flow.addEvent('errored');
+            track('passport', 'eth_signTypedData', { error });
           }
           throw error;
-        } finally {
-          flow.addEvent('End');
         }
       }
       case 'eth_chainId': {
@@ -441,24 +409,19 @@ export class ZkEvmProvider implements Provider {
           );
         }
 
-        const flow = trackFlow('passport', 'imSignEjectionTransaction');
+        track('passport', 'imSignEjectionTransaction');
 
         try {
           return await signEjectionTransaction({
             params: request.params || [],
             ethSigner: this.#ethSigner,
             zkEvmAddress,
-            flow,
           });
         } catch (error) {
           if (error instanceof Error) {
-            trackError('passport', 'imSignEjectionTransaction', error, { flowId: flow.details.flowId });
-          } else {
-            flow.addEvent('errored');
+            track('passport', 'imSignEjectionTransaction', { error });
           }
           throw error;
-        } finally {
-          flow.addEvent('End');
         }
       }
       case 'im_addSessionActivity': {

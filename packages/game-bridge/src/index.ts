@@ -1,12 +1,7 @@
 /* eslint-disable no-console */
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
-import {
-  track,
-  trackError,
-  trackDuration,
-  identify,
-} from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
 // eslint-disable-next-line import/no-duplicates
 import * as ethers from 'ethers';
 // eslint-disable-next-line import/no-duplicates
@@ -246,7 +241,7 @@ window.callFunction = async (jsonData: string) => {
 
           try {
             passportClient = new passport.Passport(passportConfig);
-            trackDuration(moduleName, 'initialisedPassport', mt(markStart));
+            track(moduleName, 'initialisedPassport', { durationMs: mt(markStart) });
           } catch (initError) {
             console.error('[GAME-BRIDGE] Error creating Passport client:', initError);
             throw initError;
@@ -274,9 +269,7 @@ window.callFunction = async (jsonData: string) => {
         };
         console.log(`Version check: ${JSON.stringify(versionInfo)}`);
 
-        trackDuration(moduleName, 'completedInitGameBridge', mt(markStart), {
-          ...versionInfo,
-        });
+        track(moduleName, 'completedInitGameBridge', { durationMs: mt(markStart) });
         break;
       }
       case PASSPORT_FUNCTIONS.relogin: {
@@ -289,10 +282,7 @@ window.callFunction = async (jsonData: string) => {
           throw new Error('Failed to re-login');
         }
 
-        identify({ passportId: userInfo?.sub });
-        trackDuration(moduleName, 'performedRelogin', mt(markStart), {
-          succeeded,
-        });
+        track(moduleName, 'performedRelogin', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -306,7 +296,7 @@ window.callFunction = async (jsonData: string) => {
         const directLoginOptions: passport.DirectLoginOptions | undefined = request?.directLoginOptions;
         const imPassportTraceId: string | undefined = request?.imPassportTraceId;
         const url = await getPassportClient().loginWithPKCEFlow(directLoginOptions, imPassportTraceId);
-        trackDuration(moduleName, 'performedGetPkceAuthUrl', mt(markStart));
+        track(moduleName, 'performedGetPkceAuthUrl', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -318,12 +308,11 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.loginPKCE: {
         const request = JSON.parse(data);
-        const profile = await getPassportClient().loginWithPKCEFlowCallback(
+        await getPassportClient().loginWithPKCEFlowCallback(
           request.authorizationCode,
           request.state,
         );
-        identify({ passportId: profile.sub });
-        trackDuration(moduleName, 'performedLoginPkce', mt(markStart));
+        track(moduleName, 'performedLoginPkce', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -335,7 +324,7 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.logout: {
         const logoutUrl = await getPassportClient().getLogoutUrl();
         zkEvmProviderInstance = null;
-        trackDuration(moduleName, 'performedGetLogoutUrl', mt(markStart));
+        track(moduleName, 'performedGetLogoutUrl', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -353,7 +342,7 @@ window.callFunction = async (jsonData: string) => {
           throw new Error('No access token');
         }
 
-        trackDuration(moduleName, 'performedGetAccessToken', mt(markStart));
+        track(moduleName, 'performedGetAccessToken', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -371,7 +360,7 @@ window.callFunction = async (jsonData: string) => {
           throw new Error('No ID token');
         }
 
-        trackDuration(moduleName, 'performedGetIdToken', mt(markStart));
+        track(moduleName, 'performedGetIdToken', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -389,7 +378,7 @@ window.callFunction = async (jsonData: string) => {
           throw new Error('No email');
         }
 
-        trackDuration(moduleName, 'performedGetEmail', mt(markStart));
+        track(moduleName, 'performedGetEmail', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -407,7 +396,7 @@ window.callFunction = async (jsonData: string) => {
           throw new Error('No Passport ID');
         }
 
-        trackDuration(moduleName, 'performedGetPassportId', mt(markStart));
+        track(moduleName, 'performedGetPassportId', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -419,7 +408,7 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.getLinkedAddresses: {
         const linkedAddresses = await getPassportClient().getLinkedAddresses();
-        trackDuration(moduleName, 'performedGetLinkedAddresses', mt(markStart));
+        track(moduleName, 'performedGetLinkedAddresses', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -432,7 +421,7 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.storeTokens: {
         const tokenResponse = JSON.parse(data);
         const response = await getPassportClient().storeTokens(tokenResponse);
-        trackDuration(moduleName, 'performedStoreTokens', mt(markStart));
+        track(moduleName, 'performedStoreTokens', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -450,9 +439,7 @@ window.callFunction = async (jsonData: string) => {
           throw new Error('Failed to connect to EVM');
         }
 
-        trackDuration(moduleName, 'performedZkevmConnectEvm', mt(markStart), {
-          succeeded: providerSet,
-        });
+        track(moduleName, 'performedZkevmConnectEvm', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -473,11 +460,7 @@ window.callFunction = async (jsonData: string) => {
           throw new Error('Failed to send transaction');
         }
 
-        trackDuration(moduleName, 'performedZkevmSendTransaction', mt(markStart), {
-          requestId,
-          transactionRequest: JSON.stringify(transaction),
-          transactionResponse: transactionHash,
-        });
+        track(moduleName, 'performedZkevmSendTransaction', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -495,11 +478,7 @@ window.callFunction = async (jsonData: string) => {
 
         const tx = await signer.sendTransaction(transaction);
         const response = await tx.wait();
-        trackDuration(moduleName, 'performedZkevmSendTransactionWithConfirmation', mt(markStart), {
-          requestId,
-          transactionRequest: JSON.stringify(transaction),
-          transactionResponse: JSON.stringify(response?.toJSON()),
-        });
+        track(moduleName, 'performedZkevmSendTransactionWithConfirmation', { durationMs: mt(markStart) });
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -527,9 +506,7 @@ window.callFunction = async (jsonData: string) => {
           throw new Error('Failed to sign payload');
         }
 
-        trackDuration(moduleName, 'performedZkevmSignTypedDataV4', mt(markStart), {
-          requestId,
-        });
+        track(moduleName, 'performedZkevmSignTypedDataV4', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -549,7 +526,7 @@ window.callFunction = async (jsonData: string) => {
           throw new Error('Failed to request accounts');
         }
 
-        trackDuration(moduleName, 'performedZkevmRequestAccounts', mt(markStart));
+        track(moduleName, 'performedZkevmRequestAccounts', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -571,7 +548,7 @@ window.callFunction = async (jsonData: string) => {
           throw new Error('Failed to get balance');
         }
 
-        trackDuration(moduleName, 'performedZkevmGetBalance', mt(markStart));
+        track(moduleName, 'performedZkevmGetBalance', { durationMs: mt(markStart) });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -593,7 +570,7 @@ window.callFunction = async (jsonData: string) => {
           throw new Error('Failed to get transaction receipt');
         }
 
-        trackDuration(moduleName, 'performedZkevmGetTransactionReceipt', mt(markStart));
+        track(moduleName, 'performedZkevmGetTransactionReceipt', { durationMs: mt(markStart) });
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -647,17 +624,8 @@ window.callFunction = async (jsonData: string) => {
       ? error?.type
       : undefined;
 
-    trackError(moduleName, fxName, wrappedError, {
-      fxName,
-      requestId,
-      errorType,
-      ...versionInfo,
-    });
-    trackDuration(moduleName, 'failedCallFunction', mt(markStart), {
-      fxName,
-      requestId,
-      error: wrappedError.message,
-    });
+    track(moduleName, fxName, { error: wrappedError });
+    track(moduleName, 'failedCallFunction', { durationMs: mt(markStart) });
 
     console.log('callFunction error', wrappedError);
     console.log('callFunction errorType', errorType);

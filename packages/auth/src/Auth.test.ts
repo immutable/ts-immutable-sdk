@@ -3,19 +3,15 @@ import { AuthEvents, User } from './types';
 import { withMetricsAsync } from './utils/metrics';
 import { decodeJwtPayload } from './utils/jwt';
 
-const trackFlowMock = jest.fn();
-const trackErrorMock = jest.fn();
-const identifyMock = jest.fn();
 const trackMock = jest.fn();
-const getDetailMock = jest.fn();
+const getRuntimeIdMock = jest.fn();
 
 jest.mock('@imtbl/metrics', () => ({
-  Detail: { RUNTIME_ID: 'runtime-id' },
-  trackFlow: (...args: any[]) => trackFlowMock(...args),
-  trackError: (...args: any[]) => trackErrorMock(...args),
-  identify: (...args: any[]) => identifyMock(...args),
   track: (...args: any[]) => trackMock(...args),
-  getDetail: (...args: any[]) => getDetailMock(...args),
+}));
+
+jest.mock('./utils/runtimeId', () => ({
+  getRuntimeId: (...args: any[]) => getRuntimeIdMock(...args),
 }));
 
 jest.mock('./utils/jwt', () => ({
@@ -23,58 +19,42 @@ jest.mock('./utils/jwt', () => ({
 }));
 
 beforeEach(() => {
-  trackFlowMock.mockReset();
-  trackErrorMock.mockReset();
-  identifyMock.mockReset();
   trackMock.mockReset();
-  getDetailMock.mockReset();
+  getRuntimeIdMock.mockReset();
   (decodeJwtPayload as jest.Mock).mockReset();
 });
 
 describe('withMetricsAsync', () => {
-  it('resolves with function result and tracks flow', async () => {
-    const flow = {
-      addEvent: jest.fn(),
-      details: { flowId: 'flow-id' },
-    };
-    trackFlowMock.mockReturnValue(flow);
-
+  it('resolves with function result and tracks method', async () => {
     const result = await withMetricsAsync(async () => 'done', 'login');
 
     expect(result).toEqual('done');
-    expect(trackFlowMock).toHaveBeenCalledWith('passport', 'login', true);
-    expect(flow.addEvent).toHaveBeenCalledWith('End');
+    expect(trackMock).toHaveBeenCalledWith('passport', 'login');
   });
 
   it('tracks error when function throws', async () => {
-    const flow = {
-      addEvent: jest.fn(),
-      details: { flowId: 'flow-id' },
-    };
-    trackFlowMock.mockReturnValue(flow);
     const error = new Error('boom');
 
     await expect(withMetricsAsync(async () => {
       throw error;
     }, 'login')).rejects.toThrow(error);
 
-    expect(trackErrorMock).toHaveBeenCalledWith('passport', 'login', error, { flowId: 'flow-id' });
-    expect(flow.addEvent).toHaveBeenCalledWith('End');
+    expect(trackMock).toHaveBeenCalledWith('passport', 'login');
+    expect(trackMock).toHaveBeenCalledWith('passport', 'login', { error });
   });
 
-  it('does not fail when non-error is thrown', async () => {
-    const flow = {
-      addEvent: jest.fn(),
-      details: { flowId: 'flow-id' },
-    };
-    trackFlowMock.mockReturnValue(flow);
-
+  it('does not track error payload when non-error is thrown', async () => {
     const nonError = { message: 'failure' };
     await expect(withMetricsAsync(async () => {
       throw nonError as unknown as Error;
     }, 'login')).rejects.toBe(nonError);
 
-    expect(flow.addEvent).toHaveBeenCalledWith('errored');
+    expect(trackMock).toHaveBeenCalledWith('passport', 'login');
+    expect(trackMock).not.toHaveBeenCalledWith(
+      'passport',
+      'login',
+      expect.objectContaining({ error: expect.anything() }),
+    );
   });
 });
 
@@ -104,7 +84,6 @@ describe('Auth', () => {
 
       expect(loginWithPopup).toHaveBeenCalledTimes(1);
       expect((auth as any).eventEmitter.emit).toHaveBeenCalledWith(AuthEvents.LOGGED_IN, user);
-      expect(identifyMock).toHaveBeenCalledWith({ passportId: user.profile.sub });
     });
 
     it('returns cached user without triggering login', async () => {
@@ -120,7 +99,6 @@ describe('Auth', () => {
       expect(user).toBe(cachedUser);
       expect((auth as any).loginWithPopup).not.toHaveBeenCalled();
       expect((auth as any).eventEmitter.emit).not.toHaveBeenCalled();
-      expect(identifyMock).not.toHaveBeenCalled();
     });
   });
 
@@ -128,7 +106,7 @@ describe('Auth', () => {
     it('omits third_party_a_id when no anonymous id is provided', () => {
       const auth = Object.create(Auth.prototype) as Auth;
       (auth as any).userManager = { settings: { extraQueryParams: {} } };
-      getDetailMock.mockReturnValue('runtime-id-value');
+      getRuntimeIdMock.mockReturnValue('runtime-id-value');
 
       const params = (auth as any).buildExtraQueryParams();
 
@@ -454,7 +432,7 @@ describe('Auth', () => {
       (auth as any).config = {
         popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
       };
-      getDetailMock.mockReturnValue('runtime-id-value');
+      getRuntimeIdMock.mockReturnValue('runtime-id-value');
 
       const user = await (auth as any).loginWithPopup({
         directLoginMethod: 'google',
@@ -487,7 +465,7 @@ describe('Auth', () => {
       (auth as any).config = {
         popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
       };
-      getDetailMock.mockReturnValue('runtime-id-value');
+      getRuntimeIdMock.mockReturnValue('runtime-id-value');
 
       await (auth as any).loginWithPopup({
         directLoginMethod: 'google',
@@ -513,7 +491,7 @@ describe('Auth', () => {
       (auth as any).config = {
         popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
       };
-      getDetailMock.mockReturnValue('runtime-id-value');
+      getRuntimeIdMock.mockReturnValue('runtime-id-value');
 
       await expect((auth as any).loginWithPopup({
         directLoginMethod: 'google',
