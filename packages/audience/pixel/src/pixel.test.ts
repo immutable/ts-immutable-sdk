@@ -478,6 +478,7 @@ describe('Pixel', () => {
         { forms: undefined, clicks: undefined },
         expect.any(Function),
         expect.any(Function),
+        expect.any(String),
       );
     });
 
@@ -494,6 +495,7 @@ describe('Pixel', () => {
         { forms: false, clicks: true },
         expect.any(Function),
         expect.any(Function),
+        expect.any(String),
       );
     });
 
@@ -510,6 +512,7 @@ describe('Pixel', () => {
         expect.objectContaining({ scroll: false }),
         expect.any(Function),
         expect.any(Function),
+        expect.any(String),
       );
     });
 

@@ -123,6 +123,7 @@ export class Pixel {
       { forms: autocapture?.forms, clicks: autocapture?.clicks, scroll: autocapture?.scroll },
       (eventName, properties) => this.track(eventName, properties),
       () => this.consent!.level,
+      this.publishableKey,
     );
     this.teardownAutocapture = autocaptureResult.teardown;
     this.resetScrollDepth = autocaptureResult.resetScroll;
@@ -135,7 +136,7 @@ export class Pixel {
     this.resetScrollDepth?.();
 
     this.sessionId = getOrCreateSessionId(this.domain);
-    const attribution = collectSessionAttribution();
+    const attribution = collectSessionAttribution(this.publishableKey);
     const thirdPartyIds = collectThirdPartyIds();
 
     const message: PageMessage = {
