@@ -78,12 +78,36 @@ function refreshBackoffWithJitter(attemptNumber: number): number {
   return base * (0.5 + Math.random() * 0.5);
 }
 
-// OAuth error codes that indicate a server-side fault rather than a verdict on the
-// refresh token itself. Any other ErrorResponse is a definitive rejection.
-const TRANSIENT_OAUTH_ERROR_CODES = new Set(['server_error', 'temporarily_unavailable']);
+// OAuth error codes that are a definitive verdict on the refresh token or client —
+// the session cannot be recovered by retrying, so the stored user must be removed.
+// Sources:
+// - RFC 6749 §5.2 (token endpoint error codes, invalid_request..invalid_scope):
+//   https://datatracker.ietf.org/doc/html/rfc6749#section-5.2
+// - OIDC Core §3.1.2.6 (access_denied, login_required, consent_required,
+//   interaction_required, account_selection_required):
+//   https://openid.net/specs/openid-connect-core-1_0.html#AuthError
+// Anything else (RFC 6749's server_error / temporarily_unavailable, Auth0's
+// too_many_requests rate-limit code, unknown/custom codes) is treated as transient:
+// oidc-client-ts throws ErrorResponse for ANY non-OK response whose body has an
+// `error` field — including 429s and 5xxs — so an allowlist of fatal codes is the
+// only safe way to avoid destroying a still-valid session.
+// Auth0 rate limits: https://auth0.com/docs/troubleshoot/customer-support/operational-policies/rate-limit-policy
+const PERMANENT_OAUTH_ERROR_CODES = new Set([
+  'invalid_request',
+  'invalid_client',
+  'invalid_grant',
+  'unauthorized_client',
+  'unsupported_grant_type',
+  'invalid_scope',
+  'access_denied',
+  'login_required',
+  'consent_required',
+  'interaction_required',
+  'account_selection_required',
+]);
 
 const isPermanentRefreshError = (error: unknown): boolean => (
-  error instanceof ErrorResponse && !TRANSIENT_OAUTH_ERROR_CODES.has(error.error ?? '')
+  error instanceof ErrorResponse && PERMANENT_OAUTH_ERROR_CODES.has(error.error ?? '')
 );
 
 const extractTokenErrorMessage = (
@@ -831,7 +855,9 @@ export class Auth {
             passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
             errorMessage = `${errorMessage}: ${err.message}`;
           } else if (err instanceof ErrorResponse) {
-            passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
+            passportErrorType = removeUser
+              ? PassportErrorType.NOT_LOGGED_IN_ERROR
+              : PassportErrorType.AUTHENTICATION_ERROR;
             errorMessage = `${errorMessage}: ${err.message || err.error_description}`;
           } else if (err instanceof Error) {
             errorMessage = `${errorMessage}: ${err.message}`;

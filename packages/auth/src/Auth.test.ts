@@ -414,6 +414,41 @@ describe('Auth', () => {
       }
     });
 
+    it('retries too_many_requests OAuth errors (rate limit) and keeps the user', async () => {
+      jest.useFakeTimers();
+      try {
+        const auth = Object.create(Auth.prototype) as Auth;
+        const mockEventEmitter = { emit: jest.fn() };
+        const mockUserManager = {
+          signinSilent: jest.fn(),
+          removeUser: jest.fn().mockResolvedValue(undefined),
+        };
+
+        // oidc-client-ts surfaces any non-OK response with an `error` body field as
+        // an ErrorResponse, including 429s — these must not destroy the session
+        const { ErrorResponse } = jest.requireActual('oidc-client-ts');
+        const errorResponse = new ErrorResponse({
+          error: 'too_many_requests',
+          error_description: 'Rate limit exceeded',
+        });
+        mockUserManager.signinSilent.mockRejectedValue(errorResponse);
+
+        (auth as any).eventEmitter = mockEventEmitter;
+        (auth as any).userManager = mockUserManager;
+        (auth as any).refreshingPromise = null;
+
+        const assertion = expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
+        await jest.advanceTimersByTimeAsync(6000);
+        await assertion;
+
+        expect(mockUserManager.signinSilent).toHaveBeenCalledTimes(3);
+        expect(mockEventEmitter.emit).not.toHaveBeenCalled();
+        expect(mockUserManager.removeUser).not.toHaveBeenCalled();
+      } finally {
+        jest.useRealTimers();
+      }
+    });
+
     it('retries unknown errors and keeps the user', async () => {
       jest.useFakeTimers();
       try {
