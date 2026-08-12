@@ -205,6 +205,7 @@ describe('Auth', () => {
       const mockEventEmitter = { emit: jest.fn() };
       const mockUserManager = {
         signinSilent: jest.fn().mockResolvedValue(mockOidcUser),
+        getUser: jest.fn().mockResolvedValue({ refresh_token: 'stored-refresh-token' }),
       };
 
       (auth as any).eventEmitter = mockEventEmitter;
@@ -229,6 +230,7 @@ describe('Auth', () => {
       const mockEventEmitter = { emit: jest.fn() };
       const mockUserManager = {
         signinSilent: jest.fn().mockResolvedValue(null),
+        getUser: jest.fn().mockResolvedValue({ refresh_token: 'stored-refresh-token' }),
       };
 
       (auth as any).eventEmitter = mockEventEmitter;
@@ -252,6 +254,7 @@ describe('Auth', () => {
           }),
         ),
         removeUser: jest.fn().mockResolvedValue(undefined),
+        getUser: jest.fn().mockResolvedValue({ refresh_token: 'stored-refresh-token' }),
       };
 
       // Make the error an instance of ErrorResponse
@@ -285,6 +288,7 @@ describe('Auth', () => {
       const mockUserManager = {
         signinSilent: jest.fn(),
         removeUser: jest.fn().mockResolvedValue(undefined),
+        getUser: jest.fn().mockResolvedValue({ refresh_token: 'stored-refresh-token' }),
       };
 
       const { ErrorResponse } = jest.requireActual('oidc-client-ts');
@@ -317,6 +321,7 @@ describe('Auth', () => {
         const mockUserManager = {
           signinSilent: jest.fn().mockRejectedValue(new Error('Network error: Failed to fetch')),
           removeUser: jest.fn().mockResolvedValue(undefined),
+        getUser: jest.fn().mockResolvedValue({ refresh_token: 'stored-refresh-token' }),
         };
 
         (auth as any).eventEmitter = mockEventEmitter;
@@ -359,6 +364,7 @@ describe('Auth', () => {
             .mockRejectedValueOnce(new Error('Network error: Failed to fetch'))
             .mockResolvedValue(mockOidcUser),
           removeUser: jest.fn().mockResolvedValue(undefined),
+        getUser: jest.fn().mockResolvedValue({ refresh_token: 'stored-refresh-token' }),
         };
 
         (auth as any).eventEmitter = mockEventEmitter;
@@ -389,6 +395,7 @@ describe('Auth', () => {
         const mockUserManager = {
           signinSilent: jest.fn(),
           removeUser: jest.fn().mockResolvedValue(undefined),
+        getUser: jest.fn().mockResolvedValue({ refresh_token: 'stored-refresh-token' }),
         };
 
         const { ErrorResponse } = jest.requireActual('oidc-client-ts');
@@ -422,6 +429,7 @@ describe('Auth', () => {
         const mockUserManager = {
           signinSilent: jest.fn(),
           removeUser: jest.fn().mockResolvedValue(undefined),
+        getUser: jest.fn().mockResolvedValue({ refresh_token: 'stored-refresh-token' }),
         };
 
         // oidc-client-ts surfaces any non-OK response with an `error` body field as
@@ -457,6 +465,7 @@ describe('Auth', () => {
         const mockUserManager = {
           signinSilent: jest.fn().mockRejectedValue(new Error('Some unknown error')),
           removeUser: jest.fn().mockResolvedValue(undefined),
+        getUser: jest.fn().mockResolvedValue({ refresh_token: 'stored-refresh-token' }),
         };
 
         (auth as any).eventEmitter = mockEventEmitter;
@@ -485,6 +494,7 @@ describe('Auth', () => {
         const mockUserManager = {
           signinSilent: jest.fn(),
           removeUser: jest.fn().mockResolvedValue(undefined),
+        getUser: jest.fn().mockResolvedValue({ refresh_token: 'stored-refresh-token' }),
         };
 
         // Mock ErrorTimeout
@@ -508,6 +518,26 @@ describe('Auth', () => {
       } finally {
         jest.useRealTimers();
       }
+    });
+
+    it('fails fast without retrying when there is no stored refresh token', async () => {
+      const auth = Object.create(Auth.prototype) as Auth;
+      const mockEventEmitter = { emit: jest.fn() };
+      const mockUserManager = {
+        signinSilent: jest.fn().mockRejectedValue(new Error('No silent_redirect_uri configured')),
+        removeUser: jest.fn().mockResolvedValue(undefined),
+        getUser: jest.fn().mockResolvedValue(null),
+      };
+
+      (auth as any).eventEmitter = mockEventEmitter;
+      (auth as any).userManager = mockUserManager;
+      (auth as any).refreshingPromise = null;
+
+      await expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
+
+      // Deterministic failure (no session to refresh): single attempt, no backoff
+      expect(mockUserManager.signinSilent).toHaveBeenCalledTimes(1);
+      expect(mockUserManager.removeUser).not.toHaveBeenCalled();
     });
   });
 

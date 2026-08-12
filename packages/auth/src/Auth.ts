@@ -39,6 +39,7 @@ import DeviceCredentialsManager from './storage/device_credentials_manager';
 import { PassportError, PassportErrorType, withPassportError } from './errors';
 import logger from './utils/logger';
 import { isAccessTokenExpiredOrExpiring } from './utils/token';
+import { delay, backoffWithJitter } from './utils/retry';
 import LoginPopupOverlay from './overlay/loginPopupOverlay';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
 import { buildLogoutUrl } from './logout';
@@ -69,19 +70,6 @@ const parseJsonSafely = (text: string): unknown => {
 // call starts a new cycle.
 const SILENT_REFRESH_MAX_RETRIES = 3;
 const SILENT_REFRESH_RETRY_DELAY_MS = 1000;
-
-function refreshRetryDelay(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
-// Full jitter on the backoff so that when the token endpoint fails for many clients at
-// once (peak-hour rate limiting), their retries spread out instead of synchronising.
-function refreshBackoffWithJitter(attemptNumber: number): number {
-  const base = SILENT_REFRESH_RETRY_DELAY_MS * attemptNumber;
-  return base * (0.5 + Math.random() * 0.5);
-}
 
 // OAuth error codes that are a definitive verdict on the refresh token or client —
 // the session cannot be recovered by retrying, so the stored user must be removed.
@@ -809,6 +797,13 @@ export class Auth {
   }
 
   private async signinSilentWithRetry(): Promise<OidcUser | null> {
+    // Retrying only helps when there is a refresh token to exchange — the failure
+    // modes worth absorbing (429s, 5xx, network blips) all live on that exchange.
+    // A silent login without one (no stored session, iframe flow) fails
+    // deterministically, so it gets a single attempt and fails fast.
+    const storedUser = await this.userManager.getUser();
+    const canRetry = !!storedUser?.refresh_token;
+
     const attempt = async (attemptNumber: number): Promise<OidcUser | null> => {
       try {
         const oidcUser = await this.userManager.signinSilent();
@@ -817,11 +812,11 @@ export class Auth {
         }
         return oidcUser;
       } catch (error) {
-        if (isPermanentRefreshError(error) || attemptNumber > SILENT_REFRESH_MAX_RETRIES) {
+        if (!canRetry || isPermanentRefreshError(error) || attemptNumber > SILENT_REFRESH_MAX_RETRIES) {
           throw error;
         }
         logger.warn(`Silent refresh attempt ${attemptNumber} failed, retrying`, error);
-        await refreshRetryDelay(refreshBackoffWithJitter(attemptNumber));
+        await delay(backoffWithJitter(SILENT_REFRESH_RETRY_DELAY_MS, attemptNumber));
         return attempt(attemptNumber + 1);
       }
     };
