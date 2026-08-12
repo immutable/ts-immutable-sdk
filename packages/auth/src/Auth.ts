@@ -870,6 +870,13 @@ export class Auth {
             errorMessage = `${errorMessage}: ${err}`;
           }
 
+          // Terminal refresh failures were previously invisible (client-side
+          // logger.warn only), which made fleet-wide incidents impossible to see.
+          trackError('passport', 'silentRefresh', err instanceof Error ? err : new Error(errorMessage), {
+            userRemoved: removeUser,
+            ...(err instanceof ErrorResponse && err.error ? { oauthErrorCode: err.error } : {}),
+          });
+
           if (removeUser) {
             // Emit USER_REMOVED event BEFORE removing user so consumers can react
             // (e.g., auth-next-client can clear the NextAuth session)
