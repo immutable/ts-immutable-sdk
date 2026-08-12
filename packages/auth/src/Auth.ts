@@ -62,7 +62,12 @@ const parseJsonSafely = (text: string): unknown => {
 // from the token endpoint) would otherwise destroy a session backed by a still-valid
 // refresh token. Retry with jittered backoff, and only remove the stored user when the
 // authorization server definitively rejects the refresh token.
-const SILENT_REFRESH_MAX_RETRIES = 2;
+// 4 attempts spread over ~3-6s of jittered backoff. Kept deliberately short: the
+// refresh blocks getAccessToken callers, and rate-limit windows are per-second, so
+// ~1s spacing already lands retries in a fresh bucket. Outages longer than this are
+// covered across cycles — exhaustion keeps the user, so the next getAccessToken
+// call starts a new cycle.
+const SILENT_REFRESH_MAX_RETRIES = 3;
 const SILENT_REFRESH_RETRY_DELAY_MS = 1000;
 
 function refreshRetryDelay(ms: number): Promise<void> {

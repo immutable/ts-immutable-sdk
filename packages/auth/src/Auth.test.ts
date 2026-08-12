@@ -324,11 +324,11 @@ describe('Auth', () => {
         (auth as any).refreshingPromise = null;
 
         const assertion = expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
-        await jest.advanceTimersByTimeAsync(6000); // both backoffs, generous for jitter
+        await jest.advanceTimersByTimeAsync(10000); // both backoffs, generous for jitter
         await assertion;
 
-        // Initial attempt + 2 retries, and the still-valid refresh token is kept
-        expect(mockUserManager.signinSilent).toHaveBeenCalledTimes(3);
+        // Initial attempt + 3 retries, and the still-valid refresh token is kept
+        expect(mockUserManager.signinSilent).toHaveBeenCalledTimes(4);
         expect(mockEventEmitter.emit).not.toHaveBeenCalled();
         expect(mockUserManager.removeUser).not.toHaveBeenCalled();
       } finally {
@@ -403,10 +403,10 @@ describe('Auth', () => {
         (auth as any).refreshingPromise = null;
 
         const assertion = expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
-        await jest.advanceTimersByTimeAsync(6000);
+        await jest.advanceTimersByTimeAsync(10000);
         await assertion;
 
-        expect(mockUserManager.signinSilent).toHaveBeenCalledTimes(3);
+        expect(mockUserManager.signinSilent).toHaveBeenCalledTimes(4);
         expect(mockEventEmitter.emit).not.toHaveBeenCalled();
         expect(mockUserManager.removeUser).not.toHaveBeenCalled();
       } finally {
@@ -438,10 +438,10 @@ describe('Auth', () => {
         (auth as any).refreshingPromise = null;
 
         const assertion = expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
-        await jest.advanceTimersByTimeAsync(6000);
+        await jest.advanceTimersByTimeAsync(10000);
         await assertion;
 
-        expect(mockUserManager.signinSilent).toHaveBeenCalledTimes(3);
+        expect(mockUserManager.signinSilent).toHaveBeenCalledTimes(4);
         expect(mockEventEmitter.emit).not.toHaveBeenCalled();
         expect(mockUserManager.removeUser).not.toHaveBeenCalled();
       } finally {
@@ -464,12 +464,12 @@ describe('Auth', () => {
         (auth as any).refreshingPromise = null;
 
         const assertion = expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
-        await jest.advanceTimersByTimeAsync(6000);
+        await jest.advanceTimersByTimeAsync(10000);
         await assertion;
 
         // Unknown errors are treated as transient: the refresh token may still be
         // valid, so the user is kept and the next call can try again
-        expect(mockUserManager.signinSilent).toHaveBeenCalledTimes(3);
+        expect(mockUserManager.signinSilent).toHaveBeenCalledTimes(4);
         expect(mockEventEmitter.emit).not.toHaveBeenCalled();
         expect(mockUserManager.removeUser).not.toHaveBeenCalled();
       } finally {
@@ -497,7 +497,7 @@ describe('Auth', () => {
         (auth as any).refreshingPromise = null;
 
         const assertion = expect((auth as any).refreshTokenAndUpdatePromise()).rejects.toThrow();
-        await jest.advanceTimersByTimeAsync(6000); // timeouts are retried before rejecting
+        await jest.advanceTimersByTimeAsync(10000); // timeouts are retried before rejecting
         await assertion;
 
         expect(mockEventEmitter.emit).not.toHaveBeenCalledWith(
