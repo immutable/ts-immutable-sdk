@@ -34,8 +34,8 @@ export { httpSend } from './transport';
 export type {
   TransportResult, AudienceErrorCode, RejectionError, MessageRejection,
 } from './errors';
-export { TransportError, AudienceError } from './errors';
-export { MessageQueue } from './queue';
+export { TransportError, AudienceError, invokeOnError } from './errors';
+export { MessageQueue, clearLegacyQueue } from './queue';
 export { collectContext } from './context';
 export {
   isTimestampValid,
@@ -52,6 +52,8 @@ export { getOrCreateSessionId } from './session';
 export {
   collectSessionAttribution,
   collectPageAttribution,
+  clearAttribution,
+  clearLegacyAttribution,
   getAttributionNetwork,
 } from './attribution';
 export type { Attribution, AttributionNetwork } from './attribution';

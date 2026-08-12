@@ -12,10 +12,14 @@ export {
   canIdentify,
   AudienceError,
   getAttributionNetwork,
+  collectPageAttribution,
+  clearAttribution,
 } from '@imtbl/audience-core';
 export type { ImmutableAudienceGlobal } from './cdn';
 export type { AudienceConfig } from './types';
-export type { AudienceErrorCode, AutocaptureOptions, AttributionNetwork } from '@imtbl/audience-core';
+export type {
+  Attribution, AudienceErrorCode, AutocaptureOptions, AttributionNetwork,
+} from '@imtbl/audience-core';
 export type {
   AchievementType,
   AchievementUnlockedProperties,

@@ -19,6 +19,23 @@ const CLICK_ID_PARAMS = [
 
 const STORAGE_KEY = '__imtbl_attribution';
 
+/**
+ * Attribution is cached per publishable key, not per browser session.
+ *
+ * A host serving several tenants from one origin (e.g. a games portal with a
+ * page per studio) runs one browser session across many publishable keys.
+ * A session-wide cache is read before it is written, so it is never recaptured
+ * and the first landing's UTM params and click IDs get replayed onto every
+ * later tenant's events. Keying by publishable key scopes first-touch to the
+ * tenant it belongs to.
+ *
+ * Single-tenant consumers only ever have one key, so the key is stable and
+ * behaviour is unchanged.
+ */
+function storageKeyFor(publishableKey: string): string {
+  return `${STORAGE_KEY}:${publishableKey}`;
+}
+
 export interface Attribution {
   utm_source?: string;
   utm_medium?: string;
@@ -65,18 +82,18 @@ function parseParams(url: string): Attribution {
   return result;
 }
 
-function loadFromStorage(): Attribution | null {
+function loadFromStorage(publishableKey: string): Attribution | null {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const raw = sessionStorage.getItem(storageKeyFor(publishableKey));
     return raw ? (JSON.parse(raw) as Attribution) : null;
   } catch {
     return null;
   }
 }
 
-function saveToStorage(attribution: Attribution): void {
+function saveToStorage(publishableKey: string, attribution: Attribution): void {
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(attribution));
+    sessionStorage.setItem(storageKeyFor(publishableKey), JSON.stringify(attribution));
   } catch {
     // sessionStorage may be unavailable (private browsing, storage full)
   }
@@ -99,8 +116,12 @@ function buildAttribution(): Attribution {
   };
 }
 
-export function collectSessionAttribution(): Attribution {
-  const cached = loadFromStorage();
+/**
+ * First-touch attribution for `publishableKey`, captured on first call and
+ * reused for the rest of the session. Scoped per key — see {@link storageKeyFor}.
+ */
+export function collectSessionAttribution(publishableKey: string): Attribution {
+  const cached = loadFromStorage(publishableKey);
   if (cached) return cached;
 
   const landingPage = typeof window !== 'undefined' && window.location
@@ -112,7 +133,7 @@ export function collectSessionAttribution(): Attribution {
     landing_page: landingPage,
   };
 
-  saveToStorage(attribution);
+  saveToStorage(publishableKey, attribution);
   return attribution;
 }
 
@@ -125,7 +146,26 @@ export function collectPageAttribution(): Attribution {
   return buildAttribution();
 }
 
-export function clearAttribution(): void {
+/** Drop the cached first-touch attribution for `publishableKey`. */
+export function clearAttribution(publishableKey: string): void {
+  try {
+    sessionStorage.removeItem(storageKeyFor(publishableKey));
+  } catch {
+    // noop
+  }
+}
+
+/**
+ * Remove the pre-namespacing attribution cache.
+ *
+ * The old key was shared by every tenant on the origin, so its contents cannot
+ * be attributed to one. It is dropped rather than migrated: carrying it into a
+ * namespaced key would preserve exactly the cross-tenant replay the namespacing
+ * exists to stop. Attribution recaptures on the next `collectSessionAttribution`
+ * call, so the only cost is losing first-touch for sessions already in flight
+ * at upgrade time.
+ */
+export function clearLegacyAttribution(): void {
   try {
     sessionStorage.removeItem(STORAGE_KEY);
   } catch {
