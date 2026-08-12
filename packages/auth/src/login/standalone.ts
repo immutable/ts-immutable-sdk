@@ -6,6 +6,7 @@
 
 import { Detail, getDetail, track } from '@imtbl/metrics';
 import { decodeJwtPayload } from '../utils/jwt';
+import { delay, backoffWithJitter } from '../utils/retry';
 import type {
   DirectLoginOptions, IdTokenPayload, MarketingConsentStatus, ZkEvmInfo,
 } from '../types';
@@ -439,19 +440,6 @@ const TOKEN_EXCHANGE_RETRY_DELAY_MS = 1000;
 // indefinite hang (this path has no other timeout around it).
 const TOKEN_EXCHANGE_TIMEOUT_MS = 10000;
 
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
-// Full jitter on the backoff so that when auth returns 5xx to many clients at once,
-// their retries spread out instead of synchronising into a thundering herd.
-function backoffWithJitter(attemptNumber: number): number {
-  const base = TOKEN_EXCHANGE_RETRY_DELAY_MS * attemptNumber;
-  return base * (0.5 + Math.random() * 0.5);
-}
-
 // Outcome of a single token-exchange attempt: transient failures are retried, permanent
 // ones (4xx) are thrown straight through.
 type TokenAttemptOutcome =
@@ -553,7 +541,7 @@ async function exchangeCodeForTokens(
     });
 
     if (retriesLeft > 0) {
-      await delay(backoffWithJitter(attemptNumber));
+      await delay(backoffWithJitter(TOKEN_EXCHANGE_RETRY_DELAY_MS, attemptNumber));
       return attempt(retriesLeft - 1);
     }
     throw outcome.error;
