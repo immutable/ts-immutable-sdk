@@ -58,6 +58,34 @@ const parseJsonSafely = (text: string): unknown => {
   }
 };
 
+// A transient failure on the silent refresh (network error, timeout, 5xx or rate limit
+// from the token endpoint) would otherwise destroy a session backed by a still-valid
+// refresh token. Retry with jittered backoff, and only remove the stored user when the
+// authorization server definitively rejects the refresh token.
+const SILENT_REFRESH_MAX_RETRIES = 2;
+const SILENT_REFRESH_RETRY_DELAY_MS = 1000;
+
+function refreshRetryDelay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+// Full jitter on the backoff so that when the token endpoint fails for many clients at
+// once (peak-hour rate limiting), their retries spread out instead of synchronising.
+function refreshBackoffWithJitter(attemptNumber: number): number {
+  const base = SILENT_REFRESH_RETRY_DELAY_MS * attemptNumber;
+  return base * (0.5 + Math.random() * 0.5);
+}
+
+// OAuth error codes that indicate a server-side fault rather than a verdict on the
+// refresh token itself. Any other ErrorResponse is a definitive rejection.
+const TRANSIENT_OAUTH_ERROR_CODES = new Set(['server_error', 'temporarily_unavailable']);
+
+const isPermanentRefreshError = (error: unknown): boolean => (
+  error instanceof ErrorResponse && !TRANSIENT_OAUTH_ERROR_CODES.has(error.error ?? '')
+);
+
 const extractTokenErrorMessage = (
   payload: unknown,
   fallbackText: string,
@@ -751,6 +779,26 @@ export class Auth {
     });
   }
 
+  private async signinSilentWithRetry(): Promise<OidcUser | null> {
+    const attempt = async (attemptNumber: number): Promise<OidcUser | null> => {
+      try {
+        const oidcUser = await this.userManager.signinSilent();
+        if (attemptNumber > 1) {
+          track('passport', 'silentRefreshRecovered', { attempt: attemptNumber });
+        }
+        return oidcUser;
+      } catch (error) {
+        if (isPermanentRefreshError(error) || attemptNumber > SILENT_REFRESH_MAX_RETRIES) {
+          throw error;
+        }
+        logger.warn(`Silent refresh attempt ${attemptNumber} failed, retrying`, error);
+        await refreshRetryDelay(refreshBackoffWithJitter(attemptNumber));
+        return attempt(attemptNumber + 1);
+      }
+    };
+    return attempt(1);
+  }
+
   private async refreshTokenAndUpdatePromise(): Promise<User | null> {
     if (this.refreshingPromise) {
       return this.refreshingPromise;
@@ -759,7 +807,7 @@ export class Auth {
     this.refreshingPromise = new Promise((resolve, reject) => {
       (async () => {
         try {
-          const newOidcUser = await this.userManager.signinSilent();
+          const newOidcUser = await this.signinSilentWithRetry();
           if (newOidcUser) {
             const user = Auth.mapOidcUserToDomainModel(newOidcUser);
             // Emit TOKEN_REFRESHED event so consumers (e.g., auth-next-client) can sync
@@ -773,13 +821,15 @@ export class Auth {
         } catch (err) {
           let passportErrorType = PassportErrorType.AUTHENTICATION_ERROR;
           let errorMessage = 'Failed to refresh token';
-          // Default to REMOVING user - safer to log out on unknown errors
-          // Only keep user logged in for explicitly known transient errors
-          let removeUser = true;
+          // Only remove the user when the authorization server definitively rejected
+          // the refresh token. Transient failures (network errors, timeouts, 5xx, rate
+          // limits) have already been retried by signinSilentWithRetry; if they still
+          // fail, keep the stored user so the next call can try again — the refresh
+          // token is still valid.
+          const removeUser = isPermanentRefreshError(err);
           if (err instanceof ErrorTimeout) {
             passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
             errorMessage = `${errorMessage}: ${err.message}`;
-            removeUser = false;
           } else if (err instanceof ErrorResponse) {
             passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
             errorMessage = `${errorMessage}: ${err.message || err.error_description}`;
