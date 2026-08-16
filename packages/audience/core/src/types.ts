@@ -1,6 +1,6 @@
 export type Surface = 'web' | 'pixel' | 'unity' | 'unreal';
 
-export type MessageType = 'track' | 'page' | 'screen' | 'identify' | 'alias';
+export type MessageType = 'track' | 'page' | 'identify' | 'alias';
 
 export interface EventContext {
   library: string;
@@ -50,13 +50,6 @@ export interface PageMessage extends BaseMessage {
   identityType?: string;
 }
 
-export interface ScreenMessage extends BaseMessage {
-  type: 'screen';
-  eventName?: string;
-  properties?: Record<string, unknown>;
-  userId?: string;
-}
-
 export interface IdentifyMessage extends BaseMessage {
   type: 'identify';
   userId?: string;
@@ -75,7 +68,6 @@ export interface AliasMessage extends BaseMessage {
 export type Message =
   | TrackMessage
   | PageMessage
-  | ScreenMessage
   | IdentifyMessage
   | AliasMessage;
 
