@@ -5,7 +5,6 @@ export type {
   UserTraits,
   TrackMessage,
   PageMessage,
-  ScreenMessage,
   IdentifyMessage,
   AliasMessage,
   Message,
