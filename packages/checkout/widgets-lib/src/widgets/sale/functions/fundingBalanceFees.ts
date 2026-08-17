@@ -87,8 +87,10 @@ export const getFundingBalanceFeeBreakDown = (
   }
 
   const addFee = (fee: Fee, label: string, prefix: string = '~ ') => {
-    if (fee.amount > 0) {
-      const formattedFee = formatUnits(fee.amount, fee?.token?.decimals);
+    // A fee without a token can't be rendered — FormattedFee.token is required
+    // and consumers read token.symbol, so skip rather than push a hole.
+    if (fee.amount > 0 && fee.token) {
+      const formattedFee = formatUnits(fee.amount, fee.token.decimals);
 
       feesBreakdown.push({
         label,
@@ -103,7 +105,7 @@ export const getFundingBalanceFeeBreakDown = (
         )}`,
         amount: `${tokenValueFormat(formattedFee)}`,
         prefix,
-        token: fee?.token!,
+        token: fee.token,
       });
     }
   };

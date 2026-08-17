@@ -66,6 +66,8 @@
       }
     ],
 
+    "eslint/preserve-caught-error": "error",
+
     "eslint/no-unused-vars": [
       "warn",
       {
@@ -80,7 +82,7 @@
     "typescript/restrict-template-expressions": "warn",
     "typescript/await-thenable": "warn",
     "typescript/no-redundant-type-constituents": "warn",
-    "typescript/no-non-null-asserted-optional-chain": "warn",
+    "typescript/no-non-null-asserted-optional-chain": "error",
     "typescript/no-duplicate-type-constituents": "warn",
     "typescript/no-unsafe-type-assertion": "off",
     "typescript/no-unnecessary-type-assertion": "off",
@@ -90,7 +92,7 @@
     "typescript/no-duplicate-enum-values": "warn",
     "typescript/no-unnecessary-parameter-property-assignment": "off",
     "typescript/no-this-alias": "warn",
-    "typescript/no-base-to-string": "warn",
+    "typescript/no-base-to-string": "error",
     "typescript/no-wrapper-object-types": "warn",
     "typescript/no-for-in-array": "warn",
 

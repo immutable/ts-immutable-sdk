@@ -158,11 +158,14 @@ export class TokenBridge {
   public async getFee(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
     const [, , res] = await Promise.all([
       this.initialise(),
-      async () => {
+      // Note the trailing `()`. This was previously passed as an uninvoked async
+      // function, so Promise.all resolved it to the function object and the
+      // chain-id validation never ran.
+      (async () => {
         if (req.action !== BridgeFeeActions.FINALISE_WITHDRAWAL) {
           await validateChainIds(req.sourceChainId, req.destinationChainId, this.config);
         }
-      },
+      })(),
       this.getFeePrivate(req),
     ]);
     return res;
@@ -702,7 +705,7 @@ export class TokenBridge {
     const [allowance, feeData, tenderlyRes] = await Promise.all([
       this.getAllowance(direction, token, sender),
       this.config.childProvider.getFeeData(),
-      await this.getDynamicWithdrawGasRootChain(
+      this.getDynamicWithdrawGasRootChain(
         direction.destinationChainId,
         sender,
         recipient,

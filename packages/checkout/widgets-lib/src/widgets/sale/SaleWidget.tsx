@@ -160,10 +160,12 @@ export default function SaleWidget(props: SaleWidgetProps) {
               errorType={viewState.view.data?.errorType}
               transactionHash={viewState.view.data?.transactionHash}
               vendorMessage={viewState.view.data?.vendorError?.message}
-              blockExplorerLink={BlockExplorerService.getTransactionLink(
-                chainId.current as ChainId,
-                viewState.view.data?.transactionHash!,
-              )}
+              blockExplorerLink={viewState.view.data?.transactionHash
+                ? BlockExplorerService.getTransactionLink(
+                  chainId.current as ChainId,
+                  viewState.view.data.transactionHash,
+                )
+                : undefined}
             />
           )}
           {viewState.view.type === SaleWidgetViews.ORDER_SUMMARY && (
