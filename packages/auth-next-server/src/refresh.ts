@@ -85,20 +85,16 @@ export function extractZkEvmFromIdToken(idToken?: string): ZkEvmData | undefined
   return undefined;
 }
 
-/**
- * Refresh access token using the refresh token.
- * This is called server-side in the JWT callback when the access token is expired.
- *
- * @param refreshToken - The refresh token to use
- * @param clientId - The OAuth client ID
- * @param authDomain - The authentication domain (default: https://auth.immutable.com)
- * @returns The refreshed tokens
- * @throws Error if refresh fails
- */
-export async function refreshAccessToken(
+// Deduplicates concurrent refresh calls for the same refresh token.
+// OAuth refresh tokens are single-use: if two requests arrive simultaneously
+// with the same expired token, only the first call reaches the provider.
+// Subsequent callers await the same promise and receive the same result.
+const refreshPromises = new Map<string, Promise<RefreshedTokens>>();
+
+async function doRefreshAccessToken(
   refreshToken: string,
   clientId: string,
-  authDomain: string = DEFAULT_AUTH_DOMAIN,
+  authDomain: string,
 ): Promise<RefreshedTokens> {
   const tokenUrl = `${authDomain}/oauth/token`;
 
@@ -140,4 +136,30 @@ export async function refreshAccessToken(
     idToken: tokenData.id_token,
     accessTokenExpires: decodeJwtExpiry(tokenData.access_token),
   };
+}
+
+/**
+ * Refresh access token using the refresh token.
+ * This is called server-side in the JWT callback when the access token is expired.
+ *
+ * @param refreshToken - The refresh token to use
+ * @param clientId - The OAuth client ID
+ * @param authDomain - The authentication domain (default: https://auth.immutable.com)
+ * @returns The refreshed tokens
+ * @throws Error if refresh fails
+ */
+export async function refreshAccessToken(
+  refreshToken: string,
+  clientId: string,
+  authDomain: string = DEFAULT_AUTH_DOMAIN,
+): Promise<RefreshedTokens> {
+  const cacheKey = `${clientId}:${refreshToken}`;
+  const inflight = refreshPromises.get(cacheKey);
+  if (inflight) return inflight;
+
+  const promise = doRefreshAccessToken(refreshToken, clientId, authDomain).finally(() => {
+    refreshPromises.delete(cacheKey);
+  });
+  refreshPromises.set(cacheKey, promise);
+  return promise;
 }
