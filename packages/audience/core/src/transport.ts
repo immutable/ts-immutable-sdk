@@ -1,7 +1,6 @@
-import { track, trackError } from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
 import type { BatchPayload, ConsentUpdatePayload } from './types';
 import { TransportError, type TransportResult } from './errors';
-import { isBrowser } from './utils';
 
 export interface TransportOptions {
   method?: string;
@@ -44,14 +43,6 @@ function parseRetryAfterMs(headers: Headers): number | null {
   return null;
 }
 
-function safeOnline(): boolean | undefined {
-  try {
-    return isBrowser() ? navigator.onLine : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
 async function parseBody(response: Response): Promise<unknown> {
   const contentType = response.headers?.get?.('content-type') ?? '';
   try {
@@ -72,7 +63,6 @@ export const httpSend: HttpSend = async (
 ) => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), HTTP_TIMEOUT_MS);
-  const startTime = Date.now();
 
   try {
     const hasBody = payload !== undefined;
@@ -88,11 +78,7 @@ export const httpSend: HttpSend = async (
     });
 
     if (response.status === 429) {
-      track('audience', 'transport_send_failed', {
-        status: 429,
-        online: safeOnline(),
-        timeToFailureMs: Date.now() - startTime,
-      });
+      track('audience', 'transport_send_failed');
       const retryAfterMs = parseRetryAfterMs(response.headers);
       return {
         ok: false,
@@ -106,11 +92,7 @@ export const httpSend: HttpSend = async (
 
     if (!response.ok) {
       const body = await parseBody(response);
-      track('audience', 'transport_send_failed', {
-        status: response.status,
-        online: safeOnline(),
-        timeToFailureMs: Date.now() - startTime,
-      });
+      track('audience', 'transport_send_failed');
       return {
         ok: false,
         error: new TransportError({
@@ -138,10 +120,7 @@ export const httpSend: HttpSend = async (
     ) {
       const rejected = (body as { rejected?: number }).rejected ?? 0;
       if (rejected > 0) {
-        track('audience', 'transport_partial_rejected', {
-          status: response.status,
-          rejected,
-        });
+        track('audience', 'transport_partial_rejected');
         return {
           ok: false,
           error: new TransportError({
@@ -160,11 +139,7 @@ export const httpSend: HttpSend = async (
       endpoint: url,
       cause: err,
     });
-    trackError('audience', 'transport_send', error, {
-      errorName: err instanceof Error ? err.name : undefined,
-      online: safeOnline(),
-      timeToFailureMs: Date.now() - startTime,
-    });
+    track('audience', 'transport_send', { error });
     return { ok: false, error };
   } finally {
     clearTimeout(timeoutId);

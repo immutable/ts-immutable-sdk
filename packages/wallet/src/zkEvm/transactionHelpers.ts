@@ -1,4 +1,3 @@
-import { Flow } from '@imtbl/metrics';
 import type { PublicClient, Hex } from 'viem';
 import {
   getEip155ChainId,
@@ -38,12 +37,11 @@ export type TransactionParams = {
   guardianClient: GuardianClient;
   relayerClient: RelayerClient;
   zkEvmAddress: string;
-  flow: Flow;
   nonceSpace?: bigint;
   isBackgroundTransaction?: boolean;
 };
 
-export type EjectionTransactionParams = Pick<TransactionParams, 'ethSigner' | 'zkEvmAddress' | 'flow'>;
+export type EjectionTransactionParams = Pick<TransactionParams, 'ethSigner' | 'zkEvmAddress'>;
 export type EjectionTransactionResponse = {
   to: string;
   data: string;
@@ -136,7 +134,6 @@ const buildMetaTransactions = async (
 export const pollRelayerTransaction = async (
   relayerClient: RelayerClient,
   relayerId: string,
-  flow: Flow,
 ) => {
   const retrieveRelayerTransaction = async () => {
     const tx = await relayerClient.imGetTransactionByHash(relayerId);
@@ -158,7 +155,6 @@ export const pollRelayerTransaction = async (
       'transaction hash not generated in time',
     ),
   });
-  flow.addEvent('endRetrieveRelayerTransaction');
 
   if (
     ![
@@ -183,13 +179,11 @@ export const prepareAndSignTransaction = async ({
   guardianClient,
   relayerClient,
   zkEvmAddress,
-  flow,
   nonceSpace,
   isBackgroundTransaction,
 }: TransactionParams & { transactionRequest: TransactionRequest }) => {
   const chainId = await rpcProvider.getChainId();
   const chainIdBigNumber = BigInt(chainId);
-  flow.addEvent('endDetectNetwork');
 
   const metaTransactions = await buildMetaTransactions(
     transactionRequest,
@@ -198,7 +192,6 @@ export const prepareAndSignTransaction = async ({
     zkEvmAddress,
     nonceSpace,
   );
-  flow.addEvent('endBuildMetaTransactions');
 
   const { nonce } = metaTransactions[0];
   if (typeof nonce === 'undefined') {
@@ -214,7 +207,6 @@ export const prepareAndSignTransaction = async ({
       metaTransactions,
       isBackgroundTransaction,
     });
-    flow.addEvent('endValidateEVMTransaction');
   };
 
   // NOTE: We sign again because we now are adding the fee transaction, so the
@@ -227,7 +219,6 @@ export const prepareAndSignTransaction = async ({
       zkEvmAddress,
       ethSigner,
     );
-    flow.addEvent('endGetSignedMetaTransactions');
     return signed;
   };
 
@@ -237,7 +228,6 @@ export const prepareAndSignTransaction = async ({
   ]);
 
   const relayerId = await relayerClient.ethSendTransaction(zkEvmAddress, signedTransactions);
-  flow.addEvent('endRelayerSendTransaction');
 
   return { signedTransactions, relayerId, nonce };
 };
@@ -281,12 +271,10 @@ export const prepareAndSignEjectionTransaction = async ({
   transactionRequest,
   ethSigner,
   zkEvmAddress,
-  flow,
 }: EjectionTransactionParams & { transactionRequest: TransactionRequest }): Promise<EjectionTransactionResponse> => {
   const metaTransaction = await buildMetaTransactionForEjection(
     transactionRequest,
   );
-  flow.addEvent('endBuildMetaTransactions');
 
   const signedTransaction = await signMetaTransactions(
     metaTransaction,
@@ -295,7 +283,6 @@ export const prepareAndSignEjectionTransaction = async ({
     zkEvmAddress,
     ethSigner,
   );
-  flow.addEvent('endGetSignedMetaTransactions');
 
   return {
     to: zkEvmAddress,

@@ -29,7 +29,6 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActionType } from '@0xsquid/squid-types';
-import { trackFlow } from '@imtbl/metrics';
 import { parseUnits } from 'ethers/utils';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -307,8 +306,6 @@ export function AddTokens({
         toTokenAddress,
         geoBlocked: !isSwapAvailable,
       },
-    }).then((ctx) => {
-      trackFlow('commerce', `addTokensLoaded_${ctx.event.messageId}`);
     });
   }, [id, isSwapAvailable]);
 

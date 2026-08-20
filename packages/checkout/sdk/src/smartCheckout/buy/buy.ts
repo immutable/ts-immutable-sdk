@@ -9,7 +9,6 @@ import {
   OrderStatusName,
 } from '@imtbl/orderbook';
 import { mr } from '@imtbl/generated-clients';
-import { track } from '@imtbl/metrics';
 import { TransactionRequest, TransactionResponse } from 'ethers';
 import * as instance from '../../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
@@ -94,8 +93,6 @@ export const buy = async (
     waitFulfillmentSettlements: true,
   },
 ): Promise<BuyResult> => {
-  track('checkout_sdk', 'buy_initiated');
-
   if (orders.length === 0) {
     throw new CheckoutError(
       'No orders were provided to the orders array. Please provide at least one order.',

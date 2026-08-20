@@ -1,8 +1,6 @@
 import { ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
 import { BlockchainData } from '@imtbl/blockchain-data';
 import { ZkevmMintRequestUpdated, handle } from '@imtbl/webhook';
-import { setEnvironment, setPublishableApiKey } from '@imtbl/metrics';
-import { trackUncaughtException } from './analytics';
 import { mintingPersistence as mintingPersistencePg } from './persistence/pg/postgres';
 import { mintingPersistence as mintingPersistencePrismaSqlite } from './persistence/prismaSqlite/sqlite';
 import {
@@ -44,11 +42,6 @@ export class MintingBackendModule {
     this.blockchainDataClient = new BlockchainData({
       baseConfig: config.baseConfig
     });
-
-    setEnvironment(this.baseConfig.environment);
-    if (this.baseConfig.publishableKey) {
-      setPublishableApiKey(this.baseConfig.publishableKey);
-    }
   }
 
   /**
@@ -96,13 +89,5 @@ export class MintingBackendModule {
         }
       }
     });
-  }
-}
-
-if (typeof process !== 'undefined' && process.on) {
-  try {
-    process.on('uncaughtExceptionMonitor', trackUncaughtException);
-  } catch {
-    // ignore
   }
 }

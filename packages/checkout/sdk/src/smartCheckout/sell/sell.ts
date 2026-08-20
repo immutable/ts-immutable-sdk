@@ -9,7 +9,6 @@ import {
   ERC721Item as OrderbookERC721Item,
   ERC1155Item as OrderbookERC1155Item,
 } from '@imtbl/orderbook';
-import { track } from '@imtbl/metrics';
 import {
   ERC721Item,
   ERC1155Item,
@@ -92,8 +91,6 @@ export const sell = async (
   let orderbook: Orderbook;
   let listing: PrepareListingResponse;
   let spenderAddress = '';
-
-  track('checkout_sdk', 'sell_initiated');
 
   if (orders.length === 0) {
     throw new CheckoutError(

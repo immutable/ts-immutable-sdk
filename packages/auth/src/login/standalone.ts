@@ -4,8 +4,9 @@
  * making them ideal for use with external session managers like NextAuth.
  */
 
-import { Detail, getDetail, track } from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
 import { decodeJwtPayload } from '../utils/jwt';
+import { getRuntimeId } from '../utils/runtimeId';
 import { delay, backoffWithJitter } from '../utils/retry';
 import type {
   DirectLoginOptions, IdTokenPayload, MarketingConsentStatus, ZkEvmInfo,
@@ -260,7 +261,7 @@ function appendEmbeddedLoginPromptStyles(): void {
 }
 
 function createEmbeddedLoginIFrame(authDomain: string, clientId: string): HTMLIFrameElement {
-  const runtimeId = getDetail(Detail.RUNTIME_ID);
+  const runtimeId = getRuntimeId();
   const iframe = document.createElement('iframe');
   iframe.id = LOGIN_PROMPT_IFRAME_ID;
   iframe.src = `${authDomain}/im-embedded-login-prompt?client_id=${clientId}&rid=${runtimeId}`;
@@ -495,7 +496,6 @@ async function exchangeCodeForTokens(
     const attemptNumber = TOKEN_EXCHANGE_MAX_RETRIES - retriesLeft + 1;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), TOKEN_EXCHANGE_TIMEOUT_MS);
-    const startTime = Date.now();
 
     // Classified as data rather than thrown, so a permanent failure isn't confused with a
     // transient one by the catch below.
@@ -525,7 +525,7 @@ async function exchangeCodeForTokens(
 
     if (outcome.kind === 'ok') {
       if (attemptNumber > 1) {
-        track('passport', 'standaloneTokenExchangeRecovered', { attempt: attemptNumber });
+        track('passport', 'standaloneTokenExchangeRecovered');
       }
       return outcome.tokens;
     }
@@ -533,12 +533,7 @@ async function exchangeCodeForTokens(
       throw outcome.error;
     }
 
-    track('passport', 'standaloneTokenExchangeFailed', {
-      attempt: attemptNumber,
-      reason: outcome.reason,
-      willRetry: retriesLeft > 0,
-      timeToFailureMs: Date.now() - startTime,
-    });
+    track('passport', 'standaloneTokenExchangeFailed');
 
     if (retriesLeft > 0) {
       await delay(backoffWithJitter(TOKEN_EXCHANGE_RETRY_DELAY_MS, attemptNumber));

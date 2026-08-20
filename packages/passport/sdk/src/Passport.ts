@@ -3,7 +3,7 @@ import {
 } from '@imtbl/generated-clients';
 import { Environment } from '@imtbl/config';
 
-import { setPassportClientId, trackError, trackFlow } from '@imtbl/metrics';
+import { configure, track } from '@imtbl/metrics';
 import {
   Auth,
   UserProfile,
@@ -65,7 +65,7 @@ export class Passport {
     this.multiRollupApiClients = new MultiRollupApiClients(this.passportConfig.multiRollupConfig);
     this.environment = privateVars.environment;
 
-    setPassportClientId(passportModuleConfiguration.clientId);
+    configure({ clientId: passportModuleConfiguration.clientId });
   }
 
   // ============================================================================
@@ -145,7 +145,7 @@ export class Passport {
       });
 
       return provider;
-    }, 'connectEvm', false);
+    }, 'connectEvm');
   }
 
   // ============================================================================
@@ -204,7 +204,7 @@ export class Passport {
     return withMetricsAsync(async () => {
       const user = await this.auth.getUser();
       return user?.profile;
-    }, 'getUserInfo', false);
+    }, 'getUserInfo');
   }
 
   /**
@@ -291,7 +291,7 @@ export class Passport {
       const headers = { Authorization: `Bearer ${user.accessToken}` };
       const getUserInfoResult = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
       return getUserInfoResult.data.linked_addresses;
-    }, 'getLinkedAddresses', false);
+    }, 'getLinkedAddresses');
   }
 
   /**
@@ -319,7 +319,7 @@ export class Passport {
       && 'message' in error
     );
 
-    const flow = trackFlow('passport', 'linkExternalWallet', false);
+    track('passport', 'linkExternalWallet');
 
     try {
       const user = await this.auth.getUser();
@@ -344,9 +344,7 @@ export class Passport {
       return { ...linkWalletV2Result.data };
     } catch (error) {
       if (error instanceof Error) {
-        trackError('passport', 'linkExternalWallet', error);
-      } else {
-        flow.addEvent('errored');
+        track('passport', 'linkExternalWallet', { error });
       }
 
       if (error instanceof PassportError) {
@@ -387,8 +385,6 @@ export class Passport {
         message,
         PassportErrorType.LINK_WALLET_GENERIC_ERROR,
       );
-    } finally {
-      flow.addEvent('End');
     }
   }
 }

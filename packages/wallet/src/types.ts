@@ -1,4 +1,3 @@
-import { Flow } from '@imtbl/metrics';
 import { TypedEventEmitter, User } from '@imtbl/auth';
 import { JsonRpcError } from './zkEvm/JsonRpcError';
 
@@ -29,10 +28,9 @@ export enum WalletEvents {
 
 export type AccountsRequestedEvent = {
   sessionActivityApiUrl: string;
-  sendTransaction: (params: Array<any>, flow: Flow) => Promise<string>;
+  sendTransaction: (params: Array<any>) => Promise<string>;
   walletAddress: string;
   passportClient: string;
-  flow?: Flow;
 };
 
 // WalletEventMap for internal wallet events

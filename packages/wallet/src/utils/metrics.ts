@@ -1,57 +1,31 @@
-import { Flow, trackError, trackFlow } from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
 
 export const withMetrics = <T>(
-  fn: (flow: Flow) => T,
+  fn: () => T,
   flowName: string,
-  trackStartEvent: boolean = true,
-  trackEndEvent: boolean = true,
 ): T => {
-  const flow: Flow = trackFlow(
-    'passport',
-    flowName,
-    trackStartEvent,
-  );
-
+  track('passport', flowName);
   try {
-    return fn(flow);
+    return fn();
   } catch (error) {
     if (error instanceof Error) {
-      trackError('passport', flowName, error, { flowId: flow.details.flowId });
-    } else {
-      flow.addEvent('errored');
+      track('passport', flowName, { error });
     }
     throw error;
-  } finally {
-    if (trackEndEvent) {
-      flow.addEvent('End');
-    }
   }
 };
 
 export const withMetricsAsync = async <T>(
-  fn: (flow: Flow) => Promise<T>,
+  fn: () => Promise<T>,
   flowName: string,
-  trackStartEvent: boolean = true,
-  trackEndEvent: boolean = true,
 ): Promise<T> => {
-  const flow: Flow = trackFlow(
-    'passport',
-    flowName,
-    trackStartEvent,
-  );
-
+  track('passport', flowName);
   try {
-    return await fn(flow);
+    return await fn();
   } catch (error) {
     if (error instanceof Error) {
-      trackError('passport', flowName, error, { flowId: flow.details.flowId });
-    } else {
-      flow.addEvent('errored');
+      track('passport', flowName, { error });
     }
     throw error;
-  } finally {
-    if (trackEndEvent) {
-      flow.addEvent('End');
-    }
   }
 };

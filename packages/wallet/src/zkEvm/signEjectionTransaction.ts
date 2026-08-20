@@ -14,7 +14,6 @@ export const signEjectionTransaction = async ({
   params,
   ethSigner,
   zkEvmAddress,
-  flow,
 }: EthSendTransactionEjectionParams): Promise<EjectionTransactionResponse> => {
   if (!params || params.length !== 1) {
     throw new JsonRpcError(
@@ -28,6 +27,5 @@ export const signEjectionTransaction = async ({
     transactionRequest,
     ethSigner,
     zkEvmAddress,
-    flow,
   });
 };

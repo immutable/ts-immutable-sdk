@@ -6,19 +6,11 @@ import { BlockchainData } from '@imtbl/blockchain-data';
 import { ZkevmMintRequestUpdated } from '@imtbl/webhook';
 import { CreateMintRequest, MintRequest, MintingPersistence } from './persistence/type';
 import { Logger } from './logger/type';
-import {
-  trackError, trackProcessMint, trackRecordMint, trackSubmitMintingRequests
-} from './analytics';
-
-// TODO: expose metrics
-//       - submitting status count, conflicting status count
-//       - failed events count
 
 export const recordMint = async (
   mintingPersistence: MintingPersistence,
   mintRequest: CreateMintRequest
 ) => {
-  trackRecordMint();
   mintingPersistence.recordMint(mintRequest);
 };
 
@@ -38,7 +30,6 @@ export const submitMintingRequests = async (
   logger: Logger = console,
   maxLoops = Infinity,
 ) => {
-  trackSubmitMintingRequests();
   let mintingResponse: Types.CreateMintRequestResult | undefined;
   let numberOfLoops = 0;
   while (numberOfLoops++ < maxLoops) {
@@ -128,8 +119,6 @@ export const submitMintingRequests = async (
             return response;
           } catch (e: any) {
             logger.error(e);
-            trackError(e);
-
             if (
               e.code === 'CONFLICT_ERROR'
               && e.details?.id === 'reference_id'
@@ -149,7 +138,6 @@ export const submitMintingRequests = async (
                 );
               } catch (e2) {
                 logger.error(e2);
-                trackError(e);
               }
             } else {
               // separate assets into "need to be retied" and "exceeded max number of tries."
@@ -199,7 +187,6 @@ export const processMint = async (
   event: ZkevmMintRequestUpdated,
   logger: Logger = console
 ) => {
-  trackProcessMint();
   if (event.event_name !== 'imtbl_zkevm_mint_request_updated') {
     logger.info(
       `${event.event_name} is not imtbl_zkevm_mint_request_updated, skip.`

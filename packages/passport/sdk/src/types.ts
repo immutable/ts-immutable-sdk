@@ -1,5 +1,4 @@
 import { Environment, ModuleConfiguration } from '@imtbl/config';
-import { Flow } from '@imtbl/metrics';
 
 /**
  * Direct login method identifier
@@ -10,10 +9,9 @@ export type DirectLoginMethod = string;
 
 export type AccountsRequestedEvent = {
   environment: Environment;
-  sendTransaction: (params: Array<any>, flow: Flow) => Promise<string>;
+  sendTransaction: (params: Array<any>) => Promise<string>;
   walletAddress: string;
   passportClient: string;
-  flow?: Flow;
 };
 
 export type {

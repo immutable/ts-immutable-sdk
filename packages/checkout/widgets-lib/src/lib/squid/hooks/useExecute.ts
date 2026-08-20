@@ -8,19 +8,16 @@ import { StatusResponse } from '@0xsquid/sdk/dist/types';
 import { EIP6963ProviderInfo, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
 import { retry } from '../../retry';
-import { withMetricsAsync } from '../../metrics';
-import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { isRejectedError } from '../../../functions/errorType';
+import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { callApprove, callExecute } from '../functions/execute';
 
 const TRANSACTION_NOT_COMPLETED = 'transaction not completed';
 
 export const useExecute = (
-  userJourney: UserJourney,
+  // Kept for call-site compatibility; metrics wrapping was removed.
+  _userJourney: UserJourney,
   onTransactionError?: (err: unknown) => void,
 ) => {
-  const { user } = useAnalytics();
-
   const getAllowance = async (
     provider: WrappedBrowserProvider,
     routeResponse: RouteResponse,
@@ -54,15 +51,6 @@ export const useExecute = (
     }
   };
 
-  const getAnonymousId = async () => {
-    try {
-      const userData = await user();
-      return userData?.anonymousId() ?? undefined;
-    } catch (error) {
-      return undefined;
-    }
-  };
-
   const approve = async (
     fromProviderInfo: EIP6963ProviderInfo,
     provider: WrappedBrowserProvider,
@@ -70,12 +58,7 @@ export const useExecute = (
   ): Promise<TransactionReceipt | undefined> => {
     try {
       if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
-        return await withMetricsAsync(
-          (flow) => callApprove(flow, fromProviderInfo, provider, routeResponse),
-          `${userJourney}_Approve`,
-          await getAnonymousId(),
-          (error) => (isRejectedError(error) ? 'rejected' : ''),
-        );
+        return await callApprove(fromProviderInfo, provider, routeResponse);
       }
       return undefined;
     } catch (error) {
@@ -94,12 +77,7 @@ export const useExecute = (
       throw new Error('provider does not have send method');
     }
     try {
-      return await withMetricsAsync(
-        (flow) => callExecute(flow, squid, fromProviderInfo, provider, routeResponse),
-        `${userJourney}_Execute`,
-        await getAnonymousId(),
-        (error) => (isRejectedError(error) ? 'rejected' : ''),
-      );
+      return await callExecute(squid, fromProviderInfo, provider, routeResponse);
     } catch (error) {
       onTransactionError?.(error);
       return undefined;

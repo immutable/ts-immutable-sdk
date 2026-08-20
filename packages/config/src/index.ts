@@ -1,5 +1,3 @@
-import { track, setEnvironment, setPublishableApiKey } from '@imtbl/metrics';
-
 export enum Environment {
   PRODUCTION = 'production',
   SANDBOX = 'sandbox',
@@ -30,9 +28,6 @@ export class ImmutableConfiguration {
     this.publishableKey = options.publishableKey;
     this.apiKey = options.apiKey;
     this.rateLimitingKey = options.rateLimitingKey;
-
-    setEnvironment(options.environment);
-    track('config', 'created_imtbl_config');
   }
 }
 
@@ -54,7 +49,6 @@ export const addKeysToHeadersOverride = <T extends { headers?: Record<string, st
 
   if (baseConfig.publishableKey) {
     newHeaders[KeyHeaders.PUBLISHABLE_KEY] = baseConfig.publishableKey;
-    setPublishableApiKey(baseConfig.publishableKey);
   }
 
   if (baseConfig.rateLimitingKey) {

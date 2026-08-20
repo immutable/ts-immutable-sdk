@@ -1,5 +1,4 @@
 import { EIP6963ProviderInfo, WrappedBrowserProvider } from '@imtbl/checkout-sdk';
-import { Flow } from '@imtbl/metrics';
 import { ethers, TransactionReceipt, TransactionResponse } from 'ethers';
 import { RouteResponse } from '@0xsquid/squid-types';
 import { Squid } from '@0xsquid/sdk';
@@ -39,12 +38,10 @@ export const waitForReceipt = async (
 };
 
 export const callApprove = async (
-  flow: Flow,
-  fromProviderInfo: EIP6963ProviderInfo,
+  _fromProviderInfo: EIP6963ProviderInfo,
   provider: WrappedBrowserProvider,
   routeResponse: RouteResponse,
 ): Promise<TransactionReceipt> => {
-  flow.addEvent(`provider_${fromProviderInfo.name}`);
   const erc20Abi = [
     'function approve(address spender, uint256 amount) public returns (bool)',
   ];
@@ -66,23 +63,19 @@ export const callApprove = async (
     transactionRequestTarget,
     fromAmount,
   );
-  flow.addEvent('transactionSent');
 
   return await waitForReceipt(provider, tx.hash);
 };
 
 export const callExecute = async (
-  flow: Flow,
   squid: Squid,
-  fromProviderInfo: EIP6963ProviderInfo,
+  _fromProviderInfo: EIP6963ProviderInfo,
   provider: WrappedBrowserProvider,
   routeResponse: RouteResponse,
 ): Promise<TransactionReceipt> => {
-  flow.addEvent(`provider_${fromProviderInfo.name}`);
   const tx = (await squid.executeRoute({
     signer: await provider.getSigner() as unknown as EvmWallet,
     route: routeResponse.route,
   })) as unknown as TransactionResponse;
-  flow.addEvent('transactionSent');
   return await waitForReceipt(provider, tx.hash);
 };

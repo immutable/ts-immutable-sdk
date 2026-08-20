@@ -13,7 +13,6 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
-import { trackError } from '@imtbl/metrics';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
@@ -276,8 +275,8 @@ export function BridgeForm(props: BridgeFormProps) {
 
         // Use child token address if mapping exists, otherwise use original token address
         tokenAddress = tokenMapping.childToken;
-      } catch (error) {
-        trackError('commerce', 'bridgeForm', error instanceof Error ? error : new Error(String(error)));
+      } catch {
+        // Token mapping lookup failed; fall through with original token address.
       }
     }
 

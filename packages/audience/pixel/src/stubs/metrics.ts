@@ -3,6 +3,4 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const track = (..._args: unknown[]): void => {};
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const trackError = (..._args: unknown[]): void => {};
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const trackDuration = (..._args: unknown[]): void => {};
+export const configure = (..._args: unknown[]): void => {};

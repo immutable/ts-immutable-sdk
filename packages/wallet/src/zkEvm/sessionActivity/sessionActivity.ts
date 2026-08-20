@@ -1,11 +1,10 @@
-import { trackFlow, utils as metricsUtils, trackError } from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
 import { encodeFunctionData, parseAbi } from 'viem';
 import { CheckResponse, get, setupClient } from './request';
 import { errorBoundary } from './errorBoundary';
 import { AccountsRequestedEvent } from '../../types';
+import { getItem, setItem } from './storage';
 
-// Local Storage Keys
-const { getItem, setItem } = metricsUtils.localStorage;
 const SESSION_ACTIVITY_COUNT_KEY = 'sessionActivitySendCount';
 const SESSION_ACTIVITY_DAY_KEY = 'sessionActivityDate';
 
@@ -52,11 +51,9 @@ const wait = async (seconds: number) => new Promise((resolve) => {
 });
 
 const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
-  // Use an existing flow if one is provided, or create a new one
-  const flow = args.flow || trackFlow('passport', 'sendSessionActivity');
+  track('passport', 'sendSessionActivity');
   const clientId = args.passportClient;
   if (!clientId) {
-    flow.addEvent('No Passport Client ID');
     throw new Error('No Passport Client ID provided');
   }
   // If there is already a tracking call in progress, do nothing
@@ -77,7 +74,6 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
 
   const from = args.walletAddress;
   if (!from) {
-    flow.addEvent('No Passport Wallet Address');
     throw new Error('No wallet address');
   }
   //   Return type of get
@@ -97,7 +93,6 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
       return;
     }
   } catch (error) {
-    flow.addEvent('Failed to fetch details');
     throw new Error('Failed to get details', { cause: error });
   }
 
@@ -112,26 +107,21 @@ const trackSessionActivityFn = async (args: AccountsRequestedEvent) => {
 
     // If transaction payload, send transaction
     try {
-      flow.addEvent('Start Sending Transaction');
-      const tx = await args.sendTransaction([{ to, from, data }], flow);
+      await args.sendTransaction([{ to, from, data }]);
       incrementSendCount(clientId);
-      flow.addEvent('Transaction Sent', { tx });
     } catch (error) {
-      flow.addEvent('Failed to send Transaction');
       const err = new Error('Failed to send transaction', { cause: error });
-      trackError('passport', 'sessionActivityError', err, { flowId: flow.details.flowId });
+      track('passport', 'sessionActivityError', { error: err });
     }
   }
 
   // if delay, perform delay.
   if (details && details.delay && details.delay > 0) {
-    flow.addEvent('Delaying Transaction', { delay: details.delay });
     await wait(details.delay);
     setTimeout(() => {
-      flow.addEvent('Retrying after Delay');
       currentSessionTrackCall[clientId] = false;
       // eslint-disable-next-line
-      trackSessionWrapper({ ...args, flow });
+      trackSessionWrapper(args);
     }, 0);
   }
 };

@@ -15,7 +15,6 @@ import {
   useInterval,
 } from '@biom3/react';
 import { ChainId } from '@imtbl/checkout-sdk';
-import { trackFlow } from '@imtbl/metrics';
 import { t } from 'i18next';
 import {
   useCallback,
@@ -359,8 +358,6 @@ export function Review({
           fromTokenSymbol: amountData?.fromToken.symbol,
           toTokenSymbol: amountData?.toToken.symbol,
         },
-      }).then((ctx) => {
-        trackFlow('commerce', `addTokensFundsAdded_${ctx.event.messageId}`);
       });
 
       sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.hash);

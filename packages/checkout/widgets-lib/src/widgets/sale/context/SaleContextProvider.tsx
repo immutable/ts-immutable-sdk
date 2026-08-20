@@ -14,7 +14,6 @@ import {
   useState,
 } from 'react';
 import { Environment } from '@imtbl/config';
-import { trackError } from '@imtbl/metrics';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import {
@@ -293,12 +292,6 @@ export function SaleContextProvider(props: {
         errorRetries.current = 0;
         setPaymentMethod(undefined);
       }
-
-      const { vendorError, ...errorData } = data;
-      trackError('commerce', 'saleError', new Error(errorType), {
-        ...errorData,
-        ...(vendorError ? { vendorCode: vendorError.code, vendorMessage: vendorError.message || '' } : {}),
-      });
 
       // eslint-disable-next-line no-console
       console.error('[IMTBL]: Sale error', errorType, data);
