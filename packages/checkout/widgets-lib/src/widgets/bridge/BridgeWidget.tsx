@@ -26,7 +26,6 @@ import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiat
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
 import { Transactions } from '../../components/Transactions/Transactions';
-import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { ClaimWithdrawalInProgress } from '../../components/Transactions/ClaimWithdrawalInProgress';
 import { getDefaultTokenImage } from '../../lib/utils';
@@ -89,9 +88,6 @@ export default function BridgeWidget({
   } = config;
   const defaultTokenImage = getDefaultTokenImage(checkout.config.environment, theme);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-
-  const { page } = useAnalytics();
-
   const [viewState, viewDispatch] = useReducer(
     viewReducer,
     {
@@ -237,15 +233,6 @@ export default function BridgeWidget({
                   if (viewState.view.type === BridgeWidgetViews.BRIDGE_FAILURE) {
                     reason = viewState.view.reason;
                   }
-
-                  page({
-                    userJourney: UserJourney.BRIDGE,
-                    screen: 'Failed',
-                    extras: {
-                      reason,
-                    },
-                  });
-
                   sendBridgeFailedEvent(eventTarget, reason);
                 }}
               />
@@ -273,17 +260,10 @@ export default function BridgeWidget({
               actionText={t('views.ERROR_VIEW.actionText')}
               onActionClick={goBackToWalletNetworkSelectorClearState}
               onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
-              errorEventAction={() => {
-                page({
-                  userJourney: UserJourney.BRIDGE,
-                  screen: 'Error',
-                });
-              }}
             />
           )}
           {viewState.view.type === SharedViews.TOP_UP_VIEW && (
             <TopUpView
-              analytics={{ userJourney: UserJourney.BRIDGE }}
               widgetEvent={IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT}
               checkout={checkout}
               provider={browserProvider}
@@ -303,10 +283,6 @@ export default function BridgeWidget({
               statusText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.success.text')}
               actionText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.success.actionText')}
               onRenderEvent={() => {
-                page({
-                  userJourney: UserJourney.BRIDGE,
-                  screen: 'ClaimWithdrawalSuccess',
-                });
                 sendBridgeClaimWithdrawalSuccessEvent(
                   eventTarget,
                   (viewState.view as BridgeClaimWithdrawalSuccess).transactionHash,
@@ -322,17 +298,6 @@ export default function BridgeWidget({
               statusText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.failure.text')}
               actionText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.failure.actionText')}
               onRenderEvent={() => {
-                let reason = '';
-                if (viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE) {
-                  reason = viewState.view.reason;
-                }
-                page({
-                  userJourney: UserJourney.BRIDGE,
-                  screen: 'ClaimWithdrawalFailure',
-                  extras: {
-                    reason,
-                  },
-                });
                 sendBridgeClaimWithdrawalFailedEvent(
                   eventTarget,
                   (viewState.view as BridgeClaimWithdrawalFailure).transactionHash,

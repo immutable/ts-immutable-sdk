@@ -19,7 +19,6 @@ import {
 import React, { Suspense } from 'react';
 import { isAddress } from 'ethers';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { Base } from '../BaseWidgetRoot';
@@ -305,25 +304,24 @@ export class CommerceWidgetRoot extends Base<WidgetType.IMMUTABLE_COMMERCE> {
     const { t } = i18n;
 
     this.reactRoot.render(
-      <CustomAnalyticsProvider checkout={this.checkout}>
-        <ThemeProvider id="checkout-container" config={this.strongConfig()}>
-          <HandoverProvider>
-            <Suspense
-              fallback={
-                <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+      <ThemeProvider id="checkout-container" config={this.strongConfig()}>
+        <HandoverProvider>
+          <Suspense
+            fallback={
+              <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
               }
-            >
-              <CommerceWidget
-                checkout={this.checkout}
-                browserProvider={this.browserProvider}
-                flowParams={this.parameters}
-                flowConfig={this.properties.config || {}}
-                widgetsConfig={this.strongConfig()}
-              />
-            </Suspense>
-          </HandoverProvider>
-        </ThemeProvider>
-      </CustomAnalyticsProvider>,
+          >
+            <CommerceWidget
+              checkout={this.checkout}
+              browserProvider={this.browserProvider}
+              flowParams={this.parameters}
+              flowConfig={this.properties.config || {}}
+              widgetsConfig={this.strongConfig()}
+            />
+          </Suspense>
+        </HandoverProvider>
+      </ThemeProvider>
+      ,
     );
   }
 }

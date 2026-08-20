@@ -10,7 +10,6 @@ import {
 import { useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
-import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { Transaction, TransactionStatus } from '../../lib/clients/checkoutApiType';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { ViewActions, ViewContext } from '../../context/view-context/ViewContext';
@@ -37,9 +36,7 @@ export function TransactionItemWithdrawPending({
   defaultTokenImage,
   environment,
 }: TransactionItemWithdrawPendingProps) {
-  const { viewDispatch } = useContext(ViewContext);
-  const { track } = useAnalytics();
-  const translation = useTranslation();
+  const { viewDispatch } = useContext(ViewContext); const translation = useTranslation();
   const dateNowUnixMs = useMemo(() => new Date().getTime(), []);
   const withdrawalReadyDate = useMemo(
     () => (transaction.details.current_status.withdrawal_ready_at
@@ -141,15 +138,6 @@ export function TransactionItemWithdrawPending({
           borderTopRightRadius: '0',
           borderTopLeftRadius: '0',
         }}
-        onExpandChange={
-          (expanded) => expanded
-            && track({
-              userJourney: UserJourney.BRIDGE,
-              screen: 'TransactionItem',
-              control: 'Accordion',
-              controlType: 'Button',
-            })
-        }
       >
         <Accordion.TargetLeftSlot sx={{ pr: 'base.spacing.x2' }}>
           <MenuItem size="xSmall">

@@ -14,7 +14,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
 import { trackError } from '@imtbl/metrics';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import {
@@ -81,9 +80,6 @@ export function BridgeForm(props: BridgeFormProps) {
     theme,
     themeOverrides,
   } = props;
-
-  const { track } = useAnalytics();
-
   // Form state
   const [formAmount, setFormAmount] = useState<string>(defaultAmount || '');
   const [amountError, setAmountError] = useState<string>('');
@@ -314,18 +310,6 @@ export function BridgeForm(props: BridgeFormProps) {
         },
       });
     }
-
-    track({
-      userJourney: UserJourney.BRIDGE,
-      screen: 'TokenAmount',
-      control: 'Review',
-      controlType: 'Button',
-      extras: {
-        tokenAddress: formToken.token.address,
-        amount: formAmount,
-      },
-    });
-
     bridgeDispatch({
       payload: {
         type: BridgeActions.SET_TOKEN_AND_AMOUNT,
@@ -350,7 +334,6 @@ export function BridgeForm(props: BridgeFormProps) {
     formToken,
     from,
     getRiskAssessment,
-    track,
     viewDispatch,
   ]);
 
@@ -376,9 +359,6 @@ export function BridgeForm(props: BridgeFormProps) {
         {(!defaultTokenAddress || !isTokenBalancesLoading) && (
           <Box sx={formInputsContainerStyles}>
             <SelectForm
-              userJourney={UserJourney.BRIDGE}
-              screen="TokenAmount"
-              control="FromToken"
               testId="bridge-token"
               options={tokensOptions}
               optionsLoading={isTokenBalancesLoading}

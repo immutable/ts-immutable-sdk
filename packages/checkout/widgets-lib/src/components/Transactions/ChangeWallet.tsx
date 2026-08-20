@@ -5,11 +5,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BridgeContext } from '../../widgets/bridge/context/BridgeContext';
 import { isWalletConnectProvider } from '../../lib/provider';
-import {
-  UserJourney,
-  useAnalytics,
-} from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { } from '../../context/view-context/BridgeViewContextTypes';
 import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
 import {
   headingStyles, rawImageStyle, wcStickerLogoStyles, wcWalletLogoStyles, wcWalletLogoWrapperStyles,
@@ -30,17 +26,10 @@ export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
   );
   const [isWalletConnect, setIsWalletConnect] = useState<boolean>(false);
   const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect();
-  const { track } = useAnalytics();
   const walletAddress = from?.walletAddress || '';
   const walletProviderInfo = from?.walletProviderInfo;
 
   const handleChangeWalletClick = () => {
-    track({
-      userJourney: UserJourney.BRIDGE,
-      screen: BridgeWidgetViews.TRANSACTIONS,
-      controlType: 'Button',
-      control: 'Pressed',
-    });
     onChangeWalletClick();
   };
 

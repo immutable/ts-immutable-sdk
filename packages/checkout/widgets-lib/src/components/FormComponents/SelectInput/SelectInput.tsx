@@ -9,7 +9,6 @@ import {
 import { SelectForm } from '../SelectForm/SelectForm';
 import { InputMode, TextInputForm, TextInputType } from '../TextInputForm/TextInputForm';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
-import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface SelectInputProps {
   testId: string;
@@ -34,11 +33,7 @@ interface SelectInputProps {
   textInputMaxButtonClick?: () => void;
   onSelectChange: (value: OptionKey) => void;
   selectedOption?: OptionKey;
-  defaultTokenImage: string;
-  userJourney: UserJourney;
-  screen: string;
-  control: string;
-  environment?: Environment;
+  defaultTokenImage: string;environment?: Environment;
   theme: WidgetTheme;
   themeOverrides: ThemeOverrides;
 }
@@ -67,9 +62,6 @@ export function SelectInput({
   selectedOption,
   coinSelectorHeading,
   defaultTokenImage,
-  userJourney,
-  screen,
-  control,
   environment,
   theme,
   themeOverrides,
@@ -88,9 +80,6 @@ export function SelectInput({
           selectedOption={selectedOption}
           coinSelectorHeading={coinSelectorHeading}
           defaultTokenImage={defaultTokenImage}
-          control={control}
-          userJourney={userJourney}
-          screen={screen}
           environment={environment}
           theme={theme}
           themeOverrides={themeOverrides}

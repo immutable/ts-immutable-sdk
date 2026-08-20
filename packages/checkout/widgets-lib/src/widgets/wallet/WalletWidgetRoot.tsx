@@ -12,7 +12,6 @@ import { Base } from '../BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { isValidWalletProvider } from '../../lib/validations/widgetValidators';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
@@ -79,32 +78,32 @@ export class Wallet extends Base<WidgetType.WALLET> {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="wallet-container" config={this.strongConfig()}>
-            <HandoverProvider>
-              <ConnectLoader
-                widgetConfig={this.strongConfig()}
-                params={connectLoaderParams}
-                closeEvent={() => sendWalletWidgetCloseEvent(window)}
-              >
-                <Suspense
-                  fallback={
-                    <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+
+        <ThemeProvider id="wallet-container" config={this.strongConfig()}>
+          <HandoverProvider>
+            <ConnectLoader
+              widgetConfig={this.strongConfig()}
+              params={connectLoaderParams}
+              closeEvent={() => sendWalletWidgetCloseEvent(window)}
+            >
+              <Suspense
+                fallback={
+                  <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
                   }
-                >
-                  <WalletWidget
-                    config={this.strongConfig()}
-                    walletConfig={{
-                      showDisconnectButton:
+              >
+                <WalletWidget
+                  config={this.strongConfig()}
+                  walletConfig={{
+                    showDisconnectButton:
                         this.properties.config?.showDisconnectButton!,
-                      showNetworkMenu: this.properties.config?.showNetworkMenu!,
-                    }}
-                  />
-                </Suspense>
-              </ConnectLoader>
-            </HandoverProvider>
-          </ThemeProvider>
-        </CustomAnalyticsProvider>
+                    showNetworkMenu: this.properties.config?.showNetworkMenu!,
+                  }}
+                />
+              </Suspense>
+            </ConnectLoader>
+          </HandoverProvider>
+        </ThemeProvider>
+
       </React.StrictMode>,
     );
   }

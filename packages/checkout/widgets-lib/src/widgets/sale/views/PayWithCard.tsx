@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Box, LoadingOverlay } from '@biom3/react';
 
 import { useTranslation } from 'react-i18next';
@@ -6,12 +6,10 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { WithCard } from '../components/WithCard';
 import { useSaleContext } from '../context/SaleContextProvider';
-import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import { SaleErrorTypes } from '../types';
 
 export function PayWithCard() {
-  const { sendPageView } = useSaleEvent();
   const [initialised, setInitialised] = useState(false);
   const {
     goBackToPaymentMethods,
@@ -19,7 +17,7 @@ export function PayWithCard() {
     signResponse: signData,
     signTokenIds,
   } = useSaleContext();
-  const { sendOrderCreated, sendCloseEvent, sendSuccessEvent } = useSaleEvent();
+  const { sendCloseEvent, sendSuccessEvent } = useSaleEvent();
   const { t } = useTranslation();
 
   const onInit = () => setInitialised(true);
@@ -64,48 +62,9 @@ export function PayWithCard() {
       transactionId: signData?.transactionId,
     };
 
-    sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, [], signTokenIds, details); // checkoutPrimarySaleSaleSuccess_SuccessEventSucceeded
-    sendCloseEvent(SaleWidgetViews.SALE_SUCCESS); // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
+    sendSuccessEvent([], signTokenIds, details);
+    sendCloseEvent();
   };
-
-  const onOrderCreated = (data: Record<string, unknown> = {}) => {
-    const {
-      id: orderId,
-      status: orderStatus,
-      cryptoAmount,
-      cryptoCurrency,
-      fiatAmount,
-      fiatAmountInUsd,
-      amountPaid,
-      totalFeeInFiat,
-      paymentOptionId: paymentOption,
-      userId,
-      userKycType,
-      walletAddress,
-      nftAssetInfo,
-    } = data;
-    const { nftDataBase64, quantity } = nftAssetInfo || ({} as any);
-    sendOrderCreated(SaleWidgetViews.PAY_WITH_CARD, {
-      orderId,
-      orderStatus,
-      cryptoAmount,
-      cryptoCurrency,
-      fiatAmount,
-      fiatAmountInUsd,
-      amountPaid,
-      totalFeeInFiat,
-      paymentOption,
-      userId,
-      userKycType,
-      walletAddress,
-      nftDataBase64,
-      quantity,
-      signData,
-      transactionId: signData?.transactionId,
-    }); // checkoutPrimarySalePayWithCard_OrderCreatedEvent
-  };
-
-  useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_CARD), []); // checkoutPrimarySalePayWithCardViewed
 
   return (
     <SimpleLayout
@@ -141,7 +100,6 @@ export function PayWithCard() {
             onInit={onInit}
             onOrderFailed={onOrderFailed}
             onOrderCompleted={onOrderProcessing}
-            onOrderCreated={onOrderCreated}
             onOrderProcessing={onOrderProcessing}
           />
         </Box>

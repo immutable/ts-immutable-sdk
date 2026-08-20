@@ -17,7 +17,6 @@ import {
 } from '../../components/ConnectLoader/ConnectLoader';
 import { isValidWalletProvider } from '../../lib/validations/widgetValidators';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
@@ -131,46 +130,46 @@ export class Sale extends Base<WidgetType.SALE> {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="sale-container" config={config}>
-            <HandoverProvider>
-              <ConnectLoader
-                widgetConfig={config}
-                params={connectLoaderParams}
-                closeEvent={() => {
-                  sendSaleWidgetCloseEvent(window);
-                }}
-              >
-                <Suspense
-                  fallback={
-                    <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+
+        <ThemeProvider id="sale-container" config={config}>
+          <HandoverProvider>
+            <ConnectLoader
+              widgetConfig={config}
+              params={connectLoaderParams}
+              closeEvent={() => {
+                sendSaleWidgetCloseEvent(window);
+              }}
+            >
+              <Suspense
+                fallback={
+                  <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
                   }
-                >
-                  <SaleWidget
-                    config={config}
-                    items={this.parameters.items!}
-                    language={this.parameters.language as WidgetLanguage}
-                    environmentId={this.parameters.environmentId!}
-                    collectionName={this.parameters.collectionName!}
-                    excludePaymentTypes={this.parameters.excludePaymentTypes!}
-                    excludeFiatCurrencies={
+              >
+                <SaleWidget
+                  config={config}
+                  items={this.parameters.items!}
+                  language={this.parameters.language as WidgetLanguage}
+                  environmentId={this.parameters.environmentId!}
+                  collectionName={this.parameters.collectionName!}
+                  excludePaymentTypes={this.parameters.excludePaymentTypes!}
+                  excludeFiatCurrencies={
                       this.parameters.excludeFiatCurrencies!
                     }
-                    preferredCurrency={this.parameters.preferredCurrency!}
-                    customOrderData={this.parameters.customOrderData!}
-                    hideExcludedPaymentTypes={
+                  preferredCurrency={this.parameters.preferredCurrency!}
+                  customOrderData={this.parameters.customOrderData!}
+                  hideExcludedPaymentTypes={
                       this.properties?.config?.hideExcludedPaymentTypes ?? false
                     }
-                    waitFulfillmentSettlements={
+                  waitFulfillmentSettlements={
                       this.properties?.config?.waitFulfillmentSettlements
                       ?? true
                     }
-                  />
-                </Suspense>
-              </ConnectLoader>
-            </HandoverProvider>
-          </ThemeProvider>
-        </CustomAnalyticsProvider>
+                />
+              </Suspense>
+            </ConnectLoader>
+          </HandoverProvider>
+        </ThemeProvider>
+
       </React.StrictMode>,
     );
   }

@@ -38,7 +38,6 @@ export function PurchaseDeliverToWalletDrawer({
       heading={t('drawers.wallet.deliverToHeading')}
       visible={visible}
       onClose={onClose}
-      providerType="to"
       walletOptions={walletOptions}
       onConnect={handleOnConnect}
       drawerBackground={drawerBackground}

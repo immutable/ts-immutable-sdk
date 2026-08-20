@@ -10,8 +10,7 @@ import {
   TransactionRequirement,
 } from '@imtbl/checkout-sdk';
 import {
-  OrderSummarySubViews,
-  SaleWidgetViews,
+
 } from '../../../context/view-context/SaleViewContextTypes';
 import { calculateCryptoToFiat, tokenValueFormat } from '../../../lib/utils';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -29,8 +28,6 @@ import {
 } from '../functions/fundingBalanceFees';
 import { FeesDisplay, OrderFees } from './OrderFees';
 import { useSaleContext } from '../context/SaleContextProvider';
-import { getPaymentTokenDetails } from '../utils/analytics';
-import { useMount } from '../../../hooks/useMount';
 
 type OrderReviewProps = {
   collectionName: string;
@@ -67,7 +64,7 @@ export function OrderReview({
     selectedCurrency,
     config: { theme, environment },
   } = useSaleContext();
-  const { sendSelectedPaymentToken, sendViewFeesEvent, sendPageView } = useSaleEvent();
+  const { sendSelectedPaymentToken } = useSaleEvent();
 
   const [showCoinsDrawer, setShowCoinsDrawer] = useState(false);
   const [selectedCurrencyIndex, setSelectedCurrencyIndex] = useState(0);
@@ -92,7 +89,6 @@ export function OrderReview({
     setSelectedCurrencyIndex(selectedIndex);
 
     sendSelectedPaymentToken(
-      OrderSummarySubViews.REVIEW_ORDER,
       fundingBalances[selectedIndex],
       conversions,
     );
@@ -175,27 +171,6 @@ export function OrderReview({
     });
   }, [gasFees, fundingBalance, conversions]);
 
-  // Trigger page loaded event
-  useMount(
-    () => {
-      const tokens = fundingBalances.map((fb) => getPaymentTokenDetails(fb, conversions));
-      sendPageView(SaleWidgetViews.ORDER_SUMMARY, {
-        subView: OrderSummarySubViews.REVIEW_ORDER,
-        tokens,
-        items,
-        collectionName,
-      });
-      // checkoutPrimarySaleOrderSummaryViewed
-    },
-    () => Boolean(
-      items.length
-          && fundingBalances.length
-          && !loadingBalances
-          && conversions.size,
-    ),
-    [items, fundingBalances, loadingBalances, conversions],
-  );
-
   const multiple = items.length > 1;
   const withFees = transactionFees.formattedFees.length > 0;
 
@@ -257,7 +232,6 @@ export function OrderReview({
                   borderTopWidth: 'base.border.size.200',
                   borderTopColor: 'base.color.translucent.inverse.1000',
                 }}
-                onFeesClick={() => sendViewFeesEvent(SaleWidgetViews.ORDER_SUMMARY)}
               />
             )}
           </OrderItems>
@@ -274,7 +248,6 @@ export function OrderReview({
             borderTopWidth: 'base.border.size.100',
             borderTopColor: 'base.color.translucent.emphasis.400',
           }}
-          onFeesClick={() => sendViewFeesEvent(SaleWidgetViews.ORDER_SUMMARY)}
         />
       )}
       <SelectCoinDropdown

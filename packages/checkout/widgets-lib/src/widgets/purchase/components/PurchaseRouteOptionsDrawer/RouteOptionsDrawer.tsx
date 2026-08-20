@@ -3,10 +3,9 @@ import {
 } from '@biom3/react';
 import { motion } from 'framer-motion';
 import {
-  useContext, useEffect, useRef, useState,
+  useRef, useState,
 } from 'react';
 import { Checkout } from '@imtbl/checkout-sdk';
-import { useAnalytics, UserJourney } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../../context/providers-context/ProvidersContext';
 import { listVariants } from '../../../../lib/animation/listAnimation';
 import { Chain, RouteData } from '../../../../lib/squid/types';
@@ -14,7 +13,6 @@ import {
   DirectCryptoPayData, DirectCryptoPayOptionType, FiatOptionType, SquidRouteOptionType,
 } from '../../types';
 import { RouteOptions } from './RouteOptions';
-import { PurchaseContext } from '../../context/PurchaseContext';
 
 type OptionsDrawerProps = {
   checkout: Checkout;
@@ -53,12 +51,6 @@ export function RouteOptionsDrawer({
   insufficientBalance,
   directCryptoPayRoutes,
 }: OptionsDrawerProps) {
-  const { track } = useAnalytics();
-
-  const {
-    purchaseState: { id },
-  } = useContext(PurchaseContext);
-
   const {
     providersState: { fromProviderInfo, fromAddress },
   } = useProvidersContext();
@@ -83,27 +75,6 @@ export function RouteOptionsDrawer({
     onClose();
     onChangeWalletClick();
   };
-
-  useEffect(() => {
-    if (!visible) {
-      return;
-    }
-
-    track({
-      userJourney: UserJourney.PURCHASE,
-      screen: 'InputScreen',
-      control: 'RoutesMenu',
-      controlType: 'MenuItem',
-      action: 'Opened',
-      extras: {
-        contextId: id,
-        showOnrampOption: Boolean(showOnrampOption),
-        showSwapOption: Boolean(showSwapOption),
-        insufficientBalance: Boolean(insufficientBalance),
-        routesAvailable: routes?.length ?? 0,
-      },
-    });
-  }, [visible]);
 
   return (
     <Drawer

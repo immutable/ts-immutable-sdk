@@ -16,7 +16,7 @@ interface FeesProps {
   gasFeeToken?: TokenInfo;
   feeFiatValue: number | null;
   fees: FormattedFee[];
-  onFeesClick: () => void;
+  onFeesClick?: () => void;
   loading: boolean;
   sx?: SxProps;
 }

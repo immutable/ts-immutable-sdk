@@ -33,9 +33,7 @@ export function PaymentMethods() {
     disabledPaymentTypes,
     hideExcludedPaymentTypes,
   } = useSaleContext();
-  const {
-    sendPageView, sendCloseEvent, sendSelectedPaymentMethod,
-  } = useSaleEvent();
+  const { sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
   const handleOptionClick = (type: SalePaymentTypes) => {
     setPaymentMethod(type);
@@ -43,7 +41,7 @@ export function PaymentMethods() {
 
   useEffect(() => {
     if (paymentMethod) {
-      sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS); // checkoutPrimarySalePaymentMethods_SelectMenuItem
+      sendSelectedPaymentMethod(paymentMethod);
     }
 
     if (
@@ -85,7 +83,6 @@ export function PaymentMethods() {
     }
   }, [paymentMethod]);
 
-  useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []); // checkoutPrimarySalePaymentMethodsViewed
   useEffect(() => {
     if (!invalidParameters) return;
     goToErrorView(SaleErrorTypes.INVALID_PARAMETERS);
@@ -96,7 +93,7 @@ export function PaymentMethods() {
       testId="payment-methods"
       header={(
         <HeaderNavigation
-          onCloseButtonClick={() => sendCloseEvent(SaleWidgetViews.PAYMENT_METHODS)} // checkoutPrimarySalePaymentMethods_CloseButtonPressed
+          onCloseButtonClick={sendCloseEvent}
         />
       )}
       footer={<FooterLogo />}

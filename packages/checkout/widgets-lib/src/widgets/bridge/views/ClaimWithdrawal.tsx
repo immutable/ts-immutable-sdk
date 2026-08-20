@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 import { getGasPriceInWei, WalletProviderName } from '@imtbl/checkout-sdk';
 import { FlowRateWithdrawResponse } from '@imtbl/bridge-sdk';
 import { FeeData } from 'ethers';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { Transaction } from '../../../lib/clients';
 import { getChainNameById } from '../../../lib/chains';
 import { WITHDRAWAL_CLAIM_GAS_LIMIT } from '../../../lib';
@@ -35,16 +34,6 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
   const { bridgeState: { checkout, tokenBridge, from } } = useContext(BridgeContext);
   const { viewDispatch } = useContext(ViewContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-
-  const { page } = useAnalytics();
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.BRIDGE,
-      screen: 'ClaimWithdrawal',
-    });
-  }, []);
-
   const [txProcessing, setTxProcessing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasWithdrawError, setHasWithdrawError] = useState(false);

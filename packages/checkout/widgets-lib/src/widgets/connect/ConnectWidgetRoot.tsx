@@ -3,7 +3,6 @@ import {
   ConnectWidgetParams, IMTBLWidgetEvents, WidgetProperties, WidgetType,
 } from '@imtbl/checkout-sdk';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { getChainNameById } from '../../lib/chains';
 import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
@@ -46,21 +45,21 @@ export class Connect extends Base<WidgetType.CONNECT> {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="connect-container" config={this.strongConfig()}>
-            <HandoverProvider>
-              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
-                <ConnectWidget
-                  config={this.strongConfig()}
-                  checkout={this.checkout}
-                  targetWalletRdns={this.parameters.targetWalletRdns}
-                  targetChainId={this.parameters.targetChainId}
-                  blocklistWalletRdns={this.parameters.blocklistWalletRdns}
-                />
-              </Suspense>
-            </HandoverProvider>
-          </ThemeProvider>
-        </CustomAnalyticsProvider>
+
+        <ThemeProvider id="connect-container" config={this.strongConfig()}>
+          <HandoverProvider>
+            <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
+              <ConnectWidget
+                config={this.strongConfig()}
+                checkout={this.checkout}
+                targetWalletRdns={this.parameters.targetWalletRdns}
+                targetChainId={this.parameters.targetChainId}
+                blocklistWalletRdns={this.parameters.blocklistWalletRdns}
+              />
+            </Suspense>
+          </HandoverProvider>
+        </ThemeProvider>
+
       </React.StrictMode>,
     );
   }

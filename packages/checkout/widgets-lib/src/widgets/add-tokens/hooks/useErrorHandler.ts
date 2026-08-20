@@ -1,16 +1,11 @@
 import { useContext } from 'react';
-import { AddTokensError, AddTokensErrorTypes } from '../types';
+import { AddTokensErrorTypes } from '../types';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { sendAddTokensFailedEvent } from '../AddTokensWidgetEvents';
 import { useError } from './useError';
-import { AddTokensContext } from '../context/AddTokensContext';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 
 export const useErrorHandler = () => {
-  const {
-    addTokensState: { id: contextId },
-  } = useContext(AddTokensContext);
-
   const {
     providersState: {
       checkout,
@@ -56,12 +51,7 @@ export const useErrorHandler = () => {
       errorType = AddTokensErrorTypes.UNRECOGNISED_CHAIN;
     }
 
-    const error: AddTokensError = {
-      type: errorType,
-      data: { error: err },
-    };
-
-    showErrorHandover(errorType, { contextId, error });
+    showErrorHandover(errorType);
   };
 
   return { onTransactionError };

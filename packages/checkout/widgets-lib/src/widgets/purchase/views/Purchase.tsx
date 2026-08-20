@@ -14,7 +14,6 @@ import {
 } from 'react';
 import { TokenBalance } from '@0xsquid/sdk/dist/types';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { CryptoFiatContext, CryptoFiatActions } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
@@ -124,7 +123,7 @@ export function Purchase({
 
   const {
     getAllowance, approve, execute, getStatus,
-  } = useExecute(UserJourney.PURCHASE, (err) => {
+  } = useExecute('Purchase', (err) => {
     // eslint-disable-next-line no-console
     console.log('useExecute err', err);
   });

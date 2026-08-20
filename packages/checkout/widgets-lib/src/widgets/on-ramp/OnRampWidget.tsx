@@ -3,7 +3,6 @@ import {
 } from 'react';
 import { IMTBLWidgetEvents, OnRampWidgetParams, OnrampWidgetConfiguration } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { NATIVE } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -149,7 +148,6 @@ export default function OnRampWidget({
 
       {viewState.view.type === SharedViews.TOP_UP_VIEW && (
         <TopUpView
-          analytics={{ userJourney: UserJourney.ON_RAMP }}
           widgetEvent={IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT}
           checkout={checkout}
           provider={provider}
