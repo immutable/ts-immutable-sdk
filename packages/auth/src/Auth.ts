@@ -861,9 +861,8 @@ export class Auth {
 
           // Terminal refresh failures were previously invisible (client-side
           // logger.warn only), which made fleet-wide incidents impossible to see.
-          trackError('passport', 'silentRefresh', err instanceof Error ? err : new Error(errorMessage), {
-            userRemoved: removeUser,
-            ...(err instanceof ErrorResponse && err.error ? { oauthErrorCode: err.error } : {}),
+          track('passport', 'silentRefresh', {
+            error: err instanceof Error ? err : new Error(errorMessage),
           });
 
           if (removeUser) {
