@@ -802,7 +802,7 @@ export class Auth {
       try {
         const oidcUser = await this.userManager.signinSilent();
         if (attemptNumber > 1) {
-          track('passport', 'silentRefreshRecovered', { attempt: attemptNumber });
+          track('passport', 'silentRefreshRecovered');
         }
         return oidcUser;
       } catch (error) {

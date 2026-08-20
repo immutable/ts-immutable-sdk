@@ -526,7 +526,7 @@ async function exchangeCodeForTokens(
 
     if (outcome.kind === 'ok') {
       if (attemptNumber > 1) {
-        track('passport', 'standaloneTokenExchangeRecovered', { attempt: attemptNumber });
+        track('passport', 'standaloneTokenExchangeRecovered');
       }
       return outcome.tokens;
     }
@@ -534,12 +534,7 @@ async function exchangeCodeForTokens(
       throw outcome.error;
     }
 
-    track('passport', 'standaloneTokenExchangeFailed', {
-      attempt: attemptNumber,
-      reason: outcome.reason,
-      willRetry: retriesLeft > 0,
-      timeToFailureMs: Date.now() - startTime,
-    });
+    track('passport', 'standaloneTokenExchangeFailed');
 
     if (retriesLeft > 0) {
       await delay(backoffWithJitter(TOKEN_EXCHANGE_RETRY_DELAY_MS, attemptNumber));
