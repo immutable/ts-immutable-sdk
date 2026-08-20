@@ -3,6 +3,7 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isWalletConnectProvider } from '../../../lib/provider';
+import { parseChainId } from '../../../lib/chains';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -34,8 +35,7 @@ export function SwitchNetworkZkEVM() {
 
     const checkCorrectNetwork = async () => {
       const currentChainId = await provider.send('eth_chainId', []);
-      // eslint-disable-next-line radix
-      const parsedChainId = Number(currentChainId.toString());
+      const parsedChainId = parseChainId(currentChainId);
       if (parsedChainId === checkout.config.l2ChainId) {
         connectDispatch({
           payload: {
@@ -76,7 +76,7 @@ export function SwitchNetworkZkEVM() {
     if (!provider.send) return;
 
     const currentChainId = await provider.send('eth_chainId', []) as `0x${string}`;
-    const parsedChainId = Number(currentChainId);
+    const parsedChainId = parseChainId(currentChainId);
 
     if (parsedChainId === checkout.config.l2ChainId) {
       connectDispatch({

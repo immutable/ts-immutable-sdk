@@ -20,6 +20,7 @@ import { ViewContext, ViewActions } from '../../../context/view-context/ViewCont
 import { isMetaMaskProvider, isPassportProvider } from '../../../lib/provider';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
+import { parseChainId } from '../../../lib/chains';
 
 export interface ReadyToConnectProps {
   targetChainId: ChainId;
@@ -89,9 +90,8 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleConnectViewUpdate = async (provider: WrappedBrowserProvider) => {
     const chainId = await provider.send!('eth_chainId', []);
-    // eslint-disable-next-line radix
-    const parsedChainId = parseInt(chainId.toString());
-    if (parsedChainId !== targetChainId && !allowedChains?.includes(parsedChainId)) {
+    const parsedChainId = parseChainId(chainId);
+    if (parsedChainId !== targetChainId && !(parsedChainId && allowedChains?.includes(parsedChainId))) {
       // TODO: What do we do with Passport here as it can't connect to L1
       if (isPassport) {
         viewDispatch({

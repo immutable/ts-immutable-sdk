@@ -167,6 +167,7 @@ export function setupAutocapture(
   options: AutocaptureOptions,
   enqueue: EnqueueFn,
   getConsent: ConsentFn,
+  publishableKey: string,
 ): { teardown: () => void; resetScroll: () => void } {
   const teardowns: Array<() => void> = [];
   let scrollReset: () => void = () => undefined;
@@ -255,7 +256,7 @@ export function setupAutocapture(
 
         if (isOutbound && options.clicks !== false) {
           enqueue('link_clicked', {
-            ...collectSessionAttribution(),
+            ...collectSessionAttribution(publishableKey),
             url: anchor.href,
             label: (anchor.textContent || '').trim().slice(0, 256),
             element_id: anchor.id || undefined,
@@ -263,7 +264,7 @@ export function setupAutocapture(
           });
         } else if (!isOutbound && options.internalClicks === true) {
           enqueue('link_clicked', {
-            ...collectSessionAttribution(),
+            ...collectSessionAttribution(publishableKey),
             url: anchor.href,
             label: (anchor.textContent || '').trim().slice(0, 256),
             element_id: anchor.id || undefined,

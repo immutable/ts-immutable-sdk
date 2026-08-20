@@ -1,5 +1,6 @@
 import type {
   Attribution,
+  AttributionNetwork,
   ConsentLevel,
   ConsentManager,
   Message,
@@ -25,7 +26,12 @@ import {
   truncate,
   collectContext,
   collectSessionAttribution,
+  clearLegacyAttribution,
+  clearLegacyQueue,
   collectThirdPartyIds,
+  AudienceError,
+  invokeOnError,
+  getAttributionNetwork as resolveAttributionNetwork,
   getOrCreateSessionId,
   createConsentManager,
   canTrack,
@@ -38,6 +44,12 @@ import { adoptAnonymousId } from '@imtbl/audience-core/internal';
 import { track } from '@imtbl/metrics';
 import { DebugLogger } from './debug';
 import { REQUIRED_EVENT_PROPS, type AudienceEventName, type PropsFor } from './events';
+import {
+  CONVERSION_ID_PROPERTY,
+  CONVERSION_NETWORK_PROPERTY,
+  DEDUP_CAPABLE_NETWORKS,
+  type ConversionResult,
+} from './conversion';
 import type { AudienceConfig } from './types';
 import {
   LIBRARY_NAME, LIBRARY_VERSION, LOG_PREFIX, DEFAULT_CONSENT_SOURCE,
@@ -109,6 +121,8 @@ export class Audience {
 
   private userId: string | undefined;
 
+  private identityType: IdentityType | undefined;
+
   private isFirstPage = true;
 
   private destroyed = false;
@@ -175,7 +189,10 @@ export class Audience {
         onFlush: (ok, count) => this.debug.logFlush(ok, count),
         onError: config.onError,
         staleFilter: (m) => isTimestampValid(m.eventTimestamp),
-        storagePrefix: '__imtbl_web_',
+        // Namespaced per tenant: a host serving several publishable keys from
+        // one origin would otherwise share a single queue, and a restore could
+        // re-send one tenant's persisted events under another's credential.
+        storagePrefix: `__imtbl_web_${publishableKey}_`,
         logPrefix: LOG_PREFIX,
       },
     );
@@ -190,7 +207,7 @@ export class Audience {
       config.baseUrl,
     );
 
-    this.attribution = collectSessionAttribution();
+    this.attribution = collectSessionAttribution(publishableKey);
 
     if (!this.isTrackingDisabled()) this.queue.start();
 
@@ -199,26 +216,43 @@ export class Audience {
       config.autocapture ?? {},
       (eventName, properties) => this.track(eventName, properties),
       () => this.consent.level,
+      publishableKey,
     );
     this.teardownAutocapture = autocaptureResult.teardown;
     this.resetScrollDepth = autocaptureResult.resetScroll;
   }
 
   /**
-   * Create and start the SDK. Warns if another instance is already active —
-   * call `shutdown()` on the previous one first.
+   * Create and start the SDK. Reports `MULTIPLE_INSTANCES` via `onError` if
+   * another instance is already active — call `shutdown()` on the previous one
+   * first.
    */
   static init(config: AudienceConfig): Audience {
     if (!config.publishableKey?.trim()) {
       throw new Error(`${LOG_PREFIX} publishableKey is required`);
     }
     if (Audience.liveInstances > 0) {
+      const message = `${LOG_PREFIX} Multiple SDK instances detected.`
+        + ' Ensure previous instances are shut down to avoid duplicate events.';
       // eslint-disable-next-line no-console
-      console.warn(
-        `${LOG_PREFIX} Multiple SDK instances detected.`
-        + ' Ensure previous instances are shut down to avoid duplicate events.',
-      );
+      console.warn(message);
+      // Also surfaced through onError: the console warning alone never reaches
+      // production monitoring, so double-initialisation goes unnoticed.
+      // Not a transport failure, so there is no status or endpoint to report.
+      invokeOnError(config.onError, new AudienceError({
+        code: 'MULTIPLE_INSTANCES',
+        message,
+        status: 0,
+        endpoint: '',
+      }));
     }
+
+    // One-time cleanup of the pre-namespacing storage keys. Their contents
+    // carry no publishable key, so they cannot be re-homed without guessing
+    // which tenant they belong to — see clearLegacyQueue / clearLegacyAttribution.
+    clearLegacyQueue();
+    clearLegacyAttribution();
+
     Audience.liveInstances += 1;
     return new Audience(config);
   }
@@ -230,6 +264,18 @@ export class Audience {
     return this.anonymousId;
   }
 
+  /**
+   * The ad network this visit is attributed to, classified from the
+   * session-cached first-touch attribution captured when the SDK initialised
+   * (UTM params + ad-network click IDs). Returns `'organic'` when there's no
+   * paid signal, or `'other'` for a recognised but unnamed click ID. Stable
+   * for the session, so it agrees with server-side attribution even after the
+   * landing URL's query params are gone.
+   */
+  getAttributionNetwork(): AttributionNetwork {
+    return resolveAttributionNetwork(this.attribution);
+  }
+
   /** True when the current consent level does not permit tracking. */
   private isTrackingDisabled(): boolean {
     return !canTrack(this.consent.level);
@@ -238,6 +284,11 @@ export class Audience {
   /** Returns userId if consent is full, undefined otherwise. */
   private effectiveUserId(): string | undefined {
     return canIdentify(this.consent.level) ? this.userId : undefined;
+  }
+
+  /** Returns identityType if consent is full, undefined otherwise. */
+  private effectiveIdentityType(): IdentityType | undefined {
+    return canIdentify(this.consent.level) ? this.identityType : undefined;
   }
 
   /** Create or resume the rolling session and cache its ID. */
@@ -294,6 +345,7 @@ export class Audience {
       type: 'page',
       properties: mergedProps,
       userId: this.effectiveUserId(),
+      identityType: this.effectiveIdentityType(),
     });
   }
 
@@ -320,17 +372,71 @@ export class Audience {
       ? [properties?: PropsFor<E>]
       : [properties: PropsFor<E>]
   ): void {
+    this.emitTrack(event, args[0] as Record<string, unknown> | undefined);
+  }
+
+  /**
+   * Like {@link track}, but mints a shared id for ad-network deduplication.
+   * Use for conversion events reported to ad networks, e.g. `sign_up` or
+   * `purchase`.
+   *
+   * Classifies the visit's network from the session-cached first-touch
+   * attribution (the same signals that drive server-side attribution). For a
+   * network that can dedupe on a shared id (Meta, TikTok, Reddit, X, Google),
+   * it mints a conversion event id, stamps it onto the event under the reserved
+   * `_imtbl_conversion_id` / `_imtbl_conversion_network` properties, and returns
+   * it. Pass the returned `eventId` to that network's browser pixel (e.g. Meta
+   * `fbq('track', 'CompleteRegistration', {}, { eventID })`) so it deduplicates
+   * against the server-side event.
+   *
+   * `eventId` is null (and no dedup id is emitted) for a non-dedup-capable or
+   * organic visit, or when consent doesn't permit tracking; `network` is always
+   * returned for the caller's own routing. Same validation as {@link track}.
+   */
+  trackConversion<E extends AudienceEventName | string & {}>(
+    event: E,
+    ...args: {} extends PropsFor<E>
+      ? [properties?: PropsFor<E>]
+      : [properties: PropsFor<E>]
+  ): ConversionResult {
+    const network = this.getAttributionNetwork();
+
+    if (this.isTrackingDisabled()) return { eventId: null, network };
+
+    const eventId = DEDUP_CAPABLE_NETWORKS.has(network) ? generateId() : null;
+    const conversionProps = eventId
+      ? {
+        [CONVERSION_ID_PROPERTY]: eventId,
+        [CONVERSION_NETWORK_PROPERTY]: network,
+      }
+      : undefined;
+
+    this.emitTrack(event, args[0] as Record<string, unknown> | undefined, conversionProps);
+
+    return { eventId, network };
+  }
+
+  /**
+   * Shared implementation for {@link track} and {@link trackConversion}.
+   * `reserved` are SDK-owned properties (e.g. conversion ids) that take
+   * precedence over caller-supplied properties on collision.
+   */
+  private emitTrack(
+    event: string,
+    properties: Record<string, unknown> | undefined,
+    reserved?: Record<string, unknown>,
+  ): void {
     if (this.isTrackingDisabled()) return;
     if (!hasValue(event)) invalidCall('track() called with an empty event name.');
 
-    const [properties] = args;
-    validateRequiredProps(event, properties as Record<string, unknown> | undefined);
+    validateRequiredProps(event, properties);
 
     this.refreshSession();
 
     const mergedProps: Record<string, unknown> = {
       ...(UTM_EVENTS.has(event) ? this.attribution : {}),
-      ...properties as Record<string, unknown> | undefined,
+      ...properties,
+      ...reserved,
     };
 
     this.enqueue('track', {
@@ -339,6 +445,7 @@ export class Audience {
       eventName: truncate(event),
       properties: mergedProps,
       userId: this.effectiveUserId(),
+      identityType: this.effectiveIdentityType(),
     });
   }
 
@@ -371,6 +478,7 @@ export class Audience {
 
     const resolvedId = truncate(id.trim());
     this.userId = resolvedId;
+    this.identityType = identityType;
     this.enqueue('identify', {
       ...this.baseMessage(),
       type: 'identify',
@@ -471,8 +579,13 @@ export class Audience {
     if (!canTrack(effective)) {
       deleteCookie(COOKIE_NAME, this.cookieDomain);
       deleteCookie(SESSION_COOKIE, this.cookieDomain);
-    } else if (canIdentify(previous) && !canIdentify(effective)) {
+    }
+    if (!canIdentify(effective)) {
+      // Cleared on any downgrade out of full (not just to anonymous) so a
+      // later upgrade back to full can't resurface a stale identity without
+      // a fresh identify() call.
       this.userId = undefined;
+      this.identityType = undefined;
     }
 
     if (isUpgradeFromNone) {
@@ -491,6 +604,7 @@ export class Audience {
    */
   reset(): void {
     this.userId = undefined;
+    this.identityType = undefined;
     this.queue.clear();
     deleteCookie(COOKIE_NAME, this.cookieDomain);
     deleteCookie(SESSION_COOKIE, this.cookieDomain);

@@ -34,6 +34,7 @@ import DeviceCredentialsManager from './storage/device_credentials_manager';
 import { PassportError, PassportErrorType, withPassportError } from './errors';
 import logger from './utils/logger';
 import { isAccessTokenExpiredOrExpiring } from './utils/token';
+import { delay, backoffWithJitter } from './utils/retry';
 import LoginPopupOverlay from './overlay/loginPopupOverlay';
 import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
 import { buildLogoutUrl } from './logout';
@@ -52,6 +53,50 @@ const parseJsonSafely = (text: string): unknown => {
     return undefined;
   }
 };
+
+// A transient failure on the silent refresh (network error, timeout, 5xx or rate limit
+// from the token endpoint) would otherwise destroy a session backed by a still-valid
+// refresh token. Retry with jittered backoff, and only remove the stored user when the
+// authorization server definitively rejects the refresh token.
+// 4 attempts spread over ~3-6s of jittered backoff. Kept deliberately short: the
+// refresh blocks getAccessToken callers, and rate-limit windows are per-second, so
+// ~1s spacing already lands retries in a fresh bucket. Outages longer than this are
+// covered across cycles — exhaustion keeps the user, so the next getAccessToken
+// call starts a new cycle.
+const SILENT_REFRESH_MAX_RETRIES = 3;
+const SILENT_REFRESH_RETRY_DELAY_MS = 1000;
+
+// OAuth error codes that are a definitive verdict on the refresh token or client —
+// the session cannot be recovered by retrying, so the stored user must be removed.
+// Sources:
+// - RFC 6749 §5.2 (token endpoint error codes, invalid_request..invalid_scope):
+//   https://datatracker.ietf.org/doc/html/rfc6749#section-5.2
+// - OIDC Core §3.1.2.6 (access_denied, login_required, consent_required,
+//   interaction_required, account_selection_required):
+//   https://openid.net/specs/openid-connect-core-1_0.html#AuthError
+// Anything else (RFC 6749's server_error / temporarily_unavailable, Auth0's
+// too_many_requests rate-limit code, unknown/custom codes) is treated as transient:
+// oidc-client-ts throws ErrorResponse for ANY non-OK response whose body has an
+// `error` field — including 429s and 5xxs — so an allowlist of fatal codes is the
+// only safe way to avoid destroying a still-valid session.
+// Auth0 rate limits: https://auth0.com/docs/troubleshoot/customer-support/operational-policies/rate-limit-policy
+const PERMANENT_OAUTH_ERROR_CODES = new Set([
+  'invalid_request',
+  'invalid_client',
+  'invalid_grant',
+  'unauthorized_client',
+  'unsupported_grant_type',
+  'invalid_scope',
+  'access_denied',
+  'login_required',
+  'consent_required',
+  'interaction_required',
+  'account_selection_required',
+]);
+
+const isPermanentRefreshError = (error: unknown): boolean => (
+  error instanceof ErrorResponse && PERMANENT_OAUTH_ERROR_CODES.has(error.error ?? '')
+);
 
 const extractTokenErrorMessage = (
   payload: unknown,
@@ -745,6 +790,33 @@ export class Auth {
     });
   }
 
+  private async signinSilentWithRetry(): Promise<OidcUser | null> {
+    // Retrying only helps when there is a refresh token to exchange — the failure
+    // modes worth absorbing (429s, 5xx, network blips) all live on that exchange.
+    // A silent login without one (no stored session, iframe flow) fails
+    // deterministically, so it gets a single attempt and fails fast.
+    const storedUser = await this.userManager.getUser();
+    const canRetry = !!storedUser?.refresh_token;
+
+    const attempt = async (attemptNumber: number): Promise<OidcUser | null> => {
+      try {
+        const oidcUser = await this.userManager.signinSilent();
+        if (attemptNumber > 1) {
+          track('passport', 'silentRefreshRecovered', { attempt: attemptNumber });
+        }
+        return oidcUser;
+      } catch (error) {
+        if (!canRetry || isPermanentRefreshError(error) || attemptNumber > SILENT_REFRESH_MAX_RETRIES) {
+          throw error;
+        }
+        logger.warn(`Silent refresh attempt ${attemptNumber} failed, retrying`, error);
+        await delay(backoffWithJitter(SILENT_REFRESH_RETRY_DELAY_MS, attemptNumber));
+        return attempt(attemptNumber + 1);
+      }
+    };
+    return attempt(1);
+  }
+
   private async refreshTokenAndUpdatePromise(): Promise<User | null> {
     if (this.refreshingPromise) {
       return this.refreshingPromise;
@@ -753,7 +825,7 @@ export class Auth {
     this.refreshingPromise = new Promise((resolve, reject) => {
       (async () => {
         try {
-          const newOidcUser = await this.userManager.signinSilent();
+          const newOidcUser = await this.signinSilentWithRetry();
           if (newOidcUser) {
             const user = Auth.mapOidcUserToDomainModel(newOidcUser);
             // Emit TOKEN_REFRESHED event so consumers (e.g., auth-next-client) can sync
@@ -767,21 +839,32 @@ export class Auth {
         } catch (err) {
           let passportErrorType = PassportErrorType.AUTHENTICATION_ERROR;
           let errorMessage = 'Failed to refresh token';
-          // Default to REMOVING user - safer to log out on unknown errors
-          // Only keep user logged in for explicitly known transient errors
-          let removeUser = true;
+          // Only remove the user when the authorization server definitively rejected
+          // the refresh token. Transient failures (network errors, timeouts, 5xx, rate
+          // limits) have already been retried by signinSilentWithRetry; if they still
+          // fail, keep the stored user so the next call can try again — the refresh
+          // token is still valid.
+          const removeUser = isPermanentRefreshError(err);
           if (err instanceof ErrorTimeout) {
             passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
             errorMessage = `${errorMessage}: ${err.message}`;
-            removeUser = false;
           } else if (err instanceof ErrorResponse) {
-            passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
+            passportErrorType = removeUser
+              ? PassportErrorType.NOT_LOGGED_IN_ERROR
+              : PassportErrorType.AUTHENTICATION_ERROR;
             errorMessage = `${errorMessage}: ${err.message || err.error_description}`;
           } else if (err instanceof Error) {
             errorMessage = `${errorMessage}: ${err.message}`;
           } else if (typeof err === 'string') {
             errorMessage = `${errorMessage}: ${err}`;
           }
+
+          // Terminal refresh failures were previously invisible (client-side
+          // logger.warn only), which made fleet-wide incidents impossible to see.
+          trackError('passport', 'silentRefresh', err instanceof Error ? err : new Error(errorMessage), {
+            userRemoved: removeUser,
+            ...(err instanceof ErrorResponse && err.error ? { oauthErrorCode: err.error } : {}),
+          });
 
           if (removeUser) {
             // Emit USER_REMOVED event BEFORE removing user so consumers can react

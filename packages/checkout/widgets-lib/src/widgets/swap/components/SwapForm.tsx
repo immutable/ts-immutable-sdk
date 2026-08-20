@@ -47,6 +47,7 @@ import { ConnectLoaderContext } from '../../../context/connect-loader-context/Co
 import useDebounce from '../../../lib/hooks/useDebounce';
 import { CancellablePromise } from '../../../lib/async/cancellablePromise';
 import { isPassportProvider } from '../../../lib/provider';
+import { parseChainId } from '../../../lib/chains';
 import { formatSwapFees } from '../functions/swapFees';
 import { processGasFree } from '../functions/processGasFree';
 import { processSecondaryFees } from '../functions/processSecondaryFees';
@@ -885,8 +886,7 @@ export function SwapForm({
     try {
     // check for switch network here
       const currentChainId = await (provider.provider as any).send('eth_chainId', []);
-      // eslint-disable-next-line radix
-      const parsedChainId = parseInt(currentChainId.toString());
+      const parsedChainId = parseChainId(currentChainId);
       if (parsedChainId !== checkout.config.l2ChainId) {
         setShowNetworkSwitchDrawer(true);
         return;
