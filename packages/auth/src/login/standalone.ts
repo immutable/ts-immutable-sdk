@@ -496,7 +496,6 @@ async function exchangeCodeForTokens(
     const attemptNumber = TOKEN_EXCHANGE_MAX_RETRIES - retriesLeft + 1;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), TOKEN_EXCHANGE_TIMEOUT_MS);
-    const startTime = Date.now();
 
     // Classified as data rather than thrown, so a permanent failure isn't confused with a
     // transient one by the catch below.
