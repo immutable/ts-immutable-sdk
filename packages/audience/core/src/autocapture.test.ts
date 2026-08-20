@@ -55,6 +55,7 @@ describe('autocapture', () => {
       },
       enqueue,
       () => consent,
+      'pk_imapik-test-local',
     );
     teardown = result.teardown;
   }
@@ -837,7 +838,7 @@ describe('autocapture', () => {
 
   describe('config defaults', () => {
     it('enables both listeners when no options specified', () => {
-      teardown = setupAutocapture({}, enqueue, () => consent).teardown;
+      teardown = setupAutocapture({}, enqueue, () => consent, 'pk_imapik-test-local').teardown;
 
       const form = document.createElement('form');
       form.action = '/signup';
@@ -1103,7 +1104,7 @@ describe('autocapture', () => {
 
       it('enables scroll tracking by default', () => {
         // Call setupAutocapture directly to verify production defaults
-        teardown = setupAutocapture({}, enqueue, () => consent).teardown;
+        teardown = setupAutocapture({}, enqueue, () => consent, 'pk_imapik-test-local').teardown;
 
         (window as Record<string, unknown>).scrollY = 375;
         document.dispatchEvent(new Event('scroll'));
@@ -1249,7 +1250,7 @@ describe('autocapture', () => {
       });
 
       it('allows milestones to re-fire after resetScroll() (SPA route change)', () => {
-        const result = setupAutocapture({ scroll: true }, enqueue, () => consent);
+        const result = setupAutocapture({ scroll: true }, enqueue, () => consent, 'pk_imapik-test-local');
         teardown = result.teardown;
 
         // Fire 25 milestone.
@@ -1272,7 +1273,7 @@ describe('autocapture', () => {
       });
 
       it('cancels pending rAF so stale scroll position cannot fire against new page', () => {
-        const result = setupAutocapture({ scroll: true }, enqueue, () => consent);
+        const result = setupAutocapture({ scroll: true }, enqueue, () => consent, 'pk_imapik-test-local');
         teardown = result.teardown;
 
         // User has scrolled to 50% — rAF is scheduled but has not yet fired.

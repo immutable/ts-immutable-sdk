@@ -80,13 +80,19 @@ export interface TransportResult {
  * - `'RATE_LIMITED'`:server returned 429. The batch is retained and will
  *                       be retried after the backoff window (honoring
  *                       `Retry-After` when present).
+ * - `'MULTIPLE_INSTANCES'`:`Audience.init()` was called while another instance
+ *                       was still live. Both instances stay running and will
+ *                       emit duplicate events until the earlier one is shut
+ *                       down. Not a transport failure — nothing was dropped —
+ *                       but it usually means a `shutdown()` call is missing.
  */
 export type AudienceErrorCode =
   | 'FLUSH_FAILED'
   | 'CONSENT_SYNC_FAILED'
   | 'NETWORK_ERROR'
   | 'VALIDATION_REJECTED'
-  | 'RATE_LIMITED';
+  | 'RATE_LIMITED'
+  | 'MULTIPLE_INSTANCES';
 
 /** One validation failure the backend reported for a single message. */
 export interface RejectionError {

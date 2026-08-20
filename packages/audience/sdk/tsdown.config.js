@@ -13,6 +13,14 @@ import { BUNDLED_WORKSPACE_DEPS } from './scripts/bundled-workspace-deps.mjs';
 
 const localVersion = pkg.version === '0.0.0' ? '0.0.0-local' : pkg.version;
 
+// Match each bundled workspace dep and any of its subpath exports (e.g.
+// `@imtbl/audience-core/internal`). A bare-name string only matches the base
+// specifier, so tsdown would leave subpath imports external and break
+// `npm install` for consumers (the private core package is never published).
+const BUNDLE_MATCHERS = BUNDLED_WORKSPACE_DEPS.map(
+  (name) => new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(/.*)?$`),
+);
+
 export default defineConfig((options) => {
   if (options.watch) {
     return {
@@ -23,7 +31,7 @@ export default defineConfig((options) => {
       platform: 'browser',
       dts: false,
       deps: {
-        alwaysBundle: BUNDLED_WORKSPACE_DEPS,
+        alwaysBundle: BUNDLE_MATCHERS,
         onlyBundle: false,
       },
       plugins: [
@@ -45,7 +53,7 @@ export default defineConfig((options) => {
       treeshake: true,
       dts: false,
       deps: {
-        alwaysBundle: BUNDLED_WORKSPACE_DEPS,
+        alwaysBundle: BUNDLE_MATCHERS,
         onlyBundle: false,
       },
       plugins: [
@@ -66,7 +74,7 @@ export default defineConfig((options) => {
       dts: false,
       clean: true,
       deps: {
-        alwaysBundle: BUNDLED_WORKSPACE_DEPS,
+        alwaysBundle: BUNDLE_MATCHERS,
         onlyBundle: false,
       },
       plugins: [replacePlugin({ __SDK_VERSION__: pkg.version })],

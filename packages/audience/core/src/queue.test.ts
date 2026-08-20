@@ -35,13 +35,15 @@ interface QueueOpts {
   logPrefix?: string;
 }
 
+const TEST_KEY = 'pk_imapik-test-local';
+
 function createQueue(
   send: HttpSend,
   opts: QueueOpts = {},
 ) {
   return new MessageQueue(
     send,
-    'pk_imapik-test-local',
+    TEST_KEY,
     {
       flushIntervalMs: opts.flushIntervalMs,
       flushSize: opts.flushSize,
@@ -122,12 +124,13 @@ describe('MessageQueue', () => {
     queue.enqueue(makeMessage('1'));
 
     const stored = JSON.parse(localStorage.getItem('__imtbl_audience_queue')!);
-    expect(stored).toHaveLength(1);
-    expect(stored[0].messageId).toBe('1');
+    expect(stored.publishableKey).toBe(TEST_KEY);
+    expect(stored.messages).toHaveLength(1);
+    expect(stored.messages[0].messageId).toBe('1');
   });
 
   it('restores messages from localStorage on construction', () => {
-    storage.setItem('queue', [makeMessage('restored')]);
+    storage.setItem('queue', { publishableKey: TEST_KEY, messages: [makeMessage('restored')] });
 
     const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
     const queue = createQueue(send);
@@ -136,7 +139,10 @@ describe('MessageQueue', () => {
   });
 
   it('filters stale messages on restore', () => {
-    storage.setItem('queue', [makeMessage('stale'), makeMessage('fresh')]);
+    storage.setItem('queue', {
+      publishableKey: TEST_KEY,
+      messages: [makeMessage('stale'), makeMessage('fresh')],
+    });
 
     const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
     const queue = createQueue(send, {
@@ -144,6 +150,30 @@ describe('MessageQueue', () => {
     });
 
     expect(queue.length).toBe(1);
+  });
+
+  it('drops a persisted queue belonging to a different publishable key', () => {
+    // A message carries no tenant of its own — the key is only applied as a
+    // header at send time. Restoring another key's batch would re-send it under
+    // ours, delivering one tenant's events into another's project.
+    storage.setItem('queue', {
+      publishableKey: 'pk_imapik-other-tenant',
+      messages: [makeMessage('other-tenant')],
+    });
+
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send);
+
+    expect(queue.length).toBe(0);
+  });
+
+  it('drops a legacy bare-array queue that carries no publishable key', () => {
+    storage.setItem('queue', [makeMessage('legacy')]);
+
+    const send = jest.fn<ReturnType<HttpSend>, Parameters<HttpSend>>().mockResolvedValue(okResult);
+    const queue = createQueue(send);
+
+    expect(queue.length).toBe(0);
   });
 
   it('filters stale messages before a flush attempt, not just on restore', async () => {

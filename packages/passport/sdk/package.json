@@ -28,7 +28,7 @@
     "typescript": "catalog:toolchain"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=20.11.0"
   },
   "exports": {
     "development": {

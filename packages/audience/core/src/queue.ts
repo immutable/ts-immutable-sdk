@@ -12,6 +12,23 @@ import { isBrowser } from './utils';
 const STORAGE_KEY = 'queue';
 const MAX_BATCH_SIZE = 100; // Backend maxItems limit per OAS
 
+/** Pre-namespacing localStorage prefix used by the web SDK's queue. */
+const LEGACY_WEB_PREFIX = '__imtbl_web_';
+
+/**
+ * Persisted queue envelope.
+ *
+ * The publishable key is stored alongside the messages because a message
+ * carries no tenant of its own — the key is only applied as a header at send
+ * time. Without it a restored batch cannot be attributed, and on a host serving
+ * several tenants from one origin it would be re-sent under whichever key
+ * happens to be active, delivering one tenant's events to another.
+ */
+interface PersistedQueue {
+  publishableKey: string;
+  messages: Message[];
+}
+
 export interface MessageQueueOptions {
   /** Override the default API base URL for the ingest endpoint. */
   baseUrl?: string;
@@ -109,10 +126,26 @@ export class MessageQueue {
     this.storagePrefix = options?.storagePrefix;
     this.logPrefix = options?.logPrefix ?? '[audience]';
 
-    const restored = (storage.getItem(STORAGE_KEY, this.storagePrefix) as Message[] | undefined) ?? [];
-    this.messages = this.staleFilter
-      ? restored.filter(this.staleFilter)
-      : restored;
+    this.messages = this.restore();
+  }
+
+  /**
+   * Reload persisted messages, dropping anything that cannot be proven to
+   * belong to this queue's publishable key.
+   *
+   * Two shapes are rejected: a bare array (the pre-namespacing format, which
+   * carries no key at all) and an envelope whose key differs from ours. Both
+   * would otherwise be re-sent under this instance's credential.
+   */
+  private restore(): Message[] {
+    const raw = storage.getItem(STORAGE_KEY, this.storagePrefix);
+    if (!raw || Array.isArray(raw)) return [];
+
+    const persisted = raw as PersistedQueue;
+    if (persisted.publishableKey !== this.publishableKey) return [];
+
+    const messages = persisted.messages ?? [];
+    return this.staleFilter ? messages.filter(this.staleFilter) : messages;
   }
 
   start(): void {
@@ -331,6 +364,23 @@ export class MessageQueue {
   }
 
   private persist(): void {
-    storage.setItem(STORAGE_KEY, this.messages, this.storagePrefix);
+    const envelope: PersistedQueue = {
+      publishableKey: this.publishableKey,
+      messages: this.messages,
+    };
+    storage.setItem(STORAGE_KEY, envelope, this.storagePrefix);
   }
+}
+
+/**
+ * Remove the pre-namespacing web SDK queue.
+ *
+ * Its messages carry no publishable key, so they cannot be re-homed into a
+ * namespaced queue without guessing which tenant they belong to — and guessing
+ * wrong sends one tenant's events to another. Dropped instead. The old key is
+ * only non-empty when the unload flush failed to drain it, so this loses at
+ * most a small number of events, once, per browser.
+ */
+export function clearLegacyQueue(): void {
+  storage.removeItem(STORAGE_KEY, LEGACY_WEB_PREFIX);
 }

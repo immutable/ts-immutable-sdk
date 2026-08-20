@@ -1,20 +1,25 @@
 export { Audience } from './sdk';
 export { AudienceEvents } from './events';
 export {
+  CONVERSION_ID_PROPERTY,
+  CONVERSION_NETWORK_PROPERTY,
+  DEDUP_CAPABLE_NETWORKS,
+} from './conversion';
+export type { ConversionResult } from './conversion';
+export {
   IdentityType,
   canTrack,
   canIdentify,
   AudienceError,
   getAttributionNetwork,
-  isPaidMeta,
-  isPaidTikTok,
-  isPaidGoogle,
-  isPaidReddit,
-  isPaidX,
+  collectPageAttribution,
+  clearAttribution,
 } from '@imtbl/audience-core';
 export type { ImmutableAudienceGlobal } from './cdn';
 export type { AudienceConfig } from './types';
-export type { AudienceErrorCode, AutocaptureOptions, AttributionNetwork } from '@imtbl/audience-core';
+export type {
+  Attribution, AudienceErrorCode, AutocaptureOptions, AttributionNetwork,
+} from '@imtbl/audience-core';
 export type {
   AchievementType,
   AchievementUnlockedProperties,
