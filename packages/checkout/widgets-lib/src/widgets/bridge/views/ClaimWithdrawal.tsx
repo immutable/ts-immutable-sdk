@@ -67,7 +67,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
   useEffect(() => {
     const getWithdrawalTxn = async () => {
       if (!tokenBridge || !transaction || transaction.details.current_status?.index === undefined) return;
-      // get withdrawal transaction from the token bridge by receipient address and index
+      // get withdrawal transaction from the token bridge by recipient address and index
       setLoading(true);
       try {
         const flowRateWithdrawTxnResponse = await tokenBridge?.getFlowRateWithdrawTx({
