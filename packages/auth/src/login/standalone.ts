@@ -414,6 +414,11 @@ async function buildAuthorizationUrl(
       if (directLoginOptions.email) {
         url.searchParams.set('direct', 'email');
         url.searchParams.set('email', directLoginOptions.email);
+        // Standard OIDC login_hint so the hosted (Ory/Hydra) login path receives the
+        // email too — Hydra relays login_hint onto the login request (the custom
+        // `email` param is dropped), letting the branded page resume at the OTP
+        // screen (PLT-1666). The Auth0 path keeps using `email` and is unaffected.
+        url.searchParams.set('login_hint', directLoginOptions.email);
       }
     } else {
       url.searchParams.set('direct', directLoginOptions.directLoginMethod);

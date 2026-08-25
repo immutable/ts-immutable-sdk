@@ -454,6 +454,12 @@ export class Auth {
         if (emailValue) {
           params.direct = directLoginOptions.directLoginMethod;
           params.email = emailValue;
+          // Standard OIDC login_hint so the hosted (Ory/Hydra) login path also
+          // receives the email: Hydra does not relay the custom `email` param to
+          // the login UI, but it does relay login_hint onto the login request, so
+          // the branded page can resume at the OTP screen (PLT-1666). The Auth0
+          // path keeps using `email` above and is unaffected.
+          params.login_hint = emailValue;
         }
       } else {
         params.direct = directLoginOptions.directLoginMethod;

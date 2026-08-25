@@ -504,6 +504,45 @@ describe('Auth', () => {
       );
     });
 
+    it('forwards the email as login_hint for direct email login (PLT-1666)', async () => {
+      const mockOidcUser = {
+        id_token: 'token',
+        access_token: 'access',
+        refresh_token: 'refresh',
+        expired: false,
+        profile: { sub: 'user-123', email: 'test@example.com', nickname: 'tester' },
+      };
+
+      (decodeJwtPayload as jest.Mock).mockReturnValue({
+        username: 'username123',
+        passport: undefined,
+      });
+
+      mockUserManager.signinPopup.mockResolvedValue(mockOidcUser);
+
+      const auth = Object.create(Auth.prototype) as Auth;
+      (auth as any).userManager = mockUserManager;
+      (auth as any).config = {
+        popupOverlayOptions: { disableHeadlessLoginPromptOverlay: true },
+      };
+      getDetailMock.mockReturnValue('runtime-id-value');
+
+      await (auth as any).loginWithPopup({
+        directLoginMethod: 'email',
+        email: 'test@example.com',
+      });
+
+      expect(mockUserManager.signinPopup).toHaveBeenCalledWith(
+        expect.objectContaining({
+          extraQueryParams: expect.objectContaining({
+            direct: 'email',
+            email: 'test@example.com',
+            login_hint: 'test@example.com',
+          }),
+        }),
+      );
+    });
+
     it('rejects when signinPopup rejects', async () => {
       const error = new Error('Authentication failed');
       mockUserManager.signinPopup.mockRejectedValue(error);
