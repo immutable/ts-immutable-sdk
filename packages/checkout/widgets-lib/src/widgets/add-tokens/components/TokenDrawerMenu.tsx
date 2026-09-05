@@ -106,10 +106,6 @@ export function TokenDrawerMenu({
     }),
     [
       addTokensState.allowedTokens,
-      addTokensState.tokens,
-      handleTokenChange,
-      isSelected,
-      defaultTokenImage,
       searchValue,
     ],
   );
@@ -126,7 +122,7 @@ export function TokenDrawerMenu({
   }, [setVisible, setSearchValue]);
 
   useEffect(() => {
-    if (!checkout || addTokensState.tokens != null) return;
+    if (!checkout || addTokensState.allowedTokens || !addTokensState.tokens) return;
 
     (async () => {
       try {
@@ -136,18 +132,31 @@ export function TokenDrawerMenu({
         });
 
         if (tokenResponse?.tokens.length > 0) {
-          const updatedTokens = tokenResponse.tokens.map((token) => {
+          const updatedTokens = tokenResponse.tokens.reduce((acc, token) => {
+            if (!addTokensState.tokens) throw new Error('Squid tokens not loaded');
+
             if (isNativeToken(token.address)) {
-              return {
+              acc.push({
                 ...token,
                 icon: getTokenImageByAddress(
                   checkout.config.environment as Environment,
                   token.symbol,
                 ),
-              };
+              });
+              return acc;
             }
-            return token;
-          });
+
+            const squidToken = addTokensState.tokens.find((x) =>
+              x.address.toLowerCase() === token.address?.toLowerCase());
+
+            if (squidToken) {
+              acc.push(token);
+              return acc;
+            }
+
+            return acc;
+          }, new Array<TokenInfo>());
+
           updatedTokens.sort((a, b) => {
             const aIndex = TOKEN_PRIORITY_ORDER.findIndex(
               (token) => token === a.symbol,
