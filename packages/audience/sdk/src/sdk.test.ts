@@ -129,6 +129,97 @@ describe('Audience', () => {
       second.shutdown();
     });
 
+    it('reports MULTIPLE_INSTANCES through onError', () => {
+      // The console warning alone never reaches production monitoring, so
+      // double-initialisation goes unnoticed. onError is the monitorable path.
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+      const onError = jest.fn();
+
+      const first = createSDK();
+      const second = Audience.init({
+        publishableKey: 'pk_imapik-test-other',
+        consent: 'none',
+        onError,
+      });
+
+      expect(onError).toHaveBeenCalledWith(
+        expect.objectContaining({ code: 'MULTIPLE_INSTANCES' }),
+      );
+
+      warnSpy.mockRestore();
+      first.shutdown();
+      second.shutdown();
+    });
+
+    it('does not report MULTIPLE_INSTANCES for a lone instance', () => {
+      const onError = jest.fn();
+      const sdk = Audience.init({
+        publishableKey: 'pk_imapik-test-local',
+        consent: 'none',
+        onError,
+      });
+
+      expect(onError).not.toHaveBeenCalled();
+      sdk.shutdown();
+    });
+
+    it('clears the pre-namespacing storage keys on init', () => {
+      // Legacy entries carry no publishable key, so they cannot be attributed
+      // to a tenant. Dropped rather than migrated — carrying them into a
+      // namespaced key would preserve the cross-tenant replay we are fixing.
+      localStorage.setItem('__imtbl_web_queue', JSON.stringify([{ messageId: 'legacy' }]));
+      sessionStorage.setItem('__imtbl_attribution', JSON.stringify({ utm_source: 'legacy' }));
+
+      const sdk = createSDK();
+
+      expect(localStorage.getItem('__imtbl_web_queue')).toBeNull();
+      expect(sessionStorage.getItem('__imtbl_attribution')).toBeNull();
+      sdk.shutdown();
+    });
+
+    it('scopes the queue storage key to the publishable key', () => {
+      const sdk = createSDK();
+      sdk.track('custom_event', { foo: 'bar' });
+
+      expect(localStorage.getItem('__imtbl_web_pk_imapik-test-local_queue')).not.toBeNull();
+      expect(localStorage.getItem('__imtbl_web_queue')).toBeNull();
+      sdk.shutdown();
+    });
+
+    it('does not replay a previous tenant\'s attribution onto a new key', async () => {
+      // The reported bug: two publishable keys on one origin share a browser
+      // session, and the session-wide attribution cache is read before it is
+      // written, so the first landing's UTMs ride on the second tenant's events.
+      Object.defineProperty(window, 'location', {
+        value: new URL('https://portal.example.com/game-a?utm_source=meta&utm_medium=cpc'),
+        writable: true,
+        configurable: true,
+      });
+      const first = createSDK();
+      first.shutdown();
+
+      Object.defineProperty(window, 'location', {
+        value: new URL('https://portal.example.com/game-b'),
+        writable: true,
+        configurable: true,
+      });
+      const second = Audience.init({
+        publishableKey: 'pk_imapik-test-other',
+        consent: 'full',
+      });
+
+      fetchCalls.length = 0;
+      second.page();
+      await second.flush();
+
+      const pageMessage = sentMessages().find((m) => m.type === 'page');
+      expect(pageMessage).toBeDefined();
+      expect(pageMessage?.properties?.utm_source).toBeUndefined();
+      expect(pageMessage?.properties?.landing_page).toBe('https://portal.example.com/game-b');
+
+      second.shutdown();
+    });
+
     it('adopts imtbl_aid from URL and uses it as the anonymous ID', () => {
       Object.defineProperty(window, 'location', {
         value: {

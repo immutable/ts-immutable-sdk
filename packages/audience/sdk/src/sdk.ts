@@ -26,7 +26,11 @@ import {
   truncate,
   collectContext,
   collectSessionAttribution,
+  clearLegacyAttribution,
+  clearLegacyQueue,
   collectThirdPartyIds,
+  AudienceError,
+  invokeOnError,
   getAttributionNetwork as resolveAttributionNetwork,
   getOrCreateSessionId,
   createConsentManager,
@@ -185,7 +189,10 @@ export class Audience {
         onFlush: (ok, count) => this.debug.logFlush(ok, count),
         onError: config.onError,
         staleFilter: (m) => isTimestampValid(m.eventTimestamp),
-        storagePrefix: '__imtbl_web_',
+        // Namespaced per tenant: a host serving several publishable keys from
+        // one origin would otherwise share a single queue, and a restore could
+        // re-send one tenant's persisted events under another's credential.
+        storagePrefix: `__imtbl_web_${publishableKey}_`,
         logPrefix: LOG_PREFIX,
       },
     );
@@ -200,7 +207,7 @@ export class Audience {
       config.baseUrl,
     );
 
-    this.attribution = collectSessionAttribution();
+    this.attribution = collectSessionAttribution(publishableKey);
 
     if (!this.isTrackingDisabled()) this.queue.start();
 
@@ -209,26 +216,43 @@ export class Audience {
       config.autocapture ?? {},
       (eventName, properties) => this.track(eventName, properties),
       () => this.consent.level,
+      publishableKey,
     );
     this.teardownAutocapture = autocaptureResult.teardown;
     this.resetScrollDepth = autocaptureResult.resetScroll;
   }
 
   /**
-   * Create and start the SDK. Warns if another instance is already active —
-   * call `shutdown()` on the previous one first.
+   * Create and start the SDK. Reports `MULTIPLE_INSTANCES` via `onError` if
+   * another instance is already active — call `shutdown()` on the previous one
+   * first.
    */
   static init(config: AudienceConfig): Audience {
     if (!config.publishableKey?.trim()) {
       throw new Error(`${LOG_PREFIX} publishableKey is required`);
     }
     if (Audience.liveInstances > 0) {
+      const message = `${LOG_PREFIX} Multiple SDK instances detected.`
+        + ' Ensure previous instances are shut down to avoid duplicate events.';
       // eslint-disable-next-line no-console
-      console.warn(
-        `${LOG_PREFIX} Multiple SDK instances detected.`
-        + ' Ensure previous instances are shut down to avoid duplicate events.',
-      );
+      console.warn(message);
+      // Also surfaced through onError: the console warning alone never reaches
+      // production monitoring, so double-initialisation goes unnoticed.
+      // Not a transport failure, so there is no status or endpoint to report.
+      invokeOnError(config.onError, new AudienceError({
+        code: 'MULTIPLE_INSTANCES',
+        message,
+        status: 0,
+        endpoint: '',
+      }));
     }
+
+    // One-time cleanup of the pre-namespacing storage keys. Their contents
+    // carry no publishable key, so they cannot be re-homed without guessing
+    // which tenant they belong to — see clearLegacyQueue / clearLegacyAttribution.
+    clearLegacyQueue();
+    clearLegacyAttribution();
+
     Audience.liveInstances += 1;
     return new Audience(config);
   }
