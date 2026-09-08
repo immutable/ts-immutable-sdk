@@ -28,6 +28,7 @@ export const sendSaleSuccessEvent = (
   transactions: ExecutedTransaction[] = [],
   tokenIds: string[] = [],
   transactionId: string = '',
+  status?: string,
 ) => {
   const event = new CustomEvent<
   WidgetEvent<WidgetType.SALE, SaleEventType.SUCCESS>
@@ -39,6 +40,7 @@ export const sendSaleSuccessEvent = (
         transactions,
         tokenIds,
         transactionId,
+        status,
       },
     },
   });
