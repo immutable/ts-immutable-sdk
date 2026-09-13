@@ -1,26 +1,15 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { BridgeReviewSummary } from '../components/BridgeReviewSummary';
 
 export function BridgeReview() {
   const { t } = useTranslation();
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-
-  const { page } = useAnalytics();
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.BRIDGE,
-      screen: 'Review',
-    });
-  }, []);
-
   return (
     <SimpleLayout
       testId="bridge-review"

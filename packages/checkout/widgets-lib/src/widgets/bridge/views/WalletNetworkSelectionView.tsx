@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { ButtCon } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import { IMTBLWidgetEvents, ThemeOverrides } from '@imtbl/checkout-sdk';
@@ -9,7 +9,6 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { ButtonNavigationStyles } from '../../../components/Header/HeaderStyles';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { WalletAndNetworkSelector } from '../components/WalletAndNetworkSelector';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
@@ -26,16 +25,6 @@ export function WalletNetworkSelectionView({
   const { viewDispatch } = useContext(ViewContext);
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-
-  const { page } = useAnalytics();
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.BRIDGE,
-      screen: 'WalletNetworkSelection',
-    });
-  }, []);
-
   return (
     <SimpleLayout
       testId="bridge-view"

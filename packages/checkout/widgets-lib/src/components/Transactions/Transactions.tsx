@@ -35,10 +35,6 @@ import {
   CryptoFiatContext,
 } from '../../context/crypto-fiat-context/CryptoFiatContext';
 import {
-  UserJourney,
-  useAnalytics,
-} from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import {
   BridgeActions,
   BridgeContext,
 } from '../../widgets/bridge/context/BridgeContext';
@@ -111,11 +107,7 @@ export function Transactions({
   const {
     bridgeDispatch,
     bridgeState: { checkout, from, tokenBridge },
-  } = useContext(BridgeContext);
-  const { page } = useAnalytics();
-  const { t } = useTranslation();
-  const { track } = useAnalytics();
-
+  } = useContext(BridgeContext); const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [knownTokenMap, setKnownTokenMap] = useState<
   KnownNetworkMap | undefined
@@ -269,16 +261,6 @@ export function Transactions({
 
   const handleWalletChange = useCallback(
     async (event: WalletChangeEvent) => {
-      track({
-        userJourney: UserJourney.BRIDGE,
-        screen: 'EmptyStateNotConnected',
-        control: 'WalletProvider',
-        controlType: 'Select',
-        extras: {
-          walletProviderName: event.providerDetail.info.name,
-        },
-      });
-
       try {
         let changeAccount = false;
         if (event.providerDetail.info.rdns === WalletProviderRdns.METAMASK) {
@@ -311,7 +293,7 @@ export function Transactions({
         setShowWalletDrawer(false);
       }
     },
-    [checkout, bridgeDispatch, track],
+    [checkout, bridgeDispatch],
   );
 
   const handleBackButtonClick = () => {
@@ -384,14 +366,6 @@ export function Transactions({
       setLoading(false);
     })();
   }, [from, checkout, fetchData]);
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.BRIDGE,
-      screen: 'Transactions',
-    });
-  }, [page]);
-
   return (
     <SimpleLayout
       testId="bridge-view"

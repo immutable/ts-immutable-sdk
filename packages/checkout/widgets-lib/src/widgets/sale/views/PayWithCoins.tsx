@@ -14,7 +14,6 @@ import {
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
-import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { isPassportProvider } from '../../../lib/provider';
 import { errorToString, getRemoteRive } from '../../../lib/utils';
 import { HandoverDuration } from '../../../context/handover-context/HandoverProvider';
@@ -55,7 +54,6 @@ export function PayWithCoins() {
 
   const { t } = useTranslation();
   const {
-    sendPageView,
     sendTransactionSuccessEvent,
     sendFailedEvent,
     sendCloseEvent,
@@ -89,7 +87,7 @@ export function PayWithCoins() {
       },
       (error, txns) => {
         const details = { transactionId: signResponse?.transactionId };
-        sendFailedEvent(error.toString(), error, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
+        sendFailedEvent(error.toString(), error, txns, details);
         goToErrorView(error.type, error.data);
       },
       onTxnStepExecuteAll,
@@ -114,7 +112,7 @@ export function PayWithCoins() {
             const details = {
               transactionId: signResponse?.transactionId,
             };
-            sendFailedEvent(err.toString(), err, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
+            sendFailedEvent(err.toString(), err, txns, details);
             goToErrorView(err.type, err.data);
           },
           onTxnStepExecuteNextTransaction,
@@ -141,8 +139,6 @@ export function PayWithCoins() {
     signResponse,
     environment,
   ]);
-
-  useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
 
   useEffect(() => {
     if (!provider || filteredTransactions.length === 0) return;
@@ -183,12 +179,11 @@ export function PayWithCoins() {
         ),
         onClose: () => {
           sendSuccessEvent(
-            SaleWidgetViews.SALE_SUCCESS,
             executeResponse?.transactions,
             signTokenIds,
             details,
-          ); // checkoutPrimarySaleSaleSuccess_SuccessEventSucceeded
-          sendCloseEvent(SaleWidgetViews.SALE_SUCCESS); // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
+          );
+          sendCloseEvent();
         },
       });
     }

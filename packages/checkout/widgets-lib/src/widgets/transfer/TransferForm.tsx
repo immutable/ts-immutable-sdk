@@ -10,7 +10,6 @@ import { SelectInput } from '../../components/FormComponents/SelectInput/SelectI
 import { TextInputForm } from '../../components/FormComponents/TextInputForm/TextInputForm';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
-import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
@@ -42,9 +41,7 @@ export function TransferForm({
   title: string;
   coinAmountTitle: string;
 }) {
-  const { t } = useTranslation();
-  const { track } = useAnalytics();
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const { t } = useTranslation(); const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { cryptoFiatState } = useContext(CryptoFiatContext);
 
   const tokenOptions = useMemo(
@@ -88,36 +85,20 @@ export function TransferForm({
 
   const handleTokenChange = useCallback(
     (optionKey: OptionKey) => {
-      track({
-        screen: 'TransferToken',
-        userJourney: UserJourney.TRANSFER,
-        control: 'SelectToken',
-        controlType: 'Select',
-        extras: { token: optionKey },
-      });
       if (typeof optionKey !== 'string') throw new Error('Invalid token address');
       setViewState((s) => ({ ...s, tokenAddress: optionKey, amountError: '' }));
     },
-    [setViewState, track],
+    [setViewState],
   );
 
   const handleMaxButtonClick = useCallback(() => {
     if (!token) throw new Error('Token not found');
     if (!token.balance) throw new Error('Token balance not found');
-
-    track({
-      screen: 'TransferToken',
-      userJourney: UserJourney.TRANSFER,
-      control: 'Max',
-      controlType: 'Button',
-      extras: { token: token.id, amount: token.balance.fullBalance },
-    });
-
     setViewState((s) => {
       if (!token.balance) throw new Error('Token balance not found');
       return { ...s, amount: token.balance.fullBalance };
     });
-  }, [token, setViewState, track]);
+  }, [token, setViewState]);
 
   const handleRecipientAddressChange = useCallback((value: string) => {
     setViewState((s) => ({ ...s, toAddress: value, toAddressError: '' }));
@@ -188,9 +169,6 @@ export function TransferForm({
               onSelectChange={handleTokenChange}
               selectedOption={token?.id}
               defaultTokenImage={defaultTokenImage}
-              userJourney={UserJourney.TRANSFER}
-              screen="TransferToken"
-              control="Token"
               theme={config.theme}
               themeOverrides={config.themeOverrides}
             />

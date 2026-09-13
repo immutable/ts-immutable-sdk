@@ -33,7 +33,6 @@ import { PaymentMethods } from './views/PaymentMethods';
 import { SaleErrorView } from './views/SaleErrorView';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { TopUpView } from '../../views/top-up/TopUpView';
-import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { OrderSummary } from './views/OrderSummary';
@@ -171,7 +170,6 @@ export default function SaleWidget(props: SaleWidgetProps) {
           )}
           {viewState.view.type === SharedViews.TOP_UP_VIEW && (
             <TopUpView
-              analytics={{ userJourney: UserJourney.SALE }}
               widgetEvent={IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT}
               checkout={checkout}
               provider={provider}

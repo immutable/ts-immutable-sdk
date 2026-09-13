@@ -29,7 +29,6 @@ import {
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { BalanceInfo, mapTokenBalancesWithConversions } from '../functions/tokenBalances';
 import { isPassportProvider } from '../../../lib/provider';
 
@@ -60,9 +59,6 @@ export function WalletBalances({
   const { conversions } = cryptoFiatState;
   const isPassport = isPassportProvider(provider);
   const enableNetworkMenu = !isPassport && showNetworkMenu;
-
-  const { track, page } = useAnalytics();
-
   const balanceInfos: BalanceInfo[] = useMemo(
     () => {
       if (!network?.chainId) return [];
@@ -71,14 +67,6 @@ export function WalletBalances({
     },
     [tokenBalances, conversions, network?.chainId],
   );
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.WALLET,
-      screen: 'WalletBalances',
-    });
-  }, []);
-
   useEffect(() => {
     (async () => {
       if (!checkout) return;
@@ -120,12 +108,6 @@ export function WalletBalances({
   }, [checkout, network, supportedTopUps]);
 
   const handleAddCoinsClick = () => {
-    track({
-      userJourney: UserJourney.WALLET,
-      screen: 'WalletBalances',
-      control: 'AddCoins',
-      controlType: 'Button',
-    });
     orchestrationEvents.sendRequestAddTokensEvent(eventTarget, IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {});
   };
 
@@ -148,12 +130,6 @@ export function WalletBalances({
               sx={ButtonNavigationStyles()}
               iconVariant="bold"
               onClick={() => {
-                track({
-                  userJourney: UserJourney.WALLET,
-                  screen: 'WalletBalances',
-                  control: 'Settings',
-                  controlType: 'Button',
-                });
                 viewDispatch({
                   payload: {
                     type: ViewActions.UPDATE_VIEW,

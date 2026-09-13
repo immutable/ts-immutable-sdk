@@ -22,8 +22,6 @@ import { LoadingView } from '../../views/loading/LoadingView';
 import ConnectWidget from '../../widgets/connect/ConnectWidget';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import { identifyUser } from '../../lib/analytics/identifyUser';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -77,9 +75,6 @@ export function ConnectLoader({
   const {
     connectionStatus, deepLink, provider,
   } = connectLoaderState;
-
-  const { identify, user } = useAnalytics();
-
   const hasNoWalletProviderNameAndNoBrowserProvider = (localProvider?: WrappedBrowserProvider): boolean => {
     if (!walletProviderName && !localProvider) {
       connectLoaderDispatch({
@@ -211,17 +206,6 @@ export function ConnectLoader({
         } catch (err) {
           return;
         }
-
-        try {
-          // WT-1698 Analytics - Identify user here then progress to widget
-          // TODO: Identify user should be separated out into a use Effect with only the provider (from connect loader state) as dependency
-          const userData = user ? await user() : undefined;
-          const anonymousId = userData?.anonymousId();
-          await identifyUser(identify, browserProvider!, { anonymousId });
-        } catch (err) {
-          return;
-        }
-
         // The user is connected and the widget will be shown
         connectLoaderDispatch({
           payload: {

@@ -22,10 +22,6 @@ import {
 import { OnRampWidgetViews } from '../../../context/view-context/OnRampViewContextTypes';
 import { boxMainStyle, containerStyle } from './onRampStyles';
 import {
-  useAnalytics,
-  UserJourney,
-} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import {
   TransakEventData,
   TransakEvents,
   TransakStatuses,
@@ -34,7 +30,6 @@ import { ConnectLoaderContext } from '../../../context/connect-loader-context/Co
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { TRANSAK_ORIGIN } from '../../../components/Transak/useTransakEvents';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
-import { isPassportProvider } from '../../../lib/provider';
 
 const transakIframeId = 'transak-iframe';
 const IN_PROGRESS_VIEW_DELAY_MS = 6000; // 6 second
@@ -80,17 +75,6 @@ function useWidgetUrl(
   return widgetUrl;
 }
 
-function useWalletAddress(provider: WrappedBrowserProvider | undefined) {
-  const [userWalletAddress, setUserWalletAddress] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    if (!provider) return;
-    provider.getSigner().then((signer) => signer.getAddress()).then(setUserWalletAddress);
-  }, [provider]);
-
-  return userWalletAddress;
-}
-
 export function OnRampMain({
   passport,
   showIframe,
@@ -111,11 +95,8 @@ export function OnRampMain({
   const { t } = useTranslation();
   const { viewState, viewDispatch } = useContext(ViewContext);
   const widgetUrl = useWidgetUrl(checkout, provider, tokenAddress, tokenAmount, passport, showMenu, customSubTitle);
-  const userWalletAddress = useWalletAddress(provider);
 
   const eventTimer = useRef<number | undefined>();
-
-  const isPassport = !!passport && isPassportProvider(provider);
 
   const openedFromTopUpView = useMemo(
     () => viewState.history.length > 2
@@ -125,76 +106,6 @@ export function OnRampMain({
   );
 
   const showBack = showBackButton || openedFromTopUpView;
-
-  const { track } = useAnalytics();
-
-  const trackSegmentEvents = useCallback(async (
-    event: TransakEventData,
-    walletAddress: string,
-  ) => {
-    const miscProps = {
-      userId: walletAddress.toLowerCase(),
-      isPassportWallet: isPassport,
-    };
-    switch (event.event_id) {
-      case TransakEvents.TRANSAK_WIDGET_OPEN:
-        track({
-          userJourney: UserJourney.ON_RAMP,
-          screen: 'InputScreen',
-          control: 'TransakWidgetOpen',
-          controlType: 'IframeEvent',
-          extras: { ...miscProps },
-        }); // checkoutOnRampInputScreen_TransakWidgetOpenIframeEvent
-        break;
-      case TransakEvents.TRANSAK_ORDER_CREATED:
-        track({
-          userJourney: UserJourney.ON_RAMP,
-          screen: 'InputScreen',
-          control: 'OrderCreated',
-          controlType: 'IframeEvent',
-          extras: { ...miscProps },
-        }); // checkoutOnRampInputScreen_OrderCreatedIframeEvent
-        break;
-      case TransakEvents.TRANSAK_ORDER_SUCCESSFUL:
-        if (event.data.status === TransakStatuses.PROCESSING) {
-          // user paid
-          track({
-            userJourney: UserJourney.ON_RAMP,
-            screen: 'OrderInProgress',
-            control: 'PaymentProcessing',
-            controlType: 'IframeEvent',
-            extras: {
-              ...miscProps,
-              transactionHash: event.data.transactionHash,
-            },
-          }); // checkoutOnRampOrderInProgress_PaymentProcessingIframeEvent
-        }
-        if (event.data.status === TransakStatuses.COMPLETED) {
-          track({
-            userJourney: UserJourney.ON_RAMP,
-            screen: 'Success',
-            control: 'PaymentCompleted',
-            controlType: 'IframeEvent',
-            extras: {
-              ...miscProps,
-              transactionHash: event.data.transactionHash,
-            },
-          }); // checkoutOnRampSuccess_PaymentCompletedIframeEvent
-        }
-        break;
-      case TransakEvents.TRANSAK_ORDER_FAILED: // payment failed
-        track({
-          userJourney: UserJourney.ON_RAMP,
-          screen: 'Failure',
-          control: 'PaymentFailed',
-          controlType: 'IframeEvent',
-          extras: { ...miscProps },
-        }); // checkoutOnRampFailure_PaymentFailedIframeEvent
-        break;
-      default:
-    }
-  }, [isPassport, track]);
-
   const transakEventHandler = useCallback((event: TransakEventData) => {
     if (eventTimer.current) clearTimeout(eventTimer.current);
 
@@ -291,7 +202,6 @@ export function OnRampMain({
         && host
         && TRANSAK_ORIGIN.includes(host)
       ) {
-        trackSegmentEvents(event.data, userWalletAddress ?? '');
         transakEventHandler(event.data);
       }
     };
@@ -302,7 +212,7 @@ export function OnRampMain({
     return () => {
       window.removeEventListener('message', handleTransakEvents);
     };
-  }, [trackSegmentEvents, transakEventHandler, userWalletAddress]);
+  }, [transakEventHandler]);
 
   return (
     <Box sx={boxMainStyle(showIframe)}>

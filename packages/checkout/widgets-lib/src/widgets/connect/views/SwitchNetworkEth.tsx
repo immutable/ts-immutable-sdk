@@ -1,5 +1,5 @@
 import {
-  useCallback, useContext, useEffect, useState,
+  useCallback, useContext, useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getChainNameById } from '../../../lib/chains';
@@ -14,7 +14,6 @@ import {
   ViewContext,
   ViewActions,
 } from '../../../context/view-context/ViewContext';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export function SwitchNetworkEth() {
   const { t } = useTranslation();
@@ -22,26 +21,8 @@ export function SwitchNetworkEth() {
   const { connectDispatch, connectState } = useContext(ConnectContext);
   const { checkout, provider, sendCloseEvent } = connectState;
   const [buttonTextKey, setButtonTextKey] = useState(t('views.SWITCH_NETWORK.eth.button.text'));
-
-  const { page, track } = useAnalytics();
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.CONNECT,
-      screen: 'SwitchNetworkEth',
-    });
-  }, []);
-
   const switchNetwork = useCallback(async () => {
-    if (!provider || !checkout) return;
-
-    track({
-      userJourney: UserJourney.CONNECT,
-      screen: 'SwitchNetworkEth',
-      control: 'Switch',
-      controlType: 'Button',
-    });
-    try {
+    if (!provider || !checkout) return; try {
       const switchRes = await checkout.switchNetwork({
         provider,
         chainId: checkout.config.l1ChainId,
@@ -65,7 +46,7 @@ export function SwitchNetworkEth() {
     } catch (err: any) {
       setButtonTextKey(t('views.SWITCH_NETWORK.eth.button.retryText'));
     }
-  }, [provider, checkout, track]);
+  }, [provider, checkout]);
 
   return (
     <SimpleLayout

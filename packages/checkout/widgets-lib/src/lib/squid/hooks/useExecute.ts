@@ -9,18 +9,15 @@ import { EIP6963ProviderInfo, WrappedBrowserProvider } from '@imtbl/checkout-sdk
 import { isSquidNativeToken } from '../functions/isSquidNativeToken';
 import { retry } from '../../retry';
 import { withMetricsAsync } from '../../metrics';
-import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { isRejectedError } from '../../../functions/errorType';
 import { callApprove, callExecute } from '../functions/execute';
 
 const TRANSACTION_NOT_COMPLETED = 'transaction not completed';
 
 export const useExecute = (
-  userJourney: UserJourney,
+  flowPrefix: 'AddTokens' | 'Purchase',
   onTransactionError?: (err: unknown) => void,
 ) => {
-  const { user } = useAnalytics();
-
   const getAllowance = async (
     provider: WrappedBrowserProvider,
     routeResponse: RouteResponse,
@@ -53,16 +50,6 @@ export const useExecute = (
       return undefined;
     }
   };
-
-  const getAnonymousId = async () => {
-    try {
-      const userData = await user();
-      return userData?.anonymousId() ?? undefined;
-    } catch (error) {
-      return undefined;
-    }
-  };
-
   const approve = async (
     fromProviderInfo: EIP6963ProviderInfo,
     provider: WrappedBrowserProvider,
@@ -72,8 +59,8 @@ export const useExecute = (
       if (!isSquidNativeToken(routeResponse?.route?.params.fromToken)) {
         return await withMetricsAsync(
           (flow) => callApprove(flow, fromProviderInfo, provider, routeResponse),
-          `${userJourney}_Approve`,
-          await getAnonymousId(),
+          `${flowPrefix}_Approve`,
+          undefined,
           (error) => (isRejectedError(error) ? 'rejected' : ''),
         );
       }
@@ -96,8 +83,8 @@ export const useExecute = (
     try {
       return await withMetricsAsync(
         (flow) => callExecute(flow, squid, fromProviderInfo, provider, routeResponse),
-        `${userJourney}_Execute`,
-        await getAnonymousId(),
+        `${flowPrefix}_Execute`,
+        undefined,
         (error) => (isRejectedError(error) ? 'rejected' : ''),
       );
     } catch (error) {

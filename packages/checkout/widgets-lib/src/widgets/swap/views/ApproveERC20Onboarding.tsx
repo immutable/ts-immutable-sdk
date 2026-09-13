@@ -1,6 +1,6 @@
 import { Box } from '@biom3/react';
 import {
-  useCallback, useContext, useEffect, useMemo, useState,
+  useCallback, useContext, useMemo, useState,
 } from 'react';
 import { CheckoutError, CheckoutErrorType, TokenInfo } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
@@ -22,15 +22,11 @@ import { ConnectLoaderContext } from '../../../context/connect-loader-context/Co
 import { SpendingCapHero } from '../../../components/Hero/SpendingCapHero';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { isPassportProvider } from '../../../lib/provider';
 
 export interface ApproveERC20Props {
   data: ApproveERC20SwapData;
 }
-
-const APPROVE_SPENDING = 'ApproveSpending';
-const APPROVE_SWAP = 'ApproveSwap';
 
 export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   const { t } = useTranslation();
@@ -51,19 +47,6 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   // reject transaction flags
   const [rejectedSpending, setRejectedSpending] = useState(false);
   const [rejectedSwap, setRejectedSwap] = useState(false);
-
-  const { page, track } = useAnalytics();
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.SWAP,
-      screen: noApprovalTransaction ? APPROVE_SWAP : APPROVE_SPENDING,
-      extras: {
-        swapFormInfo: data.swapFormInfo,
-      },
-    });
-  }, []);
-
   // Get symbol from swap info for approve amount text
   const fromToken = useMemo(
     () => allowedTokens.find(
@@ -152,15 +135,6 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const handleApproveSpendingClick = useCallback(async () => {
     if (loading) return;
-    track({
-      userJourney: UserJourney.SWAP,
-      screen: APPROVE_SPENDING,
-      control: APPROVE_SPENDING,
-      controlType: 'Button',
-      extras: {
-        autoProceed: data.autoProceed,
-      },
-    });
     setLoading(true);
 
     if (!checkout || !provider) {
@@ -256,15 +230,6 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const handleApproveSwapClick = useCallback(async () => {
     if (loading) return;
-    track({
-      userJourney: UserJourney.SWAP,
-      screen: APPROVE_SWAP,
-      control: APPROVE_SWAP,
-      controlType: 'Button',
-      extras: {
-        autoProceed: data.autoProceed,
-      },
-    });
     setLoading(true);
 
     if (!checkout || !provider) {

@@ -28,9 +28,9 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActionType } from '@0xsquid/squid-types';
 import { trackFlow } from '@imtbl/metrics';
 import { parseUnits } from 'ethers/utils';
+import { v4 as uuidv4 } from 'uuid';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -46,7 +46,7 @@ import {
 import type { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
 import { AddTokensWidgetViews } from '../../../context/view-context/AddTokensViewContextTypes';
-import { AddTokensErrorTypes, AddTokensExperiments } from '../types';
+import { AddTokensErrorTypes } from '../types';
 import { DeliverToWalletDrawer } from '../../../components/WalletDrawer/DeliverToWalletDrawer';
 import { PayWithWalletDrawer } from '../../../components/WalletDrawer/PayWithWalletDrawer';
 import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
@@ -54,10 +54,6 @@ import { getProviderSlugFromRdns } from '../../../lib/provider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { sendConnectProviderSuccessEvent } from '../AddTokensWidgetEvents';
 import { convertToUsd } from '../../../lib/squid/functions/convertToUsd';
-import {
-  useAnalytics,
-  UserJourney,
-} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { validateToAmount } from '../functions/amountValidation';
 import { OnboardingDrawer } from '../components/OnboardingDrawer';
 import { useError } from '../hooks/useError';
@@ -66,14 +62,12 @@ import { TokenDrawerMenu } from '../components/TokenDrawerMenu';
 import { PULSE_SHADOW } from '../utils/animation';
 import { RouteData } from '../../../lib/squid/types';
 import { SQUID_NATIVE_TOKEN, TOOLKIT_SQUID_URL } from '../../../lib/squid/config';
-import { identifyUser } from '../../../lib/analytics/identifyUser';
 import { NotEnoughGasDrawer } from '../../../components/NotEnoughGasDrawer/NotEnoughGasDrawer';
 import { SelectedWallet } from '../../../components/SelectedWallet/SelectedWallet';
 import { RouteOptionsDrawer } from '../../../components/RouteOptionsDrawer/RouteOptionsDrawer';
 import { SelectedRouteOption } from '../../../components/SelectedRouteOption/SelectedRouteOption';
 import { getFormattedAmounts } from '../../../functions/getFormattedNumber';
 import { checkSanctionedAddresses } from '../../../functions/checkSanctionedAddresses';
-import { RouteError } from '../../../lib/squid/RouteError';
 
 interface AddTokensProps {
   checkout: Checkout;
@@ -120,15 +114,7 @@ export function AddTokens({
     selectedRouteData,
     selectedToken,
     isSwapAvailable,
-    experiments,
   } = addTokensState;
-
-  const {
-    track,
-    page,
-    identify,
-    user,
-  } = useAnalytics();
   const { viewDispatch } = useContext(ViewContext);
   const { t } = useTranslation();
 
@@ -188,31 +174,6 @@ export function AddTokens({
   }, [selectedAmount, inputValue]);
 
   const setSelectedRouteData = (route: RouteData | undefined) => {
-    if (route) {
-      track({
-        userJourney: UserJourney.ADD_TOKENS,
-        screen: 'InputScreen',
-        control: 'RoutesMenu',
-        controlType: 'MenuItem',
-        extras: {
-          contextId: id,
-          toTokenAddress: route.amountData.toToken.address,
-          toTokenChainId: route.amountData.toToken.chainId,
-          toTokenSymbol: route.amountData.toToken.symbol,
-          fromTokenAddress: route.amountData.fromToken.address,
-          fromTokenChainId: route.amountData.fromToken.chainId,
-          fromTokenSymbol: route.amountData.fromToken.symbol,
-          toAmount: route.amountData.toAmount,
-          fromAmount: route.amountData.fromAmount,
-          isBridge: route.amountData.toToken.chainId !== route.amountData.fromToken.chainId,
-          isSwap: route.amountData.toToken.chainId === route.amountData.fromToken.chainId,
-          hasEmbeddedSwap: !!route.route.route.estimate.actions.find(
-            (action) => action.type === ActionType.SWAP,
-          ),
-          isInsufficientGas: route.isInsufficientGas,
-        },
-      });
-    }
     addTokensDispatch({
       payload: {
         type: AddTokensActions.SET_SELECTED_ROUTE_DATA,
@@ -229,17 +190,6 @@ export function AddTokens({
 
       if (amount > 0) {
         setSelectedAmount(value);
-
-        track({
-          userJourney: UserJourney.ADD_TOKENS,
-          screen: 'InputScreen',
-          control: 'AmountInput',
-          controlType: 'TextInput',
-          extras: {
-            contextId: id,
-            toAmount: value,
-          },
-        });
       } else {
         setSelectedAmount('');
       }
@@ -282,12 +232,7 @@ export function AddTokens({
   useEffect(() => {
     if (!lockedToProvider) { return; }
 
-    (async () => {
-      const userData = user ? await user() : undefined;
-      const anonymousId = userData?.anonymousId();
-
-      await identifyUser(identify, toProvider!, { anonymousId });
-    })();
+    (async () => { })();
   }, [toProvider, lockedToProvider]);
 
   const toChain = useMemo(
@@ -296,20 +241,8 @@ export function AddTokens({
   );
 
   useEffect(() => {
-    if (!id || isSwapAvailable === undefined) { return; }
-
-    page({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'InputScreen',
-      extras: {
-        contextId: id,
-        toAmount,
-        toTokenAddress,
-        geoBlocked: !isSwapAvailable,
-      },
-    }).then((ctx) => {
-      trackFlow('commerce', `addTokensLoaded_${ctx.event.messageId}`);
-    });
+    if (!id || isSwapAvailable === undefined) return;
+    trackFlow('commerce', `addTokensLoaded_${uuidv4()}`);
   }, [id, isSwapAvailable]);
 
   useEffect(() => {
@@ -364,32 +297,8 @@ export function AddTokens({
           if (availableRoutes.length === 0) {
             setInsufficientBalance(true);
           }
-
-          track({
-            userJourney: UserJourney.ADD_TOKENS,
-            screen: 'InputScreen',
-            control: 'RoutesMenu',
-            controlType: 'MenuItem',
-            action: 'Request',
-            extras: {
-              contextId: id,
-              routesAvailable: availableRoutes.length,
-              geoBlocked: !isSwapAvailable,
-            },
-          });
-        } catch (error) {
-          if (error instanceof RouteError && error.data) {
-            track({
-              userJourney: UserJourney.ADD_TOKENS,
-              screen: 'Routes',
-              action: 'Failed',
-              extras: {
-                contextId: id,
-                message: error.message,
-                ...error.data,
-              },
-            });
-          }
+        } catch {
+          // Route errors are reflected by the empty routes state.
         }
 
         setFetchingRoutes(false);
@@ -417,24 +326,13 @@ export function AddTokens({
           setOnRampAllowedTokens(tokenResponse.tokens);
         }
       } catch (error) {
-        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { contextId: id, error });
+        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN);
       }
     };
     fetchOnRampTokens();
   }, [checkout, id]);
 
   const sendRequestOnRampEvent = async () => {
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'InputScreen',
-      control: 'PayWithCardMenu',
-      controlType: 'MenuItem',
-      extras: {
-        contextId: id,
-        tokenAddress: selectedToken?.address ?? '',
-        amount: selectedAmount ?? '',
-      },
-    });
     const data = {
       tokenAddress: selectedToken?.address ?? '',
       amount: selectedAmount ?? '',
@@ -501,23 +399,6 @@ export function AddTokens({
 
       return;
     }
-
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'InputScreen',
-      control: 'Review',
-      controlType: 'Button',
-      extras: {
-        contextId: id,
-        toTokenAddress: selectedRouteData.amountData.toToken.address,
-        toTokenChainId: selectedRouteData.amountData.toToken.chainId,
-        fromTokenAddress: selectedRouteData.amountData.fromToken.address,
-        fromTokenChainId: selectedRouteData.amountData.fromToken.chainId,
-        toAmount: selectedRouteData.amountData.toAmount,
-        fromAmount: selectedRouteData.amountData.fromAmount,
-      },
-    });
-
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -575,19 +456,6 @@ export function AddTokens({
     provider: WrappedBrowserProvider,
     providerInfo: EIP6963ProviderInfo,
   ) => {
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'InputScreen',
-      control: 'WalletsMenu',
-      controlType: 'MenuItem',
-      extras: {
-        contextId: id,
-        providerType,
-        providerName: providerInfo.name,
-        providerRdns: providerInfo.rdns,
-        providerUuid: providerInfo.uuid,
-      },
-    });
     sendConnectProviderSuccessEvent(
       eventTarget,
       providerType,
@@ -605,20 +473,6 @@ export function AddTokens({
     }
     return undefined;
   };
-
-  useEffect(() => {
-    if (!id || !experiments) return;
-
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'Experiments',
-      action: 'Started',
-      extras: {
-        contextId: id,
-        preselectedToken: experiments[AddTokensExperiments.PRESELECTED_TOKEN] || 'none',
-      },
-    });
-  }, [id, experiments]);
 
   useEffect(() => {
     if (selectedRouteData?.isInsufficientGas) {

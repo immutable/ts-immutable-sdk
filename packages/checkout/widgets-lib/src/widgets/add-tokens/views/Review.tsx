@@ -14,9 +14,9 @@ import {
   Sticker,
   useInterval,
 } from '@biom3/react';
-import { ChainId } from '@imtbl/checkout-sdk';
 import { trackFlow } from '@imtbl/metrics';
 import { t } from 'i18next';
+import { v4 as uuidv4 } from 'uuid';
 import {
   useCallback,
   useContext,
@@ -38,11 +38,6 @@ import { useExecute } from '../../../lib/squid/hooks/useExecute';
 import { useRoutes } from '../../../lib/squid/hooks/useRoutes';
 import { AddTokensContext } from '../context/AddTokensContext';
 import { AddTokensErrorTypes } from '../types';
-
-import {
-  useAnalytics,
-  UserJourney,
-} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext } from '../../../context/providers-context/ProvidersContext';
 import { getRouteChains } from '../../../lib/squid/functions/getRouteChains';
 import { getTotalRouteFees } from '../../../lib/squid/functions/getTotalRouteFees';
@@ -60,7 +55,6 @@ import {
 } from '../../../lib/squid/config';
 import { verifyAndSwitchChain } from '../../../lib/squid/functions/verifyAndSwitchChain';
 import { useError } from '../hooks/useError';
-import { FromAmountData } from '../../../lib/squid/types';
 import {
   sendAddTokensSuccessEvent,
 } from '../AddTokensWidgetEvents';
@@ -90,12 +84,9 @@ export function Review({
   onCloseButtonClick,
 }: ReviewProps) {
   const { viewDispatch } = useContext(ViewContext);
-
-  const { track, page } = useAnalytics();
-
   const {
     addTokensState: {
-      id, squid, chains, tokens,
+      squid, chains, tokens,
     },
   } = useContext(AddTokensContext);
 
@@ -112,7 +103,6 @@ export function Review({
   } = useContext(EventTargetContext);
 
   const [route, setRoute] = useState<RouteResponse | undefined>();
-  const [amountData, setAmountData] = useState<FromAmountData | undefined>();
   const [proceedDisabled, setProceedDisabled] = useState(true);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [showSecuringQuote, setShowSecuringQuote] = useState(false);
@@ -124,21 +114,7 @@ export function Review({
 
   const {
     getAllowance, approve, execute, getStatus,
-  } = useExecute(UserJourney.ADD_TOKENS, onTransactionError);
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'Review',
-      extras: {
-        contextId: id,
-        toAmount: data.toAmount,
-        toChainId: data.toChainId,
-        toTokenAddress: data.toTokenAddress,
-      },
-    });
-  }, [id]);
-
+  } = useExecute('AddTokens', onTransactionError);
   const getFromAmountAndRoute = async () => {
     if (!squid || !tokens) return;
 
@@ -170,14 +146,10 @@ export function Review({
       false,
     );
     setRoute(routeResponse.route);
-    setAmountData(updatedAmountData);
     setProceedDisabled(false);
     setShowSecuringQuote(false);
     if (routeResponse?.route === undefined) {
-      showErrorHandover(AddTokensErrorTypes.ROUTE_ERROR, {
-        contextId: id,
-        error: 'Failed to obtain final route',
-      });
+      showErrorHandover(AddTokensErrorTypes.ROUTE_ERROR);
     }
   };
 
@@ -197,20 +169,6 @@ export function Review({
   );
 
   const openFeeBreakdown = () => {
-    const feesToken = route?.route.estimate.feeCosts?.[0]?.token;
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'Review',
-      control: 'FeeBreakdown',
-      controlType: 'Button',
-      extras: {
-        contextId: id,
-        feesToken: feesToken?.symbol,
-        totalAmount: feesToken ? getFormattedNumber(totalFees, feesToken.decimals) : null,
-        totalFiatAmount: getFormattedAmounts(totalFeesUsd),
-      },
-    });
-
     setShowFeeBreakdown(true);
   };
 
@@ -268,32 +226,10 @@ export function Review({
     }
 
     let currentFromAddress = '';
-    track({
-      userJourney: UserJourney.ADD_TOKENS,
-      screen: 'Review',
-      control: 'Proceed',
-      controlType: 'Button',
-      extras: {
-        contextId: id,
-        toTokenAddress: route.route.params.toToken,
-        toTokenChainId: route.route.params.toChain,
-        fromTokenAddress: route.route.params.fromToken,
-        fromTokenChainId: route.route.params.fromChain,
-        fromAddress: route.route.params.fromAddress,
-        toAddress: route.route.params.toAddress,
-        estimatedRouteDuration: route.route.estimate.estimatedRouteDuration,
-        fromAmount: amountData?.fromAmount,
-        toAmount: amountData?.toAmount,
-      },
-    });
-
     try {
       currentFromAddress = await (await fromProvider.getSigner()).getAddress();
     } catch (error) {
-      showErrorHandover(AddTokensErrorTypes.PROVIDER_ERROR, {
-        contextId: id,
-        error,
-      });
+      showErrorHandover(AddTokensErrorTypes.PROVIDER_ERROR);
       return;
     }
 
@@ -338,31 +274,7 @@ export function Review({
     const executeTxnReceipt = await execute(squid, fromProviderInfo, changeableProvider, route);
 
     if (executeTxnReceipt) {
-      track({
-        userJourney: UserJourney.ADD_TOKENS,
-        screen: 'FundsAdded',
-        action: 'Succeeded',
-        extras: {
-          contextId: id,
-          ...(route.route.params.fromChain !== ChainId.IMTBL_ZKEVM_MAINNET.toString()
-            && { txHash: executeTxnReceipt.hash }),
-          ...(route.route.params.fromChain === ChainId.IMTBL_ZKEVM_MAINNET.toString()
-            && { immutableZkEVMTxHash: executeTxnReceipt.hash }),
-          toTokenAddress: route.route.params.toToken,
-          toTokenChainId: route.route.params.toChain,
-          fromTokenAddress: route.route.params.fromToken,
-          fromTokenChainId: route.route.params.fromChain,
-          fromAmount: amountData?.fromAmount,
-          fromAddress: route.route.params.fromAddress,
-          toAddress: route.route.params.toAddress,
-          toAmount: amountData?.toAmount,
-          fromTokenSymbol: amountData?.fromToken.symbol,
-          toTokenSymbol: amountData?.toToken.symbol,
-        },
-      }).then((ctx) => {
-        trackFlow('commerce', `addTokensFundsAdded_${ctx.event.messageId}`);
-      });
-
+      trackFlow('commerce', `addTokensFundsAdded_${uuidv4()}`);
       sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.hash);
 
       if (toChain === fromChain) {
