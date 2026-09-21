@@ -96,15 +96,6 @@ export const CHECKOUT_CDN_BASE_URL = {
 };
 
 /**
- * URL for axelar scan based on the environment
- */
-export const AXELAR_SCAN_URL = {
-  [ENV_DEVELOPMENT]: 'https://testnet.axelarscan.io/gmp/',
-  [Environment.SANDBOX]: 'https://testnet.axelarscan.io/gmp/',
-  [Environment.PRODUCTION]: 'https://axelarscan.io/gmp/',
-};
-
-/**
  * URL for passport based on environment
  */
 export const PASSPORT_URL = {
