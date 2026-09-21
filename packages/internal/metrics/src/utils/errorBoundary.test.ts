@@ -20,7 +20,7 @@ describe('errorBoundary', () => {
     };
     expect(errorBoundary(testFn)).not.toThrowError();
   });
-  it('should not throw an error for an async funtion that errors', () => {
+  it('should not throw an error for an async function that errors', () => {
     const testFn = async () => {
       throw new Error('test');
     };
