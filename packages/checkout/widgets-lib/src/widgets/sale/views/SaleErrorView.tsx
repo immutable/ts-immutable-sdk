@@ -90,7 +90,7 @@ export function SaleErrorView({
           const details = {
             transactionId: signResponse?.transactionId,
           };
-          sendFailedEvent(err.toString(), err, txns, undefined, details);
+          sendFailedEvent(err.toString(), err, txns, details);
           setCurrentErrorType(SaleErrorTypes.TRANSACTION_FAILED);
         },
         onTxnStepExecuteNextTransaction,

@@ -4,7 +4,6 @@ import {
 import { Checkout } from '@imtbl/checkout-sdk';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { PASSPORT_URL } from '../../lib';
 import {
   noTransactionsBodyStyle, noTransactionsContainerStyle, passportBodyStyle, containerStyles,
@@ -24,7 +23,6 @@ export function NoTransactions(
     changeWallet,
   }: NoTransactionsProps,
 ) {
-  const { page } = useAnalytics();
   const { t } = useTranslation();
   const [passportLink, setPassportLink] = useState('');
 
@@ -32,14 +30,6 @@ export function NoTransactions(
     if (!checkout) return;
     setPassportLink(PASSPORT_URL[checkout.config.environment]);
   }, [checkout]);
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.BRIDGE,
-      screen: 'NoTransactions',
-    });
-  }, []);
-
   return (
     <Box sx={containerStyles}>
       <ChangeWallet onChangeWalletClick={changeWallet} />

@@ -12,12 +12,10 @@ import { MenuItemProps } from '@biom3/react';
 import { UnableToConnectDrawer } from '../../../components/UnableToConnectDrawer/UnableToConnectDrawer';
 import { WalletDrawer } from '../../../components/WalletDrawer/WalletDrawer';
 import { WalletChangeEvent } from '../../../components/WalletDrawer/WalletDrawerEvents';
-import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useProvidersContext, ProvidersContextActions } from '../../../context/providers-context/ProvidersContext';
-import { identifyUser } from '../../../lib/analytics/identifyUser';
 import { ConnectEIP6963ProviderError, connectEIP6963Provider } from '../../../lib/connectEIP6963Provider';
-import { getProviderSlugFromRdns } from '../../../lib/provider';
-import { removeSpace } from '../../../lib/utils';
+import { } from '../../../lib/provider';
+import { } from '../../../lib/utils';
 
 type PurchaseConnectWalletDrawerProps = {
   heading: string;
@@ -28,7 +26,6 @@ type PurchaseConnectWalletDrawerProps = {
     providerInfo: EIP6963ProviderInfo
   ) => void;
   onError?: (errorType: ConnectEIP6963ProviderError) => void;
-  providerType: 'from' | 'to';
   walletOptions: EIP6963ProviderDetail[];
   bottomSlot?: ReactNode;
   menuItemSize?: MenuItemProps['size'];
@@ -36,7 +33,6 @@ type PurchaseConnectWalletDrawerProps = {
     label: string;
     rdns: string;
   }[];
-  shouldIdentifyUser?: boolean;
   drawerBackground: string | undefined;
 };
 
@@ -46,21 +42,16 @@ export function PurchaseConnectWalletDrawer({
   onClose,
   onConnect,
   onError,
-  providerType,
   walletOptions,
   bottomSlot,
   menuItemSize = 'small',
   disabledOptions = [],
-  shouldIdentifyUser = true,
   drawerBackground,
 }: PurchaseConnectWalletDrawerProps) {
   const {
     providersState: { checkout },
     providersDispatch,
   } = useProvidersContext();
-
-  const { identify, track, user } = useAnalytics();
-
   const prevWalletChangeEvent = useRef<WalletChangeEvent | undefined>();
 
   const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
@@ -94,20 +85,6 @@ export function PurchaseConnectWalletDrawer({
   const handleWalletConnection = async (event: WalletChangeEvent) => {
     const { providerDetail } = event;
     const { info } = providerDetail;
-
-    // Trigger analytics connect wallet, menu item, with wallet details
-    track({
-      userJourney: UserJourney.CONNECT,
-      screen: 'ConnectWallet',
-      control: removeSpace(info.name),
-      controlType: 'MenuItem',
-      extras: {
-        providerType,
-        wallet: getProviderSlugFromRdns(info.rdns),
-        walletRdns: info.rdns,
-      },
-    });
-
     if (info.rdns === WalletProviderRdns.PASSPORT) {
       const { isConnected } = await checkout.checkIsWalletConnected({
         provider: new WrappedBrowserProvider(providerDetail.provider!),
@@ -126,15 +103,6 @@ export function PurchaseConnectWalletDrawer({
         checkout,
         true,
       );
-
-      // Identify connected wallet, retaining current anonymousId
-      if (shouldIdentifyUser) {
-        const userData = user ? await user() : undefined;
-        const anonymousId = userData?.anonymousId();
-
-        await identifyUser(identify, provider, { anonymousId });
-      }
-
       // Store selected provider as fromProvider in context
       address = await setProviderInContext(provider, providerDetail.info);
 

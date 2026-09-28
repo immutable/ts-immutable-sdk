@@ -1,5 +1,5 @@
 import { Box, Button } from '@biom3/react';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 import { isWalletConnectProvider } from '../../../lib/provider';
@@ -17,10 +17,6 @@ import {
 } from './SettingsStyles';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import {
-  UserJourney,
-  useAnalytics,
-} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { TransferAssetsL1Warning } from '../components/TransferAssetsL1Warning';
 
 export interface SettingsProps {
@@ -38,16 +34,6 @@ export function Settings({ showDisconnectButton }: SettingsProps) {
   } = useContext(EventTargetContext);
 
   const { ethereumProvider } = useWalletConnect();
-
-  const { page } = useAnalytics();
-
-  useEffect(() => {
-    page({
-      userJourney: UserJourney.WALLET,
-      screen: 'Settings',
-    });
-  }, []);
-
   // disconnect all Wallet Connect pairings and disconnect the provider
   // so that restoreSession doesn't pick up the previous sessions
   const handleWCDisconnect = async () => {

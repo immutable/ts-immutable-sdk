@@ -33,7 +33,6 @@ import {
   ConnectLoaderContext,
 } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
-import { UserJourney, useAnalytics } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export function NetworkMenu() {
   const { t } = useTranslation();
@@ -46,21 +45,9 @@ export function NetworkMenu() {
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[] | undefined>(
     [],
   );
-  const { track } = useAnalytics();
-
   const switchNetwork = useCallback(
     async (chainId: ChainId) => {
       if (!checkout || !provider || !network || Number(network.chainId) === chainId) return;
-      track({
-        userJourney: UserJourney.WALLET,
-        screen: 'WalletBalances',
-        control: 'SwitchNetwork',
-        controlType: 'Button',
-        extras: {
-          chainId,
-        },
-      });
-
       try {
         const switchNetworkResult = await checkout.switchNetwork({
           provider,

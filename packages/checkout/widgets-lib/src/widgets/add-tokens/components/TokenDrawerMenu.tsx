@@ -32,10 +32,6 @@ import {
   getTokenImageByAddress,
   isNativeToken,
 } from '../../../lib/utils';
-import {
-  useAnalytics,
-  UserJourney,
-} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { AddTokensErrorTypes } from '../types';
 import { TokenImage } from '../../../components/TokenImage/TokenImage';
 import { PULSE_SHADOW } from '../utils/animation';
@@ -62,9 +58,7 @@ export function TokenDrawerMenu({
   const defaultTokenImage = getDefaultTokenImage(
     checkout?.config.environment,
     config.theme,
-  );
-  const { track } = useAnalytics();
-  const { t } = useTranslation();
+  ); const { t } = useTranslation();
 
   const setSelectedToken = (token: TokenInfo | undefined) => {
     addTokensDispatch({
@@ -77,16 +71,6 @@ export function TokenDrawerMenu({
 
   const handleTokenChange = useCallback(
     (token: TokenInfo) => {
-      track({
-        userJourney: UserJourney.ADD_TOKENS,
-        screen: 'InputScreen',
-        control: 'TokensMenu',
-        controlType: 'MenuItem',
-        extras: {
-          contextId: addTokensState.id,
-          tokenAddress: token?.address,
-        },
-      });
       setSelectedToken(token);
       setVisible(false);
       setSearchValue('');
@@ -188,7 +172,7 @@ export function TokenDrawerMenu({
           });
         }
       } catch (error) {
-        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN, { contextId: addTokensState.id, error });
+        showErrorHandover(AddTokensErrorTypes.SERVICE_BREAKDOWN);
       }
     })();
   }, [addTokensState.tokens, checkout, toTokenAddress]);

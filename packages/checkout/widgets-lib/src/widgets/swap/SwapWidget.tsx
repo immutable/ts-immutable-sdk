@@ -50,7 +50,6 @@ import { TopUpView } from '../../views/top-up/TopUpView';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { getAllowedBalances } from '../../lib/balance';
-import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { ServiceUnavailableToRegionErrorView } from '../../views/error/ServiceUnavailableToRegionErrorView';
 import { ServiceType } from '../../views/error/serviceTypes';
@@ -95,9 +94,6 @@ export default function SwapWidget({
     history: [],
   });
   const [swapState, swapDispatch] = useReducer(swapReducer, initialSwapState);
-
-  const { page } = useAnalytics();
-
   const [errorViewLoading, setErrorViewLoading] = useState(false);
 
   const swapReducerValues = useMemo(
@@ -281,16 +277,6 @@ export default function SwapWidget({
               statusText={t('views.SWAP.success.text')}
               actionText={t('views.SWAP.success.actionText')}
               onRenderEvent={() => {
-                page({
-                  userJourney: UserJourney.SWAP,
-                  screen: 'SwapSuccess',
-                  extras: {
-                    fromTokenAddress: viewState.view.data?.fromTokenAddress,
-                    fromAmount: viewState.view.data?.fromAmount,
-                    toTokenAddress: viewState.view.data?.toTokenAddress,
-                    toAmount: viewState.view.data?.toAmount,
-                  },
-                });
                 sendSwapSuccessEvent(
                   eventTarget,
                   (viewState.view as SwapSuccessView).data.transactionHash,
@@ -306,10 +292,6 @@ export default function SwapWidget({
               statusText={t('views.SWAP.failed.text')}
               actionText={t('views.SWAP.failed.actionText')}
               onRenderEvent={() => {
-                page({
-                  userJourney: UserJourney.SWAP,
-                  screen: 'SwapFailed',
-                });
                 sendSwapFailedEvent(eventTarget, 'Transaction failed');
               }}
               onActionClick={() => {
@@ -335,11 +317,6 @@ export default function SwapWidget({
               statusText={t('views.SWAP.rejected.text')}
               actionText={t('views.SWAP.rejected.actionText')}
               onRenderEvent={() => {
-                page({
-                  userJourney: UserJourney.SWAP,
-                  screen: 'PriceSurge',
-                  extras: viewState.view.data,
-                });
                 sendSwapRejectedEvent(eventTarget, 'Price surge');
               }}
               onActionClick={() => {
@@ -392,7 +369,6 @@ export default function SwapWidget({
             )}
             {viewState.view.type === SharedViews.TOP_UP_VIEW && (
               <TopUpView
-                analytics={{ userJourney: UserJourney.SWAP }}
                 checkout={checkout}
                 provider={provider}
                 widgetEvent={IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT}

@@ -44,7 +44,7 @@ type OrderSummaryProps = {
 
 export function OrderSummary({ subView }: OrderSummaryProps) {
   const { t } = useTranslation();
-  const { sendFailedEvent, sendProceedToPay, sendInsufficientFunds } = useSaleEvent();
+  const { sendFailedEvent } = useSaleEvent();
   const {
     fromTokenAddress,
     collectionName,
@@ -138,7 +138,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
 
     if (riskAssessment && isSingleAddressSanctioned(riskAssessment, address)) {
       const error = new Error('Sanctioned address');
-      sendFailedEvent(error.message, {}, [], undefined, { riskAssessment, paymentMethod });
+      sendFailedEvent(error.message, {}, [], { riskAssessment, paymentMethod });
 
       viewDispatch({
         payload: {
@@ -152,13 +152,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
 
       return;
     }
-
-    sendProceedToPay(
-      SaleWidgetViews.ORDER_SUMMARY,
-      fundingBalance,
-      cryptoFiatState.conversions,
-    );
-    // checkoutPrimarySaleProceedToPay
 
     if (type === FundingBalanceType.SUFFICIENT) {
       signAndProceed(fundingItem.token.address);
@@ -236,12 +229,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         smartCheckoutResult.transactionRequirements,
       );
       setPaymentMethod(undefined);
-
-      // Send analytics event to track insufficient funds
-      sendInsufficientFunds(
-        SaleWidgetViews.ORDER_SUMMARY,
-        data,
-      );
 
       closeHandover();
       viewDispatch({

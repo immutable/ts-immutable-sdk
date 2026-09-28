@@ -80,7 +80,6 @@ export function PayWithWalletDrawer({
       disabledOptions={disabledOptions}
       bottomSlot={payWithCardItem}
       onConnect={handleOnConnect}
-      shouldIdentifyUser={false}
       drawerBackground={drawerBackground}
     />
   );

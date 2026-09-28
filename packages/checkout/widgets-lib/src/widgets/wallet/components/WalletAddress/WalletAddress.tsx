@@ -6,10 +6,6 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { WrappedBrowserProvider } from '@imtbl/checkout-sdk';
-import {
-  UserJourney,
-  useAnalytics,
-} from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { getWalletLogoByName } from '../../../../lib/logoUtils';
 import { getWalletProviderNameByProvider, isPassportProvider } from '../../../../lib/provider';
 import { abbreviateWalletAddress } from '../../../../lib/utils';
@@ -36,9 +32,6 @@ export function WalletAddress({
   const [isCopied, setIsCopied] = useState(false);
 
   const { t } = useTranslation();
-
-  const { track } = useAnalytics();
-
   const ctaIcon = useMemo<AllIconKeys>(() => {
     if (isPassportProvider(provider) && !showL1Warning) {
       return 'ShowPassword';
@@ -57,12 +50,6 @@ export function WalletAddress({
 
   const handleIconClick = async () => {
     if (walletAddress && ctaIcon === 'CopyText') {
-      track({
-        userJourney: UserJourney.WALLET,
-        screen: 'Settings',
-        control: 'CopyWalletAddress',
-        controlType: 'Button',
-      });
       navigator.clipboard.writeText(walletAddress);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 1000);

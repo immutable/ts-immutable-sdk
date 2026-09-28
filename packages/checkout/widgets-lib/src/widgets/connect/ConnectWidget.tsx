@@ -20,7 +20,6 @@ import { useTranslation } from 'react-i18next';
 import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
-import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { ConnectWidgetView, ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import {
@@ -31,7 +30,6 @@ import {
   viewReducer,
 } from '../../context/view-context/ViewContext';
 import { addProviderListenersForWidgetRoot, sendProviderUpdatedEvent } from '../../lib';
-import { identifyUser } from '../../lib/analytics/identifyUser';
 import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
 import {
   isMetaMaskProvider, isPassportProvider, isWalletConnectProvider,
@@ -112,9 +110,6 @@ export default function ConnectWidget({
     () => ({ viewState, viewDispatch }),
     [viewState, viewDispatch],
   );
-
-  const { identify, page, user } = useAnalytics();
-
   const targetChain = targetChainId ?? checkout.config.l2ChainId;
 
   useEffect(() => {
@@ -176,19 +171,8 @@ export default function ConnectWidget({
   }, [isWalletConnectEnabled, ethereumProvider]);
 
   const handleConnectSuccess = useCallback(async () => {
-    if (!provider) return;
-    // WT-1698 Analytics - Identify user here
-    page({
-      userJourney: UserJourney.CONNECT,
-      screen: 'ConnectSuccess',
-    });
-    // Set up EIP-1193 provider event listeners for widget root instances
+    if (!provider) return; // Set up EIP-1193 provider event listeners for widget root instances
     addProviderListenersForWidgetRoot(provider);
-
-    const userData = user ? await user() : undefined;
-    const anonymousId = userData?.anonymousId();
-
-    await identifyUser(identify, provider, { anonymousId });
     sendProviderUpdatedEvent({ provider });
 
     // Find the wallet provider info via injected with Passport and MetaMask fallbacks
@@ -206,7 +190,7 @@ export default function ConnectWidget({
       return;
     }
     sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined, walletProviderInfo);
-  }, [provider, identify]);
+  }, [provider]);
 
   return (
     <ViewContext.Provider value={viewReducerValues}>

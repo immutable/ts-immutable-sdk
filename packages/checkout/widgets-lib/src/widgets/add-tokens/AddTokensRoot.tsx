@@ -8,7 +8,6 @@ import {
 } from '@imtbl/checkout-sdk';
 import React, { Suspense } from 'react';
 import { Base } from '../BaseWidgetRoot';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import i18n from '../../i18n';
 import { LoadingView } from '../../views/loading/LoadingView';
@@ -71,35 +70,35 @@ export class AddTokens extends Base<WidgetType.ADD_TOKENS> {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="add-tokens-container" config={this.strongConfig()}>
-            <HandoverProvider>
-              <ProvidersContextProvider
-                initialState={{
-                  checkout: this.checkout,
-                  toProvider: this.parameters.toProvider,
-                }}
-              >
-                <Suspense
-                  fallback={
-                    <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+
+        <ThemeProvider id="add-tokens-container" config={this.strongConfig()}>
+          <HandoverProvider>
+            <ProvidersContextProvider
+              initialState={{
+                checkout: this.checkout,
+                toProvider: this.parameters.toProvider,
+              }}
+            >
+              <Suspense
+                fallback={
+                  <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
                   }
-                >
-                  <AddTokensWidget
-                    config={this.strongConfig()}
-                    toTokenAddress={this.parameters.toTokenAddress}
-                    toAmount={this.parameters.toAmount}
-                    showBridgeOption={this.parameters.showBridgeOption}
-                    showSwapOption={this.parameters.showSwapOption}
-                    showOnrampOption={this.parameters.showOnrampOption}
-                    showBackButton={this.parameters.showBackButton}
-                    experiments={this.parameters.experiments}
-                  />
-                </Suspense>
-              </ProvidersContextProvider>
-            </HandoverProvider>
-          </ThemeProvider>
-        </CustomAnalyticsProvider>
+              >
+                <AddTokensWidget
+                  config={this.strongConfig()}
+                  toTokenAddress={this.parameters.toTokenAddress}
+                  toAmount={this.parameters.toAmount}
+                  showBridgeOption={this.parameters.showBridgeOption}
+                  showSwapOption={this.parameters.showSwapOption}
+                  showOnrampOption={this.parameters.showOnrampOption}
+                  showBackButton={this.parameters.showBackButton}
+                  experiments={this.parameters.experiments}
+                />
+              </Suspense>
+            </ProvidersContextProvider>
+          </HandoverProvider>
+        </ThemeProvider>
+
       </React.StrictMode>,
     );
   }

@@ -9,12 +9,7 @@ import {
 import { MenuItemProps } from '@biom3/react';
 import { WalletDrawer } from './WalletDrawer';
 import { WalletChangeEvent } from './WalletDrawerEvents';
-import { identifyUser } from '../../lib/analytics/identifyUser';
-import { getProviderSlugFromRdns, isPassportProvider } from '../../lib/provider';
-import {
-  useAnalytics,
-  UserJourney,
-} from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { isPassportProvider } from '../../lib/provider';
 import {
   ProvidersContextActions,
   useProvidersContext,
@@ -25,7 +20,7 @@ import {
   ConnectEIP6963ProviderError,
 } from '../../lib/connectEIP6963Provider';
 import { EOAWarningDrawer } from '../EOAWarningDrawer/EOAWarningDrawer';
-import { removeSpace } from '../../lib/utils';
+import { } from '../../lib/utils';
 
 type ConnectWalletDrawerProps = {
   heading: string;
@@ -45,7 +40,6 @@ type ConnectWalletDrawerProps = {
     rdns: string;
   }[];
   getShouldRequestWalletPermissions?: (providerInfo: EIP6963ProviderInfo) => boolean | undefined;
-  shouldIdentifyUser?: boolean;
   drawerBackground: string | undefined;
 };
 
@@ -61,16 +55,12 @@ export function ConnectWalletDrawer({
   menuItemSize = 'small',
   disabledOptions = [],
   getShouldRequestWalletPermissions,
-  shouldIdentifyUser = true,
   drawerBackground,
 }: ConnectWalletDrawerProps) {
   const {
     providersState: { checkout, fromProvider, lockedToProvider },
     providersDispatch,
   } = useProvidersContext();
-
-  const { identify, track, user } = useAnalytics();
-
   const prevWalletChangeEvent = useRef<WalletChangeEvent | undefined>();
 
   const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
@@ -110,20 +100,6 @@ export function ConnectWalletDrawer({
   const handleWalletConnection = async (event: WalletChangeEvent) => {
     const { providerDetail } = event;
     const { info } = providerDetail;
-
-    // Trigger analytics connect wallet, menu item, with wallet details
-    track({
-      userJourney: UserJourney.CONNECT,
-      screen: 'ConnectWallet',
-      control: removeSpace(info.name),
-      controlType: 'MenuItem',
-      extras: {
-        providerType,
-        wallet: getProviderSlugFromRdns(info.rdns),
-        walletRdns: info.rdns,
-      },
-    });
-
     if (info.rdns === WalletProviderRdns.PASSPORT) {
       const { isConnected } = await checkout.checkIsWalletConnected({
         provider: new WrappedBrowserProvider(providerDetail.provider!),
@@ -148,15 +124,6 @@ export function ConnectWalletDrawer({
         checkout,
         shouldRequestWalletPermissions,
       );
-
-      // Identify connected wallet, retaining current anonymousId
-      if (shouldIdentifyUser) {
-        const userData = user ? await user() : undefined;
-        const anonymousId = userData?.anonymousId();
-
-        await identifyUser(identify, provider, { anonymousId });
-      }
-
       // Store selected provider as fromProvider in context
       address = await setProviderInContext(provider, providerDetail.info);
 

@@ -25,10 +25,6 @@ import {
 import { AddTokens } from './views/AddTokens';
 import { ErrorView } from '../../views/error/ErrorView';
 import { useSquid } from '../../lib/squid/hooks/useSquid';
-import {
-  useAnalytics,
-  UserJourney,
-} from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { fetchChains } from '../../lib/squid/functions/fetchChains';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { Review } from './views/Review';
@@ -65,8 +61,6 @@ export default function AddTokensWidget({
     history: [{ type: AddTokensWidgetViews.ADD_TOKENS }],
   });
   const { t } = useTranslation();
-  const { page } = useAnalytics();
-
   const viewReducerValues = useMemo(
     () => ({
       viewState,
@@ -130,7 +124,7 @@ export default function AddTokensWidget({
 
   useEffect(() => {
     if (config.environment !== Environment.PRODUCTION) {
-      showErrorHandover(AddTokensErrorTypes.ENVIRONMENT_ERROR, { contextId: id });
+      showErrorHandover(AddTokensErrorTypes.ENVIRONMENT_ERROR);
     }
   }, [config, id]);
 
@@ -151,7 +145,7 @@ export default function AddTokensWidget({
     const isInvalidToAmount = toAmount && !amountInputValidation(toAmount);
 
     if (isInvalidToTokenAddress || isInvalidToAmount) {
-      showErrorHandover(AddTokensErrorTypes.INVALID_PARAMETERS, { contextId: id });
+      showErrorHandover(AddTokensErrorTypes.INVALID_PARAMETERS);
     }
   }, [toTokenAddress, toAmount, id]);
 
@@ -281,15 +275,6 @@ export default function AddTokensWidget({
               actionText={t('views.ERROR_VIEW.actionText')}
               onActionClick={errorAction}
               onCloseClick={() => sendAddTokensCloseEvent(eventTarget)}
-              errorEventAction={() => {
-                page({
-                  userJourney: UserJourney.ADD_TOKENS,
-                  screen: 'Error',
-                  extras: {
-                    contextId: id,
-                  },
-                });
-              }}
             />
           )}
           {viewState.view.type

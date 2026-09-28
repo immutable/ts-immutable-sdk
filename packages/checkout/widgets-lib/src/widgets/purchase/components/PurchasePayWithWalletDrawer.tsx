@@ -75,12 +75,10 @@ export function PurchasePayWithWalletDrawer({
       }
       visible={visible}
       onClose={onClose}
-      providerType="from"
       walletOptions={walletOptions}
       disabledOptions={disabledOptions}
       bottomSlot={payWithCardItem}
       onConnect={handleOnConnect}
-      shouldIdentifyUser={false}
       drawerBackground={drawerBackground}
     />
   );
