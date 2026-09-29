@@ -389,7 +389,12 @@ export class ZkEvmProvider implements Provider {
           params: [transaction, blockNumber || 'latest'],
         });
       }
+      // eth_feeHistory and eth_maxPriorityFeePerGas are how viem, wagmi and
+      // ethers estimate EIP-1559 fees; without them a dapp cannot price a
+      // transaction against this provider and falls back to hardcoded fees.
       case 'eth_gasPrice':
+      case 'eth_feeHistory':
+      case 'eth_maxPriorityFeePerGas':
       case 'eth_blockNumber':
       case 'eth_getBlockByHash':
       case 'eth_getBlockByNumber':

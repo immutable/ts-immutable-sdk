@@ -4,11 +4,13 @@ import { ProviderEvent } from './types';
 import { ZkEvmProvider } from './zkEvmProvider';
 import { WalletConfiguration } from '../config';
 
+const mockRpcRequest = jest.fn();
+
 jest.mock('viem', () => {
   const actual = jest.requireActual<typeof import('viem')>('viem');
   return {
     ...actual,
-    createPublicClient: jest.fn(() => ({})),
+    createPublicClient: jest.fn(() => ({ request: mockRpcRequest })),
     http: jest.fn(() => ({})),
   };
 });
@@ -70,5 +72,51 @@ describe('ZkEvmProvider', () => {
     walletEventEmitter.emit(WalletEvents.LOGGED_IN, mockUserWithZkEvm as any);
 
     expect(accountsChangedHandler).toHaveBeenCalledWith([mockUserWithZkEvm.zkEvm.ethAddress]);
+  });
+
+  describe('fee estimation passthrough', () => {
+    const newProvider = () => new ZkEvmProvider({
+      getUser: mockGetUser,
+      clientId: 'test-client',
+      config,
+      multiRollupApiClients: {} as any,
+      walletEventEmitter,
+      guardianClient: {} as any,
+      ethSigner: mockEthSigner as any,
+      user: null,
+      sessionActivityApiUrl: null,
+    });
+
+    it('forwards eth_feeHistory to the node with its params and returns the answer as-is', async () => {
+      const feeHistory = {
+        oldestBlock: '0x10',
+        baseFeePerGas: ['0x3b9aca00', '0x3b9aca00'],
+        gasUsedRatio: [0.1],
+        reward: [['0x0']],
+      };
+      mockRpcRequest.mockResolvedValueOnce(feeHistory);
+      const params = ['0x1', 'latest', [50]];
+
+      const result = await newProvider().request({ method: 'eth_feeHistory', params });
+
+      expect(mockRpcRequest).toHaveBeenCalledWith({ method: 'eth_feeHistory', params });
+      expect(result).toBe(feeHistory);
+    });
+
+    it('forwards eth_maxPriorityFeePerGas to the node and returns the answer as-is', async () => {
+      mockRpcRequest.mockResolvedValueOnce('0x3b9aca00');
+
+      const result = await newProvider().request({ method: 'eth_maxPriorityFeePerGas' });
+
+      expect(mockRpcRequest).toHaveBeenCalledWith({ method: 'eth_maxPriorityFeePerGas', params: [] });
+      expect(result).toBe('0x3b9aca00');
+    });
+
+    it('still rejects a method that is not on the passthrough list', async () => {
+      await expect(newProvider().request({ method: 'eth_coinbase' })).rejects.toMatchObject({
+        message: 'Method not supported',
+      });
+      expect(mockRpcRequest).not.toHaveBeenCalled();
+    });
   });
 });
