@@ -44,13 +44,18 @@ export const getGasItemRequirement = (
   };
 };
 
+/**
+ * Works out what the wallet must hold to pay for gas: every approval the
+ * fulfilment needs plus the fulfilment itself (or a caller-supplied gas limit),
+ * priced at the current gas price. estimateGas answers in gas units, so the
+ * units are converted to a cost before they become a balance requirement.
+ */
 export const gasCalculator = async (
   provider: WrappedBrowserProvider,
   insufficientItems: (InsufficientERC20 | InsufficientERC721 | InsufficientERC1155)[],
   transactionOrGas: FulfillmentTransaction | GasAmount,
 ): Promise<ItemRequirement | null> => {
-  const estimateGasPromises = [];
-  let totalGas = BigInt(0);
+  const estimateGasPromises: Promise<bigint>[] = [];
 
   // Get all the gas estimate promises for the approval transactions
   for (const item of insufficientItems) {
@@ -59,24 +64,26 @@ export const gasCalculator = async (
   }
 
   // If the transaction is a fulfillment transaction get the estimate gas promise
-  // Otherwise use the gas amount with the limit to estimate the gas
+  // Otherwise the caller has supplied the gas limit directly
   if (transactionOrGas.type === TransactionOrGasType.TRANSACTION) {
     estimateGasPromises.push(estimateGas(provider, transactionOrGas.transaction));
-  } else {
-    const feeData = await provider.getFeeData();
-    const gasPrice = getGasPriceInWei(feeData);
-    if (gasPrice !== null) {
-      const gas = gasPrice * transactionOrGas.gasToken.limit;
-      if (gas) totalGas += gas;
-    }
   }
 
-  // Get the gas estimates for all the transactions and calculate the total gas
-  const gasEstimatePromises = await Promise.all(estimateGasPromises);
-  gasEstimatePromises.forEach((gasEstimate) => {
-    totalGas += gasEstimate;
-  });
+  const [feeData, gasEstimates] = await Promise.all([
+    provider.getFeeData(),
+    Promise.all(estimateGasPromises),
+  ]);
 
-  if (totalGas === 0n) return null;
-  return getGasItemRequirement(totalGas, transactionOrGas);
+  // Without a price the gas units cannot be turned into a balance requirement
+  const gasPrice = getGasPriceInWei(feeData);
+  if (gasPrice === null) return null;
+
+  let totalGasUnits = gasEstimates.reduce((sum, gasEstimate) => sum + gasEstimate, BigInt(0));
+  if (transactionOrGas.type === TransactionOrGasType.GAS) {
+    totalGasUnits += transactionOrGas.gasToken.limit;
+  }
+
+  const totalGasCost = totalGasUnits * gasPrice;
+  if (totalGasCost === BigInt(0)) return null;
+  return getGasItemRequirement(totalGasCost, transactionOrGas);
 };
