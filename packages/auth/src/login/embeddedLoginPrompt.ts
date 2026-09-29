@@ -1,4 +1,3 @@
-import { Detail, getDetail } from '@imtbl/metrics';
 import {
   EMBEDDED_LOGIN_PROMPT_EVENT_TYPE,
   EmbeddedLoginPromptResult,
@@ -6,6 +5,7 @@ import {
 } from './types';
 import { IAuthConfiguration } from '../config';
 import EmbeddedLoginPromptOverlay from '../overlay/embeddedLoginPromptOverlay';
+import { getRuntimeId } from '../utils/runtimeId';
 
 const LOGIN_PROMPT_WINDOW_HEIGHT = 660;
 const LOGIN_PROMPT_WINDOW_WIDTH = 440;
@@ -23,7 +23,7 @@ export default class EmbeddedLoginPrompt {
   private getHref = () => {
     const href = `${this.config.authenticationDomain}/im-embedded-login-prompt`
     + `?client_id=${this.config.oidcConfiguration.clientId}`
-    + `&rid=${getDetail(Detail.RUNTIME_ID)}`;
+    + `&rid=${getRuntimeId()}`;
 
     return href;
   };

@@ -1,6 +1,6 @@
 import { Auth, isUserZkEvm } from '@imtbl/auth';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { trackFlow, trackError } from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
 import { WalletError, WalletErrorType } from './errors';
 import { isAxiosError } from './utils/http';
 
@@ -72,7 +72,7 @@ export async function linkExternalWallet(
   apiClient: MultiRollupApiClients,
   params: LinkWalletParams,
 ): Promise<LinkedWallet> {
-  const flowInit = trackFlow('wallet', 'linkExternalWallet');
+  track('wallet', 'linkExternalWallet');
 
   try {
     const user = await auth.getUser();
@@ -102,9 +102,7 @@ export async function linkExternalWallet(
   } catch (error) {
     // Track error
     if (error instanceof Error) {
-      trackError('wallet', 'linkExternalWallet', error);
-    } else {
-      flowInit.addEvent('errored');
+      track('wallet', 'linkExternalWallet', { error });
     }
 
     // Handle and rethrow
@@ -141,7 +139,5 @@ export async function linkExternalWallet(
       message,
       WalletErrorType.WALLET_CONNECTION_ERROR,
     );
-  } finally {
-    flowInit.addEvent('End');
   }
 }

@@ -1,27 +1,24 @@
 import type { Pool } from 'pg';
 import { CreateMintRequest, MintingPersistence, SubmittedMintRequest } from '../type';
-import { trackInitializePersistencePG } from '../../analytics';
 
-export const mintingPersistence = (client: Pool): MintingPersistence => {
-  trackInitializePersistencePG();
-  return {
-    recordMint: async (request: CreateMintRequest) => {
-      const r = await client.query(
-        `
+export const mintingPersistence = (client: Pool): MintingPersistence => ({
+  recordMint: async (request: CreateMintRequest) => {
+    const r = await client.query(
+      `
         INSERT INTO im_assets (asset_id, contract_address, owner_address, metadata, amount, token_id) 
         VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (asset_id, contract_address) DO NOTHING;
         `,
-        [
-          request.asset_id, request.contract_address, request.owner_address,
-          request.metadata, request.amount, request.token_id
-        ]
-      );
-      if (r.rowCount === 0) {
-        throw new Error('Duplicated mint');
-      }
-    },
-    getNextBatchForSubmission: async (limit: number) => {
-      const res = await client.query(`
+      [
+        request.asset_id, request.contract_address, request.owner_address,
+        request.metadata, request.amount, request.token_id
+      ]
+    );
+    if (r.rowCount === 0) {
+      throw new Error('Duplicated mint');
+    }
+  },
+  getNextBatchForSubmission: async (limit: number) => {
+    const res = await client.query(`
       WITH limited_assets AS (
         SELECT id 
         FROM im_assets 
@@ -35,16 +32,16 @@ export const mintingPersistence = (client: Pool): MintingPersistence => {
         AND id IN (SELECT id FROM limited_assets)
       RETURNING *;
       `, [limit]);
-      return res.rows;
-    },
-    updateMintingStatusToSubmitted: async (ids: string[]) => {
-      await client.query(`
+    return res.rows;
+  },
+  updateMintingStatusToSubmitted: async (ids: string[]) => {
+    await client.query(`
                 UPDATE im_assets SET minting_status = $2 WHERE id = ANY($1);
               `, [ids, 'submitted']);
-    },
-    syncMintingStatus: async (submittedMintRequest: SubmittedMintRequest) => {
-      // doing a upsert just in case the row has not been created yet
-      await client.query(`
+  },
+  syncMintingStatus: async (submittedMintRequest: SubmittedMintRequest) => {
+    // doing a upsert just in case the row has not been created yet
+    await client.query(`
         INSERT INTO im_assets (
           asset_id, 
           contract_address, 
@@ -68,46 +65,45 @@ export const mintingPersistence = (client: Pool): MintingPersistence => {
           im_assets.last_imtbl_zkevm_mint_request_updated_id is null
         );
         `, [
-        submittedMintRequest.assetId,
-        submittedMintRequest.contractAddress,
-        submittedMintRequest.ownerAddress,
-        submittedMintRequest.tokenId,
-        submittedMintRequest.status,
-        submittedMintRequest.metadataId,
-        submittedMintRequest.imtblZkevmMintRequestUpdatedId,
-        submittedMintRequest.error,
-        submittedMintRequest.amount
-      ]);
-    },
-    markAsConflict: async (assetIds: string[], contractAddress: string) => {
-      await client.query(`
+      submittedMintRequest.assetId,
+      submittedMintRequest.contractAddress,
+      submittedMintRequest.ownerAddress,
+      submittedMintRequest.tokenId,
+      submittedMintRequest.status,
+      submittedMintRequest.metadataId,
+      submittedMintRequest.imtblZkevmMintRequestUpdatedId,
+      submittedMintRequest.error,
+      submittedMintRequest.amount
+    ]);
+  },
+  markAsConflict: async (assetIds: string[], contractAddress: string) => {
+    await client.query(`
         UPDATE im_assets 
         SET minting_status = 'conflicting' 
         WHERE asset_id = ANY($1) 
           AND contract_address = $2;
               `, [assetIds, contractAddress]);
-    },
-    resetMintingStatus: async (ids: string[]) => {
-      await client.query(`
+  },
+  resetMintingStatus: async (ids: string[]) => {
+    await client.query(`
               UPDATE im_assets SET minting_status = null WHERE id = ANY($1);
               `, [ids]);
-    },
-    markForRetry: async (ids: string[]) => {
-      await client.query(`
+  },
+  markForRetry: async (ids: string[]) => {
+    await client.query(`
         UPDATE im_assets 
         SET minting_status = null, tried_count = tried_count + 1 WHERE id = ANY($1);
         `, [ids]);
-    },
-    updateMintingStatusToSubmissionFailed: async (ids: string[]) => {
-      await client.query(`
+  },
+  updateMintingStatusToSubmissionFailed: async (ids: string[]) => {
+    await client.query(`
         UPDATE im_assets SET minting_status = 'submission_failed' WHERE id = ANY($1);
       `, [ids]);
-    },
-    getMintingRequest: async (contractAddress: string, referenceId: string) => {
-      const res = await client.query(`
+  },
+  getMintingRequest: async (contractAddress: string, referenceId: string) => {
+    const res = await client.query(`
         SELECT * FROM im_assets WHERE contract_address = $1 and asset_id = $2;
       `, [contractAddress, referenceId]);
-      return res.rows[0] || null;
-    }
-  };
-};
+    return res.rows[0] || null;
+  }
+});

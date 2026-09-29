@@ -14,9 +14,7 @@ import {
   Sticker,
   useInterval,
 } from '@biom3/react';
-import { trackFlow } from '@imtbl/metrics';
 import { t } from 'i18next';
-import { v4 as uuidv4 } from 'uuid';
 import {
   useCallback,
   useContext,
@@ -114,7 +112,7 @@ export function Review({
 
   const {
     getAllowance, approve, execute, getStatus,
-  } = useExecute('AddTokens', onTransactionError);
+  } = useExecute(onTransactionError);
   const getFromAmountAndRoute = async () => {
     if (!squid || !tokens) return;
 
@@ -274,7 +272,6 @@ export function Review({
     const executeTxnReceipt = await execute(squid, fromProviderInfo, changeableProvider, route);
 
     if (executeTxnReceipt) {
-      trackFlow('commerce', `addTokensFundsAdded_${uuidv4()}`);
       sendAddTokensSuccessEvent(eventTarget, executeTxnReceipt.hash);
 
       if (toChain === fromChain) {

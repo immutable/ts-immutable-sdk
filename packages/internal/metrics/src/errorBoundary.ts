@@ -5,18 +5,14 @@ export function errorBoundary<T extends (
 ): (...args: Parameters<T>) => ReturnType<T> {
   return (...args) => {
     try {
-      // Execute the original function
       const result = fn(...args);
 
       if (result instanceof Promise) {
-        // Silent fail for now, in future
-        // we can send errors to a logging service
         return result.catch(() => fallbackResult);
       }
 
       return result;
-    } catch (error) {
-      // As above, fail silently for now
+    } catch {
       return fallbackResult;
     }
   };

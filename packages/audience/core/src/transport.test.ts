@@ -1,11 +1,10 @@
-import { track, trackError } from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
 import { httpSend } from './transport';
 import { TransportError } from './errors';
 import type { BatchPayload } from './types';
 
 jest.mock('@imtbl/metrics', () => ({
   track: jest.fn(),
-  trackError: jest.fn(),
 }));
 
 const payload: BatchPayload = {
@@ -24,7 +23,6 @@ const payload: BatchPayload = {
 };
 
 const mockTrack = track as jest.Mock;
-const mockTrackError = trackError as jest.Mock;
 
 describe('httpSend', () => {
   const originalFetch = global.fetch;
@@ -32,7 +30,6 @@ describe('httpSend', () => {
   afterEach(() => {
     global.fetch = originalFetch;
     mockTrack.mockClear();
-    mockTrackError.mockClear();
   });
 
   it('sends POST with correct headers and body', async () => {
@@ -281,15 +278,10 @@ describe('httpSend', () => {
 
       await httpSend('https://example.com', 'pk', payload);
 
-      expect(mockTrackError).toHaveBeenCalledWith(
+      expect(mockTrack).toHaveBeenCalledWith(
         'audience',
         'transport_send',
-        expect.any(TransportError),
-        expect.objectContaining({
-          errorName: 'TypeError',
-          online: true,
-          timeToFailureMs: expect.any(Number),
-        }),
+        { error: expect.any(TransportError) },
       );
     });
 
@@ -307,15 +299,10 @@ describe('httpSend', () => {
       jest.advanceTimersByTime(30_000);
       await sendPromise;
 
-      expect(mockTrackError).toHaveBeenCalledWith(
+      expect(mockTrack).toHaveBeenCalledWith(
         'audience',
         'transport_send',
-        expect.any(TransportError),
-        expect.objectContaining({
-          errorName: 'AbortError',
-          online: true,
-          timeToFailureMs: expect.any(Number),
-        }),
+        { error: expect.any(TransportError) },
       );
 
       jest.useRealTimers();
@@ -327,18 +314,14 @@ describe('httpSend', () => {
 
       await httpSend('https://example.com', 'pk', payload);
 
-      expect(mockTrackError).toHaveBeenCalledWith(
+      expect(mockTrack).toHaveBeenCalledWith(
         'audience',
         'transport_send',
-        expect.any(TransportError),
-        expect.objectContaining({
-          online: false,
-          timeToFailureMs: expect.any(Number),
-        }),
+        { error: expect.any(TransportError) },
       );
     });
 
-    it('attaches online and timeToFailureMs to transport_send_failed on HTTP error', async () => {
+    it('tracks transport_send_failed on HTTP error', async () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: false,
         status: 500,
@@ -348,18 +331,10 @@ describe('httpSend', () => {
 
       await httpSend('https://example.com', 'pk', payload);
 
-      expect(mockTrack).toHaveBeenCalledWith(
-        'audience',
-        'transport_send_failed',
-        expect.objectContaining({
-          status: 500,
-          online: true,
-          timeToFailureMs: expect.any(Number),
-        }),
-      );
+      expect(mockTrack).toHaveBeenCalledWith('audience', 'transport_send_failed');
     });
 
-    it('attaches online and timeToFailureMs to transport_send_failed on 429', async () => {
+    it('tracks transport_send_failed on 429', async () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: false,
         status: 429,
@@ -368,15 +343,7 @@ describe('httpSend', () => {
 
       await httpSend('https://example.com', 'pk', payload);
 
-      expect(mockTrack).toHaveBeenCalledWith(
-        'audience',
-        'transport_send_failed',
-        expect.objectContaining({
-          status: 429,
-          online: true,
-          timeToFailureMs: expect.any(Number),
-        }),
-      );
+      expect(mockTrack).toHaveBeenCalledWith('audience', 'transport_send_failed');
     });
   });
 });

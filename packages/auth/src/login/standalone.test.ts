@@ -83,12 +83,10 @@ describe('exchangeCodeForTokens retry (via handleLoginCallback)', () => {
     expect(trackMock).toHaveBeenCalledWith(
       'passport',
       'standaloneTokenExchangeFailed',
-      expect.objectContaining({ attempt: 1, reason: '503', willRetry: true }),
     );
     expect(trackMock).toHaveBeenCalledWith(
       'passport',
       'standaloneTokenExchangeRecovered',
-      expect.objectContaining({ attempt: 2 }),
     );
   });
 

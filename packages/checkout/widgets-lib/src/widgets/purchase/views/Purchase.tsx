@@ -123,7 +123,7 @@ export function Purchase({
 
   const {
     getAllowance, approve, execute, getStatus,
-  } = useExecute('Purchase', (err) => {
+  } = useExecute((err) => {
     // eslint-disable-next-line no-console
     console.log('useExecute err', err);
   });

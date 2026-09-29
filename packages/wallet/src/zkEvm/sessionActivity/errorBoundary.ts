@@ -1,4 +1,4 @@
-import { trackError } from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
 
 export function errorBoundary<T extends (
   ...args: any[]) => any>(
@@ -15,7 +15,7 @@ export function errorBoundary<T extends (
         // we can send errors to a logging service
         return result.catch((error) => {
           if (error instanceof Error) {
-            trackError('passport', 'sessionActivityError', error);
+            track('passport', 'sessionActivityError', { error });
           }
           return fallbackResult;
         });
@@ -24,7 +24,7 @@ export function errorBoundary<T extends (
       return result;
     } catch (error: unknown | Error) {
       if (error instanceof Error) {
-        trackError('passport', 'sessionActivityError', error);
+        track('passport', 'sessionActivityError', { error });
       }
       // As above, fail silently for now
       return fallbackResult;

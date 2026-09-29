@@ -1,5 +1,4 @@
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { Flow } from '@imtbl/metrics';
 import type { PublicClient } from 'viem';
 import { getEip155ChainId } from '../walletHelpers';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
@@ -16,7 +15,6 @@ export type RegisterZkEvmUserInput = {
   multiRollupApiClients: MultiRollupApiClients,
   accessToken: string;
   rpcProvider: PublicClient;
-  flow: Flow;
 };
 
 const MESSAGE_TO_SIGN = 'Only sign this message from Immutable Passport';
@@ -27,20 +25,12 @@ export async function registerZkEvmUser({
   multiRollupApiClients,
   accessToken,
   rpcProvider,
-  flow,
 }: RegisterZkEvmUserInput): Promise<string> {
   // Parallelize the operations that can happen concurrently
   const getAddressPromise = ethSigner.getAddress();
-  getAddressPromise.then(() => flow.addEvent('endGetAddress'));
-
   const signRawPromise = signRaw(MESSAGE_TO_SIGN, ethSigner);
-  signRawPromise.then(() => flow.addEvent('endSignRaw'));
-
   const detectNetworkPromise = rpcProvider.getChainId();
-  detectNetworkPromise.then(() => flow.addEvent('endDetectNetwork'));
-
   const listChainsPromise = multiRollupApiClients.chainsApi.listChains();
-  listChainsPromise.then(() => flow.addEvent('endListChains'));
 
   const [ethereumAddress, ethereumSignature, chainId, chainListResponse] = await Promise.all([
     getAddressPromise,
@@ -68,7 +58,6 @@ export async function registerZkEvmUser({
     }, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    flow.addEvent('endCreateCounterfactualAddress');
 
     // Trigger a background refresh to get the updated user with zkEvm info.
     // This is a best-effort operation - the caller will need to get updated

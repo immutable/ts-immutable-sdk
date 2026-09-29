@@ -28,9 +28,7 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { trackFlow } from '@imtbl/metrics';
 import { parseUnits } from 'ethers/utils';
-import { v4 as uuidv4 } from 'uuid';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -241,8 +239,6 @@ export function AddTokens({
   );
 
   useEffect(() => {
-    if (!id || isSwapAvailable === undefined) return;
-    trackFlow('commerce', `addTokensLoaded_${uuidv4()}`);
   }, [id, isSwapAvailable]);
 
   useEffect(() => {

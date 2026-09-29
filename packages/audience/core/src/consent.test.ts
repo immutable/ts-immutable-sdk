@@ -138,25 +138,19 @@ describe('createConsentManager', () => {
     Object.defineProperty(navigator, 'globalPrivacyControl', { value: undefined, configurable: true });
   });
 
-  it('tracks gpc_consent_override metric with signal and configured level when GPC fires', () => {
+  it('tracks gpc_consent_overridden when GPC fires at init', () => {
     Object.defineProperty(navigator, 'globalPrivacyControl', { value: true, configurable: true });
     const send = createMockSend();
     createConsentManager(send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'full');
-    const expected = {
-      signal: 'gpc', requestedLevel: 'full', context: 'init', publishableKey: 'pk_imapik-test-local',
-    };
-    expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden', expected);
+    expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden');
     Object.defineProperty(navigator, 'globalPrivacyControl', { value: undefined, configurable: true });
   });
 
-  it('tracks gpc_consent_override metric with dnt signal when DNT fires', () => {
+  it('tracks gpc_consent_overridden when DNT fires at init', () => {
     Object.defineProperty(navigator, 'doNotTrack', { value: '1', configurable: true });
     const send = createMockSend();
     createConsentManager(send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'anonymous');
-    const expected = {
-      signal: 'dnt', requestedLevel: 'anonymous', context: 'init', publishableKey: 'pk_imapik-test-local',
-    };
-    expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden', expected);
+    expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden');
     Object.defineProperty(navigator, 'doNotTrack', { value: '0', configurable: true });
   });
 
@@ -176,23 +170,17 @@ describe('createConsentManager', () => {
       const manager = createConsentManager(send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'none');
       (track as jest.Mock).mockClear();
       manager.setLevel('full');
-      const expected = {
-        signal: 'gpc', requestedLevel: 'full', context: 'runtime', publishableKey: 'pk_imapik-test-local',
-      };
-      expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden', expected);
+      expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden');
       Object.defineProperty(navigator, 'globalPrivacyControl', { value: undefined, configurable: true });
     });
 
-    it('tracks gpc_consent_overridden with dnt signal when blocked by DNT at runtime', () => {
+    it('tracks gpc_consent_overridden when setLevel is blocked by DNT', () => {
       Object.defineProperty(navigator, 'doNotTrack', { value: '1', configurable: true });
       const send = createMockSend();
       const manager = createConsentManager(send, 'pk_imapik-test-local', 'anon-1', 'pixel', 'none');
       (track as jest.Mock).mockClear();
       manager.setLevel('full');
-      const expected = {
-        signal: 'dnt', requestedLevel: 'full', context: 'runtime', publishableKey: 'pk_imapik-test-local',
-      };
-      expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden', expected);
+      expect(track).toHaveBeenCalledWith('audience', 'gpc_consent_overridden');
       Object.defineProperty(navigator, 'doNotTrack', { value: '0', configurable: true });
     });
 

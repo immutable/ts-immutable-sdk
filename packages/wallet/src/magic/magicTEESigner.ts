@@ -1,6 +1,6 @@
 /* eslint-disable no-bitwise */
 import { MagicTeeApiClients } from '@imtbl/generated-clients';
-import { Flow, trackDuration } from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
 import { WalletError, WalletErrorType } from '../errors';
 import { withMetricsAsync } from '../utils/metrics';
 import {
@@ -115,7 +115,7 @@ export default class MagicTEESigner implements WalletSigner {
         const authenticatedUser = user || await this.getUserOrThrow();
         const headers = MagicTEESigner.getHeaders(authenticatedUser);
 
-        await withMetricsAsync(async (flow: Flow) => {
+        await withMetricsAsync(async () => {
           try {
             const startTime = performance.now();
             // The createWallet endpoint is idempotent, so it can be called multiple times without causing an error.
@@ -126,11 +126,9 @@ export default class MagicTEESigner implements WalletSigner {
               { headers },
             );
 
-            trackDuration(
-              'passport',
-              flow.details.flowName,
-              Math.round(performance.now() - startTime),
-            );
+            track('passport', 'magicCreateWallet', {
+              durationMs: Math.round(performance.now() - startTime),
+            });
 
             this.userWallet = {
               userIdentifier: authenticatedUser.profile.sub,
@@ -202,7 +200,7 @@ export default class MagicTEESigner implements WalletSigner {
     const user = await this.getUserOrThrow();
     const headers = MagicTEESigner.getHeaders(user);
 
-    return withMetricsAsync(async (flow: Flow) => {
+    return withMetricsAsync(async () => {
       try {
         const startTime = performance.now();
         const response = await this.magicTeeApiClient.signOperationsApi.signMessageV1WalletSignMessagePost(
@@ -215,11 +213,9 @@ export default class MagicTEESigner implements WalletSigner {
           { headers },
         );
 
-        trackDuration(
-          'passport',
-          flow.details.flowName,
-          Math.round(performance.now() - startTime),
-        );
+        track('passport', 'magicSignMessage', {
+          durationMs: Math.round(performance.now() - startTime),
+        });
 
         return response.data.signature as `0x${string}`;
       } catch (error) {

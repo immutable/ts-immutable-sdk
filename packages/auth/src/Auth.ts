@@ -8,13 +8,8 @@ import {
   WebStorageStateStore,
 } from 'oidc-client-ts';
 import localForage from 'localforage';
-import {
-  Detail,
-  getDetail,
-  identify,
-  track,
-  trackError,
-} from '@imtbl/metrics';
+import { track } from '@imtbl/metrics';
+import { getRuntimeId } from './utils/runtimeId';
 import { AuthConfiguration, IAuthConfiguration } from './config';
 import {
   AuthModuleConfiguration,
@@ -253,7 +248,7 @@ export class Auth {
         user = await this.getUserInternal();
       } catch (error: any) {
         if (error instanceof Error && !error.message.includes('Unknown or invalid refresh token')) {
-          trackError('passport', 'login', error);
+          track('passport', 'login', { error });
         }
         if (useCachedSession) {
           throw error;
@@ -272,7 +267,7 @@ export class Auth {
         user = await this.loginWithPopup(options?.directLoginOptions);
       }
 
-      // Emit LOGGED_IN event and identify user if logged in
+      // Emit LOGGED_IN event if logged in
       if (user) {
         this.handleSuccessfulLogin(user);
       }
@@ -362,7 +357,7 @@ export class Auth {
     return withMetricsAsync(async () => {
       const user = await this.getUserInternal();
       return user?.idToken;
-    }, 'getIdToken', false);
+    }, 'getIdToken');
   }
 
   /**
@@ -373,7 +368,7 @@ export class Auth {
     return withMetricsAsync(async () => {
       const user = await this.getUserInternal();
       return user?.accessToken;
-    }, 'getAccessToken', false, false);
+    }, 'getAccessToken');
   }
 
   /**
@@ -481,7 +476,6 @@ export class Auth {
 
   private handleSuccessfulLogin(user: User): void {
     this.eventEmitter.emit(AuthEvents.LOGGED_IN, user);
-    identify({ passportId: user.profile.sub });
   }
 
   private buildExtraQueryParams(
@@ -490,7 +484,7 @@ export class Auth {
   ): Record<string, string> {
     const params: Record<string, string> = {
       ...(this.userManager.settings?.extraQueryParams ?? {}),
-      rid: getDetail(Detail.RUNTIME_ID) || '',
+      rid: getRuntimeId(),
     };
 
     if (directLoginOptions) {
@@ -808,7 +802,7 @@ export class Auth {
       try {
         const oidcUser = await this.userManager.signinSilent();
         if (attemptNumber > 1) {
-          track('passport', 'silentRefreshRecovered', { attempt: attemptNumber });
+          track('passport', 'silentRefreshRecovered');
         }
         return oidcUser;
       } catch (error) {
@@ -867,9 +861,8 @@ export class Auth {
 
           // Terminal refresh failures were previously invisible (client-side
           // logger.warn only), which made fleet-wide incidents impossible to see.
-          trackError('passport', 'silentRefresh', err instanceof Error ? err : new Error(errorMessage), {
-            userRemoved: removeUser,
-            ...(err instanceof ErrorResponse && err.error ? { oauthErrorCode: err.error } : {}),
+          track('passport', 'silentRefresh', {
+            error: err instanceof Error ? err : new Error(errorMessage),
           });
 
           if (removeUser) {
