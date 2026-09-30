@@ -26,6 +26,7 @@ import {
   SmartCheckoutResult, BuyOverrides,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
+import { isPassportProvider } from '../routing';
 import {
   getUnsignedERC20ApprovalTransactions,
   getUnsignedFulfillmentTransactions,
@@ -268,6 +269,13 @@ export const buy = async (
     getItemRequirement(type, contractAddress, amount, spenderAddress),
   ];
 
+  // A Passport wallet does not pay gas from its native balance: the relayer prices
+  // and collects the fee. Checking the item price still matters, so Smart Checkout
+  // runs, but without a gas requirement.
+  const transactionOrGas = isPassportProvider(provider)
+    ? undefined
+    : getTransactionOrGas(gasLimit, unsignedFulfillmentTransactions);
+
   const smartCheckoutResult = await measureAsyncExecution<SmartCheckoutResult>(
     config,
     'Total time running smart checkout',
@@ -275,10 +283,7 @@ export const buy = async (
       config,
       provider,
       itemRequirements,
-      getTransactionOrGas(
-        gasLimit,
-        unsignedFulfillmentTransactions,
-      ),
+      transactionOrGas,
     ),
   );
 
