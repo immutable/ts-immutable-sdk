@@ -34,6 +34,7 @@ export const useSaleEvent = () => {
       transactions,
       tokenIds,
       details.transactionId,
+      details.orderStatus,
     );
   };
 
