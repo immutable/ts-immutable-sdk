@@ -189,6 +189,51 @@ describe('buy', () => {
       );
     });
 
+    it('should call smart checkout without a gas requirement when the provider is Passport', async () => {
+      const passportProvider = {
+        ...mockProvider,
+        ethereumProvider: { isPassport: true },
+      } as unknown as WrappedBrowserProvider;
+      const smartCheckoutResult = { sufficient: true, transactionRequirements: [] };
+      (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
+        getListing: jest.fn().mockResolvedValue({
+          result: {
+            buy: [{ type: 'NATIVE', amount: '1000000000000000000' }],
+            sell: [{ type: 'ERC721', amount: '1' }],
+            fees: [{ amount: '1000000000000000000' }],
+          },
+        }),
+        config: jest.fn().mockReturnValue({ seaportContractAddress }),
+        fulfillOrder: jest.fn().mockReturnValue({
+          actions: [
+            {
+              type: ActionType.TRANSACTION,
+              purpose: TransactionPurpose.FULFILL_ORDER,
+              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PreparedTransactionRequest),
+            },
+          ],
+        }),
+      });
+      (getUnsignedERC20ApprovalTransactions as jest.Mock).mockResolvedValue([]);
+      (getUnsignedFulfillmentTransactions as jest.Mock).mockResolvedValue([{ from: '0xTRANSACTION' }]);
+      (signApprovalTransactions as jest.Mock).mockResolvedValue({ type: SignTransactionStatusType.SUCCESS });
+      (signFulfillmentTransactions as jest.Mock).mockResolvedValue({ type: SignTransactionStatusType.SUCCESS });
+
+      const order: BuyOrder = { id: '1', takerFees: [] };
+      const buyResult = await buy(config, passportProvider, [order]);
+
+      // Item price is still checked; the native gas requirement is not, because the
+      // relayer prices gas for Passport wallets.
+      expect(smartCheckout).toBeCalledWith(
+        config,
+        passportProvider,
+        [{ type: ItemType.NATIVE, amount: BigInt('2000000000000000000'), isFee: false }],
+        undefined,
+      );
+      expect(buyResult).toEqual({ status: CheckoutStatus.SUCCESS, smartCheckoutResult });
+    });
+
     // eslint-disable-next-line max-len
     it('should call smart checkout with item requirements and execute transactions for ERC20 fulfillment - ERC721 order', async () => {
       const smartCheckoutResult = {

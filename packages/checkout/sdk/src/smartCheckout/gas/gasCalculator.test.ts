@@ -6,9 +6,16 @@ import { CheckoutErrorType } from '../..';
 
 describe('gasCalculator', () => {
   describe('gasCalculator', () => {
+    const oneWeiFeeData = {
+      maxFeePerGas: 1n,
+      maxPriorityFeePerGas: 1n,
+      gasPrice: null,
+    };
+
     it('should return gas for transaction', async () => {
       const mockProvider = {
         estimateGas: jest.fn().mockResolvedValue(100000n),
+        getFeeData: jest.fn().mockResolvedValue(oneWeiFeeData),
       } as unknown as WrappedBrowserProvider;
 
       const item = await gasCalculator(
@@ -32,6 +39,7 @@ describe('gasCalculator', () => {
     it('should return the total gas required for approvals and transaction', async () => {
       const mockProvider = {
         estimateGas: jest.fn().mockResolvedValue(100000n),
+        getFeeData: jest.fn().mockResolvedValue(oneWeiFeeData),
       } as unknown as WrappedBrowserProvider;
 
       const item = await gasCalculator(
@@ -188,9 +196,121 @@ describe('gasCalculator', () => {
       });
     });
 
+    it('should price the gas units at the current gas price', async () => {
+      // 10 gwei on a legacy (non-1559) fee response
+      const gasPrice = 10_000_000_000n;
+      const mockProvider = {
+        estimateGas: jest.fn().mockResolvedValue(21_000n),
+        getFeeData: jest.fn().mockResolvedValue({
+          maxFeePerGas: null,
+          maxPriorityFeePerGas: null,
+          gasPrice,
+        }),
+      } as unknown as WrappedBrowserProvider;
+
+      const item = await gasCalculator(
+        mockProvider,
+        [
+          {
+            sufficient: false,
+            type: ItemType.ERC20,
+            delta: BigInt(1),
+            itemRequirement: {
+              type: ItemType.ERC20,
+              tokenAddress: '0xERC20',
+              amount: BigInt(1),
+              spenderAddress: '0xSEAPORT',
+              isFee: false,
+            },
+            approvalTransaction: { from: '0xADDRESS', data: '0xDATA', to: '0xSEAPORT' },
+          },
+        ],
+        {
+          type: TransactionOrGasType.TRANSACTION,
+          transaction: {
+            from: '0xADDRESS',
+          },
+        },
+      );
+
+      // approval (21,000) + fulfilment (21,000) gas units, each priced at 10 gwei
+      expect(item).toEqual({
+        type: ItemType.NATIVE,
+        amount: 42_000n * gasPrice,
+        isFee: true,
+      });
+    });
+
+    it('should price a caller-supplied gas limit and the approvals at the same gas price', async () => {
+      const gasPrice = 10_000_000_000n;
+      const mockProvider = {
+        estimateGas: jest.fn().mockResolvedValue(50_000n),
+        getFeeData: jest.fn().mockResolvedValue({
+          maxFeePerGas: null,
+          maxPriorityFeePerGas: null,
+          gasPrice,
+        }),
+      } as unknown as WrappedBrowserProvider;
+
+      const item = await gasCalculator(
+        mockProvider,
+        [
+          {
+            sufficient: false,
+            type: ItemType.ERC721,
+            itemRequirement: {
+              type: ItemType.ERC721,
+              contractAddress: '0xERC721',
+              id: '0',
+              spenderAddress: '0xSEAPORT',
+            },
+            approvalTransaction: { from: '0xADDRESS', data: '0xDATA', to: '0xSEAPORT' },
+          },
+        ],
+        {
+          type: TransactionOrGasType.GAS,
+          gasToken: {
+            type: GasTokenType.NATIVE,
+            limit: 150_000n,
+          },
+        },
+      );
+
+      expect(item).toEqual({
+        type: ItemType.NATIVE,
+        amount: 200_000n * gasPrice,
+        isFee: true,
+      });
+    });
+
+    it('should return null when the node gives no gas price', async () => {
+      const mockProvider = {
+        estimateGas: jest.fn().mockResolvedValue(100000n),
+        getFeeData: jest.fn().mockResolvedValue({
+          maxFeePerGas: null,
+          maxPriorityFeePerGas: null,
+          gasPrice: null,
+        }),
+      } as unknown as WrappedBrowserProvider;
+
+      const item = await gasCalculator(
+        mockProvider,
+        [],
+        {
+          type: TransactionOrGasType.TRANSACTION,
+          transaction: {
+            from: '0xADDRESS',
+          },
+        },
+      );
+
+      expect(item).toBeNull();
+    });
+
     it('should return null if no gas required', async () => {
       const mockProvider = {
         estimateGas: jest.fn().mockResolvedValue(0n),
+        getFeeData: jest.fn().mockResolvedValue(oneWeiFeeData),
       } as unknown as WrappedBrowserProvider;
 
       const item = await gasCalculator(
