@@ -114,9 +114,14 @@ describe('axelarFee', () => {
         'HTTP 403',
       ],
       [
-        'an Axelar error body on a failed response',
-        Object.assign(new Error('400'), { response: { status: 400, data: { error: true, message: 'bad chain' } } }),
-        'Axelar error: bad chain',
+        'a rate limit',
+        Object.assign(new Error('429'), { response: { status: 429, data: { error: true, message: 'slow down' } } }),
+        'HTTP 429',
+      ],
+      [
+        'a server error',
+        Object.assign(new Error('502'), { response: { status: 502, data: 'Bad Gateway' } }),
+        'HTTP 502',
       ],
     ])('falls back on %s and logs the reason', async (_, error, reason) => {
       mockedAxios.post.mockRejectedValue(error);
@@ -132,16 +137,33 @@ describe('axelarFee', () => {
     });
 
     it.each([
-      ['an Axelar error body', { error: true, message: 'bad chain' }, 'Axelar error: bad chain'],
-      ['a non-numeric body', '<html>Just a moment...</html>', 'unexpected response body'],
-      ['an empty body', undefined, 'unexpected response body'],
-    ])('falls back when a successful response carries %s', async (_, data, reason) => {
-      mockedAxios.post.mockResolvedValue({ data });
+      ['an Axelar error body', { data: { error: true, message: 'bad chain' } }, 'bad chain'],
+      ['a non-numeric body', { data: 'not a fee' }, 'unexpected response body'],
+      ['an empty body', { data: undefined }, 'unexpected response body'],
+    ])('throws AXELAR_GAS_ESTIMATE_FAILED without falling back on %s', async (_, response, message) => {
+      mockedAxios.post.mockResolvedValue(response);
 
-      const result = await getAxelarFeeWithFallback(withdrawParams());
+      const promise = getAxelarFeeWithFallback(withdrawParams());
 
-      expect(result.source).toBe('fallback');
-      expect(warnSpy).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ reason }));
+      await expect(promise).rejects.toMatchObject({
+        type: BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
+        message: expect.stringContaining(message),
+      });
+      expect(mockedAxios.get).not.toHaveBeenCalled();
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ['with an Axelar error body', { status: 400, data: { error: true, message: 'invalid gas limit' } }, 'invalid gas limit'],
+      ['without an Axelar error body', { status: 404, data: 'Not Found' }, 'HTTP 404'],
+    ])('throws AXELAR_GAS_ESTIMATE_FAILED without falling back on a 4xx %s', async (_, response, message) => {
+      mockedAxios.post.mockRejectedValue(Object.assign(new Error('4xx'), { response }));
+
+      await expect(getAxelarFeeWithFallback(withdrawParams())).rejects.toMatchObject({
+        type: BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
+        message: expect.stringContaining(message),
+      });
+      expect(mockedAxios.get).not.toHaveBeenCalled();
     });
 
     it('returns to the Axelar API fee on the next call once the API responds again', async () => {
@@ -187,6 +209,23 @@ describe('axelarFee', () => {
 
       // (250k + 250k) gas × 2 gwei × 2 = 0.002 ETH = 20 IMX at 10,000 IMX/ETH; 5 cents = 0.25 IMX
       expect(fee).toBe(BigInt('20250000000000000000'));
+    });
+
+    it.each([
+      ['auto', 'auto', '20250000000000000000'],
+      ['a number below 2', 1.2, '20250000000000000000'],
+      ['a number above 2', 3, '30250000000000000000'],
+      ['a fractional number above 2', 2.5, '25250000000000000000'],
+    ])('uses max(gasMultiplier, 2) for %s', async (_, gasMultiplier, expected) => {
+      mockedAxios.get.mockResolvedValue({ data: { ethereum: { usd: 2000 }, 'immutable-x': { usd: 0.2 } } });
+
+      const fee = await estimateFallbackAxelarFee(withdrawParams({
+        gasMultiplier,
+        getDestinationFeeData: async () => feeData(gwei(2)),
+      }));
+
+      // (250k + 250k) gas × 2 gwei × multiplier = 0.001 ETH × multiplier = 10 IMX × multiplier; plus 0.25 IMX
+      expect(fee).toBe(BigInt(expected));
     });
 
     it('applies the 1 gwei minimum gas price', async () => {

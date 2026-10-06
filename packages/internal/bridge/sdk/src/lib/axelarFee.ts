@@ -36,11 +36,12 @@ export const FALLBACK_BASE_FEE_DESTINATION_GAS = BigInt(250000);
 export const FALLBACK_BASE_FEE_USD_CENTS = BigInt(5);
 
 /**
- * Multiplier applied to destination gas in the fallback estimate. Axelar's own multiplier was 1.15-1.32
- * on 2026-10-07. A larger buffer is used because the fallback cannot see Axelar's pricing, and Axelar
- * refunds unused gas to the sender after execution, while an underpaid message waits for a gas top-up.
+ * Minimum multiplier applied to destination gas in the fallback estimate. A numeric `gasMultiplier` from
+ * the caller applies when larger. Axelar's own multiplier was 1.15-1.32 on 2026-10-07. A larger buffer is
+ * used because the fallback cannot see Axelar's pricing, and Axelar refunds unused gas to the sender after
+ * execution, while an underpaid message waits for a gas top-up.
  */
-export const FALLBACK_GAS_MULTIPLIER = BigInt(2);
+export const FALLBACK_GAS_MULTIPLIER = 2;
 
 /**
  * CoinGecko ids, as served by the checkout price API, for the native token symbols in `axelarChains`.
@@ -52,8 +53,10 @@ export const coingeckoIds: Record<string, string> = {
 
 const LOG_PREFIX = '[imtbl-bridge]';
 
-// Prices are carried as integers scaled by 1e8 so the fee arithmetic stays in bigint.
+// Prices are carried as integers scaled by 1e8, and multipliers scaled by 100, so the fee arithmetic
+// stays in bigint.
 const PRICE_SCALE = 1e8;
+const MULTIPLIER_SCALE = 100;
 const WEI_PER_TOKEN = BigInt(10) ** BigInt(18);
 
 export type AxelarFeeEstimate = {
@@ -72,7 +75,9 @@ export type AxelarFeeParams = {
 };
 
 /**
- * Error raised when the Axelar API returns no usable fee. `reason` is a short description for logs.
+ * Error raised when the Axelar API could not be reached or did not answer: no response (including a
+ * CORS rejection), a timeout, HTTP 403 (Cloudflare challenge), HTTP 429 or HTTP 5xx. These fall back to
+ * the local estimate. `reason` is a short description for logs.
  */
 class AxelarFeeAPIError extends Error {
   public readonly reason: string;
@@ -83,15 +88,17 @@ class AxelarFeeAPIError extends Error {
   }
 }
 
-const describeRequestError = (err: any): string => {
-  if (err?.code === 'ECONNABORTED' || err?.code === 'ETIMEDOUT') return 'timeout';
-  if (err?.response?.status) return `HTTP ${err.response.status}`;
-  // A browser reports a CORS rejection as a network error with no response.
-  return `network error, possibly CORS (${err?.message ?? 'unknown'})`;
-};
+const isUnavailableStatus = (status: number) => status === 403 || status === 429 || status >= 500;
+
+const axelarRejection = (reason: string) => new BridgeError(
+  `Estimating Axelar Gas failed with the reason: ${reason}`,
+  BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
+);
 
 /**
  * Queries the Axelar GMP API for the fee to pay on the source chain, in the source chain's native token.
+ * Throws `AxelarFeeAPIError` when the API is unavailable, and a `BridgeError` of type
+ * AXELAR_GAS_ESTIMATE_FAILED when the API answers with an error or an unparseable fee.
  */
 export async function fetchAxelarFee(params: AxelarFeeParams): Promise<bigint> {
   const estimateGasReq = {
@@ -111,19 +118,27 @@ export async function fetchAxelarFee(params: AxelarFeeParams): Promise<bigint> {
     });
     data = response.data;
   } catch (err: any) {
-    if (err?.response?.data?.error) {
-      throw new AxelarFeeAPIError(`Axelar error: ${err.response.data.message}`);
+    const status: number | undefined = err?.response?.status;
+    if (err?.code === 'ECONNABORTED' || err?.code === 'ETIMEDOUT') {
+      throw new AxelarFeeAPIError('timeout');
     }
-    throw new AxelarFeeAPIError(describeRequestError(err));
+    if (!status) {
+      // A browser reports a CORS rejection as a network error with no response.
+      throw new AxelarFeeAPIError(`network error, possibly CORS (${err?.message ?? 'unknown'})`);
+    }
+    if (isUnavailableStatus(status)) {
+      throw new AxelarFeeAPIError(`HTTP ${status}`);
+    }
+    throw axelarRejection(err.response.data?.error ? err.response.data.message : `HTTP ${status}`);
   }
 
   if (data?.error) {
-    throw new AxelarFeeAPIError(`Axelar error: ${data.message}`);
+    throw axelarRejection(data.message);
   }
 
   // A successful response body is the fee as a bare integer string.
   if (!/^\d+$/.test(`${data}`.trim())) {
-    throw new AxelarFeeAPIError('unexpected response body');
+    throw axelarRejection(`unexpected response body ${JSON.stringify(data)?.slice(0, 100)}`);
   }
   return BigInt(`${data}`.trim());
 }
@@ -163,8 +178,21 @@ export async function fetchUSDPrices(
 }
 
 /**
+ * Returns the fallback multiplier scaled by MULTIPLIER_SCALE: the caller's numeric `gasMultiplier` when it
+ * exceeds FALLBACK_GAS_MULTIPLIER, otherwise FALLBACK_GAS_MULTIPLIER. 'auto' resolves to the minimum.
+ */
+const resolveFallbackMultiplier = (gasMultiplier: number | string): bigint => {
+  const requested = Number(gasMultiplier);
+  const multiplier = Number.isFinite(requested) && requested > FALLBACK_GAS_MULTIPLIER
+    ? requested
+    : FALLBACK_GAS_MULTIPLIER;
+  return BigInt(Math.ceil(multiplier * MULTIPLIER_SCALE));
+};
+
+/**
  * Estimates the Axelar fee without the Axelar API, in the source chain's native token (wei).
  *
+ *   multiplier      = max(numeric gasMultiplier, 2)
  *   destination gas = (execution gas limit + base fee gas) × max(destination gas price, 1 gwei) × multiplier
  *   fee             = destination gas converted to the source token at USD prices + fixed base fee in USD
  *
@@ -183,7 +211,8 @@ export async function estimateFallbackAxelarFee(params: AxelarFeeParams): Promis
   const gasPrice = reportedGasPrice > AXELAR_MIN_GAS_PRICE ? reportedGasPrice : AXELAR_MIN_GAS_PRICE;
 
   const destinationGas = BigInt(params.destinationChainGasLimit) + FALLBACK_BASE_FEE_DESTINATION_GAS;
-  const destinationCost = destinationGas * gasPrice * FALLBACK_GAS_MULTIPLIER;
+  const destinationCost = (destinationGas * gasPrice * resolveFallbackMultiplier(params.gasMultiplier))
+    / BigInt(MULTIPLIER_SCALE);
   const destinationCostInSource = (destinationCost * destinationPrice) / sourcePrice;
 
   // cents × 1e18 × PRICE_SCALE / (100 × scaled price) = wei of the source token
@@ -194,7 +223,9 @@ export async function estimateFallbackAxelarFee(params: AxelarFeeParams): Promis
 }
 
 /**
- * Returns the Axelar fee from the Axelar API, or from `estimateFallbackAxelarFee` when the API fails.
+ * Returns the Axelar fee from the Axelar API, or from `estimateFallbackAxelarFee` when the API is
+ * unavailable (see `AxelarFeeAPIError`). An error answer from the API is thrown as
+ * AXELAR_GAS_ESTIMATE_FAILED without falling back.
  * The API is tried on every call, so estimates return to the Axelar API as soon as it responds again.
  * Each fallback logs a console warning prefixed with `[imtbl-bridge]`.
  */
@@ -203,7 +234,8 @@ export async function getAxelarFeeWithFallback(params: AxelarFeeParams): Promise
   try {
     return { fee: await fetchAxelarFee(params), source: 'axelar' };
   } catch (err: any) {
-    reason = err instanceof AxelarFeeAPIError ? err.reason : `${err?.message ?? err}`;
+    if (!(err instanceof AxelarFeeAPIError)) throw err;
+    reason = err.reason;
   }
 
   let fee: bigint;
