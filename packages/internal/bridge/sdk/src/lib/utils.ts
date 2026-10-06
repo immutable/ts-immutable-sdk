@@ -5,6 +5,7 @@ import {
   childChains,
   axelarGateways,
   axelarAPIEndpoints,
+  priceAPIEndpoints,
   tenderlyAPIEndpoints,
   childWIMXs,
   NATIVE,
@@ -62,6 +63,10 @@ export function getAxelarGateway(source: string) {
 
 export function getAxelarEndpoint(source: string) {
   return getAddresses(source, axelarAPIEndpoints);
+}
+
+export function getPriceAPIEndpoint(source: string) {
+  return getAddresses(source, priceAPIEndpoints);
 }
 
 export function getTenderlyEndpoint(source: string) {
