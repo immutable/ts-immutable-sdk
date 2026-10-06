@@ -154,6 +154,16 @@ export const axelarAPIEndpoints:Record<string, string> = {
 };
 
 /**
+ * @typedef {Object} priceAPIEndpoints - Checkout API endpoints serving token USD prices, used by the fallback
+ * Axelar fee estimate.
+ */
+export const priceAPIEndpoints:Record<string, string> = {
+  mainnet: 'https://checkout-api.immutable.com',
+  testnet: 'https://checkout-api.sandbox.immutable.com',
+  devnet: 'https://checkout-api.dev.immutable.com',
+};
+
+/**
  * @typedef {Object} tenderlyAPIEndpoints - API endpoints for the testnet & mainnet Axelar environment configurations
  */
 export const tenderlyAPIEndpoints:Record<string, string> = {

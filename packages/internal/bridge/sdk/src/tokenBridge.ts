@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
-import axios, { AxiosResponse } from 'axios';
 import {
   concat,
   Contract, getAddress, keccak256, Provider, toBeHex, toQuantity, TransactionRequest,
@@ -13,7 +12,7 @@ import {
   validateGetFee,
 } from './lib/validation';
 import {
-  getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor,
+  getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getPriceAPIEndpoint, getRootAdaptor,
   isValidDeposit,
   isValidWithdraw,
   isWithdrawNativeIMX,
@@ -24,6 +23,7 @@ import {
 } from './lib/utils';
 import { TenderlyResult, TenderlySimulation } from './types/tenderly';
 import { calculateGasFee } from './lib/gas';
+import { AxelarFeeEstimate, getAxelarFeeWithFallback } from './lib/axelarFee';
 import { createContract } from './contracts/createContract';
 import { getWithdrawRootToken, genAxelarWithdrawPayload, genUniqueAxelarCommandId } from './lib/axelarUtils';
 import { StateObject, submitTenderlySimulations } from './lib/tenderly';
@@ -48,6 +48,7 @@ import { BridgeConfiguration } from './config';
 import {
   BridgeFeeRequest,
   BridgeFeeResponse,
+  BridgeFeeSource,
   BridgeMethodsGasLimit,
   BridgeTxRequest,
   BridgeFeeActions,
@@ -175,7 +176,7 @@ export class TokenBridge {
   }
 
   private async getDepositOrWithdrawFee(req: BridgeFeeRequest):
-  Promise<{ sourceChainFee: bigint, approvalFee: bigint, bridgeFee: bigint }> {
+  Promise<{ sourceChainFee: bigint, approvalFee: bigint, bridgeFee: bigint, bridgeFeeSource: BridgeFeeSource }> {
     let feeData;
     if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
       feeData = await this.config.rootProvider.getFeeData();
@@ -231,13 +232,16 @@ export class TokenBridge {
       axelarGasLimit = BridgeMethodsGasLimit.WITHDRAW_DESTINATION;
     }
     // Get bridge fee
-    bridgeFee = await this.getAxelarFee(
+    const axelarFee = await this.getAxelarFee(
       req.sourceChainId,
       req.destinationChainId,
       axelarGasLimit,
       req.gasMultiplier,
     );
-    return { sourceChainFee, approvalFee, bridgeFee };
+    bridgeFee = axelarFee.fee;
+    return {
+      sourceChainFee, approvalFee, bridgeFee, bridgeFeeSource: axelarFee.source,
+    };
   }
 
   private async getFeePrivate(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
@@ -246,6 +250,7 @@ export class TokenBridge {
     let sourceChainFee: bigint = BigInt(0);
     let approvalFee: bigint = BigInt(0);
     let bridgeFee: bigint = BigInt(0);
+    let bridgeFeeSource: BridgeFeeSource | undefined;
 
     if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
       sourceChainFee = await this.getFinaliseWithdrawFee();
@@ -254,6 +259,7 @@ export class TokenBridge {
       sourceChainFee = fees.sourceChainFee;
       approvalFee = fees.approvalFee;
       bridgeFee = fees.bridgeFee;
+      bridgeFeeSource = fees.bridgeFeeSource;
     }
 
     const totalFees: bigint = sourceChainFee + approvalFee + bridgeFee;
@@ -266,6 +272,7 @@ export class TokenBridge {
       bridgeFee,
       imtblFee,
       totalFees,
+      ...(bridgeFeeSource ? { bridgeFeeSource } : {}),
     };
   }
 
@@ -627,7 +634,7 @@ export class TokenBridge {
     let unsignedApprovalTx: TransactionRequest | null;
     let sourceChainFee: bigint = BigInt(0);
     let approvalFee: bigint = BigInt(0);
-    const bridgeFee: bigint = axelarFee;
+    const bridgeFee: bigint = axelarFee.fee;
     const imtblFee: bigint = BigInt(0);
 
     // Approval required for non-native tokens with insufficient allowance.
@@ -680,6 +687,7 @@ export class TokenBridge {
         bridgeFee,
         imtblFee,
         totalFees,
+        bridgeFeeSource: axelarFee.source,
       },
       contractToApprove,
       unsignedApprovalTx,
@@ -723,7 +731,7 @@ export class TokenBridge {
     let unsignedApprovalTx: TransactionRequest | null;
     let sourceChainFee: bigint = BigInt(0);
     let approvalFee: bigint = BigInt(0);
-    const bridgeFee: bigint = axelarFee;
+    const bridgeFee: bigint = axelarFee.fee;
     const imtblFee: bigint = BigInt(0);
 
     // Approval required only for WIMX tokens with insufficient allowance.
@@ -776,6 +784,7 @@ export class TokenBridge {
         bridgeFee,
         imtblFee,
         totalFees,
+        bridgeFeeSource: axelarFee.source,
       },
       contractToApprove,
       unsignedApprovalTx,
@@ -965,19 +974,20 @@ export class TokenBridge {
   }
 
   /**
- * Query the axelar fee for a transaction using axelarjs-sdk.
+ * Query the Axelar fee for a transaction from the Axelar GMP API, falling back to an SDK estimate when the
+ * API is unavailable. See `getAxelarFeeWithFallback`.
  * @param {*} sourceChainId - The source chainId.
  * @param {*} destinationChainId - The destination chainId.
  * @param {*} destinationChainGaslimit - The gas limit for the desired operation.
  * @param {*} gasMultiplier - The gas multiplier to add buffer to the fees.
- * @returns {ethers.BigNumber} - The Axelar Gas amount in the source chain currency.
+ * @returns {AxelarFeeEstimate} - The Axelar gas amount in the source chain currency, and where it came from.
  */
   private async getAxelarFee(
     sourceChainId: string,
     destinationChainId: string,
     destinationChainGaslimit: number,
     gasMultiplier: number | string = 'auto',
-  ): Promise<bigint> {
+  ): Promise<AxelarFeeEstimate> {
     const sourceAxelar: AxelarChainDetails = axelarChains[sourceChainId];
     const destinationAxelar: AxelarChainDetails = axelarChains[destinationChainId];
 
@@ -995,41 +1005,19 @@ export class TokenBridge {
       );
     }
 
-    const axelarAPIEndpoint: string = getAxelarEndpoint(sourceChainId);
+    const destinationProvider = destinationChainId === this.config.bridgeInstance.rootChainID
+      ? this.config.rootProvider
+      : this.config.childProvider;
 
-    const estimateGasReq = {
-      method: 'estimateGasFee',
-      sourceChain: sourceAxelar.id,
-      destinationChain: destinationAxelar.id,
-      symbol: sourceAxelar.symbol,
-      gasLimit: destinationChainGaslimit,
+    return getAxelarFeeWithFallback({
+      axelarAPIEndpoint: getAxelarEndpoint(sourceChainId),
+      priceAPIEndpoint: getPriceAPIEndpoint(sourceChainId),
+      sourceAxelar,
+      destinationAxelar,
+      destinationChainGasLimit: destinationChainGaslimit,
       gasMultiplier,
-      minGasPrice: 1000000000, // 1 gwei
-    };
-
-    let axiosResponse: AxiosResponse;
-
-    try {
-      axiosResponse = await axios.post(axelarAPIEndpoint, estimateGasReq);
-    } catch (error: any) {
-      axiosResponse = error.response;
-    }
-
-    if (axiosResponse.data.error) {
-      throw new BridgeError(
-        `Estimating Axelar Gas failed with the reason: ${axiosResponse.data.message}`,
-        BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
-      );
-    }
-
-    try {
-      return BigInt(`${axiosResponse.data}`);
-    } catch (err) {
-      throw new BridgeError(
-        `Estimating Axelar Gas failed with the reason: ${err}`,
-        BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
-      );
-    }
+      getDestinationFeeData: () => destinationProvider.getFeeData(),
+    });
   }
 
   /**

@@ -218,6 +218,9 @@ export interface FinaliseFeeRequest {
  * @property {bigint} totalFees - The total fees the user will be charged which is;
  * sourceChainGas + approvalFee + bridgeFee + imtblFee.
  * - priced in the source chain's native token.
+ * @property {BridgeFeeSource} [bridgeFeeSource] - Where bridgeFee came from: 'axelar' when quoted by the
+ * Axelar GMP API, 'fallback' when the API was unavailable and the SDK estimated it. Absent when there is no
+ * bridge fee (finalising a withdrawal).
  */
 export interface BridgeFeeResponse {
   sourceChainGas: bigint,
@@ -225,7 +228,13 @@ export interface BridgeFeeResponse {
   bridgeFee: bigint,
   imtblFee: bigint,
   totalFees: bigint,
+  bridgeFeeSource?: BridgeFeeSource,
 }
+
+/**
+ * Where a bridge fee came from: the Axelar GMP API ('axelar') or the SDK's fallback estimate ('fallback').
+ */
+export type BridgeFeeSource = 'axelar' | 'fallback';
 
 /**
  * @typedef {Object} ApproveBridgeRequest

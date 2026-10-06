@@ -34,7 +34,7 @@ const parseGMPError = (response: any): GMPError | undefined => {
 
 const execGet = async (base: string, params?: any) => fetch(`${base}?${new URLSearchParams(params).toString()}`, {
   method: 'GET',
-  headers: { 'Content-Type': 'application/json' },
+  // No custom headers: the browser then sends this without a CORS preflight.
   cache: 'no-store',
 })
   .then((res) => res.json())
