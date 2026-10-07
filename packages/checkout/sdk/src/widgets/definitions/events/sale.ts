@@ -33,6 +33,15 @@ export type SaleSuccess = {
   }[];
   /** The order reference id, use it to trace order throughout flow */
   transactionId: string;
+  /**
+   * Settlement status of the order. For card payments this mirrors the Transak
+   * order status: `'PROCESSING'` while the payment is captured but the mint is
+   * not yet settled (typically a couple of minutes), and `'COMPLETED'` once
+   * settled. Undefined for crypto payments, which settle on-chain synchronously.
+   * Do not treat the sale as final until settlement is confirmed — reconcile
+   * server-side using `transactionId`.
+   */
+  status?: string;
   [key: string]: unknown;
 };
 
