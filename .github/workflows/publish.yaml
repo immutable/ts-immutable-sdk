@@ -46,7 +46,7 @@ jobs:
       contents: write # Required for git tag push and GitHub release creation
     env:
       NODE_OPTIONS: --max-old-space-size=14366
-      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
+      NX_CLOUD_ACCESS_TOKEN: ${{ github.ref == 'refs/heads/main' && secrets.TS_IMMUTABLE_SDK_NX_TOKEN || secrets.TS_IMMUTABLE_SDK_NX_TOKEN_READ_ONLY }}
     steps:
       - name: Check Public Release Branch
         if: ${{ !startsWith(env.RELEASE_TYPE, 'pre') && github.ref != 'refs/heads/main' }}
@@ -94,7 +94,7 @@ jobs:
 
       - name: Build SDK, Checkout Widgets & Audience
         shell: bash
-        run: pnpm build
+        run: pnpm build --skip-nx-cache
 
       - name: Pack SDK, Checkout Widgets & Audience packages and dependencies
         shell: bash
