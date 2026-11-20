@@ -40,7 +40,9 @@ export { default as NextAuth } from 'next-auth';
 export { createAuthConfig, createAuthOptions } from './config';
 export {
   isTokenExpired,
+  isTerminalRefreshError,
   refreshAccessToken,
+  RefreshTokenRequestError,
   extractZkEvmFromIdToken,
   type RefreshedTokens,
   type ZkEvmData,

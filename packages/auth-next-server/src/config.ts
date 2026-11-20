@@ -5,7 +5,9 @@ import type { NextAuthConfig } from 'next-auth';
 import CredentialsImport from 'next-auth/providers/credentials';
 import { encode as encodeImport } from 'next-auth/jwt';
 import type { ImmutableAuthConfig, ImmutableTokenData, UserInfoResponse } from './types';
-import { isTokenExpired, refreshAccessToken, extractZkEvmFromIdToken } from './refresh';
+import {
+  isTokenExpired, isTerminalRefreshError, refreshAccessToken, extractZkEvmFromIdToken,
+} from './refresh';
 import {
   DEFAULT_AUTH_DOMAIN,
   DEFAULT_REDIRECT_URI_PATH,
@@ -67,6 +69,22 @@ function resolveDefaultRedirectUri(): string {
     return new URL(DEFAULT_REDIRECT_URI_PATH, origin).href;
   }
   return DEFAULT_REDIRECT_URI_PATH;
+}
+
+/**
+ * JWT state after a failed refresh.
+ *
+ * A rejected token (`invalid_grant`) is dropped. The session is read on every request and
+ * every `/api/auth/session` poll, so keeping it would resend the same dead token to the
+ * token endpoint each time, for as long as the session cookie lives. A transient failure
+ * keeps the token so a later read can retry.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function refreshFailed(token: any, error: unknown) {
+  if (isTerminalRefreshError(error)) {
+    return { ...token, refreshToken: undefined, error: 'RefreshTokenError' };
+  }
+  return { ...token, error: 'RefreshTokenError' };
 }
 
 /**
@@ -252,10 +270,7 @@ export function createAuthConfig(config?: ImmutableAuthConfig): NextAuthConfig {
               } catch (error) {
                 // eslint-disable-next-line no-console
                 console.error('[auth-next-server] Force refresh failed:', error);
-                return {
-                  ...token,
-                  error: 'RefreshTokenError',
-                };
+                return refreshFailed(token, error);
               }
             }
 
@@ -300,17 +315,15 @@ export function createAuthConfig(config?: ImmutableAuthConfig): NextAuthConfig {
             } catch (error) {
               // eslint-disable-next-line no-console
               console.error('[auth-next-server] Token refresh failed:', error);
-              return {
-                ...token,
-                error: 'RefreshTokenError',
-              };
+              return refreshFailed(token, error);
             }
           }
 
-          // No refresh token available
+          // No refresh token available. Keep RefreshTokenError if a rejected token was
+          // dropped: TokenExpired tells callers a client-side refresh may still work.
           return {
             ...token,
-            error: 'TokenExpired',
+            error: token.error === 'RefreshTokenError' ? token.error : 'TokenExpired',
           };
         } catch (error) {
           // eslint-disable-next-line no-console

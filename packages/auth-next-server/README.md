@@ -556,6 +556,8 @@ The session may contain an `error` field indicating authentication issues:
 | `"TokenExpired"`      | Access token expired, refresh token may be valid | Let client refresh via `@imtbl/auth-next-client` |
 | `"RefreshTokenError"` | Refresh token invalid/expired                    | Redirect to login                                |
 
+When the auth server rejects the refresh token with `invalid_grant`, the token is removed from the session, so later session reads do not send it again. The error stays `"RefreshTokenError"` until the user signs in again. Other failures (network errors, 5xx, 429) keep the refresh token, and the next session read retries.
+
 ## TypeScript
 
 All types are exported for use in your application:

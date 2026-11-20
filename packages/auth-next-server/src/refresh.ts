@@ -32,6 +32,37 @@ export interface RefreshedTokens {
 }
 
 /**
+ * Thrown by refreshAccessToken when the token endpoint rejects the request.
+ * `oauthError` is the RFC 6749 `error` code, when the response carried one.
+ */
+export class RefreshTokenRequestError extends Error {
+  readonly status: number;
+
+  readonly oauthError?: string;
+
+  constructor(message: string, status: number, oauthError?: string) {
+    super(message);
+    this.name = 'RefreshTokenRequestError';
+    this.status = status;
+    this.oauthError = oauthError;
+  }
+}
+
+/**
+ * True when sending the same refresh token again can never succeed.
+ *
+ * `invalid_grant` means the auth server does not know the token: it expired, was
+ * revoked or already rotated, or was issued by a different auth server (e.g. an Auth0
+ * token presented after the client moved to Ory). Auth0 returns it with a 403 and Ory
+ * with a 400, so the OAuth error code is checked rather than the HTTP status.
+ *
+ * Network errors, 5xx and 429 are not terminal: the token may still be good.
+ */
+export function isTerminalRefreshError(error: unknown): boolean {
+  return error instanceof RefreshTokenRequestError && error.oauthError === 'invalid_grant';
+}
+
+/**
  * Decode JWT payload to extract expiry time
  */
 function decodeJwtExpiry(token: string): number {
@@ -93,7 +124,8 @@ export function extractZkEvmFromIdToken(idToken?: string): ZkEvmData | undefined
  * @param clientId - The OAuth client ID
  * @param authDomain - The authentication domain (default: https://auth.immutable.com)
  * @returns The refreshed tokens
- * @throws Error if refresh fails
+ * @throws RefreshTokenRequestError if the token endpoint rejects the request
+ * @throws Error if the request itself fails (e.g. network error)
  */
 export async function refreshAccessToken(
   refreshToken: string,
@@ -117,8 +149,12 @@ export async function refreshAccessToken(
   if (!response.ok) {
     const errorText = await response.text();
     let errorMessage = `Token refresh failed with status ${response.status}`;
+    let oauthError: string | undefined;
     try {
       const errorData = JSON.parse(errorText);
+      if (typeof errorData.error === 'string') {
+        oauthError = errorData.error;
+      }
       if (errorData.error_description) {
         errorMessage = errorData.error_description;
       } else if (errorData.error) {
@@ -129,7 +165,7 @@ export async function refreshAccessToken(
         errorMessage = errorText;
       }
     }
-    throw new Error(errorMessage);
+    throw new RefreshTokenRequestError(errorMessage, response.status, oauthError);
   }
 
   const tokenData = await response.json();
