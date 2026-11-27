@@ -35,8 +35,10 @@ const audience = Audience.init({
 
 audience.page();
 audience.track('purchase', { currency: 'USD', value: '9.99' });
-audience.identify('user@example.com', 'email', { name: 'Jane' });
+
+// identify() needs 'full' consent; at 'anonymous' the SDK ignores it.
 audience.setConsent('full');
+audience.identify('user@example.com', 'email', { name: 'Jane' });
 
 // when the app unmounts
 audience.shutdown();
